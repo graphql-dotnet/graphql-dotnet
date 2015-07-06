@@ -10,7 +10,7 @@ namespace GraphQL.Tests
 
         public StarWarsData()
         {
-            _humans.Add(new Human { Id = "1", Name = "Luke"});
+            _humans.Add(new Human { Id = "1", Name = "Luke", Friends = new [] {"3", "4"}});
             _humans.Add(new Human { Id = "2", Name = "Vader"});
 
             _droids.Add(new Droid { Id = "3", Name = "R2-D2", Friends = new []{"1", "4"}});

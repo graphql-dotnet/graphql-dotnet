@@ -52,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocumentValidator.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="GraphQLDocumentBuilder.cs" />
     <Compile Include="GraphQLVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentExecuter.cs" />

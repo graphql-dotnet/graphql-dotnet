@@ -196,12 +196,17 @@ namespace GraphQL
 
     public class ListGraphType : GraphType
     {
-        public ListGraphType(GraphType type)
+        public ListGraphType(Type type)
         {
             Type = type;
         }
 
-        public GraphType Type { get; private set; }
+        public Type Type { get; private set; }
+
+        public GraphType CreateType()
+        {
+            return (GraphType)Activator.CreateInstance(Type);
+        }
 
         public override string ToString()
         {
@@ -461,7 +466,23 @@ namespace GraphQL
 
             if (fieldType is ListGraphType)
             {
-                throw new NotImplementedException(string.Format("Graph field type '{0}' is not supported", fieldType.Name));
+                var list = result as IEnumerable;
+
+                if (list == null)
+                {
+                    throw new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                }
+
+                var listType = fieldType as ListGraphType;
+
+                var itemType = listType.CreateType();
+
+                var results = list.Map(item =>
+                {
+                    return CompleteValue(context, itemType, fields, item);
+                });
+
+                return results;
             }
 
             var objectType = fieldType as ObjectGraphType;

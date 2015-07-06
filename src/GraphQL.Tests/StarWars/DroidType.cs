@@ -23,15 +23,15 @@ namespace GraphQL.Tests
                     Description = "The name of the droid.",
                     Type = new NonNullGraphType(new StringGraphType())
                 },
-//                new FieldType
-//                {
-//                    Name = "friends",
-//                    Type = new ListGraphType(new CharacterInterface()),
-//                    Resolve = (context) =>
-//                    {
-//                        return data.GetFriends(context.Source as StarWarsCharacter);
-//                    }
-//                }
+                new FieldType
+                {
+                    Name = "friends",
+                    Type = new ListGraphType(typeof(CharacterInterface)),
+                    Resolve = (context) =>
+                    {
+                        return data.GetFriends(context.Source as StarWarsCharacter);
+                    }
+                }
             };
             Interfaces = new List<InterfaceGraphType>
             {
