@@ -1,0 +1,10 @@
+*.DS_Store
+
+.vs/
+*.user
+*.suo
+
+TestResults/
+[Oo]bj/
+[Bb]in/
+packages/
