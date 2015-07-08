@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>GraphQL</id>
+    <version>0.1.0.0</version>
+    <authors>Joseph T. McBride</authors>
+    <owners>Joseph T. McBride</owners>
+    <licenseUrl>https://github.com/joemcbride/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/joemcbride/graphql-dotnet</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>GraphQL for .NET</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <tags>GraphQL json api</tags>
+  </metadata>
+</package>

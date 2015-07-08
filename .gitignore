@@ -3,8 +3,12 @@
 .vs/
 *.user
 *.suo
+*.nupkg
+npm-debug.log
 
 TestResults/
 [Oo]bj/
 [Bb]in/
 packages/
+node_modules/
+nuget/lib
