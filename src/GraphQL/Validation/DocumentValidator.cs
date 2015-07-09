@@ -1,6 +1,7 @@
 using System.Linq;
+using GraphQL.Language;
 
-namespace GraphQL
+namespace GraphQL.Validation
 {
     public class DocumentValidator
     {

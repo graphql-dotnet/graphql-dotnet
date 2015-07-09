@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using GraphQL.Http;
+using Newtonsoft.Json.Linq;
 using Should;
 
 namespace GraphQL.Tests

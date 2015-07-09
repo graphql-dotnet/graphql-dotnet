@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
+using GraphQL.Language;
 using GraphQL.Parsing;
 
 namespace GraphQL

@@ -57,13 +57,14 @@
     <Compile Include="StarWars\DroidType.cs" />
     <Compile Include="StarWars\HumanType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StarWarsBasicQueryTests.cs" />
+    <Compile Include="StarWars\StarWarsBasicQueryTests.cs" />
     <Compile Include="StarWars\StarWarsCharacter.cs" />
     <Compile Include="StarWars\StarWarsData.cs" />
     <Compile Include="StarWars\StarWarsQuery.cs" />
     <Compile Include="QueryTestBase.cs" />
     <Compile Include="StarWars\StarWarsSchema.cs" />
     <Compile Include="TestAttribute.cs" />
+    <Compile Include="Types\FieldRegistrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
@@ -73,6 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Execution\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -51,13 +51,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocumentValidator.cs" />
+    <Compile Include="Validation\DocumentValidator.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="GraphQLDocumentBuilder.cs" />
-    <Compile Include="GraphQLVisitor.cs" />
+    <Compile Include="Execution\GraphQLDocumentBuilder.cs" />
+    <Compile Include="Language\Argument.cs" />
+    <Compile Include="Language\Arguments.cs" />
+    <Compile Include="Language\Directive.cs" />
+    <Compile Include="Language\Directives.cs" />
+    <Compile Include="Language\Document.cs" />
+    <Compile Include="Language\Field.cs" />
+    <Compile Include="Language\Fields.cs" />
+    <Compile Include="Language\FragmentDefinition.cs" />
+    <Compile Include="Language\Fragments.cs" />
+    <Compile Include="Language\FragmentSpread.cs" />
+    <Compile Include="Language\GraphQLVisitor.cs" />
+    <Compile Include="Language\IFragment.cs" />
+    <Compile Include="Language\InlineFragment.cs" />
+    <Compile Include="Language\Operation.cs" />
+    <Compile Include="Language\Operations.cs" />
+    <Compile Include="Language\OperationType.cs" />
+    <Compile Include="Language\Selection.cs" />
+    <Compile Include="Language\Selections.cs" />
+    <Compile Include="Language\Variable.cs" />
+    <Compile Include="Language\Variables.cs" />
+    <Compile Include="Language\VariableType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DocumentExecuter.cs" />
-    <Compile Include="DocumentWriter.cs" />
+    <Compile Include="Execution\DocumentExecuter.cs" />
+    <Compile Include="Http\DocumentWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Antlr4 Include="GraphQL.g4">
@@ -65,6 +85,9 @@
       <CustomToolNamespace>GraphQL.Parsing</CustomToolNamespace>
     </Antlr4>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Types\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

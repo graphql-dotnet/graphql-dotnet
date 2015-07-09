@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace GraphQL.Tests
 {
     public class StarWarsQuery : ObjectGraphType
@@ -8,35 +6,25 @@ namespace GraphQL.Tests
         {
             var data = new StarWarsData();
 
-            Fields = new List<FieldType>
-            {
-                new FieldType
-                {
-                    Name = "hero",
-                    Type = new CharacterInterface(),
-                    Resolve = (obj) => data.GetDroidById("3")
-                },
-                new FieldType
-                {
-                    Name = "human",
-                    Type = new HumanType(),
-                    Arguments = new QueryArguments(new List<QueryArgument>
+            Field<CharacterInterface>("hero", resolve: context => data.GetDroidById("3"));
+            Field<HumanType>(
+                "human",
+                arguments: new QueryArguments(
+                    new []
                     {
-                        new QueryArgument { Name = "id", Type = new NonNullGraphType(new StringGraphType())}
+                        new QueryArgument { Name = "id", Type = NonNullGraphType.String}
                     }),
-                    Resolve = (context) => data.GetHumanById((string)context.Arguments["id"])
-                },
-                new FieldType
-                {
-                    Name = "droid",
-                    Type = new DroidType(),
-                    Arguments = new QueryArguments(new List<QueryArgument>
+                resolve: context => data.GetHumanById((string)context.Arguments["id"])
+            );
+            Field<DroidType>(
+                "droid",
+                arguments: new QueryArguments(
+                    new []
                     {
-                        new QueryArgument { Name = "id", Type = new NonNullGraphType(new StringGraphType())}
+                        new QueryArgument { Name = "id", Type = NonNullGraphType.String}
                     }),
-                    Resolve = (context) => data.GetDroidById((string)context.Arguments["id"])
-                }
-            };
+                resolve: context => data.GetDroidById((string)context.Arguments["id"])
+            );
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Language;
+using GraphQL.Validation;
 
 namespace GraphQL
 {
@@ -73,11 +75,41 @@ namespace GraphQL
         public IEnumerable<FieldType> Fields
         {
             get { return _fields; }
-            set
+            private set
             {
                 _fields.Clear();
                 _fields.AddRange(value);
             }
+        }
+
+        public void Field(string name, string description, GraphType type, QueryArguments arguments = null,
+            Func<ResolveFieldContext, object> resolve = null)
+        {
+            if (_fields.Exists(x => x.Name == name))
+            {
+                throw new ArgumentOutOfRangeException("name", "A field with that name is already registered.");
+            }
+
+            _fields.Add(new FieldType
+            {
+                Name = name,
+                Type = type,
+                Arguments = arguments,
+                Resolve = resolve
+            });
+        }
+
+        public void Field(string name, GraphType type, QueryArguments arguments = null,
+            Func<ResolveFieldContext, object> resolve = null)
+        {
+            Field(name, null, type, arguments, resolve);
+        }
+
+        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
+            Func<ResolveFieldContext, object> resolve = null)
+            where TType : GraphType, new()
+        {
+            Field(name, description, new TType(), arguments, resolve);
         }
 
         public override string ToString()
@@ -95,7 +127,7 @@ namespace GraphQL
     {
         public override object Coerce(object value)
         {
-            return value.ToString();
+            return value != null ? value.ToString() : null;
         }
     }
 
@@ -148,6 +180,12 @@ namespace GraphQL
 
     public class NonNullGraphType : GraphType
     {
+        public static readonly NonNullGraphType String = new NonNullGraphType(new StringGraphType());
+        public static readonly NonNullGraphType Boolean = new NonNullGraphType(new BooleanGraphType());
+        public static readonly NonNullGraphType Int = new NonNullGraphType(new FloatGraphType());
+        public static readonly NonNullGraphType Float = new NonNullGraphType(new FloatGraphType());
+        public static readonly NonNullGraphType Id = new NonNullGraphType(new IdGraphType());
+
         public NonNullGraphType(GraphType type)
         {
             if (type.GetType() == typeof (NonNullGraphType))
@@ -162,7 +200,7 @@ namespace GraphQL
 
         public override string ToString()
         {
-            return string.Format("{0}!", Type);
+            return "{0}!".ToFormat(Type);
         }
     }
 
@@ -192,6 +230,12 @@ namespace GraphQL
                 _interfaces.AddRange(value);
             }
         }
+
+        public void Interface<TInterface>()
+            where TInterface : InterfaceGraphType, new()
+        {
+            _interfaces.Add(new TInterface());
+        }
     }
 
     public class ListGraphType : GraphType
@@ -210,7 +254,16 @@ namespace GraphQL
 
         public override string ToString()
         {
-            return string.Format("[{0}]", Type);
+            return "[{0}]".ToFormat(Type);
+        }
+    }
+
+    public class ListGraphType<T> : ListGraphType
+        where T : GraphType, new()
+    {
+        public ListGraphType()
+            : base(typeof(T))
+        {
         }
     }
 
@@ -362,7 +415,7 @@ namespace GraphQL
 
             if (operation == null)
             {
-                context.Errors.Add(new ExecutionError(string.Format("Unknown operation name: {0}", operationName)));
+                context.Errors.Add(new ExecutionError("Unknown operation name: {0}".ToFormat(operationName)));
                 return context;
             }
 
@@ -424,7 +477,7 @@ namespace GraphQL
             }
             catch (Exception exc)
             {
-                context.Errors.Add(new ExecutionError(string.Format("Error trying to resolve {0}.", field.Name), exc));
+                context.Errors.Add(new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc));
                 return null;
             }
         }
@@ -446,7 +499,7 @@ namespace GraphQL
                 var completed = CompleteValue(context, nonNullType.Type, fields, result);
                 if (completed == null)
                 {
-                    throw new ExecutionError(string.Format("Cannot return null for non-null type. Field: {0}", nonNullType.Name));
+                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}".ToFormat(nonNullType.Name));
                 }
 
                 return completed;
@@ -570,7 +623,7 @@ namespace GraphQL
                 return CoerceValue(type, input);
             }
 
-            throw new Exception(string.Format("Variable {0} expected type '{1}'.", variable.Name, type.Name));
+            throw new Exception("Variable {0} expected type '{1}'.".ToFormat(variable.Name, type.Name));
         }
 
         public bool IsValidValue(GraphType type, object input)
@@ -636,10 +689,10 @@ namespace GraphQL
             {
                 var objType = type as ObjectGraphType;
                 var obj = new Dictionary<string, object>();
+                var dict = (Dictionary<string, object>)input;
 
                 objType.Fields.Apply(field =>
                 {
-                    var dict = (Dictionary<string, object>)input;
                     var fieldValue = CoerceValue(field.Type, dict[field.Name]);
                     obj[field.Name] = fieldValue ?? field.DefaultValue;
                 });

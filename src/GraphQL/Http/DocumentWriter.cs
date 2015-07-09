@@ -1,14 +1,14 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace GraphQL
+namespace GraphQL.Http
 {
     public class DocumentWriter
     {
-        public string Write(ExecutionResult result)
+        public string Write(object value)
         {
             return JsonConvert.SerializeObject(
-                result,
+                value,
                 Formatting.Indented,
                 new JsonSerializerSettings
                 {
