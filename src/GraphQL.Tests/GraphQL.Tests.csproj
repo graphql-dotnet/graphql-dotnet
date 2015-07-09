@@ -64,6 +64,7 @@
     <Compile Include="QueryTestBase.cs" />
     <Compile Include="StarWars\StarWarsSchema.cs" />
     <Compile Include="TestAttribute.cs" />
+    <Compile Include="Expect.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
   </ItemGroup>
   <ItemGroup>

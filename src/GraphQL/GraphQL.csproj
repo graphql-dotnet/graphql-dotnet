@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="Validation\DocumentValidator.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Execution\GraphQLDocumentBuilder.cs" />
