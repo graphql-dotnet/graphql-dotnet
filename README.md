@@ -6,6 +6,12 @@ This is a work-in-progress implementation of [Facebook's GraphQL](https://github
 
 This project uses [Antlr4](https://github.com/tunnelvisionlabs/antlr4cs) for the GraphQL grammar definition.
 
+## Installation
+
+You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
+
+`PM> Install-Package GraphQL`
+
 ## Roadmap
 
 ### Grammar / AST
