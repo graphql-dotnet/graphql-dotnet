@@ -23,6 +23,26 @@ namespace GraphQL.Tests
         }
 
         [Test]
+        public void can_query_without_query_name()
+        {
+            var query = @"
+               {
+                  hero {
+                    name
+                  }
+               }
+            ";
+
+            var expected = @"{
+  hero: {
+    name: 'R2-D2'
+  }
+}";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
         public void can_query_for_the_id_and_friends_of_r2()
         {
             var query = @"
@@ -49,6 +69,70 @@ namespace GraphQL.Tests
         name: 'C-3PO',
       },
     ]
+  }
+}";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void can_query_for_humans()
+        {
+            var query = @"
+               {
+                  human(id: ""1"") {
+                    name
+                  }
+               }
+            ";
+
+            var expected = @"{
+  human: {
+    name: 'Luke'
+  }
+}";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void can_query_for_friends_of_humans()
+        {
+            var query = @"
+               {
+                  human(id: ""1"") {
+                    name
+                    friends {
+                      name
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+  human: {
+    name: 'Luke',
+    friends: [{name:'R2-D2'}, {name:'C-3PO'}]
+  }
+}";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void can_query_for_droids()
+        {
+            var query = @"
+               {
+                  droid(id: ""4"") {
+                    name
+                  }
+               }
+            ";
+
+            var expected = @"{
+  droid: {
+    name: 'C-3PO'
   }
 }";
 

@@ -103,8 +103,7 @@ directives
     ;
 
 directive
-    :   '@' NAME ':' valueOrVariable
-    |   '@' NAME
+    :   '@' NAME arguments?
     ;
 
 typeCondition

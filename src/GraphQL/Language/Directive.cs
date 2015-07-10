@@ -4,8 +4,6 @@ namespace GraphQL.Language
     {
         public string Name { get; set; }
 
-        public object Value { get; set; }
-
-        public Variable Variable { get; set; }
+        public Arguments Arguments { get; set; }
     }
 }

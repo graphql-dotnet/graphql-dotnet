@@ -127,7 +127,7 @@ namespace GraphQL
     {
         public override object Coerce(object value)
         {
-            return value != null ? value.ToString() : null;
+            return value != null ? value.ToString().Trim('"') : null;
         }
     }
 
@@ -161,11 +161,20 @@ namespace GraphQL
     {
         public override object Coerce(object value)
         {
-            bool result;
-            if (bool.TryParse(value.ToString(), out result))
+            if (value != null)
             {
-                return result;
+                var stringValue = value.ToString().ToLower();
+                switch (stringValue)
+                {
+                    case "false":
+                    case "0":
+                        return false;
+                    case "true":
+                    case "1":
+                        return true;
+                }
             }
+
             return null;
         }
     }
@@ -182,7 +191,7 @@ namespace GraphQL
     {
         public static readonly NonNullGraphType String = new NonNullGraphType(new StringGraphType());
         public static readonly NonNullGraphType Boolean = new NonNullGraphType(new BooleanGraphType());
-        public static readonly NonNullGraphType Int = new NonNullGraphType(new FloatGraphType());
+        public static readonly NonNullGraphType Int = new NonNullGraphType(new IntGraphType());
         public static readonly NonNullGraphType Float = new NonNullGraphType(new FloatGraphType());
         public static readonly NonNullGraphType Id = new NonNullGraphType(new IdGraphType());
 
@@ -568,8 +577,12 @@ namespace GraphQL
                 return null;
             }
 
-            var result = new Dictionary<string, object>();
-            return result;
+            return definitionArguments.Aggregate(new Dictionary<string, object>(), (acc, arg) =>
+            {
+                var value = astArguments.ValueFor(arg.Name);
+                acc[arg.Name] = CoerceValueAst(arg.Type, value, variables);
+                return acc;
+            });
         }
 
         public FieldType GetFieldDefinition(Schema schema, ObjectGraphType parentType, Field field)
@@ -617,7 +630,7 @@ namespace GraphQL
             {
                 if (input == null && variable.DefaultValue != null)
                 {
-                    return CoerceValueAst(type, variable.DefaultValue);
+                    return CoerceValueAst(type, variable.DefaultValue, null);
                 }
 
                 return CoerceValue(type, input);
@@ -676,6 +689,11 @@ namespace GraphQL
                 return CoerceValue(nonNull.Type, input);
             }
 
+            if (input == null)
+            {
+                return null;
+            }
+
             if (type is ListGraphType)
             {
                 var listType = type as ListGraphType;
@@ -707,8 +725,49 @@ namespace GraphQL
             return null;
         }
 
-        public object CoerceValueAst(GraphType type, object input)
+        public object CoerceValueAst(GraphType type, object input, Variables variables)
         {
+            if (type is NonNullGraphType)
+            {
+                var nonNull = type as NonNullGraphType;
+                return CoerceValueAst(nonNull.Type, input, variables);
+            }
+
+            if (input == null)
+            {
+                return null;
+            }
+
+            // TODO: handle variables
+
+            if (type is ListGraphType)
+            {
+                var listType = type as ListGraphType;
+                var list = input as IEnumerable;
+                return list != null
+                    ? list.Map(item => CoerceValueAst(listType, item, variables))
+                    : new[] { input };
+            }
+
+            if (type is ObjectGraphType)
+            {
+                var objType = type as ObjectGraphType;
+                var obj = new Dictionary<string, object>();
+                var dict = (Dictionary<string, object>)input;
+
+                objType.Fields.Apply(field =>
+                {
+                    var fieldValue = CoerceValueAst(field.Type, dict[field.Name], variables);
+                    obj[field.Name] = fieldValue ?? field.DefaultValue;
+                });
+            }
+
+            if (type is ScalarGraphType)
+            {
+                var scalarType = type as ScalarGraphType;
+                return scalarType.Coerce(input);
+            }
+
             return input;
         }
 

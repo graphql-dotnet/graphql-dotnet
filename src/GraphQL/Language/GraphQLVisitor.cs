@@ -84,6 +84,18 @@ namespace GraphQL.Language
             return context.GetText();
         }
 
+        public override object VisitArguments(GraphQLParser.ArgumentsContext context)
+        {
+            var arguments = new Arguments();
+
+            foreach (var arg in context.argument())
+            {
+                arguments.Add((Argument) Visit(arg));
+            }
+
+            return arguments;
+        }
+
         public override object VisitArgument(GraphQLParser.ArgumentContext context)
         {
             var name = context.NAME().GetText();
@@ -95,9 +107,7 @@ namespace GraphQL.Language
                 Value = val
             };
 
-            Console.WriteLine("argument: {0}:{1}", arg.Name, arg.Value);
-
-            return base.VisitArgument(context);
+            return arg;
         }
 
         public override object VisitDirectives(GraphQLParser.DirectivesContext context)
@@ -115,27 +125,12 @@ namespace GraphQL.Language
         public override object VisitDirective(GraphQLParser.DirectiveContext context)
         {
             var directive = new Directive();
-
             directive.Name = context.NAME().GetText();
-            Console.Write("directive: {0}", directive.Name);
-            if (context.valueOrVariable() != null)
+
+            if (context.arguments() != null)
             {
-                var val = "";
-                var valOrVar = context.valueOrVariable();
-                if (valOrVar.value() != null)
-                {
-                    directive.Value = valOrVar.value().GetText();
-                    val = directive.Value.ToString();
-                }
-                else if (valOrVar.variable() != null)
-                {
-                    var name = valOrVar.variable().GetText().Substring(1);
-                    directive.Variable = new Variable {Name = name};
-                    val = name;
-                }
-                Console.Write(":{0}", val);
+                directive.Arguments = Visit(context.arguments()) as Arguments;
             }
-            Console.WriteLine();
 
             return directive;
         }
@@ -143,6 +138,13 @@ namespace GraphQL.Language
         public override object VisitFragmentSpread(GraphQLParser.FragmentSpreadContext context)
         {
             var fragment = new FragmentSpread();
+            fragment.Name = context.fragmentName().GetText();
+
+            if (context.directives() != null)
+            {
+                fragment.Directives = Visit(context.directives()) as Directives;
+            }
+
             return fragment;
         }
 
@@ -205,6 +207,7 @@ namespace GraphQL.Language
             {
                 field.Name = context.fieldName().NAME().GetText();
             }
+
 
             if (context.arguments() != null)
             {
