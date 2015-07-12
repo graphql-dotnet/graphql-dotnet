@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.Language
 {
@@ -10,6 +11,12 @@ namespace GraphQL.Language
         public void Add(Variable variable)
         {
             _variables.Add(variable);
+        }
+
+        public object ValueFor(string name)
+        {
+            var variable = _variables.FirstOrDefault(v => v.Name == name);
+            return variable != null ? variable.Value : null;
         }
 
         public IEnumerator<Variable> GetEnumerator()

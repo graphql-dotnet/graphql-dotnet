@@ -138,5 +138,28 @@ namespace GraphQL.Tests
 
             AssertQuerySuccess(query, expected);
         }
+
+        [Test]
+        public void create_generic_query_that_fetches_luke()
+        {
+            var query = @"
+                query humanQuery($id: String!) {
+                  human(id: $id) {
+                    name
+                  }
+                }
+            ";
+
+            var expected = @"{
+              human: {
+                name: 'Luke'
+              }
+            }
+            ";
+
+            var inputs = new Inputs {["id"] = "1"};
+
+            AssertQuerySuccess(query, expected, inputs);
+        }
     }
 }

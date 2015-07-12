@@ -47,7 +47,7 @@ operationDefinition
     ;
 
 selectionSet
-    :   '{' selection (','? selection)* '}'
+    :   '{' selection+ '}'
     ;
 
 operationType
@@ -75,7 +75,7 @@ alias
     ;
 
 arguments
-    :   '(' argument (',' argument)* ')'
+    :   '(' argument+ ')'
     ;
 
 argument
@@ -111,7 +111,7 @@ typeCondition
     ;
 
 variableDefinitions
-    :   '(' variableDefinition (',' variableDefinition)* ')'
+    :   '(' variableDefinition+ ')'
     ;
 
 variableDefinition
@@ -127,15 +127,22 @@ defaultValue
     ;
 
 valueOrVariable
-    :   value
+    :   STRING
+    |   NUMBER
+    |   BOOLEAN
     |   variable
+    |   enum
+    |   arrayWithVariable
+    |   objectWithVariable
     ;
 
 value
-    :   STRING # stringValue
-    |   NUMBER # numberValue
-    |   BOOLEAN # booleanValue
-    |   array # arrayValue
+    :   STRING
+    |   NUMBER
+    |   BOOLEAN
+    |   enum
+    |   array
+    |   object
     ;
 
 type
@@ -147,6 +154,10 @@ typeName
     :   NAME
     ;
 
+enum
+    :   NAME
+    ;
+
 listType
     :   '[' type ']'
     ;
@@ -155,9 +166,24 @@ nonNullType
     : '!'
     ;
 
+object
+    :   '{' pair* '}'
+    ;
+
+objectWithVariable
+    :   '{' pairWithVariable* '}'
+    ;
+
+pair:   NAME ':' value ;
+
+pairWithVariable:   NAME ':' valueOrVariable ;
+
 array
-    :   '[' value (',' value)* ']'
-    |   '[' ']' // empty array
+    :   '[' value* ']'
+    ;
+
+arrayWithVariable
+    :   '[' valueOrVariable* ']'
     ;
 
 NAME : [_A-Za-z][_0-9A-Za-z]* ;
@@ -174,3 +200,4 @@ NUMBER
 fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
 fragment EXP :   [Ee] [+\-]? INT ; // \- since - means "range" inside [...]
 WS  :   [ \t\n\r]+ -> skip ;
+COMMA  :   [,]+ -> skip ;

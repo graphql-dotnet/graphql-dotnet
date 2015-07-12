@@ -23,7 +23,7 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 - [x] Lists of objects/interfaces
 - [x] Interfaces
 - [x] Arguments
-- [ ] Variables (evaluation partialially finished)
+- [x] Variables
 - [ ] Fragments
 - [ ] Directives
 - [ ] Unions

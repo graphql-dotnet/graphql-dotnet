@@ -12,6 +12,21 @@ namespace GraphQL
     {
         private readonly Dictionary<string, GraphType> _types = new Dictionary<string, GraphType>();
 
+        public GraphTypesLookup()
+        {
+            _types[ScalarGraphType.String.ToString()] = ScalarGraphType.String;
+            _types[ScalarGraphType.Boolean.ToString()] = ScalarGraphType.Boolean;
+            _types[ScalarGraphType.Float.ToString()] = ScalarGraphType.Float;
+            _types[ScalarGraphType.Int.ToString()] = ScalarGraphType.Int;
+            _types[ScalarGraphType.Id.ToString()] = ScalarGraphType.Id;
+
+            _types[NonNullGraphType.String.ToString()] = NonNullGraphType.String;
+            _types[NonNullGraphType.Boolean.ToString()] = NonNullGraphType.Boolean;
+            _types[NonNullGraphType.Float.ToString()] = NonNullGraphType.Float;
+            _types[NonNullGraphType.Int.ToString()] = NonNullGraphType.Int;
+            _types[NonNullGraphType.Id.ToString()] = NonNullGraphType.Id;
+        }
+
         public GraphType this[string typeName]
         {
             get
@@ -55,7 +70,7 @@ namespace GraphQL
                 return;
             }
 
-            lookup[type.Name] = type;
+            lookup[type.ToString()] = type;
 
             type.Fields.Apply(field =>
             {
@@ -120,11 +135,22 @@ namespace GraphQL
 
     public abstract class ScalarGraphType : GraphType
     {
+        public static StringGraphType String = new StringGraphType();
+        public static BooleanGraphType Boolean = new BooleanGraphType();
+        public static IntGraphType Int = new IntGraphType();
+        public static FloatGraphType Float = new FloatGraphType();
+        public static IdGraphType Id = new IdGraphType();
+
         public abstract object Coerce(object value);
     }
 
     public class StringGraphType : ScalarGraphType
     {
+        public StringGraphType()
+        {
+            Name = "String";
+        }
+
         public override object Coerce(object value)
         {
             return value != null ? value.ToString().Trim('"') : null;
@@ -133,6 +159,11 @@ namespace GraphQL
 
     public class IntGraphType : ScalarGraphType
     {
+        public IntGraphType()
+        {
+            Name = "Int";
+        }
+
         public override object Coerce(object value)
         {
             int result;
@@ -146,6 +177,11 @@ namespace GraphQL
 
     public class FloatGraphType : ScalarGraphType
     {
+        public FloatGraphType()
+        {
+            Name = "Float";
+        }
+
         public override object Coerce(object value)
         {
             float result;
@@ -159,6 +195,11 @@ namespace GraphQL
 
     public class BooleanGraphType : ScalarGraphType
     {
+        public BooleanGraphType()
+        {
+            Name = "Boolean";
+        }
+
         public override object Coerce(object value)
         {
             if (value != null)
@@ -181,6 +222,11 @@ namespace GraphQL
 
     public class IdGraphType : ScalarGraphType
     {
+        public IdGraphType()
+        {
+            Name = "ID";
+        }
+
         public override object Coerce(object value)
         {
             throw new NotImplementedException();
@@ -377,13 +423,12 @@ namespace GraphQL
 
     public class DocumentExecuter
     {
-        public ExecutionResult Execute(Schema schema, string query, string operationName)
+        public ExecutionResult Execute(Schema schema, string query, string operationName, Inputs inputs = null)
         {
             var documentBuilder = new GraphQLDocumentBuilder();
             var validator = new DocumentValidator();
             var document = documentBuilder.Build(query);
             var result = new ExecutionResult();
-            var inputs = new Inputs();
 
             var validationResult = validator.IsValid(schema, document, operationName);
 
@@ -615,10 +660,13 @@ namespace GraphQL
 
         public Variables GetVariableValues(Schema schema, Variables variables, Inputs inputs)
         {
-            variables.Apply(v =>
+            if (inputs != null)
             {
-                v.Value = GetVariableValue(schema, v, inputs[v.Name]);
-            });
+                variables.Apply(v =>
+                {
+                    v.Value = GetVariableValue(schema, v, inputs[v.Name]);
+                });
+            }
 
             return variables;
         }
@@ -738,7 +786,13 @@ namespace GraphQL
                 return null;
             }
 
-            // TODO: handle variables
+            // should probably handle this with a variable object
+            if (input is Variable)
+            {
+                return variables != null
+                    ? variables.ValueFor(((Variable)input).Name)
+                    : null;
+            }
 
             if (type is ListGraphType)
             {
@@ -810,7 +864,7 @@ namespace GraphQL
         public Schema Schema { get; set; }
     }
 
-    public class Inputs : Dictionary<string, string>
+    public class Inputs : Dictionary<string, object>
     {
     }
 }

@@ -14,18 +14,18 @@ namespace GraphQL.Tests
 
         public TSchema Schema { get; private set; }
 
-        public void AssertQuerySuccess(string query, string expected)
+        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null)
         {
             var queryResult = CreateQueryResult(expected);
-            AssertQuery(query, queryResult);
+            AssertQuery(query, queryResult, inputs);
         }
 
-        public void AssertQuery(string query, ExecutionResult executionResult)
+        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs)
         {
             var executer = new DocumentExecuter();
             var writer = new DocumentWriter();
 
-            var runResult = executer.Execute(Schema, query, null);
+            var runResult = executer.Execute(Schema, query, null, inputs);
 
             var writtenResult = writer.Write(runResult);
             var expectedResult = writer.Write(executionResult);

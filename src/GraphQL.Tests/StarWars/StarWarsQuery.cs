@@ -6,6 +6,8 @@ namespace GraphQL.Tests
         {
             var data = new StarWarsData();
 
+            Name = "Query";
+
             Field<CharacterInterface>("hero", resolve: context => data.GetDroidById("3"));
             Field<HumanType>(
                 "human",

@@ -1,10 +1,143 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
 using GraphQL.Parsing;
 
 namespace GraphQL.Language
 {
     public class GraphQLVisitor : GraphQLBaseVisitor<object>
     {
+        public override object VisitDefaultValue(GraphQLParser.DefaultValueContext context)
+        {
+            return Visit(context.value());
+        }
+
+        public override object VisitValue(GraphQLParser.ValueContext context)
+        {
+            if (context.STRING() != null)
+            {
+                return context.STRING().GetText();
+            }
+
+            if (context.NUMBER() != null)
+            {
+                return context.NUMBER().GetText();
+            }
+
+            if (context.BOOLEAN() != null)
+            {
+                return context.BOOLEAN().GetText();
+            }
+
+            if (context.@enum() != null)
+            {
+                return context.@enum().GetText();
+            }
+
+            if (context.array() != null)
+            {
+                return Visit(context.array());
+            }
+
+            if (context.@object() != null)
+            {
+                return Visit(context.@object());
+            }
+
+            return null;
+        }
+
+        public override object VisitValueOrVariable(GraphQLParser.ValueOrVariableContext context)
+        {
+            if (context.STRING() != null)
+            {
+                return context.STRING().GetText();
+            }
+
+            if (context.NUMBER() != null)
+            {
+                return context.NUMBER().GetText();
+            }
+
+            if (context.BOOLEAN() != null)
+            {
+                return context.BOOLEAN().GetText();
+            }
+
+            if (context.@enum() != null)
+            {
+                return context.@enum().GetText();
+            }
+
+            if (context.variable() != null)
+            {
+                return Visit(context.variable());
+            }
+
+            if (context.arrayWithVariable() != null)
+            {
+                return Visit(context.arrayWithVariable());
+            }
+
+            if (context.objectWithVariable() != null)
+            {
+                return Visit(context.objectWithVariable());
+            }
+
+            return null;
+        }
+
+        public override object VisitVariable(GraphQLParser.VariableContext context)
+        {
+            var variable = new Variable();
+            variable.Name = context.NAME().GetText();
+            return variable;
+        }
+
+        public override object VisitEnum(GraphQLParser.EnumContext context)
+        {
+            return context.NAME().GetText();
+        }
+
+        public override object VisitArray(GraphQLParser.ArrayContext context)
+        {
+            return context.value().Select(Visit).ToList();
+        }
+
+        public override object VisitArrayWithVariable(GraphQLParser.ArrayWithVariableContext context)
+        {
+            return context.valueOrVariable().Select(Visit).ToList();
+        }
+
+        public override object VisitObject(GraphQLParser.ObjectContext context)
+        {
+            var obj = new Dictionary<string, object>();
+
+            foreach (var item in context.pair())
+            {
+                var name = item.NAME().GetText();
+                var val = Visit(item.value());
+                obj[name] = val;
+            }
+
+            return obj;
+        }
+
+        public override object VisitObjectWithVariable(GraphQLParser.ObjectWithVariableContext context)
+        {
+            var obj = new Dictionary<string, object>();
+
+            foreach (var item in context.pairWithVariable())
+            {
+                var name = item.NAME().GetText();
+                var val = Visit(item.valueOrVariable());
+                obj[name] = val;
+            }
+
+            return obj;
+        }
+
         public override object VisitVariableDefinitions(GraphQLParser.VariableDefinitionsContext context)
         {
             var variables = new Variables();
@@ -16,26 +149,6 @@ namespace GraphQL.Language
             });
 
             return variables;
-        }
-
-        public override object VisitStringValue(GraphQLParser.StringValueContext context)
-        {
-            return context.STRING().GetText();
-        }
-
-        public override object VisitNumberValue(GraphQLParser.NumberValueContext context)
-        {
-            return context.NUMBER().GetText();
-        }
-
-        public override object VisitBooleanValue(GraphQLParser.BooleanValueContext context)
-        {
-            return context.BOOLEAN().GetText();
-        }
-
-        public override object VisitArrayValue(GraphQLParser.ArrayValueContext context)
-        {
-            return context.array().GetText();
         }
 
         public override object VisitVariableDefinition(GraphQLParser.VariableDefinitionContext context)
@@ -100,7 +213,8 @@ namespace GraphQL.Language
         {
             var name = context.NAME().GetText();
             var valOrVar = context.valueOrVariable();
-            var val = valOrVar.value() != null ? valOrVar.value().GetText() : valOrVar.variable().GetText();
+            var val = Visit(valOrVar);
+            //var val = valOrVar.value() != null ? valOrVar.value().GetText() : valOrVar.variable().GetText();
             var arg = new Argument
             {
                 Name = name,
