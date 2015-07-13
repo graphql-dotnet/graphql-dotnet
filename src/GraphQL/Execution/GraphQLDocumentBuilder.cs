@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
@@ -18,7 +17,6 @@ namespace GraphQL
             var tokens = new CommonTokenStream(lexer);
             var parser = new GraphQLParser(tokens);
             var documentTree = parser.document();
-            Console.WriteLine(documentTree.ToStringTree(parser));
             var vistor = new GraphQLVisitor();
             return vistor.Visit(documentTree) as Document;
         }

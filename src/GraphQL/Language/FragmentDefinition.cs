@@ -1,6 +1,6 @@
 namespace GraphQL.Language
 {
-    public class FragmentDefinition : IFragment
+    public class FragmentDefinition : IHaveFragmentType
     {
         public FragmentDefinition()
         {

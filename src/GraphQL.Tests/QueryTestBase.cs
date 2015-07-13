@@ -1,4 +1,5 @@
-﻿using GraphQL.Http;
+﻿using System;
+using GraphQL.Http;
 using Newtonsoft.Json.Linq;
 using Should;
 
@@ -29,6 +30,8 @@ namespace GraphQL.Tests
 
             var writtenResult = writer.Write(runResult);
             var expectedResult = writer.Write(executionResult);
+
+            Console.WriteLine(writtenResult);
 
             writtenResult.ShouldEqual(expectedResult);
         }

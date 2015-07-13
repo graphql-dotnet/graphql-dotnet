@@ -270,9 +270,21 @@ namespace GraphQL
     public class InterfaceGraphType : ObjectGraphType
     {
         public Func<object, ObjectGraphType> ResolveType { get; set; }
+
+        public bool IsPossibleType(IImplementInterfaces type)
+        {
+            return type != null
+                ? type.Interfaces.Any(i => i.Name == this.Name)
+                : false;
+        }
     }
 
-    public class ObjectGraphType : GraphType
+    public interface IImplementInterfaces
+    {
+        IEnumerable<InterfaceGraphType> Interfaces { get; }
+    }
+
+    public class ObjectGraphType : GraphType, IImplementInterfaces
     {
         private readonly List<InterfaceGraphType> _interfaces = new List<InterfaceGraphType>();
 
@@ -475,6 +487,7 @@ namespace GraphQL
 
             context.Operation = operation;
             context.Variables = GetVariableValues(schema, operation.Variables, inputs);
+            context.Fragments = document.Fragments;
 
             return context;
         }
@@ -786,7 +799,6 @@ namespace GraphQL
                 return null;
             }
 
-            // should probably handle this with a variable object
             if (input is Variable)
             {
                 return variables != null
@@ -843,9 +855,45 @@ namespace GraphQL
                     }
                     fields[name].Add(selection.Field);
                 }
+                else if (selection.Fragment != null)
+                {
+                    if (selection.Fragment is FragmentSpread)
+                    {
+                        var spread = selection.Fragment as FragmentSpread;
+                        var fragment = context.Fragments.FindDefinition(spread.Name);
+                        if (DoesFragmentConditionMatch(context, fragment, type))
+                        {
+                            CollectFields(context, type, fragment.Selections, fields);
+                        }
+                    }
+                    else if (selection.Fragment is InlineFragment)
+                    {
+                        var inline = selection.Fragment as InlineFragment;
+                        if (DoesFragmentConditionMatch(context, inline, type))
+                        {
+                            CollectFields(context, type, inline.Selections, fields);
+                        }
+                    }
+                }
             });
 
             return fields;
+        }
+
+        public bool DoesFragmentConditionMatch(ExecutionContext context, IHaveFragmentType fragment, GraphType type)
+        {
+            var conditionalType = context.Schema.FindType(fragment.Type);
+            if (conditionalType == type)
+            {
+                return true;
+            }
+
+            if (conditionalType is InterfaceGraphType)
+            {
+                return ((InterfaceGraphType)conditionalType).IsPossibleType(type as IImplementInterfaces);
+            }
+
+            return false;
         }
     }
 

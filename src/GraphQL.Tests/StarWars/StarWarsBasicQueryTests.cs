@@ -161,5 +161,32 @@ namespace GraphQL.Tests
 
             AssertQuerySuccess(query, expected, inputs);
         }
+
+        [Test]
+        public void query_same_root_field_using_alias()
+        {
+            var query = @"
+               query SomeDroids {
+                  r2d2: droid(id: ""3"") {
+                    name
+                  }
+
+                  c3po: droid(id: ""4"") {
+                    name
+                  }
+               }
+            ";
+
+            var expected = @"{
+              'r2d2': {
+                name: 'R2-D2'
+              },
+              'c3po': {
+                name: 'C-3PO'
+              }
+            }";
+
+            AssertQuerySuccess(query, expected);
+        }
     }
 }

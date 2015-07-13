@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.1.0.0</version>
+    <version>0.1.1.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/joemcbride/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>

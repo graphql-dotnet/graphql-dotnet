@@ -127,7 +127,7 @@ Console.Writeline(result);
 - [x] Interfaces
 - [x] Arguments
 - [x] Variables
-- [ ] Fragments
+- [x] Fragments
 - [ ] Directives
 - [ ] Unions
 - [ ] Async execution

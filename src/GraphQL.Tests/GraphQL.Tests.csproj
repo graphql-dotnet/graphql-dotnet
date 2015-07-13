@@ -60,6 +60,7 @@
     <Compile Include="StarWars\StarWarsBasicQueryTests.cs" />
     <Compile Include="StarWars\StarWarsCharacter.cs" />
     <Compile Include="StarWars\StarWarsData.cs" />
+    <Compile Include="StarWars\StarWarsFragmentTests.cs" />
     <Compile Include="StarWars\StarWarsQuery.cs" />
     <Compile Include="QueryTestBase.cs" />
     <Compile Include="StarWars\StarWarsSchema.cs" />

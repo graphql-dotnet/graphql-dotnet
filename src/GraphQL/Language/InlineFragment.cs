@@ -1,6 +1,6 @@
 namespace GraphQL.Language
 {
-    public class InlineFragment : IFragment
+    public class InlineFragment : IHaveFragmentType
     {
         public string Type { get; set; }
 

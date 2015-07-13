@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.Language
 {
@@ -10,6 +11,11 @@ namespace GraphQL.Language
         public void Add(IFragment fragment)
         {
             _fragments.Add(fragment);
+        }
+
+        public FragmentDefinition FindDefinition(string name)
+        {
+            return _fragments.OfType<FragmentDefinition>().FirstOrDefault(f => f.Name == name);
         }
 
         public IEnumerator<IFragment> GetEnumerator()
