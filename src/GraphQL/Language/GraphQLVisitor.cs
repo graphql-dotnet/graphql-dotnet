@@ -213,7 +213,6 @@ namespace GraphQL.Language
             var name = context.NAME().GetText();
             var valOrVar = context.valueOrVariable();
             var val = Visit(valOrVar);
-            //var val = valOrVar.value() != null ? valOrVar.value().GetText() : valOrVar.variable().GetText();
             var arg = new Argument
             {
                 Name = name,
