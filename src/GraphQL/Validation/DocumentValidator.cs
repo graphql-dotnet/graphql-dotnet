@@ -1,9 +1,15 @@
 using System.Linq;
 using GraphQL.Language;
+using GraphQL.Types;
 
 namespace GraphQL.Validation
 {
-    public class DocumentValidator
+    public interface IDocumentValidator
+    {
+        ValidationResult IsValid(Schema schema, Document document, string operationName);
+    }
+
+    public class DocumentValidator : IDocumentValidator
     {
         public ValidationResult IsValid(Schema schema, Document document, string operationName)
         {
@@ -17,20 +23,5 @@ namespace GraphQL.Validation
 
             return result;
         }
-    }
-
-    public class ValidationResult
-    {
-        public ValidationResult()
-        {
-            Errors = new ExecutionErrors();
-        }
-
-        public bool IsValid
-        {
-            get { return !Errors.Any(); }
-        }
-
-        public ExecutionErrors Errors { get; set; }
     }
 }

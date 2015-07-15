@@ -3,446 +3,40 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Execution;
 using GraphQL.Language;
+using GraphQL.Types;
 using GraphQL.Validation;
 
 namespace GraphQL
 {
-    public class GraphTypesLookup
+    public interface IDocumentExecuter
     {
-        private readonly Dictionary<string, GraphType> _types = new Dictionary<string, GraphType>();
-
-        public GraphTypesLookup()
-        {
-            _types[ScalarGraphType.String.ToString()] = ScalarGraphType.String;
-            _types[ScalarGraphType.Boolean.ToString()] = ScalarGraphType.Boolean;
-            _types[ScalarGraphType.Float.ToString()] = ScalarGraphType.Float;
-            _types[ScalarGraphType.Int.ToString()] = ScalarGraphType.Int;
-            _types[ScalarGraphType.Id.ToString()] = ScalarGraphType.Id;
-
-            _types[NonNullGraphType.String.ToString()] = NonNullGraphType.String;
-            _types[NonNullGraphType.Boolean.ToString()] = NonNullGraphType.Boolean;
-            _types[NonNullGraphType.Float.ToString()] = NonNullGraphType.Float;
-            _types[NonNullGraphType.Int.ToString()] = NonNullGraphType.Int;
-            _types[NonNullGraphType.Id.ToString()] = NonNullGraphType.Id;
-        }
-
-        public GraphType this[string typeName]
-        {
-            get
-            {
-                GraphType result = null;
-                if (_types.ContainsKey(typeName))
-                {
-                    result = _types[typeName];
-                }
-
-                return result;
-            }
-            set { _types[typeName] = value; }
-        }
+        ExecutionResult Execute(Schema schema, string query, string operationName, Inputs inputs = null);
     }
 
-    public class Schema
+    public class DocumentExecuter : IDocumentExecuter
     {
-        private GraphTypesLookup _lookup;
-
-        public ObjectGraphType Query { get; set; }
-
-        public ObjectGraphType Mutation { get; set; }
-
-        public GraphType FindType(string name)
-        {
-            if (_lookup == null)
-            {
-                _lookup = new GraphTypesLookup();
-                CollectTypes(Query, _lookup);
-                CollectTypes(Mutation, _lookup);
-            }
-
-            return _lookup[name];
-        }
-
-        private void CollectTypes(GraphType type, GraphTypesLookup lookup)
-        {
-            if (type == null)
-            {
-                return;
-            }
-
-            lookup[type.ToString()] = type;
-
-            type.Fields.Apply(field =>
-            {
-                CollectTypes(field.Type, lookup);
-            });
-        }
-    }
-
-    public abstract class GraphType
-    {
-        private readonly List<FieldType> _fields = new List<FieldType>();
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public IEnumerable<FieldType> Fields
-        {
-            get { return _fields; }
-            private set
-            {
-                _fields.Clear();
-                _fields.AddRange(value);
-            }
-        }
-
-        public void Field(string name, string description, GraphType type, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-        {
-            if (_fields.Exists(x => x.Name == name))
-            {
-                throw new ArgumentOutOfRangeException("name", "A field with that name is already registered.");
-            }
-
-            _fields.Add(new FieldType
-            {
-                Name = name,
-                Type = type,
-                Arguments = arguments,
-                Resolve = resolve
-            });
-        }
-
-        public void Field(string name, GraphType type, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-        {
-            Field(name, null, type, arguments, resolve);
-        }
-
-        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-            where TType : GraphType, new()
-        {
-            Field(name, description, new TType(), arguments, resolve);
-        }
-
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
-
-    public abstract class ScalarGraphType : GraphType
-    {
-        public static StringGraphType String = new StringGraphType();
-        public static BooleanGraphType Boolean = new BooleanGraphType();
-        public static IntGraphType Int = new IntGraphType();
-        public static FloatGraphType Float = new FloatGraphType();
-        public static IdGraphType Id = new IdGraphType();
-
-        public abstract object Coerce(object value);
-    }
-
-    public class StringGraphType : ScalarGraphType
-    {
-        public StringGraphType()
-        {
-            Name = "String";
-        }
-
-        public override object Coerce(object value)
-        {
-            return value != null ? value.ToString().Trim('"') : null;
-        }
-    }
-
-    public class IntGraphType : ScalarGraphType
-    {
-        public IntGraphType()
-        {
-            Name = "Int";
-        }
-
-        public override object Coerce(object value)
-        {
-            int result;
-            if (int.TryParse(value.ToString(), out result))
-            {
-                return result;
-            }
-            return null;
-        }
-    }
-
-    public class FloatGraphType : ScalarGraphType
-    {
-        public FloatGraphType()
-        {
-            Name = "Float";
-        }
-
-        public override object Coerce(object value)
-        {
-            float result;
-            if (float.TryParse(value.ToString(), out result))
-            {
-                return result;
-            }
-            return null;
-        }
-    }
-
-    public class BooleanGraphType : ScalarGraphType
-    {
-        public BooleanGraphType()
-        {
-            Name = "Boolean";
-        }
-
-        public override object Coerce(object value)
-        {
-            if (value != null)
-            {
-                var stringValue = value.ToString().ToLower();
-                switch (stringValue)
-                {
-                    case "false":
-                    case "0":
-                        return false;
-                    case "true":
-                    case "1":
-                        return true;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public class IdGraphType : ScalarGraphType
-    {
-        public IdGraphType()
-        {
-            Name = "ID";
-        }
-
-        public override object Coerce(object value)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class NonNullGraphType : GraphType
-    {
-        public static readonly NonNullGraphType String = new NonNullGraphType(new StringGraphType());
-        public static readonly NonNullGraphType Boolean = new NonNullGraphType(new BooleanGraphType());
-        public static readonly NonNullGraphType Int = new NonNullGraphType(new IntGraphType());
-        public static readonly NonNullGraphType Float = new NonNullGraphType(new FloatGraphType());
-        public static readonly NonNullGraphType Id = new NonNullGraphType(new IdGraphType());
-
-        public NonNullGraphType(GraphType type)
-        {
-            if (type.GetType() == typeof (NonNullGraphType))
-            {
-                throw new ArgumentException("Cannot nest NonNull inside NonNull.", "type");
-            }
-
-            Type = type;
-        }
-
-        public GraphType Type { get; private set; }
-
-        public override string ToString()
-        {
-            return "{0}!".ToFormat(Type);
-        }
-    }
-
-    public class EnumerationGraphType : ScalarGraphType
-    {
-        public override object Coerce(object value)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class InterfaceGraphType : ObjectGraphType
-    {
-        public Func<object, ObjectGraphType> ResolveType { get; set; }
-
-        public bool IsPossibleType(IImplementInterfaces type)
-        {
-            return type != null
-                ? type.Interfaces.Any(i => i.Name == this.Name)
-                : false;
-        }
-    }
-
-    public interface IImplementInterfaces
-    {
-        IEnumerable<InterfaceGraphType> Interfaces { get; }
-    }
-
-    public class ObjectGraphType : GraphType, IImplementInterfaces
-    {
-        private readonly List<InterfaceGraphType> _interfaces = new List<InterfaceGraphType>();
-
-        public IEnumerable<InterfaceGraphType> Interfaces
-        {
-            get { return _interfaces; }
-            set
-            {
-                _interfaces.Clear();
-                _interfaces.AddRange(value);
-            }
-        }
-
-        public void Interface<TInterface>()
-            where TInterface : InterfaceGraphType, new()
-        {
-            _interfaces.Add(new TInterface());
-        }
-    }
-
-    public class ListGraphType : GraphType
-    {
-        public ListGraphType(Type type)
-        {
-            Type = type;
-        }
-
-        public Type Type { get; private set; }
-
-        public GraphType CreateType()
-        {
-            return (GraphType)Activator.CreateInstance(Type);
-        }
-
-        public override string ToString()
-        {
-            return "[{0}]".ToFormat(Type);
-        }
-    }
-
-    public class ListGraphType<T> : ListGraphType
-        where T : GraphType, new()
-    {
-        public ListGraphType()
-            : base(typeof(T))
-        {
-        }
-    }
-
-    public class FieldType
-    {
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public object DefaultValue { get; set; }
-
-        public GraphType Type { get; set; }
-
-        public QueryArguments Arguments { get; set; }
-
-        public Func<ResolveFieldContext, object> Resolve { get; set; }
-    }
-
-    public class ResolveArguments : List<ResolveArgument>
-    {
-    }
-
-    public class ResolveArgument
-    {
-        public string Name { get; set; }
-        public object Value { get; set; }
-    }
-
-    public class QueryArguments : List<QueryArgument>
-    {
-        public QueryArguments(IEnumerable<QueryArgument> list)
-            : base(list)
-        {
-        }
-    }
-
-    public class QueryArgument
-    {
-        public string Name { get; set; }
-
-        public GraphType Type { get; set; }
-    }
-
-    public class ExecutionResult
-    {
-        public object Data { get; set; }
-
-        public ExecutionErrors Errors { get; set; }
-    }
-
-    public class ExecutionContext
-    {
-        public ExecutionContext()
-        {
-            Fragments = new Fragments();
-            Errors = new ExecutionErrors();
-        }
-
-        public Schema Schema { get; set; }
-
-        public Operation Operation { get; set; }
-
-        public Fragments Fragments { get; set; }
-
-        public Variables Variables { get; set; }
-
-        public ExecutionErrors Errors { get; set; }
-    }
-
-    public class ExecutionErrors : IEnumerable<ExecutionError>
-    {
-        private readonly List<ExecutionError> _errors = new List<ExecutionError>();
-
-        public void Add(ExecutionError error)
-        {
-            _errors.Add(error);
-        }
-
-        public IEnumerator<ExecutionError> GetEnumerator()
-        {
-            return _errors.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    public class ExecutionError : Exception
-    {
-        public ExecutionError(string message)
-            : base(message)
+        private readonly IDocumentBuilder _documentBuilder;
+        private readonly IDocumentValidator _documentValidator;
+
+        public DocumentExecuter()
+            : this(new AntlrDocumentBuilder(), new DocumentValidator())
         {
         }
 
-        public ExecutionError(string message, Exception innerException)
-            : base(message, innerException)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
         {
+            _documentBuilder = documentBuilder;
+            _documentValidator = documentValidator;
         }
-    }
 
-    public class DocumentExecuter
-    {
         public ExecutionResult Execute(Schema schema, string query, string operationName, Inputs inputs = null)
         {
-            var documentBuilder = new GraphQLDocumentBuilder();
-            var validator = new DocumentValidator();
-            var document = documentBuilder.Build(query);
+            var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
 
-            var validationResult = validator.IsValid(schema, document, operationName);
+            var validationResult = _documentValidator.IsValid(schema, document, operationName);
 
             if (validationResult.IsValid)
             {
@@ -742,6 +336,7 @@ namespace GraphQL
             return false;
         }
 
+        // TODO: combine dupliation with CoerceValueAST
         public object CoerceValue(GraphType type, object input)
         {
             if (type is NonNullGraphType)
@@ -786,6 +381,7 @@ namespace GraphQL
             return null;
         }
 
+        // TODO: combine duplication with CoerceValue
         public object CoerceValueAst(GraphType type, object input, Variables variables)
         {
             if (type is NonNullGraphType)
@@ -895,24 +491,5 @@ namespace GraphQL
 
             return false;
         }
-    }
-
-    public class ResolveFieldContext
-    {
-        public Field FieldAst { get; set; }
-
-        public FieldType FieldDefinition { get; set; }
-
-        public ObjectGraphType ParentType { get; set; }
-
-        public Dictionary<string, object> Arguments { get; set; }
-
-        public object Source { get; set; }
-
-        public Schema Schema { get; set; }
-    }
-
-    public class Inputs : Dictionary<string, object>
-    {
     }
 }

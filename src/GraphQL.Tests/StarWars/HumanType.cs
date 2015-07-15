@@ -1,3 +1,5 @@
+using GraphQL.Types;
+
 namespace GraphQL.Tests
 {
     public class HumanType : ObjectGraphType

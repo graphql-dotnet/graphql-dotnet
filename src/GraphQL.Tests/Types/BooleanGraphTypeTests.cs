@@ -1,4 +1,5 @@
-﻿using Should;
+﻿using GraphQL.Types;
+using Should;
 
 namespace GraphQL.Tests.Types
 {

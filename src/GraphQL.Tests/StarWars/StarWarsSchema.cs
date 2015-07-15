@@ -1,4 +1,6 @@
-﻿namespace GraphQL.Tests
+﻿using GraphQL.Types;
+
+namespace GraphQL.Tests
 {
     public class StarWarsSchema : Schema
     {

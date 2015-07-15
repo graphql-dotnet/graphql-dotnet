@@ -4,9 +4,9 @@ using Antlr4.Runtime;
 using GraphQL.Language;
 using GraphQL.Parsing;
 
-namespace GraphQL
+namespace GraphQL.Execution
 {
-    public class GraphQLDocumentBuilder
+    public class AntlrDocumentBuilder : IDocumentBuilder
     {
         public Document Build(string data)
         {
