@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
+    <Compile Include="Types\DirectiveGraphType.cs" />
     <Compile Include="Types\EnumerationGraphType.cs" />
     <Compile Include="Execution\ExecutionContext.cs" />
     <Compile Include="Execution\ExecutionError.cs" />

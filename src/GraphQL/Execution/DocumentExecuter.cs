@@ -12,7 +12,7 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        ExecutionResult Execute(Schema schema, string query, string operationName, Inputs inputs = null);
+        ExecutionResult Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -31,7 +31,7 @@ namespace GraphQL
             _documentValidator = documentValidator;
         }
 
-        public ExecutionResult Execute(Schema schema, string query, string operationName, Inputs inputs = null)
+        public ExecutionResult Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null)
         {
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
@@ -40,7 +40,7 @@ namespace GraphQL
 
             if (validationResult.IsValid)
             {
-                var context = BuildExecutionContext(schema, document, operationName, inputs);
+                var context = BuildExecutionContext(schema, root, document, operationName, inputs);
 
                 if (context.Errors.Any())
                 {
@@ -62,12 +62,14 @@ namespace GraphQL
 
         public ExecutionContext BuildExecutionContext(
             Schema schema,
+            object root,
             Document document,
             string operationName,
             Inputs inputs)
         {
             var context = new ExecutionContext();
             context.Schema = schema;
+            context.RootObject = root;
 
             var operation = !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)
@@ -91,7 +93,7 @@ namespace GraphQL
             var rootType = GetOperationRootType(context.Schema, context.Operation);
             var fields = CollectFields(context, rootType, context.Operation.Selections, null);
 
-            return ExecuteFields(context, rootType, null, fields);
+            return ExecuteFields(context, rootType, context.RootObject, fields);
         }
 
         public object ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
@@ -444,6 +446,11 @@ namespace GraphQL
             {
                 if (selection.Field != null)
                 {
+                    if (!ShouldIncludeNode(context, selection.Field.Directives))
+                    {
+                        return;
+                    }
+
                     var name = selection.Field.Alias ?? selection.Field.Name;
                     if (!fields.ContainsKey(name))
                     {
@@ -456,24 +463,65 @@ namespace GraphQL
                     if (selection.Fragment is FragmentSpread)
                     {
                         var spread = selection.Fragment as FragmentSpread;
-                        var fragment = context.Fragments.FindDefinition(spread.Name);
-                        if (DoesFragmentConditionMatch(context, fragment, type))
+
+                        if (!ShouldIncludeNode(context, spread.Directives))
                         {
-                            CollectFields(context, type, fragment.Selections, fields);
+                            return;
                         }
+
+                        var fragment = context.Fragments.FindDefinition(spread.Name);
+                        if (!ShouldIncludeNode(context, fragment.Directives)
+                            || !DoesFragmentConditionMatch(context, fragment, type))
+                        {
+                            return;
+                        }
+
+                        CollectFields(context, type, fragment.Selections, fields);
                     }
                     else if (selection.Fragment is InlineFragment)
                     {
                         var inline = selection.Fragment as InlineFragment;
-                        if (DoesFragmentConditionMatch(context, inline, type))
+
+                        if (!ShouldIncludeNode(context, inline.Directives)
+                          || !DoesFragmentConditionMatch(context, inline, type))
                         {
-                            CollectFields(context, type, inline.Selections, fields);
+                            return;
                         }
+
+                        CollectFields(context, type, inline.Selections, fields);
                     }
                 }
             });
 
             return fields;
+        }
+
+        public bool ShouldIncludeNode(ExecutionContext context, Directives directives)
+        {
+            if (directives != null)
+            {
+                var directive = directives.Find(DirectiveGraphType.Skip.Name);
+                if (directive != null)
+                {
+                    var values = GetArgumentValues(
+                        DirectiveGraphType.Skip.Arguments,
+                        directive.Arguments,
+                        context.Variables);
+                    return !((bool) values["if"]);
+                }
+
+                directive = directives.Find(DirectiveGraphType.Include.Name);
+                if (directive != null)
+                {
+                    var values = GetArgumentValues(
+                        DirectiveGraphType.Include.Arguments,
+                        directive.Arguments,
+                        context.Variables);
+                    return (bool) values["if"];
+                }
+            }
+
+            return true;
         }
 
         public bool DoesFragmentConditionMatch(ExecutionContext context, IHaveFragmentType fragment, GraphType type)

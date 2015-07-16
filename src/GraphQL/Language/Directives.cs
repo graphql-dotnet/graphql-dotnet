@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.Language
 {
@@ -10,6 +11,11 @@ namespace GraphQL.Language
         public void Add(Directive directive)
         {
             _directives.Add(directive);
+        }
+
+        public Directive Find(string name)
+        {
+            return _directives.FirstOrDefault(d => d.Name == name);
         }
 
         public IEnumerator<Directive> GetEnumerator()

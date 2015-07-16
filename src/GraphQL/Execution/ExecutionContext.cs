@@ -13,6 +13,8 @@ namespace GraphQL.Execution
 
         public Schema Schema { get; set; }
 
+        public object RootObject { get; set; }
+
         public Operation Operation { get; set; }
 
         public Fragments Fragments { get; set; }

@@ -31,15 +31,15 @@ namespace GraphQL.Tests
 
         public IDocumentWriter Writer { get; private set; }
 
-        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null)
+        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null)
         {
             var queryResult = CreateQueryResult(expected);
-            AssertQuery(query, queryResult, inputs);
+            AssertQuery(query, queryResult, inputs, root);
         }
 
-        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs)
+        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root)
         {
-            var runResult = Executer.Execute(Schema, query, null, inputs);
+            var runResult = Executer.Execute(Schema, root, query, null, inputs);
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(executionResult);
