@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Execution;
+using GraphQL.Introspection;
 using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -241,7 +242,18 @@ namespace GraphQL
 
         public FieldType GetFieldDefinition(Schema schema, ObjectGraphType parentType, Field field)
         {
-            // TODO: handle meta fields
+            if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
+            {
+                return SchemaIntrospection.SchemaMeta;
+            }
+            if (field.Name == SchemaIntrospection.TypeMeta.Name && schema.Query == parentType)
+            {
+                return SchemaIntrospection.TypeMeta;
+            }
+            if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
+            {
+                return SchemaIntrospection.TypeNameMeta;
+            }
 
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
         }

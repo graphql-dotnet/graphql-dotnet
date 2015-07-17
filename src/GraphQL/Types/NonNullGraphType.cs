@@ -2,6 +2,15 @@ using System;
 
 namespace GraphQL.Types
 {
+    public class NonNullGraphType<T> : NonNullGraphType
+        where T : GraphType, new()
+    {
+        public NonNullGraphType()
+            : base(new T())
+        {
+        }
+    }
+
     public class NonNullGraphType : GraphType
     {
         public static readonly NonNullGraphType String = new NonNullGraphType(new StringGraphType());

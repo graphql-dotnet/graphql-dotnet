@@ -52,6 +52,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
+    <Compile Include="Introspection\SchemaIntrospection.cs" />
+    <Compile Include="Introspection\SchemaMetaFieldType.cs" />
+    <Compile Include="Introspection\TypeKind.cs" />
+    <Compile Include="Introspection\TypeMetaFieldType.cs" />
+    <Compile Include="Introspection\TypeNameMetaFieldType.cs" />
+    <Compile Include="Introspection\__EnumValue.cs" />
+    <Compile Include="Introspection\__Field.cs" />
+    <Compile Include="Introspection\__InputValue.cs" />
+    <Compile Include="Introspection\__Type.cs" />
+    <Compile Include="Introspection\__TypeKind.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
     <Compile Include="Types\DirectiveGraphType.cs" />
     <Compile Include="Types\EnumerationGraphType.cs" />
@@ -64,12 +74,15 @@
     <Compile Include="Types\GraphType.cs" />
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />
+    <Compile Include="Types\IHaveDefaultValue.cs" />
     <Compile Include="Types\IImplementInterfaces.cs" />
     <Compile Include="Execution\Inputs.cs" />
+    <Compile Include="Types\InputObjectGraphType.cs" />
     <Compile Include="Types\InterfaceGraphType.cs" />
     <Compile Include="Types\IntGraphType.cs" />
     <Compile Include="Types\ListGraphType.cs" />
     <Compile Include="Types\NonNullGraphType.cs" />
+    <Compile Include="Types\NonNullListGraphType.cs" />
     <Compile Include="Types\ObjectGraphType.cs" />
     <Compile Include="Types\QueryArgument.cs" />
     <Compile Include="Types\QueryArguments.cs" />
@@ -78,6 +91,7 @@
     <Compile Include="Types\Schema.cs" />
     <Compile Include="Types\StringGraphType.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="Types\UnionGraphType.cs" />
     <Compile Include="Validation\DocumentValidator.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Execution\IDocumentBuilder.cs" />

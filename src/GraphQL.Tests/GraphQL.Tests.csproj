@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
+    <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
     <Compile Include="StarWars\CharacterInterface.cs" />
     <Compile Include="CustomConvention.cs" />
     <Compile Include="StarWars\DroidType.cs" />
@@ -79,7 +80,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Introspection\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

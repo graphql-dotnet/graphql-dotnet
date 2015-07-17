@@ -129,6 +129,8 @@ Console.Writeline(result);
 - [x] Variables
 - [x] Fragments
 - [x] Directives
+- [ ] Enumerations
+- [ ] Input Objects
 - [ ] Unions
 - [ ] Async execution
 
@@ -136,4 +138,18 @@ Console.Writeline(result);
 - Not started
 
 ### Schema Introspection
-- Not started
+- [x] __typename
+- [ ] __type
+  - [x] name
+  - [x] kind
+  - [x] description
+  - [x] fields
+  - [x] interfaces
+  - [ ] possibleTypes
+  - [ ] enumValues
+  - [ ] ofType
+- [ ] __schema
+  - [ ] types
+  - [ ] queryType
+  - [ ] mutationType
+  - [ ] directives

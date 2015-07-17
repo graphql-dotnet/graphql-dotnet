@@ -1,6 +1,8 @@
+using GraphQL.Types;
+
 namespace GraphQL.Language
 {
-    public class Variable
+    public class Variable : IHaveDefaultValue
     {
         public string Name { get; set; }
 

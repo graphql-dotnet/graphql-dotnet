@@ -1,13 +1,14 @@
 using System;
-using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class FieldType
+    public class FieldType : IHaveDefaultValue
     {
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public string DeprecationReason { get; set; }
 
         public object DefaultValue { get; set; }
 

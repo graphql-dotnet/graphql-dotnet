@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/joemcbride/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* Added fragment exection
+    <releaseNotes>* Added fragment execution
 * Added @include/@skip directives
 * Added the ability to specifiy a root object
 * Added interfaces IDocumentExecuter, IDocumentBuilder, IDocumentWriter, IDocumentValidation
