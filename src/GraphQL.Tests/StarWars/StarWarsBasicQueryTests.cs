@@ -82,15 +82,17 @@ namespace GraphQL.Tests
                {
                   human(id: ""1"") {
                     name
+                    homePlanet
                   }
                }
             ";
 
             var expected = @"{
-  human: {
-    name: 'Luke'
-  }
-}";
+              human: {
+                name: 'Luke',
+                homePlanet: 'Tatooine'
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -104,17 +106,21 @@ namespace GraphQL.Tests
                     name
                     friends {
                       name
+                      appearsIn
                     }
                   }
                }
             ";
 
             var expected = @"{
-  human: {
-    name: 'Luke',
-    friends: [{name:'R2-D2'}, {name:'C-3PO'}]
-  }
-}";
+              human: {
+                name: 'Luke',
+                friends: [
+                  {name:'R2-D2', appearsIn:['NEWHOPE','EMPIRE','JEDI']},
+                  {name:'C-3PO', appearsIn:['NEWHOPE','EMPIRE','JEDI']}
+                ]
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }

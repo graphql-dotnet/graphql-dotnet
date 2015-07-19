@@ -56,27 +56,52 @@ namespace GraphQL.Introspection
                     {
                         var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
                         var type = context.Source as GraphType;
-                        if (!includeDeprecated)
-                        {
-                            return type.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason));
-                        }
-                        else
-                        {
-                            return type.Fields;
-                        }
+                        return !includeDeprecated
+                            ? type.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
+                            : type.Fields;
                     }
 
                     return null;
                 });
             Field("interfaces", new ListGraphType<NonNullGraphType<__Type>>(), null, context =>
             {
-                if (context.Source is ObjectGraphType)
-                {
-                    return ((ObjectGraphType) context.Source).Interfaces;
-                }
-
-                return null;
+                var type = context.Source as IImplementInterfaces;
+                return type != null ? type.Interfaces : null;
             });
+            Field("possibleTypes", new ListGraphType<NonNullGraphType<__Type>>(), null, context =>
+            {
+                var type = context.Source as IProvidePossibleTypes;
+                return type != null ? type.PossibleTypes() : null;
+            });
+            Field("enumValues", new ListGraphType<NonNullGraphType<__EnumValue>>(),
+                new QueryArguments(new[]
+                {
+                    new QueryArgument
+                    {
+                        Name = "includeDeprecated",
+                        Type = ScalarGraphType.Boolean,
+                        DefaultValue = false
+                    }
+                }),
+                context =>
+                {
+                    var type = context.Source as EnumerationGraphType;
+                    if (type != null)
+                    {
+                        var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
+                        return !includeDeprecated
+                            ? type.Values.Where(e => !string.IsNullOrWhiteSpace(e.DeprecationReason))
+                            : type.Values;
+                    }
+
+                    return null;
+                });
+            Field("inputFields", new ListGraphType<NonNullGraphType<__InputValue>>(), null, context =>
+            {
+                var type = context.Source as InputObjectGraphType;
+                return type != null ? type.Fields : null;
+            });
+            //Field("ofType", new __Type());
         }
     }
 }

@@ -129,8 +129,9 @@ Console.Writeline(result);
 - [x] Variables
 - [x] Fragments
 - [x] Directives
-- [ ] Enumerations
+- [x] Enumerations
 - [ ] Input Objects
+- [ ] Mutations
 - [ ] Unions
 - [ ] Async execution
 
@@ -146,7 +147,8 @@ Console.Writeline(result);
   - [x] fields
   - [x] interfaces
   - [ ] possibleTypes
-  - [ ] enumValues
+  - [x] enumValues
+  - [x] inputFields
   - [ ] ofType
 - [ ] __schema
   - [ ] types

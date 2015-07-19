@@ -1,6 +1,13 @@
-﻿namespace GraphQL.Types
+﻿using System;
+using System.Collections.Generic;
+
+namespace GraphQL.Types
 {
-    public class UnionGraphType : GraphType
+    public class UnionGraphType : GraphType, IProvidePossibleTypes
     {
+        public IEnumerable<GraphType> PossibleTypes()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

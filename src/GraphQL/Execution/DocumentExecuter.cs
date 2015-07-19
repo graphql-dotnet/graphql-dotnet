@@ -234,8 +234,9 @@ namespace GraphQL
 
             return definitionArguments.Aggregate(new Dictionary<string, object>(), (acc, arg) =>
             {
-                var value = astArguments.ValueFor(arg.Name);
-                acc[arg.Name] = CoerceValueAst(arg.Type, value, variables);
+                var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
+                var coercedValue = CoerceValueAst(arg.Type, value, variables);
+                acc[arg.Name] = coercedValue ?? arg.DefaultValue;
                 return acc;
             });
         }

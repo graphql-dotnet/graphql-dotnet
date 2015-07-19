@@ -75,6 +75,7 @@
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />
     <Compile Include="Types\IHaveDefaultValue.cs" />
+    <Compile Include="Types\IProvidePossibleTypes.cs" />
     <Compile Include="Types\IImplementInterfaces.cs" />
     <Compile Include="Execution\Inputs.cs" />
     <Compile Include="Types\InputObjectGraphType.cs" />

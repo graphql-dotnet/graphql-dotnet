@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
+    <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
     <Compile Include="StarWars\CharacterInterface.cs" />
     <Compile Include="CustomConvention.cs" />
