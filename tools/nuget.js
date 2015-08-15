@@ -3,7 +3,10 @@ import yargs from 'yargs';
 import { exec } from 'child-process-promise';
 
 const options = yargs
+  .usage('Usage: --v 0.1.0.0 --debug')
   .alias('d', 'debug')
+  .alias('ver', 'version')
+  .demand(['version'])
   .argv;
 
 let releaseConfig = options.debug ? 'debug' : 'release';
@@ -14,13 +17,14 @@ let outputDir = 'nuget/lib';
 let inputDir = `src/GraphQL/bin/${releaseConfig}`;
 let outputName = 'GraphQL.dll';
 let sources = ['GraphQL.dll', 'Antlr4.Runtime.dll', 'Newtonsoft.Json.dll'];
-let out = `/out:${path.join(outputDir, outputName)}`;
+let outFlag = `/out:${path.join(outputDir, outputName)}`;
+let versionFlag = `/ver:${options.version}`;
 
 let sourceOptions = sources.map(source=> {
   return path.join(inputDir, source);
 }).join(' ');
 
-let ilRepackCommand = `${ilRepack} ${out} ${sourceOptions}`;
+let ilRepackCommand = `${ilRepack} ${versionFlag} /internalize ${outFlag}  ${sourceOptions}`;
 
 console.log(ilRepackCommand);
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GraphQL.Types;
 
@@ -8,7 +9,7 @@ namespace GraphQL.Introspection
         public __Type()
         {
             Name = "__Type";
-            Field("kind", new NonNullGraphType(new __TypeKind()), null, context =>
+            Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
                 if (context.Source is ScalarGraphType)
                 {
@@ -38,15 +39,14 @@ namespace GraphQL.Introspection
 
                 throw new ExecutionError("Unkown kind of type: {0}".ToFormat(context.Source));
             });
-            Field("name", ScalarGraphType.String);
-            Field("description", ScalarGraphType.String);
-            Field("fields", new ListGraphType<NonNullGraphType<__Field>>(),
+            Field<StringGraphType>("name");
+            Field<StringGraphType>("description");
+            Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(new[]
                 {
-                    new QueryArgument
+                    new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
-                        Type = ScalarGraphType.Boolean,
                         DefaultValue = false
                     }
                 }),
@@ -61,25 +61,28 @@ namespace GraphQL.Introspection
                             : type.Fields;
                     }
 
-                    return null;
+                    return Enumerable.Empty<FieldType>();
                 });
-            Field("interfaces", new ListGraphType<NonNullGraphType<__Type>>(), null, context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", null, null, context =>
             {
                 var type = context.Source as IImplementInterfaces;
-                return type != null ? type.Interfaces : null;
+                return type != null ? type.Interfaces : Enumerable.Empty<Type>();
             });
-            Field("possibleTypes", new ListGraphType<NonNullGraphType<__Type>>(), null, context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", null, null, context =>
             {
-                var type = context.Source as IProvidePossibleTypes;
-                return type != null ? type.PossibleTypes() : null;
+                if (context.Source is InterfaceGraphType || context.Source is UnionGraphType)
+                {
+                    var type = (GraphType)context.Source;
+                    return context.Schema.FindImplemenationsOf(type.GetType());
+                }
+                return Enumerable.Empty<GraphType>();
             });
-            Field("enumValues", new ListGraphType<NonNullGraphType<__EnumValue>>(),
+            Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
                 new QueryArguments(new[]
                 {
-                    new QueryArgument
+                    new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
-                        Type = ScalarGraphType.Boolean,
                         DefaultValue = false
                     }
                 }),
@@ -94,14 +97,14 @@ namespace GraphQL.Introspection
                             : type.Values;
                     }
 
-                    return null;
+                    return Enumerable.Empty<EnumValue>();
                 });
-            Field("inputFields", new ListGraphType<NonNullGraphType<__InputValue>>(), null, context =>
+            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", null, null, context =>
             {
                 var type = context.Source as InputObjectGraphType;
-                return type != null ? type.Fields : null;
+                return type != null ? type.Fields : Enumerable.Empty<FieldType>();
             });
-            //Field("ofType", new __Type());
+            Field<__Type>("ofType");
         }
     }
 }

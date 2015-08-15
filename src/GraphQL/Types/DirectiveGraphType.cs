@@ -24,7 +24,7 @@
         {
             Name = "include";
             Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
-            Arguments = new QueryArguments(new [] { new QueryArgument { Name = "if", Type = NonNullGraphType.Boolean} });
+            Arguments = new QueryArguments(new [] { new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "if" } });
             OnOperation = false;
             OnFragment = true;
             OnField = true;
@@ -37,7 +37,7 @@
         {
             Name = "skip";
             Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
-            Arguments = new QueryArguments(new [] { new QueryArgument { Name = "if", Type = NonNullGraphType.Boolean} });
+            Arguments = new QueryArguments(new [] { new QueryArgument<NonNullGraphType<BooleanGraphType>>  { Name = "if" } });
             OnOperation = false;
             OnFragment = true;
             OnField = true;

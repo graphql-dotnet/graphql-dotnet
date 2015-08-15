@@ -7,10 +7,10 @@ namespace GraphQL.Introspection
         public __InputValue()
         {
             Name = "__InputValue";
-            Field("name", NonNullGraphType.String);
-            Field("description", ScalarGraphType.String);
-            Field("type", new NonNullGraphType(new __Type()));
-            Field("defaultValue", ScalarGraphType.String, null, context =>
+            Field<NonNullGraphType<StringGraphType>>("name");
+            Field<StringGraphType>("description");
+            Field<NonNullGraphType<__Type>>("type");
+            Field<StringGraphType>("defaultValue", null, null, context =>
             {
                 var hasDefault = context.Source as IHaveDefaultValue;
                 if (hasDefault != null && hasDefault.DefaultValue != null)

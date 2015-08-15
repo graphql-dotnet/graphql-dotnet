@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
     public class ObjectGraphType : GraphType, IImplementInterfaces
     {
-        private readonly List<InterfaceGraphType> _interfaces = new List<InterfaceGraphType>();
+        private readonly List<Type> _interfaces = new List<Type>();
 
-        public IEnumerable<InterfaceGraphType> Interfaces
+        public IEnumerable<Type> Interfaces
         {
             get { return _interfaces; }
             set
@@ -17,9 +18,9 @@ namespace GraphQL.Types
         }
 
         public void Interface<TInterface>()
-            where TInterface : InterfaceGraphType, new()
+            where TInterface : InterfaceGraphType
         {
-            _interfaces.Add(new TInterface());
+            _interfaces.Add(typeof(TInterface));
         }
     }
 }

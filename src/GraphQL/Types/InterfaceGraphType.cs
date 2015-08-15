@@ -1,23 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class InterfaceGraphType : GraphType, IProvidePossibleTypes
+    public class InterfaceGraphType : GraphType
     {
         public Func<object, ObjectGraphType> ResolveType { get; set; }
 
-        public IEnumerable<GraphType> PossibleTypes()
+        public bool IsPossibleType(IEnumerable<GraphType> types)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool IsPossibleType(IImplementInterfaces type)
-        {
-            return type != null
-                ? type.Interfaces.Any(i => i.Name == Name)
-                : false;
+            return types.Any(i => i == this);
         }
     }
 }

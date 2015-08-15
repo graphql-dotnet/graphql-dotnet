@@ -140,18 +140,18 @@ Console.Writeline(result);
 
 ### Schema Introspection
 - [x] __typename
-- [ ] __type
+- [x] __type
   - [x] name
   - [x] kind
   - [x] description
   - [x] fields
   - [x] interfaces
-  - [ ] possibleTypes
+  - [x] possibleTypes
   - [x] enumValues
   - [x] inputFields
-  - [ ] ofType
-- [ ] __schema
-  - [ ] types
-  - [ ] queryType
-  - [ ] mutationType
-  - [ ] directives
+  - [x] ofType
+- [x] __schema
+  - [x] types
+  - [x] queryType
+  - [x] mutationType
+  - [x] directives

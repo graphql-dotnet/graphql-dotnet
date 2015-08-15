@@ -7,14 +7,13 @@ namespace GraphQL.Introspection
         public TypeMetaFieldType()
         {
             Name = "__type";
-            Type = new __Type();
+            Type = typeof(__Type);
             Description = "Request the type information of a single type.";
             Arguments = new QueryArguments(new[]
             {
-                new QueryArgument
+                new QueryArgument<NonNullGraphType<StringGraphType>>
                 {
-                    Name = "name",
-                    Type = NonNullGraphType.String
+                    Name = "name"
                 }
             });
             Resolve = context => context.Schema.FindType((string) context.Arguments["name"]);

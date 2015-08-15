@@ -20,14 +20,12 @@ namespace GraphQL.Types
 
         public Type Type { get; private set; }
 
-        public GraphType CreateType()
+        public override string CollectTypes(TypeCollectionContext context)
         {
-            return (GraphType)Activator.CreateInstance(Type);
-        }
-
-        public override string ToString()
-        {
-            return "[{0}]".ToFormat(Type);
+            var innerType = context.ResolveType(Type);
+            var name = innerType.CollectTypes(context);
+            context.AddType(name, innerType);
+            return "[{0}]".ToFormat(name);
         }
     }
 }

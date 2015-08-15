@@ -7,22 +7,22 @@ namespace GraphQL.Introspection
         public __Field()
         {
             Name = "__Field";
-            Field("name", NonNullGraphType.String);
-            Field("description", ScalarGraphType.String);
-            Field("args", new NonNullListGraphType<NonNullGraphType<__InputValue>>(), null,
+            Field<NonNullGraphType<StringGraphType>>("name");
+            Field<StringGraphType>("description");
+            Field<NonNullGraphType<ListGraphType<__InputValue>>>("args", null, null,
                 context =>
                 {
                     var fieldType = (FieldType) context.Source;
                     // TODO: probably need to format these
                     return fieldType.Arguments;
                 });
-            Field("type", new NonNullGraphType(new __Type()));
-            Field("isDeprecated", NonNullGraphType.Boolean, null, context =>
+            Field<NonNullGraphType<__Type>>("type");
+            Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", null, null, context =>
             {
                 var fieldType = (FieldType) context.Source;
                 return !string.IsNullOrWhiteSpace(fieldType.DeprecationReason);
             });
-            Field("deprecationReason", ScalarGraphType.String);
+            Field<StringGraphType>("deprecationReason");
         }
     }
 }

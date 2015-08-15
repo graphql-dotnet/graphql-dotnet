@@ -18,7 +18,7 @@
             var query = @"
                 query IntrospectionDroidKindQuery {
                   __type(name: 'Droid') {
-                    name
+                    name,
                     kind
                   }
                 }
@@ -39,17 +39,47 @@
         {
             var query = @"
             query IntrospectionCharacterKindQuery {
-                      __type(name: ""Character"") {
-                        name
-                        kind
-                      }
-                }
+              __type(name: ""Character"") {
+                name
+                kind
+              }
+            }
             ";
 
             var expected = @"{
               __type: {
                 name: 'Character',
                 kind: 'INTERFACE'
+              }
+            }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_querying_schema_for_possibleTypes_of_an_interface()
+        {
+            var query = @"
+            query IntrospectionCharacterKindQuery {
+              __type(name: ""Character"") {
+                name
+                kind
+                  possibleTypes {
+                    name,
+                    kind
+                  }
+              }
+            }
+            ";
+
+            var expected = @"{
+              __type: {
+                name: 'Character',
+                kind: 'INTERFACE',
+                possibleTypes: [
+                  { name: 'Human', kind: 'OBJECT' },
+                  { name: 'Droid', kind: 'OBJECT' },
+                ]
               }
             }";
 
@@ -135,6 +165,35 @@
             '__type': {
               'name': 'Droid',
               'description': 'A mechanical creature in the Star Wars universe.'
+            }
+            }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_querying_the_schema()
+        {
+            var query = @"
+            query SchemaIntrospectionQuery {
+              __schema {
+                queryType { name, kind }
+                mutationType { name }
+                directives {
+                  name
+                  description
+                  onOperation
+                  onFragment
+                  onField
+                }
+              }
+            }
+            ";
+            var expected = @"{
+            '__schema': {
+              'queryType': { 'name':'Query', 'kind': 'OBJECT'},
+              'mutationType': null,
+              'directives': [],
             }
             }";
 

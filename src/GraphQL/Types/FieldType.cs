@@ -12,7 +12,7 @@ namespace GraphQL.Types
 
         public object DefaultValue { get; set; }
 
-        public GraphType Type { get; set; }
+        public Type Type { get; set; }
 
         public QueryArguments Arguments { get; set; }
 

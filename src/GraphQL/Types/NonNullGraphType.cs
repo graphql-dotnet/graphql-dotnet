@@ -3,25 +3,19 @@ using System;
 namespace GraphQL.Types
 {
     public class NonNullGraphType<T> : NonNullGraphType
-        where T : GraphType, new()
+        where T : GraphType
     {
         public NonNullGraphType()
-            : base(new T())
+            : base(typeof(T))
         {
         }
     }
 
     public class NonNullGraphType : GraphType
     {
-        public static readonly NonNullGraphType String = new NonNullGraphType(new StringGraphType());
-        public static readonly NonNullGraphType Boolean = new NonNullGraphType(new BooleanGraphType());
-        public static readonly NonNullGraphType Int = new NonNullGraphType(new IntGraphType());
-        public static readonly NonNullGraphType Float = new NonNullGraphType(new FloatGraphType());
-        public static readonly NonNullGraphType Id = new NonNullGraphType(new IdGraphType());
-
-        public NonNullGraphType(GraphType type)
+        public NonNullGraphType(Type type)
         {
-            if (type.GetType() == typeof (NonNullGraphType))
+            if (type == typeof (NonNullGraphType))
             {
                 throw new ArgumentException("Cannot nest NonNull inside NonNull.", "type");
             }
@@ -29,11 +23,14 @@ namespace GraphQL.Types
             Type = type;
         }
 
-        public GraphType Type { get; private set; }
+        public Type Type { get; private set; }
 
-        public override string ToString()
+        public override string CollectTypes(TypeCollectionContext context)
         {
-            return "{0}!".ToFormat(Type);
+            var innerType = context.ResolveType(Type);
+            var name = innerType.CollectTypes(context);
+            context.AddType(name, innerType);
+            return "{0}!".ToFormat(name);
         }
     }
 }

@@ -21,8 +21,9 @@ namespace GraphQL.Types
             }
         }
 
-        public void Field(string name, string description, GraphType type, QueryArguments arguments = null,
+        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
             Func<ResolveFieldContext, object> resolve = null)
+            where TType : GraphType
         {
             if (_fields.Exists(x => x.Name == name))
             {
@@ -32,28 +33,29 @@ namespace GraphQL.Types
             _fields.Add(new FieldType
             {
                 Name = name,
-                Type = type,
+                Type = typeof(TType),
                 Arguments = arguments,
                 Resolve = resolve
             });
         }
 
-        public void Field(string name, GraphType type, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-        {
-            Field(name, null, type, arguments, resolve);
-        }
-
-        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-            where TType : GraphType, new()
-        {
-            Field(name, description, new TType(), arguments, resolve);
-        }
-
-        public override string ToString()
+        public virtual string CollectTypes(TypeCollectionContext context)
         {
             return Name;
         }
+    }
+
+    public class TypeCollectionContext
+    {
+        public TypeCollectionContext(
+            Func<Type, GraphType> resolver,
+            Action<string, GraphType> addType)
+        {
+            ResolveType = resolver;
+            AddType = addType;
+        }
+
+        public Func<Type, GraphType> ResolveType { get; private set; }
+        public Action<string, GraphType> AddType { get; private set; }
     }
 }

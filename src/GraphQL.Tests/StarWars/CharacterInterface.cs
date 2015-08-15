@@ -7,10 +7,10 @@ namespace GraphQL.Tests
         public CharacterInterface()
         {
             Name = "Character";
-            Field("id", "The id of the character.", NonNullGraphType.String);
-            Field("name", "The name of the character.", ScalarGraphType.String);
-            Field("friends", new ListGraphType<CharacterInterface>());
-            Field("appearsIn", "Which movie they appear in.", new ListGraphType<EpisodeEnum>());
+            Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
+            Field<StringGraphType>("name", "The name of the character.");
+            Field<ListGraphType<CharacterInterface>>("friends");
+            Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
 
             ResolveType = (obj) =>
             {

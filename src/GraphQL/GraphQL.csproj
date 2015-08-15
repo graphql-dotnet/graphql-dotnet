@@ -62,6 +62,7 @@
     <Compile Include="Introspection\__InputValue.cs" />
     <Compile Include="Introspection\__Type.cs" />
     <Compile Include="Introspection\__TypeKind.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
     <Compile Include="Types\DirectiveGraphType.cs" />
     <Compile Include="Types\EnumerationGraphType.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />
     <Compile Include="Types\IHaveDefaultValue.cs" />
-    <Compile Include="Types\IProvidePossibleTypes.cs" />
     <Compile Include="Types\IImplementInterfaces.cs" />
     <Compile Include="Execution\Inputs.cs" />
     <Compile Include="Types\InputObjectGraphType.cs" />
@@ -83,7 +83,6 @@
     <Compile Include="Types\IntGraphType.cs" />
     <Compile Include="Types\ListGraphType.cs" />
     <Compile Include="Types\NonNullGraphType.cs" />
-    <Compile Include="Types\NonNullListGraphType.cs" />
     <Compile Include="Types\ObjectGraphType.cs" />
     <Compile Include="Types\QueryArgument.cs" />
     <Compile Include="Types\QueryArguments.cs" />

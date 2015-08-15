@@ -16,7 +16,7 @@ namespace GraphQL.Tests
                 arguments: new QueryArguments(
                     new []
                     {
-                        new QueryArgument { Name = "id", Type = NonNullGraphType.String}
+                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
                     }),
                 resolve: context => data.GetHumanById((string)context.Arguments["id"])
             );
@@ -25,7 +25,7 @@ namespace GraphQL.Tests
                 arguments: new QueryArguments(
                     new []
                     {
-                        new QueryArgument { Name = "id", Type = NonNullGraphType.String}
+                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
                     }),
                 resolve: context => data.GetDroidById((string)context.Arguments["id"])
             );

@@ -16,8 +16,8 @@ namespace GraphQL.Tests.Execution.Directives
         {
             Name = "TestType";
 
-            Field("a", ScalarGraphType.String);
-            Field("b", ScalarGraphType.String);
+            Field<StringGraphType>("a");
+            Field<StringGraphType>("b");
         }
     }
 

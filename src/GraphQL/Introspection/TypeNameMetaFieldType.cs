@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
         public TypeNameMetaFieldType()
         {
             Name = "__typename";
-            Type = NonNullGraphType.String;
+            Type = typeof(NonNullGraphType<StringGraphType>);
             Description = "The name of the current Object type at runtime.";
             Resolve = (context) => context.ParentType.Name;
         }
