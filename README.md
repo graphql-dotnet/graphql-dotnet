@@ -43,9 +43,9 @@ public class CharacterInterface : InterfaceGraphType
   public CharacterInterface()
   {
     Name = "Character";
-    Field("id", "The id of the character.", NonNullGraphType.String);
-    Field("name", "The name of the character.", NonNullGraphType.String);
-    Field("friends", new ListGraphType<CharacterInterface>());
+    Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
+    Field<NonNullGraphType<StringGraphType>>("name", "The name of the character.");
+    Field<ListGraphType<CharacterInterface>>("friends");
     ResolveType = (obj) =>
     {
       if (obj is Human)
@@ -63,8 +63,8 @@ public class DroidType : ObjectGraphType
   {
     var data = new StarWarsData();
     Name = "Droid";
-    Field("id", "The id of the droid.", NonNullGraphType.String);
-    Field("name", "The name of the droid.", NonNullGraphType.String);
+    Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
+    Field<NonNullGraphType<StringGraphType>>("name", "The name of the droid.");
     Field<ListGraphType<CharacterInterface>>(
         "friends",
         resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
