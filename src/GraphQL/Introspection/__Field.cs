@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -13,8 +15,7 @@ namespace GraphQL.Introspection
                 context =>
                 {
                     var fieldType = (FieldType) context.Source;
-                    // TODO: probably need to format these
-                    return fieldType.Arguments;
+                    return fieldType.Arguments ?? Enumerable.Empty<QueryArgument>();
                 });
             Field<NonNullGraphType<__Type>>("type");
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", null, null, context =>

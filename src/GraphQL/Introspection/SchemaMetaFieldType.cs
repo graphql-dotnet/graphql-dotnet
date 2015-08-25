@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -35,7 +32,7 @@ namespace GraphQL.Introspection
             {
                 return context.Schema.Mutation;
             });
-            Field<NonNullGraphType<ListGraphType<__Type>>>("directives", "A list of all directives supported by this server.", null, context =>
+            Field<NonNullGraphType<ListGraphType<__Directive>>>("directives", "A list of all directives supported by this server.", null, context =>
             {
                 return context.Schema.Directives;
             });

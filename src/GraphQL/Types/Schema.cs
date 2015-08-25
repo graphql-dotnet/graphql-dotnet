@@ -33,7 +33,13 @@ namespace GraphQL.Types
 
         public IEnumerable<GraphType> AllTypes
         {
-            get { return _lookup.All(); }
+            get
+            {
+                return _lookup
+                    .All()
+                    .Where(x => !(x is NonNullGraphType || x is ListGraphType))
+                    .ToList();
+            }
         }
 
         public GraphType FindType(string name)

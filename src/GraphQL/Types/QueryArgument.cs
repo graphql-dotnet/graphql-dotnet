@@ -20,6 +20,8 @@ namespace GraphQL.Types
 
         public string Name { get; set; }
 
+        public string Description { get; set; }
+
         public object DefaultValue { get; set; }
 
         public Type Type { get; private set; }

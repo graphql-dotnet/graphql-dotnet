@@ -177,6 +177,7 @@
             var query = @"
             query SchemaIntrospectionQuery {
               __schema {
+                types { name, kind }
                 queryType { name, kind }
                 mutationType { name }
                 directives {
@@ -196,6 +197,83 @@
               'directives': [],
             }
             }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_querying_field_args()
+        {
+            var query = @"
+            query SchemaIntrospectionQuery {
+              __schema {
+                queryType {
+                  fields {
+                    name
+                    args {
+                      name
+                      description
+                      type {
+                        name
+                        kind
+                        ofType {
+                          name
+                          kind
+                        }
+                      }
+                      defaultValue
+                    }
+                  }
+                }
+              }
+            }
+            ";
+            var expected = @"{
+            '__schema': {
+              'queryType': { 'name':'Query', 'kind': 'OBJECT'},
+              'mutationType': null,
+              'directives': [],
+            }
+            }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void full_schema_query()
+        {
+            var query = @"
+            query SchemaIntrospectionQuery {
+              __schema {
+                queryType { name, kind }
+                types { 
+                    kind
+                    name
+                    description
+                    fields {
+                        name
+                        description
+                        type {
+                            name
+                            kind
+                        }
+                        isDeprecated
+                        deprecationReason
+                    }
+                }
+                mutationType { name }
+                directives {
+                  name
+                  description
+                  onOperation
+                  onFragment
+                  onField
+                }
+              }
+            }
+            ";
+
+            var expected = "{'__schema':''}";
 
             AssertQuerySuccess(query, expected);
         }

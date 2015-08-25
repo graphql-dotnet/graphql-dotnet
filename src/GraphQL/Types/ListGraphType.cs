@@ -11,9 +11,9 @@ namespace GraphQL.Types
         }
     }
 
-    public class ListGraphType : GraphType
+    public abstract class ListGraphType : GraphType
     {
-        public ListGraphType(Type type)
+        protected ListGraphType(Type type)
         {
             Type = type;
         }

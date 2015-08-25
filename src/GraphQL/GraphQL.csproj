@@ -57,6 +57,7 @@
     <Compile Include="Introspection\TypeKind.cs" />
     <Compile Include="Introspection\TypeMetaFieldType.cs" />
     <Compile Include="Introspection\TypeNameMetaFieldType.cs" />
+    <Compile Include="Introspection\__Directive.cs" />
     <Compile Include="Introspection\__EnumValue.cs" />
     <Compile Include="Introspection\__Field.cs" />
     <Compile Include="Introspection\__InputValue.cs" />

@@ -11,9 +11,9 @@ namespace GraphQL.Types
         }
     }
 
-    public class NonNullGraphType : GraphType
+    public abstract class NonNullGraphType : GraphType
     {
-        public NonNullGraphType(Type type)
+        protected NonNullGraphType(Type type)
         {
             if (type == typeof (NonNullGraphType))
             {

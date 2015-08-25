@@ -11,35 +11,35 @@ namespace GraphQL.Introspection
             Name = "__Type";
             Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
-                if (context.Source is ScalarGraphType)
+                if (context.Source is GraphType)
                 {
-                    return TypeKind.SCALAR;
-                } else if (context.Source is ObjectGraphType)
+                    return KindForInstance((GraphType)context.Source);
+                }
+                else if (context.Source is Type)
                 {
-                    return TypeKind.OBJECT;
-                } else if (context.Source is InterfaceGraphType)
-                {
-                    return TypeKind.INTERFACE;
-                } else if (context.Source is UnionGraphType)
-                {
-                    return TypeKind.UNION;
-                } else if (context.Source is EnumerationGraphType)
-                {
-                    return TypeKind.ENUM;
-                } else if (context.Source is InputObjectGraphType)
-                {
-                    return TypeKind.INPUT_OBJECT;
-                } else if (context.Source is ListGraphType)
-                {
-                    return TypeKind.LIST;
-                } else if (context.Source is NonNullGraphType)
-                {
-                    return TypeKind.NON_NULL;
+                    return KindForType((Type)context.Source);
                 }
 
                 throw new ExecutionError("Unkown kind of type: {0}".ToFormat(context.Source));
             });
-            Field<StringGraphType>("name");
+            Field<StringGraphType>("name", resolve: context =>
+            {
+                if (context.Source is Type)
+                {
+                    var type = (Type) context.Source;
+
+                    if (typeof (NonNullGraphType).IsAssignableFrom(type)
+                        || typeof (ListGraphType).IsAssignableFrom(type))
+                    {
+                        return null;
+                    }
+
+                    var resolved = context.Schema.FindType(type);
+                    return resolved.Name;
+                }
+
+                return ((GraphType) context.Source).Name;
+            });
             Field<StringGraphType>("description");
             Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(new[]
@@ -63,12 +63,12 @@ namespace GraphQL.Introspection
 
                     return Enumerable.Empty<FieldType>();
                 });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", null, null, context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: context =>
             {
                 var type = context.Source as IImplementInterfaces;
                 return type != null ? type.Interfaces : Enumerable.Empty<Type>();
             });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", null, null, context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
                 if (context.Source is InterfaceGraphType || context.Source is UnionGraphType)
                 {
@@ -99,12 +99,98 @@ namespace GraphQL.Introspection
 
                     return Enumerable.Empty<EnumValue>();
                 });
-            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", null, null, context =>
+            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
             {
                 var type = context.Source as InputObjectGraphType;
                 return type != null ? type.Fields : Enumerable.Empty<FieldType>();
             });
-            Field<__Type>("ofType");
+            Field<__Type>("ofType", resolve: context =>
+            {
+                if (context.Source is Type)
+                {
+                    var type = (Type) context.Source;
+                    var genericType = type.GetGenericArguments()[0];
+                    return genericType;
+                }
+
+                return null;
+            });
+        }
+
+        public TypeKind KindForInstance(GraphType type)
+        {
+            if (type is EnumerationGraphType)
+            {
+                return TypeKind.ENUM;
+            }
+            if (type is ScalarGraphType)
+            {
+                return TypeKind.SCALAR;
+            }
+            if (type is ObjectGraphType)
+            {
+                return TypeKind.OBJECT;
+            }
+            if (type is InterfaceGraphType)
+            {
+                return TypeKind.INTERFACE;
+            }
+            if (type is UnionGraphType)
+            {
+                return TypeKind.UNION;
+            }
+            if (type is InputObjectGraphType)
+            {
+                return TypeKind.INPUT_OBJECT;
+            }
+            if (type is ListGraphType)
+            {
+                return TypeKind.LIST;
+            }
+            if (type is NonNullGraphType)
+            {
+                return TypeKind.NON_NULL;
+            }
+
+            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
+        }
+
+        public TypeKind KindForType(Type type)
+        {
+            if (typeof(EnumerationGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.ENUM;
+            }
+            if (typeof(ScalarGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.SCALAR;
+            }
+            if (typeof(ObjectGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.OBJECT;
+            }
+            if (typeof(InterfaceGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.INTERFACE;
+            }
+            if (typeof(UnionGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.UNION;
+            }
+            if (typeof (InputObjectGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.INPUT_OBJECT;
+            }
+            if (typeof (ListGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.LIST;
+            }
+            if (typeof(NonNullGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.NON_NULL;
+            }
+
+            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
         }
     }
 }
