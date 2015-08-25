@@ -270,8 +270,7 @@
                   onField
                 }
               }
-            }
-            ";
+            }";
 
             var expected = "{'__schema':''}";
 

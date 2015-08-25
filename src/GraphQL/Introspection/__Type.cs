@@ -92,9 +92,10 @@ namespace GraphQL.Introspection
                     if (type != null)
                     {
                         var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
-                        return !includeDeprecated
-                            ? type.Values.Where(e => !string.IsNullOrWhiteSpace(e.DeprecationReason))
-                            : type.Values;
+                        var values = !includeDeprecated
+                            ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
+                            : type.Values.ToList();
+                        return values;
                     }
 
                     return Enumerable.Empty<EnumValue>();
@@ -109,8 +110,18 @@ namespace GraphQL.Introspection
                 if (context.Source is Type)
                 {
                     var type = (Type) context.Source;
-                    var genericType = type.GetGenericArguments()[0];
+                    var genericType = type.IsConstructedGenericType ? type.GetGenericArguments()[0] : null;
                     return genericType;
+                }
+
+                if (context.Source is NonNullGraphType)
+                {
+                    return ((NonNullGraphType) context.Source).Type;
+                }
+
+                if (context.Source is ListGraphType)
+                {
+                    return ((ListGraphType) context.Source).Type;
                 }
 
                 return null;

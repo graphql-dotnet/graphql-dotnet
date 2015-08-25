@@ -79,6 +79,7 @@ Executing a query.
 ```csharp
 public string Execute(
   Schema schema,
+  object rootObject,
   string query,
   string operationName = null,
   Inputs inputs = null)
@@ -86,7 +87,7 @@ public string Execute(
   var executer = new DocumentExecuter();
   var writer = new DocumentWriter();
 
-  var result = executer.Execute(schema, query, operationName, inputs);
+  var result = executer.Execute(schema, rootObject, query, operationName, inputs);
   return writer.Write(result);
 }
 

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using GraphQL.Types;
+﻿using GraphQL.Types;
+using System.Linq;
 
 namespace GraphQL.Introspection
 {
@@ -12,7 +12,7 @@ namespace GraphQL.Introspection
             Field<StringGraphType>("description");
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args", resolve: context =>
             {
-                var fieldType = (FieldType) context.Source;
+                var fieldType = (DirectiveGraphType) context.Source;
                 return fieldType.Arguments ?? Enumerable.Empty<QueryArgument>();
             });
             Field<NonNullGraphType<BooleanGraphType>>("onOperation");

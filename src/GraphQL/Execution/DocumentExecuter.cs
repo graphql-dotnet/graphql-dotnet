@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using GraphQL.Execution;
+﻿using GraphQL.Execution;
 using GraphQL.Introspection;
 using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Validation;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace GraphQL
 {
@@ -137,6 +137,7 @@ namespace GraphQL
                 resolveContext.Source = source;
                 var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
+
                 if (parentType is __Field && result is Type)
                 {
                     result = context.Schema.FindType(result as Type);

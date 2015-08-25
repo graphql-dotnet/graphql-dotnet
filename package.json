@@ -18,8 +18,15 @@
     "url": "https://github.com/joemcbride/graphql-dotnet/issues"
   },
   "homepage": "https://github.com/joemcbride/graphql-dotnet",
+  "dependencies": {
+    "graphiql": "^0.1.0",
+    "graphql": "^0.4.2",
+    "isomorphic-fetch": "^2.1.1",
+    "react": "^0.13.3"
+  },
   "devDependencies": {
     "babel": "^5.6.14",
+    "babel-loader": "^5.3.2",
     "babel-eslint": "^3.1.23",
     "child-process-promise": "^1.1.0",
     "eslint": "^0.24.0",

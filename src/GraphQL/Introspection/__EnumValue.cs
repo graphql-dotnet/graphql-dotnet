@@ -14,7 +14,7 @@ namespace GraphQL.Introspection
                 var enumValue = context.Source as EnumValue;
                 return enumValue != null && !string.IsNullOrWhiteSpace(enumValue.DeprecationReason);
             });
-            Field<NonNullGraphType<StringGraphType>>("deprecationReason");
+            Field<StringGraphType>("deprecationReason");
         }
     }
 }
