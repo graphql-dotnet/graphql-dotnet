@@ -5,6 +5,7 @@
 *.suo
 *.nupkg
 npm-debug.log
+bundle.js
 
 TestResults/
 [Oo]bj/

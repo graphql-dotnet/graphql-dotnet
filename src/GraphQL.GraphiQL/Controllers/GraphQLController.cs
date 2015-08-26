@@ -1,7 +1,6 @@
 ﻿using GraphQL.Tests;
 using GraphQL.Types;
 using System.Web.Http;
-using GraphQL.Introspection;
 
 namespace GraphQL.GraphiQL.Controllers
 {
