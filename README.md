@@ -12,6 +12,10 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 
 `PM> Install-Package GraphQL`
 
+## GraphiQL
+There is a sample web api project hosting the GraphiQL interface.
+![](http://i.imgur.com/KUZM5N9.png)
+
 ## Usage
 
 Define your type system with a top level query object.
