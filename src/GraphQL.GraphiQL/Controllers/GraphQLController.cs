@@ -14,19 +14,9 @@ namespace GraphQL.GraphiQL.Controllers
             _schema = new StarWarsSchema();
         }
 
-        public ExecutionResult Get()
+        public ExecutionResult Post(GraphQLQuery query)
         {
-            return Execute(_schema, null, "{ hero { __typename name } }");
-        }
-
-        public ExecutionResult Post()
-        {
-            return Execute(_schema, null, SchemaIntrospection.IntrospectionQuery);
-        }
-
-        public ExecutionResult Post(string query)
-        {
-            return Execute(_schema, null, query);
+            return Execute(_schema, null, query.Query);
         }
 
         public ExecutionResult Execute(
@@ -37,9 +27,13 @@ namespace GraphQL.GraphiQL.Controllers
           Inputs inputs = null)
         {
             var executer = new DocumentExecuter();
-
-            var result = executer.Execute(schema, rootObject, query, operationName);
-            return result;
+            return executer.Execute(schema, rootObject, query, operationName);
         }
+    }
+
+    public class GraphQLQuery
+    {
+        public string Query { get; set; }
+        public string Variables { get; set; }
     }
 }
