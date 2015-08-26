@@ -2,18 +2,16 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.2.0.0</version>
+    <version>0.3.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/joemcbride/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/joemcbride/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* Added fragment execution
-* Added @include/@skip directives
-* Added the ability to specifiy a root object
-* Added interfaces IDocumentExecuter, IDocumentBuilder, IDocumentWriter, IDocumentValidation
-* Changed DocumentWriter to default to unformatted JSON</releaseNotes>
+    <releaseNotes>* BREAKING CHANGE: The way field registration works has changed.  Only Field&lt;T&gt; registration is now supported.  This was to support introspection.
+* Added introspection support.
+* Antrl/JSON.NET types are now marked as internal.</releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
