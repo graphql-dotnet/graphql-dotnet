@@ -108,6 +108,19 @@ namespace GraphQL.Types
                     AddType(context.ResolveType(field.Type), context);
                 }
             });
+
+            if (type is ObjectGraphType)
+            {
+                var obj = (ObjectGraphType) type;
+                obj.Interfaces.Apply(objectInterface =>
+                {
+                    var foundType = this[objectInterface];
+                    if (foundType == null)
+                    {
+                        AddType(context.ResolveType(objectInterface), context);
+                    }
+                });
+            }
         }
     }
 }

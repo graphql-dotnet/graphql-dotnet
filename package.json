@@ -12,7 +12,7 @@
     "type": "git",
     "url": "https://github.com/joemcbride/graphql-dotnet.git"
   },
-  "author": "",
+  "author": "Joe McBride",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/joemcbride/graphql-dotnet/issues"

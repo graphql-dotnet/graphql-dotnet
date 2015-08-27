@@ -76,7 +76,7 @@ namespace GraphQL.Types
             return instance;
         }
 
-        private void EnsureLookup()
+        public void EnsureLookup()
         {
             if (_lookup == null)
             {

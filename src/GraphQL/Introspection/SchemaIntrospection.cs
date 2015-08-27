@@ -33,8 +33,7 @@ namespace GraphQL.Introspection
           kind
           name
           description
-          fields
-          {
+          fields {
             name
             description
             args {

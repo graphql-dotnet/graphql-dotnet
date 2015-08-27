@@ -71,6 +71,7 @@
     <Compile Include="Expect.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
+    <Compile Include="Types\SchemaTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
