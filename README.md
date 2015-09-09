@@ -110,7 +110,7 @@ var query = @"
   }
 ";
 
-var result = Execute(schema, query);
+var result = Execute(schema, null, query);
 
 Console.Writeline(result);
 
