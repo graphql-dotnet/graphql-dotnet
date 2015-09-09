@@ -100,7 +100,7 @@ public string Execute(
   return writer.Write(result);
 }
 
-var schema = new StartWarsSchema();
+var schema = new StarWarsSchema();
 
 var query = @"
   query HeroNameQuery {
