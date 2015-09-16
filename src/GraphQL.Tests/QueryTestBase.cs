@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -21,7 +22,7 @@ namespace GraphQL.Tests
         public QueryTestBase()
         {
             Schema = new TSchema();
-            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
+            Executer = new AsyncDocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
             Writer = new DocumentWriter(Formatting.Indented);
         }
 
@@ -39,7 +40,9 @@ namespace GraphQL.Tests
 
         public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root)
         {
-            var runResult = Executer.Execute(Schema, root, query, null, inputs);
+            var runTask = Executer.ExecuteAsync(Schema, root, query, null, inputs);
+            Task.WaitAll(runTask);
+            var runResult = runTask.Result;
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(executionResult);

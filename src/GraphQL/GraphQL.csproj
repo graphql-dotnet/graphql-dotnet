@@ -14,6 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
+    <Compile Include="Execution\AsyncDocumentExecuter.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />
     <Compile Include="Introspection\SchemaMetaFieldType.cs" />
     <Compile Include="Introspection\TypeKind.cs" />
