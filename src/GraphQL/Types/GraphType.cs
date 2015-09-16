@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GraphQL.Types
 {
@@ -21,8 +22,12 @@ namespace GraphQL.Types
             }
         }
 
-        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
+        public void Field<TType>(
+            string name, 
+            string description = null, 
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext, object> resolve = null,
+            Func<ResolveFieldContext, Task<object>> resolveAsync = null)
             where TType : GraphType
         {
             if (_fields.Exists(x => x.Name == name))
@@ -35,7 +40,8 @@ namespace GraphQL.Types
                 Name = name,
                 Type = typeof(TType),
                 Arguments = arguments,
-                Resolve = resolve
+                Resolve = resolve,
+                ResolveAsync = resolveAsync
             });
         }
 
