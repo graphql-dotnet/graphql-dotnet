@@ -18,7 +18,5 @@ namespace GraphQL.Types
         public QueryArguments Arguments { get; set; }
 
         public Func<ResolveFieldContext, object> Resolve { get; set; }
-
-        public Func<ResolveFieldContext, Task<object>> ResolveAsync { get; set; }
     }
 }

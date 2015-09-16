@@ -26,8 +26,7 @@ namespace GraphQL.Types
             string name, 
             string description = null, 
             QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null,
-            Func<ResolveFieldContext, Task<object>> resolveAsync = null)
+            Func<ResolveFieldContext, object> resolve = null)
             where TType : GraphType
         {
             if (_fields.Exists(x => x.Name == name))
@@ -40,8 +39,7 @@ namespace GraphQL.Types
                 Name = name,
                 Type = typeof(TType),
                 Arguments = arguments,
-                Resolve = resolve,
-                ResolveAsync = resolveAsync
+                Resolve = resolve
             });
         }
 

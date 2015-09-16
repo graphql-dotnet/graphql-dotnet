@@ -131,12 +131,15 @@ namespace GraphQL
                 resolveContext.ParentType = parentType;
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
-                var resolve = fieldDefinition.ResolveAsync ?? fieldDefinition.Resolve ?? defaultResolve;
+                var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
 
-                if(result is Task<object>)
+                if(result is Task)
                 {
-                    result = await (result as Task<object>);
+                    var task = result as Task;
+                    await task;
+
+                    result = GetProperyValue(task, "Result");
                 }
 
                 if (parentType is __Field && result is Type)
