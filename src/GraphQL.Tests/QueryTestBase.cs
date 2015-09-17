@@ -39,7 +39,7 @@ namespace GraphQL.Tests
 
         public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root)
         {
-            var runResult = Executer.Execute(Schema, root, query, null, inputs).Result;
+            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs).Result;
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(executionResult);

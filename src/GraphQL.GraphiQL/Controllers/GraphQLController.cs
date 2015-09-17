@@ -27,7 +27,7 @@ namespace GraphQL.GraphiQL.Controllers
           Inputs inputs = null)
         {
             var executer = new DocumentExecuter();
-            return await executer.Execute(schema, rootObject, query, operationName);
+            return await executer.ExecuteAsync(schema, rootObject, query, operationName);
         }
     }
 

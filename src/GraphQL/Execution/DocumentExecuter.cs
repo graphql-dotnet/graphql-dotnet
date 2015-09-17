@@ -14,7 +14,7 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        Task<ExecutionResult> Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null);
+        Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -33,7 +33,7 @@ namespace GraphQL
             _documentValidator = documentValidator;
         }
 
-        public async Task<ExecutionResult> Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null)
+        public async Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null)
         {
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
