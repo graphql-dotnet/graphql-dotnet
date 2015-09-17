@@ -6,35 +6,36 @@ using GraphQL.Validation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace GraphQL
-{
-    public interface IDocumentExecuter
-    {
-        ExecutionResult Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null);
-        Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null);
-    }
+{ 
 
-    public class DocumentExecuter : IDocumentExecuter
+    public class AsyncDocumentExecuter : IDocumentExecuter
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
 
-        public DocumentExecuter()
+        public AsyncDocumentExecuter()
             : this(new AntlrDocumentBuilder(), new DocumentValidator())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
+        public AsyncDocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
         }
 
         public ExecutionResult Execute(Schema schema, object root, string query, string operationName, Inputs inputs = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null)
         {
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
@@ -51,7 +52,7 @@ namespace GraphQL
                     return result;
                 }
 
-                result.Data = ExecuteOperation(context);
+                result.Data = await ExecuteOperation(context);
                 result.Errors = context.Errors;
             }
             else
@@ -61,11 +62,6 @@ namespace GraphQL
             }
 
             return result;
-        }
-
-        public Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null)
-        {
-            throw new NotImplementedException();
         }
 
         public ExecutionContext BuildExecutionContext(
@@ -96,29 +92,45 @@ namespace GraphQL
             return context;
         }
 
-        public object ExecuteOperation(ExecutionContext context)
+        public async Task<object> ExecuteOperation(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Schema, context.Operation);
             var fields = CollectFields(context, rootType, context.Operation.Selections, null);
 
-            return ExecuteFields(context, rootType, context.RootObject, fields);
+            return await ExecuteFields(context, rootType, context.RootObject, fields);
         }
 
-        public object ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
+        public async Task<object> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
         {
             var result = new Dictionary<string, object>();
+            var tasks = new List<Task<object>>();
 
-            fields.Apply(pair =>
+            foreach(var pair in fields)
             {
-                result[pair.Key] = ResolveField(context, rootType, source, pair.Value);
-            });
+                Debug.WriteLine("ResolveField: " + pair.Key + " Queue " + DateTime.UtcNow.Second);
+                // result[pair.Key] = ResolveField(context, rootType, source, pair.Value);
+                result[pair.Key] = null;
+                tasks.Add(ResolveField(context, rootType, source, pair.Value));
+            }
+
+            Debug.WriteLine("ResolveField: WhenAll " + DateTime.UtcNow.Second);
+            var results = await Task.WhenAll(tasks);
+            Debug.WriteLine("ResolveField: WhenAllDone " + DateTime.UtcNow.Second);
+            
+            int i = 0;
+            foreach (var pair in fields)
+            {
+                Debug.WriteLine("ResolveField: " + pair.Key + " Done " + DateTime.UtcNow.Second); 
+                result[pair.Key] = results[i];
+                i++;
+            }                
 
             return result;
         }
 
-        public object ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
+        public async Task<object> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
         {
-            var field = fields.First();
+            var field = fields.First(); 
 
             var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
             if (fieldDefinition == null)
@@ -145,11 +157,26 @@ namespace GraphQL
                 var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
 
-                if (parentType is __Field && result is Type)
+                if (result is Task)
                 {
-                    result = context.Schema.FindType(result as Type);
+                    await ((Task<object>)result);
+                    object r = ((Task<object>)result).Result;
+
+                    if (parentType is __Field && r is Type)
+                    {
+                        r = context.Schema.FindType(r as Type);
+                    }
+                    return await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, r);
+
                 }
-                return CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result);
+                else
+                {
+                    if (parentType is __Field && result is Type)
+                    {
+                        result = context.Schema.FindType(result as Type);
+                    }
+                    return await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result);
+                }
             }
             catch (Exception exc)
             {
@@ -167,12 +194,12 @@ namespace GraphQL
             return val;
         }
 
-        public object CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
             if (fieldType is NonNullGraphType)
             {
                 var nonNullType = fieldType as NonNullGraphType;
-                var completed = CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
+                var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
                 if (completed == null)
                 {
                     throw new ExecutionError("Cannot return null for non-null type. Field: {0}".ToFormat(nonNullType.Name));
@@ -204,12 +231,10 @@ namespace GraphQL
 
                 var listType = fieldType as ListGraphType;
                 var itemType = context.Schema.FindType(listType.Type);
-
-                var results = list.Map(item =>
-                {
-                    return CompleteValue(context, itemType, fields, item);
-                });
-
+                 
+                var tasks = ((IEnumerable<object>)list).Select(_ => CompleteValue(context, itemType, fields, _));
+                var results = await Task.WhenAll(tasks);
+                                                         
                 return results;
             }
 
@@ -233,7 +258,7 @@ namespace GraphQL
                 subFields = CollectFields(context, objectType, field.Selections, subFields);
             });
 
-            return ExecuteFields(context, objectType, result, subFields);
+            return await ExecuteFields(context, objectType, result, subFields);
         }
 
         public Dictionary<string, object> GetArgumentValues(Schema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

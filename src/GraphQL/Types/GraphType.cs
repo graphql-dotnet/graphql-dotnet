@@ -21,8 +21,10 @@ namespace GraphQL.Types
             }
         }
 
-        public void Field<TType>(string name, string description = null, QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
+        public void Field<TType>(string name, 
+                                 string description = null, 
+                                 QueryArguments arguments = null,
+                                 Func<ResolveFieldContext, object> resolve = null)
             where TType : GraphType
         {
             if (_fields.Exists(x => x.Name == name))

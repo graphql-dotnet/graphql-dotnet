@@ -12,28 +12,32 @@ namespace GraphQL.Tests
         {
             _humans.Add(new Human
             {
-                Id = "1", Name = "Luke",
+                Id = "1", 
+                Name = "Luke",
                 Friends = new[] {"3", "4"},
                 AppearsIn = new[] {4, 5, 6},
                 HomePlanet = "Tatooine"
             });
             _humans.Add(new Human
             {
-                Id = "2", Name = "Vader",
+                Id = "2", 
+                Name = "Vader",
                 AppearsIn = new[] {4, 5, 6},
                 HomePlanet = "Tatooine"
             });
 
             _droids.Add(new Droid
             {
-                Id = "3", Name = "R2-D2",
+                Id = "3", 
+                Name = "R2-D2",
                 Friends = new[] {"1", "4"},
                 AppearsIn = new[] {4, 5, 6},
                 PrimaryFunction = "Astromech"
             });
             _droids.Add(new Droid
             {
-                Id = "4", Name = "C-3PO",
+                Id = "4", 
+                Name = "C-3PO",
                 AppearsIn = new[] {4, 5, 6},
                 PrimaryFunction = "Protocol"
             });
