@@ -1,5 +1,6 @@
 ﻿using GraphQL.Tests;
 using GraphQL.Types;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace GraphQL.GraphiQL.Controllers
@@ -13,12 +14,12 @@ namespace GraphQL.GraphiQL.Controllers
             _schema = new StarWarsSchema();
         }
 
-        public ExecutionResult Post(GraphQLQuery query)
+        public async Task<ExecutionResult> Post(GraphQLQuery query)
         {
-            return Execute(_schema, null, query.Query);
+            return await Execute(_schema, null, query.Query);
         }
 
-        public ExecutionResult Execute(
+        public async Task<ExecutionResult> Execute(
           Schema schema,
           object rootObject,
           string query,
@@ -26,7 +27,7 @@ namespace GraphQL.GraphiQL.Controllers
           Inputs inputs = null)
         {
             var executer = new DocumentExecuter();
-            return executer.Execute(schema, rootObject, query, operationName);
+            return await executer.ExecuteAsync(schema, rootObject, query, operationName);
         }
     }
 

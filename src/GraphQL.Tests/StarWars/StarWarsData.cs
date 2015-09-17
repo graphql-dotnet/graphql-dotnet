@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GraphQL.Tests
 {
@@ -56,14 +57,14 @@ namespace GraphQL.Tests
             return friends;
         }
 
-        public Human GetHumanById(string id)
+        public Task<Human> GetHumanByIdAsync(string id)
         {
-            return _humans.FirstOrDefault(h => h.Id == id);
+            return Task.FromResult(_humans.FirstOrDefault(h => h.Id == id));
         }
 
-        public Droid GetDroidById(string id)
+        public Task<Droid> GetDroidByIdAsync(string id)
         {
-            return _droids.FirstOrDefault(h => h.Id == id);
+            return Task.FromResult(_droids.FirstOrDefault(h => h.Id == id));
         }
     }
 }
