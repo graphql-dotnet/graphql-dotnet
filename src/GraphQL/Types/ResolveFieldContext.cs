@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GraphQL.Language;
+using System.Threading;
 
 namespace GraphQL.Types
 {
@@ -16,5 +17,7 @@ namespace GraphQL.Types
         public object Source { get; set; }
 
         public Schema Schema { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

@@ -150,6 +150,7 @@ namespace GraphQL
                 resolveContext.ParentType = parentType;
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
+                resolveContext.CancellationToken = context.CancellationToken;
                 var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
 
