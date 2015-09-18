@@ -8,13 +8,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null);
+        Task<ExecutionResult> ExecuteAsync(
+            Schema schema, 
+            object root, 
+            string query, 
+            string operationName, 
+            Inputs inputs = null, 
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -33,7 +42,13 @@ namespace GraphQL
             _documentValidator = documentValidator;
         }
 
-        public async Task<ExecutionResult> ExecuteAsync(Schema schema, object root, string query, string operationName, Inputs inputs = null)
+        public async Task<ExecutionResult> ExecuteAsync(
+            Schema schema, 
+            object root, 
+            string query, 
+            string operationName, 
+            Inputs inputs = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
@@ -42,7 +57,7 @@ namespace GraphQL
 
             if (validationResult.IsValid)
             {
-                var context = BuildExecutionContext(schema, root, document, operationName, inputs);
+                var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
 
                 if (context.Errors.Any())
                 {
@@ -67,7 +82,8 @@ namespace GraphQL
             object root,
             Document document,
             string operationName,
-            Inputs inputs)
+            Inputs inputs,
+            CancellationToken cancellationToken)
         {
             var context = new ExecutionContext();
             context.Schema = schema;
@@ -86,6 +102,7 @@ namespace GraphQL
             context.Operation = operation;
             context.Variables = GetVariableValues(schema, operation.Variables, inputs);
             context.Fragments = document.Fragments;
+            context.CancellationToken = cancellationToken;
 
             return context;
         }
@@ -107,6 +124,8 @@ namespace GraphQL
 
         public async Task<object> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var field = fields.First();
 
             var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
