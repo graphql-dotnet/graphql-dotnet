@@ -8,9 +8,9 @@ namespace GraphQL
 {
     public static class EnumerableExtensions
     {
-        public static IEnumerable Map(this IEnumerable items, Func<object, object> map)
+        public static IEnumerable Map<TList, TResult>(this IEnumerable items, Func<TList, TResult> map)
         {
-            return from object item in items select map(item);
+            return from TList item in items select map(item);
         }
 
         public static async Task<IEnumerable> MapAsync(this IEnumerable items, Func<object, Task<object>> map)

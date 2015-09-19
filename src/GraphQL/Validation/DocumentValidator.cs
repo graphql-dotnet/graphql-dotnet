@@ -1,24 +1,41 @@
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
 {
     public interface IDocumentValidator
     {
-        ValidationResult IsValid(Schema schema, Document document, string operationName);
+        List<IValidationRule> Rules(Schema schema, Document document);
+        IValidationResult IsValid(Schema schema, Document document, string operationName);
     }
 
     public class DocumentValidator : IDocumentValidator
     {
-        public ValidationResult IsValid(Schema schema, Document document, string operationName)
+        public List<IValidationRule> Rules(Schema schema, Document docoment)
+        {
+            List<IValidationRule> rules = new List<IValidationRule>()
+            {
+                new OperationNameUniquenessRule(),
+                new LoneAnonymousOperationRule()
+            };
+            return rules;
+        }
+
+        public IValidationResult IsValid(Schema schema, Document document, string operationName)
         {
             var result = new ValidationResult();
+            var rules = Rules(schema, document);
 
-            if (string.IsNullOrWhiteSpace(operationName)
-                && document.Operations.Count() > 1)
+            List<ExecutionError> errors = new List<ExecutionError>(rules.Count);
+
+            foreach (IValidationRule rule in rules)
             {
-                result.Errors.Add(new ExecutionError("Must provide operation name if query contains multiple operations"));
+                List<ExecutionError> newErrors = rule.Validate(schema, document, operationName);
+                if (newErrors != null)
+                    errors.AddRange(newErrors);
             }
 
             return result;
