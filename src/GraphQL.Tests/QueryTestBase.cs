@@ -6,6 +6,8 @@ using GraphQL.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Should;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace GraphQL.Tests
 {
@@ -31,15 +33,15 @@ namespace GraphQL.Tests
 
         public IDocumentWriter Writer { get; private set; }
 
-        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null)
+        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var queryResult = CreateQueryResult(expected);
-            AssertQuery(query, queryResult, inputs, root);
+            AssertQuery(query, queryResult, inputs, root, cancellationToken);
         }
 
-        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root)
+        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs).Result;
+            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(executionResult);

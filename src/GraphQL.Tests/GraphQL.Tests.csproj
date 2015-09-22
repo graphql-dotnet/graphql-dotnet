@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
