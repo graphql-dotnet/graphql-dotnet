@@ -51,7 +51,10 @@ namespace GraphQL
                 }
 
                 result.Data = await ExecuteOperation(context);
-                result.Errors = context.Errors;
+                if (context.Errors.Any())
+                {
+                    result.Errors = context.Errors;
+                }
             }
             else
             {

@@ -52,7 +52,7 @@ namespace GraphQL.Tests
         public ExecutionResult CreateQueryResult(string result)
         {
             var expected = JObject.Parse(result);
-            return new ExecutionResult { Data = expected, Errors = new ExecutionErrors()};
+            return new ExecutionResult { Data = expected };
         }
 
         public ExecutionResult CreateErrorQueryResult()
