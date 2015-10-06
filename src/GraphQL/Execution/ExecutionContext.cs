@@ -1,5 +1,6 @@
 ﻿using GraphQL.Language;
 using GraphQL.Types;
+using System.Threading;
 
 namespace GraphQL.Execution
 {
@@ -22,5 +23,7 @@ namespace GraphQL.Execution
         public Variables Variables { get; set; }
 
         public ExecutionErrors Errors { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }
