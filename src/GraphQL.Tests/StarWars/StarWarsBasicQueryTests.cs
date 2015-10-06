@@ -163,7 +163,7 @@ namespace GraphQL.Tests
             }
             ";
 
-            var inputs = new Inputs {["id"] = "1"};
+            var inputs = new Inputs {{"id", "1"}};
 
             AssertQuerySuccess(query, expected, inputs);
         }
