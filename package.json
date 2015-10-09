@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel-node tools/nuget.js --ver 0.3.0.0",
-    "build-dev": "babel-node tools/nuget.js --d"
+    "build-dev": "babel-node tools/nuget.js --d",
+    "test-dotnet": "powershell \".\\test.ps1\""
   },
   "repository": {
     "type": "git",
