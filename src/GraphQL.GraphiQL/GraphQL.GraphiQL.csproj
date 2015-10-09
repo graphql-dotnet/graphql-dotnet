@@ -169,6 +169,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\app.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="public\app.css" />
@@ -194,7 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Tests\GraphQL.Tests.csproj">
