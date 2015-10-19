@@ -66,9 +66,9 @@ namespace GraphQL.Types
 
         private GraphType AddType(Type type)
         {
-            var ctx = new TypeCollectionContext(ResolveType, (name, graphType) =>
+            var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
             {
-                _lookup[name] = graphType;
+              _lookup.AddType( name, graphType, context );
             });
 
             var instance = ResolveType(type);
@@ -82,9 +82,9 @@ namespace GraphQL.Types
             {
                 _lookup = new GraphTypesLookup();
 
-                var ctx = new TypeCollectionContext(ResolveType, (name, graphType) =>
+                var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
                 {
-                    _lookup[name] = graphType;
+                    _lookup.AddType( name, graphType, context );
                 });
 
                 _lookup.AddType(Query, ctx);

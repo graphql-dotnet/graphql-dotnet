@@ -62,6 +62,14 @@ namespace GraphQL.Types
             AddType = addType;
         }
 
+        public TypeCollectionContext(
+            Func<Type, GraphType> resolver,
+            Action<string, GraphType, TypeCollectionContext> addType)
+        {
+            ResolveType = resolver;
+            AddType = ( name, type ) => addType( name, type, this );
+        }
+
         public Func<Type, GraphType> ResolveType { get; private set; }
         public Action<string, GraphType> AddType { get; private set; }
     }
