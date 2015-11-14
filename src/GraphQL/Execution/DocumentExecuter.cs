@@ -1,15 +1,15 @@
-﻿using GraphQL.Execution;
-using GraphQL.Introspection;
-using GraphQL.Language;
-using GraphQL.Types;
-using GraphQL.Validation;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Execution;
+using GraphQL.Introspection;
+using GraphQL.Language;
+using GraphQL.Types;
+using GraphQL.Validation;
 
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
@@ -400,23 +400,28 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = type as ListGraphType;
+                var listItemType = schema.FindType(listType.Type);
                 var list = input as IEnumerable;
-                return list != null
-                    ? list.Map(item => CoerceValue(schema, listType, item))
-                    : new[] { input };
+                return list != null && !(input is string)
+                    ? list.Map(item => CoerceValue(schema, listItemType, item)).ToArray()
+                    : new[] { CoerceValue(schema, listItemType, input) };
             }
 
-            if (type is ObjectGraphType)
+            if (type is ObjectGraphType || type is InputObjectGraphType)
             {
-                var objType = type as ObjectGraphType;
+                var objType = type;
                 var obj = new Dictionary<string, object>();
                 var dict = (Dictionary<string, object>)input;
 
                 objType.Fields.Apply(field =>
                 {
-                    var fieldValue = CoerceValue(schema, schema.FindType(field.Type), dict[field.Name]);
-                    obj[field.Name] = fieldValue ?? field.DefaultValue;
+                    if (dict.ContainsKey(field.Name))
+                    {
+                        var fieldValue = CoerceValue(schema, schema.FindType(field.Type), dict[field.Name]);
+                        obj[field.Name] = fieldValue ?? field.DefaultValue;
+                    }
                 });
+                return obj;
             }
 
             if (type is ScalarGraphType)
@@ -452,23 +457,28 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = type as ListGraphType;
+                var listItemType = schema.FindType(listType.Type);
                 var list = input as IEnumerable;
-                return list != null
-                    ? list.Map(item => CoerceValueAst(schema, listType, item, variables))
-                    : new[] { input };
+                return list != null && !(input is string)
+                    ? list.Map(item => CoerceValueAst(schema, listItemType, item, variables)).ToArray()
+                    : new[] { CoerceValueAst(schema, listItemType, input, variables) };
             }
 
-            if (type is ObjectGraphType)
+            if (type is ObjectGraphType || type is InputObjectGraphType)
             {
-                var objType = type as ObjectGraphType;
+                var objType = type;
                 var obj = new Dictionary<string, object>();
                 var dict = (Dictionary<string, object>)input;
 
                 objType.Fields.Apply(field =>
                 {
-                    var fieldValue = CoerceValueAst(schema, schema.FindType(field.Type), dict[field.Name], variables);
-                    obj[field.Name] = fieldValue ?? field.DefaultValue;
+                    if (dict.ContainsKey(field.Name))
+                    {
+                        var fieldValue = CoerceValueAst(schema, schema.FindType(field.Type), dict[field.Name], variables);
+                        obj[field.Name] = fieldValue ?? field.DefaultValue;
+                    }
                 });
+                return obj;
             }
 
             if (type is ScalarGraphType)

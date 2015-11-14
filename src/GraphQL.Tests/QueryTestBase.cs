@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -6,8 +7,6 @@ using GraphQL.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Should;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace GraphQL.Tests
 {

@@ -8,7 +8,7 @@ namespace GraphQL
 {
     public static class EnumerableExtensions
     {
-        public static IEnumerable Map(this IEnumerable items, Func<object, object> map)
+        public static IEnumerable<object> Map(this IEnumerable items, Func<object, object> map)
         {
             return from object item in items select map(item);
         }
