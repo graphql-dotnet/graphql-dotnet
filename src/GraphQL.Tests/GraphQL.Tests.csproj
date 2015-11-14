@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
+    <Compile Include="Execution\MutationTests.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
     <Compile Include="StarWars\CharacterInterface.cs" />

@@ -19,5 +19,15 @@ namespace GraphQL.Types
         public Schema Schema { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
+
+        public TType Argument<TType>(string name)
+        {
+            if (Arguments.ContainsKey(name))
+            {
+                return (TType) Arguments[name];
+            }
+
+            return default(TType);
+        }
     }
 }

@@ -142,9 +142,9 @@ Console.Writeline(result);
 - [x] Directives
 - [x] Enumerations
 - [ ] Input Objects
-- [ ] Mutations
+- [x] Mutations
 - [ ] Unions
-- [ ] Async execution
+- [x] Async execution
 
 ### Validation
 - Not started
