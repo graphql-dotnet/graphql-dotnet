@@ -267,7 +267,12 @@ namespace GraphQL
             return definitionArguments.Aggregate(new Dictionary<string, object>(), (acc, arg) =>
             {
                 var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
-                var coercedValue = CoerceValueAst(schema, schema.FindType(arg.Type), value, variables);
+                var type = schema.FindType(arg.Type);
+                object coercedValue = null;
+                if (IsValidValue(schema, type, value))
+                {
+                    coercedValue = CoerceValueAst(schema, type, value, variables);
+                }
                 acc[arg.Name] = coercedValue ?? arg.DefaultValue;
                 return acc;
             });
@@ -361,17 +366,20 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = (ListGraphType) type;
+                var listItemType = schema.FindType(listType.Type);
                 var list = input as IEnumerable;
-                return list != null
-                    ? list.All(item => IsValidValue(schema, type, item))
-                    : IsValidValue(schema, listType, input);
+                return list != null && !(input is string)
+                    ? list.All(item => IsValidValue(schema, listItemType, item))
+                    : IsValidValue(schema, listItemType, input);
             }
 
-            if (type is ObjectGraphType)
+            if (type is ObjectGraphType || type is InputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
                 return dict != null
-                    && type.Fields.All(field => IsValidValue(schema, schema.FindType(field.Type), dict[field.Name]));
+                       && type.Fields.All(field =>
+                           IsValidValue(schema, schema.FindType(field.Type),
+                               dict.ContainsKey(field.Name) ? dict[field.Name] : null));
             }
 
             if (type is ScalarGraphType)
@@ -411,7 +419,12 @@ namespace GraphQL
             {
                 var objType = type;
                 var obj = new Dictionary<string, object>();
-                var dict = (Dictionary<string, object>)input;
+                var dict = input as Dictionary<string, object>;
+
+                if (dict == null)
+                {
+                    return null;
+                }
 
                 objType.Fields.Apply(field =>
                 {
@@ -468,7 +481,12 @@ namespace GraphQL
             {
                 var objType = type;
                 var obj = new Dictionary<string, object>();
-                var dict = (Dictionary<string, object>)input;
+                var dict = input as Dictionary<string, object>;
+
+                if (dict == null)
+                {
+                    return null;
+                }
 
                 objType.Fields.Apply(field =>
                 {

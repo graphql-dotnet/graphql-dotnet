@@ -12,12 +12,12 @@ namespace GraphQL.Tests.Execution
 
         public override object Coerce(object value)
         {
-            if (value == "SerializedValue")
+            if (value is string && value.Equals("SerializedValue"))
             {
                 return "DeserializedValue";
             }
 
-            if (value == "DeserializedValue")
+            if (value is string && value.Equals("DeserializedValue"))
             {
                 return "SerializedValue";
             }
@@ -87,6 +87,19 @@ namespace GraphQL.Tests.Execution
             }
             ";
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void does_not_use_incorrect_value()
+        {
+            var query = @"
+            {
+              fieldWithObjectInput(input: [""foo"", ""bar"", ""baz""])
+            }
+            ";
+            var expected = "{ \"fieldWithObjectInput\": \"null\" }";
 
             AssertQuerySuccess(query, expected);
         }

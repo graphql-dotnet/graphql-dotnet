@@ -246,8 +246,7 @@ namespace GraphQL.Tests.Execution
                   'sixth': null
                 }";
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6));
-            result.Errors.Count().ShouldEqual(2);
+            var result = AssertQueryWithErrors(query, expected, root: new Root(6), expectedErrorCount: 2);
             result.Errors.First().InnerException.Message.ShouldEqual("Cannot change the number");
             result.Errors.Last().InnerException.Message.ShouldEqual("Cannot change the number");
         }
