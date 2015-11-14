@@ -120,6 +120,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Execution\DocumentExecuter.cs" />
     <Compile Include="Http\DocumentWriter.cs" />
+    <Compile Include="Validation\IValidationResult.cs" />
+    <Compile Include="Validation\IValidationRule.cs" />
+    <Compile Include="Validation\Rules\LoneAnonymousOperationRule.cs" />
+    <Compile Include="Validation\Rules\OperationNameUniquenessRule.cs" />
+    <Compile Include="Validation\ValidationError.cs" />
     <Compile Include="Validation\ValidationResult.cs" />
   </ItemGroup>
   <ItemGroup>
