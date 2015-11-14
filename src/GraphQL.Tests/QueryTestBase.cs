@@ -33,22 +33,44 @@ namespace GraphQL.Tests
 
         public IDocumentWriter Writer { get; private set; }
 
-        public void AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var queryResult = CreateQueryResult(expected);
-            AssertQuery(query, queryResult, inputs, root, cancellationToken);
+            return AssertQuery(query, queryResult, inputs, root, cancellationToken);
         }
 
-        public void AssertQuery(string query, ExecutionResult executionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQueryWithErrors(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var queryResult = CreateQueryResult(expected);
+            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, cancellationToken);
+        }
+
+        public ExecutionResult AssertQueryIgnoreErrors(string query, ExecutionResult expectedExecutionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
         {
             var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = Writer.Write(executionResult);
+            var writtenResult = Writer.Write(new ExecutionResult {Data = runResult.Data});
+            var expectedResult = Writer.Write(expectedExecutionResult);
 
             Console.WriteLine(writtenResult);
 
             writtenResult.ShouldEqual(expectedResult);
+
+            return runResult;
+        }
+
+        public ExecutionResult AssertQuery(string query, ExecutionResult expectedExecutionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
+
+            var writtenResult = Writer.Write(runResult);
+            var expectedResult = Writer.Write(expectedExecutionResult);
+
+            Console.WriteLine(writtenResult);
+
+            writtenResult.ShouldEqual(expectedResult);
+
+            return runResult;
         }
 
         public ExecutionResult CreateQueryResult(string result)
