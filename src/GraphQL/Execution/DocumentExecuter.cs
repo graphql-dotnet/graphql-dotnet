@@ -268,6 +268,13 @@ namespace GraphQL
             {
                 var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
                 var type = schema.FindType(arg.Type);
+
+                if (value is Variable)
+                {
+                    var variable = (Variable) value;
+                    value = variables.ValueFor(variable.Name);
+                }
+
                 object coercedValue = null;
                 if (IsValidValue(schema, type, value))
                 {

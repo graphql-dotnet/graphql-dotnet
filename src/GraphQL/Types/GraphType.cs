@@ -44,6 +44,11 @@ namespace GraphQL.Types
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                Name = GetType().Name;
+            }
+
             return Name;
         }
     }

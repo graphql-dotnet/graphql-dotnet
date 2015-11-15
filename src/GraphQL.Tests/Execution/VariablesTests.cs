@@ -36,11 +36,6 @@ namespace GraphQL.Tests.Execution
             Field<NonNullGraphType<StringGraphType>>("c");
             Field<TestComplexScalarType>("d");
         }
-
-        public override string CollectTypes(TypeCollectionContext context)
-        {
-            return base.CollectTypes(context);
-        }
     }
 
     public class TestType : ObjectGraphType
