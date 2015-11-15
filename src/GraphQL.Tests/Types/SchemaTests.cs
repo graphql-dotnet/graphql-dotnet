@@ -41,6 +41,17 @@ namespace GraphQL.Tests.Types
                 "DInputType");
         }
 
+        [Test]
+        public void registers_type_when_list()
+        {
+            var schema = new ARootSchema();
+            schema.EnsureLookup();
+
+            ContainsTypeNames(
+                schema,
+                "DListType");
+        }
+
         public void ContainsTypeNames(Schema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
@@ -127,6 +138,7 @@ namespace GraphQL.Tests.Types
                 "filter",
                 arguments: new QueryArguments(new [] { new QueryArgument<DInputType> {Name = "input"} }),
                 resolve: ctx => new {id = "id"});
+            Field<ListGraphType<DListType>>("alist");
         }
     }
 
@@ -135,6 +147,14 @@ namespace GraphQL.Tests.Types
         public DInputType()
         {
             Field<StringGraphType>("one");
+        }
+    }
+
+    public class DListType : ObjectGraphType
+    {
+        public DListType()
+        {
+            Field<StringGraphType>("list");
         }
     }
 }

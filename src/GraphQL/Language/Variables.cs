@@ -16,7 +16,11 @@ namespace GraphQL.Language
         public object ValueFor(string name)
         {
             var variable = _variables.FirstOrDefault(v => v.Name == name);
-            return variable != null ? variable.Value : null;
+            if (variable == null)
+            {
+                return null;
+            }
+            return variable.Value ?? variable.DefaultValue;
         }
 
         public IEnumerator<Variable> GetEnumerator()

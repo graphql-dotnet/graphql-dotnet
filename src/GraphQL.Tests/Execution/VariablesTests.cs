@@ -1,5 +1,7 @@
-﻿using GraphQL.Types;
+﻿using System;
+using GraphQL.Types;
 using Newtonsoft.Json;
+using Should;
 
 namespace GraphQL.Tests.Execution
 {
@@ -17,12 +19,7 @@ namespace GraphQL.Tests.Execution
                 return "DeserializedValue";
             }
 
-            if (value is string && value.Equals("DeserializedValue"))
-            {
-                return "SerializedValue";
-            }
-
-            return null;
+            return value;
         }
     }
 
@@ -107,20 +104,142 @@ namespace GraphQL.Tests.Execution
 
     public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
+        private string _query = @"
+            query q($input: TestInputObject) {
+              fieldWithObjectInput(input: $input)
+            }
+        ";
+
         [Test]
         public void executes_with_complex_input()
         {
-            var query = @"
-                query q($input: TestInputObject) {
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+
+            var inputs = "{'input': {'a':'foo', 'b':['bar'], 'c': 'baz'} }".ToInputs();
+
+            AssertQuerySuccess(_query, expected, inputs);
+        }
+
+        [Test]
+        public void properly_parses_single_value_to_list()
+        {
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+
+            var inputs = "{'input': {'a':'foo', 'b':'bar', 'c': 'baz'} }".ToInputs();
+
+            AssertQuerySuccess(_query, expected, inputs);
+        }
+
+        [Test]
+        public void uses_default_value_when_not_provided()
+        {
+            var queryWithDefaults = @"
+                query q($input: TestInputObject = {a: ""foo"", b: [""bar""] c: ""baz""}) {
                   fieldWithObjectInput(input: $input)
                 }
             ";
 
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
-            var inputs = "{'input': {'a':'foo', 'b':['bar'], 'c': 'baz'} }".ToInputs();
+            AssertQuerySuccess(queryWithDefaults, expected);
+        }
 
-            AssertQuerySuccess(query, expected, inputs);
+        [Test]
+        public void executes_with_complex_scalar_input()
+        {
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+
+            var inputs = "{'input': {'c': 'foo', 'd': 'SerializedValue'} }".ToInputs();
+
+            AssertQuerySuccess(_query, expected, inputs);
+        }
+
+        [Test]
+        public void errors_on_null_for_nested_non_null()
+        {
+            var expected = "{}";
+
+            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': null} }".ToInputs();
+
+            Exception caughtError = null;
+
+            try
+            {
+                AssertQueryWithErrors(_query, expected, inputs);
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+        }
+
+        [Test]
+        public void errors_on_incorrect_type()
+        {
+            var expected = "{}";
+
+            var inputs = "{'input': 'foo bar'}".ToInputs();
+
+            Exception caughtError = null;
+
+            try
+            {
+                AssertQueryWithErrors(_query, expected, inputs);
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+        }
+
+        [Test]
+        public void errors_on_omission_of_nested_non_null()
+        {
+            var expected = "{}";
+
+            var inputs = "{'input': {'a': 'foo', 'b': 'bar'} }".ToInputs();
+
+            Exception caughtError = null;
+
+            try
+            {
+                AssertQueryWithErrors(_query, expected, inputs);
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+        }
+
+        [Test]
+        public void errors_on_addition_of_unknown_input_field()
+        {
+            var expected = "{}";
+
+            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'e': 'dog'} }".ToInputs();
+
+            Exception caughtError = null;
+
+            try
+            {
+                AssertQueryWithErrors(_query, expected, inputs);
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
     }
 }
