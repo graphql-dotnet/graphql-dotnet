@@ -323,7 +323,10 @@ namespace GraphQL
             {
                 variables.Apply(v =>
                 {
-                    v.Value = GetVariableValue(schema, v, inputs[v.Name]);
+                    var value = inputs.ContainsKey(v.Name)
+                        ? GetVariableValue(schema, v, inputs[v.Name])
+                        : null;
+                    v.Value = value;
                 });
             }
 

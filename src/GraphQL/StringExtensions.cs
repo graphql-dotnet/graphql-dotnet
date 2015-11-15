@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL
 {
@@ -22,16 +23,30 @@ namespace GraphQL
             var values2 = new Dictionary<string, object>();
             foreach (KeyValuePair<string, object> d in values)
             {
-                if (d.Value is JObject)
-                {
-                    values2.Add(d.Key, ToDictionary(d.Value.ToString()));
-                }
-                else
-                {
-                    values2.Add(d.Key, d.Value);
-                }
+                var value = GetValue(d.Value);
+                values2.Add(d.Key, value);
             }
             return values2;
+        }
+
+        public static object GetValue(object value)
+        {
+            if (value is JObject)
+            {
+                return ToDictionary(value.ToString());
+            }
+
+            if (value is JArray)
+            {
+                var array = (JArray) value;
+                return array.Values().Aggregate(new List<object>(), (list, token) =>
+                {
+                    list.Add(GetValue(token.ToObject<object>()));
+                    return list;
+                });
+            }
+
+            return value;
         }
     }
 }

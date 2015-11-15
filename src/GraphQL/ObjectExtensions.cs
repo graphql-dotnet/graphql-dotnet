@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,10 +21,35 @@ namespace GraphQL
                         BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyType != null)
                 {
-                    propertyType.SetValue(
-                        obj,
-                        Convert.ChangeType(item.Value, propertyType.PropertyType),
-                        null);
+                    if (propertyType.PropertyType.Name != "String"
+                        && propertyType.PropertyType.GetInterface("IEnumerable`1") != null)
+                    {
+                        var elementType = propertyType.PropertyType.GetGenericArguments()[0];
+                        var genericListType = typeof(List<>).MakeGenericType(elementType);
+                        var newArray = (IList)Activator.CreateInstance(genericListType);
+
+                        var valueList = item.Value as IEnumerable;
+
+                        if (valueList != null)
+                        {
+                            foreach (var listItem in valueList)
+                            {
+                                newArray.Add(Convert.ChangeType(listItem, elementType));
+                            }
+                        }
+
+                        propertyType.SetValue(
+                            obj,
+                            newArray,
+                            null);
+                    }
+                    else
+                    {
+                        propertyType.SetValue(
+                            obj,
+                            Convert.ChangeType(item.Value, propertyType.PropertyType),
+                            null);
+                    }
                 }
             }
 

@@ -36,6 +36,11 @@ namespace GraphQL.Tests.Execution
             Field<NonNullGraphType<StringGraphType>>("c");
             Field<TestComplexScalarType>("d");
         }
+
+        public override string CollectTypes(TypeCollectionContext context)
+        {
+            return base.CollectTypes(context);
+        }
     }
 
     public class TestType : ObjectGraphType
@@ -102,6 +107,25 @@ namespace GraphQL.Tests.Execution
             var expected = "{ \"fieldWithObjectInput\": \"null\" }";
 
             AssertQuerySuccess(query, expected);
+        }
+    }
+
+    public class UsingVariablesTests : QueryTestBase<VariablesSchema>
+    {
+        [Test]
+        public void executes_with_complex_input()
+        {
+            var query = @"
+                query q($input: TestInputObject) {
+                  fieldWithObjectInput(input: $input)
+                }
+            ";
+
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+
+            var inputs = "{'input': {'a':'foo', 'b':['bar'], 'c': 'baz'} }".ToInputs();
+
+            AssertQuerySuccess(query, expected, inputs);
         }
     }
 }
