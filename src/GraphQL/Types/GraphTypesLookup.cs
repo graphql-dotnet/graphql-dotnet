@@ -40,12 +40,8 @@ namespace GraphQL.Types
         {
             get
             {
-                GraphType result = null;
-                if (_types.ContainsKey(typeName))
-                {
-                    result = _types[typeName];
-                }
-
+                GraphType result;
+                _types.TryGetValue(typeName, out result);
                 return result;
             }
             set { _types[typeName] = value; }
@@ -76,7 +72,7 @@ namespace GraphQL.Types
         {
             var context = new TypeCollectionContext(
                 type => (GraphType) Activator.CreateInstance(type),
-                (name, type) =>
+                (name, type, _) =>
                 {
                     _types[name] = type;
                 });
@@ -111,6 +107,18 @@ namespace GraphQL.Types
                     {
                         AddTypeIfNotRegistered(arg.Type, context);
                     });
+                }
+
+                if (field.Arguments != null)
+                {
+                    foreach (var arg in field.Arguments)
+                    {
+                        var foundType = this[arg.Type];
+                        if (foundType == null)
+                        {
+                            AddType(context.ResolveType(arg.Type), context);
+                        }
+                    }
                 }
             });
 

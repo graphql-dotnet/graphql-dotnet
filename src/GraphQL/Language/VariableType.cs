@@ -18,7 +18,7 @@ namespace GraphQL.Language
             get
             {
                 var typeNameFormat = IsList ? "[{0}]{1}" : "{0}{1}";
-                return string.Format(typeNameFormat, Name, AllowsNull? "" : "!");
+                return string.Format(typeNameFormat, Name, AllowsNull ? "" : "!");
             }
         }
     }

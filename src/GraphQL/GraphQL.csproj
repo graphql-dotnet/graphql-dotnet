@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\ConnectionBuilder.cs" />
+    <Compile Include="Builders\FieldBuilder.cs" />
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />
     <Compile Include="Introspection\SchemaMetaFieldType.cs" />
@@ -66,7 +68,10 @@
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
+    <Compile Include="Types\ConnectionType.cs" />
+    <Compile Include="Types\DateGraphType.cs" />
     <Compile Include="Types\DirectiveGraphType.cs" />
+    <Compile Include="Types\EdgeType.cs" />
     <Compile Include="Types\EnumerationGraphType.cs" />
     <Compile Include="Execution\ExecutionContext.cs" />
     <Compile Include="Execution\ExecutionError.cs" />
@@ -83,9 +88,11 @@
     <Compile Include="Types\InputObjectGraphType.cs" />
     <Compile Include="Types\InterfaceGraphType.cs" />
     <Compile Include="Types\IntGraphType.cs" />
+    <Compile Include="Types\IReturnsAllFields.cs" />
     <Compile Include="Types\ListGraphType.cs" />
     <Compile Include="Types\NonNullGraphType.cs" />
     <Compile Include="Types\ObjectGraphType.cs" />
+    <Compile Include="Types\PageInfoType.cs" />
     <Compile Include="Types\QueryArgument.cs" />
     <Compile Include="Types\QueryArguments.cs" />
     <Compile Include="Types\ResolveFieldContext.cs" />

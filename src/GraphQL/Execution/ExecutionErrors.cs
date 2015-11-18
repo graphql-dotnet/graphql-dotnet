@@ -12,6 +12,11 @@ namespace GraphQL
             _errors.Add(error);
         }
 
+        public int Count
+        {
+            get { return _errors.Count; }
+        }
+
         public IEnumerator<ExecutionError> GetEnumerator()
         {
             return _errors.GetEnumerator();

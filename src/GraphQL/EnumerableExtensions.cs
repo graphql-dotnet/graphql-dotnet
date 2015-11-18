@@ -10,7 +10,8 @@ namespace GraphQL
     {
         public static IEnumerable<object> Map(this IEnumerable items, Func<object, object> map)
         {
-            return from object item in items select map(item);
+            var mappedItems = from object item in items select map(item);
+            return mappedItems.ToList();
         }
 
         public static async Task<IEnumerable> MapAsync(this IEnumerable items, Func<object, Task<object>> map)

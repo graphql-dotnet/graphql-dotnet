@@ -34,6 +34,13 @@ namespace GraphQL.Types
             var found = Values.FirstOrDefault(v => v.Value.Equals(value));
             return found != null ? found.Name : null;
         }
+
+        public object GetValue(string name)
+        {
+            var found = Values.FirstOrDefault(v =>
+                StringComparer.InvariantCultureIgnoreCase.Equals(v.Name, name));
+            return found != null ? found.Value : null;
+        }
     }
 
     public class EnumValues : IEnumerable<EnumValue>
