@@ -141,7 +141,7 @@ Console.Writeline(result);
 - [x] Fragments
 - [x] Directives
 - [x] Enumerations
-- [ ] Input Objects
+- [x] Input Objects
 - [x] Mutations
 - [ ] Unions
 - [x] Async execution
