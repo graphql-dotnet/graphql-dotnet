@@ -63,6 +63,7 @@
     <Compile Include="Introspection\__InputValue.cs" />
     <Compile Include="Introspection\__Type.cs" />
     <Compile Include="Introspection\__TypeKind.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
     <Compile Include="Types\DirectiveGraphType.cs" />

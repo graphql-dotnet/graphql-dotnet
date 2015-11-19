@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace GraphQL.Types
 {
@@ -45,6 +44,11 @@ namespace GraphQL.Types
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                Name = GetType().Name;
+            }
+
             return Name;
         }
     }

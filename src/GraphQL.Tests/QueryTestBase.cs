@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -6,8 +8,6 @@ using GraphQL.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Should;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace GraphQL.Tests
 {
@@ -33,19 +33,36 @@ namespace GraphQL.Tests
 
         public IDocumentWriter Writer { get; private set; }
 
-        public ExecutionResult AssertQuerySuccess(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQuerySuccess(
+            string query,
+            string expected,
+            Inputs inputs = null,
+            object root = null,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQuery(query, queryResult, inputs, root, cancellationToken);
         }
 
-        public ExecutionResult AssertQueryWithErrors(string query, string expected, Inputs inputs = null, object root = null, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQueryWithErrors(
+            string query,
+            string expected,
+            Inputs inputs = null,
+            object root = null,
+            CancellationToken cancellationToken = default(CancellationToken),
+            int expectedErrorCount = 0)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, cancellationToken);
+            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, cancellationToken, expectedErrorCount);
         }
 
-        public ExecutionResult AssertQueryIgnoreErrors(string query, ExecutionResult expectedExecutionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQueryIgnoreErrors(
+            string query,
+            ExecutionResult expectedExecutionResult,
+            Inputs inputs,
+            object root,
+            CancellationToken cancellationToken = default(CancellationToken),
+            int expectedErrorCount = 0)
         {
             var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
 
@@ -55,6 +72,10 @@ namespace GraphQL.Tests
             Console.WriteLine(writtenResult);
 
             writtenResult.ShouldEqual(expectedResult);
+
+            var errors = runResult.Errors ?? new ExecutionErrors();
+
+            errors.Count().ShouldEqual(expectedErrorCount);
 
             return runResult;
         }
