@@ -43,7 +43,46 @@ namespace GraphQL.Tests.Execution
 
             Field<StringGraphType>(
                 "fieldWithObjectInput",
-                arguments: new QueryArguments(new [] { new QueryArgument<TestInputObject> { Name = "input"} }),
+                arguments: new QueryArguments(new []
+                {
+                    new QueryArgument<TestInputObject> { Name = "input"}
+                }),
+                resolve: context =>
+                {
+                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    return result;
+                });
+
+            Field<StringGraphType>(
+                "fieldWithNullableStringInput",
+                arguments: new QueryArguments(new []
+                {
+                    new QueryArgument<StringGraphType> { Name = "input" }
+                }),
+                resolve: context =>
+                {
+                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    return result;
+                });
+
+            Field<StringGraphType>(
+                "fieldWithNonNullableStringInput",
+                arguments: new QueryArguments(new []
+                {
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "input" }
+                }),
+                resolve: context =>
+                {
+                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    return result;
+                });
+
+            Field<StringGraphType>(
+                "fieldWithDefaultArgumentValue",
+                arguments: new QueryArguments(new []
+                {
+                    new QueryArgument<StringGraphType> { Name = "input", DefaultValue = "Hello World"}
+                }),
                 resolve: context =>
                 {
                     var result = JsonConvert.SerializeObject(context.Arguments["input"]);
@@ -241,5 +280,284 @@ namespace GraphQL.Tests.Execution
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
+    }
+
+    public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
+    {
+        [Test]
+        public void allows_nullable_inputs_to_be_ommited()
+        {
+            var query = @"
+            {
+              fieldWithNullableStringInput
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'null'
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_nullable_inputs_to_be_ommited_in_a_variable()
+        {
+            var query = @"
+                query SetsNullable($value: String) {
+                  fieldWithNullableStringInput(input: $value)
+                }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'null'
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_nullable_inputs_to_be_ommited_in_an_unlisted_variable()
+        {
+            var query = @"
+                query SetsNullable {
+                  fieldWithNullableStringInput(input: $value)
+                }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'null'
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void allows_nullable_inputs_to_be_set_to_null_in_a_variable()
+        {
+            var query = @"
+                query SetsNullable($value: String) {
+                  fieldWithNullableStringInput(input: $value)
+                }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'null'
+            }
+            ";
+
+            var inputs = "{'value':null}".ToInputs();
+
+            AssertQuerySuccess(query, expected, inputs);
+        }
+
+        [Test]
+        public void allows_nullable_inputs_to_be_set_to_a_value_in_a_variable()
+        {
+            var query = @"
+                query SetsNullable($value: String) {
+                  fieldWithNullableStringInput(input: $value)
+                }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'a'
+            }
+            ";
+
+            var inputs = "{'value':'a'}".ToInputs();
+
+            AssertQuerySuccess(query, expected, inputs);
+        }
+
+        [Test]
+        public void allows_nullable_inputs_to_be_set_to_a_value_directly()
+        {
+            var query = @"
+            {
+              fieldWithNullableStringInput(input: ""a"")
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'a'
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+    }
+
+    public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
+    {
+        [Test]
+        public void does_not_allow_non_nullable_inputs_to_be_omitted_in_a_variable()
+        {
+            var query = @"
+            query SetsNonNullable($value: String!) {
+              fieldWithNonNullableStringInput(input: $value)
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNonNullableStringInput': 'null'
+            }
+            ";
+
+            Exception caughtError = null;
+
+            try
+            {
+                AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+        }
+
+        [Test]
+        public void does_not_allow_non_nullable_inputs_to_be_set_to_null_in_a_variable()
+        {
+            var query = @"
+            query SetsNonNullable($value: String!) {
+              fieldWithNonNullableStringInput(input: $value)
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNonNullableStringInput': 'null'
+            }
+            ";
+
+            var inputs = "{'value':null}".ToInputs();
+
+            Exception caughtError = null;
+
+            try
+            {
+                var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
+                if (result != null)
+                {
+                }
+            }
+            catch (Exception exc)
+            {
+                caughtError = exc;
+            }
+
+            caughtError.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+        }
+
+        [Test]
+        public void allows_non_nullable_inputs_to_be_set_to_a_value_in_a_variable()
+        {
+            var query = @"
+                query SetsNullable($value: String) {
+                  fieldWithNullableStringInput(input: $value)
+                }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'a'
+            }
+            ";
+
+            var inputs = "{'value':'a'}".ToInputs();
+
+            AssertQuerySuccess(query, expected, inputs);
+        }
+
+        [Test]
+        public void allows_non_nullable_inputs_to_be_set_to_a_value_directly()
+        {
+            var query = @"
+            {
+              fieldWithNullableStringInput(input: ""a"")
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithNullableStringInput': 'a'
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+    }
+
+    public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
+    {
+        [Test]
+        public void when_no_argument_provided()
+        {
+            var query = @"
+            {
+              fieldWithDefaultArgumentValue
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithDefaultArgumentValue': ""Hello World""
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Test]
+        public void when_nullable_variable_provided()
+        {
+            var query = @"
+            query optionalVariable($optional:String) {
+              fieldWithDefaultArgumentValue(input: $optional)
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithDefaultArgumentValue': ""Hello World""
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        // this test currently fails
+//        [Test]
+//        public void when_argument_provided_cannot_be_parsed()
+//        {
+//            var query = @"
+//            {
+//              fieldWithDefaultArgumentValue(input: 2)
+//            }
+//            ";
+//
+//            var expected = @"
+//            {
+//              'fieldWithDefaultArgumentValue': ""Hello World""
+//            }
+//            ";
+//
+//            AssertQuerySuccess(query, expected);
+//        }
     }
 }

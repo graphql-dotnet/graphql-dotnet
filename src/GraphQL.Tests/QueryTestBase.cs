@@ -73,7 +73,9 @@ namespace GraphQL.Tests
 
             writtenResult.ShouldEqual(expectedResult);
 
-            runResult.Errors.Count().ShouldEqual(expectedErrorCount);
+            var errors = runResult.Errors ?? new ExecutionErrors();
+
+            errors.Count().ShouldEqual(expectedErrorCount);
 
             return runResult;
         }

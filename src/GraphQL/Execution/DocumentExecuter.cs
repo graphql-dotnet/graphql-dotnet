@@ -337,11 +337,16 @@ namespace GraphQL
 
         public object GetVariableValue(Schema schema, Variable variable, object input)
         {
-            var type = schema.FindType(variable.Type.Name);
+            var type = schema.FindType(variable.Type.FullName);
             var value = input ?? variable.DefaultValue;
             if (IsValidValue(schema, type, value))
             {
                 return CoerceValue(schema, type, value);
+            }
+
+            if (value == null)
+            {
+                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, variable.Type.FullName));
             }
 
             throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name));
