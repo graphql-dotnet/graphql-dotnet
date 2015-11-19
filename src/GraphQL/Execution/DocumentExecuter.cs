@@ -250,18 +250,6 @@ namespace GraphQL
 
             fields.Apply(field =>
             {
-                if (objectType is IReturnsAllFields)
-                {
-                    field.Selections = new Selections();
-                    foreach (var f in objectType.Fields)
-                    {
-                        field.Selections.Add(new Selection
-                        {
-                            Field = new Field { Name = f.Name },
-                        });
-                    }
-                }
-
                 subFields = CollectFields(context, objectType, field.Selections, subFields);
             });
 

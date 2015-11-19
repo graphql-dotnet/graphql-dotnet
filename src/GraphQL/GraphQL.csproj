@@ -88,7 +88,6 @@
     <Compile Include="Types\InputObjectGraphType.cs" />
     <Compile Include="Types\InterfaceGraphType.cs" />
     <Compile Include="Types\IntGraphType.cs" />
-    <Compile Include="Types\IReturnsAllFields.cs" />
     <Compile Include="Types\ListGraphType.cs" />
     <Compile Include="Types\NonNullGraphType.cs" />
     <Compile Include="Types\ObjectGraphType.cs" />
