@@ -93,12 +93,21 @@ namespace GraphQL.Types
 
         public void AddType(GraphType type, TypeCollectionContext context)
         {
+            AddType(null, type, context);
+        }
+
+        public void AddType( string name, GraphType type, TypeCollectionContext context )
+        {
             if (type == null)
             {
                 return;
             }
 
-            var name = type.CollectTypes(context);
+            if (name == null)
+            {
+              name = type.CollectTypes(context);
+            }
+            
             _types[name] = type;
 
             type.Fields.Apply(field =>
