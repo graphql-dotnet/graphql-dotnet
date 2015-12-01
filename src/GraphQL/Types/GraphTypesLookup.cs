@@ -112,18 +112,6 @@ namespace GraphQL.Types
                         AddTypeIfNotRegistered(arg.Type, context);
                     });
                 }
-
-                if (field.Arguments != null)
-                {
-                    foreach (var arg in field.Arguments)
-                    {
-                        var foundType = this[arg.Type];
-                        if (foundType == null)
-                        {
-                            AddType(context.ResolveType(arg.Type), context);
-                        }
-                    }
-                }
             });
 
             if (type is ObjectGraphType)

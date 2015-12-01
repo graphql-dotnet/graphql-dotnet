@@ -84,7 +84,7 @@ namespace GraphQL.Types
 
                 var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
                 {
-                    if (_lookup[graphType.Name] == null)
+                    if (_lookup[name] == null)
                     {
                         _lookup.AddType(graphType, context);
                     }

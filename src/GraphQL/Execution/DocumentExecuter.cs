@@ -189,13 +189,13 @@ namespace GraphQL
 
         public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
-            if (fieldType is NonNullGraphType)
+            var nonNullType = fieldType as NonNullGraphType;
+            if (nonNullType != null)
             {
-                var nonNullType = fieldType as NonNullGraphType;
                 var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
                 if (completed == null)
                 {
-                    throw new ExecutionError("Cannot return null for non-null type.");
+                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}".ToFormat(nonNullType.Name));
                 }
 
                 return completed;
