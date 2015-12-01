@@ -10,7 +10,6 @@ using GraphQL.Introspection;
 using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Validation;
-
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
@@ -18,11 +17,11 @@ namespace GraphQL
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
-            Schema schema, 
-            object root, 
-            string query, 
-            string operationName, 
-            Inputs inputs = null, 
+            Schema schema,
+            object root,
+            string query,
+            string operationName,
+            Inputs inputs = null,
             CancellationToken cancellationToken = default(CancellationToken));
     }
 
@@ -190,9 +189,9 @@ namespace GraphQL
 
         public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
-            if (fieldType is NonNullGraphType)
+            var nonNullType = fieldType as NonNullGraphType;
+            if (nonNullType != null)
             {
-                var nonNullType = fieldType as NonNullGraphType;
                 var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
                 if (completed == null)
                 {
@@ -278,7 +277,7 @@ namespace GraphQL
                 object coercedValue = null;
                 if (IsValidValue(schema, type, value))
                 {
-                    coercedValue = CoerceValueAst(schema, type, value, variables);
+                    coercedValue = CoerceValue(schema, type, value, variables);
                 }
                 acc[arg.Name] = coercedValue ?? arg.DefaultValue;
                 return acc;
@@ -328,10 +327,16 @@ namespace GraphQL
         {
             variables.Apply(v =>
             {
-                var input = inputs != null && inputs.ContainsKey(v.Name) ? inputs[v.Name] : null;
-                v.Value = GetVariableValue(schema, v, input);
+                object variableValue;
+                if (inputs != null && inputs.TryGetValue(v.Name, out variableValue))
+                {
+                    v.Value = GetVariableValue(schema, v, variableValue);
+                }
+                else
+                {
+                    v.Value = GetVariableValue(schema, v, v.DefaultValue);
+                }
             });
-
             return variables;
         }
 
@@ -408,13 +413,12 @@ namespace GraphQL
             return false;
         }
 
-        // TODO: combine dupliation with CoerceValueAST
-        public object CoerceValue(Schema schema, GraphType type, object input)
+        public object CoerceValue(Schema schema, GraphType type, object input, Variables variables = null)
         {
             if (type is NonNullGraphType)
             {
                 var nonNull = type as NonNullGraphType;
-                return CoerceValue(schema, schema.FindType(nonNull.Type), input);
+                return CoerceValue(schema, schema.FindType(nonNull.Type), input, variables);
             }
 
             if (input == null)
@@ -422,65 +426,11 @@ namespace GraphQL
                 return null;
             }
 
-            if (type is ListGraphType)
-            {
-                var listType = type as ListGraphType;
-                var listItemType = schema.FindType(listType.Type);
-                var list = input as IEnumerable;
-                return list != null && !(input is string)
-                    ? list.Map(item => CoerceValue(schema, listItemType, item)).ToArray()
-                    : new[] { CoerceValue(schema, listItemType, input) };
-            }
-
-            if (type is ObjectGraphType || type is InputObjectGraphType)
-            {
-                var objType = type;
-                var obj = new Dictionary<string, object>();
-                var dict = input as Dictionary<string, object>;
-
-                if (dict == null)
-                {
-                    return null;
-                }
-
-                objType.Fields.Apply(field =>
-                {
-                    if (dict.ContainsKey(field.Name))
-                    {
-                        var fieldValue = CoerceValue(schema, schema.FindType(field.Type), dict[field.Name]);
-                        obj[field.Name] = fieldValue ?? field.DefaultValue;
-                    }
-                });
-                return obj;
-            }
-
-            if (type is ScalarGraphType)
-            {
-                var scalarType = type as ScalarGraphType;
-                return scalarType.Coerce(input);
-            }
-
-            return null;
-        }
-
-        // TODO: combine duplication with CoerceValue
-        public object CoerceValueAst(Schema schema, GraphType type, object input, Variables variables)
-        {
-            if (type is NonNullGraphType)
-            {
-                var nonNull = type as NonNullGraphType;
-                return CoerceValueAst(schema, schema.FindType(nonNull.Type), input, variables);
-            }
-
-            if (input == null)
-            {
-                return null;
-            }
-
-            if (input is Variable)
+            var variable = input as Variable;
+            if (variable != null)
             {
                 return variables != null
-                    ? variables.ValueFor(((Variable)input).Name)
+                    ? variables.ValueFor(variable.Name)
                     : null;
             }
 
@@ -490,29 +440,42 @@ namespace GraphQL
                 var listItemType = schema.FindType(listType.Type);
                 var list = input as IEnumerable;
                 return list != null && !(input is string)
-                    ? list.Map(item => CoerceValueAst(schema, listItemType, item, variables)).ToArray()
-                    : new[] { CoerceValueAst(schema, listItemType, input, variables) };
+                    ? list.Map(item => CoerceValue(schema, listItemType, item, variables)).ToArray()
+                    : new[] { CoerceValue(schema, listItemType, input, variables) };
             }
 
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
-                var objType = type;
                 var obj = new Dictionary<string, object>();
-                var dict = input as Dictionary<string, object>;
 
+                if (input is KeyValuePair<string, object>)
+                {
+                    var kvp = (KeyValuePair<string, object>)input;
+                    input = new Dictionary<string, object> { { kvp.Key, kvp.Value } };
+                }
+
+                var kvps = input as IEnumerable<KeyValuePair<string, object>>;
+                if (kvps != null)
+                {
+                    input = kvps.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                }
+
+                var dict = input as Dictionary<string, object>;
                 if (dict == null)
                 {
                     return null;
                 }
 
-                objType.Fields.Apply(field =>
+                type.Fields.Apply(field =>
                 {
-                    if (dict.ContainsKey(field.Name))
+                    object inputValue;
+                    if (dict.TryGetValue(field.Name, out inputValue))
                     {
-                        var fieldValue = CoerceValueAst(schema, schema.FindType(field.Type), dict[field.Name], variables);
+                        var fieldValue = CoerceValue(schema, schema.FindType(field.Type), inputValue, variables);
                         obj[field.Name] = fieldValue ?? field.DefaultValue;
                     }
                 });
+
                 return obj;
             }
 

@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fixie, Version=1.0.0.29, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Fixie.1.0.0.29\lib\net45\Fixie.dll</HintPath>
+    <Reference Include="Fixie, Version=1.0.0.33, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Fixie.1.0.0.33\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -73,6 +73,7 @@
     <Compile Include="StarWars\StarWarsSchema.cs" />
     <Compile Include="TestAttribute.cs" />
     <Compile Include="Expect.cs" />
+    <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />

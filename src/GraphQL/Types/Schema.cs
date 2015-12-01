@@ -59,16 +59,16 @@ namespace GraphQL.Types
             return types.Select(FindType).ToList();
         }
 
-        public IEnumerable<GraphType> FindImplemenationsOf(Type type)
+        public IEnumerable<GraphType> FindImplementationsOf(Type type)
         {
             return _lookup.FindImplemenationsOf(type);
         }
 
         private GraphType AddType(Type type)
         {
-            var ctx = new TypeCollectionContext(ResolveType, (name, graphType) =>
+            var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
             {
-                _lookup[name] = graphType;
+                _lookup.AddType(graphType, context);
             });
 
             var instance = ResolveType(type);
@@ -82,9 +82,12 @@ namespace GraphQL.Types
             {
                 _lookup = new GraphTypesLookup();
 
-                var ctx = new TypeCollectionContext(ResolveType, (name, graphType) =>
+                var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
                 {
-                    _lookup[name] = graphType;
+                    if (_lookup[name] == null)
+                    {
+                        _lookup.AddType(graphType, context);
+                    }
                 });
 
                 _lookup.AddType(Query, ctx);

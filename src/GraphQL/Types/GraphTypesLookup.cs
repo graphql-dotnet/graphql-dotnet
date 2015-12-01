@@ -40,12 +40,8 @@ namespace GraphQL.Types
         {
             get
             {
-                GraphType result = null;
-                if (_types.ContainsKey(typeName))
-                {
-                    result = _types[typeName];
-                }
-
+                GraphType result;
+                _types.TryGetValue(typeName, out result);
                 return result;
             }
             set { _types[typeName] = value; }
@@ -76,9 +72,13 @@ namespace GraphQL.Types
         {
             var context = new TypeCollectionContext(
                 type => (GraphType) Activator.CreateInstance(type),
-                (name, type) =>
+                (name, type, _) =>
                 {
                     _types[name] = type;
+                    if (_ != null)
+                    {
+                        _.AddType(name, type, null);
+                    }
                 });
 
             AddType<TType>(context);

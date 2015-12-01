@@ -73,7 +73,7 @@ namespace GraphQL.Introspection
                 if (context.Source is InterfaceGraphType || context.Source is UnionGraphType)
                 {
                     var type = (GraphType)context.Source;
-                    return context.Schema.FindImplemenationsOf(type.GetType());
+                    return context.Schema.FindImplementationsOf(type.GetType());
                 }
                 return Enumerable.Empty<GraphType>();
             });
