@@ -73,6 +73,7 @@
     <Compile Include="StarWars\StarWarsSchema.cs" />
     <Compile Include="TestAttribute.cs" />
     <Compile Include="Expect.cs" />
+    <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
