@@ -109,7 +109,7 @@ namespace GraphQL.Tests.Execution
               fieldWithObjectInput(input: {a: ""foo"", b: [""bar""], c: ""baz""})
             }
             ";
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\",\\\"d\\\":null}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -122,7 +122,7 @@ namespace GraphQL.Tests.Execution
               fieldWithObjectInput(input: {a: ""foo"", b: ""bar"", c: ""baz""})
             }
             ";
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\",\\\"d\\\":null}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -152,7 +152,7 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void executes_with_complex_input()
         {
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\",\\\"d\\\":null}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
             var inputs = "{'input': {'a':'foo', 'b':['bar'], 'c': 'baz'} }".ToInputs();
 
@@ -162,7 +162,7 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void properly_parses_single_value_to_list()
         {
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\",\\\"d\\\":null}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
             var inputs = "{'input': {'a':'foo', 'b':'bar', 'c': 'baz'} }".ToInputs();
 
@@ -178,7 +178,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\",\\\"d\\\":null}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
             AssertQuerySuccess(queryWithDefaults, expected);
         }
@@ -186,7 +186,7 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void executes_with_complex_scalar_input()
         {
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":null,\\\"b\\\":null,\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
 
             var inputs = "{'input': {'c': 'foo', 'd': 'SerializedValue'} }".ToInputs();
 
