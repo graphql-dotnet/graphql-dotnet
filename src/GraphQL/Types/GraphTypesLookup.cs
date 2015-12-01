@@ -75,6 +75,10 @@ namespace GraphQL.Types
                 (name, type, _) =>
                 {
                     _types[name] = type;
+                    if (_ != null)
+                    {
+                        _.AddType(name, type, null);
+                    }
                 });
 
             AddType<TType>(context);

@@ -327,10 +327,10 @@ namespace GraphQL
         {
             variables.Apply(v =>
             {
-                object value;
-                if (!inputs.TryGetValue(v.Name, out value))
+                object value = null;
+                if (inputs != null)
                 {
-                    throw new ArgumentException(string.Format("No input variable for '{0}'", v.Name));
+                    inputs.TryGetValue(v.Name, out value);
                 }
                 v.Value = GetVariableValue(schema, v, value);
             });

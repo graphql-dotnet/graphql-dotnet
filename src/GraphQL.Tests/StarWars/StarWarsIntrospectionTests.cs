@@ -746,7 +746,7 @@
                   'fields': [
                     {
                       'name': 'id',
-                      'description': null,
+                      'description': 'The id of the character.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
@@ -756,7 +756,7 @@
                     },
                     {
                       'name': 'name',
-                      'description': null,
+                      'description': 'The name of the character.',
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
@@ -776,7 +776,7 @@
                     },
                     {
                       'name': 'appearsIn',
-                      'description': null,
+                      'description': 'Which movie they appear in.',
                       'type': {
                         'name': null,
                         'kind': 'LIST'
@@ -799,7 +799,7 @@
                   'fields': [
                     {
                       'name': 'id',
-                      'description': null,
+                      'description': 'The id of the human.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
@@ -809,7 +809,7 @@
                     },
                     {
                       'name': 'name',
-                      'description': null,
+                      'description': 'The name of the human.',
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
@@ -829,7 +829,7 @@
                     },
                     {
                       'name': 'appearsIn',
-                      'description': null,
+                      'description': 'Which movie they appear in.',
                       'type': {
                         'name': null,
                         'kind': 'LIST'
@@ -839,7 +839,7 @@
                     },
                     {
                       'name': 'homePlanet',
-                      'description': null,
+                      'description': 'The home planet of the human.',
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
@@ -856,7 +856,7 @@
                   'fields': [
                     {
                       'name': 'id',
-                      'description': null,
+                      'description': 'The id of the droid.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
@@ -866,7 +866,7 @@
                     },
                     {
                       'name': 'name',
-                      'description': null,
+                      'description': 'The name of the droid.',
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
@@ -886,7 +886,7 @@
                     },
                     {
                       'name': 'appearsIn',
-                      'description': null,
+                      'description': 'Which movie they appear in.',
                       'type': {
                         'name': null,
                         'kind': 'LIST'
@@ -896,7 +896,7 @@
                     },
                     {
                       'name': 'primaryFunction',
-                      'description': null,
+                      'description': 'The primary function of the droid.',
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
@@ -913,7 +913,7 @@
                   'fields': [
                     {
                       'name': 'types',
-                      'description': null,
+                      'description': 'A list of all types supported by this server.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
@@ -923,7 +923,7 @@
                     },
                     {
                       'name': 'queryType',
-                      'description': null,
+                      'description': 'The type that query operations will be rooted at.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
@@ -933,7 +933,7 @@
                     },
                     {
                       'name': 'mutationType',
-                      'description': null,
+                      'description': 'If this server supports mutation, the type that mutation operations will be rooted at.',
                       'type': {
                         'name': '__Type',
                         'kind': 'OBJECT'
@@ -943,7 +943,7 @@
                     },
                     {
                       'name': 'directives',
-                      'description': null,
+                      'description': 'A list of all directives supported by this server.',
                       'type': {
                         'name': null,
                         'kind': 'NON_NULL'
