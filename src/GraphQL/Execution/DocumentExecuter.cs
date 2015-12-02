@@ -195,7 +195,9 @@ namespace GraphQL
                 var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
                 if (completed == null)
                 {
-                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}".ToFormat(nonNullType.Name));
+                    var field = fields != null ? fields.FirstOrDefault() : null;
+                    var fieldName = field != null ? field.Name : null;
+                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}.".ToFormat(fieldName));
                 }
 
                 return completed;
@@ -268,18 +270,10 @@ namespace GraphQL
                 var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
                 var type = schema.FindType(arg.Type);
 
-                if (value is Variable)
-                {
-                    var variable = (Variable) value;
-                    value = variables.ValueFor(variable.Name);
-                }
-
-                object coercedValue = null;
-                if (IsValidValue(schema, type, value))
-                {
-                    coercedValue = CoerceValue(schema, type, value, variables);
-                }
-                acc[arg.Name] = coercedValue ?? arg.DefaultValue;
+                var coercedValue = CoerceValue(schema, type, value, variables);
+                acc[arg.Name] = IsValidValue(schema, type, coercedValue)
+                    ? coercedValue ?? arg.DefaultValue
+                    : arg.DefaultValue;
                 return acc;
             });
         }
@@ -351,10 +345,10 @@ namespace GraphQL
 
             if (value == null)
             {
-                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, variable.Type.FullName));
+                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
             }
 
-            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name));
+            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
         }
 
         public bool IsValidValue(Schema schema, GraphType type, object input)
@@ -386,6 +380,18 @@ namespace GraphQL
 
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
+                if (input is KeyValuePair<string, object>)
+                {
+                    var kvp = (KeyValuePair<string, object>)input;
+                    input = new Dictionary<string, object> { { kvp.Key, kvp.Value } };
+                }
+
+                var kvps = input as IEnumerable<KeyValuePair<string, object>>;
+                if (kvps != null)
+                {
+                    input = kvps.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                }
+
                 var dict = input as Dictionary<string, object>;
                 if (dict == null)
                 {
