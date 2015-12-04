@@ -380,18 +380,6 @@ namespace GraphQL
 
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
-                if (input is KeyValuePair<string, object>)
-                {
-                    var kvp = (KeyValuePair<string, object>)input;
-                    input = new Dictionary<string, object> { { kvp.Key, kvp.Value } };
-                }
-
-                var kvps = input as IEnumerable<KeyValuePair<string, object>>;
-                if (kvps != null)
-                {
-                    input = kvps.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                }
-
                 var dict = input as Dictionary<string, object>;
                 if (dict == null)
                 {
