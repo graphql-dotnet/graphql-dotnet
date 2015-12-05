@@ -33,7 +33,7 @@ namespace GraphQL.Builders
                 }
             }
 
-            public Schema Schema { get { return _context.Schema; } }
+            public ISchema Schema { get { return _context.Schema; } }
 
             public object Source { get { return _context.Source; } }
 

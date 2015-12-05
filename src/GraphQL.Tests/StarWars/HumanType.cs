@@ -4,10 +4,8 @@ namespace GraphQL.Tests
 {
     public class HumanType : ObjectGraphType
     {
-        public HumanType()
+        public HumanType(StarWarsData data)
         {
-            var data = new StarWarsData();
-
             Name = "Human";
 
             Field<NonNullGraphType<StringGraphType>>("id", "The id of the human.");

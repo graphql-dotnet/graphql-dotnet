@@ -4,10 +4,8 @@ namespace GraphQL.Tests
 {
     public class DroidType : ObjectGraphType
     {
-        public DroidType()
+        public DroidType(StarWarsData data)
         {
-            var data = new StarWarsData();
-
             Name = "Droid";
             Description = "A mechanical creature in the Star Wars universe.";
 

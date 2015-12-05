@@ -6,12 +6,12 @@ namespace GraphQL.Validation
 {
     public interface IDocumentValidator
     {
-        ValidationResult IsValid(Schema schema, Document document, string operationName);
+        ValidationResult IsValid(ISchema schema, Document document, string operationName);
     }
 
     public class DocumentValidator : IDocumentValidator
     {
-        public ValidationResult IsValid(Schema schema, Document document, string operationName)
+        public ValidationResult IsValid(ISchema schema, Document document, string operationName)
         {
             var result = new ValidationResult();
 

@@ -12,22 +12,27 @@ using Should;
 namespace GraphQL.Tests
 {
     public class QueryTestBase<TSchema> : QueryTestBase<TSchema, AntlrDocumentBuilder>
-        where TSchema : Schema, new()
+        where TSchema : ISchema
     {
     }
 
     public class QueryTestBase<TSchema, TDocumentBuilder>
-        where TSchema : Schema, new()
+        where TSchema : ISchema
         where TDocumentBuilder : IDocumentBuilder, new()
     {
         public QueryTestBase()
         {
-            Schema = new TSchema();
+            Services = new SimpleContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
             Writer = new DocumentWriter(Formatting.Indented);
         }
 
-        public TSchema Schema { get; private set; }
+        public ISimpleContainer Services { get; set; }
+
+        public TSchema Schema
+        {
+            get { return Services.Get<TSchema>(); }
+        }
 
         public IDocumentExecuter Executer { get; private set; }
 

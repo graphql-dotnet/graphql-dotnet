@@ -4,11 +4,35 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema
+    public interface ISchema
+    {
+        ObjectGraphType Query { get; set; }
+
+        ObjectGraphType Mutation { get; set; }
+
+        IEnumerable<DirectiveGraphType> Directives { get; }
+
+        IEnumerable<GraphType> AllTypes { get; }
+
+        GraphType FindType(string name);
+
+        GraphType FindType(Type type);
+
+        IEnumerable<GraphType> FindTypes(IEnumerable<Type> types);
+
+        IEnumerable<GraphType> FindImplementationsOf(Type type);
+    }
+
+    public class Schema : ISchema
     {
         public Schema()
+            : this(type => (GraphType) Activator.CreateInstance(type))
         {
-            ResolveType = type => (GraphType)Activator.CreateInstance(type);
+        }
+
+        public Schema(Func<Type, GraphType> resolveType)
+        {
+            ResolveType = resolveType;
         }
 
         private GraphTypesLookup _lookup;

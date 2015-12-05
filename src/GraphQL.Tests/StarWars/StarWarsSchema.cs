@@ -1,12 +1,14 @@
-﻿using GraphQL.Types;
+﻿using System;
+using GraphQL.Types;
 
 namespace GraphQL.Tests
 {
     public class StarWarsSchema : Schema
     {
-        public StarWarsSchema()
+        public StarWarsSchema(Func<Type, GraphType> resolveType)
+            : base(resolveType)
         {
-            Query = new StarWarsQuery();
+            Query = (ObjectGraphType)resolveType(typeof (StarWarsQuery));
         }
     }
 }

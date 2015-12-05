@@ -1,6 +1,6 @@
 ﻿namespace GraphQL.Tests.StarWars
 {
-    public class StarWarsFragmentTests : QueryTestBase<StarWarsSchema>
+    public class StarWarsFragmentTests : StarWarsTestBase
     {
         [Test]
         public void use_fragment_spread_to_avoid_duplicate_content()

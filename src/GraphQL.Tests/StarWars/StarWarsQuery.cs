@@ -4,10 +4,8 @@ namespace GraphQL.Tests
 {
     public class StarWarsQuery : ObjectGraphType
     {
-        public StarWarsQuery()
+        public StarWarsQuery(StarWarsData data)
         {
-            var data = new StarWarsData();
-
             Name = "Query";
 
             Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));

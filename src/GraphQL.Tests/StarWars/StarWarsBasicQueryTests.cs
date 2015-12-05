@@ -1,6 +1,6 @@
 namespace GraphQL.Tests
 {
-    public class StarWarsBasicQueryTests : QueryTestBase<StarWarsSchema>
+    public class StarWarsBasicQueryTests : StarWarsTestBase
     {
         [Test]
         public void identifies_r2_as_the_hero()
@@ -14,10 +14,10 @@ namespace GraphQL.Tests
             ";
 
             var expected = @"{
-  hero: {
-    name: 'R2-D2'
-  }
-}";
+              hero: {
+                name: 'R2-D2'
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -34,10 +34,10 @@ namespace GraphQL.Tests
             ";
 
             var expected = @"{
-  hero: {
-    name: 'R2-D2'
-  }
-}";
+              hero: {
+                name: 'R2-D2'
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -58,19 +58,19 @@ namespace GraphQL.Tests
             ";
 
             var expected = @"{
-  hero: {
-    id: '3',
-    name: 'R2-D2',
-    friends: [
-      {
-        name: 'Luke',
-      },
-      {
-        name: 'C-3PO',
-      },
-    ]
-  }
-}";
+              hero: {
+                id: '3',
+                name: 'R2-D2',
+                friends: [
+                  {
+                    name: 'Luke',
+                  },
+                  {
+                    name: 'C-3PO',
+                  },
+                ]
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -137,10 +137,10 @@ namespace GraphQL.Tests
             ";
 
             var expected = @"{
-  droid: {
-    name: 'C-3PO'
-  }
-}";
+              droid: {
+                name: 'C-3PO'
+              }
+            }";
 
             AssertQuerySuccess(query, expected);
         }

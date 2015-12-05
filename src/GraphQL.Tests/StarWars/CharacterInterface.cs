@@ -4,7 +4,7 @@ namespace GraphQL.Tests
 {
     public class CharacterInterface : InterfaceGraphType
     {
-        public CharacterInterface()
+        public CharacterInterface(HumanType humanType, DroidType droidType)
         {
             Name = "Character";
             Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
@@ -12,14 +12,14 @@ namespace GraphQL.Tests
             Field<ListGraphType<CharacterInterface>>("friends");
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
 
-            ResolveType = (obj) =>
+            ResolveType = obj =>
             {
                 if (obj is Human)
                 {
-                    return new HumanType();
+                    return humanType;
                 }
 
-                return new DroidType();
+                return droidType;
             };
         }
     }

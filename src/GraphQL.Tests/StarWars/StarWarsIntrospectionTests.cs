@@ -1,6 +1,6 @@
 ﻿namespace GraphQL.Tests.StarWars
 {
-    public class StarWarsIntrospectionTests : QueryTestBase<StarWarsSchema>
+    public class StarWarsIntrospectionTests : StarWarsTestBase
     {
         [Test]
         public void provides_typename()

@@ -17,7 +17,7 @@ namespace GraphQL
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
-            Schema schema,
+            ISchema schema,
             object root,
             string query,
             string operationName,
@@ -42,10 +42,10 @@ namespace GraphQL
         }
 
         public async Task<ExecutionResult> ExecuteAsync(
-            Schema schema, 
-            object root, 
-            string query, 
-            string operationName, 
+            ISchema schema,
+            object root,
+            string query,
+            string operationName,
             Inputs inputs = null,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -80,7 +80,7 @@ namespace GraphQL
         }
 
         public ExecutionContext BuildExecutionContext(
-            Schema schema,
+            ISchema schema,
             object root,
             Document document,
             string operationName,
@@ -256,7 +256,7 @@ namespace GraphQL
             return await ExecuteFields(context, objectType, result, subFields);
         }
 
-        public Dictionary<string, object> GetArgumentValues(Schema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
         {
             if (definitionArguments == null || !definitionArguments.Any())
             {
@@ -284,7 +284,7 @@ namespace GraphQL
             });
         }
 
-        public FieldType GetFieldDefinition(Schema schema, ObjectGraphType parentType, Field field)
+        public FieldType GetFieldDefinition(ISchema schema, ObjectGraphType parentType, Field field)
         {
             if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
             {
@@ -302,7 +302,7 @@ namespace GraphQL
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
         }
 
-        public ObjectGraphType GetOperationRootType(Schema schema, Operation operation)
+        public ObjectGraphType GetOperationRootType(ISchema schema, Operation operation)
         {
             ObjectGraphType type;
 
@@ -323,7 +323,7 @@ namespace GraphQL
             return type;
         }
 
-        public Variables GetVariableValues(Schema schema, Variables variables, Inputs inputs)
+        public Variables GetVariableValues(ISchema schema, Variables variables, Inputs inputs)
         {
             variables.Apply(v =>
             {
@@ -340,7 +340,7 @@ namespace GraphQL
             return variables;
         }
 
-        public object GetVariableValue(Schema schema, Variable variable, object input)
+        public object GetVariableValue(ISchema schema, Variable variable, object input)
         {
             var type = schema.FindType(variable.Type.FullName);
             var value = input ?? variable.DefaultValue;
@@ -357,7 +357,7 @@ namespace GraphQL
             throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name));
         }
 
-        public bool IsValidValue(Schema schema, GraphType type, object input)
+        public bool IsValidValue(ISchema schema, GraphType type, object input)
         {
             if (type is NonNullGraphType)
             {
@@ -413,7 +413,7 @@ namespace GraphQL
             return false;
         }
 
-        public object CoerceValue(Schema schema, GraphType type, object input, Variables variables = null)
+        public object CoerceValue(ISchema schema, GraphType type, object input, Variables variables = null)
         {
             if (type is NonNullGraphType)
             {

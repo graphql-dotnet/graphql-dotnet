@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Types
                 "DListType");
         }
 
-        public void ContainsTypeNames(Schema schema, params string[] typeNames)
+        public void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
             {

@@ -57,6 +57,7 @@
     <Compile Include="Execution\InputConversionTests.cs" />
     <Compile Include="Execution\MutationTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
     <Compile Include="StarWars\CharacterInterface.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="StarWars\StarWarsQuery.cs" />
     <Compile Include="QueryTestBase.cs" />
     <Compile Include="StarWars\StarWarsSchema.cs" />
+    <Compile Include="StarWars\StarWarsTestBase.cs" />
     <Compile Include="TestAttribute.cs" />
     <Compile Include="Expect.cs" />
     <Compile Include="Types\DateGraphTypeTests.cs" />

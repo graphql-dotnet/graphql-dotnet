@@ -7,11 +7,23 @@ namespace GraphQL.GraphiQL.Controllers
 {
     public class GraphQLController : ApiController
     {
-        private Schema _schema;
+        private readonly ISimpleContainer _container;
+        private readonly ISchema _schema;
+        private readonly IDocumentExecuter _executer;
 
         public GraphQLController()
         {
-            _schema = new StarWarsSchema();
+            _executer = new DocumentExecuter();
+
+            _container = new SimpleContainer();
+            _container.Singleton(new StarWarsData());
+            _container.Register<StarWarsQuery>();
+            _container.Register<HumanType>();
+            _container.Register<DroidType>();
+            _container.Register<CharacterInterface>();
+            _container.Singleton(() => new StarWarsSchema(type => (GraphType) _container.Get(type)));
+
+            _schema = _container.Get<StarWarsSchema>();
         }
 
         public async Task<ExecutionResult> Post(GraphQLQuery query)
@@ -20,14 +32,13 @@ namespace GraphQL.GraphiQL.Controllers
         }
 
         public async Task<ExecutionResult> Execute(
-          Schema schema,
+          ISchema schema,
           object rootObject,
           string query,
           string operationName = null,
           Inputs inputs = null)
         {
-            var executer = new DocumentExecuter();
-            return await executer.ExecuteAsync(schema, rootObject, query, operationName);
+            return await _executer.ExecuteAsync(schema, rootObject, query, operationName);
         }
     }
 

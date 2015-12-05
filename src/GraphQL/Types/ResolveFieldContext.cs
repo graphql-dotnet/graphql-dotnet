@@ -16,7 +16,7 @@ namespace GraphQL.Types
 
         public object Source { get; set; }
 
-        public Schema Schema { get; set; }
+        public ISchema Schema { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
 
