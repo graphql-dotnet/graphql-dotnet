@@ -2,16 +2,20 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.3.0.0</version>
+    <version>0.4.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
-    <licenseUrl>https://github.com/joemcbride/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
-    <projectUrl>https://github.com/joemcbride/graphql-dotnet</projectUrl>
+    <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* BREAKING CHANGE: The way field registration works has changed.  Only Field&lt;T&gt; registration is now supported.  This was to support introspection.
-* Added introspection support.
-* Antrl/JSON.NET types are now marked as internal.</releaseNotes>
+    <releaseNotes>* Lots of bug fixes.
+* Async
+* Mutations
+* Input objects
+* Skeleton of Relay connections
+* DateGraphType
+* ISchema interface</releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>

@@ -11,7 +11,7 @@ const options = yargs
 
 let releaseConfig = options.debug ? 'debug' : 'release';
 
-let ilRepack = '"packages/ILRepack.2.0.2/tools/ILRepack.exe"';
+let ilMerge = '"ILMerge.exe"';
 
 let outputDir = 'nuget/lib';
 let inputDir = `src/GraphQL/bin/${releaseConfig}`;
@@ -24,7 +24,7 @@ let sourceOptions = sources.map(source=> {
   return path.join(inputDir, source);
 }).join(' ');
 
-let ilRepackCommand = `${ilRepack} ${versionFlag} /internalize ${outFlag}  ${sourceOptions}`;
+let ilRepackCommand = `${ilMerge} ${versionFlag} /target:library /targetplatform:v4 /internalize ${outFlag}  ${sourceOptions}`;
 
 console.log(ilRepackCommand);
 

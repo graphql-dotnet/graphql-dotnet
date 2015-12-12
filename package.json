@@ -1,24 +1,24 @@
 {
   "name": "graphql-dotnet",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
     "test": "powershell \".\\test-local.ps1\"",
-    "build": "babel-node tools/nuget.js --ver 0.3.0.0",
+    "build": "babel-node tools/nuget.js --ver 0.4.0.0",
     "build-dev": "babel-node tools/nuget.js --d",
     "test-dotnet": "powershell \".\\test.ps1\""
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/joemcbride/graphql-dotnet.git"
+    "url": "https://github.com/graphql-dotnet/graphql-dotnet.git"
   },
   "author": "Joe McBride",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joemcbride/graphql-dotnet/issues"
+    "url": "https://github.com/graphql-dotnet/graphql-dotnet/issues"
   },
-  "homepage": "https://github.com/joemcbride/graphql-dotnet",
+  "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
     "graphiql": "^0.1.0",
     "graphql": "^0.4.2",
