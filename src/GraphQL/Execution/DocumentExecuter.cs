@@ -192,10 +192,14 @@ namespace GraphQL
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
-                var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
+                var type = context.Schema.FindType(nonNullType.Type);
+                var completed = await CompleteValue(context, type, fields, result);
                 if (completed == null)
                 {
-                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}".ToFormat(nonNullType.Name));
+                    var field = fields != null ? fields.FirstOrDefault() : null;
+                    var fieldName = field != null ? field.Name : null;
+                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
+                        .ToFormat(fieldName, type.Name));
                 }
 
                 return completed;
@@ -268,18 +272,10 @@ namespace GraphQL
                 var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
                 var type = schema.FindType(arg.Type);
 
-                if (value is Variable)
-                {
-                    var variable = (Variable) value;
-                    value = variables.ValueFor(variable.Name);
-                }
-
-                object coercedValue = null;
-                if (IsValidValue(schema, type, value))
-                {
-                    coercedValue = CoerceValue(schema, type, value, variables);
-                }
-                acc[arg.Name] = coercedValue ?? arg.DefaultValue;
+                var coercedValue = CoerceValue(schema, type, value, variables);
+                acc[arg.Name] = IsValidValue(schema, type, coercedValue)
+                    ? coercedValue ?? arg.DefaultValue
+                    : arg.DefaultValue;
                 return acc;
             });
         }
@@ -351,10 +347,10 @@ namespace GraphQL
 
             if (value == null)
             {
-                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, variable.Type.FullName));
+                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
             }
 
-            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name));
+            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
         }
 
         public bool IsValidValue(ISchema schema, GraphType type, object input)

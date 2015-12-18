@@ -280,6 +280,22 @@ namespace GraphQL.Tests.Execution
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
+
+        [Test]
+        public void executes_with_injected_input_variables()
+        {
+            var query = @"
+                query q($argC: String, $argD: ComplexScalar) {
+                  fieldWithObjectInput(input: { c: $argC, d: $argD })
+                }
+            ";
+
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+
+            var inputs = "{'argC': 'foo', 'argD': 'SerializedValue'}".ToInputs();
+
+            AssertQuerySuccess(query, expected, inputs);
+        }
     }
 
     public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
