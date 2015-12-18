@@ -192,12 +192,14 @@ namespace GraphQL
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
-                var completed = await CompleteValue(context, context.Schema.FindType(nonNullType.Type), fields, result);
+                var type = context.Schema.FindType(nonNullType.Type);
+                var completed = await CompleteValue(context, type, fields, result);
                 if (completed == null)
                 {
                     var field = fields != null ? fields.FirstOrDefault() : null;
                     var fieldName = field != null ? field.Name : null;
-                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}.".ToFormat(fieldName));
+                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
+                        .ToFormat(fieldName, type.Name));
                 }
 
                 return completed;

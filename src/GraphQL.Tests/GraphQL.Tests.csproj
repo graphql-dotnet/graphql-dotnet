@@ -76,6 +76,7 @@
     <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
+    <Compile Include="Types\NonNullGraphTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
   </ItemGroup>
   <ItemGroup>
