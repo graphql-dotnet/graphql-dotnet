@@ -89,7 +89,7 @@ namespace GraphQL
         {
             var context = new ExecutionContext();
             context.Schema = schema;
-            context.RootObject = root;
+            context.RootValue = root;
 
             var operation = !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)
@@ -114,7 +114,7 @@ namespace GraphQL
             var rootType = GetOperationRootType(context.Schema, context.Operation);
             var fields = CollectFields(context, rootType, context.Operation.Selections, null);
 
-            return ExecuteFields(context, rootType, context.RootObject, fields);
+            return ExecuteFields(context, rootType, context.RootValue, fields);
         }
 
         public async Task<object> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
@@ -146,12 +146,18 @@ namespace GraphQL
             try
             {
                 var resolveContext = new ResolveFieldContext();
+                resolveContext.FieldName = field.Name;
                 resolveContext.FieldAst = field;
                 resolveContext.FieldDefinition = fieldDefinition;
-                resolveContext.Schema = context.Schema;
+                resolveContext.ReturnType = context.Schema.FindType(fieldDefinition.Type);
                 resolveContext.ParentType = parentType;
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
+                resolveContext.Schema = context.Schema;
+                resolveContext.Fragments = context.Fragments;
+                resolveContext.RootValue = context.RootValue;
+                resolveContext.Operation = context.Operation;
+                resolveContext.Variables = context.Variables;
                 resolveContext.CancellationToken = context.CancellationToken;
                 var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
