@@ -14,7 +14,7 @@ namespace GraphQL.Execution
 
         public ISchema Schema { get; set; }
 
-        public object RootObject { get; set; }
+        public object RootValue { get; set; }
 
         public Operation Operation { get; set; }
 
