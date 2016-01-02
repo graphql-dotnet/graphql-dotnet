@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
@@ -39,7 +40,34 @@ namespace GraphQL.Builders
 
             public TObjectType Object { get; set; }
 
-            public T GetArgument<T>(string argumentName, T defaultValue = default(T))
+            public T GetArgument<T>(string argumentName)
+            {
+                object argument;
+                var defaultValue = default(T);
+
+                if (_context.FieldDefinition != null &&
+                    _context.FieldDefinition.Arguments != null)
+                {
+                    var arg = _context.FieldDefinition
+                        .Arguments
+                        .FirstOrDefault(a => a.Name == argumentName);
+                    if (arg != null)
+                    {
+                        defaultValue = arg.DefaultValue is T
+                            ? (T)arg.DefaultValue
+                            : default(T);
+                    }
+                }
+
+                if (_context.Arguments.TryGetValue(argumentName, out argument))
+                {
+                    return argument is T ? (T)argument : defaultValue;
+                }
+
+                return defaultValue;
+            }
+
+            public T GetArgument<T>(string argumentName, T defaultValue)
             {
                 object argument;
 
