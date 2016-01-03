@@ -12,7 +12,10 @@
             Field<StringGraphType>("startCursor", "When paginating backwards, the cursor to continue.");
             Field<StringGraphType>("endCursor", "When paginating forwards, the cursor to continue.");
         }
+    }
 
+    public class PageInfo
+    {
         public bool HasNextPage { get; set; }
 
         public bool HasPreviousPage { get; set; }

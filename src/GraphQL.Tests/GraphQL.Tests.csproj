@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Builders\ConnectionBuilderTests.cs" />
+    <Compile Include="Builders\ConnectionTests.cs" />
     <Compile Include="Builders\FieldBuilderTests.cs" />
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
