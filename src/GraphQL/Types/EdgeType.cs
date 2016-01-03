@@ -1,7 +1,7 @@
 ﻿namespace GraphQL.Types
 {
     public class EdgeType<TTo> : ObjectGraphType
-        where TTo : ObjectGraphType, new()
+        where TTo : ObjectGraphType
     {
         public EdgeType()
         {

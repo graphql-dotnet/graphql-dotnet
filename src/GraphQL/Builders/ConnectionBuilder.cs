@@ -9,14 +9,14 @@ namespace GraphQL.Builders
     public static class ConnectionBuilder
     {
         public static ConnectionBuilder<TGraphType, object, TDataObject> Create<TGraphType, TDataObject>()
-            where TGraphType : ObjectGraphType, new()
+            where TGraphType : ObjectGraphType
         {
             return ConnectionBuilder<TGraphType, object, TDataObject>.Create();
         }
     }
 
     public class ConnectionBuilder<TGraphType, TObjectType, TDataObject>
-        where TGraphType : ObjectGraphType, new()
+        where TGraphType : ObjectGraphType
     {
         public class ResolutionArguments : FieldBuilder<TGraphType, TObjectType, IEnumerable<TDataObject>>.ResolutionArguments
         {
@@ -250,7 +250,6 @@ namespace GraphQL.Builders
 
         private Connection<TDataObject> ResolveCallback(ResolutionArguments args, List<TDataObject> entries)
         {
-
             var totalCount = args.IsPartial ? args.TotalCount : entries.Count;
 
             if (!args.IsUnidirectional && !totalCount.HasValue)

@@ -6,7 +6,7 @@ using System.Linq;
 namespace GraphQL.Types
 {
     public class ConnectionType<TTo> : ObjectGraphType
-        where TTo : ObjectGraphType, new()
+        where TTo : ObjectGraphType
     {
         public ConnectionType()
         {
