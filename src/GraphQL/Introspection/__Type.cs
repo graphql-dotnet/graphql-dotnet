@@ -70,7 +70,7 @@ namespace GraphQL.Introspection
             });
             Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
-                if (context.Source is InterfaceGraphType || context.Source is UnionGraphType)
+                if (context.Source is GraphQLAbstractType)
                 {
                     var type = (GraphType)context.Source;
                     return context.Schema.FindImplementationsOf(type.GetType());

@@ -79,6 +79,7 @@
     <Compile Include="Execution\ExecutionResult.cs" />
     <Compile Include="Types\FieldType.cs" />
     <Compile Include="Types\FloatGraphType.cs" />
+    <Compile Include="Types\GraphQLAbstractType.cs" />
     <Compile Include="Types\GraphType.cs" />
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />

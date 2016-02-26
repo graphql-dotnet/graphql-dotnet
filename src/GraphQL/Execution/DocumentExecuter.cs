@@ -245,9 +245,9 @@ namespace GraphQL
 
             var objectType = fieldType as ObjectGraphType;
 
-            if (fieldType is InterfaceGraphType)
+            if (fieldType is GraphQLAbstractType)
             {
-                var interfaceType = fieldType as InterfaceGraphType;
+                var interfaceType = fieldType as GraphQLAbstractType;
                 objectType = interfaceType.ResolveType(result);
             }
 
@@ -589,15 +589,10 @@ namespace GraphQL
                 return true;
             }
 
-            if (conditionalType is InterfaceGraphType)
+            if (conditionalType is GraphQLAbstractType)
             {
-                var interfaceType = (InterfaceGraphType) conditionalType;
-                var hasInterfaces = type as IImplementInterfaces;
-                if (hasInterfaces != null)
-                {
-                    var interfaces = context.Schema.FindTypes(hasInterfaces.Interfaces);
-                    return interfaceType.IsPossibleType(interfaces);
-                }
+                var interfaceType = (GraphQLAbstractType) conditionalType;
+                return interfaceType.IsPossibleType(context, type);
             }
 
             return false;
