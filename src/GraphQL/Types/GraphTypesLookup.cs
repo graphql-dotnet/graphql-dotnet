@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
 using GraphQL.Introspection;
 
 namespace GraphQL.Types
@@ -120,6 +119,15 @@ namespace GraphQL.Types
                 obj.Interfaces.Apply(objectInterface =>
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
+                });
+            }
+
+            if (type is UnionGraphType)
+            {
+                var union = (UnionGraphType) type;
+                union.Types.Apply(unionedType =>
+                {
+                    AddTypeIfNotRegistered(unionedType, context);
                 });
             }
         }

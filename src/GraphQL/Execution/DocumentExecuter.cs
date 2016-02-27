@@ -112,7 +112,7 @@ namespace GraphQL
         public Task<object> ExecuteOperation(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Schema, context.Operation);
-            var fields = CollectFields(context, rootType, context.Operation.Selections, null);
+            var fields = CollectFields(context, rootType, rootType, context.Operation.Selections, null);
 
             return ExecuteFields(context, rootType, context.RootValue, fields);
         }
@@ -260,7 +260,7 @@ namespace GraphQL
 
             fields.Apply(field =>
             {
-                subFields = CollectFields(context, objectType, field.Selections, subFields);
+                subFields = CollectFields(context, fieldType, objectType, field.Selections, subFields);
             });
 
             return await ExecuteFields(context, objectType, result, subFields);
@@ -490,7 +490,12 @@ namespace GraphQL
             return input;
         }
 
-        public Dictionary<string, Fields> CollectFields(ExecutionContext context, GraphType type, Selections selections, Dictionary<string, Fields> fields)
+        public Dictionary<string, Fields> CollectFields(
+            ExecutionContext context,
+            GraphType originalType,
+            GraphType specificType,
+            Selections selections,
+            Dictionary<string, Fields> fields)
         {
             if (fields == null)
             {
@@ -526,24 +531,24 @@ namespace GraphQL
 
                         var fragment = context.Fragments.FindDefinition(spread.Name);
                         if (!ShouldIncludeNode(context, fragment.Directives)
-                            || !DoesFragmentConditionMatch(context, fragment, type))
+                            || !DoesFragmentConditionMatch(context, fragment, originalType))
                         {
                             return;
                         }
 
-                        CollectFields(context, type, fragment.Selections, fields);
+                        CollectFields(context, originalType, specificType, fragment.Selections, fields);
                     }
                     else if (selection.Fragment is InlineFragment)
                     {
                         var inline = selection.Fragment as InlineFragment;
 
                         if (!ShouldIncludeNode(context, inline.Directives)
-                          || !DoesFragmentConditionMatch(context, inline, type))
+                          || !DoesFragmentConditionMatch(context, inline, originalType))
                         {
                             return;
                         }
 
-                        CollectFields(context, type, inline.Selections, fields);
+                        CollectFields(context, originalType, specificType, inline.Selections, fields);
                     }
                 }
             });
@@ -584,7 +589,13 @@ namespace GraphQL
         public bool DoesFragmentConditionMatch(ExecutionContext context, IHaveFragmentType fragment, GraphType type)
         {
             var conditionalType = context.Schema.FindType(fragment.Type);
-            if (conditionalType == type)
+
+            if (conditionalType == null)
+            {
+                return false;
+            }
+
+            if (conditionalType.Equals(type))
             {
                 return true;
             }
@@ -593,6 +604,12 @@ namespace GraphQL
             {
                 var interfaceType = (GraphQLAbstractType) conditionalType;
                 return interfaceType.IsPossibleType(context, type);
+            }
+
+            if (type is GraphQLAbstractType)
+            {
+                var interfaceType = (GraphQLAbstractType) type;
+                return interfaceType.IsPossibleType(context, conditionalType);
             }
 
             return false;
