@@ -14,36 +14,54 @@ namespace GraphQL
 
         public static Inputs ToInputs(this string json)
         {
-            return new Inputs(ToDictionary(json));
+            var dictionary = json != null ? ToDictionary(json) : null;
+            return dictionary == null
+                ? new Inputs()
+                : new Inputs(dictionary);
         }
 
-        public static Dictionary<string, object> ToDictionary(this string json)
+        private static Dictionary<string, object> ToDictionary(this string json)
         {
-            var values = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-            var values2 = new Dictionary<string, object>();
-            foreach (KeyValuePair<string, object> d in values)
-            {
-                var value = GetValue(d.Value);
-                values2.Add(d.Key, value);
-            }
-            return values2;
+            var values = JsonConvert.DeserializeObject(json);
+            return GetValue(values) as Dictionary<string, object>;
         }
 
-        public static object GetValue(object value)
+        private static object GetValue(object value)
         {
-            if (value is JObject)
+            var objectValue = value as JObject;
+            if (objectValue != null)
             {
-                return ToDictionary(value.ToString());
-            }
-
-            if (value is JArray)
-            {
-                var array = (JArray) value;
-                return array.Values().Aggregate(new List<object>(), (list, token) =>
+                var output = new Dictionary<string, object>();
+                foreach (var kvp in objectValue)
                 {
-                    list.Add(GetValue(token.ToObject<object>()));
+                    output.Add(kvp.Key, GetValue(kvp.Value));
+                }
+                return output;
+            }
+
+            var propertyValue = value as JProperty;
+            if (propertyValue != null)
+            {
+                return new Dictionary<string, object>
+                {
+                    { propertyValue.Name, GetValue(propertyValue.Value) }
+                };
+            }
+
+            var arrayValue = value as JArray;
+            if (arrayValue != null)
+            {
+                return arrayValue.Children().Aggregate(new List<object>(), (list, token) =>
+                {
+                    list.Add(GetValue(token));
                     return list;
                 });
+            }
+
+            var rawValue = value as JValue;
+            if (rawValue != null)
+            {
+                return rawValue.Value;
             }
 
             return value;

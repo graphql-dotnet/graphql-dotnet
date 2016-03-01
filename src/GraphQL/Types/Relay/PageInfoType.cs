@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Types
+﻿namespace GraphQL.Types.Relay
 {
     public class PageInfoType : ObjectGraphType
     {
@@ -12,13 +12,5 @@
             Field<StringGraphType>("startCursor", "When paginating backwards, the cursor to continue.");
             Field<StringGraphType>("endCursor", "When paginating forwards, the cursor to continue.");
         }
-
-        public bool HasNextPage { get; set; }
-
-        public bool HasPreviousPage { get; set; }
-
-        public string StartCursor { get; set; }
-
-        public string EndCursor { get; set; }
     }
 }

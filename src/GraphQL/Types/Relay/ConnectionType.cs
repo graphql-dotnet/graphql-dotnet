@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace GraphQL.Types
+﻿namespace GraphQL.Types.Relay
 {
-    public class ConnectionType<TFrom, TTo> : ObjectGraphType
-        where TTo : ObjectGraphType, new()
+    public class ConnectionType<TTo> : ObjectGraphType
+        where TTo : ObjectGraphType
     {
         public ConnectionType()
         {
-            Name = string.Format("{0}{1}Connection", typeof(TFrom).GraphQLName(true), typeof(TTo).GraphQLName());
-            Description = string.Format("A connection from an object of type `{0}` to a list of objects of type `{1}`",
-                typeof(TFrom).GraphQLName(), typeof(TTo).GraphQLName());
+            Name = string.Format("{0}Connection", typeof(TTo).GraphQLName());
+            Description = string.Format("A connection from an object to a list of objects of type `{0}`.",
+                typeof(TTo).GraphQLName());
 
             Field<IntGraphType>()
                 .Name("totalCount")
@@ -25,7 +22,7 @@ namespace GraphQL.Types
                 .Name("pageInfo")
                 .Description("Information to aid in pagination.");
 
-            Field<ListGraphType<EdgeType<TFrom, TTo>>>()
+            Field<ListGraphType<EdgeType<TTo>>>()
                 .Name("edges")
                 .Description("Information to aid in pagination.");
 
@@ -37,22 +34,6 @@ namespace GraphQL.Types
                     "is needed, this field can be used instead. Note that when clients like Relay need to fetch " +
                     "the \"cursor\" field on the edge to enable efficient pagination, this shortcut cannot be used, " +
                     "and the full \"{ edges { node } } \" version should be used instead.");
-        }
-
-        public int? TotalCount { get; set; }
-
-        public PageInfoType PageInfo { get; set; }
-
-        public List<EdgeType<TFrom, TTo>> Edges { get; set; }
-
-        public List<TTo> Items
-        {
-            get
-            {
-                return Edges != null
-                    ? Edges.Select(e => e.Node).Where(n => n != null).ToList()
-                    : new List<TTo>();
-            }
         }
     }
 }

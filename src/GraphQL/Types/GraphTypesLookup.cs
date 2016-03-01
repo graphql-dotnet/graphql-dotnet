@@ -118,9 +118,9 @@ namespace GraphQL.Types
                 }
             });
 
-            if (type is ObjectGraphType)
+            var obj = type as ObjectGraphType;
+            if (obj != null)
             {
-                var obj = (ObjectGraphType) type;
                 obj.Interfaces.Apply(objectInterface =>
                 {
                     AddTypeIfNotRegistered(objectInterface, context);

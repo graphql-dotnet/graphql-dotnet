@@ -373,6 +373,18 @@ namespace GraphQL
         public object GetVariableValue(ISchema schema, Variable variable, object input)
         {
             var type = schema.FindType(variable.Type.FullName);
+
+            if (type == null && !variable.Type.AllowsNull)
+            {
+                var nonNullType = new VariableType
+                {
+                    Name = variable.Type.Name,
+                    IsList = variable.Type.IsList,
+                    AllowsNull = true,
+                };
+                type = schema.FindType(nonNullType.FullName);
+            }
+
             var value = input ?? variable.DefaultValue;
             if (IsValidValue(schema, type, value))
             {
@@ -384,7 +396,7 @@ namespace GraphQL
                 throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
             }
 
-            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
+            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName));
         }
 
         public bool IsValidValue(ISchema schema, GraphType type, object input)
