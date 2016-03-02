@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Execution;
 
 namespace GraphQL.Types
@@ -11,7 +10,7 @@ namespace GraphQL.Types
             if (hasInterfaces != null)
             {
                 var interfaces = context.Schema.FindTypes(hasInterfaces.Interfaces);
-                return interfaces.Any(i => i == this);
+                return interfaces.Any(i => i.Equals(this));
             }
 
             return false;

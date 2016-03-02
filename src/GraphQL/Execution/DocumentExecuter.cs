@@ -112,28 +112,39 @@ namespace GraphQL
         public Task<object> ExecuteOperation(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Schema, context.Operation);
-            var fields = CollectFields(context, rootType, rootType, context.Operation.Selections, null);
+            var fields = CollectFields(
+                context,
+                rootType,
+                context.Operation.Selections,
+                new Dictionary<string, Fields>(), 
+                new List<string>());
 
             return ExecuteFields(context, rootType, context.RootValue, fields);
         }
 
         public async Task<object> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
         {
-            return await fields.ToDictionaryAsync(
+            return await fields.ToDictionaryAsync<KeyValuePair<string, Fields>,string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveField(context, rootType, source, pair.Value));
         }
 
-        public async Task<object> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
+
+            var resolveResult = new ResolveFieldResult<object>
+            {
+                Skip = false
+            };
 
             var field = fields.First();
 
             var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
             if (fieldDefinition == null)
             {
-                return null;
+                resolveResult.Skip = true;
+                return resolveResult;
             }
 
             var arguments = GetArgumentValues(context.Schema, fieldDefinition.Arguments, field.Arguments, context.Variables);
@@ -175,12 +186,14 @@ namespace GraphQL
                     result = context.Schema.FindType(result as Type);
                 }
 
-                return await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result);
+                resolveResult.Value = await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result);
+                return resolveResult;
             }
             catch (Exception exc)
             {
                 context.Errors.Add(new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc));
-                return null;
+                resolveResult.Skip = false;
+                return resolveResult;
             }
         }
 
@@ -257,10 +270,11 @@ namespace GraphQL
             }
 
             var subFields = new Dictionary<string, Fields>();
+            var visitedFragments = new List<string>();
 
             fields.Apply(field =>
             {
-                subFields = CollectFields(context, fieldType, objectType, field.Selections, subFields);
+                subFields = CollectFields(context, objectType, field.Selections, subFields, visitedFragments);
             });
 
             return await ExecuteFields(context, objectType, result, subFields);
@@ -492,10 +506,10 @@ namespace GraphQL
 
         public Dictionary<string, Fields> CollectFields(
             ExecutionContext context,
-            GraphType originalType,
             GraphType specificType,
             Selections selections,
-            Dictionary<string, Fields> fields)
+            Dictionary<string, Fields> fields,
+            List<string> visitedFragmentNames)
         {
             if (fields == null)
             {
@@ -524,31 +538,35 @@ namespace GraphQL
                     {
                         var spread = selection.Fragment as FragmentSpread;
 
-                        if (!ShouldIncludeNode(context, spread.Directives))
+                        if (visitedFragmentNames.Contains(spread.Name)
+                            || !ShouldIncludeNode(context, spread.Directives))
                         {
                             return;
                         }
+
+                        visitedFragmentNames.Add(spread.Name);
 
                         var fragment = context.Fragments.FindDefinition(spread.Name);
-                        if (!ShouldIncludeNode(context, fragment.Directives)
-                            || !DoesFragmentConditionMatch(context, fragment, originalType))
+                        if (fragment == null
+                            || !ShouldIncludeNode(context, fragment.Directives)
+                            || !DoesFragmentConditionMatch(context, fragment, specificType))
                         {
                             return;
                         }
 
-                        CollectFields(context, originalType, specificType, fragment.Selections, fields);
+                        CollectFields(context, specificType, fragment.Selections, fields, visitedFragmentNames);
                     }
                     else if (selection.Fragment is InlineFragment)
                     {
                         var inline = selection.Fragment as InlineFragment;
 
                         if (!ShouldIncludeNode(context, inline.Directives)
-                          || !DoesFragmentConditionMatch(context, inline, originalType))
+                          || !DoesFragmentConditionMatch(context, inline, specificType))
                         {
                             return;
                         }
 
-                        CollectFields(context, originalType, specificType, inline.Selections, fields);
+                        CollectFields(context, specificType, inline.Selections, fields, visitedFragmentNames);
                     }
                 }
             });
@@ -588,6 +606,11 @@ namespace GraphQL
 
         public bool DoesFragmentConditionMatch(ExecutionContext context, IHaveFragmentType fragment, GraphType type)
         {
+            if (string.IsNullOrWhiteSpace(fragment.Type))
+            {
+                return true;
+            }
+
             var conditionalType = context.Schema.FindType(fragment.Type);
 
             if (conditionalType == null)
@@ -602,14 +625,8 @@ namespace GraphQL
 
             if (conditionalType is GraphQLAbstractType)
             {
-                var interfaceType = (GraphQLAbstractType) conditionalType;
-                return interfaceType.IsPossibleType(context, type);
-            }
-
-            if (type is GraphQLAbstractType)
-            {
-                var interfaceType = (GraphQLAbstractType) type;
-                return interfaceType.IsPossibleType(context, conditionalType);
+                var abstractType = (GraphQLAbstractType) conditionalType;
+                return abstractType.IsPossibleType(context, type);
             }
 
             return false;

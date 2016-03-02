@@ -122,7 +122,6 @@ Console.Writeline(result);
       "name": "R2-D2"
     }
   }
-  "errors": []
 }
 ```
 
@@ -143,7 +142,7 @@ Console.Writeline(result);
 - [x] Enumerations
 - [x] Input Objects
 - [x] Mutations
-- [ ] Unions
+- [x] Unions
 - [x] Async execution
 
 ### Validation

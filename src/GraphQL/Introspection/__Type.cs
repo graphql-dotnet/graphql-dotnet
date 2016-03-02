@@ -61,21 +61,28 @@ namespace GraphQL.Introspection
                             : type.Fields;
                     }
 
-                    return Enumerable.Empty<FieldType>();
+                    return null;
                 });
             Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: context =>
             {
                 var type = context.Source as IImplementInterfaces;
-                return type != null ? type.Interfaces : Enumerable.Empty<Type>();
+                return type != null ? type.Interfaces : null;
             });
             Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
-                if (context.Source is GraphQLAbstractType)
+                if (context.Source is InterfaceGraphType)
                 {
                     var type = (GraphType)context.Source;
                     return context.Schema.FindImplementationsOf(type.GetType());
                 }
-                return Enumerable.Empty<GraphType>();
+
+                if (context.Source is UnionGraphType)
+                {
+                    var type = (UnionGraphType) context.Source;
+                    return context.Schema.FindTypes(type.Types);
+                }
+
+                return null;
             });
             Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
                 new QueryArguments(new[]
@@ -98,12 +105,12 @@ namespace GraphQL.Introspection
                         return values;
                     }
 
-                    return Enumerable.Empty<EnumValue>();
+                    return null;
                 });
             Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
             {
                 var type = context.Source as InputObjectGraphType;
-                return type != null ? type.Fields : Enumerable.Empty<FieldType>();
+                return type != null ? type.Fields : null;
             });
             Field<__Type>("ofType", resolve: context =>
             {

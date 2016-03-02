@@ -27,7 +27,7 @@ namespace GraphQL.Types
         public override bool IsPossibleType(ExecutionContext context, GraphType type)
         {
             var graphTypes = context.Schema.FindTypes(Types);
-            return graphTypes.Any(x => x == type);
+            return graphTypes.Any(x => x.Equals(type));
         }
     }
 }

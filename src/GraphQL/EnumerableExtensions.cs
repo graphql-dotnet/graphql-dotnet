@@ -32,21 +32,22 @@ namespace GraphQL
             }
         }
         
-        public static async Task<Dictionary<TKey, TValue>> ToDictionaryAsync<TSource, TKey, TValue>(
+        public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
             this IEnumerable<TSource> items,
             Func<TSource, TKey> keyFunc,
-            Func<TSource, Task<TValue>> valueFunc)
+            Func<TSource, Task<TValue>> valueFunc) where TValue : ResolveFieldResult<TValueVal>
         {
             var tasks = items
                 .Select(async item => new {
                     Key = keyFunc(item),
-                    Value = await valueFunc(item)
+                    Result = await valueFunc(item)
                 })
                 .ToArray();
 
             var keyValuePairs = await Task.WhenAll(tasks);
+            keyValuePairs = keyValuePairs.Where(x => !x.Result.Skip).ToArray();
 
-            return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);
         }
 
         public static bool Any<T>(this IEnumerable<T> items, Func<T, bool> check)

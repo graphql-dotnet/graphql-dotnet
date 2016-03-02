@@ -412,31 +412,31 @@
                   'kind': 'SCALAR',
                   'name': 'String',
                   'description': null,
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'SCALAR',
                   'name': 'Boolean',
                   'description': null,
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'SCALAR',
                   'name': 'Float',
                   'description': null,
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'SCALAR',
                   'name': 'Int',
                   'description': null,
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'SCALAR',
                   'name': 'ID',
                   'description': null,
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'OBJECT',
@@ -539,7 +539,7 @@
                   'kind': 'ENUM',
                   'name': '__TypeKind',
                   'description': 'An enum describing what kind of type a given __Type is.',
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'OBJECT',
@@ -790,7 +790,7 @@
                   'kind': 'ENUM',
                   'name': 'Episode',
                   'description': 'One of the films in the Star Wars Trilogy.',
-                  'fields': []
+                  'fields': null
                 },
                 {
                   'kind': 'OBJECT',

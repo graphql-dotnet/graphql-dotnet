@@ -29,6 +29,13 @@ namespace GraphQL.Tests.Execution
                 Barks = true
             };
 
+            var liz = new Person
+            {
+                Name = "Liz",
+                Pets = new List<IPet>(),
+                Friends = new List<INamed>()
+            };
+
             _john = new Person
             {
                 Name = "John",
@@ -36,8 +43,72 @@ namespace GraphQL.Tests.Execution
                 {
                     garfield,
                     odie
+                },
+                Friends = new List<INamed>
+                {
+                    liz,
+                    odie
                 }
             };
+        }
+
+        [Test]
+        public void can_introspect_on_union_and_intercetion_types()
+        {
+            var query = @"
+            query AQuery {
+                Named: __type(name: 'Named') {
+                  kind
+                  name
+                  fields { name }
+                    interfaces { name }
+                    possibleTypes { name }
+                    enumValues { name }
+                    inputFields { name }
+                }
+                Pet: __type(name: 'Pet') {
+                  kind
+                  name
+                  fields { name }
+                    interfaces { name }
+                    possibleTypes { name }
+                    enumValues { name }
+                    inputFields { name }
+                }
+            }
+            ";
+
+            var expected = @"{
+                named: {
+                  kind: 'INTERFACE',
+                  name: 'Named',
+                  fields: [
+                    { name: 'name' }
+                  ],
+                  interfaces: null,
+                  possibleTypes: [
+                    { name: 'Person' },
+                    { name: 'Dog' },
+                    { name: 'Cat' }
+                  ],
+                  enumValues: null,
+                  inputFields: null
+                },
+                pet: {
+                  kind: 'UNION',
+                  name: 'Pet',
+                  fields: null,
+                  interfaces: null,
+                  possibleTypes: [
+                    { name: 'Dog' },
+                    { name: 'Cat' }
+                  ],
+                  enumValues: null,
+                  inputFields: null
+                }
+            }";
+
+            AssertQuerySuccess(query, expected);
         }
 
         [Test]
@@ -110,6 +181,38 @@ namespace GraphQL.Tests.Execution
         }
 
         [Test]
+        public void executes_using_interface_types()
+        {
+            // NOTE: This is an *invalid* query, but it should be an *executable* query.
+
+            var query = @"
+                query AQuery {
+                  __typename
+                  name
+                  friends {
+                    __typename
+                    name
+                    barks
+                    meows
+                  }
+                }
+            ";
+
+            var expected = @"
+                {
+                  __typename: 'Person',
+                  name: 'John',
+                  friends: [
+                    { __typename:  'Person', name: 'Liz' },
+                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ]
+                }
+            ";
+
+            AssertQuerySuccess(query, expected, root: _john);
+        }
+
+        [Test]
         public void allows_fragment_conditions_to_be_abstract_types()
         {
             var query = @"
@@ -117,6 +220,7 @@ namespace GraphQL.Tests.Execution
                   __typename
                   name
                   pets { ...PetFields }
+                  friends { ...FriendFields }
                 }
                 fragment PetFields on Pet {
                   __typename
@@ -129,6 +233,16 @@ namespace GraphQL.Tests.Execution
                     meows
                   }
                 }
+                fragment FriendFields on Named {
+                  __typename
+                  name
+                  ... on Dog {
+                    barks
+                  },
+                  ... on Cat {
+                    meows
+                  }
+                }
             ";
 
             var expected = @"
@@ -138,6 +252,10 @@ namespace GraphQL.Tests.Execution
                   pets: [
                     { __typename:  'Cat', name: 'Garfield', meows: false },
                     { __typename:  'Dog', name: 'Odie', barks: true }
+                  ],
+                  friends: [
+                    { __typename:  'Person', name: 'Liz' },
+                    { __typename:  'Dog', name: 'Odie', barks: true }
                   ]
                 }
             ";
@@ -146,7 +264,12 @@ namespace GraphQL.Tests.Execution
         }
     }
 
-    public interface IPet
+    public interface INamed
+    {
+        string Name { get; set; }
+    }
+
+    public interface IPet : INamed
     {
     }
 
@@ -162,15 +285,16 @@ namespace GraphQL.Tests.Execution
         public bool Meows { get; set; }
     }
 
-    public class Person
+    public class Person : INamed
     {
         public string Name { get; set; }
         public List<IPet> Pets { get; set; }
+        public List<INamed> Friends { get; set; }
     }
 
     public class NamedType : InterfaceGraphType
     {
-        public NamedType(DogType dogType, CatType catType)
+        public NamedType(DogType dogType, CatType catType, PersonType personType)
         {
             Name = "Named";
 
@@ -186,6 +310,11 @@ namespace GraphQL.Tests.Execution
                 if (obj is Cat)
                 {
                     return catType;
+                }
+
+                if (obj is Person)
+                {
+                    return personType;
                 }
 
                 return null;
@@ -253,6 +382,7 @@ namespace GraphQL.Tests.Execution
 
             Field<StringGraphType>("name");
             Field<ListGraphType<PetType>>("pets");
+            Field<ListGraphType<NamedType>>("friends");
 
             Interface<NamedType>();
         }
