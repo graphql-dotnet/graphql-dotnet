@@ -2,15 +2,19 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.4.1.0</version>
+    <version>0.5.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* Add additional fields to FieldResolveContext
-* Fix bug with input objects and variables</releaseNotes>
+    <releaseNotes>* Add Union support
+* Add GraphQLAbstractType which both interface and union types inherit from
+* CHANGE: only return field if source object contains that field
+* CHANGE: Return null instead of an empty list when introspecting (to match the spec) - fields, interfaces, enums, input values
+* CHANGE: GraphType now implements Equals, based on the Name of the type
+* Fix: Ensure fragments are only visited once during an execution path</releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
