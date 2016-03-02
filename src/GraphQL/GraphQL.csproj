@@ -54,6 +54,7 @@
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
+    <Compile Include="Execution\ResolveFieldResult.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />
     <Compile Include="Introspection\SchemaMetaFieldType.cs" />
     <Compile Include="Introspection\TypeKind.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Execution\ExecutionResult.cs" />
     <Compile Include="Types\FieldType.cs" />
     <Compile Include="Types\FloatGraphType.cs" />
+    <Compile Include="Types\GraphQLAbstractType.cs" />
     <Compile Include="Types\GraphType.cs" />
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />

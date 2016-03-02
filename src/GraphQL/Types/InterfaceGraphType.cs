@@ -1,15 +1,19 @@
-using System;
-using System.Collections.Generic;
+using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class InterfaceGraphType : GraphType
+    public class InterfaceGraphType : GraphQLAbstractType
     {
-        public Func<object, ObjectGraphType> ResolveType { get; set; }
-
-        public bool IsPossibleType(IEnumerable<GraphType> types)
+        public override bool IsPossibleType(ExecutionContext context, GraphType type)
         {
-            return types.Any(i => i == this);
+            var hasInterfaces = type as IImplementInterfaces;
+            if (hasInterfaces != null)
+            {
+                var interfaces = context.Schema.FindTypes(hasInterfaces.Interfaces);
+                return interfaces.Any(i => i.Equals(this));
+            }
+
+            return false;
         }
     }
 }

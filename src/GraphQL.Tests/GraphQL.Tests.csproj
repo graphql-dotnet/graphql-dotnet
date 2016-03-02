@@ -56,6 +56,7 @@
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
     <Compile Include="Execution\InputConversionTests.cs" />
     <Compile Include="Execution\MutationTests.cs" />
+    <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
     <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
