@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public interface ISchema
+    public interface ISchema : IDisposable
     {
         ObjectGraphType Query { get; set; }
 
@@ -25,6 +25,8 @@ namespace GraphQL.Types
 
     public class Schema : ISchema
     {
+        private GraphTypesLookup _lookup;
+
         public Schema()
             : this(type => (GraphType) Activator.CreateInstance(type))
         {
@@ -34,8 +36,6 @@ namespace GraphQL.Types
         {
             ResolveType = resolveType;
         }
-
-        private GraphTypesLookup _lookup;
 
         public ObjectGraphType Query { get; set; }
 
@@ -59,6 +59,7 @@ namespace GraphQL.Types
         {
             get
             {
+                EnsureLookup();
                 return _lookup
                     .All()
                     .Where(x => !(x is NonNullGraphType || x is ListGraphType))
@@ -116,6 +117,18 @@ namespace GraphQL.Types
 
                 _lookup.AddType(Query, ctx);
                 _lookup.AddType(Mutation, ctx);
+            }
+        }
+
+        public void Dispose()
+        {
+            ResolveType = null;
+            Query = null;
+            Mutation = null;
+
+            if (_lookup != null)
+            {
+                _lookup.Clear();
             }
         }
     }

@@ -18,6 +18,8 @@ namespace GraphQL.Tests
             Field<StringGraphType>("homePlanet", "The home planet of the human.");
 
             Interface<CharacterInterface>();
+
+            IsTypeOf = value => value is Human;
         }
     }
 }

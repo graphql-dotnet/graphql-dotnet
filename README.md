@@ -56,14 +56,6 @@ public class CharacterInterface : InterfaceGraphType
     Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
     Field<NonNullGraphType<StringGraphType>>("name", "The name of the character.");
     Field<ListGraphType<CharacterInterface>>("friends");
-    ResolveType = (obj) =>
-    {
-      if (obj is Human)
-      {
-        return new HumanType();
-      }
-      return new DroidType();
-    };
   }
 }
 
@@ -80,6 +72,7 @@ public class DroidType : ObjectGraphType
         resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
     );
     Interface<CharacterInterface>();
+    IsTypeOf = value => value is Droid;
   }
 }
 ```

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Execution
@@ -53,7 +54,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Test]
-        public void can_introspect_on_union_and_intercetion_types()
+        public void can_introspect_on_union_and_intersection_types()
         {
             var query = @"
             query AQuery {
@@ -87,9 +88,9 @@ namespace GraphQL.Tests.Execution
                   ],
                   interfaces: null,
                   possibleTypes: [
-                    { name: 'Person' },
                     { name: 'Dog' },
-                    { name: 'Cat' }
+                    { name: 'Cat' },
+                    { name: 'Person' }
                   ],
                   enumValues: null,
                   inputFields: null
@@ -294,31 +295,11 @@ namespace GraphQL.Tests.Execution
 
     public class NamedType : InterfaceGraphType
     {
-        public NamedType(DogType dogType, CatType catType, PersonType personType)
+        public NamedType()
         {
             Name = "Named";
 
             Field<StringGraphType>("name");
-
-            ResolveType = obj =>
-            {
-                if (obj is Dog)
-                {
-                    return dogType;
-                }
-
-                if (obj is Cat)
-                {
-                    return catType;
-                }
-
-                if (obj is Person)
-                {
-                    return personType;
-                }
-
-                return null;
-            };
         }
     }
 
@@ -332,6 +313,8 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("barks");
 
             Interface<NamedType>();
+
+            IsTypeOf = value => value is Dog;
         }
     }
 
@@ -345,32 +328,19 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("meows");
 
             Interface<NamedType>();
+
+            IsTypeOf = value => value is Cat;
         }
     }
 
     public class PetType : UnionGraphType
     {
-        public PetType(DogType dogType, CatType catType)
+        public PetType()
         {
             Name = "Pet";
 
             Type<DogType>();
             Type<CatType>();
-
-            ResolveType = obj =>
-            {
-                if (obj is Dog)
-                {
-                    return dogType;
-                }
-
-                if (obj is Cat)
-                {
-                    return catType;
-                }
-
-                return null;
-            };
         }
     }
 
@@ -385,6 +355,8 @@ namespace GraphQL.Tests.Execution
             Field<ListGraphType<NamedType>>("friends");
 
             Interface<NamedType>();
+
+            IsTypeOf = value => value is Person;
         }
     }
 

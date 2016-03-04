@@ -19,6 +19,8 @@ namespace GraphQL.Tests
             Field<StringGraphType>("primaryFunction", "The primary function of the droid.");
 
             Interface<CharacterInterface>();
+
+            IsTypeOf = value => value is Droid;
         }
     }
 }
