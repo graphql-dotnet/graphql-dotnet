@@ -30,6 +30,11 @@ namespace GraphQL.Types
             AddType<__TypeKind>();
         }
 
+        public void Clear()
+        {
+            _types.Clear();
+        }
+
         public IEnumerable<GraphType> All()
         {
             return _types.Values;
@@ -119,15 +124,49 @@ namespace GraphQL.Types
                 obj.Interfaces.Apply(objectInterface =>
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
+
+                    var interfaceInstance = this[objectInterface] as InterfaceGraphType;
+                    if (interfaceInstance != null)
+                    {
+                        interfaceInstance.AddPossibleType(obj);
+
+                        if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
+                        {
+                            throw new ExecutionError((
+                                "Interface type {0} does not provide a \"resolveType\" function" +
+                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                "There is no way to resolve this possible type during execution.")
+                                .ToFormat(interfaceInstance, obj));
+                        }
+                    }
                 });
             }
 
             if (type is UnionGraphType)
             {
                 var union = (UnionGraphType) type;
+
+                if (!union.Types.Any())
+                {
+                    throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
+                }
+
                 union.Types.Apply(unionedType =>
                 {
                     AddTypeIfNotRegistered(unionedType, context);
+
+                    var objType = this[unionedType] as ObjectGraphType;
+
+                    if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
+                    {
+                        throw new ExecutionError((
+                            "Union type {0} does not provide a \"resolveType\" function" +
+                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                            "There is no way to resolve this possible type during execution.")
+                            .ToFormat(union, objType));
+                    }
+
+                    union.AddPossibleType(objType);
                 });
             }
         }

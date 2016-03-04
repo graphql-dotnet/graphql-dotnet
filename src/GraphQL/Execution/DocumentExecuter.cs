@@ -260,13 +260,27 @@ namespace GraphQL
 
             if (fieldType is GraphQLAbstractType)
             {
-                var interfaceType = fieldType as GraphQLAbstractType;
-                objectType = interfaceType.ResolveType(result);
+                var abstractType = fieldType as GraphQLAbstractType;
+                objectType = abstractType.GetObjectType(result);
+
+                if (objectType != null && !abstractType.IsPossibleType(objectType))
+                {
+                    throw new ExecutionError(
+                        "Runtime Object type \"{0}\" is not a possible type for \"{1}\""
+                        .ToFormat(objectType, abstractType));
+                }
             }
 
             if (objectType == null)
             {
                 return null;
+            }
+
+            if (objectType.IsTypeOf != null && !objectType.IsTypeOf(result))
+            {
+                throw new ExecutionError(
+                    "Expected value of type \"{0}\" but got: {1}."
+                    .ToFormat(objectType, result));
             }
 
             var subFields = new Dictionary<string, Fields>();
@@ -626,7 +640,7 @@ namespace GraphQL
             if (conditionalType is GraphQLAbstractType)
             {
                 var abstractType = (GraphQLAbstractType) conditionalType;
-                return abstractType.IsPossibleType(context, type);
+                return abstractType.IsPossibleType(type);
             }
 
             return false;

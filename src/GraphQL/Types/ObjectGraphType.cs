@@ -5,7 +5,14 @@ namespace GraphQL.Types
 {
     public class ObjectGraphType : GraphType, IImplementInterfaces
     {
-        private readonly List<Type> _interfaces = new List<Type>();
+        private readonly List<Type> _interfaces;
+
+        public ObjectGraphType()
+        {
+            _interfaces = new List<Type>();
+        }
+
+        public Func<object, bool> IsTypeOf { get; set; }
 
         public IEnumerable<Type> Interfaces
         {
