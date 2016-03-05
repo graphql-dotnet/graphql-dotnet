@@ -30,11 +30,10 @@ namespace GraphQL.Types
             return builder;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, object> Connection<TParentType, TGraphType>()
-            where TParentType : GraphType
+        public ConnectionBuilder<TGraphType, object, TDataObject> Connection<TGraphType, TDataObject>()
             where TGraphType : ObjectGraphType, new()
         {
-            var builder = ConnectionBuilder.Create<TParentType, TGraphType>();
+            var builder = ConnectionBuilder.Create<TGraphType, TDataObject>();
             _fields.Add(builder.FieldType);
             return builder;
         }

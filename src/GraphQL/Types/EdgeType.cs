@@ -1,23 +1,27 @@
 ﻿namespace GraphQL.Types
 {
-    public class EdgeType<TFrom, TTo> : ObjectGraphType
-        where TTo : ObjectGraphType, new()
+    public class EdgeType<TTo> : ObjectGraphType
+        where TTo : ObjectGraphType
     {
         public EdgeType()
         {
-            Name = string.Format("{0}{1}Edge",
-                typeof(TFrom).GraphQLName(true), typeof(TTo).GraphQLName());
+            Name = string.Format("{0}Edge", typeof(TTo).GraphQLName());
             Description = string.Format(
-                "An edge in a connection between objects of types `{0}` and `{1}`.",
-                typeof(TFrom).GraphQLName(), typeof(TTo).GraphQLName());
+                "An edge in a connection from an object to another object of type `{0}`.",
+                typeof(TTo).GraphQLName());
 
-            Field<NonNullGraphType<StringGraphType>>("cursor", "A cursor for use in pagination",
-                resolve: context => ((EdgeType<TFrom, TTo>)context.Source).Cursor);
+            Field<NonNullGraphType<StringGraphType>>()
+                .Name("cursor")
+                .Description("A cursor for use in pagination");
 
-            Field<TTo>("node", "The item at the end of the edge",
-                resolve: context => ((EdgeType<TFrom, TTo>)context.Source).Node);
+            Field<TTo>()
+                .Name("node")
+                .Description("The item at the end of the edge");
         }
+    }
 
+    public class Edge<TTo>
+    {
         public string Cursor { get; set; }
 
         public TTo Node { get; set; }

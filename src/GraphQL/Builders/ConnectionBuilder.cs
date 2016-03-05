@@ -8,19 +8,17 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
-        public static ConnectionBuilder<TParentType, TGraphType, object> Create<TParentType, TGraphType>()
-            where TParentType : GraphType
-            where TGraphType : ObjectGraphType, new()
+        public static ConnectionBuilder<TGraphType, object, TDataObject> Create<TGraphType, TDataObject>()
+            where TGraphType : ObjectGraphType
         {
-            return ConnectionBuilder<TParentType, TGraphType, object>.Create();
+            return ConnectionBuilder<TGraphType, object, TDataObject>.Create();
         }
     }
 
-    public class ConnectionBuilder<TParentType, TGraphType, TObjectType>
-        where TParentType : GraphType
-        where TGraphType : ObjectGraphType, new()
+    public class ConnectionBuilder<TGraphType, TObjectType, TDataObject>
+        where TGraphType : ObjectGraphType
     {
-        public class ResolutionArguments : FieldBuilder<TGraphType, TObjectType, IEnumerable<TGraphType>>.ResolutionArguments
+        public class ResolutionArguments : FieldBuilder<TGraphType, TObjectType, IEnumerable<TDataObject>>.ResolutionArguments
         {
             private readonly int? _defaultPageSize;
 
@@ -31,7 +29,7 @@ namespace GraphQL.Builders
                 _defaultPageSize = defaultPageSize;
             }
 
-            public bool IsUnidirectional { get; set; }
+            public bool IsUnidirectional { get; private set; }
 
             public int? First
             {
@@ -97,18 +95,18 @@ namespace GraphQL.Builders
             FieldType = fieldType;
         }
 
-        public static ConnectionBuilder<TParentType, TGraphType, TObjectType> Create()
+        public static ConnectionBuilder<TGraphType, TObjectType, TDataObject> Create()
         {
             var fieldType = new FieldType
             {
-                Type = typeof(ConnectionType<TParentType, TGraphType>),
+                Type = typeof(ConnectionType<TGraphType>),
                 Arguments = new QueryArguments(new QueryArgument[0]),
             };
-            return new ConnectionBuilder<TParentType, TGraphType, TObjectType>(fieldType, null, false, false, null)
+            return new ConnectionBuilder<TGraphType, TObjectType, TDataObject>(fieldType, null, false, false, null)
                 .Unidirectional();
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Unidirectional()
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Unidirectional()
         {
             if (_isUnidirectional)
             {
@@ -126,7 +124,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Bidirectional()
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Bidirectional()
         {
             if (_isBidirectional)
             {
@@ -136,7 +134,7 @@ namespace GraphQL.Builders
             Argument<StringGraphType, string>("before",
                 "Only look at connected edges with cursors smaller than the value of `before`.");
             Argument<IntGraphType, int?>("last",
-                "Specifies the number of edges to return counting reversly from `before` or the last entry if `before` is not specified");
+                "Specifies the number of edges to return counting reversely from `before`, or the last entry if `before` is not specified.");
 
             _isUnidirectional = false;
             _isBidirectional = true;
@@ -144,33 +142,33 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Name(string name)
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Name(string name)
         {
             FieldType.Name = name;
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Description(string description)
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Description(string description)
         {
             FieldType.Description = description;
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> PageSize(int pageSize)
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> PageSize(int pageSize)
         {
             _pageSize = pageSize;
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> ReturnAll()
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> ReturnAll()
         {
             _pageSize = null;
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TNewObjectType> WithObject<TNewObjectType>(Func<object, TNewObjectType> objectResolver = null)
+        public ConnectionBuilder<TGraphType, TNewObjectType, TDataObject> WithObject<TNewObjectType>(Func<object, TNewObjectType> objectResolver = null)
         {
-            return new ConnectionBuilder<TParentType, TGraphType, TNewObjectType>(
+            return new ConnectionBuilder<TGraphType, TNewObjectType, TDataObject>(
                 FieldType,
                 objectResolver ?? (obj => (TNewObjectType)obj),
                 _isUnidirectional,
@@ -178,7 +176,7 @@ namespace GraphQL.Builders
                 _pageSize);
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Argument<TArgumentGraphType>(string name, string description)
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Argument<TArgumentGraphType>(string name, string description)
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
@@ -188,7 +186,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, TObjectType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
+        public ConnectionBuilder<TGraphType, TObjectType, TDataObject> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default(TArgumentType))
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
@@ -200,25 +198,25 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public void Resolve(Func<ResolutionArguments, IEnumerable<TGraphType>> resolver)
+        public void Resolve(Func<ResolutionArguments, IEnumerable<TDataObject>> resolver)
         {
             FieldType.Resolve = context =>
             {
                 var args = new ResolutionArguments(context, _objectResolver, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
                 var entries = resolver(args);
-                return ResolveCallback(args, entries != null ? entries.ToList() : new List<TGraphType>());
+                return ResolveCallback(args, entries != null ? entries.ToList() : new List<TDataObject>());
             };
         }
 
-        public void Resolve(Func<ResolutionArguments, Task<IEnumerable<TGraphType>>> resolver)
+        public void Resolve(Func<ResolutionArguments, Task<IEnumerable<TDataObject>>> resolver)
         {
             FieldType.Resolve = context =>
             {
                 var args = new ResolutionArguments(context, _objectResolver, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
                 var entries = resolver(args).Result;
-                return ResolveCallback(args, entries != null ? entries.ToList() : new List<TGraphType>());
+                return ResolveCallback(args, entries != null ? entries.ToList() : new List<TDataObject>());
             };
         }
 
@@ -250,83 +248,20 @@ namespace GraphQL.Builders
             }
         }
 
-        private ConnectionType<TParentType, TGraphType> ResolveCallback(ResolutionArguments args, List<TGraphType> entries)
+        private Connection<TDataObject> ResolveCallback(ResolutionArguments args, List<TDataObject> entries)
         {
             var totalCount = args.IsPartial ? args.TotalCount : entries.Count;
-            var limit = args.PageSize ?? totalCount ?? 25;
-            var firstIndex = args.NumberOfSkippedEntries ?? 0;
-            var skip = 0;
 
             if (!args.IsUnidirectional && !totalCount.HasValue)
             {
                 throw new ArgumentException("`totalCount` is not set for partial bidirectional connection.");
             }
 
-            var after = ParseCursor(args.After);
-            var before = ParseCursor(args.Before);
+            var connection = new Connection<TDataObject>()
+                .FromCollection(entries)
+                .Paginate(args.First, args.Last, args.After, args.Before);
 
-            if (!args.IsPartial)
-            {
-                if (after.HasValue)
-                {
-                    skip = Math.Max(after.Value - firstIndex, 0);
-                }
-                else if (before.HasValue)
-                {
-                    var count = totalCount.GetValueOrDefault(0);
-                    var skipFromEnd = Math.Max(count - before.Value + 1, 0);
-                    skip = count - limit - skipFromEnd;
-                    if (skip < 0)
-                    {
-                        skip = 0;
-                        limit = 0;
-                    }
-                }
-                firstIndex = skip;
-            }
-
-            var cursor = firstIndex;
-            var edges = entries
-                .Skip(skip)
-                .Take(limit)
-                .Select(entry =>
-                    new EdgeType<TParentType, TGraphType>
-                    {
-                        Cursor = GetCursorFromIndex(++cursor),
-                        Node = entry,
-                    })
-                .ToList();
-            var takeCount = edges.Count;
-
-            var pageInfo = new PageInfoType
-            {
-                HasNextPage = takeCount < entries.Count - skip,
-                HasPreviousPage = firstIndex > 0,
-                StartCursor = GetCursorFromIndex(firstIndex + 1),
-                EndCursor = GetCursorFromIndex(firstIndex + Math.Max(1, takeCount)),
-            };
-
-            return new ConnectionType<TParentType, TGraphType>
-            {
-                TotalCount = totalCount,
-                Edges = edges,
-                PageInfo = pageInfo,
-            };
-        }
-
-        private static string GetCursorFromIndex(int index)
-        {
-            return index.ToString("D8");
-        }
-
-        private static int? ParseCursor(string cursor)
-        {
-            int cursorInt;
-            if (cursor != null && int.TryParse(cursor, out cursorInt))
-            {
-                return cursorInt;
-            }
-            return null;
+            return connection;
         }
     }
 }
