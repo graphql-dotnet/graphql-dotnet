@@ -374,17 +374,6 @@ namespace GraphQL
         {
             var type = schema.FindType(variable.Type.FullName);
 
-            if (type == null && !variable.Type.AllowsNull)
-            {
-                var nonNullType = new VariableType
-                {
-                    Name = variable.Type.Name,
-                    IsList = variable.Type.IsList,
-                    AllowsNull = true,
-                };
-                type = schema.FindType(nonNullType.FullName);
-            }
-
             var value = input ?? variable.DefaultValue;
             if (IsValidValue(schema, type, value))
             {
