@@ -31,7 +31,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TGraphType, object> Connection<TGraphType>()
-            where TGraphType : ObjectGraphType, new()
+            where TGraphType : ObjectGraphType
         {
             var builder = ConnectionBuilder.Create<TGraphType>();
             _fields.Add(builder.FieldType);
