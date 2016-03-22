@@ -5,7 +5,6 @@ using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Types;
 using GraphQL.Validation;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Should;
 
@@ -24,7 +23,7 @@ namespace GraphQL.Tests
         {
             Services = new SimpleContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
-            Writer = new DocumentWriter(Formatting.Indented);
+            Writer = new DocumentWriter(indent: true);
         }
 
         public ISimpleContainer Services { get; set; }
