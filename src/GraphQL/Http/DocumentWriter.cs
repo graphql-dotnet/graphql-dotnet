@@ -14,13 +14,13 @@ namespace GraphQL.Http
         private readonly JsonSerializerSettings _settings;
 
         public DocumentWriter()
-            : this(Formatting.None)
+            : this(indent: false)
         {
         }
 
-        public DocumentWriter(Formatting formatting)
+        public DocumentWriter(bool indent)
             : this(
-                formatting,
+                indent ? Formatting.Indented : Formatting.None,
                 new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -30,7 +30,7 @@ namespace GraphQL.Http
         {
         }
 
-        public DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
+        internal DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
         {
             _formatting = formatting;
             _settings = settings;
