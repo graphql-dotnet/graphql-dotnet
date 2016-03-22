@@ -2,16 +2,24 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.5.1.0</version>
+    <version>0.6.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* Add `IsTypeOf`
-* `GraphQLAbstractType` now has a `PossibleTypes` property which is a list of graph types of all possible types that abstract type could be.
-* The `PossibleTypes` collection is populated on bootstrap of the Schema.</releaseNotes>
+    <releaseNotes><![CDATA[
+ * `GetArgument()` wasn't using the `FieldDefinition`'s default value for an argument correctly. Added method signature for using the `FieldDefinition` default, and one for overriding the value
+ * `ConnectionType<T>`, `EdgeType<T>` and `PageInfoType` implementations have been separated from their backing data objects. Improved and more consistent Relay-specific helper functions for these will be transitioned over to graphql-dotnet/conventions
+ * Moved Relay-specific type structures to the `GraphQL.Types.Relay` namespace
+ * Removed `new()` constraint on connections and edges
+ * Exposing `ResolveFieldContext` in `FieldBuilder` and `ConnectionBuilder` (and consequently also the `CancellationToken`, etc.)
+ * Added new scalar type `DecimalGraphType`
+ * Added support for deprecation of `EnumerationGraphType` members
+ * Added a range of unit tests for the above
+ * Implemented `IdGraphType.Coerce()`
+ * `IntGraphType.Coerce()` can now also deal with `long` integers]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
