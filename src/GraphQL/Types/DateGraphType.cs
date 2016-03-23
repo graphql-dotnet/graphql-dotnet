@@ -8,8 +8,9 @@ namespace GraphQL.Types
         public DateGraphType()
         {
             Name = "Date";
-            Description = "The `Date` scalar type represents a timestamp provided in UTC. `Date` expects timestamps " +
-                          "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
+            Description =
+                "The `Date` scalar type represents a timestamp provided in UTC. `Date` expects timestamps " +
+                "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
         public override object Coerce(object value)

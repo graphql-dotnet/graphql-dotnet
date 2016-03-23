@@ -16,18 +16,24 @@ namespace GraphQL.Types
             AddType<FloatGraphType>();
             AddType<IntGraphType>();
             AddType<IdGraphType>();
+            AddType<DateGraphType>();
+            AddType<DecimalGraphType>();
 
             AddType<NonNullGraphType<StringGraphType>>();
             AddType<NonNullGraphType<BooleanGraphType>>();
             AddType<NonNullGraphType<FloatGraphType>>();
             AddType<NonNullGraphType<IntGraphType>>();
             AddType<NonNullGraphType<IdGraphType>>();
+            AddType<NonNullGraphType<DateGraphType>>();
+            AddType<NonNullGraphType<DecimalGraphType>>();
 
+            AddType<__Schema>();
             AddType<__Type>();
             AddType<__Field>();
             AddType<__EnumValue>();
             AddType<__InputValue>();
             AddType<__TypeKind>();
+            AddType<__Directive>();
         }
 
         public void Clear()
