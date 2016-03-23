@@ -40,8 +40,8 @@ namespace GraphQL.Types
 
         public FieldType Field(
             Type type,
-            string name, 
-            string description = null, 
+            string name,
+            string description = null,
             QueryArguments arguments = null,
             Func<ResolveFieldContext, object> resolve = null)
         {

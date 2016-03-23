@@ -99,5 +99,16 @@ namespace GraphQL
 
             return result;
         }
+
+        public static void Fill<T>(this IList<T> items, IEnumerable<T> itemsToAdd)
+        {
+            itemsToAdd.Apply(x =>
+            {
+                if (!items.Contains(x))
+                {
+                    items.Add(x);
+                }
+            });
+        }
     }
 }

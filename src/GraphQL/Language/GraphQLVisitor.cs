@@ -405,7 +405,6 @@ namespace GraphQL.Language
         public override object VisitDocument(GraphQLParser.DocumentContext context)
         {
             var document = new Document();
-
             context.definition().Apply(childContext =>
             {
                 var definition = Visit(childContext);

@@ -10,7 +10,7 @@ namespace GraphQL.Introspection
             Name = "__Field";
             Field<NonNullGraphType<StringGraphType>>("name");
             Field<StringGraphType>("description");
-            Field<NonNullGraphType<ListGraphType<__InputValue>>>("args", null, null,
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args", null, null,
                 context =>
                 {
                     var fieldType = (FieldType) context.Source;
