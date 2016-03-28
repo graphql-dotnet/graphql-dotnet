@@ -13,7 +13,7 @@ namespace GraphQL.Language
             _arguments.Add(arg);
         }
 
-        public object ValueFor(string name)
+        public IValue ValueFor(string name)
         {
             var arg = _arguments.FirstOrDefault(x => x.Name == name);
             return arg != null ? arg.Value : null;

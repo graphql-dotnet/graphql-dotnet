@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Execution
         {
             var query = @"
             query AQuery {
-                Named: __type(name: 'Named') {
+                Named: __type(name: ""Named"") {
                   kind
                   name
                   fields { name }
@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Execution
                     enumValues { name }
                     inputFields { name }
                 }
-                Pet: __type(name: 'Pet') {
+                Pet: __type(name: ""Pet"") {
                   kind
                   name
                   fields { name }

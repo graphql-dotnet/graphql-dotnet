@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Antlr4.Runtime;
 using GraphQL.Parsing;
 
 namespace GraphQL.Language
@@ -14,59 +15,110 @@ namespace GraphQL.Language
 
         public override object VisitValue(GraphQLParser.ValueContext context)
         {
-            if (context.STRING() != null)
+            if (context.StringValue() != null)
             {
-                return context.STRING().GetText();
+                var val = new StringValue(context.StringValue().GetText());
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.NUMBER() != null)
+            if (context.IntValue() != null)
             {
-                return context.NUMBER().GetText();
+                var value = context.IntValue().GetText();
+                int intResult;
+                if (int.TryParse(value, out intResult))
+                {
+                    var val = new IntValue(intResult);
+                    NewNode(val, context);
+                    return val;
+                }
+
+                // If the value doesn't fit in an integer, revert to using long...
+                long longResult;
+                if (long.TryParse(value, out longResult))
+                {
+                    var val = new LongValue(intResult);
+                    NewNode(val, context);
+                    return val;
+                }
             }
 
-            if (context.BOOLEAN() != null)
+            if (context.FloatValue() != null)
             {
-                return context.BOOLEAN().GetText();
+                var val = new FloatValue(float.Parse(context.FloatValue().GetText()));
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.@enum() != null)
+            if (context.BooleanValue() != null)
             {
-                return context.@enum().GetText();
+                var val = new BooleanValue(bool.Parse(context.BooleanValue().GetText()));
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.array() != null)
+            if (context.enumValue() != null)
             {
-                return Visit(context.array());
+                var val = new EnumValue(context.enumValue().GetText());
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.@object() != null)
+            if (context.arrayValue() != null)
             {
-                return Visit(context.@object());
+                return Visit(context.arrayValue());
+            }
+
+            if (context.objectValue() != null)
+            {
+                return Visit(context.objectValue());
             }
 
             return null;
         }
 
-        public override object VisitValueOrVariable(GraphQLParser.ValueOrVariableContext context)
+        public override object VisitValueWithVariable(GraphQLParser.ValueWithVariableContext context)
         {
-            if (context.STRING() != null)
+            if (context.StringValue() != null)
             {
-                return context.STRING().GetText();
+                var val = new StringValue(context.StringValue().GetText());
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.NUMBER() != null)
+            if (context.IntValue() != null)
             {
-                return context.NUMBER().GetText();
+                var value = context.IntValue().GetText();
+                int intResult;
+                if (int.TryParse(value, out intResult))
+                {
+                    var val = new IntValue(intResult);
+                    NewNode(val, context);
+                    return val;
+                }
+
+                // If the value doesn't fit in an integer, revert to using long...
+                long longResult;
+                if (long.TryParse(value, out longResult))
+                {
+                    var val = new LongValue(intResult);
+                    NewNode(val, context);
+                    return val;
+                }
             }
 
-            if (context.BOOLEAN() != null)
+            if (context.BooleanValue() != null)
             {
-                return context.BOOLEAN().GetText();
+                var val = new BooleanValue(bool.Parse(context.BooleanValue().GetText()));
+                NewNode(val, context);
+                return val;
             }
 
-            if (context.@enum() != null)
+            if (context.enumValue() != null)
             {
-                return context.@enum().GetText();
+                var val = new EnumValue(context.enumValue().GetText());
+                NewNode(val, context);
+                return val;
             }
 
             if (context.variable() != null)
@@ -74,14 +126,14 @@ namespace GraphQL.Language
                 return Visit(context.variable());
             }
 
-            if (context.arrayWithVariable() != null)
+            if (context.arrayValueWithVariable() != null)
             {
-                return Visit(context.arrayWithVariable());
+                return Visit(context.arrayValueWithVariable());
             }
 
-            if (context.objectWithVariable() != null)
+            if (context.objectValueWithVariable() != null)
             {
-                return Visit(context.objectWithVariable());
+                return Visit(context.objectValueWithVariable());
             }
 
             return null;
@@ -89,61 +141,70 @@ namespace GraphQL.Language
 
         public override object VisitVariable(GraphQLParser.VariableContext context)
         {
-            var variable = new Variable();
+            var variable = new VariableReference();
             variable.Name = context.NAME().GetText();
             return variable;
         }
 
-        public override object VisitEnum(GraphQLParser.EnumContext context)
+        public override object VisitArrayValue(GraphQLParser.ArrayValueContext context)
         {
-            return context.NAME().GetText();
+            var values = context.value().Select(Visit).OfType<IValue>().ToList();
+            var list = new ListValue(values);
+            NewNode(list, context);
+            return list;
         }
 
-        public override object VisitArray(GraphQLParser.ArrayContext context)
+        public override object VisitArrayValueWithVariable(GraphQLParser.ArrayValueWithVariableContext context)
         {
-            return context.value().Select(Visit).ToList();
+            var values = context.valueWithVariable().Select(Visit).OfType<IValue>().ToList();
+            var list = new ListValue(values);
+            NewNode(list, context);
+            return list;
         }
 
-        public override object VisitArrayWithVariable(GraphQLParser.ArrayWithVariableContext context)
+        public override object VisitObjectValue(GraphQLParser.ObjectValueContext context)
         {
-            return context.valueOrVariable().Select(Visit).ToList();
-        }
+            var fields = new List<ObjectField>();
 
-        public override object VisitObject(GraphQLParser.ObjectContext context)
-        {
-            var obj = new Dictionary<string, object>();
-
-            foreach (var item in context.pair())
+            foreach (var item in context.objectField())
             {
                 var name = item.NAME().GetText();
-                var val = Visit(item.value());
-                obj[name] = val;
+                var val = Visit(item.value()) as IValue;
+                var field = new ObjectField(name, val);
+                fields.Add(field);
             }
 
-            return obj;
+            var objValue = new ObjectValue(fields);
+            NewNode(objValue, context);
+
+            return objValue;
         }
 
-        public override object VisitObjectWithVariable(GraphQLParser.ObjectWithVariableContext context)
+        public override object VisitObjectValueWithVariable(GraphQLParser.ObjectValueWithVariableContext context)
         {
-            var obj = new Dictionary<string, object>();
+            var fields = new List<ObjectField>();
 
-            foreach (var item in context.pairWithVariable())
+            foreach (var item in context.objectFieldWithVariable())
             {
                 var name = item.NAME().GetText();
-                var val = Visit(item.valueOrVariable());
-                obj[name] = val;
+                var val = Visit(item.valueWithVariable()) as IValue;
+                var field = new ObjectField(name, val);
+                fields.Add(field);
             }
 
-            return obj;
+            var objValue = new ObjectValue(fields);
+            NewNode(objValue, context);
+
+            return objValue;
         }
 
         public override object VisitVariableDefinitions(GraphQLParser.VariableDefinitionsContext context)
         {
-            var variables = new Variables();
+            var variables = new VariableDefinitions();
 
             context.variableDefinition().Apply(childContext =>
             {
-                var variable = Visit(childContext) as Variable;
+                var variable = Visit(childContext) as VariableDefinition;
                 variables.Add(variable);
             });
 
@@ -152,17 +213,18 @@ namespace GraphQL.Language
 
         public override object VisitVariableDefinition(GraphQLParser.VariableDefinitionContext context)
         {
-            var variable = new Variable();
+            var variable = new VariableDefinition();
+            NewNode(variable, context);
             variable.Name = context.variable().GetText().Substring(1);
 
             if (context.defaultValue() != null)
             {
-                variable.DefaultValue = Visit(context.defaultValue());
+                variable.DefaultValue = Visit(context.defaultValue()) as IValue;
             }
 
             if (context.type() != null)
             {
-                variable.Type = Visit(context.type()) as VariableType;
+                variable.Type = Visit(context.type()) as IType;
             }
 
             return variable;
@@ -170,30 +232,49 @@ namespace GraphQL.Language
 
         public override object VisitType(GraphQLParser.TypeContext context)
         {
-            var type = new VariableType();
-
             if (context.typeName() != null)
             {
-                type.Name = context.typeName().GetText();
+                return Visit(context.typeName());
             }
 
             if (context.listType() != null)
             {
-                type.IsList = true;
-                type.Name = context.listType().type().typeName().GetText();
+                return Visit(context.listType());
             }
 
             if (context.nonNullType() != null)
             {
-                type.AllowsNull = false;
+                return Visit(context.nonNullType());
             }
 
-            return type;
+            return null;
         }
 
         public override object VisitTypeName(GraphQLParser.TypeNameContext context)
         {
-            return context.GetText();
+            var type = new NamedType(context.GetText());
+            NewNode(type, context);
+            return type;
+        }
+
+        public override object VisitListType(GraphQLParser.ListTypeContext context)
+        {
+            var type = new ListType(Visit(context.type()) as IType);
+            NewNode(type, context);
+            return type;
+        }
+
+        public override object VisitNonNullType(GraphQLParser.NonNullTypeContext context)
+        {
+            var type = new NonNullType(
+                context.typeName() != null
+                    ? Visit(context.typeName()) as IType
+                    : Visit(context.listType()) as IType
+                );
+
+            NewNode(type, context);
+
+            return type;
         }
 
         public override object VisitArguments(GraphQLParser.ArgumentsContext context)
@@ -211,13 +292,14 @@ namespace GraphQL.Language
         public override object VisitArgument(GraphQLParser.ArgumentContext context)
         {
             var name = context.NAME().GetText();
-            var valOrVar = context.valueOrVariable();
-            var val = Visit(valOrVar);
+            var valOrVar = context.valueWithVariable();
+            var val = Visit(valOrVar) as IValue;
             var arg = new Argument
             {
                 Name = name,
                 Value = val
             };
+            NewNode(arg, context);
 
             return arg;
         }
@@ -237,6 +319,7 @@ namespace GraphQL.Language
         public override object VisitDirective(GraphQLParser.DirectiveContext context)
         {
             var directive = new Directive();
+            NewNode(directive, context);
             directive.Name = context.NAME().GetText();
 
             if (context.arguments() != null)
@@ -250,6 +333,7 @@ namespace GraphQL.Language
         public override object VisitFragmentSpread(GraphQLParser.FragmentSpreadContext context)
         {
             var fragment = new FragmentSpread();
+            NewNode(fragment, context);
             fragment.Name = context.fragmentName().GetText();
 
             if (context.directives() != null)
@@ -263,8 +347,9 @@ namespace GraphQL.Language
         public override object VisitInlineFragment(GraphQLParser.InlineFragmentContext context)
         {
             var fragment = new InlineFragment();
+            NewNode(fragment, context);
 
-            fragment.Type = context.typeCondition().typeName().NAME().GetText();
+            fragment.Type = Visit(context.typeCondition().typeName()) as NamedType;
 
             if (context.directives() != null)
             {
@@ -282,9 +367,11 @@ namespace GraphQL.Language
         public override object VisitFragmentDefinition(GraphQLParser.FragmentDefinitionContext context)
         {
             var name = context.fragmentName().GetText();
-            var type = context.typeCondition().typeName().NAME().GetText();
+            var type = Visit(context.typeCondition().typeName()) as NamedType;
 
             var fragmentDefinition = new FragmentDefinition();
+            NewNode(fragmentDefinition, context);
+
             fragmentDefinition.Name = name;
             fragmentDefinition.Type = type;
 
@@ -308,18 +395,18 @@ namespace GraphQL.Language
         public override object VisitField(GraphQLParser.FieldContext context)
         {
             var field = new Field();
+            NewNode(field, context);
 
-            if (context.fieldName().alias() != null)
+            if (context.NAME() != null)
             {
-                var aliasContext = context.fieldName().alias();
-                field.Alias = aliasContext.NAME(0).GetText();
-                field.Name = aliasContext.NAME(1).GetText();
-            }
-            else
-            {
-                field.Name = context.fieldName().NAME().GetText();
+                field.Name = context.NAME().GetText();
+
             }
 
+            if (context.alias() != null)
+            {
+                field.Alias = context.alias().NAME().GetText();
+            }
 
             if (context.arguments() != null)
             {
@@ -345,7 +432,7 @@ namespace GraphQL.Language
 
             foreach (var selectionContext in context.selection())
             {
-                var selection = Visit(selectionContext) as Selection;
+                var selection = Visit(selectionContext) as ISelection;
                 selections.Add(selection);
             }
 
@@ -354,27 +441,22 @@ namespace GraphQL.Language
 
         public override object VisitSelection(GraphQLParser.SelectionContext context)
         {
-            var selection = new Selection();
-
             if (context.field() != null)
             {
-                var field = Visit(context.field()) as Field;
-                selection.Field = field;
+                return Visit(context.field());
             }
 
             if (context.fragmentSpread() != null)
             {
-                var fragment = Visit(context.fragmentSpread()) as IFragment;
-                selection.Fragment = fragment;
+                return Visit(context.fragmentSpread());
             }
 
             if (context.inlineFragment() != null)
             {
-                var fragment = Visit(context.inlineFragment()) as IFragment;
-                selection.Fragment = fragment;
+                return Visit(context.inlineFragment());
             }
 
-            return selection;
+            return null;
         }
 
         public override object VisitOperationDefinition(GraphQLParser.OperationDefinitionContext context)
@@ -391,7 +473,7 @@ namespace GraphQL.Language
 
             if (context.variableDefinitions() != null)
             {
-                operation.Variables = Visit(context.variableDefinitions()) as Variables;
+                operation.Variables = Visit(context.variableDefinitions()) as VariableDefinitions;
             }
 
             if (context.directives() != null)
@@ -407,11 +489,12 @@ namespace GraphQL.Language
             var document = new Document();
             context.definition().Apply(childContext =>
             {
-                var definition = Visit(childContext);
+                var definition = Visit(childContext) as IDefinition;
+                document.AddDefinition(definition);
 
-                if (definition is IFragment)
+                if (definition is FragmentDefinition)
                 {
-                    document.Fragments.Add(definition as IFragment);
+                    document.Fragments.Add(definition as FragmentDefinition);
                 }
                 else if (definition is Operation)
                 {
@@ -424,6 +507,16 @@ namespace GraphQL.Language
             });
 
             return document;
+        }
+
+        private void NewNode(AbstractNode node, ParserRuleContext context)
+        {
+            node.SourceLocation = GetSourceLocation(context);
+        }
+
+        private SourceLocation GetSourceLocation(ParserRuleContext context)
+        {
+            return new SourceLocation(context.Start.Line, context.Start.Column);
         }
     }
 }

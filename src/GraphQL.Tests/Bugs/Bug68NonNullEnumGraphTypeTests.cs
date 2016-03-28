@@ -110,7 +110,7 @@ namespace GraphQL.Tests.Bugs
             }
         }
 
-        public override object Coerce(object value)
+        public override object ParseValue(object value)
         {
             var found = Values.FirstOrDefault(
               v =>

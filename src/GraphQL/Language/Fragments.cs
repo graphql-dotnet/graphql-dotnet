@@ -4,21 +4,21 @@ using System.Linq;
 
 namespace GraphQL.Language
 {
-    public class Fragments : IEnumerable<IFragment>
+    public class Fragments : IEnumerable<FragmentDefinition>
     {
-        private readonly List<IFragment> _fragments = new List<IFragment>();
+        private readonly List<FragmentDefinition> _fragments = new List<FragmentDefinition>();
 
-        public void Add(IFragment fragment)
+        public void Add(FragmentDefinition fragment)
         {
             _fragments.Add(fragment);
         }
 
         public FragmentDefinition FindDefinition(string name)
         {
-            return _fragments.OfType<FragmentDefinition>().FirstOrDefault(f => f.Name == name);
+            return _fragments.FirstOrDefault(f => f.Name == name);
         }
 
-        public IEnumerator<IFragment> GetEnumerator()
+        public IEnumerator<FragmentDefinition> GetEnumerator()
         {
             return _fragments.GetEnumerator();
         }

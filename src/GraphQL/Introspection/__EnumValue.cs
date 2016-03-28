@@ -11,7 +11,7 @@ namespace GraphQL.Introspection
             Field<StringGraphType>("description");
             Field<NonNullGraphType<StringGraphType>>("isDeprecated", null, null, context =>
             {
-                var enumValue = context.Source as EnumValue;
+                var enumValue = context.Source as EnumValueDefinition;
                 return enumValue != null && !string.IsNullOrWhiteSpace(enumValue.DeprecationReason);
             });
             Field<StringGraphType>("deprecationReason");
