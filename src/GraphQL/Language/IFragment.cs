@@ -1,11 +1,6 @@
 namespace GraphQL.Language
 {
-    public interface IFragment
+    public interface IFragment : ISelection
     {
-    }
-
-    public interface IHaveFragmentType : IFragment
-    {
-        string Type { get; set; }
     }
 }

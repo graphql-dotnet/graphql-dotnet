@@ -1,4 +1,5 @@
 ﻿using System;
+using GraphQL.Language;
 using GraphQL.Types;
 using Newtonsoft.Json;
 using Should;
@@ -12,14 +13,32 @@ namespace GraphQL.Tests.Execution
             Name = "ComplexScalar";
         }
 
-        public override object Coerce(object value)
+        public override object ParseValue(object value)
         {
+            if (value is string && value.Equals("DeserializedValue"))
+            {
+                return "SerializedValue";
+            }
+
             if (value is string && value.Equals("SerializedValue"))
             {
                 return "DeserializedValue";
             }
 
-            return value;
+            return null;
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            if (value is StringValue)
+            {
+                if (((StringValue) value).Value.Equals("SerializedValue"))
+                {
+                    return "DeserializedValue";
+                }
+            }
+
+            return null;
         }
     }
 
@@ -49,7 +68,7 @@ namespace GraphQL.Tests.Execution
                 }),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
                     return result;
                 });
 
@@ -61,7 +80,7 @@ namespace GraphQL.Tests.Execution
                 }),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
                     return result;
                 });
 
@@ -73,7 +92,7 @@ namespace GraphQL.Tests.Execution
                 }),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
                     return result;
                 });
 
@@ -85,7 +104,7 @@ namespace GraphQL.Tests.Execution
                 }),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Arguments["input"]);
+                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
                     return result;
                 });
         }
@@ -212,7 +231,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.ShouldNotBeNull();
+            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Test]
@@ -234,7 +254,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.ShouldNotBeNull();
+            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Test]
@@ -256,7 +277,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.ShouldNotBeNull();
+            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Test]
@@ -278,7 +300,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.ShouldNotBeNull();
+            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Test]
@@ -442,7 +465,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
         }
 
         [Test]
@@ -477,7 +501,8 @@ namespace GraphQL.Tests.Execution
             }
 
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.ShouldNotBeNull();
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
         }
 
         [Test]
@@ -557,23 +582,22 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        // this test currently fails
-//        [Test]
-//        public void when_argument_provided_cannot_be_parsed()
-//        {
-//            var query = @"
-//            {
-//              fieldWithDefaultArgumentValue(input: 2)
-//            }
-//            ";
-//
-//            var expected = @"
-//            {
-//              'fieldWithDefaultArgumentValue': ""Hello World""
-//            }
-//            ";
-//
-//            AssertQuerySuccess(query, expected);
-//        }
+        [Test]
+        public void when_argument_provided_cannot_be_parsed()
+        {
+            var query = @"
+            {
+              fieldWithDefaultArgumentValue(input: WRONG_TYPE)
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithDefaultArgumentValue': ""Hello World""
+            }
+            ";
+
+            AssertQuerySuccess(query, expected);
+        }
     }
 }

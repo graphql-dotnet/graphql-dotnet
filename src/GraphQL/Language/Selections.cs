@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language
 {
-    public class Selections : IEnumerable<Selection>
+    public class Selections : IEnumerable<ISelection>
     {
-        private readonly List<Selection> _selections = new List<Selection>();
+        private readonly List<ISelection> _selections = new List<ISelection>();
 
-        public void Add(Selection selection)
+        public void Add(ISelection selection)
         {
             _selections.Add(selection);
         }
 
-        public IEnumerator<Selection> GetEnumerator()
+        public IEnumerator<ISelection> GetEnumerator()
         {
             return _selections.GetEnumerator();
         }

@@ -10,37 +10,37 @@ namespace GraphQL.Tests.Types
         [Test]
         public void coerces_0_to_false()
         {
-            type.Coerce(0).ShouldEqual(false);
+            type.ParseValue(0).ShouldEqual(false);
         }
 
         [Test]
         public void coerces_1_to_true()
         {
-            type.Coerce(1).ShouldEqual(true);
+            type.ParseValue(1).ShouldEqual(true);
         }
 
         [Test]
         public void coerces_string_false()
         {
-            type.Coerce("false").ShouldEqual(false);
+            type.ParseValue("false").ShouldEqual(false);
         }
 
         [Test]
         public void coerces_string_False()
         {
-            type.Coerce("False").ShouldEqual(false);
+            type.ParseValue("False").ShouldEqual(false);
         }
 
         [Test]
         public void coerces_string_true()
         {
-            type.Coerce("true").ShouldEqual(true);
+            type.ParseValue("true").ShouldEqual(true);
         }
 
         [Test]
         public void coerces_string_True()
         {
-            type.Coerce("True").ShouldEqual(true);
+            type.ParseValue("True").ShouldEqual(true);
         }
     }
 }

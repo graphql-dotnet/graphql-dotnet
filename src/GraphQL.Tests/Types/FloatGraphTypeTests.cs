@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphQL.Types;
+﻿using GraphQL.Types;
 using Should;
 
 namespace GraphQL.Tests.Types
@@ -15,19 +10,19 @@ namespace GraphQL.Tests.Types
         [Test]
         public void coerces_null_to_null()
         {
-            type.Coerce(null).ShouldEqual(null);
+            type.ParseValue(null).ShouldEqual(null);
         }
 
         [Test]
         public void coerces_invalid_string_to_null()
         {
-            type.Coerce("abcd").ShouldEqual(null);
+            type.ParseValue("abcd").ShouldEqual(null);
         }
 
         [Test]
         public void coerces_double_to_value()
         {
-            type.Coerce(1.79769313486231e308).ShouldEqual((double)1.79769313486231e308);
+            type.ParseValue(1.79769313486231e308).ShouldEqual((double)1.79769313486231e308);
         }
     }
 }

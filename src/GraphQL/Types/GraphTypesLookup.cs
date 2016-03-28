@@ -70,6 +70,11 @@ namespace GraphQL.Types
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(typeName))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
+                }
+
                 GraphType result;
                 _types.TryGetValue(typeName, out result);
                 return result;

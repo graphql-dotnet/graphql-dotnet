@@ -1,3 +1,5 @@
+using GraphQL.Language;
+
 namespace GraphQL.Types
 {
     public class IntGraphType : ScalarGraphType
@@ -7,7 +9,7 @@ namespace GraphQL.Types
             Name = "Int";
         }
 
-        public override object Coerce(object value)
+        public override object ParseValue(object value)
         {
             /* The Int scalar type represents non-fractional signed whole numeric values.
                Int can represent values between -(2^53 - 1) and 2^53 - 1 since represented
@@ -24,6 +26,18 @@ namespace GraphQL.Types
                 return longResult;
             }
             return null;
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            var intValue = value as IntValue;
+            if (intValue != null)
+            {
+                return intValue?.Value;
+            }
+
+            var longValue = value as LongValue;
+            return longValue?.Value;
         }
     }
 }
