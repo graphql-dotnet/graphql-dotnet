@@ -100,6 +100,11 @@ namespace GraphQL
             return result;
         }
 
+        public static void Fill<T>(this IList<T> items, T itemToAdd)
+        {
+            Fill(items, new[] { itemToAdd });
+        }
+
         public static void Fill<T>(this IList<T> items, IEnumerable<T> itemsToAdd)
         {
             itemsToAdd.Apply(x =>
