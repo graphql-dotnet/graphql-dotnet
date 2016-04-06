@@ -1,11 +1,11 @@
 {
   "name": "graphql-dotnet",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
     "test": "powershell \".\\test-local.ps1\"",
-    "build": "babel-node tools/nuget.js --ver 0.6.2.0",
+    "build": "babel-node tools/nuget.js --ver 0.6.3.0",
     "build-dev": "babel-node tools/nuget.js --d",
     "test-dotnet": "powershell \".\\test.ps1\""
   },
