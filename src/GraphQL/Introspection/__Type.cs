@@ -54,7 +54,7 @@ namespace GraphQL.Introspection
                 {
                     if (context.Source is ObjectGraphType || context.Source is InterfaceGraphType)
                     {
-                        var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
+                        var includeDeprecated = context.Argument<bool>("includeDeprecated");
                         var type = context.Source as GraphType;
                         return !includeDeprecated
                             ? type.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
@@ -92,7 +92,7 @@ namespace GraphQL.Introspection
                     var type = context.Source as EnumerationGraphType;
                     if (type != null)
                     {
-                        var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
+                        var includeDeprecated = context.Argument<bool>("includeDeprecated");
                         var values = !includeDeprecated
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
@@ -108,21 +108,17 @@ namespace GraphQL.Introspection
             });
             Field<__Type>("ofType", resolve: context =>
             {
+                if (context.Source == null) return null;
+
                 if (context.Source is Type)
                 {
                     var type = (Type) context.Source;
                     var genericType = type.IsConstructedGenericType ? type.GetGenericArguments()[0] : null;
-                    return genericType;
-                }
-
-                if (context.Source is NonNullGraphType)
-                {
-                    return ((NonNullGraphType) context.Source).Type;
-                }
-
-                if (context.Source is ListGraphType)
-                {
-                    return ((ListGraphType) context.Source).Type;
+                    if (genericType != null && typeof(GraphType).IsAssignableFrom(genericType))
+                    {
+                        return genericType;
+                    }
+                    return null;
                 }
 
                 return null;
