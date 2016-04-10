@@ -2,16 +2,14 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.5.1.0</version>
+    <version>0.6.3.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes>* Add `IsTypeOf`
-* `GraphQLAbstractType` now has a `PossibleTypes` property which is a list of graph types of all possible types that abstract type could be.
-* The `PossibleTypes` collection is populated on bootstrap of the Schema.</releaseNotes>
+    <releaseNotes><![CDATA[Fix a threading issue with GraphTypesLookup.]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>

@@ -12,13 +12,14 @@ namespace GraphQL.Types
             Values = new EnumValues();
         }
 
-        public void AddValue(string name, string description, object value)
+        public void AddValue(string name, string description, object value, string deprecationReason = null)
         {
             AddValue(new EnumValue
             {
                 Name = name,
                 Description = description,
-                Value = value
+                Value = value,
+                DeprecationReason = deprecationReason
             });
         }
 

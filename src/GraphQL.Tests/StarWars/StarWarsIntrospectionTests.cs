@@ -214,7 +214,23 @@
                   'kind': 'SCALAR'
                 },
                 {
+                  'name': 'Date',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'Decimal',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': '__Schema',
+                  'kind': 'OBJECT'
+                },
+                {
                   'name': '__Type',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': '__Directive',
                   'kind': 'OBJECT'
                 },
                 {
@@ -251,14 +267,6 @@
                 },
                 {
                   'name': 'Droid',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__Schema',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__Directive',
                   'kind': 'OBJECT'
                 }
               ],
@@ -439,6 +447,65 @@
                   'fields': null
                 },
                 {
+                  'kind': 'SCALAR',
+                  'name': 'Date',
+                  'description': 'The `Date` scalar type represents a timestamp provided in UTC. `Date` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.',
+                  'fields': null
+                },
+                {
+                  'kind': 'SCALAR',
+                  'name': 'Decimal',
+                  'description': null,
+                  'fields': null
+                },
+                {
+                  'kind': 'OBJECT',
+                  'name': '__Schema',
+                  'description': 'A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query and mutation operations.',
+                  'fields': [
+                    {
+                      'name': 'types',
+                      'description': 'A list of all types supported by this server.',
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'queryType',
+                      'description': 'The type that query operations will be rooted at.',
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'mutationType',
+                      'description': 'If this server supports mutation, the type that mutation operations will be rooted at.',
+                      'type': {
+                        'name': '__Type',
+                        'kind': 'OBJECT'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'directives',
+                      'description': 'A list of all directives supported by this server.',
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    }
+                  ]
+                },
+                {
                   'kind': 'OBJECT',
                   'name': '__Type',
                   'description': null,
@@ -529,6 +596,73 @@
                       'type': {
                         'name': '__Type',
                         'kind': 'OBJECT'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    }
+                  ]
+                },
+                {
+                  'kind': 'OBJECT',
+                  'name': '__Directive',
+                  'description': null,
+                  'fields': [
+                    {
+                      'name': 'name',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'description',
+                      'description': null,
+                      'type': {
+                        'name': 'String',
+                        'kind': 'SCALAR'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'args',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onOperation',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onFragment',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onField',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
                       },
                       'isDeprecated': false,
                       'deprecationReason': null
@@ -900,120 +1034,6 @@
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    }
-                  ]
-                },
-                {
-                  'kind': 'OBJECT',
-                  'name': '__Schema',
-                  'description': 'A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query and mutation operations.',
-                  'fields': [
-                    {
-                      'name': 'types',
-                      'description': 'A list of all types supported by this server.',
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'queryType',
-                      'description': 'The type that query operations will be rooted at.',
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'mutationType',
-                      'description': 'If this server supports mutation, the type that mutation operations will be rooted at.',
-                      'type': {
-                        'name': '__Type',
-                        'kind': 'OBJECT'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'directives',
-                      'description': 'A list of all directives supported by this server.',
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    }
-                  ]
-                },
-                {
-                  'kind': 'OBJECT',
-                  'name': '__Directive',
-                  'description': null,
-                  'fields': [
-                    {
-                      'name': 'name',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'description',
-                      'description': null,
-                      'type': {
-                        'name': 'String',
-                        'kind': 'SCALAR'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'args',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onOperation',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onFragment',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onField',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
                       },
                       'isDeprecated': false,
                       'deprecationReason': null

@@ -16,18 +16,44 @@ namespace GraphQL.Types
             AddType<FloatGraphType>();
             AddType<IntGraphType>();
             AddType<IdGraphType>();
+            AddType<DateGraphType>();
+            AddType<DecimalGraphType>();
 
             AddType<NonNullGraphType<StringGraphType>>();
             AddType<NonNullGraphType<BooleanGraphType>>();
             AddType<NonNullGraphType<FloatGraphType>>();
             AddType<NonNullGraphType<IntGraphType>>();
             AddType<NonNullGraphType<IdGraphType>>();
+            AddType<NonNullGraphType<DateGraphType>>();
+            AddType<NonNullGraphType<DecimalGraphType>>();
 
+            AddType<__Schema>();
             AddType<__Type>();
             AddType<__Field>();
             AddType<__EnumValue>();
             AddType<__InputValue>();
             AddType<__TypeKind>();
+            AddType<__Directive>();
+        }
+
+        public static GraphTypesLookup Create(IEnumerable<GraphType> types, Func<Type, GraphType> resolveType)
+        {
+            var lookup = new GraphTypesLookup();
+
+            var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
+            {
+                if (lookup[name] == null)
+                {
+                    lookup.AddType(graphType, context);
+                }
+            });
+
+            types.Apply(type =>
+            {
+                lookup.AddType(type, ctx);
+            });
+
+            return lookup;
         }
 
         public void Clear()
@@ -62,11 +88,9 @@ namespace GraphQL.Types
 
         public IEnumerable<GraphType> FindImplemenationsOf(Type type)
         {
-            // TODO: handle Unions
             return _types
                 .Values
-                .Where(t => t is ObjectGraphType)
-                .Where(t => t.As<ObjectGraphType>().Interfaces.Any(i => (Type)i == type))
+                .Where(t => t is ObjectGraphType && t.As<ObjectGraphType>().Interfaces.Any(i => i == type))
                 .Select(x => x)
                 .ToList();
         }
@@ -79,10 +103,7 @@ namespace GraphQL.Types
                 (name, type, _) =>
                 {
                     _types[name] = type;
-                    if (_ != null)
-                    {
-                        _.AddType(name, type, null);
-                    }
+                    _?.AddType(name, type, null);
                 });
 
             AddType<TType>(context);
@@ -109,13 +130,10 @@ namespace GraphQL.Types
             {
                 AddTypeIfNotRegistered(field.Type, context);
 
-                if (field.Arguments != null)
+                field.Arguments?.Apply(arg =>
                 {
-                    field.Arguments.Apply(arg =>
-                    {
-                        AddTypeIfNotRegistered(arg.Type, context);
-                    });
-                }
+                    AddTypeIfNotRegistered(arg.Type, context);
+                });
             });
 
             if (type is ObjectGraphType)

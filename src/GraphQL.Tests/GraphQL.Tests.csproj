@@ -52,12 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\ConnectionBuilderTests.cs" />
+    <Compile Include="Builders\FieldBuilderTests.cs" />
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
     <Compile Include="Execution\InputConversionTests.cs" />
     <Compile Include="Execution\MutationTests.cs" />
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="Utilities\SchemaPrinterTests.cs" />
     <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
@@ -78,8 +81,12 @@
     <Compile Include="Expect.cs" />
     <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
+    <Compile Include="Types\DecimalGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
+    <Compile Include="Types\IdGraphTypeTests.cs" />
     <Compile Include="Types\NonNullGraphTypeTests.cs" />
+    <Compile Include="Types\Relay\EdgeTypeTests.cs" />
+    <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Introspection\" />
+    <Folder Include="Language\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

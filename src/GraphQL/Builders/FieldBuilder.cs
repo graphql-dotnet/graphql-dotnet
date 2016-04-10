@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
@@ -27,7 +28,7 @@ namespace GraphQL.Builders
                 {
                     Object = objectResolver(context.Source);
                 }
-                else if (context.Source is TObjectType)
+                else if (context?.Source is TObjectType)
                 {
                     Object = (TObjectType)context.Source;
                 }
@@ -35,15 +36,44 @@ namespace GraphQL.Builders
 
             public ISchema Schema { get { return _context.Schema; } }
 
+            public ResolveFieldContext ResolveFieldContext { get { return _context; } }
+
             public object Source { get { return _context.Source; } }
 
             public TObjectType Object { get; set; }
 
-            public T GetArgument<T>(string argumentName, T defaultValue = default(T))
+            public T GetArgument<T>(string argumentName)
+            {
+                object argument;
+                var defaultValue = default(T);
+
+                if (_context?.FieldDefinition != null &&
+                    _context?.FieldDefinition.Arguments != null)
+                {
+                    var arg = _context.FieldDefinition
+                        .Arguments
+                        .FirstOrDefault(a => a.Name == argumentName);
+                    if (arg != null)
+                    {
+                        defaultValue = arg.DefaultValue is T
+                            ? (T)arg.DefaultValue
+                            : default(T);
+                    }
+                }
+
+                if (_context?.Arguments != null && _context.Arguments.TryGetValue(argumentName, out argument))
+                {
+                    return argument is T ? (T)argument : defaultValue;
+                }
+
+                return defaultValue;
+            }
+
+            public T GetArgument<T>(string argumentName, T defaultValue)
             {
                 object argument;
 
-                if (_context.Arguments.TryGetValue(argumentName, out argument))
+                if (_context?.Arguments != null && _context.Arguments.TryGetValue(argumentName, out argument))
                 {
                     return argument is T ? (T)argument : defaultValue;
                 }
@@ -53,7 +83,7 @@ namespace GraphQL.Builders
 
             public bool HasArgument(string argumentName)
             {
-                return _context.Arguments.ContainsKey(argumentName);
+                return _context?.Arguments?.ContainsKey(argumentName) ?? false;
             }
         }
 

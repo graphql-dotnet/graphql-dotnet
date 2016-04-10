@@ -30,32 +30,36 @@ namespace GraphQL.Types
             return builder;
         }
 
-        public ConnectionBuilder<TParentType, TGraphType, object> Connection<TParentType, TGraphType>()
-            where TParentType : GraphType
-            where TGraphType : ObjectGraphType, new()
+        public ConnectionBuilder<TGraphType, object> Connection<TGraphType>()
+            where TGraphType : ObjectGraphType
         {
-            var builder = ConnectionBuilder.Create<TParentType, TGraphType>();
+            var builder = ConnectionBuilder.Create<TGraphType>();
             _fields.Add(builder.FieldType);
             return builder;
         }
 
-        public FieldType Field<TType>(
-            string name, 
-            string description = null, 
+        public FieldType Field(
+            Type type,
+            string name,
+            string description = null,
             QueryArguments arguments = null,
             Func<ResolveFieldContext, object> resolve = null)
-            where TType : GraphType
         {
             if (_fields.Exists(x => x.Name == name))
             {
                 throw new ArgumentOutOfRangeException("name", "A field with that name is already registered.");
             }
 
+            if (!type.IsSubclassOf(typeof(GraphType)))
+            {
+                throw new ArgumentOutOfRangeException("type", "Field type must derive from GraphType.");
+            }
+
             var fieldType = new FieldType
             {
                 Name = name,
                 Description = description,
-                Type = typeof(TType),
+                Type = type,
                 Arguments = arguments,
                 Resolve = resolve,
             };
@@ -63,6 +67,16 @@ namespace GraphQL.Types
             _fields.Add(fieldType);
 
             return fieldType;
+        }
+
+        public FieldType Field<TType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext, object> resolve = null)
+            where TType : GraphType
+        {
+            return Field(typeof(TType), name, description, arguments, resolve);
         }
 
         public virtual string CollectTypes(TypeCollectionContext context)

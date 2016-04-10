@@ -16,15 +16,15 @@ namespace GraphQL
 
             foreach (var item in source)
             {
-                var propertyType =
-                    type.GetProperty(item.Key,
-                        BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                var propertyType = type.GetProperty(item.Key,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyType != null)
                 {
-                    if (propertyType.PropertyType.Name != "String"
-                        && propertyType.PropertyType.GetInterface("IEnumerable`1") != null)
+                    var fieldType = propertyType.PropertyType;
+                    if (fieldType.Name != "String"
+                             && fieldType.GetInterface("IEnumerable`1") != null)
                     {
-                        var elementType = propertyType.PropertyType.GetGenericArguments()[0];
+                        var elementType = fieldType.GetGenericArguments()[0];
                         var genericListType = typeof(List<>).MakeGenericType(elementType);
                         var newArray = (IList)Activator.CreateInstance(genericListType);
 
@@ -34,21 +34,24 @@ namespace GraphQL
                         {
                             foreach (var listItem in valueList)
                             {
-                                newArray.Add(Convert.ChangeType(listItem, elementType));
+                                var value = listItem;
+                                newArray.Add(Convert.ChangeType(value, elementType));
                             }
                         }
 
-                        propertyType.SetValue(
-                            obj,
-                            newArray,
-                            null);
+                        propertyType.SetValue(obj, newArray, null);
                     }
                     else
                     {
-                        propertyType.SetValue(
-                            obj,
-                            Convert.ChangeType(item.Value, propertyType.PropertyType),
-                            null);
+                        var value = item.Value;
+
+                        var isNullable = fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                        if (isNullable)
+                        {
+                            fieldType = fieldType.GenericTypeArguments.First();
+                        }
+
+                        propertyType.SetValue(obj, isNullable ? value : Convert.ChangeType(value, fieldType), null);
                     }
                 }
             }
@@ -58,8 +61,7 @@ namespace GraphQL
 
         public static IDictionary<string, object> AsDictionary(
             this object source,
-            BindingFlags flags
-                = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+            BindingFlags flags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
         {
             return source
                 .GetType()

@@ -13,11 +13,14 @@ namespace GraphQL
 
         public static string GraphQLName(this Type type, bool useInTypeName = false)
         {
-            if (useInTypeName && type.Name.StartsWith("Root"))
+            if (useInTypeName && type.Name == nameof(ObjectGraphType))
             {
                 return string.Empty;
             }
-            return type.Name.EndsWith("Type") ? type.Name.Remove(type.Name.Length - 4) : type.Name;
+            var typeName = type.Name.Replace(nameof(GraphType), nameof(Type));
+            return typeName.EndsWith(nameof(Type))
+                ? typeName.Remove(typeName.Length - nameof(Type).Length)
+                : typeName;
         }
     }
 }
