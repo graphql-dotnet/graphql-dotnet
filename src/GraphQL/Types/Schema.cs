@@ -25,7 +25,7 @@ namespace GraphQL.Types
 
     public class Schema : ISchema
     {
-        private readonly Lazy<GraphTypesLookup> _lookup;
+        protected readonly Lazy<GraphTypesLookup> _lookup;
 
         public Schema()
             : this(type => (GraphType) Activator.CreateInstance(type))

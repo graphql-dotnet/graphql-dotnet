@@ -1,17 +1,21 @@
 using System;
+using GraphQL.Language;
 
 namespace GraphQL
 {
     public class ExecutionError : Exception
     {
-        public ExecutionError(string message)
-            : base(message)
+        public Field Field { get; set; }
+
+        public ExecutionError(Field field, string message)
+            : this(field, message, null)
         {
         }
 
-        public ExecutionError(string message, Exception innerException)
+        public ExecutionError(Field field, string message, Exception innerException)
             : base(message, innerException)
         {
+            Field = field;
         }
     }
 }

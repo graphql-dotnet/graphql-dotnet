@@ -150,7 +150,7 @@ namespace GraphQL.Types
 
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
-                            throw new ExecutionError((
+                            throw new ExecutionError(null, (
                                 "Interface type {0} does not provide a \"resolveType\" function" +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                                 "There is no way to resolve this possible type during execution.")
@@ -166,7 +166,7 @@ namespace GraphQL.Types
 
                 if (!union.Types.Any())
                 {
-                    throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
+                    throw new ExecutionError(null, "Must provide types for Union {0}.".ToFormat(union));
                 }
 
                 union.Types.Apply(unionedType =>
@@ -177,7 +177,7 @@ namespace GraphQL.Types
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
-                        throw new ExecutionError((
+                        throw new ExecutionError(null, (
                             "Union type {0} does not provide a \"resolveType\" function" +
                             "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                             "There is no way to resolve this possible type during execution.")
