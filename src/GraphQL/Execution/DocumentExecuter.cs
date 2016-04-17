@@ -534,7 +534,7 @@ namespace GraphQL
             {
                 fields = new Dictionary<string, Fields>();
             }
-            if (selections == null) throw new Exception("Selection cannot be null");
+            if (Strict && selections == null) throw new Exception("Selection cannot be null");
             selections.Apply(selection =>
             {
                 if (selection.Field != null)
