@@ -20,7 +20,7 @@ namespace GraphQL.Introspection
             Name = "__Schema";
             Description = "A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query and mutation operations.";
 
-            Field<ObjectGraphType>("subscriptionType", "", null, context => null);
+            Field<__Type>("subscriptionType", "", null, context => null);
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
                 "types",
                 "A list of all types supported by this server.",

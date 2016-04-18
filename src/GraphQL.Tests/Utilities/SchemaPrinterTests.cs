@@ -443,6 +443,7 @@ type __InputValue {
 }
 
 type __Schema {
+  subscriptionType: __Type
   types: [__Type!]!
   queryType: __Type!
   mutationType: __Type
