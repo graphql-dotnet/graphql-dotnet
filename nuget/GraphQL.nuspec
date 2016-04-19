@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.6.3.0</version>
+    <version>0.6.4.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[Fix a threading issue with GraphTypesLookup.]]></releaseNotes>
+    <releaseNotes><![CDATA[Fix an issue where ofType on __Type in Introspection was not behaving properly.]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
