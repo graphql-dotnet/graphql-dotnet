@@ -121,6 +121,16 @@ namespace GraphQL.Introspection
                     return null;
                 }
 
+                if (context.Source is NonNullGraphType)
+                {
+                    return ((NonNullGraphType) context.Source).Type;
+                }
+
+                if (context.Source is ListGraphType)
+                {
+                    return ((ListGraphType) context.Source).Type;
+                }
+
                 return null;
             });
         }
