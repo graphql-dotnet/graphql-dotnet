@@ -61,6 +61,8 @@
     <Compile Include="Execution\MutationTests.cs" />
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="Introspection\IntrospectionResult.cs" />
+    <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
     <Compile Include="Utilities\SchemaPrinterTests.cs" />
     <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
@@ -100,7 +102,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Introspection\" />
     <Folder Include="Language\" />
   </ItemGroup>
   <ItemGroup>
