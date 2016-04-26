@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using GraphQL.Types;
 using Should;
 
@@ -72,6 +73,29 @@ namespace GraphQL.Tests.Types
             Expect.Throws<ExecutionError>(() => schema.FindType("a"));
         }
 
+        [Test]
+        public void throw_error_on_non_graphtype_with_register_types()
+        {
+            var schema = new Schema();
+            Expect.Throws<ArgumentOutOfRangeException>(() => schema.RegisterTypes(typeof(MyDto)));
+        }
+        
+        [Test]
+        public void throw_error_on_null_with_register_types()
+        {
+            var schema = new Schema();
+            Expect.Throws<ArgumentNullException>(() => schema.RegisterTypes(null));
+        }
+
+        [Test]
+        public void registers_additional_types()
+        {
+            var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
+            schema.FindType("abcd");
+
+            ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
+        }
+
         public void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
@@ -79,6 +103,50 @@ namespace GraphQL.Tests.Types
                 var type = schema.FindType(typeName);
                 type.ShouldNotBeNull("Did not find {0} in type lookup.".ToFormat(typeName));
             });
+        }
+    }
+
+    public class MyDto
+    {
+    }
+
+    public class AnInterfaceOnlySchemaWithExtraRegisteredType : Schema
+    {
+        public AnInterfaceOnlySchemaWithExtraRegisteredType()
+        {
+            Query = new SomeQuery();
+
+            RegisterType<SomeObject>();
+        }
+    }
+
+    public class SomeQuery : ObjectGraphType
+    {
+        public SomeQuery()
+        {
+            Name = "SomeQuery";
+            Field<SomeInterface>("something");
+        }
+    }
+
+    public class SomeObject : ObjectGraphType
+    {
+        public SomeObject()
+        {
+            Name = "SomeObject";
+            Field<StringGraphType>("name");
+            Interface<SomeInterface>();
+
+            IsTypeOf = t => true;
+        }
+    }
+
+    public class SomeInterface : InterfaceGraphType
+    {
+        public SomeInterface()
+        {
+            Name = "SomeInterface";
+            Field<StringGraphType>("name");
         }
     }
 

@@ -151,7 +151,7 @@ namespace GraphQL.Types
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
                             throw new ExecutionError((
-                                "Interface type {0} does not provide a \"resolveType\" function" +
+                                "Interface type {0} does not provide a \"resolveType\" function " +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                                 "There is no way to resolve this possible type during execution.")
                                 .ToFormat(interfaceInstance, obj));
