@@ -9,8 +9,8 @@ namespace GraphQL.Types
 
         public override object Coerce(object value)
         {
-            float result;
-            if (float.TryParse(value.ToString(), out result))
+            double result;
+            if (double.TryParse(value?.ToString() ?? string.Empty, out result))
             {
                 return result;
             }
