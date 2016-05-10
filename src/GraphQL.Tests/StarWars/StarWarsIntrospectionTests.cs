@@ -230,10 +230,6 @@
                   'kind': 'OBJECT'
                 },
                 {
-                  'name': '__Directive',
-                  'kind': 'OBJECT'
-                },
-                {
                   'name': '__TypeKind',
                   'kind': 'ENUM'
                 },
@@ -247,6 +243,10 @@
                 },
                 {
                   'name': '__InputValue',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': '__Directive',
                   'kind': 'OBJECT'
                 },
                 {
@@ -464,6 +464,16 @@
                   'description': 'A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query and mutation operations.',
                   'fields': [
                     {
+                      'name': 'subscriptionType',
+                      'description': '',
+                      'type': {
+                        'name': '__Type',
+                        'kind': 'OBJECT'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
                       'name': 'types',
                       'description': 'A list of all types supported by this server.',
                       'type': {
@@ -596,73 +606,6 @@
                       'type': {
                         'name': '__Type',
                         'kind': 'OBJECT'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    }
-                  ]
-                },
-                {
-                  'kind': 'OBJECT',
-                  'name': '__Directive',
-                  'description': null,
-                  'fields': [
-                    {
-                      'name': 'name',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'description',
-                      'description': null,
-                      'type': {
-                        'name': 'String',
-                        'kind': 'SCALAR'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'args',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onOperation',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onFragment',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onField',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
                       },
                       'isDeprecated': false,
                       'deprecationReason': null
@@ -830,6 +773,73 @@
                       'type': {
                         'name': 'String',
                         'kind': 'SCALAR'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    }
+                  ]
+                },
+                {
+                  'kind': 'OBJECT',
+                  'name': '__Directive',
+                  'description': null,
+                  'fields': [
+                    {
+                      'name': 'name',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'description',
+                      'description': null,
+                      'type': {
+                        'name': 'String',
+                        'kind': 'SCALAR'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'args',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onOperation',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onFragment',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onField',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
                       },
                       'isDeprecated': false,
                       'deprecationReason': null

@@ -29,10 +29,12 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
+        public bool Strict { get; set; }
 
-        public DocumentExecuter()
+        public DocumentExecuter(bool strict = false)
             : this(new AntlrDocumentBuilder(), new DocumentValidator())
         {
+            Strict = strict;
         }
 
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
@@ -97,7 +99,7 @@ namespace GraphQL
 
             if (operation == null)
             {
-                context.Errors.Add(new ExecutionError("Unknown operation name: {0}".ToFormat(operationName)));
+                context.Errors.Add(new ExecutionError(null, "Unknown operation name: {0}".ToFormat(operationName)));
                 return context;
             }
 
@@ -143,6 +145,7 @@ namespace GraphQL
             var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
             if (fieldDefinition == null)
             {
+                if (Strict) throw new ExecutionError(field, $"No field definition for {parentType.Name}.{field.Name}. Could be undefined operation, missing field on the entity, or spelling/capitalization error.");
                 resolveResult.Skip = true;
                 return resolveResult;
             }
@@ -191,7 +194,7 @@ namespace GraphQL
             }
             catch (Exception exc)
             {
-                context.Errors.Add(new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc));
+                context.Errors.Add(new ExecutionError(field, "Error trying to resolve {0}.".ToFormat(field.Name), exc));
                 resolveResult.Skip = false;
                 return resolveResult;
             }
@@ -208,6 +211,8 @@ namespace GraphQL
 
         public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
+            var field = fields != null ? fields.FirstOrDefault() : null;
+
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
@@ -215,9 +220,8 @@ namespace GraphQL
                 var completed = await CompleteValue(context, type, fields, result);
                 if (completed == null)
                 {
-                    var field = fields != null ? fields.FirstOrDefault() : null;
                     var fieldName = field != null ? field.Name : null;
-                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
+                    throw new ExecutionError(field, "Cannot return null for non-null type. Field: {0}, Type: {1}!."
                         .ToFormat(fieldName, type.Name));
                 }
 
@@ -242,7 +246,7 @@ namespace GraphQL
 
                 if (list == null)
                 {
-                    throw new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                    throw new ExecutionError(field, "User error: expected an IEnumerable list though did not find one.");
                 }
 
                 var listType = fieldType as ListGraphType;
@@ -265,7 +269,7 @@ namespace GraphQL
 
                 if (objectType != null && !abstractType.IsPossibleType(objectType))
                 {
-                    throw new ExecutionError(
+                    throw new ExecutionError(field, 
                         "Runtime Object type \"{0}\" is not a possible type for \"{1}\""
                         .ToFormat(objectType, abstractType));
                 }
@@ -278,7 +282,7 @@ namespace GraphQL
 
             if (objectType.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new ExecutionError(
+                throw new ExecutionError(field, 
                     "Expected value of type \"{0}\" but got: {1}."
                     .ToFormat(objectType, result));
             }
@@ -286,9 +290,9 @@ namespace GraphQL
             var subFields = new Dictionary<string, Fields>();
             var visitedFragments = new List<string>();
 
-            fields.Apply(field =>
+            fields.Apply(f =>
             {
-                subFields = CollectFields(context, objectType, field.Selections, subFields, visitedFragments);
+                subFields = CollectFields(context, objectType, f.Selections, subFields, visitedFragments);
             });
 
             return await ExecuteFields(context, objectType, result, subFields);
@@ -530,7 +534,7 @@ namespace GraphQL
             {
                 fields = new Dictionary<string, Fields>();
             }
-
+            if (Strict && selections == null) throw new Exception("Selection cannot be null");
             selections.Apply(selection =>
             {
                 if (selection.Field != null)
@@ -633,7 +637,7 @@ namespace GraphQL
                 return false;
             }
 
-            if (conditionalType.Equals(type))
+            if (conditionalType.ToString() == type.ToString())
             {
                 return true;
             }

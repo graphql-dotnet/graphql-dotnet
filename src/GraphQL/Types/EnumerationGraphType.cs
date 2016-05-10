@@ -33,7 +33,8 @@ namespace GraphQL.Types
         public override object Coerce(object value)
         {
             var found = Values.FirstOrDefault(v => v.Value.Equals(value));
-            return found != null ? found.Name : null;
+            if (found != null) return found.Name;
+            return Values.FirstOrDefault(v => v.Name.Equals(value))?.Value;
         }
 
         public object GetValue(string name)
