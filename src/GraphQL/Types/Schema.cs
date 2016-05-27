@@ -21,6 +21,12 @@ namespace GraphQL.Types
         IEnumerable<GraphType> FindTypes(IEnumerable<Type> types);
 
         IEnumerable<GraphType> FindImplementationsOf(Type type);
+
+        IEnumerable<Type> AdditionalTypes { get; }
+
+        void RegisterTypes(params Type[] types);
+
+        void RegisterType<T>() where T : GraphType;
     }
 
     public class Schema : ISchema
