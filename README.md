@@ -20,7 +20,7 @@ There is a sample web api project hosting the GraphiQL interface.  `npm install`
 > npm install
 > webpack --progress
 ```
-![](http://i.imgur.com/q1FdP8p.png)
+![](http://i.imgur.com/2uGdVAj.png)
 
 ## Usage
 

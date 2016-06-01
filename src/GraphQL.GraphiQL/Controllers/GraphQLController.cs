@@ -28,7 +28,8 @@ namespace GraphQL.GraphiQL.Controllers
 
         public async Task<ExecutionResult> Post(GraphQLQuery query)
         {
-            return await Execute(_schema, null, query.Query);
+            var inputs = query.Variables.ToInputs();
+            return await Execute(_schema, null, query.Query, query.OperationName, inputs);
         }
 
         public async Task<ExecutionResult> Execute(
@@ -38,12 +39,13 @@ namespace GraphQL.GraphiQL.Controllers
           string operationName = null,
           Inputs inputs = null)
         {
-            return await _executer.ExecuteAsync(schema, rootObject, query, operationName);
+            return await _executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
         }
     }
 
     public class GraphQLQuery
     {
+        public string OperationName { get; set; }
         public string Query { get; set; }
         public string Variables { get; set; }
     }
