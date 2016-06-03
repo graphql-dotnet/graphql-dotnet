@@ -5,21 +5,28 @@ namespace GraphQL.Tests.Execution
     public class EnumAsInputsTests : QueryTestBase<EnumMutationSchema>
     {
         [Test]
-        public void something()
+        public void mutation_input()
         {
             AssertQuerySuccess(
                 @"
-mutation createUser {
-  createUser(userInput:{
-    profileImage:""myimage.png"",
-    gender: Female
-  }){
-    id
-    gender
-  }
-}
-",
-                @"{}");
+                mutation createUser {
+                  createUser(userInput:{
+                    profileImage:""myimage.png"",
+                    gender: Female
+                  }){
+                    id
+                    gender
+                    profileImage
+                  }
+                }
+                ",
+                @"{
+                'createUser': {
+                  'id': 1,
+                  'gender': 'Female',
+                  'profileImage': 'myimage.png'
+                 }
+                }");
         }
     }
 
@@ -48,9 +55,9 @@ mutation createUser {
         {
             Name = "Gender";
             Description = "User gender";
-            AddValue("NotSpecified", "NotSpecified gender.", 0);
-            AddValue("Male", "gender Male", 1);
-            AddValue("Female", "gender female", 2);
+            AddValue("NotSpecified", "NotSpecified gender.", Gender.NotSpecified);
+            AddValue("Male", "gender Male", Gender.Male);
+            AddValue("Female", "gender female", Gender.Female);
         }
     }
 
@@ -74,7 +81,13 @@ mutation createUser {
                 ),
                 context =>
                 {
-                    return new User();
+                    var input = context.Argument<CreateUser>("userInput");
+                    return new User
+                    {
+                        Id = 1,
+                        ProfileImage = input.ProfileImage,
+                        Gender = input.Gender
+                    };
                 });
         }
     }
@@ -85,6 +98,7 @@ mutation createUser {
         {
             Name = "User";
             Field<IntGraphType>("id");
+            Field<StringGraphType>("profileImage");
             Field<GenderEnum>("gender");
         }
     }
@@ -92,12 +106,20 @@ mutation createUser {
     public class User
     {
         public int Id { get; set; }
+        public string ProfileImage { get; set; }
+        public Gender Gender { get; set; }
+    }
+
+    public class CreateUser
+    {
+        public string ProfileImage { get; set; }
         public Gender Gender { get; set; }
     }
 
     public enum Gender
     {
-        Female,
-        Male
+        NotSpecified,
+        Male,
+        Female
     }
 }
