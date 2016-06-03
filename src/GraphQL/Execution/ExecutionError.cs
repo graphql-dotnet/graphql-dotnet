@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Language;
 
 namespace GraphQL
 {
@@ -34,5 +35,16 @@ namespace GraphQL
     {
         public int Line { get; set; }
         public int Column { get; set; }
+    }
+
+    public static class ExecutionErrorExtensions
+    {
+        public static void AddLocation(this ExecutionError error, Field field)
+        {
+            if (field != null)
+            {
+                error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
+            }
+        }
     }
 }
