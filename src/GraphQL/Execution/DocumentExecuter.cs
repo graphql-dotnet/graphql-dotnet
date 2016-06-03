@@ -210,6 +210,9 @@ namespace GraphQL
 
         public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
+            var field = fields != null ? fields.FirstOrDefault() : null;
+            var fieldName = field != null ? field.Name : null;
+
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
@@ -217,14 +220,9 @@ namespace GraphQL
                 var completed = await CompleteValue(context, type, fields, result);
                 if (completed == null)
                 {
-                    var field = fields != null ? fields.FirstOrDefault() : null;
-                    var fieldName = field != null ? field.Name : null;
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
                         .ToFormat(fieldName, type.Name));
-                    if (field != null)
-                    {
-                        error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
-                    }
+                    error.AddLocation(field);
                     throw error;
                 }
 
@@ -250,6 +248,7 @@ namespace GraphQL
                 if (list == null)
                 {
                     var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                    error.AddLocation(field);
                     throw error;
                 }
 
@@ -273,9 +272,11 @@ namespace GraphQL
 
                 if (objectType != null && !abstractType.IsPossibleType(objectType))
                 {
-                    throw new ExecutionError(
+                    var error = new ExecutionError(
                         "Runtime Object type \"{0}\" is not a possible type for \"{1}\""
                         .ToFormat(objectType, abstractType));
+                    error.AddLocation(field);
+                    throw error;
                 }
             }
 
@@ -286,17 +287,19 @@ namespace GraphQL
 
             if (objectType.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new ExecutionError(
+                var error = new ExecutionError(
                     "Expected value of type \"{0}\" but got: {1}."
                     .ToFormat(objectType, result));
+                error.AddLocation(field);
+                throw error;
             }
 
             var subFields = new Dictionary<string, Fields>();
             var visitedFragments = new List<string>();
 
-            fields.Apply(field =>
+            fields.Apply(f =>
             {
-                subFields = CollectFields(context, objectType, field.Selections, subFields, visitedFragments);
+                subFields = CollectFields(context, objectType, f.Selections, subFields, visitedFragments);
             });
 
             return await ExecuteFields(context, objectType, result, subFields);

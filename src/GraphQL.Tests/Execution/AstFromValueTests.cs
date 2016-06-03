@@ -7,7 +7,15 @@ namespace GraphQL.Tests.Execution
 {
     public class AstFromValueTests
     {
-        DocumentExecuter _executor = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+        readonly DocumentExecuter _executor = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+
+        [Test]
+        public void converts_null_to_string_value()
+        {
+            var result = _executor.AstFromValue(null, null, null);
+            result.ShouldNotBeNull();
+            result.ShouldBeType<StringValue>();
+        }
 
         [Test]
         public void converts_string_to_string_value()
@@ -41,6 +49,15 @@ namespace GraphQL.Tests.Execution
             var result = _executor.AstFromValue(null, val, null);
             result.ShouldNotBeNull();
             result.ShouldBeType<IntValue>();
+        }
+
+        [Test]
+        public void converts_double_to_float_value()
+        {
+            double val = 0.42;
+            var result = _executor.AstFromValue(null, val, null);
+            result.ShouldNotBeNull();
+            result.ShouldBeType<FloatValue>();
         }
     }
 }
