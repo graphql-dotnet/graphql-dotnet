@@ -29,5 +29,18 @@ namespace GraphQL.Types
         {
             _interfaces.Add(typeof(TInterface));
         }
+
+        public void Interface(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+            if (!type.IsSubclassOf(typeof(InterfaceGraphType)))
+            {
+                throw new ArgumentException("Interface must implement InterfaceGraphType", nameof(type));
+            }
+            _interfaces.Add(type);
+        }
     }
 }
