@@ -162,10 +162,10 @@ namespace GraphQL
 
             var arguments = GetArgumentValues(context.Schema, fieldDefinition.Arguments, field.Arguments, context.Variables);
 
-            Func<ResolveFieldContext, object> defaultResolve = (ctx) =>
-            {
-                return ctx.Source != null ? GetProperyValue(ctx.Source, ctx.FieldAst.Name) : null;
-            };
+            Func<ResolveFieldContext, object> defaultResolve =
+                ctx => ctx.Source != null
+                    ? GetProperyValue(ctx.Source, ctx.FieldAst.Name)
+                    : null;
 
             try
             {
@@ -204,7 +204,9 @@ namespace GraphQL
             }
             catch (Exception exc)
             {
-                context.Errors.Add(new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc));
+                var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
+                error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
+                context.Errors.Add(error);
                 resolveResult.Skip = false;
                 return resolveResult;
             }
@@ -230,8 +232,13 @@ namespace GraphQL
                 {
                     var field = fields != null ? fields.FirstOrDefault() : null;
                     var fieldName = field != null ? field.Name : null;
-                    throw new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
+                    var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
                         .ToFormat(fieldName, type.Name));
+                    if (field != null)
+                    {
+                        error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
+                    }
+                    throw error;
                 }
 
                 return completed;
@@ -255,7 +262,8 @@ namespace GraphQL
 
                 if (list == null)
                 {
-                    throw new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                    var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                    throw error;
                 }
 
                 var listType = fieldType as ListGraphType;

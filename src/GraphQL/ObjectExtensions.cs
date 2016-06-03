@@ -11,8 +11,12 @@ namespace GraphQL
         public static T ToObject<T>(this IDictionary<string, object> source)
             where T : class, new()
         {
-            var obj = new T();
-            var type = obj.GetType();
+            return (T) ToObject(source, typeof(T));
+        }
+
+        public static object ToObject(this IDictionary<string, object> source, Type type)
+        {
+            var obj = Activator.CreateInstance(type);
 
             foreach (var item in source)
             {
