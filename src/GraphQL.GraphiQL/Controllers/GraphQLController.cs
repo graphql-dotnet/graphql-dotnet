@@ -1,4 +1,6 @@
-﻿using GraphQL.Tests;
+﻿using System.Net;
+using System.Net.Http;
+using GraphQL.Tests;
 using GraphQL.Types;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -26,10 +28,16 @@ namespace GraphQL.GraphiQL.Controllers
             _schema = _container.Get<StarWarsSchema>();
         }
 
-        public async Task<ExecutionResult> Post(GraphQLQuery query)
+        public async Task<HttpResponseMessage> Post(HttpRequestMessage request, GraphQLQuery query)
         {
             var inputs = query.Variables.ToInputs();
-            return await Execute(_schema, null, query.Query, query.OperationName, inputs);
+            var result = await Execute(_schema, null, query.Query, query.OperationName, inputs);
+
+            var httpResult = result.Errors?.Count > 0
+                ? HttpStatusCode.BadRequest
+                : HttpStatusCode.OK;
+
+            return request.CreateResponse(httpResult, result);
         }
 
         public async Task<ExecutionResult> Execute(

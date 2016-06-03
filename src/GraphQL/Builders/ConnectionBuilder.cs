@@ -175,6 +175,7 @@ namespace GraphQL.Builders
         }
 
         public ConnectionBuilder<TGraphType, TObjectType> Argument<TArgumentGraphType>(string name, string description)
+            where TArgumentGraphType : GraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
@@ -186,6 +187,7 @@ namespace GraphQL.Builders
 
         public ConnectionBuilder<TGraphType, TObjectType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default(TArgumentType))
+            where TArgumentGraphType : GraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
