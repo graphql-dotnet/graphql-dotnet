@@ -14,6 +14,11 @@ namespace GraphQL.Types
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
+        public override object Serialize(object value)
+        {
+            return ParseValue(value);
+        }
+
         public override object ParseValue(object value)
         {
             string inputValue;

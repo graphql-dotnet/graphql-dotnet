@@ -31,23 +31,23 @@ namespace GraphQL.Types
 
         public EnumValues Values { get; private set; }
 
-        public override object ParseValue(object value)
+        public override object Serialize(object value)
         {
             var found = Values.FirstOrDefault(v => v.Value.Equals(value));
-            return found != null ? found.Name : null;
+            return found?.Name;
+        }
+
+        public override object ParseValue(object value)
+        {
+            var found = Values.FirstOrDefault(v =>
+                StringComparer.InvariantCultureIgnoreCase.Equals(v.Name, value.ToString()));
+            return found?.Value;
         }
 
         public override object ParseLiteral(IValue value)
         {
             var enumVal = value as EnumValue;
             return ParseValue(enumVal?.Name);
-        }
-
-        public object GetValue(string name)
-        {
-            var found = Values.FirstOrDefault(v =>
-                StringComparer.InvariantCultureIgnoreCase.Equals(v.Name, name));
-            return found != null ? found.Value : null;
         }
     }
 

@@ -47,12 +47,12 @@ namespace GraphQL.Types
         {
             if (_fields.Exists(x => x.Name == name))
             {
-                throw new ArgumentOutOfRangeException("name", "A field with that name is already registered.");
+                throw new ArgumentOutOfRangeException(nameof(name), "A field with that name is already registered.");
             }
 
             if (!type.IsSubclassOf(typeof(GraphType)))
             {
-                throw new ArgumentOutOfRangeException("type", "Field type must derive from GraphType.");
+                throw new ArgumentOutOfRangeException(nameof(type), "Field type must derive from GraphType.");
             }
 
             var fieldType = new FieldType
@@ -104,7 +104,7 @@ namespace GraphQL.Types
 
         public override int GetHashCode()
         {
-            return (Name != null ? Name.GetHashCode() : 0);
+            return Name?.GetHashCode() ?? 0;
         }
     }
 

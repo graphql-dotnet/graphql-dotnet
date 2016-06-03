@@ -553,6 +553,11 @@ type __Type {
                 Name = "Odd";
             }
 
+            public override object Serialize(object value)
+            {
+                return null;
+            }
+
             public override object ParseValue(object value)
             {
                 return null;

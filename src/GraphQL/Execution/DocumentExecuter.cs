@@ -245,7 +245,7 @@ namespace GraphQL
             if (fieldType is ScalarGraphType)
             {
                 var scalarType = fieldType as ScalarGraphType;
-                var coercedValue = scalarType.ParseValue(result);
+                var coercedValue = scalarType.Serialize(result);
                 return coercedValue;
             }
 

@@ -9,6 +9,11 @@ namespace GraphQL.Types
             Name = "String";
         }
 
+        public override object Serialize(object value)
+        {
+            return ParseValue(value);
+        }
+
         public override object ParseValue(object value)
         {
             return value != null ? ProcessString(value.ToString()) : null;
