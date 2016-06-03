@@ -13,13 +13,18 @@ namespace GraphQL.Tests.Execution
             Name = "ComplexScalar";
         }
 
-        public override object ParseValue(object value)
+        public override object Serialize(object value)
         {
             if (value is string && value.Equals("DeserializedValue"))
             {
                 return "SerializedValue";
             }
 
+            return value;
+        }
+
+        public override object ParseValue(object value)
+        {
             if (value is string && value.Equals("SerializedValue"))
             {
                 return "DeserializedValue";

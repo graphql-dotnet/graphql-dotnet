@@ -9,6 +9,11 @@ namespace GraphQL.Types
             Name = "Decimal";
         }
 
+        public override object Serialize(object value)
+        {
+            return ParseValue(value);
+        }
+
         public override object ParseValue(object value)
         {
             decimal result;
