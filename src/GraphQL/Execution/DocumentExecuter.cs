@@ -306,10 +306,16 @@ namespace GraphQL
                 var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
                 var type = schema.FindType(arg.Type);
 
-                var coercedValue = CoerceValue(schema, type, value, variables);
-                acc[arg.Name] = IsValidValue(schema, type, coercedValue)
-                    ? coercedValue ?? arg.DefaultValue
-                    : arg.DefaultValue;
+                var coercedValue = CoerceValue(schema, type, value, variables)
+                                   ?? arg.DefaultValue;
+
+                if (coercedValue != null)
+                {
+                    acc[arg.Name] = coercedValue;
+                }
+//                acc[arg.Name] = IsValidValue(schema, type, coercedValue)
+//                    ? coercedValue ?? arg.DefaultValue
+//                    : arg.DefaultValue;
                 return acc;
             });
         }
