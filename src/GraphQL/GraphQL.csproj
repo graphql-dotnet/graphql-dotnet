@@ -56,6 +56,7 @@
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />
+    <Compile Include="GraphQL.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />
     <Compile Include="Introspection\SchemaMetaFieldType.cs" />
     <Compile Include="Introspection\TypeKind.cs" />
