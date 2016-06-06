@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GraphQL.Types;
 using Newtonsoft.Json;
 using Should;
@@ -196,21 +197,13 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void errors_on_null_for_nested_non_null()
         {
-            var expected = "{}";
+            string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': null} }".ToInputs();
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
-            try
-            {
-                AssertQueryWithErrors(_query, expected, inputs);
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
-
+            var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
@@ -218,20 +211,13 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void errors_on_incorrect_type()
         {
-            var expected = "{}";
+            string expected = null;
 
             var inputs = "{'input': 'foo bar'}".ToInputs();
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
-            try
-            {
-                AssertQueryWithErrors(_query, expected, inputs);
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
+            var caughtError = result.Errors.Single();
 
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
@@ -240,21 +226,13 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void errors_on_omission_of_nested_non_null()
         {
-            var expected = "{}";
+            string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar'} }".ToInputs();
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
-            try
-            {
-                AssertQueryWithErrors(_query, expected, inputs);
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
-
+            var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
@@ -262,21 +240,13 @@ namespace GraphQL.Tests.Execution
         [Test]
         public void errors_on_addition_of_unknown_input_field()
         {
-            var expected = "{}";
+            string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'e': 'dog'} }".ToInputs();
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
-            try
-            {
-                AssertQueryWithErrors(_query, expected, inputs);
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
-
+            var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
@@ -424,23 +394,11 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var expected = @"
-            {
-              'fieldWithNonNullableStringInput': 'null'
-            }
-            ";
+            string expected = null;
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
 
-            try
-            {
-                AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
-
+            var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
         }
@@ -454,28 +412,13 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var expected = @"
-            {
-              'fieldWithNonNullableStringInput': 'null'
-            }
-            ";
+            string expected = null;
 
             var inputs = "{'value':null}".ToInputs();
 
-            Exception caughtError = null;
+            var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
 
-            try
-            {
-                var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
-                if (result != null)
-                {
-                }
-            }
-            catch (Exception exc)
-            {
-                caughtError = exc;
-            }
-
+            var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
         }

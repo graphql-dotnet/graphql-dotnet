@@ -61,19 +61,11 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             using (var tokenSource = new CancellationTokenSource())
             {
-                try
-                {
-                    tokenSource.Cancel();
-                    AssertQuerySuccess("{two}", "{two: 'two'}", cancellationToken: tokenSource.Token);
-                }
-                catch(AggregateException aggExc)
-                {
-                    aggExc.InnerException.ShouldBeType<TaskCanceledException>();
-                    return;
-                }
+                tokenSource.Cancel();
+                var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
+                var aggExc = result.Errors.Single();
+                aggExc.InnerException.ShouldBeType<OperationCanceledException>();
             }
-
-            throw new Exception("Cancellation did not propagate!");
         }
     }
 }
