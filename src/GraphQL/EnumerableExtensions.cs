@@ -56,40 +56,6 @@ namespace GraphQL
             return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);
         }
 
-        public static bool Any<T>(this IEnumerable<T> items, Func<T, bool> check)
-        {
-            var result = false;
-
-            foreach (var item in items)
-            {
-                result |= check(item);
-
-                if (result)
-                {
-                    break;
-                }
-            }
-
-            return result;
-        }
-
-        public static bool Any(this IEnumerable items, Func<object, bool> check)
-        {
-            var result = false;
-
-            foreach (var item in items)
-            {
-                result |= check(item);
-
-                if (result)
-                {
-                    break;
-                }
-            }
-
-            return result;
-        }
-
         public static bool All(this IEnumerable items, Func<object, bool> check)
         {
             var result = true;

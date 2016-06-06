@@ -32,6 +32,16 @@ namespace GraphQL.Types
 
         public CancellationToken CancellationToken { get; set; }
 
+        public TType SourceAs<TType>()
+        {
+            if (Source != null)
+            {
+                return (TType) Source;
+            }
+
+            return default(TType);
+        }
+
         public TType Argument<TType>(string name)
         {
             if (Arguments.ContainsKey(name))

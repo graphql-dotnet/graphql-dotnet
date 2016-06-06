@@ -481,6 +481,8 @@ namespace GraphQL.Language
                 operation.Directives = Visit(context.directives()) as Directives;
             }
 
+            NewNode(operation, context);
+
             return operation;
         }
 

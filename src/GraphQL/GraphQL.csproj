@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
+    <Compile Include="GraphQLUsage.cs" />
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />

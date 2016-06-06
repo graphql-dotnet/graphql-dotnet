@@ -55,6 +55,7 @@
     <Compile Include="Bugs\Bug68NonNullEnumGraphTypeTests.cs" />
     <Compile Include="Builders\ConnectionBuilderTests.cs" />
     <Compile Include="Builders\FieldBuilderTests.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\AstFromValueTests.cs" />
     <Compile Include="Execution\EnumAsInputsTests.cs" />
