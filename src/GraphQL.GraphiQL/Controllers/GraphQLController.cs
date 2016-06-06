@@ -1,31 +1,34 @@
 ﻿using System.Net;
 using System.Net.Http;
-using GraphQL.Tests;
-using GraphQL.Types;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using GraphQL.Http;
+using GraphQL.Tests;
+using GraphQL.Types;
 
 namespace GraphQL.GraphiQL.Controllers
 {
     public class GraphQLController : ApiController
     {
-        private readonly ISimpleContainer _container;
         private readonly ISchema _schema;
         private readonly IDocumentExecuter _executer;
+        private readonly IDocumentWriter _writer;
 
-        public GraphQLController()
+        public GraphQLController(
+            IDocumentExecuter executer,
+            IDocumentWriter writer,
+            StarWarsSchema schema)
         {
-            _executer = new DocumentExecuter();
+            _executer = executer;
+            _writer = writer;
+            _schema = schema;
+        }
 
-            _container = new SimpleContainer();
-            _container.Singleton(new StarWarsData());
-            _container.Register<StarWarsQuery>();
-            _container.Register<HumanType>();
-            _container.Register<DroidType>();
-            _container.Register<CharacterInterface>();
-            _container.Singleton(() => new StarWarsSchema(type => (GraphType) _container.Get(type)));
-
-            _schema = _container.Get<StarWarsSchema>();
+        // This will display an example error
+        public async Task<HttpResponseMessage> Get(HttpRequestMessage request)
+        {
+            return await Post(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" });
         }
 
         public async Task<HttpResponseMessage> Post(HttpRequestMessage request, GraphQLQuery query)
@@ -37,7 +40,12 @@ namespace GraphQL.GraphiQL.Controllers
                 ? HttpStatusCode.BadRequest
                 : HttpStatusCode.OK;
 
-            return request.CreateResponse(httpResult, result);
+            var json = _writer.Write(result);
+
+            var response = request.CreateResponse(httpResult);
+            response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            return response;
         }
 
         public async Task<ExecutionResult> Execute(

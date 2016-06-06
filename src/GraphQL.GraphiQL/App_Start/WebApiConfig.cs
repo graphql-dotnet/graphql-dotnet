@@ -1,7 +1,4 @@
-﻿using System.Net.Http.Formatting;
-using System.Web.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using System.Web.Http;
 
 namespace GraphQL.GraphiQL
 {
@@ -9,12 +6,8 @@ namespace GraphQL.GraphiQL
     {
         public static void Register(HttpConfiguration config)
         {
-            config.Formatters.Clear();
-
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-            config.Formatters.Add(new JsonMediaTypeFormatter {Indent = true, SerializerSettings = settings});
+            var bootstrapper = new Bootstrapper();
+            config.DependencyResolver = bootstrapper.Resolver();
 
             // Web API routes
             config.MapHttpAttributeRoutes();

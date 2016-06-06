@@ -100,7 +100,11 @@ namespace GraphQL.Tests
 
         public ExecutionResult CreateQueryResult(string result)
         {
-            var expected = JObject.Parse(result);
+            object expected = null;
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                expected = JObject.Parse(result);
+            }
             return new ExecutionResult { Data = expected };
         }
 

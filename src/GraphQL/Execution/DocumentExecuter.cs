@@ -56,18 +56,31 @@ namespace GraphQL
 
             if (validationResult.IsValid)
             {
-                var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
-
-                if (context.Errors.Any())
+                try
                 {
-                    result.Errors = context.Errors;
-                    return result;
+                    var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
+
+                    if (context.Errors.Any())
+                    {
+                        result.Errors = context.Errors;
+                        return result;
+                    }
+
+                    result.Data = await ExecuteOperation(context);
+                    if (context.Errors.Any())
+                    {
+                        result.Errors = context.Errors;
+                    }
                 }
-
-                result.Data = await ExecuteOperation(context);
-                if (context.Errors.Any())
+                catch (Exception exc)
                 {
-                    result.Errors = context.Errors;
+                    if (result.Errors == null)
+                    {
+                        result.Errors = new ExecutionErrors();
+                    }
+
+                    result.Data = null;
+                    result.Errors.Add(new ExecutionError(exc.Message, exc));
                 }
             }
             else
@@ -347,7 +360,7 @@ namespace GraphQL
                     break;
 
                 default:
-                    throw new InvalidOperationException("Can only execute queries and mutations");
+                    throw new ExecutionError("Can only execute queries and mutations");
             }
 
             return type;
@@ -382,10 +395,10 @@ namespace GraphQL
 
             if (value == null)
             {
-                throw new Exception("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
+                throw new ExecutionError("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName));
             }
 
-            throw new Exception("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName));
+            throw new ExecutionError("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName));
         }
 
         public bool IsValidValue(ISchema schema, GraphType type, object input)

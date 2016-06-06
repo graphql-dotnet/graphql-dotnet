@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GraphQL.Tests
 {
-    public interface ISimpleContainer
+    public interface ISimpleContainer : IDisposable
     {
         object Get(Type serviceType);
         T Get<T>();
@@ -71,6 +71,11 @@ namespace GraphQL.Tests
             }
 
             throw new InvalidOperationException("No registration for " + serviceType);
+        }
+
+        public void Dispose()
+        {
+            _registrations.Clear();
         }
 
         private object CreateInstance(Type implementationType)
