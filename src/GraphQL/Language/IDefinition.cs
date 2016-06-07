@@ -1,6 +1,6 @@
 ﻿namespace GraphQL.Language
 {
-    public interface IDefinition
+    public interface IDefinition : INode
     {
     }
 }

@@ -43,7 +43,8 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
+            Func<ResolveFieldContext, object> resolve = null,
+            string deprecationReason = null)
         {
             if (_fields.Exists(x => x.Name == name))
             {
@@ -59,6 +60,7 @@ namespace GraphQL.Types
             {
                 Name = name,
                 Description = description,
+                DeprecationReason = deprecationReason,
                 Type = type,
                 Arguments = arguments,
                 Resolve = resolve,
@@ -73,10 +75,11 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
+            Func<ResolveFieldContext, object> resolve = null,
+            string deprecationReason = null)
             where TType : GraphType
         {
-            return Field(typeof(TType), name, description, arguments, resolve);
+            return Field(typeof(TType), name, description, arguments, resolve, deprecationReason);
         }
 
         public virtual string CollectTypes(TypeCollectionContext context)

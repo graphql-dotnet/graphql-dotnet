@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace GraphQL.Validation
 {
-    public class ValidationResult
+    public class ValidationResult : IValidationResult
     {
         public ValidationResult()
         {

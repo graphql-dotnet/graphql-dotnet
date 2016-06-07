@@ -106,6 +106,11 @@ namespace GraphQL.Types
 
         public GraphType FindType(Type type)
         {
+            if (type == null)
+            {
+                return null;
+            }
+
             return _lookup.Value[type] ?? AddType(type);
         }
 
@@ -156,6 +161,11 @@ namespace GraphQL.Types
 
         private GraphType AddType(Type type)
         {
+            if (type == null)
+            {
+                return null;
+            }
+
             var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
             {
                 _lookup.Value.AddType(graphType, context);

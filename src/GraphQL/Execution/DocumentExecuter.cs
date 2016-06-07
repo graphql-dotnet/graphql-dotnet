@@ -52,7 +52,7 @@ namespace GraphQL
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
 
-            var validationResult = _documentValidator.IsValid(schema, document, operationName);
+            var validationResult = _documentValidator.Validate(schema, document);
 
             if (validationResult.IsValid)
             {
@@ -128,7 +128,7 @@ namespace GraphQL
             var fields = CollectFields(
                 context,
                 rootType,
-                context.Operation.Selections,
+                context.Operation.SelectionSet,
                 new Dictionary<string, Fields>(), 
                 new List<string>());
 
@@ -312,7 +312,7 @@ namespace GraphQL
 
             fields.Apply(f =>
             {
-                subFields = CollectFields(context, objectType, f.Selections, subFields, visitedFragments);
+                subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
             });
 
             return await ExecuteFields(context, objectType, result, subFields);
@@ -369,6 +369,9 @@ namespace GraphQL
                 case OperationType.Mutation:
                     type = schema.Mutation;
                     break;
+
+                case OperationType.Subscription:
+                    throw new ExecutionError("Subscriptions are not yet supported.");
 
                 default:
                     throw new ExecutionError("Can only execute queries and mutations");
@@ -706,7 +709,7 @@ namespace GraphQL
         public Dictionary<string, Fields> CollectFields(
             ExecutionContext context,
             GraphType specificType,
-            Selections selections,
+            SelectionSet selectionSet,
             Dictionary<string, Fields> fields,
             List<string> visitedFragmentNames)
         {
@@ -715,7 +718,7 @@ namespace GraphQL
                 fields = new Dictionary<string, Fields>();
             }
 
-            selections.Apply(selection =>
+            selectionSet.Selections.Apply(selection =>
             {
                 if (selection is Field)
                 {
@@ -752,7 +755,7 @@ namespace GraphQL
                         return;
                     }
 
-                    CollectFields(context, specificType, fragment.Selections, fields, visitedFragmentNames);
+                    CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
                 }
                 else if (selection is InlineFragment)
                 {
@@ -764,7 +767,7 @@ namespace GraphQL
                         return;
                     }
 
-                    CollectFields(context, specificType, inline.Selections, fields, visitedFragmentNames);
+                    CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                 }
             });
 

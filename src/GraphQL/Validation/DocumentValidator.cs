@@ -1,32 +1,60 @@
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
 {
     public interface IDocumentValidator
     {
-        ValidationResult IsValid(ISchema schema, Document document, string operationName);
+        IValidationResult Validate(
+            ISchema schema,
+            Document document,
+            IEnumerable<IValidationRule> rules = null);
     }
 
     public class DocumentValidator : IDocumentValidator
     {
-        public ValidationResult IsValid(ISchema schema, Document document, string operationName)
+        public IValidationResult Validate(
+            ISchema schema,
+            Document document,
+            IEnumerable<IValidationRule> rules = null)
         {
-            var result = new ValidationResult();
-
-            if (string.IsNullOrWhiteSpace(operationName)
-                && document.Operations.Count() > 1)
+            var context = new ValidationContext
             {
-                var operation = document.Operations.Take(2).Last();
+                Schema = schema,
+                Document = document,
+                TypeInfo = new TypeInfo(schema)
+            };
 
-                var error = new ExecutionError("Must provide operation name if query contains multiple operations");
-                error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
-
-                result.Errors.Add(error);
+            if (rules == null)
+            {
+                rules = Rules();
             }
 
+            var visitors = rules.Select(x => x.Validate(context)).ToList();
+
+            visitors.Insert(0, context.TypeInfo);
+
+            var basic = new BasicVisitor(visitors);
+
+            basic.Visit(document);
+
+            var result = new ValidationResult();
+            result.Errors.AddRange(context.Errors);
             return result;
+        }
+
+        private List<IValidationRule> Rules()
+        {
+            var rules = new List<IValidationRule>()
+            {
+                new UniqueOperationNames(),
+                new LoneAnonymousOperationRule(),
+                new ScalarLeafs()
+            };
+            return rules;
         }
     }
 }
