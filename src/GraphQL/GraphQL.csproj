@@ -149,6 +149,7 @@
     <Compile Include="Validation\IValidationRule.cs" />
     <Compile Include="Validation\INodeVisitor.cs" />
     <Compile Include="Validation\BasicVisitor.cs" />
+    <Compile Include="GraphQLExtensions.cs" />
     <Compile Include="Validation\Rules\LoneAnonymousOperationRule.cs" />
     <Compile Include="Validation\NodeVisitorMatchFuncListener.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />

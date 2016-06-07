@@ -16,12 +16,18 @@ namespace GraphQL.Language
             {
                 yield return Type;
 
-                foreach (var directive in Directives)
+                if (Directives != null)
                 {
-                    yield return directive;
+                    foreach (var directive in Directives)
+                    {
+                        yield return directive;
+                    }
                 }
 
-                yield return SelectionSet;
+                if (SelectionSet != null)
+                {
+                    yield return SelectionSet;
+                }
             }
         }
 

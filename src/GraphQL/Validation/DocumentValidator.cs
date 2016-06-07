@@ -30,8 +30,7 @@ namespace GraphQL.Validation
 
             if (rules == null)
             {
-//                rules = Rules();
-                rules = new List<IValidationRule>();
+                rules = Rules();
             }
 
             var visitors = rules.Select(x => x.Validate(context)).ToList();

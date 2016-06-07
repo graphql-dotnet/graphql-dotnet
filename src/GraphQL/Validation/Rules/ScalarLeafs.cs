@@ -28,7 +28,12 @@ namespace GraphQL.Validation.Rules
 
         private void Field(GraphType type, Field field, ValidationContext context)
         {
-            if (IsLeafType(type))
+            if (type == null)
+            {
+                return;
+            }
+
+            if (type.IsLeafType(context.Schema))
             {
                 if (field.SelectionSet != null && field.SelectionSet.Selections.Any())
                 {
@@ -37,13 +42,8 @@ namespace GraphQL.Validation.Rules
             }
             else if(field.SelectionSet == null || !field.SelectionSet.Selections.Any())
             {
-                context.ReportError(new ValidationError("", RequiredSubselectionMessage(field.Name, type?.Name)));
+                context.ReportError(new ValidationError("", RequiredSubselectionMessage(field.Name, type.Name)));
             }
-        }
-
-        private bool IsLeafType(GraphType type)
-        {
-            return type is ScalarGraphType || type is EnumerationGraphType;
         }
     }
 }
