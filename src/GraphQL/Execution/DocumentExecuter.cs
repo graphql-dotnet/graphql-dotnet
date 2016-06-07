@@ -370,6 +370,9 @@ namespace GraphQL
                     type = schema.Mutation;
                     break;
 
+                case OperationType.Subscription:
+                    throw new ExecutionError("Subscriptions are not yet supported.");
+
                 default:
                     throw new ExecutionError("Can only execute queries and mutations");
             }

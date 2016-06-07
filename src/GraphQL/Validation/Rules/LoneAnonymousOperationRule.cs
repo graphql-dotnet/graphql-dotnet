@@ -21,12 +21,12 @@ namespace GraphQL.Validation.Rules
                     if (string.IsNullOrWhiteSpace(op.Name)
                         && operationCount > 1)
                     {
-                        context.ReportError(
-                            new ValidationError(
-                                "5.1.2.1",
-                                "This anonymous operation must be the only defined operation.",
-                                op
-                                ));
+                        var error = new ValidationError(
+                            "5.1.2.1",
+                            "This anonymous operation must be the only defined operation.",
+                            op);
+                        error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
+                        context.ReportError(error);
                     }
                 });
         }

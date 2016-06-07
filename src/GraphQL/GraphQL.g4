@@ -23,7 +23,7 @@ operationDefinition:
 selectionSet |
 operationType  NAME? variableDefinitions? directives? selectionSet;
 
-operationType : 'query' | 'mutation';
+operationType : 'query' | 'mutation' | 'subscription';
 
 variableDefinitions : '(' variableDefinition+ ')';
 

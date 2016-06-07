@@ -35,18 +35,39 @@ namespace GraphQL.Validation
 
         public void Enter(INode node)
         {
-            System.Diagnostics.Debug.WriteLine($"Entering: {node}");
+//            System.Diagnostics.Debug.WriteLine($"Entering: {node}");
+
+            if (node is Operation)
+            {
+                var op = (Operation) node;
+                GraphType type = null;
+                if (op.OperationType == OperationType.Query)
+                {
+                    type = _schema.Query;
+                }
+                else if (op.OperationType == OperationType.Mutation)
+                {
+                    type = _schema.Mutation;
+                }
+                else if (op.OperationType == OperationType.Subscription)
+                {
+                }
+                _typeStack.Push(type);
+                return;
+            }
 
             if (node is FragmentDefinition)
             {
                 var def = (FragmentDefinition) node;
                 var type = _schema.FindType(def.Type.Name);
                 _typeStack.Push(type);
+                return;
             }
 
             if (node is SelectionSet)
             {
                 _parentTypeStack.Push(GetLastType());
+                return;
             }
 
             if (node is Field)
@@ -57,14 +78,16 @@ namespace GraphQL.Validation
                 _fieldDefStack.Push(fieldType);
                 var targetType = _schema.FindType(fieldType?.Type);
                 _typeStack.Push(targetType);
+                return;
             }
         }
 
         public void Leave(INode node)
         {
-            System.Diagnostics.Debug.WriteLine($"Leaving: {node}");
+//            System.Diagnostics.Debug.WriteLine($"Leaving: {node}");
 
-            if (node is FragmentDefinition)
+            if (node is Operation
+                || node is FragmentDefinition)
             {
                 _typeStack.Pop();
             }

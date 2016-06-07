@@ -29,11 +29,12 @@ namespace GraphQL.Validation.Rules
 
                     if (frequency.ContainsKey(op.Name))
                     {
-                        context.ReportError(
-                            new ValidationError(
-                                "5.1.1.1",
-                                $"There can only be one operation named {op.Name}.",
-                                op));
+                        var error = new ValidationError(
+                            "5.1.1.1",
+                            $"There can only be one operation named {op.Name}.",
+                            op);
+                        error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
+                        context.ReportError(error);
                     }
                     else
                     {

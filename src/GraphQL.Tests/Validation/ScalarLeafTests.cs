@@ -1,13 +1,9 @@
-﻿using System.Linq;
-using GraphQL.Execution;
-using GraphQL.Types;
-using GraphQL.Validation;
+﻿using GraphQL.Types;
 using GraphQL.Validation.Rules;
-using Should;
 
 namespace GraphQL.Tests.Validation
 {
-    public class ScalarLeafTests
+    public class ScalarLeafTests : ValidationTestBase<ValidationSchema>
     {
         private readonly ScalarLeafs _rule;
 
@@ -19,58 +15,76 @@ namespace GraphQL.Tests.Validation
         [Test]
         public void valid_scalar_selection()
         {
-            var schema = new ValidationSchema();
-
             var query = @"
 fragment scalarSelection on Dog {
   barks
 }
 ";
 
-            var result = Validate(query, schema, _rule);
+            ShouldPassRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+            });
+        }
 
-            result.IsValid.ShouldBeTrue();
+        [Test]
+        public void object_type_missing_selection()
+        {
+            var query = @"
+query directQueryOnObjectWithoutSubFields{
+  human
+}
+";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.RequiredSubselectionMessage("human", "Human"),
+                    line: 3,
+                    column: 3);
+            });
         }
 
         [Test]
         public void scalar_selection_not_allowed_on_boolean()
         {
-            var schema = new ValidationSchema();
-
             var query = @"
 fragment scalarSelectionNotAllowedOnBoolean on Dog {
   barks { sinceWhen }
 }
 ";
-
-            var result = Validate(query, schema, _rule);
-
-            result.IsValid.ShouldBeFalse();
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.NoSubselectionAllowedMessage("barks", "Boolean"),
+                    line: 3,
+                    column: 3);
+            });
         }
 
         [Test]
         public void scalar_selection_not_allowed_on_enum()
         {
-            var schema = new ValidationSchema();
-
             var query = @"
 fragment scalarSelectionsNotAllowedOnEnum on Cat {
   furColor { inHexdec }
 }
 ";
 
-            var result = Validate(query, schema, _rule);
-
-            result.IsValid.ShouldBeFalse();
-            result.Errors.First().Message.ShouldEqual(_rule.NoSubselectionAllowedMessage("furColor", "FurColor"));
-        }
-
-        private IValidationResult Validate(string query, Schema schema, params IValidationRule[] rules)
-        {
-            var documentBuilder = new AntlrDocumentBuilder();
-            var document = documentBuilder.Build(query);
-            var validator = new DocumentValidator();
-            return validator.Validate(schema, document, rules);
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.NoSubselectionAllowedMessage("furColor", "FurColor"),
+                    line: 3,
+                    column: 3);
+            });
         }
     }
 
@@ -99,12 +113,49 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
         }
     }
 
+    public class Human : ObjectGraphType
+    {
+        public Human()
+        {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(new[]
+                {
+                    new QueryArgument<BooleanGraphType>
+                    {
+                        Name = "surname"
+                    }
+                }));
+            Field<IntGraphType>("iq");
+        }
+    }
+
+    public class ValidationQueryRoot : ObjectGraphType
+    {
+        public ValidationQueryRoot()
+        {
+            Field<Human>(
+                "human",
+                arguments: new QueryArguments(new[]
+                {
+                    new QueryArgument<IdGraphType>
+                    {
+                        Name = "id"
+                    }
+                }));
+            Field<Dog>("dog");
+            Field<Cat>("cat");
+        }
+    }
+
     public class ValidationSchema : Schema
     {
         public ValidationSchema()
         {
-            Query = new Dog();
+            Query = new ValidationQueryRoot();
+            RegisterType<Dog>();
             RegisterType<Cat>();
+            RegisterType<Human>();
         }
     }
 }

@@ -96,6 +96,9 @@
     <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
+    <Compile Include="Validation\ValidationErrorAssertion.cs" />
+    <Compile Include="Validation\ValidationTestBase.cs" />
+    <Compile Include="Validation\ValidationTestConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">

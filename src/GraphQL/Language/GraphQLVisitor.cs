@@ -143,6 +143,7 @@ namespace GraphQL.Language
         {
             var variable = new VariableReference();
             variable.Name = context.NAME().GetText();
+            NewNode(variable, context);
             return variable;
         }
 
@@ -463,6 +464,7 @@ namespace GraphQL.Language
         public override object VisitOperationDefinition(GraphQLParser.OperationDefinitionContext context)
         {
             var operation = new Operation();
+            NewNode(operation, context);
 
             operation.Name = context.NAME() != null ? context.NAME().GetText() : "";
             operation.SelectionSet = Visit(context.selectionSet()) as SelectionSet;
@@ -488,6 +490,7 @@ namespace GraphQL.Language
         public override object VisitDocument(GraphQLParser.DocumentContext context)
         {
             var document = new Document();
+            NewNode(document, context);
             context.definition().Apply(childContext =>
             {
                 var definition = Visit(childContext) as IDefinition;
@@ -517,7 +520,7 @@ namespace GraphQL.Language
 
         private SourceLocation GetSourceLocation(ParserRuleContext context)
         {
-            return new SourceLocation(context.Start.Line, context.Start.Column);
+            return new SourceLocation(context.Start.Line, context.Start.Column + 1);
         }
     }
 }
