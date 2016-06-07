@@ -2,16 +2,19 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.7.1.0</version>
+    <version>0.8.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* Add RegisterType and AdditionalTypes to ISchema
-* Change how ExecutionResult is serialized, which should now conform to the spec with a lowercase "message"
-* Add ObjectGraphType.Interface(Type)]]></releaseNotes>
+    <releaseNotes><![CDATA[* See http://github.com/graphql-dotnet/graphql-dotnet/blob/master/upgrade-guides/v0.8.0.md for more information.
+* The core language has been revamed to provide additional metadata such as line numbers and AST types.
+* Coerce on Scalar types has been replaced by parseValue, parseLiteral, and serialize.
+* Several fixes around the use of enums.
+
+These language updates should allow the Validation feature to be completed.]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
