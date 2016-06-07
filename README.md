@@ -139,7 +139,7 @@ Console.Writeline(result);
 - [x] Async execution
 
 ### Validation
-- Not started
+- In progress
 
 ### Schema Introspection
 - [x] __typename
