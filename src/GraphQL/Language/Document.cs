@@ -18,7 +18,7 @@ namespace GraphQL.Language
             _definitions.Add(definition);
         }
 
-        public IEnumerable<IDefinition> Definitions => _definitions;
+        public override IEnumerable<INode> Children => _definitions;
 
         public Operations Operations { get; }
 

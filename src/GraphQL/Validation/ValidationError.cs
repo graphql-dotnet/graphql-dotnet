@@ -1,24 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GraphQL.Language;
 
 namespace GraphQL.Validation
 {
-    abstract class ValidationError : ExecutionError
+    public class ValidationError : ExecutionError
     {
-        
-        public abstract string ErrorCode { get; }
-        
-        public ValidationError(string message) : base(message)
+        private readonly List<INode> _nodes = new List<INode>();
+
+        public ValidationError(string errorCode, string message, params INode[] nodes)
+            : this(errorCode, message, null, nodes)
         {
         }
 
-        public ValidationError(string message, Exception innerException) : base(message, innerException)
+        public ValidationError(
+            string errorCode,
+            string message,
+            Exception innerException,
+            params INode[] nodes)
+            : base(message, innerException)
         {
+            ErrorCode = errorCode;
+
+            if (nodes != null)
+            {
+                _nodes.AddRange(nodes);
+            }
         }
 
-        
+        public string ErrorCode { get; }
+
+        public IEnumerable<INode> Nodes => _nodes;
     }
 }

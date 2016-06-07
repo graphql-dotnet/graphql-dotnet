@@ -12,7 +12,7 @@ namespace GraphQL.Language
 
         public Arguments Arguments { get; set; }
 
-        public Selections Selections { get; set; }
+        public SelectionSet SelectionSet { get; set; }
 
         public override IEnumerable<INode> Children
         {
@@ -34,12 +34,9 @@ namespace GraphQL.Language
                     }
                 }
 
-                if (Selections != null)
+                if (SelectionSet != null)
                 {
-                    foreach (var selection in Selections)
-                    {
-                        yield return selection;
-                    }
+                    yield return SelectionSet;
                 }
             }
         }
@@ -47,7 +44,7 @@ namespace GraphQL.Language
         public override string ToString()
         {
             return "Field{{name='{0}', alias='{1}', arguments={2}, directives={3}, selectionSet={4}}}"
-                .ToFormat(Name, Alias, Arguments, Directives, Selections);
+                .ToFormat(Name, Alias, Arguments, Directives, SelectionSet);
         }
 
         protected bool Equals(Field other)

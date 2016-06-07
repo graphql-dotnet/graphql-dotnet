@@ -8,37 +8,54 @@ namespace GraphQL.Validation
 {
     public interface IDocumentValidator
     {
-        List<IValidationRule> Rules(ISchema schema, Document document);
-        IValidationResult IsValid(ISchema schema, Document document, string operationName);
+        IValidationResult Validate(
+            ISchema schema,
+            Document document,
+            IEnumerable<IValidationRule> rules = null);
     }
 
     public class DocumentValidator : IDocumentValidator
     {
-        public List<IValidationRule> Rules(ISchema schema, Document docoment)
+        public IValidationResult Validate(
+            ISchema schema,
+            Document document,
+            IEnumerable<IValidationRule> rules = null)
         {
-            List<IValidationRule> rules = new List<IValidationRule>()
+            var context = new ValidationContext
             {
-                new OperationNameUniquenessRule(),
-                new LoneAnonymousOperationRule()
+                Schema = schema,
+                Document = document,
+                TypeInfo = new TypeInfo(schema)
             };
-            return rules;
-        }
 
-        public IValidationResult IsValid(Schema schema, Document document, string operationName)
-        {
-            var result = new ValidationResult();
-            var rules = Rules(schema, document);
-
-            List<ExecutionError> errors = new List<ExecutionError>(rules.Count);
-
-            foreach (IValidationRule rule in rules)
+            if (rules == null)
             {
-                List<ExecutionError> newErrors = rule.Validate(schema, document, operationName);
-                if (newErrors != null)
-                    errors.AddRange(newErrors);
+//                rules = Rules();
+                rules = new List<IValidationRule>();
             }
 
+            var visitors = rules.Select(x => x.Validate(context)).ToList();
+
+            visitors.Insert(0, context.TypeInfo);
+
+            var basic = new BasicVisitor(visitors);
+
+            basic.Visit(document);
+
+            var result = new ValidationResult();
+            result.Errors.AddRange(context.Errors);
             return result;
+        }
+
+        private List<IValidationRule> Rules()
+        {
+            var rules = new List<IValidationRule>()
+            {
+                new UniqueOperationNames(),
+                new LoneAnonymousOperationRule(),
+                new ScalarLeafs()
+            };
+            return rules;
         }
     }
 }

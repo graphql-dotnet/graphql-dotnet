@@ -19,7 +19,7 @@ namespace GraphQL.Language
 
         public VariableDefinitions Variables { get; set; }
 
-        public Selections Selections { get; set; }
+        public SelectionSet SelectionSet { get; set; }
 
         public override IEnumerable<INode> Children
         {
@@ -35,17 +35,14 @@ namespace GraphQL.Language
                     yield return directive;
                 }
 
-                foreach (var selection in Selections)
-                {
-                    yield return selection;
-                }
+                yield return SelectionSet;
             }
         }
 
         public override string ToString()
         {
             return "OperationDefinition{{name='{0}', operation={1}, variableDefinitions={2}, directives={3}, selectionSet={4}}}"
-                .ToFormat(Name, OperationType, Variables, Directives, Selections);
+                .ToFormat(Name, OperationType, Variables, Directives, SelectionSet);
         }
 
         protected bool Equals(Operation other)

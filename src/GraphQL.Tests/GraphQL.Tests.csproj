@@ -95,6 +95,7 @@
     <Compile Include="Types\Relay\EdgeTypeTests.cs" />
     <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
+    <Compile Include="Validation\ScalarLeafTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">

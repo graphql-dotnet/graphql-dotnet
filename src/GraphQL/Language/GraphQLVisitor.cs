@@ -358,7 +358,7 @@ namespace GraphQL.Language
 
             if (context.selectionSet() != null)
             {
-                fragment.Selections = Visit(context.selectionSet()) as Selections;
+                fragment.SelectionSet = Visit(context.selectionSet()) as SelectionSet;
             }
 
             return fragment;
@@ -385,8 +385,8 @@ namespace GraphQL.Language
             var selectionContext = context.selectionSet();
             if (selectionContext != null)
             {
-                var selections = Visit(selectionContext) as Selections;
-                fragmentDefinition.Selections = selections;
+                var selections = Visit(selectionContext) as SelectionSet;
+                fragmentDefinition.SelectionSet = selections;
             }
 
             return fragmentDefinition;
@@ -420,7 +420,7 @@ namespace GraphQL.Language
 
             if (context.selectionSet() != null)
             {
-                field.Selections = Visit(context.selectionSet()) as Selections;
+                field.SelectionSet = Visit(context.selectionSet()) as SelectionSet;
             }
 
             return field;
@@ -428,7 +428,8 @@ namespace GraphQL.Language
 
         public override object VisitSelectionSet(GraphQLParser.SelectionSetContext context)
         {
-            var selections = new Selections();
+            var selections = new SelectionSet();
+            NewNode(selections, context);
 
             foreach (var selectionContext in context.selection())
             {
@@ -464,7 +465,7 @@ namespace GraphQL.Language
             var operation = new Operation();
 
             operation.Name = context.NAME() != null ? context.NAME().GetText() : "";
-            operation.Selections = Visit(context.selectionSet()) as Selections;
+            operation.SelectionSet = Visit(context.selectionSet()) as SelectionSet;
 
             if (context.operationType() != null)
             {
@@ -502,7 +503,7 @@ namespace GraphQL.Language
                 }
                 else
                 {
-                    throw new Exception("Unhandled document definition");
+                    throw new ExecutionError("Unhandled document definition");
                 }
             });
 

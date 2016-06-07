@@ -15,7 +15,7 @@ namespace GraphQL.Language
 
         public Directives Directives { get; set; }
 
-        public Selections Selections { get; set; }
+        public SelectionSet SelectionSet { get; set; }
 
         public override IEnumerable<INode> Children
         {
@@ -28,17 +28,14 @@ namespace GraphQL.Language
                     yield return directive;
                 }
 
-                foreach (var selection in Selections)
-                {
-                    yield return selection;
-                }
+                yield return SelectionSet;
             }
         }
 
         public override string ToString()
         {
             return "FragmentDefinition{{name='{0}', typeCondition={1}, directives={2}, selectionSet={3}}}"
-                .ToFormat(Name, Type, Directives, Selections);
+                .ToFormat(Name, Type, Directives, SelectionSet);
         }
 
         protected bool Equals(FragmentDefinition other)

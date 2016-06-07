@@ -1,45 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphQL.Language;
-using GraphQL.Types;
+﻿using GraphQL.Language;
 
 namespace GraphQL.Validation.Rules
 {
-
-    class LoneAnonymousOperationError : ValidationError
+    /// <summary>
+    /// Lone anonymous operation
+    /// 
+    /// A GraphQL document is only valid if when it contains an anonymous operation
+    /// (the query short-hand) that it contains only that one operation definition.
+    /// </summary>
+    public class LoneAnonymousOperationRule : IValidationRule
     {
-        public LoneAnonymousOperationError(string message)
-            : base(message)
+        public INodeVisitor Validate(ValidationContext context)
         {
-        }
+            var operationCount = context.Document.Operations.Count;
 
-        public LoneAnonymousOperationError(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
-
-        public override string ErrorCode
-        {
-            get { return "5.1.2.1"; }
-        }
-    }
-
-    class LoneAnonymousOperationRule : IValidationRule
-    {
-        public List<ExecutionError> Validate(Schema schema, Document document, string operationName)
-        {
-
-            if (string.IsNullOrWhiteSpace(operationName)
-                && document.Operations.Count() > 1)
-            {
-                return new List<ExecutionError>( ){
-                    new LoneAnonymousOperationError( "Must provide operation name if query contains multiple operations")
-                };
-            }
-            return null;
+            return new NodeVisitorMatchFuncListener<Operation>(
+                n => n is Operation,
+                op =>
+                {
+                    if (string.IsNullOrWhiteSpace(op.Name)
+                        && operationCount > 1)
+                    {
+                        context.ReportError(
+                            new ValidationError(
+                                "5.1.2.1",
+                                "This anonymous operation must be the only defined operation.",
+                                op
+                                ));
+                    }
+                });
         }
     }
 }
