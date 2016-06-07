@@ -35,8 +35,6 @@ namespace GraphQL.Validation
 
         public void Enter(INode node)
         {
-//            System.Diagnostics.Debug.WriteLine($"Entering: {node}");
-
             if (node is Operation)
             {
                 var op = (Operation) node;
@@ -84,8 +82,6 @@ namespace GraphQL.Validation
 
         public void Leave(INode node)
         {
-//            System.Diagnostics.Debug.WriteLine($"Leaving: {node}");
-
             if (node is Operation
                 || node is FragmentDefinition)
             {

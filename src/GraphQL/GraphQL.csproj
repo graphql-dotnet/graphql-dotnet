@@ -119,6 +119,7 @@
     <Compile Include="Types\TypeExtensions.cs" />
     <Compile Include="Types\UnionGraphType.cs" />
     <Compile Include="Utilities\SchemaPrinter.cs" />
+    <Compile Include="Validation\DebugNodeVisitor.cs" />
     <Compile Include="Validation\DocumentValidator.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Execution\IDocumentBuilder.cs" />
