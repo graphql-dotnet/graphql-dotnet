@@ -96,6 +96,11 @@ namespace GraphQL.Types
 
         public GraphType FindType(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
+            }
+
             return _lookup.Value[name];
         }
 

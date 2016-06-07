@@ -36,7 +36,20 @@ namespace GraphQL.Types
         {
             if (Arguments.ContainsKey(name))
             {
-                return (TType) Arguments[name];
+                var arg = Arguments[name];
+                var inputObject = arg as Dictionary<string, object>;
+                if (inputObject != null)
+                {
+                    var type = typeof(TType);
+                    if (type.Namespace?.StartsWith("System") == true)
+                    {
+                        return (TType)arg;
+                    }
+
+                    return (TType)inputObject.ToObject(typeof(TType));
+                }
+
+                return (TType) arg;
             }
 
             return default(TType);

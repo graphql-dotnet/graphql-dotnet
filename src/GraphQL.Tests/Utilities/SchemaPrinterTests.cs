@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Should;
@@ -552,7 +553,17 @@ type __Type {
                 Name = "Odd";
             }
 
-            public override object Coerce(object value)
+            public override object Serialize(object value)
+            {
+                return null;
+            }
+
+            public override object ParseValue(object value)
+            {
+                return null;
+            }
+
+            public override object ParseLiteral(IValue value)
             {
                 return null;
             }

@@ -56,6 +56,8 @@
     <Compile Include="Builders\ConnectionBuilderTests.cs" />
     <Compile Include="Builders\FieldBuilderTests.cs" />
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
+    <Compile Include="Execution\AstFromValueTests.cs" />
+    <Compile Include="Execution\EnumAsInputsTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
     <Compile Include="Execution\InputConversionTests.cs" />
     <Compile Include="Execution\MutationTests.cs" />

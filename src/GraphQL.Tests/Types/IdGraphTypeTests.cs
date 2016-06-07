@@ -10,19 +10,19 @@ namespace GraphQL.Tests.Types
         [Test]
         public void coerces_null_to_null()
         {
-            type.Coerce(null).ShouldEqual(null);
+            type.ParseValue(null).ShouldEqual(null);
         }
 
         [Test]
         public void coerces_string_to_identifier()
         {
-            type.Coerce("abcd").ShouldEqual("abcd");
+            type.ParseValue("abcd").ShouldEqual("abcd");
         }
 
         [Test]
         public void coerces_quoted_string_to_identifier()
         {
-            type.Coerce("\"12345\"").ShouldEqual("12345");
+            type.ParseValue("\"12345\"").ShouldEqual("12345");
         }
     }
 }

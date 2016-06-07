@@ -17,7 +17,7 @@
         {
             var query = @"
                 query IntrospectionDroidKindQuery {
-                  __type(name: 'Droid') {
+                  __type(name: ""Droid"") {
                     name,
                     kind
                   }

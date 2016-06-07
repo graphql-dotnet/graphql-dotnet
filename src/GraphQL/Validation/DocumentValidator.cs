@@ -18,7 +18,12 @@ namespace GraphQL.Validation
             if (string.IsNullOrWhiteSpace(operationName)
                 && document.Operations.Count() > 1)
             {
-                result.Errors.Add(new ExecutionError("Must provide operation name if query contains multiple operations"));
+                var operation = document.Operations.Take(2).Last();
+
+                var error = new ExecutionError("Must provide operation name if query contains multiple operations");
+                error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+
+                result.Errors.Add(error);
             }
 
             return result;

@@ -1,3 +1,5 @@
+using GraphQL.Language;
+
 namespace GraphQL.Types
 {
     public class StringGraphType : ScalarGraphType
@@ -7,9 +9,21 @@ namespace GraphQL.Types
             Name = "String";
         }
 
-        public override object Coerce(object value)
+        public override object Serialize(object value)
+        {
+            return ParseValue(value);
+        }
+
+        public override object ParseValue(object value)
         {
             return value != null ? ProcessString(value.ToString()) : null;
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            var stringValue = value as StringValue;
+
+            return stringValue != null && stringValue.Value != null ? ProcessString(stringValue.Value) : null;
         }
 
         private string ProcessString(string value)

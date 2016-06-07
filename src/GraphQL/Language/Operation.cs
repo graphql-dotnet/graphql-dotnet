@@ -1,12 +1,14 @@
+using System.Collections.Generic;
+
 namespace GraphQL.Language
 {
-    public class Operation
+    public class Operation : AbstractNode, IDefinition
     {
         public Operation()
         {
             OperationType = OperationType.Query;
             Directives = new Directives();
-            Variables = new Variables();
+            Variables = new VariableDefinitions();
         }
 
         public string Name { get; set; }
@@ -15,8 +17,48 @@ namespace GraphQL.Language
 
         public Directives Directives { get; set; }
 
-        public Variables Variables { get; set; }
+        public VariableDefinitions Variables { get; set; }
 
         public Selections Selections { get; set; }
+
+        public override IEnumerable<INode> Children
+        {
+            get
+            {
+                foreach (var variable in Variables)
+                {
+                    yield return variable;
+                }
+
+                foreach (var directive in Directives)
+                {
+                    yield return directive;
+                }
+
+                foreach (var selection in Selections)
+                {
+                    yield return selection;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return "OperationDefinition{{name='{0}', operation={1}, variableDefinitions={2}, directives={3}, selectionSet={4}}}"
+                .ToFormat(Name, OperationType, Variables, Directives, Selections);
+        }
+
+        protected bool Equals(Operation other)
+        {
+            return string.Equals(Name, other.Name) && OperationType == other.OperationType;
+        }
+
+        public override bool IsEqualTo(INode node)
+        {
+            if (ReferenceEquals(null, node)) return false;
+            if (ReferenceEquals(this, node)) return true;
+            if (node.GetType() != this.GetType()) return false;
+            return Equals((Operation) node);
+        }
     }
 }

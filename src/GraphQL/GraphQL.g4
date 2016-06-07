@@ -1,204 +1,149 @@
 /*
-The MIT License (MIT)
+    GraphQL grammar derived from:
 
-Copyright (c) 2015 Joseph T. McBride
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-GraphQL grammar derived from:
-
-    GraphQL Draft Specification - July 2015
+    GraphQL Draft Specification - October 2015
 
     http://facebook.github.io/graphql/
     https://github.com/facebook/graphql
-
+    https://github.com/andimarek/graphql-java/blob/master/src/main/grammar/Graphql.g4
 */
 
 grammar GraphQL;
 
-document
-    : definition+
-    ;
+// Document
 
-definition
-    : operationDefinition
-    | fragmentDefinition
-    ;
+document : definition+;
 
-operationDefinition
-    :   selectionSet
-    |   operationType NAME variableDefinitions? directives? selectionSet
-    ;
-
-selectionSet
-    :   '{' selection+ '}'
-    ;
-
-operationType
-    :   'query'
-    |   'mutation'
-    ;
-
-selection
-    :   field
-    |   fragmentSpread
-    |   inlineFragment
-    ;
-
-field
-    :   fieldName arguments? directives? selectionSet?
-    ;
-
-fieldName
-    :   alias
-    |   NAME
-    ;
-
-alias
-    :   NAME ':' NAME
-    ;
-
-arguments
-    :   '(' argument+ ')'
-    ;
-
-argument
-    :   NAME ':' valueOrVariable
-    ;
-
-fragmentSpread
-    :   '...' fragmentName directives?
-    ;
-
-inlineFragment
-    :   '...' 'on' typeCondition directives? selectionSet
-    ;
-
+definition:
+operationDefinition |
 fragmentDefinition
-    :   'fragment' fragmentName 'on' typeCondition directives? selectionSet
-    ;
+;
 
-fragmentName
-    :   NAME
-    ;
+operationDefinition:
+selectionSet |
+operationType  NAME? variableDefinitions? directives? selectionSet;
 
-directives
-    :   directive+
-    ;
+operationType : 'query' | 'mutation';
 
-directive
-    :   '@' NAME arguments?
-    ;
+variableDefinitions : '(' variableDefinition+ ')';
 
-typeCondition
-    :   typeName
-    ;
+variableDefinition : variable ':' type defaultValue?;
 
-variableDefinitions
-    :   '(' variableDefinition+ ')'
-    ;
+variable : '$' NAME;
 
-variableDefinition
-    :   variable ':' type defaultValue?
-    ;
+defaultValue : '=' value;
 
-variable
-    :   '$' NAME
-    ;
+// Operations
 
-defaultValue
-    :   '=' value
-    ;
+selectionSet :  '{' selection+ '}';
 
-valueOrVariable
-    :   STRING
-    |   NUMBER
-    |   BOOLEAN
-    |   variable
-    |   enum
-    |   arrayWithVariable
-    |   objectWithVariable
-    ;
+selection :
+field |
+fragmentSpread |
+inlineFragment;
 
-value
-    :   STRING
-    |   NUMBER
-    |   BOOLEAN
-    |   enum
-    |   array
-    |   object
-    ;
+field : alias? NAME arguments? directives? selectionSet?;
 
-type
-    :   typeName nonNullType?
-    |   listType nonNullType?
-    ;
+alias : NAME ':';
 
-typeName
-    :   NAME
-    ;
+arguments : '(' argument+ ')';
 
-enum
-    :   NAME
-    ;
+argument : NAME ':' valueWithVariable;
 
-listType
-    :   '[' type ']'
-    ;
+// Fragments
 
-nonNullType
-    : '!'
-    ;
+fragmentSpread : '...' fragmentName directives?;
 
-object
-    :   '{' pair* '}'
-    ;
+inlineFragment : '...' 'on' typeCondition directives? selectionSet;
 
-objectWithVariable
-    :   '{' pairWithVariable* '}'
-    ;
+fragmentDefinition : 'fragment' fragmentName 'on' typeCondition directives? selectionSet;
 
-pair:   NAME ':' value ;
+fragmentName :  NAME;
 
-pairWithVariable:   NAME ':' valueOrVariable ;
+typeCondition : typeName;
 
-array
-    :   '[' value* ']'
-    ;
+// Value
 
-arrayWithVariable
-    :   '[' valueOrVariable* ']'
-    ;
 
-NAME : [_A-Za-z][_0-9A-Za-z]* ;
-STRING :  '"' (ESC | ~["\\])* '"' ;
-BOOLEAN : 'true' | 'false' ;
-fragment ESC :   '\\' (["\\/bfnrt] | UNICODE) ;
-fragment UNICODE : 'u' HEX HEX HEX HEX ;
-fragment HEX : [0-9a-fA-F] ;
-NUMBER
-    :   '-'? INT '.' [0-9]+ EXP? // 1.35, 1.35E-9, 0.3, -4.5
-    |   '-'? INT EXP             // 1e10 -3e4
-    |   '-'? INT                 // -3, 45
-    ;
-fragment INT :   '0' | [1-9] [0-9]* ; // no leading zeros
-fragment EXP :   [Ee] [+\-]? INT ; // \- since - means "range" inside [...]
-WS  :   [ \t\n\r]+ -> skip ;
-COMMA  :   [,]+ -> skip ;
-COMMENT  :   '#' ~[\r\n\u2028\u2029]* -> skip ;
+value :
+IntValue |
+FloatValue |
+StringValue |
+BooleanValue |
+enumValue |
+arrayValue |
+objectValue;
+
+valueWithVariable :
+variable |
+IntValue |
+FloatValue |
+StringValue |
+BooleanValue |
+enumValue |
+arrayValueWithVariable |
+objectValueWithVariable;
+
+
+enumValue : NAME ;
+
+// Array Value
+
+arrayValue: '[' value* ']';
+
+arrayValueWithVariable: '[' valueWithVariable* ']';
+
+
+// Object Value
+
+objectValue: '{' objectField* '}';
+objectValueWithVariable: '{' objectFieldWithVariable* '}';
+objectField : NAME ':' value;
+objectFieldWithVariable : NAME ':' valueWithVariable;
+
+// Directives
+
+directives : directive+;
+
+directive :'@' NAME arguments?;
+
+// Types
+
+type : typeName | listType | nonNullType;
+
+typeName : NAME;
+listType : '[' type ']';
+nonNullType: typeName '!' | listType '!';
+
+
+
+// Token
+
+BooleanValue: 'true' | 'false';
+
+NAME: [_A-Za-z][_0-9A-Za-z]* ;
+
+IntValue : Sign? IntegerPart;
+
+FloatValue : Sign? IntegerPart ('.' Digit+)? ExponentPart?;
+
+Sign : '-';
+
+IntegerPart : '0' | NonZeroDigit | NonZeroDigit Digit+;
+
+NonZeroDigit: '1'.. '9';
+
+ExponentPart : ('e'|'E') Sign? Digit+;
+
+Digit : '0'..'9';
+
+
+StringValue: '"' (~(["\\\n\r\u2028\u2029])|EscapedChar)* '"';
+fragment EscapedChar :   '\\' (["\\/bfnrt] | Unicode) ;
+fragment Unicode : 'u' Hex Hex Hex Hex ;
+fragment Hex : [0-9a-fA-F] ;
+Ignored: (Whitspace|Comma|LineTerminator|Comment) -> skip;
+fragment Comment: '#' ~[\n\r\u2028\u2029]*;
+fragment LineTerminator: [\n\r\u2028\u2029];
+fragment Whitspace : [\t\u000b\f\u0020\u00a0];
+fragment Comma : ',';

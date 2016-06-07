@@ -1,17 +1,20 @@
-namespace GraphQL.Language
+﻿namespace GraphQL.Language
 {
-    public class Directive : AbstractNode
+    public class NamedType : AbstractNode, IType
     {
-        public string Name { get; set; }
+        public NamedType(string name)
+        {
+            Name = name;
+        }
 
-        public Arguments Arguments { get; set; }
+        public string Name { get; }
 
         public override string ToString()
         {
-            return "Directive{{name='{0}',arguments={1}}}".ToFormat(Name, Arguments);
+            return "NamedType{{name={0}}}".ToFormat(Name);
         }
 
-        protected bool Equals(Directive other)
+        protected bool Equals(NamedType other)
         {
             return string.Equals(Name, other.Name);
         }
@@ -21,7 +24,8 @@ namespace GraphQL.Language
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Directive) obj);
+
+            return Equals((NamedType) obj);
         }
     }
 }

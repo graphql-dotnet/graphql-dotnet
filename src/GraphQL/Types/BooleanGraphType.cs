@@ -1,3 +1,5 @@
+using GraphQL.Language;
+
 namespace GraphQL.Types
 {
     public class BooleanGraphType : ScalarGraphType
@@ -7,7 +9,17 @@ namespace GraphQL.Types
             Name = "Boolean";
         }
 
-        public override object Coerce(object value)
+        public override object Serialize(object value)
+        {
+            if (value is bool)
+            {
+                return (bool) value;
+            }
+
+            return false;
+        }
+
+        public override object ParseValue(object value)
         {
             if (value != null)
             {
@@ -24,6 +36,12 @@ namespace GraphQL.Types
             }
 
             return null;
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            var boolVal = value as BooleanValue;
+            return boolVal?.Value;
         }
     }
 }

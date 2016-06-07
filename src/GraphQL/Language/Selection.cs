@@ -1,9 +1,6 @@
 namespace GraphQL.Language
 {
-    public class Selection
+    public interface ISelection : INode
     {
-        public Field Field { get; set; }
-
-        public IFragment Fragment { get; set; }
     }
 }
