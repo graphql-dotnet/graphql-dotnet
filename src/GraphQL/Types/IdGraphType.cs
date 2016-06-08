@@ -29,7 +29,7 @@ namespace GraphQL.Types
             var str = value as StringValue;
             if (str != null)
             {
-                return str.Value;
+                return ParseValue(str.Value);
             }
 
             var num = value as IntValue;
