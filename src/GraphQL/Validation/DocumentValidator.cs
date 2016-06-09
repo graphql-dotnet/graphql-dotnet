@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -36,8 +37,11 @@ namespace GraphQL.Validation
             var visitors = rules.Select(x => x.Validate(context)).ToList();
 
             visitors.Insert(0, context.TypeInfo);
+#if DEBUG
+            visitors.Insert(1, new DebugNodeVisitor());
+#endif
 
-            var basic = new BasicVisitor(visitors);
+            var basic = new BasicVisitor(visitors.ToArray());
 
             basic.Visit(document);
 
@@ -50,6 +54,7 @@ namespace GraphQL.Validation
         {
             var rules = new List<IValidationRule>()
             {
+                new ArgumentsOfCorrectType(),
                 new UniqueOperationNames(),
                 new LoneAnonymousOperationRule(),
                 new ScalarLeafs()

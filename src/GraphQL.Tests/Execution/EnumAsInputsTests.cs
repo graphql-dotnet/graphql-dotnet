@@ -28,6 +28,30 @@ namespace GraphQL.Tests.Execution
                  }
                 }");
         }
+
+        [Test]
+        public void mutation_input_from_variables()
+        {
+            var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
+
+            AssertQuerySuccess(
+                @"
+                mutation createUser($userInput: UserInput!) {
+                  createUser(userInput: $userInput){
+                    id
+                    gender
+                    profileImage
+                  }
+                }
+                ",
+                @"{
+                'createUser': {
+                  'id': 1,
+                  'gender': 'Female',
+                  'profileImage': 'myimage.png'
+                 }
+                }", inputs);
+        }
     }
 
     public class EnumMutationSchema : Schema
@@ -70,13 +94,10 @@ namespace GraphQL.Tests.Execution
 
             Field<UserType>("createUser", "create user api",
                 new QueryArguments(
-                    new QueryArgument[]
+                    new QueryArgument<NonNullGraphType<UserInputType>>
                     {
-                        new QueryArgument<NonNullGraphType<UserInputType>>
-                        {
-                            Name = "userInput",
-                            Description = "user info details"
-                        }
+                        Name = "userInput",
+                        Description = "user info details"
                     }
                 ),
                 context =>

@@ -8,7 +8,7 @@ namespace GraphQL.Validation
     {
         private readonly IEnumerable<INodeVisitor> _visitors;
 
-        public BasicVisitor(IEnumerable<INodeVisitor> visitors)
+        public BasicVisitor(params INodeVisitor[] visitors)
         {
             _visitors = visitors;
         }

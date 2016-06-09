@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace GraphQL.Language
 {
     public class Directive : AbstractNode
@@ -5,6 +7,11 @@ namespace GraphQL.Language
         public string Name { get; set; }
 
         public Arguments Arguments { get; set; }
+
+        public override IEnumerable<INode> Children
+        {
+            get { yield return Arguments; }
+        }
 
         public override string ToString()
         {

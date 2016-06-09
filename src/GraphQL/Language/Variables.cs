@@ -40,17 +40,6 @@ namespace GraphQL.Language
             _variables.Add(variable);
         }
 
-        public object ValueFor(string name)
-        {
-            throw new NotImplementedException();
-//            var variable = _variables.FirstOrDefault(v => v.Name == name);
-//            if (variable == null)
-//            {
-//                return null;
-//            }
-//            return variable.Value ?? variable.DefaultValue;
-        }
-
         public IEnumerator<VariableDefinition> GetEnumerator()
         {
             return _variables.GetEnumerator();

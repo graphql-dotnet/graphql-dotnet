@@ -20,18 +20,12 @@ namespace GraphQL.Language
             {
                 if (Arguments != null)
                 {
-                    foreach (var argument in Arguments)
-                    {
-                        yield return argument;
-                    }
+                    yield return Arguments;
                 }
 
                 if (Directives != null)
                 {
-                    foreach (var directive in Directives)
-                    {
-                        yield return directive;
-                    }
+                    yield return Directives;
                 }
 
                 if (SelectionSet != null)

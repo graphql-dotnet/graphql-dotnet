@@ -119,14 +119,23 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
         {
             Field<StringGraphType>(
                 "name",
-                arguments: new QueryArguments(new[]
-                {
-                    new QueryArgument<BooleanGraphType>
-                    {
-                        Name = "surname"
-                    }
-                }));
+                arguments: new QueryArguments(
+                    new QueryArgument<BooleanGraphType> {Name = "surname"}
+                ));
             Field<IntGraphType>("iq");
+        }
+    }
+
+    public class ComplicatedArgs : ObjectGraphType
+    {
+        public ComplicatedArgs()
+        {
+            Name = "ComplicatedArgs";
+            Field<StringGraphType>(
+                "intArgField",
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> {Name = "intArg"}
+                ));
         }
     }
 
@@ -136,15 +145,15 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
         {
             Field<Human>(
                 "human",
-                arguments: new QueryArguments(new[]
-                {
+                arguments: new QueryArguments(
                     new QueryArgument<IdGraphType>
                     {
                         Name = "id"
                     }
-                }));
+                ));
             Field<Dog>("dog");
             Field<Cat>("cat");
+            Field<ComplicatedArgs>("complicatedArgs");
         }
     }
 

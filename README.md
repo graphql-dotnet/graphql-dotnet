@@ -143,10 +143,30 @@ Console.Writeline(result);
 - [x] Async execution
 
 ### Validation
-- In progress
-- [x] Unique operation names
+- [x] Arguments of correct type - *additional test coverage needed*
+- [ ] Default values of correct type
+- [ ] Fields on correct type
+- [ ] Fragments on composite type
+- [ ] Known argument names
+- [ ] Known directives
+- [ ] Known fragment names
+- [ ] Known type names
 - [x] Lone anonymous operations
-- [x] Scalar leafs
+- [ ] No fragment cycle
+- [ ] No undefined variables
+- [ ] No unused fragments
+- [ ] No unused variables
+- [ ] Overlapping fields can be merged
+- [ ] Possible fragment spreads
+- [ ] Provide non-null arguments
+- [x] Scalar leafs - *additional test coverage needed*
+- [ ] Unique argument names
+- [ ] Unique fragment names
+- [ ] Unique input field names
+- [x] Unique operation names
+- [ ] Unique variable names
+- [ ] Variables are input types
+- [ ] Variables in allowed position
 
 ### Schema Introspection
 - [x] __typename
@@ -164,4 +184,5 @@ Console.Writeline(result);
   - [x] types
   - [x] queryType
   - [x] mutationType
+  - [ ] subscriptionType
   - [x] directives
