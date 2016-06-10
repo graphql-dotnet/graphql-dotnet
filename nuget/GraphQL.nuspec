@@ -2,20 +2,18 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.8.2.0</version>
+    <version>0.9.0.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* Fixes a bug with EnumerationGraphType and input variables
-* Fixes a bug where float values would not be created
-* Add ArgumentsOfCorrectType validation rule
-* Add AstPrinter
-* Add overload to DocumentExecutor where validation rules can be provided
-* Refactor ToObject to support enums, guids, nullable lists, and nested lists
-* Add overload to QueryArguments which takes params]]></releaseNotes>
+    <releaseNotes><![CDATA[* Change how types are registered - only register the root type, not every permutation
+* When a ListGraphType or NonNullGraphType type is requested via FindType, that type is created on the fly.
+* Attempt to trim list/non-null type names when finding type by name
+* Provide public list of core rules
+* Fix a bug where Schema would not properly dispose]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
