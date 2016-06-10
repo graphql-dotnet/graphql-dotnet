@@ -72,7 +72,6 @@ namespace GraphQL.Types
                 return _lookup
                     .Value
                     .All()
-                    .Where(x => !(x is NonNullGraphType || x is ListGraphType))
                     .ToList();
             }
         }
@@ -109,6 +108,15 @@ namespace GraphQL.Types
             if (type == null)
             {
                 return null;
+            }
+
+            if (type.IsGenericType)
+            {
+                var genericDef = type.GetGenericTypeDefinition();
+                if (genericDef == typeof(ListGraphType<>) || genericDef == typeof(NonNullGraphType<>))
+                {
+                    return (GraphType) Activator.CreateInstance(type);
+                }
             }
 
             return _lookup.Value[type] ?? AddType(type);
@@ -148,7 +156,7 @@ namespace GraphQL.Types
 
         private GraphTypesLookup CreateTypesLookup()
         {
-            var resolvedTypes = _additionalTypes.Select(ResolveType).ToList();
+            var resolvedTypes = _additionalTypes.Select(t => ResolveType(t.GetNamedType())).ToList();
 
             var types = new List<GraphType>
             {
@@ -174,7 +182,8 @@ namespace GraphQL.Types
                 _lookup.Value.AddType(graphType, context);
             });
 
-            var instance = ResolveType(type);
+            var namedType = type.GetNamedType();
+            var instance = ResolveType(namedType);
             _lookup.Value.AddType(instance, ctx);
             return instance;
         }

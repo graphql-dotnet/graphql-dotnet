@@ -96,12 +96,30 @@ namespace GraphQL.Tests.Types
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
+        [Test]
+        public void registers_only_root_types()
+        {
+            var schema = new ARootSchema();
+            schema.FindType("abcd");
+
+            DoesNotContainTypeNames(schema, "ASchemaType!");
+        }
+
         public void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
             {
                 var type = schema.FindType(typeName);
                 type.ShouldNotBeNull("Did not find {0} in type lookup.".ToFormat(typeName));
+            });
+        }
+
+        public void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
+        {
+            typeNames.Apply(typeName =>
+            {
+                var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
+                type.ShouldEqual(null, "Found {0} in type lookup.".ToFormat(typeName));
             });
         }
     }
@@ -191,6 +209,7 @@ namespace GraphQL.Tests.Types
         public RootSchemaType()
         {
             Field<ASchemaType>("a");
+            Field<NonNullGraphType<ASchemaType>>("nonNullA");
             Field<AUnionType>("union");
         }
     }

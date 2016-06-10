@@ -230,10 +230,6 @@
                   'kind': 'OBJECT'
                 },
                 {
-                  'name': '__Directive',
-                  'kind': 'OBJECT'
-                },
-                {
                   'name': '__TypeKind',
                   'kind': 'ENUM'
                 },
@@ -242,11 +238,15 @@
                   'kind': 'OBJECT'
                 },
                 {
+                  'name': '__InputValue',
+                  'kind': 'OBJECT'
+                },
+                {
                   'name': '__EnumValue',
                   'kind': 'OBJECT'
                 },
                 {
-                  'name': '__InputValue',
+                  'name': '__Directive',
                   'kind': 'OBJECT'
                 },
                 {
@@ -603,73 +603,6 @@
                   ]
                 },
                 {
-                  'kind': 'OBJECT',
-                  'name': '__Directive',
-                  'description': null,
-                  'fields': [
-                    {
-                      'name': 'name',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'description',
-                      'description': null,
-                      'type': {
-                        'name': 'String',
-                        'kind': 'SCALAR'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'args',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onOperation',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onFragment',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    },
-                    {
-                      'name': 'onField',
-                      'description': null,
-                      'type': {
-                        'name': null,
-                        'kind': 'NON_NULL'
-                      },
-                      'isDeprecated': false,
-                      'deprecationReason': null
-                    }
-                  ]
-                },
-                {
                   'kind': 'ENUM',
                   'name': '__TypeKind',
                   'description': 'An enum describing what kind of type a given __Type is.',
@@ -744,6 +677,53 @@
                 },
                 {
                   'kind': 'OBJECT',
+                  'name': '__InputValue',
+                  'description': null,
+                  'fields': [
+                    {
+                      'name': 'name',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'description',
+                      'description': null,
+                      'type': {
+                        'name': 'String',
+                        'kind': 'SCALAR'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'type',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'defaultValue',
+                      'description': null,
+                      'type': {
+                        'name': 'String',
+                        'kind': 'SCALAR'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    }
+                  ]
+                },
+                {
+                  'kind': 'OBJECT',
                   'name': '__EnumValue',
                   'description': null,
                   'fields': [
@@ -791,7 +771,7 @@
                 },
                 {
                   'kind': 'OBJECT',
-                  'name': '__InputValue',
+                  'name': '__Directive',
                   'description': null,
                   'fields': [
                     {
@@ -815,7 +795,7 @@
                       'deprecationReason': null
                     },
                     {
-                      'name': 'type',
+                      'name': 'args',
                       'description': null,
                       'type': {
                         'name': null,
@@ -825,11 +805,31 @@
                       'deprecationReason': null
                     },
                     {
-                      'name': 'defaultValue',
+                      'name': 'onOperation',
                       'description': null,
                       'type': {
-                        'name': 'String',
-                        'kind': 'SCALAR'
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onFragment',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
+                      },
+                      'isDeprecated': false,
+                      'deprecationReason': null
+                    },
+                    {
+                      'name': 'onField',
+                      'description': null,
+                      'type': {
+                        'name': null,
+                        'kind': 'NON_NULL'
                       },
                       'isDeprecated': false,
                       'deprecationReason': null

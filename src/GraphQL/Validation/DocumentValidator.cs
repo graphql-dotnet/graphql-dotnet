@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -31,7 +30,7 @@ namespace GraphQL.Validation
 
             if (rules == null)
             {
-                rules = Rules();
+                rules = CoreRules();
             }
 
             var visitors = rules.Select(x => x.Validate(context)).ToList();
@@ -50,7 +49,7 @@ namespace GraphQL.Validation
             return result;
         }
 
-        private List<IValidationRule> Rules()
+        public static List<IValidationRule> CoreRules()
         {
             var rules = new List<IValidationRule>()
             {
