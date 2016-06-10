@@ -2,6 +2,7 @@
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Validation;
 using Newtonsoft.Json;
 using Should;
 
@@ -162,7 +163,7 @@ namespace GraphQL.Tests.Execution
             ";
             var expected = "{ \"fieldWithObjectInput\": \"null\" }";
 
-            AssertQuerySuccess(query, expected);
+            AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
         }
     }
 
@@ -545,7 +546,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            AssertQuerySuccess(query, expected);
+            AssertQuerySuccess(query, expected, rules:Enumerable.Empty<IValidationRule>());
         }
     }
 }

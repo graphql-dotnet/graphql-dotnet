@@ -46,7 +46,7 @@ namespace GraphQL.Types
                         return (TType)arg;
                     }
 
-                    return (TType)inputObject.ToObject(typeof(TType));
+                    return (TType)inputObject.ToObject(type);
                 }
 
                 return (TType) arg;

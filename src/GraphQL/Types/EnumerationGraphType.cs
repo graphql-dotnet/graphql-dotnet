@@ -39,6 +39,11 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
+            if (value == null)
+            {
+                return null;
+            }
+
             var found = Values.FirstOrDefault(v =>
                 StringComparer.InvariantCultureIgnoreCase.Equals(v.Name, value.ToString()));
             return found?.Value;
@@ -46,8 +51,18 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value)
         {
-            var enumVal = value as EnumValue;
-            return ParseValue(enumVal?.Name);
+            object val = null;
+
+            if (value is EnumValue)
+            {
+                val = ((EnumValue)value).Name;
+            }
+            else if (value is StringValue)
+            {
+                val = ((StringValue)value).Value;
+            }
+
+            return ParseValue(val);
         }
     }
 

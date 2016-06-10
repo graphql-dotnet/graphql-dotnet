@@ -12,19 +12,15 @@ namespace GraphQL.Tests
             Field<HumanType>(
                 "human",
                 arguments: new QueryArguments(
-                    new []
-                    {
-                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
-                    }),
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
+                ),
                 resolve: context => data.GetHumanByIdAsync(context.Argument<string>("id"))
             );
             Field<DroidType>(
                 "droid",
                 arguments: new QueryArguments(
-                    new []
-                    {
-                        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
-                    }),
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+                ),
                 resolve: context => data.GetDroidByIdAsync(context.Argument<string>("id"))
             );
         }

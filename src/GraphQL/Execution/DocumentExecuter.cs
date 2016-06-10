@@ -22,7 +22,8 @@ namespace GraphQL
             string query,
             string operationName,
             Inputs inputs = null,
-            CancellationToken cancellationToken = default(CancellationToken));
+            CancellationToken cancellationToken = default(CancellationToken),
+            IEnumerable<IValidationRule> rules = null);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -47,12 +48,13 @@ namespace GraphQL
             string query,
             string operationName,
             Inputs inputs = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            IEnumerable<IValidationRule> rules = null)
         {
             var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
 
-            var validationResult = _documentValidator.Validate(schema, document);
+            var validationResult = _documentValidator.Validate(schema, document, rules);
 
             if (validationResult.IsValid)
             {

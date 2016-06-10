@@ -10,8 +10,11 @@ namespace GraphQL.Validation
     {
         private readonly ISchema _schema;
         private readonly Stack<GraphType> _typeStack = new Stack<GraphType>();
+        private readonly Stack<GraphType> _inputTypeStack = new Stack<GraphType>();
         private readonly Stack<GraphType> _parentTypeStack = new Stack<GraphType>();
         private readonly Stack<FieldType> _fieldDefStack = new Stack<FieldType>();
+        private DirectiveGraphType _directive;
+        private QueryArgument _argument;
 
         public TypeInfo(ISchema schema)
         {
@@ -31,6 +34,16 @@ namespace GraphQL.Validation
         public FieldType GetFieldDef()
         {
             return _fieldDefStack.Any() ? _fieldDefStack.Peek() : null;
+        }
+
+        public DirectiveGraphType GetDirective()
+        {
+            return _directive;
+        }
+
+        public QueryArgument GetArgument()
+        {
+            return _argument;
         }
 
         public void Enter(INode node)
@@ -78,6 +91,30 @@ namespace GraphQL.Validation
                 _typeStack.Push(targetType);
                 return;
             }
+
+            if (node is Directive)
+            {
+                var directive = (Directive) node;
+                _directive = _schema.Directives.SingleOrDefault(x => x.Name == directive.Name);
+            }
+
+            if (node is Argument)
+            {
+                var argAst = (Argument) node;
+                QueryArgument argDef = null;
+                GraphType argType = null;
+
+                var args = GetDirective() != null ? GetDirective()?.Arguments : GetFieldDef()?.Arguments;
+
+                if (args != null)
+                {
+                    argDef = args.Find(argAst.Name);
+                    argType = _schema.FindType(argDef?.Type);
+                }
+
+                _argument = argDef;
+                _inputTypeStack.Push(argType);
+            }
         }
 
         public void Leave(INode node)
@@ -97,6 +134,17 @@ namespace GraphQL.Validation
             {
                 _fieldDefStack.Pop();
                 _typeStack.Pop();
+            }
+
+            if (node is Directive)
+            {
+                _directive = null;
+            }
+
+            if (node is Argument)
+            {
+                _argument = null;
+                _inputTypeStack.Pop();
             }
         }
 

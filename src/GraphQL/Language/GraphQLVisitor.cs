@@ -107,6 +107,13 @@ namespace GraphQL.Language
                 }
             }
 
+            if (context.FloatValue() != null)
+            {
+                var val = new FloatValue(float.Parse(context.FloatValue().GetText()));
+                NewNode(val, context);
+                return val;
+            }
+
             if (context.BooleanValue() != null)
             {
                 var val = new BooleanValue(bool.Parse(context.BooleanValue().GetText()));
@@ -281,6 +288,7 @@ namespace GraphQL.Language
         public override object VisitArguments(GraphQLParser.ArgumentsContext context)
         {
             var arguments = new Arguments();
+            NewNode(arguments, context);
 
             foreach (var arg in context.argument())
             {
@@ -308,6 +316,7 @@ namespace GraphQL.Language
         public override object VisitDirectives(GraphQLParser.DirectivesContext context)
         {
             var directives = new Directives();
+            NewNode(directives, context);
 
             foreach (var dir in context.directive())
             {

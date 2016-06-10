@@ -67,6 +67,7 @@
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
     <Compile Include="Types\FloatGraphTypeTests.cs" />
     <Compile Include="Types\QueryArgumentTests.cs" />
+    <Compile Include="Utilities\AstPrinterTests.cs" />
     <Compile Include="Utilities\SchemaPrinterTests.cs" />
     <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Types\Relay\EdgeTypeTests.cs" />
     <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
+    <Compile Include="Validation\ArgumentsOfCorrectTypeTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
     <Compile Include="Validation\ValidationErrorAssertion.cs" />
     <Compile Include="Validation\ValidationTestBase.cs" />

@@ -80,14 +80,12 @@ namespace GraphQL.Tests.Execution
             Field<NumberHolderType>(
                 "immediatelyChangeTheNumber",
                 arguments: new QueryArguments(
-                    new QueryArgument[]
+                    new QueryArgument<IntGraphType>
                     {
-                        new QueryArgument<IntGraphType>
-                        {
-                            Name = "newNumber",
-                            DefaultValue = 0
-                        }
-                    }),
+                        Name = "newNumber",
+                        DefaultValue = 0
+                    }
+                ),
                 resolve: context =>
                 {
                     var root = context.Source as Root;
@@ -99,14 +97,12 @@ namespace GraphQL.Tests.Execution
             Field<NumberHolderType>(
                 "promiseToChangeTheNumber",
                 arguments: new QueryArguments(
-                    new QueryArgument[]
+                    new QueryArgument<IntGraphType>
                     {
-                        new QueryArgument<IntGraphType>
-                        {
-                            Name = "newNumber",
-                            DefaultValue = 0
-                        }
-                    }),
+                        Name = "newNumber",
+                        DefaultValue = 0
+                    }
+                ),
                 resolve: context =>
                 {
                     var root = context.Source as Root;
@@ -118,14 +114,12 @@ namespace GraphQL.Tests.Execution
             Field<NumberHolderType>(
                 "failToChangeTheNumber",
                 arguments: new QueryArguments(
-                    new QueryArgument[]
+                    new QueryArgument<IntGraphType>
                     {
-                        new QueryArgument<IntGraphType>
-                        {
-                            Name = "newNumber",
-                            DefaultValue = 0
-                        }
-                    }),
+                        Name = "newNumber",
+                        DefaultValue = 0
+                    }
+                ),
                 resolve: context =>
                 {
                     var root = context.Source as Root;
@@ -137,14 +131,12 @@ namespace GraphQL.Tests.Execution
             Field<NumberHolderType>(
                 "promiseAndFailToChangeTheNumber",
                 arguments: new QueryArguments(
-                    new QueryArgument[]
+                    new QueryArgument<IntGraphType>
                     {
-                        new QueryArgument<IntGraphType>
-                        {
-                            Name = "newNumber",
-                            DefaultValue = 0
-                        }
-                    }),
+                        Name = "newNumber",
+                        DefaultValue = 0
+                    }
+                ),
                 resolve: context =>
                 {
                     var root = context.Source as Root;

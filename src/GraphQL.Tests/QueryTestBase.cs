@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using GraphQL.Execution;
@@ -42,10 +43,11 @@ namespace GraphQL.Tests
             string expected,
             Inputs inputs = null,
             object root = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, cancellationToken);
+            return AssertQuery(query, queryResult, inputs, root, cancellationToken, rules);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -84,9 +86,23 @@ namespace GraphQL.Tests
             return runResult;
         }
 
-        public ExecutionResult AssertQuery(string query, ExecutionResult expectedExecutionResult, Inputs inputs, object root, CancellationToken cancellationToken = default(CancellationToken))
+        public ExecutionResult AssertQuery(
+            string query,
+            ExecutionResult expectedExecutionResult,
+            Inputs inputs,
+            object root,
+            CancellationToken cancellationToken = default(CancellationToken),
+            IEnumerable<IValidationRule> rules = null)
         {
-            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
+            var runResult = Executer.ExecuteAsync(
+                Schema,
+                root, 
+                query,
+                null,
+                inputs,
+                cancellationToken,
+                rules
+                ).Result;
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);

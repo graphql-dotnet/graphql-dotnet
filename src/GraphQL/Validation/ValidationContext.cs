@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using GraphQL.Language;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL.Validation
 {
@@ -22,6 +23,11 @@ namespace GraphQL.Validation
         public void ReportError(ValidationError error)
         {
             _errors.Add(error);
+        }
+
+        public string Print(INode node)
+        {
+            return AstPrinter.Print(node);
         }
     }
 }

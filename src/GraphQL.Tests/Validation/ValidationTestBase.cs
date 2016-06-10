@@ -25,8 +25,6 @@ namespace GraphQL.Tests.Validation
 
             var result = Validate(config.Query, Schema, config.Rules);
 
-            result.IsValid.ShouldBeFalse();
-
             var count = 0;
 
             config.Assertions.Apply(assert =>
@@ -41,6 +39,8 @@ namespace GraphQL.Tests.Validation
                     location.Column.ShouldEqual(assert.Column.Value);
                 }
             });
+
+            result.IsValid.ShouldBeFalse();
         }
 
         protected void ShouldPassRule(Action<ValidationTestConfig> configure)
