@@ -2,19 +2,20 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.8.1.0</version>
+    <version>0.8.2.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* See http://github.com/graphql-dotnet/graphql-dotnet/blob/master/upgrade-guides/v0.8.0.md for more information.
-* The core language has been revamed to provide additional metadata such as line numbers and AST types.
-* Coerce on Scalar types has been replaced by parseValue, parseLiteral, and serialize.
-* Several fixes around the use of enums.
-
-These language updates should allow the Validation feature to be completed.]]></releaseNotes>
+    <releaseNotes><![CDATA[* Fixes a bug with EnumerationGraphType and input variables
+* Fixes a bug where float values would not be created
+* Add ArgumentsOfCorrectType validation rule
+* Add AstPrinter
+* Add overload to DocumentExecutor where validation rules can be provided
+* Refactor ToObject to support enums, guids, nullable lists, and nested lists
+* Add overload to QueryArguments which takes params]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
