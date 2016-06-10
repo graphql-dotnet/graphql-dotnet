@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Http;
-using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -124,11 +123,6 @@ namespace GraphQL.Tests
                 expected = JObject.Parse(result);
             }
             return new ExecutionResult { Data = expected };
-        }
-
-        public ExecutionResult CreateErrorQueryResult()
-        {
-            return new ExecutionResult();
         }
     }
 }

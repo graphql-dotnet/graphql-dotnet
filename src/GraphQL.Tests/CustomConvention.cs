@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Fixie;
+﻿using Fixie;
 
 namespace GraphQL.Tests
 {

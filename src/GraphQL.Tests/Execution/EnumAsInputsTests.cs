@@ -52,13 +52,43 @@ namespace GraphQL.Tests.Execution
                  }
                 }", inputs);
         }
+
+        [Test]
+        public void query_can_get_enum_argument()
+        {
+            AssertQuerySuccess(
+                @"{ user { id, gender, printGender(g: Male) }}",
+                @"{
+                  'user': {
+                    'id': 1,
+                    'gender': 'Male',
+                    'printGender': 'gender: Male'
+                  }
+                }");
+        }
     }
 
     public class EnumMutationSchema : Schema
     {
         public EnumMutationSchema()
         {
+            Query = new UserQuery();
             Mutation = new MutationRoot();
+        }
+    }
+
+    public class UserQuery : ObjectGraphType
+    {
+        public UserQuery()
+        {
+            Field<UserType>(
+                "user",
+                resolve: c => new User
+                {
+                    Id = 1,
+                    Gender = Gender.Male,
+                    ProfileImage = "hello.png"
+                });
         }
     }
 
@@ -121,6 +151,14 @@ namespace GraphQL.Tests.Execution
             Field<IntGraphType>("id");
             Field<StringGraphType>("profileImage");
             Field<GenderEnum>("gender");
+            Field<StringGraphType>(
+                "printGender",
+                arguments: new QueryArguments(new QueryArgument<GenderEnum> {Name = "g"}),
+                resolve: c =>
+                {
+                    var gender = c.Argument<Gender>("g");
+                    return $"gender: {gender}";
+                });
         }
     }
 
