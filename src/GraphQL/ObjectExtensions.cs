@@ -58,6 +58,11 @@ namespace GraphQL
 
             fieldType = Nullable.GetUnderlyingType(fieldType) ?? fieldType;
 
+            if (propertyValue is Dictionary<string, object>)
+            {
+                return ToObject(propertyValue as Dictionary<string, object>, fieldType);
+            }
+
             if (fieldType.IsEnum)
             {
                 if (value == null)

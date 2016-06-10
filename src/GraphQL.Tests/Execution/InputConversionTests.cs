@@ -38,6 +38,23 @@ namespace GraphQL.Tests.Execution
             Three
         }
 
+        public class Parent2
+        {
+            public Parent Input { get; set; }
+        }
+
+        public class Parent
+        {
+            public string A { get; set; }
+            public List<Child> B { get; set; }
+            public string C { get; set; }
+        }
+
+        public class Child
+        {
+            public string A { get; set; }
+        }
+
         [Test]
         public void can_convert_json_to_input_object_and_specific_object()
         {
@@ -200,6 +217,34 @@ namespace GraphQL.Tests.Execution
 
             myInput.ShouldNotBeNull();
             myInput.B.Value.ShouldEqual(Numbers2.Three);
+        }
+
+        [Test]
+        public void can_convert_json_to_input_object_with_child_object_list()
+        {
+            var json = @"{'a': 'foo', 'b':[{'a':'bar'}], 'c': 'baz'}";
+
+            var inputs = json.ToInputs();
+
+            var myInput = inputs.ToObject<Parent>();
+
+            myInput.ShouldNotBeNull();
+            myInput.B.Count.ShouldEqual(1);
+            myInput.B[0].A.ShouldEqual("bar");
+        }
+
+        [Test]
+        public void can_convert_json_to_input_object_with_child_object()
+        {
+            var json = @"{ 'input': {'a': 'foo', 'b':[{'a':'bar'}], 'c': 'baz'}}";
+
+            var inputs = json.ToInputs();
+
+            var myInput = inputs.ToObject<Parent2>();
+
+            myInput.ShouldNotBeNull();
+            myInput.Input.B.Count.ShouldEqual(1);
+            myInput.Input.B[0].A.ShouldEqual("bar");
         }
     }
 }
