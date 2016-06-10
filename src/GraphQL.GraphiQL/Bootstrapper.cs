@@ -1,6 +1,8 @@
 using System.Web.Http.Dependencies;
 using GraphQL.Http;
-using GraphQL.Tests;
+using GraphQL.StarWars;
+using GraphQL.StarWars.IoC;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
 namespace GraphQL.GraphiQL

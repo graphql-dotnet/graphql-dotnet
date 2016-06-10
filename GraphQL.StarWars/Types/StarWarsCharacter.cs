@@ -1,4 +1,4 @@
-namespace GraphQL.Tests
+namespace GraphQL.StarWars.Types
 {
     public abstract class StarWarsCharacter
     {

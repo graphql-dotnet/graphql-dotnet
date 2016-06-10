@@ -1,6 +1,7 @@
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
-namespace GraphQL.Tests
+namespace GraphQL.StarWars
 {
     public class StarWarsQuery : ObjectGraphType
     {

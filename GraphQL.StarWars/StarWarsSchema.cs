@@ -1,7 +1,7 @@
 ﻿using System;
 using GraphQL.Types;
 
-namespace GraphQL.Tests
+namespace GraphQL.StarWars
 {
     public class StarWarsSchema : Schema
     {

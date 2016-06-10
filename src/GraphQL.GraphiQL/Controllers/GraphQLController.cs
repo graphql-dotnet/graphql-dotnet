@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using GraphQL.Http;
-using GraphQL.Tests;
+using GraphQL.StarWars;
 using GraphQL.Types;
 
 namespace GraphQL.GraphiQL.Controllers

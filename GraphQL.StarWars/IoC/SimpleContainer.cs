@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GraphQL.Tests
+namespace GraphQL.StarWars.IoC
 {
     public interface ISimpleContainer : IDisposable
     {
