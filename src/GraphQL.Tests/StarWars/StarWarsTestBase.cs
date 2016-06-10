@@ -1,6 +1,8 @@
+using GraphQL.StarWars;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
-namespace GraphQL.Tests
+namespace GraphQL.Tests.StarWars
 {
     public class StarWarsTestBase : QueryTestBase<StarWarsSchema>
     {

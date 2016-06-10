@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.Tests
+namespace GraphQL.StarWars.Types
 {
     public class DroidType : ObjectGraphType
     {

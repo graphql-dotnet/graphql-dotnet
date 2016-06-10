@@ -65,26 +65,17 @@
     <Compile Include="Execution\VariablesTests.cs" />
     <Compile Include="Introspection\IntrospectionResult.cs" />
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
+    <Compile Include="StarWars\StarWarsBasicQueryTests.cs" />
+    <Compile Include="StarWars\StarWarsFragmentTests.cs" />
+    <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
+    <Compile Include="StarWars\StarWarsTestBase.cs" />
     <Compile Include="Types\FloatGraphTypeTests.cs" />
     <Compile Include="Types\QueryArgumentTests.cs" />
     <Compile Include="Utilities\AstPrinterTests.cs" />
     <Compile Include="Utilities\SchemaPrinterTests.cs" />
-    <Compile Include="SimpleContainer.cs" />
-    <Compile Include="StarWars\EpisodeEnum.cs" />
-    <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
-    <Compile Include="StarWars\CharacterInterface.cs" />
     <Compile Include="CustomConvention.cs" />
-    <Compile Include="StarWars\DroidType.cs" />
-    <Compile Include="StarWars\HumanType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StarWars\StarWarsBasicQueryTests.cs" />
-    <Compile Include="StarWars\StarWarsCharacter.cs" />
-    <Compile Include="StarWars\StarWarsData.cs" />
-    <Compile Include="StarWars\StarWarsFragmentTests.cs" />
-    <Compile Include="StarWars\StarWarsQuery.cs" />
     <Compile Include="QueryTestBase.cs" />
-    <Compile Include="StarWars\StarWarsSchema.cs" />
-    <Compile Include="StarWars\StarWarsTestBase.cs" />
     <Compile Include="TestAttribute.cs" />
     <Compile Include="Expect.cs" />
     <Compile Include="Types\DateGraphTypeTests.cs" />
@@ -103,6 +94,10 @@
     <Compile Include="Validation\ValidationTestConfig.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\GraphQL.StarWars\GraphQL.StarWars.csproj">
+      <Project>{3255c0dc-9f24-4423-8ba3-3b979d0e90e2}</Project>
+      <Name>GraphQL.StarWars</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
       <Project>{c0e08b04-8a0d-4196-967c-8850825041b0}</Project>
       <Name>GraphQL</Name>
