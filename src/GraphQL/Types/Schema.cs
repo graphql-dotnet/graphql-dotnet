@@ -130,7 +130,10 @@ namespace GraphQL.Types
             Query = null;
             Mutation = null;
 
-            _lookup.Value.Clear();
+            if (_lookup.IsValueCreated)
+            {
+                _lookup.Value.Clear();
+            }
         }
 
         private void RegisterType(Type type)
