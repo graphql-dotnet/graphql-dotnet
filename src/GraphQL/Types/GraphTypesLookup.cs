@@ -19,21 +19,13 @@ namespace GraphQL.Types
             AddType<DateGraphType>();
             AddType<DecimalGraphType>();
 
-            AddType<NonNullGraphType<StringGraphType>>();
-            AddType<NonNullGraphType<BooleanGraphType>>();
-            AddType<NonNullGraphType<FloatGraphType>>();
-            AddType<NonNullGraphType<IntGraphType>>();
-            AddType<NonNullGraphType<IdGraphType>>();
-            AddType<NonNullGraphType<DateGraphType>>();
-            AddType<NonNullGraphType<DecimalGraphType>>();
-
             AddType<__Schema>();
             AddType<__Type>();
+            AddType<__Directive>();
             AddType<__Field>();
             AddType<__EnumValue>();
             AddType<__InputValue>();
             AddType<__TypeKind>();
-            AddType<__Directive>();
         }
 
         public static GraphTypesLookup Create(IEnumerable<GraphType> types, Func<Type, GraphType> resolveType)
@@ -76,10 +68,13 @@ namespace GraphQL.Types
                 }
 
                 GraphType result;
-                _types.TryGetValue(typeName, out result);
+                _types.TryGetValue(typeName.TrimGraphQLTypes(), out result);
                 return result;
             }
-            set { _types[typeName] = value; }
+            set
+            {
+                _types[typeName.TrimGraphQLTypes()] = value;
+            }
         }
 
         public GraphType this[Type type]
@@ -117,7 +112,8 @@ namespace GraphQL.Types
         public void AddType<TType>(TypeCollectionContext context)
             where TType : GraphType
         {
-            var instance = context.ResolveType(typeof (TType));
+            var type = typeof(TType).GetNamedType();
+            var instance = context.ResolveType(type);
             AddType(instance, context);
         }
 
@@ -126,6 +122,11 @@ namespace GraphQL.Types
             if (type == null)
             {
                 return;
+            }
+
+            if (type is NonNullGraphType || type is ListGraphType)
+            {
+                throw new ExecutionError("Only add root types.");
             }
 
             var name = type.CollectTypes(context);
@@ -196,10 +197,11 @@ namespace GraphQL.Types
 
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
-            var foundType = this[type];
+            var namedType = type.GetNamedType();
+            var foundType = this[namedType];
             if (foundType == null)
             {
-                AddType(context.ResolveType(type), context);
+                AddType(context.ResolveType(namedType), context);
             }
         }
     }

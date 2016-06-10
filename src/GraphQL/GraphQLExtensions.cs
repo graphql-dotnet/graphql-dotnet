@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using GraphQL.Language;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -10,6 +11,11 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
+        public static string TrimGraphQLTypes(this string name)
+        {
+            return Regex.Replace(name, "[\\[!\\]]", "");
+        }
+
         public static bool IsLeafType(this GraphType type, ISchema schema)
         {
             var namedType = type.GetNamedType(schema);
@@ -33,6 +39,18 @@ namespace GraphQL
             }
 
             return unmodifiedType;
+        }
+
+        public static Type GetNamedType(this Type type)
+        {
+            if (type.IsGenericType
+                && (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>) ||
+                    type.GetGenericTypeDefinition() == typeof(ListGraphType<>)))
+            {
+                return GetNamedType(type.GetGenericArguments()[0]);
+            }
+
+            return type;
         }
 
         public static IEnumerable<string> IsValidLiteralValue(this GraphType type, IValue valueAst, ISchema schema)

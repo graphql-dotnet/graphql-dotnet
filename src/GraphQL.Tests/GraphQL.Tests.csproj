@@ -64,6 +64,7 @@
     <Compile Include="Execution\SchemaLifetimeTests.cs" />
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="GraphQLExtensionsTester.cs" />
     <Compile Include="Introspection\IntrospectionResult.cs" />
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
     <Compile Include="StarWars\StarWarsBasicQueryTests.cs" />
