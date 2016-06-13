@@ -53,7 +53,7 @@
     <Compile Include="StarWarsSchema.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\GraphQL\GraphQL.csproj">
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj">
       <Project>{c0e08b04-8a0d-4196-967c-8850825041b0}</Project>
       <Name>GraphQL</Name>
     </ProjectReference>
