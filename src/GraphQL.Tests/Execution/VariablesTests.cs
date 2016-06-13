@@ -69,10 +69,9 @@ namespace GraphQL.Tests.Execution
 
             Field<StringGraphType>(
                 "fieldWithObjectInput",
-                arguments: new QueryArguments(new []
-                {
+                arguments: new QueryArguments(
                     new QueryArgument<TestInputObject> { Name = "input"}
-                }),
+                ),
                 resolve: context =>
                 {
                     var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
@@ -81,22 +80,21 @@ namespace GraphQL.Tests.Execution
 
             Field<StringGraphType>(
                 "fieldWithNullableStringInput",
-                arguments: new QueryArguments(new []
-                {
+                arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> { Name = "input" }
-                }),
+                ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
+                    var val = context.Argument<object>("input");
+                    var result = JsonConvert.SerializeObject(val);
                     return result;
                 });
 
             Field<StringGraphType>(
                 "fieldWithNonNullableStringInput",
-                arguments: new QueryArguments(new []
-                {
+                arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "input" }
-                }),
+                ),
                 resolve: context =>
                 {
                     var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
@@ -105,10 +103,9 @@ namespace GraphQL.Tests.Execution
 
             Field<StringGraphType>(
                 "fieldWithDefaultArgumentValue",
-                arguments: new QueryArguments(new []
-                {
+                arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> { Name = "input", DefaultValue = "Hello World"}
-                }),
+                ),
                 resolve: context =>
                 {
                     var result = JsonConvert.SerializeObject(context.Argument<object>("input"));

@@ -66,6 +66,46 @@ namespace GraphQL.Tests.Execution
                   }
                 }");
         }
+
+        [Test]
+        public void query_can_get_long_variable()
+        {
+            var inputs = "{ 'userId': 1000000000000000001 }".ToInputs();
+
+            AssertQuerySuccess(
+                @"query aQuery($userId: Int!) { getLongUser(userId: $userId) { idLong }}",
+                @"{
+                  'getLongUser': {
+                    'idLong': 1000000000000000001
+                  }
+                }", inputs);
+        }
+
+        [Test]
+        public void query_can_get_long_inline()
+        {
+            AssertQuerySuccess(
+                @"query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
+                @"{
+                  'getLongUser': {
+                    'idLong': 1000000000000000001
+                  }
+                }");
+        }
+
+        [Test]
+        public void query_can_get_int_variable()
+        {
+            var inputs = "{ 'userId': 3 }".ToInputs();
+
+            AssertQuerySuccess(
+                @"query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
+                @"{
+                  'getIntUser': {
+                    'id': 3
+                  }
+                }", inputs);
+        }
     }
 
     public class EnumMutationSchema : Schema
@@ -89,6 +129,41 @@ namespace GraphQL.Tests.Execution
                     Gender = Gender.Male,
                     ProfileImage = "hello.png"
                 });
+            Field<UserType>("getIntUser", "get user api",
+                new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>>
+                    {
+                        Name = "userId",
+                        Description = "user id"
+                    }
+                ),
+                context =>
+                {
+                    var id = context.Argument<int>("userId");
+                    return new User
+                    {
+                        Id = id
+                    };
+                }
+            );
+
+            Field<UserType>("getLongUser", "get user api",
+                new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>>
+                    {
+                        Name = "userId",
+                        Description = "user id"
+                    }
+                ),
+                context =>
+                {
+                    var id = context.Argument<long>("userId");
+                    return new User
+                    {
+                        IdLong = id
+                    };
+                }
+            );
         }
     }
 
@@ -149,6 +224,7 @@ namespace GraphQL.Tests.Execution
         {
             Name = "User";
             Field<IntGraphType>("id");
+            Field<IntGraphType>("idLong");
             Field<StringGraphType>("profileImage");
             Field<GenderEnum>("gender");
             Field<StringGraphType>(
@@ -165,6 +241,7 @@ namespace GraphQL.Tests.Execution
     public class User
     {
         public int Id { get; set; }
+        public long IdLong { get; set; }
         public string ProfileImage { get; set; }
         public Gender Gender { get; set; }
     }
