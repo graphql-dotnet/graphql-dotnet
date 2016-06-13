@@ -61,6 +61,7 @@
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
     <Compile Include="Execution\InputConversionTests.cs" />
     <Compile Include="Execution\MutationTests.cs" />
+    <Compile Include="Execution\ResolveFieldContextTests.cs" />
     <Compile Include="Execution\SchemaLifetimeTests.cs" />
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />

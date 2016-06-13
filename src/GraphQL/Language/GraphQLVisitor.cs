@@ -37,7 +37,7 @@ namespace GraphQL.Language
                 long longResult;
                 if (long.TryParse(value, out longResult))
                 {
-                    var val = new LongValue(intResult);
+                    var val = new LongValue(longResult);
                     NewNode(val, context);
                     return val;
                 }
@@ -101,7 +101,7 @@ namespace GraphQL.Language
                 long longResult;
                 if (long.TryParse(value, out longResult))
                 {
-                    var val = new LongValue(intResult);
+                    var val = new LongValue(longResult);
                     NewNode(val, context);
                     return val;
                 }

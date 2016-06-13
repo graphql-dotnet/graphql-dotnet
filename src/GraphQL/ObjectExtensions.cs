@@ -35,6 +35,11 @@ namespace GraphQL
 
         public static object GetPropertyValue(object propertyValue, Type fieldType)
         {
+            if (fieldType.FullName == "System.Object")
+            {
+                return propertyValue;
+            }
+
             if (fieldType.Name != "String"
                 && fieldType.GetInterface("IEnumerable`1") != null)
             {
@@ -80,10 +85,10 @@ namespace GraphQL
                 value = Enum.Parse(fieldType, str, true);
             }
 
-            return GetValue(value, fieldType);
+            return ConvertValue(value, fieldType);
         }
 
-        public static object GetValue(object value, Type fieldType)
+        public static object ConvertValue(object value, Type fieldType)
         {
             if (value == null) return null;
 
@@ -91,6 +96,11 @@ namespace GraphQL
             return text != null
               ? TypeDescriptor.GetConverter(fieldType).ConvertFromInvariantString(text)
               : Convert.ChangeType(value, fieldType);
+        }
+
+        public static T GetPropertyValue<T>(this object value)
+        {
+            return (T)GetPropertyValue(value, typeof(T));
         }
 
         public static bool IsDefinedEnumValue(Type type, object value)

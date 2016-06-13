@@ -34,25 +34,30 @@ namespace GraphQL.Types
 
         public TType Argument<TType>(string name)
         {
-            if (Arguments.ContainsKey(name))
+            if (!Arguments.ContainsKey(name))
             {
-                var arg = Arguments[name];
-                var inputObject = arg as Dictionary<string, object>;
-                if (inputObject != null)
+                var error = new ExecutionError($"An argument with name \"{name}\" does not exist.");
+                if (FieldAst?.SourceLocation != null)
                 {
-                    var type = typeof(TType);
-                    if (type.Namespace?.StartsWith("System") == true)
-                    {
-                        return (TType)arg;
-                    }
-
-                    return (TType)inputObject.ToObject(type);
+                    error.AddLocation(FieldAst.SourceLocation.Line, FieldAst.SourceLocation.Column);
                 }
-
-                return (TType) arg;
+                throw error;
             }
 
-            return default(TType);
+            var arg = Arguments[name];
+            var inputObject = arg as Dictionary<string, object>;
+            if (inputObject != null)
+            {
+                var type = typeof(TType);
+                if (type.Namespace?.StartsWith("System") == true)
+                {
+                    return (TType)arg;
+                }
+
+                return (TType)inputObject.ToObject(type);
+            }
+
+            return arg.GetPropertyValue<TType>();
         }
     }
 }

@@ -56,6 +56,24 @@ namespace GraphQL.Tests.Execution
         }
 
         [Test]
+        public void converts_small_numbers_to_int()
+        {
+            var json = @"{'a': 1}";
+            var inputs = json.ToInputs();
+            inputs["a"].ShouldEqual(1);
+            inputs["a"].GetType().ShouldEqual(typeof(int));
+        }
+
+        [Test]
+        public void converts_large_numbers_to_long()
+        {
+            var json = @"{'a': 1000000000000000001}";
+            var inputs = json.ToInputs();
+            inputs["a"].ShouldEqual(1000000000000000001);
+            inputs["a"].GetType().ShouldEqual(typeof(long));
+        }
+
+        [Test]
         public void can_convert_json_to_input_object_and_specific_object()
         {
             var json = @"{'a': 1, 'b': '2'}";
@@ -63,7 +81,7 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldEqual((long)1);
+            inputs["a"].ShouldEqual((int)1);
             inputs["b"].ShouldEqual("2");
 
             var myInput = inputs.ToObject<MyInput>();
@@ -81,7 +99,7 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldEqual((long)1);
+            inputs["a"].ShouldEqual((int)1);
             inputs["b"].ShouldEqual("2");
             inputs["c"].ShouldBeType<List<object>>();
 
