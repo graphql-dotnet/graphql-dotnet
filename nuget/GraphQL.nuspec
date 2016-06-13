@@ -2,18 +2,16 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.9.0.0</version>
+    <version>0.9.1.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* Change how types are registered - only register the root type, not every permutation
-* When a ListGraphType or NonNullGraphType type is requested via FindType, that type is created on the fly.
-* Attempt to trim list/non-null type names when finding type by name
-* Provide public list of core rules
-* Fix a bug where Schema would not properly dispose]]></releaseNotes>
+    <releaseNotes><![CDATA[* Fix issues when trying to cast between int/long in Argument
+* Fixed an issue where long values were not initialized properly in the GraphQLVisitor
+* Throw exception if argument doesn't exist]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
