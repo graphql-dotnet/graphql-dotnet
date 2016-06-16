@@ -38,6 +38,7 @@ namespace GraphQL.Tests.Validation
                     location.Line.ShouldEqual(assert.Line.Value);
                     location.Column.ShouldEqual(assert.Column.Value);
                 }
+                count++;
             });
 
             result.IsValid.ShouldBeFalse();
@@ -49,6 +50,10 @@ namespace GraphQL.Tests.Validation
             configure(config);
 
             var result = Validate(config.Query, Schema, config.Rules);
+            if (result.Errors?.Any() == true)
+            {
+                Console.WriteLine(string.Join(", ", result.Errors.Select(x=>x.Message)));
+            }
             result.IsValid.ShouldBeTrue();
         }
 

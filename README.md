@@ -143,7 +143,7 @@ Console.Writeline(result);
 - [x] Async execution
 
 ### Validation
-- [x] Arguments of correct type - *additional test coverage needed*
+- [x] Arguments of correct type
 - [ ] Default values of correct type
 - [ ] Fields on correct type
 - [ ] Fragments on composite type

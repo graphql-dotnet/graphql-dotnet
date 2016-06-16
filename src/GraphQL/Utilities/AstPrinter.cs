@@ -282,7 +282,7 @@ namespace GraphQL.Utilities
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower());
             });
             Config<EnumValue>(c =>
             {
