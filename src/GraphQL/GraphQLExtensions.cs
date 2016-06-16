@@ -64,7 +64,7 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected {ofType.Name}, found null"};
+                        return new[] { $"Expected \"{ofType.Name}!\", found null."};
                     }
 
                     return new[] { "Expected non-null value, found null"};
@@ -96,7 +96,7 @@ namespace GraphQL
                     return ((ListValue) valueAst).Values.Aggregate(new string[] {}, (acc, value) =>
                     {
                         var errors = IsValidLiteralValue(ofType, value, schema);
-                        var result = acc.Concat(errors.Map(err => $"In element {index}: {err}")).ToArray();
+                        var result = acc.Concat(errors.Map(err => $"In element #{index}: {err}")).ToArray();
                         index++;
                         return result;
                     });

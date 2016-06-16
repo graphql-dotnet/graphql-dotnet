@@ -27,7 +27,13 @@ namespace GraphQL.Types
         public override object ParseLiteral(IValue value)
         {
             var floatVal = value as FloatValue;
-            return floatVal?.Value;
+            if(floatVal != null) return floatVal?.Value;
+
+            var intVal = value as IntValue;
+            if (intVal != null) return intVal.Value;
+
+            var longVal = value as LongValue;
+            return longVal?.Value;
         }
     }
 }
