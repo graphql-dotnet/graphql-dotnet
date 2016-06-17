@@ -159,7 +159,7 @@ Console.Writeline(result);
 - [ ] Overlapping fields can be merged
 - [ ] Possible fragment spreads
 - [ ] Provide non-null arguments
-- [x] Scalar leafs - *additional test coverage needed*
+- [x] Scalar leafs
 - [ ] Unique argument names
 - [ ] Unique fragment names
 - [ ] Unique input field names
