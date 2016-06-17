@@ -16,10 +16,10 @@ namespace GraphQL.Tests.Validation
         public void valid_scalar_selection()
         {
             var query = @"
-fragment scalarSelection on Dog {
-  barks
-}
-";
+                fragment scalarSelection on Dog {
+                  barks
+                }
+                ";
 
             ShouldPassRule(_ =>
             {
@@ -32,10 +32,10 @@ fragment scalarSelection on Dog {
         public void object_type_missing_selection()
         {
             var query = @"
-query directQueryOnObjectWithoutSubFields{
-  human
-}
-";
+                query directQueryOnObjectWithoutSubFields{
+                  human
+                }
+                ";
 
             ShouldFailRule(_ =>
             {
@@ -44,7 +44,44 @@ query directQueryOnObjectWithoutSubFields{
                 _.Error(
                     message: _rule.RequiredSubselectionMessage("human", "Human"),
                     line: 3,
-                    column: 3);
+                    column: 19);
+            });
+        }
+
+        [Test]
+        public void interface_type_missing_selection()
+        {
+            var query = @"{
+                  human {
+                    pets
+                  }
+                }
+                ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.RequiredSubselectionMessage("pets", "[Pet]"),
+                    line: 3,
+                    column: 21);
+            });
+        }
+
+        [Test]
+        public void valid_scalar_selection_with_args()
+        {
+            var query = @"
+                fragment scalarSelectionWithArgs on Dog {
+                  doesKnowCommand(dogCommand: SIT)
+                }
+                ";
+
+            ShouldPassRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
             });
         }
 
@@ -52,10 +89,11 @@ query directQueryOnObjectWithoutSubFields{
         public void scalar_selection_not_allowed_on_boolean()
         {
             var query = @"
-fragment scalarSelectionNotAllowedOnBoolean on Dog {
-  barks { sinceWhen }
-}
-";
+                fragment scalarSelectionNotAllowedOnBoolean on Dog {
+                  barks { sinceWhen }
+                }
+                ";
+
             ShouldFailRule(_ =>
             {
                 _.Query = query;
@@ -63,7 +101,7 @@ fragment scalarSelectionNotAllowedOnBoolean on Dog {
                 _.Error(
                     message: _rule.NoSubselectionAllowedMessage("barks", "Boolean"),
                     line: 3,
-                    column: 3);
+                    column: 25);
             });
         }
 
@@ -71,10 +109,10 @@ fragment scalarSelectionNotAllowedOnBoolean on Dog {
         public void scalar_selection_not_allowed_on_enum()
         {
             var query = @"
-fragment scalarSelectionsNotAllowedOnEnum on Cat {
-  furColor { inHexdec }
-}
-";
+                fragment scalarSelectionsNotAllowedOnEnum on Cat {
+                  furColor { inHexdec }
+                }
+                ";
 
             ShouldFailRule(_ =>
             {
@@ -83,8 +121,105 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
                 _.Error(
                     message: _rule.NoSubselectionAllowedMessage("furColor", "FurColor"),
                     line: 3,
-                    column: 3);
+                    column: 28);
             });
+        }
+
+        [Test]
+        public void scalar_selection_not_allowed_with_args()
+        {
+            var query = @"
+                fragment scalarSelectionWithArgs on Dog {
+                  doesKnowCommand(dogCommand: SIT) { sinceWhen }
+                }
+                ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    line: 3,
+                    column: 52);
+            });
+        }
+
+        [Test]
+        public void scalar_selection_not_allowed_with_directives()
+        {
+            var query = @"
+                fragment scalarSelectionsNotAllowedWithDirectives on Dog {
+                  name @include(if: true) { isAlsoHumanName }
+                }
+                ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.NoSubselectionAllowedMessage("name", "String"),
+                    line: 3,
+                    column: 43);
+            });
+        }
+
+        [Test]
+        public void scalar_selection_not_allowed_with_directives_and_args()
+        {
+            var query = @"
+                fragment scalarSelectionsNotAllowedWithDirectivesAndArgs on Dog {
+                  doesKnowCommand(dogCommand: SIT) @include(if: true) { sinceWhen }
+                }
+                ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(
+                    message: _rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    line: 3,
+                    column: 71);
+            });
+        }
+    }
+
+    public class Being : InterfaceGraphType
+    {
+        public Being()
+        {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(
+                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                ));
+        }
+    }
+
+    public class Pet : InterfaceGraphType
+    {
+        public Pet()
+        {
+            Name = "Pet";
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(
+                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                ));
+        }
+    }
+
+    public class Canine : InterfaceGraphType
+    {
+        public Canine()
+        {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(
+                    new QueryArgument<BooleanGraphType> { Name = "surname"}
+                ));
         }
     }
 
@@ -103,6 +238,9 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
     {
         public Dog()
         {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> {Name = "surname"}));
             Field<BooleanGraphType>("barks");
             Field<BooleanGraphType>(
                 "doesKnowCommand",
@@ -111,6 +249,11 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
                 "isHousetrained",
                 arguments: new QueryArguments(
                     new QueryArgument<BooleanGraphType> {Name = "atOtherHomes", DefaultValue = true}));
+            Interface<Being>();
+            Interface<Pet>();
+            Interface<Canine>();
+
+            IsTypeOf = obj => true;
         }
     }
 
@@ -131,6 +274,14 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
         }
     }
 
+    public class Intelligent : InterfaceGraphType
+    {
+        public Intelligent()
+        {
+            Field<IntGraphType>("id");
+        }
+    }
+
     public class Human : ObjectGraphType
     {
         public Human()
@@ -140,7 +291,14 @@ fragment scalarSelectionsNotAllowedOnEnum on Cat {
                 arguments: new QueryArguments(
                     new QueryArgument<BooleanGraphType> {Name = "surname"}
                 ));
+            Field<ListGraphType<Pet>>("pets");
+            Field<ListGraphType<Human>>("relatives");
             Field<IntGraphType>("iq");
+
+            Interface<Being>();
+            Interface<Intelligent>();
+
+            IsTypeOf = obj => true;
         }
     }
 

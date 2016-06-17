@@ -29,5 +29,11 @@ namespace GraphQL.Validation
         {
             return AstPrinter.Print(node);
         }
+
+        public string Print(GraphType type)
+        {
+            var printer = new SchemaPrinter(Schema);
+            return printer.ResolveName(type);
+        }
     }
 }
