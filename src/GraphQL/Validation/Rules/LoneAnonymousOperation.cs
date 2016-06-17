@@ -1,4 +1,5 @@
-﻿using GraphQL.Language;
+﻿using System;
+using GraphQL.Language;
 
 namespace GraphQL.Validation.Rules
 {
@@ -8,8 +9,11 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if when it contains an anonymous operation
     /// (the query short-hand) that it contains only that one operation definition.
     /// </summary>
-    public class LoneAnonymousOperationRule : IValidationRule
+    public class LoneAnonymousOperation : IValidationRule
     {
+        public Func<string> AnonOperationNotAloneMessage => () =>
+            "This anonymous operation must be the only defined operation.";
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var operationCount = context.Document.Operations.Count;
@@ -23,7 +27,7 @@ namespace GraphQL.Validation.Rules
                     {
                         var error = new ValidationError(
                             "5.1.2.1",
-                            "This anonymous operation must be the only defined operation.",
+                            AnonOperationNotAloneMessage(),
                             op);
                         error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
                         context.ReportError(error);

@@ -91,6 +91,7 @@
     <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
     <Compile Include="Validation\ArgumentsOfCorrectTypeTests.cs" />
+    <Compile Include="Validation\LoneAnonymousOperationTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
     <Compile Include="Validation\UniqueOperationNamesTests.cs" />
     <Compile Include="Validation\ValidationErrorAssertion.cs" />

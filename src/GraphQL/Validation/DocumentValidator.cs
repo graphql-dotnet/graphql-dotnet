@@ -55,7 +55,7 @@ namespace GraphQL.Validation
             {
                 new ArgumentsOfCorrectType(),
                 new UniqueOperationNames(),
-                new LoneAnonymousOperationRule(),
+                new LoneAnonymousOperation(),
                 new ScalarLeafs()
             };
             return rules;
