@@ -37,6 +37,16 @@ namespace GraphQL
                 action(item);
             }
         }
+
+        public static void Apply<T>(this IEnumerable<T> items, Action<T, int> action)
+        {
+            var count = 0;
+            foreach (var item in items)
+            {
+                action(item, count);
+                count++;
+            }
+        }
         
         public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
             this IEnumerable<TSource> items,

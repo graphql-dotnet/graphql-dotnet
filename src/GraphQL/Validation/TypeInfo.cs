@@ -26,6 +26,11 @@ namespace GraphQL.Validation
             return _typeStack.Any() ? _typeStack.Peek() : null;
         }
 
+        public GraphType GetInputType()
+        {
+            return _inputTypeStack.Any() ? _inputTypeStack.Peek() : null;
+        }
+
         public GraphType GetParentType()
         {
             return _parentTypeStack.Any() ? _parentTypeStack.Peek() : null;
@@ -48,6 +53,29 @@ namespace GraphQL.Validation
 
         public void Enter(INode node)
         {
+            if (node is SelectionSet)
+            {
+                _parentTypeStack.Push(GetLastType());
+                return;
+            }
+
+            if (node is Field)
+            {
+                var field = (Field) node;
+                var parentType = _parentTypeStack.Peek();
+                var fieldType = GetFieldDef(_schema, parentType, field);
+                _fieldDefStack.Push(fieldType);
+                var targetType = _schema.FindType(fieldType?.Type);
+                _typeStack.Push(targetType);
+                return;
+            }
+
+            if (node is Directive)
+            {
+                var directive = (Directive) node;
+                _directive = _schema.Directives.SingleOrDefault(x => x.Name == directive.Name);
+            }
+
             if (node is Operation)
             {
                 var op = (Operation) node;
@@ -75,27 +103,20 @@ namespace GraphQL.Validation
                 return;
             }
 
-            if (node is SelectionSet)
+            if (node is InlineFragment)
             {
-                _parentTypeStack.Push(GetLastType());
+                var def = (InlineFragment) node;
+                var type = _schema.FindType(def.Type.Name);
+                _typeStack.Push(type);
                 return;
             }
 
-            if (node is Field)
+            if (node is VariableDefinition)
             {
-                var field = (Field) node;
-                var parentType = _parentTypeStack.Peek();
-                var fieldType = GetFieldDef(_schema, parentType, field);
-                _fieldDefStack.Push(fieldType);
-                var targetType = _schema.FindType(fieldType?.Type);
-                _typeStack.Push(targetType);
+                var varDef = (VariableDefinition) node;
+                var inputType = varDef.Type.GraphTypeFromType(_schema);
+                _inputTypeStack.Push(inputType);
                 return;
-            }
-
-            if (node is Directive)
-            {
-                var directive = (Directive) node;
-                _directive = _schema.Directives.SingleOrDefault(x => x.Name == directive.Name);
             }
 
             if (node is Argument)
@@ -119,32 +140,44 @@ namespace GraphQL.Validation
 
         public void Leave(INode node)
         {
-            if (node is Operation
-                || node is FragmentDefinition)
-            {
-                _typeStack.Pop();
-            }
-
             if (node is SelectionSet)
             {
                 _parentTypeStack.Pop();
+                return;
             }
 
             if (node is Field)
             {
                 _fieldDefStack.Pop();
                 _typeStack.Pop();
+                return;
             }
 
             if (node is Directive)
             {
                 _directive = null;
+                return;
+            }
+
+            if (node is Operation
+                || node is FragmentDefinition
+                || node is InlineFragment)
+            {
+                _typeStack.Pop();
+                return;
+            }
+
+            if (node is VariableDefinition)
+            {
+                _inputTypeStack.Pop();
+                return;
             }
 
             if (node is Argument)
             {
                 _argument = null;
                 _inputTypeStack.Pop();
+                return;
             }
         }
 

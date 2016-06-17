@@ -25,6 +25,25 @@ namespace GraphQL.Validation
             _errors.Add(error);
         }
 
+        public IEnumerable<VariableUsage> GetVariables(IDefinition node)
+        {
+            var usages = new List<VariableUsage>();
+            var info = new TypeInfo(Schema);
+            var listener = new EnterLeaveFuncListener(_ =>
+            {
+                _.Add<VariableReference>(
+                    n => n is VariableReference,
+                    enter: varRef =>
+                    {
+                        usages.Add(new VariableUsage { Node = varRef, Type = info.GetInputType()});
+                    });
+            });
+            var visitor = new BasicVisitor(info, listener);
+            visitor.Visit(node);
+
+            return usages;
+        }
+
         public string Print(INode node)
         {
             return AstPrinter.Print(node);
@@ -35,5 +54,11 @@ namespace GraphQL.Validation
             var printer = new SchemaPrinter(Schema);
             return printer.ResolveName(type);
         }
+    }
+
+    public struct VariableUsage
+    {
+        public VariableReference Node;
+        public GraphType Type;
     }
 }

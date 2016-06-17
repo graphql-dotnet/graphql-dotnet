@@ -8,7 +8,7 @@ namespace GraphQL.Types
     {
         private readonly List<ObjectGraphType> _possibleTypes;
 
-        protected GraphQLAbstractType()
+        protected internal GraphQLAbstractType()
         {
             _possibleTypes = new List<ObjectGraphType>();
         }

@@ -25,20 +25,19 @@ namespace GraphQL.Tests.Validation
 
             var result = Validate(config.Query, Schema, config.Rules);
 
-            var count = 0;
-
-            config.Assertions.Apply(assert =>
+            config.Assertions.Apply((assert, idx) =>
             {
-                var error = result.Errors.Skip(count).First();
+                var error = result.Errors.Skip(idx).First();
                 error.Message.ShouldEqual(assert.Message);
 
-                if (assert.Line != null)
+                assert.Locations.Apply((assertLoc, locIdx) =>
                 {
-                    var location = error.Locations.Single();
-                    location.Line.ShouldEqual(assert.Line.Value);
-                    location.Column.ShouldEqual(assert.Column.Value);
-                }
-                count++;
+                    var errorLoc = error.Locations.Skip(locIdx).First();
+                    errorLoc.Line.ShouldEqual(assertLoc.Line);
+                    errorLoc.Column.ShouldEqual(assertLoc.Column);
+                });
+
+                error.Locations.Count().ShouldEqual(assert.Locations.Count());
             });
 
             result.IsValid.ShouldBeFalse();

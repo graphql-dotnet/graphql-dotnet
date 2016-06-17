@@ -156,6 +156,7 @@
     <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
     <Compile Include="Validation\NodeVisitorMatchFuncListener.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
+    <Compile Include="Validation\Rules\VariablesInAllowedPosition.cs" />
     <Compile Include="Validation\TypeInfo.cs" />
     <Compile Include="Validation\Rules\UniqueOperationNames.cs" />
     <Compile Include="Validation\ValidationContext.cs" />
