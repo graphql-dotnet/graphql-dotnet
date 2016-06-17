@@ -42,6 +42,7 @@ namespace GraphQL.Tests.Validation
             });
 
             result.IsValid.ShouldBeFalse();
+            result.Errors.Count.ShouldEqual(config.Assertions.Count());
         }
 
         protected void ShouldPassRule(Action<ValidationTestConfig> configure)
