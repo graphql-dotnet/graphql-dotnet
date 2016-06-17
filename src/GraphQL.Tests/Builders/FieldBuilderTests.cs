@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Should;
 
@@ -161,27 +162,7 @@ namespace GraphQL.Tests.Builders
             field.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
-                FieldDefinition = field,
-            });
-        }
-
-        [Test]
-        public void getting_unspecified_argument_in_resolver_yields_default_value()
-        {
-            var objectType = new ObjectGraphType();
-            objectType.Field<StringGraphType>()
-                .Argument<StringGraphType, string>("arg1", "desc1", "default")
-                .Resolve(context =>
-                {
-                    context.GetArgument<string>("arg1").ShouldEqual("default");
-                    return null;
-                });
-
-            var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
-            {
-                Arguments = new Dictionary<string, object>(),
-                FieldDefinition = field,
+                FieldDefinition = field
             });
         }
 
@@ -201,7 +182,116 @@ namespace GraphQL.Tests.Builders
             field.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
-                FieldDefinition = field,
+                FieldDefinition = field
+            });
+        }
+
+        [Test]
+        public void can_get_nullable_argument_with_value()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<IntGraphType, int?>("skip", "desc1", 1)
+                .Resolve(context =>
+                {
+                    context.GetArgument<int?>("skip").ShouldEqual(1);
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>
+                {
+                    { "skip", 1 }
+                },
+                FieldDefinition = field
+            });
+        }
+
+        [Test]
+        public void can_get_nullable_argument_with_null_value()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<IntGraphType, int?>("skip", "desc1")
+                .Resolve(context =>
+                {
+                    context.GetArgument<int?>("skip").ShouldEqual(null);
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>
+                {
+                    { "skip", null }
+                },
+                FieldDefinition = field
+            });
+        }
+
+        [Test]
+        public void can_get_nullable_argument_missing_value()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<IntGraphType, int?>("skip", "desc1")
+                .Resolve(context =>
+                {
+                    context.GetArgument<int?>("skip").ShouldEqual(null);
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>(),
+                FieldDefinition = field
+            });
+        }
+
+        [Test]
+        public void can_get_enum_argument()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+                .Resolve(context =>
+                {
+                    context.GetArgument<Episodes>("episode").ShouldEqual(Episodes.JEDI);
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>
+                {
+                    {"episode", "JEDI" }
+                },
+                FieldDefinition = field
+            });
+        }
+
+        [Test]
+        public void can_get_enum_argument_with_overriden_default_value()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+                .Resolve(context =>
+                {
+                    context.GetArgument("episode", Episodes.EMPIRE).ShouldEqual(Episodes.EMPIRE);
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>(),
+                FieldDefinition = field
             });
         }
 
@@ -224,7 +314,7 @@ namespace GraphQL.Tests.Builders
                 {
                     { "arg1", "arg1value" }
                 },
-                FieldDefinition = field,
+                FieldDefinition = field
             });
         }
 
@@ -243,7 +333,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolve(new ResolveFieldContext
             {
-                Source = 12345,
+                Source = 12345
             });
         }
 
@@ -262,7 +352,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolve(new ResolveFieldContext
             {
-                Source = 12345,
+                Source = 12345
             });
         }
     }
