@@ -69,6 +69,7 @@
     <Compile Include="Introspection\__TypeKind.cs" />
     <Compile Include="Language\AbstractNode.cs" />
     <Compile Include="Language\IDefinition.cs" />
+    <Compile Include="Language\IHaveSelectionSet.cs" />
     <Compile Include="Language\INode.cs" />
     <Compile Include="Language\IntValue.cs" />
     <Compile Include="Language\IType.cs" />

@@ -136,6 +136,26 @@ namespace GraphQL.Validation
                 _argument = argDef;
                 _inputTypeStack.Push(argType);
             }
+
+            if (node is ListValue)
+            {
+                var type = GetInputType().GetNamedType(_schema);
+                _inputTypeStack.Push(type);
+            }
+
+            if (node is ObjectField)
+            {
+                var objectType = GetInputType().GetNamedType(_schema);
+                GraphType fieldType = null;
+
+                if (objectType is InputObjectGraphType)
+                {
+                    var inputField = objectType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
+                    fieldType = inputField != null ? _schema.FindType(inputField.Type) : null;
+                }
+
+                _inputTypeStack.Push(fieldType);
+            }
         }
 
         public void Leave(INode node)
@@ -176,6 +196,12 @@ namespace GraphQL.Validation
             if (node is Argument)
             {
                 _argument = null;
+                _inputTypeStack.Pop();
+                return;
+            }
+
+            if (node is ListValue || node is ObjectField)
+            {
                 _inputTypeStack.Pop();
                 return;
             }

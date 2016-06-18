@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Validation
         public string Message { get; set; }
         public IEnumerable<ErrorLocation> Locations => _locations;
 
-        public void Add(int line, int column)
+        public void Loc(int line, int column)
         {
             _locations.Add(new ErrorLocation {Line = line, Column = column});
         }

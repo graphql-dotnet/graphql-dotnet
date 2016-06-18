@@ -291,8 +291,160 @@ namespace GraphQL.Tests.Validation
                 _.Error(err =>
                 {
                     err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
-                    err.Add(2, 27);
-                    err.Add(4, 53);
+                    err.Loc(2, 27);
+                    err.Loc(4, 53);
+                });
+            });
+        }
+
+        [Test]
+        public void int_to_nonnull_int_within_fragment()
+        {
+            var query = @"
+              fragment nonNullIntArgFieldFrag on ComplicatedArgs {
+                nonNullIntArgField(nonNullIntArg: $intArg)
+              }
+
+              query Query($intArg: Int) {
+                complicatedArgs {
+                  ...nonNullIntArgFieldFrag
+                }
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Loc(6, 27);
+                    err.Loc(3, 51);
+                });
+            });
+        }
+
+        [Test]
+        public void int_to_nonnull_int_within_nested_fragment()
+        {
+            var query = @"
+              fragment outerFrag on ComplicatedArgs {
+                ...nonNullIntArgFieldFrag
+              }
+
+              fragment nonNullIntArgFieldFrag on ComplicatedArgs {
+                nonNullIntArgField(nonNullIntArg: $intArg)
+              }
+
+              query Query($intArg: Int) {
+                complicatedArgs {
+                  ...outerFrag
+                }
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Loc(10, 27);
+                    err.Loc(7, 51);
+                });
+            });
+        }
+
+        [Test]
+        public void string_over_boolean()
+        {
+            var query = @"
+              query Query($stringVar: String) {
+                complicatedArgs {
+                  booleanArgField(booleanArg: $stringVar)
+                }
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "Boolean");
+                    err.Loc(2, 27);
+                    err.Loc(4, 47);
+                });
+            });
+        }
+
+        [Test]
+        public void string_to_string_list()
+        {
+            var query = @"
+              query Query($stringVar: String) {
+                complicatedArgs {
+                  stringListArgField(stringListArg: $stringVar)
+                }
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "[String]");
+                    err.Loc(2, 27);
+                    err.Loc(4, 53);
+                });
+            });
+        }
+
+        [Test]
+        public void boolean_to_nonnull_boolean_in_directive()
+        {
+            var query = @"
+              query Query($boolVar: Boolean) {
+                dog @include(if: $boolVar)
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("boolVar", "Boolean", "Boolean!");
+                    err.Loc(2, 27);
+                    err.Loc(3, 34);
+                });
+            });
+        }
+
+        [Test]
+        public void string_to_nonnull_boolean_in_directive()
+        {
+            var query = @"
+              query Query($stringVar: String) {
+                dog @include(if: $stringVar)
+              }
+            ";
+
+            ShouldFailRule(_ =>
+            {
+                _.Query = query;
+                _.Rule(_rule);
+                _.Error(err =>
+                {
+                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "Boolean!");
+                    err.Loc(2, 27);
+                    err.Loc(3, 34);
                 });
             });
         }

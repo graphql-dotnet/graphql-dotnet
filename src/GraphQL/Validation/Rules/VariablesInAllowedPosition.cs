@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
                     enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
                     leave: op =>
                     {
-                        var usages = context.GetVariables(op);
+                        var usages = context.GetRecursiveVariables(op);
                         usages.Apply(usage =>
                         {
                             var varName = usage.Node.Name;
@@ -45,7 +45,7 @@ namespace GraphQL.Validation.Rules
                                     !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
                                 {
                                     var error = new ValidationError(
-                                        "",
+                                        "5.7.6",
                                         BadVarPosMessage(varName, context.Print(varType), context.Print(usage.Type)));
                                     error.AddLocation(varDef.SourceLocation.Line, varDef.SourceLocation.Column);
                                     error.AddLocation(usage.Node.SourceLocation.Line, usage.Node.SourceLocation.Column);

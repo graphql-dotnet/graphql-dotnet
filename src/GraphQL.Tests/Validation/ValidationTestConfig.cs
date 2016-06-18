@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Validation
             };
             if (line.HasValue)
             {
-                assertion.Add(line.Value, column.Value);
+                assertion.Loc(line.Value, column.Value);
             }
             _assertions.Add(assertion);
         }
