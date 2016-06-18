@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Builders
@@ -34,48 +33,26 @@ namespace GraphQL.Builders
                 }
             }
 
-            public ISchema Schema { get { return _context.Schema; } }
+            public ISchema Schema => _context.Schema;
 
-            public ResolveFieldContext ResolveFieldContext { get { return _context; } }
+            public ResolveFieldContext ResolveFieldContext => _context;
 
-            public object Source { get { return _context.Source; } }
+            public object Source => _context.Source;
 
             public TObjectType Object { get; set; }
 
             public T GetArgument<T>(string argumentName)
             {
-                object argument;
-                var defaultValue = default(T);
-
-                if (_context?.FieldDefinition != null &&
-                    _context?.FieldDefinition.Arguments != null)
-                {
-                    var arg = _context.FieldDefinition
-                        .Arguments
-                        .FirstOrDefault(a => a.Name == argumentName);
-                    if (arg != null)
-                    {
-                        defaultValue = arg.DefaultValue is T
-                            ? (T)arg.DefaultValue
-                            : default(T);
-                    }
-                }
-
-                if (_context?.Arguments != null && _context.Arguments.TryGetValue(argumentName, out argument))
-                {
-                    return argument is T ? (T)argument : defaultValue;
-                }
-
-                return defaultValue;
+                return HasArgument(argumentName)
+                    ? _context.Argument<T>(argumentName)
+                    : default(T);
             }
 
             public T GetArgument<T>(string argumentName, T defaultValue)
             {
-                object argument;
-
-                if (_context?.Arguments != null && _context.Arguments.TryGetValue(argumentName, out argument))
+                if (HasArgument(argumentName))
                 {
-                    return argument is T ? (T)argument : defaultValue;
+                    return _context.Argument<T>(argumentName);
                 }
 
                 return defaultValue;
@@ -102,7 +79,7 @@ namespace GraphQL.Builders
             var fieldType = new FieldType
             {
                 Type = typeof(TGraphType),
-                Arguments = new QueryArguments(new QueryArgument[0]),
+                Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TGraphType, TObjectType, TReturnType>(fieldType, null);
         }
