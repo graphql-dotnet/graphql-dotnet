@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GraphQL.Language;
 
 namespace GraphQL.Validation.Rules
@@ -10,6 +11,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueOperationNames : IValidationRule
     {
+        public Func<string, string> DuplicateOperationNameMessage => opName =>
+            $"There can only be one operation named {opName}.";
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var frequency = new Dictionary<string, string>();
@@ -31,7 +35,7 @@ namespace GraphQL.Validation.Rules
                     {
                         var error = new ValidationError(
                             "5.1.1.1",
-                            $"There can only be one operation named {op.Name}.",
+                            DuplicateOperationNameMessage(op.Name),
                             op);
                         error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
                         context.ReportError(error);

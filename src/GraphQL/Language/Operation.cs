@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language
 {
-    public class Operation : AbstractNode, IDefinition
+    public class Operation : AbstractNode, IDefinition, IHaveSelectionSet
     {
         public Operation()
         {

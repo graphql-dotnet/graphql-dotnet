@@ -158,5 +158,59 @@ namespace GraphQL
             var member = (MemberExpression) expression.Body;
             return member.Member.Name;
         }
+
+        public static bool IsSubtypeOf(this GraphType maybeSubType, GraphType superType, ISchema schema)
+        {
+            if (maybeSubType.Equals(superType))
+            {
+                return true;
+            }
+
+            // If superType is non-null, maybeSubType must also be nullable.
+            if (superType is NonNullGraphType)
+            {
+                if (maybeSubType is NonNullGraphType)
+                {
+                    var sub = (NonNullGraphType) maybeSubType;
+                    var sup = (NonNullGraphType) superType;
+                    return IsSubtypeOf(schema.FindType(sub.Type), schema.FindType(sup.Type), schema);
+                }
+
+                return false;
+            }
+            else if (maybeSubType is NonNullGraphType)
+            {
+                var sub = (NonNullGraphType) maybeSubType;
+                return IsSubtypeOf(schema.FindType(sub.Type), superType, schema);
+            }
+
+            // If superType type is a list, maybeSubType type must also be a list.
+            if (superType is ListGraphType)
+            {
+                if (maybeSubType is ListGraphType)
+                {
+                    var sub = (ListGraphType) maybeSubType;
+                    var sup = (ListGraphType) superType;
+                    return IsSubtypeOf(schema.FindType(sub.Type), schema.FindType(sup.Type), schema);
+                }
+
+                return false;
+            }
+            else if (maybeSubType is ListGraphType)
+            {
+                // If superType is not a list, maybeSubType must also be not a list.
+                return false;
+            }
+
+            // If superType type is an abstract type, maybeSubType type may be a currently
+            // possible object type.
+            if (superType is GraphQLAbstractType &&
+                maybeSubType is ObjectGraphType)
+            {
+                return ((GraphQLAbstractType) superType).IsPossibleType(maybeSubType);
+            }
+
+            return false;
+        }
     }
 }

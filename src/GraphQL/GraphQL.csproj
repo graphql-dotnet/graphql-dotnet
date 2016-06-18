@@ -69,6 +69,7 @@
     <Compile Include="Introspection\__TypeKind.cs" />
     <Compile Include="Language\AbstractNode.cs" />
     <Compile Include="Language\IDefinition.cs" />
+    <Compile Include="Language\IHaveSelectionSet.cs" />
     <Compile Include="Language\INode.cs" />
     <Compile Include="Language\IntValue.cs" />
     <Compile Include="Language\IType.cs" />
@@ -153,9 +154,10 @@
     <Compile Include="Validation\BasicVisitor.cs" />
     <Compile Include="GraphQLExtensions.cs" />
     <Compile Include="Validation\Rules\ArgumentsOfCorrectType.cs" />
-    <Compile Include="Validation\Rules\LoneAnonymousOperationRule.cs" />
+    <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
     <Compile Include="Validation\NodeVisitorMatchFuncListener.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
+    <Compile Include="Validation\Rules\VariablesInAllowedPosition.cs" />
     <Compile Include="Validation\TypeInfo.cs" />
     <Compile Include="Validation\Rules\UniqueOperationNames.cs" />
     <Compile Include="Validation\ValidationContext.cs" />

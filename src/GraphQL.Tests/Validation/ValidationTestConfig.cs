@@ -18,9 +18,11 @@ namespace GraphQL.Tests.Validation
             var assertion = new ValidationErrorAssertion
             {
                 Message = message,
-                Line = line,
-                Column = column
             };
+            if (line.HasValue)
+            {
+                assertion.Loc(line.Value, column.Value);
+            }
             _assertions.Add(assertion);
         }
 

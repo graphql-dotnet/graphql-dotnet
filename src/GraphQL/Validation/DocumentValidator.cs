@@ -51,12 +51,13 @@ namespace GraphQL.Validation
 
         public static List<IValidationRule> CoreRules()
         {
-            var rules = new List<IValidationRule>()
+            var rules = new List<IValidationRule>
             {
                 new ArgumentsOfCorrectType(),
                 new UniqueOperationNames(),
-                new LoneAnonymousOperationRule(),
-                new ScalarLeafs()
+                new LoneAnonymousOperation(),
+                new ScalarLeafs(),
+                new VariablesInAllowedPosition()
             };
             return rules;
         }

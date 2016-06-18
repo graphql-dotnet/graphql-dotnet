@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language
 {
-    public class Field : AbstractNode, ISelection
+    public class Field : AbstractNode, ISelection, IHaveSelectionSet
     {
         public string Name { get; set; }
 

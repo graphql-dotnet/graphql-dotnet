@@ -281,7 +281,7 @@ namespace GraphQL.Tests.Execution
         public void executes_with_injected_input_variables()
         {
             var query = @"
-                query q($argC: String, $argD: ComplexScalar) {
+                query q($argC: String!, $argD: ComplexScalar) {
                   fieldWithObjectInput(input: { c: $argC, d: $argD })
                 }
             ";
