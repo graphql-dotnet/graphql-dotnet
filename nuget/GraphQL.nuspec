@@ -2,16 +2,16 @@
 <package >
   <metadata>
     <id>GraphQL</id>
-    <version>0.9.1.0</version>
+    <version>0.9.2.0</version>
     <authors>Joseph T. McBride</authors>
     <owners>Joseph T. McBride</owners>
     <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* Fix issues when trying to cast between int/long in Argument
-* Fixed an issue where long values were not initialized properly in the GraphQLVisitor
-* Throw exception if argument doesn't exist]]></releaseNotes>
+    <releaseNotes><![CDATA[* Add VariablesInAllowedPosition validation rule
+* Update GetArgument<T> in FieldBuilder to delegate to Argument<T> on ResolveFieldContext
+* FloatGraphType will now try to convert int and long values]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>
