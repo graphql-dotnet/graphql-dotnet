@@ -21,9 +21,10 @@ namespace GraphQL.Validation.Rules
 
         public INodeVisitor Validate(ValidationContext context)
         {
-            return new NodeVisitorMatchFuncListener<Field>(
-                n => n is Field,
-                f => Field(context.TypeInfo.GetLastType(), f, context));
+            return new EnterLeaveListener(_ =>
+            {
+                _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context));
+            });
         }
 
         private void Field(GraphType type, Field field, ValidationContext context)
@@ -37,15 +38,13 @@ namespace GraphQL.Validation.Rules
             {
                 if (field.SelectionSet != null && field.SelectionSet.Selections.Any())
                 {
-                    var error = new ValidationError("5.2.3", NoSubselectionAllowedMessage(field.Name, context.Print(type)), field);
-                    error.AddLocation(field.SelectionSet.SourceLocation.Line, field.SelectionSet.SourceLocation.Column);
+                    var error = new ValidationError("5.2.3", NoSubselectionAllowedMessage(field.Name, context.Print(type)), field.SelectionSet);
                     context.ReportError(error);
                 }
             }
             else if(field.SelectionSet == null || !field.SelectionSet.Selections.Any())
             {
                 var error = new ValidationError("5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
-                error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
                 context.ReportError(error);
             }
         }

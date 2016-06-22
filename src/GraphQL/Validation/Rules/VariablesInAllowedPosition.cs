@@ -16,15 +16,13 @@ namespace GraphQL.Validation.Rules
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();
 
-            return new EnterLeaveFuncListener(_ =>
+            return new EnterLeaveListener(_ =>
             {
-                _.Add<VariableDefinition>(
-                    n => n is VariableDefinition,
-                    enter: varDefAst => varDefMap[varDefAst.Name] = varDefAst
+                _.Match<VariableDefinition>(
+                    varDefAst => varDefMap[varDefAst.Name] = varDefAst
                 );
 
-                _.Add<Operation>(
-                    n => n is Operation,
+                _.Match<Operation>(
                     enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
                     leave: op =>
                     {

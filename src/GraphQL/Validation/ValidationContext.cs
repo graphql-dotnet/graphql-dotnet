@@ -36,15 +36,14 @@ namespace GraphQL.Validation
         {
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
-            var listener = new EnterLeaveFuncListener(_ =>
+
+            var listener = new EnterLeaveListener(_ =>
             {
-                _.Add<VariableReference>(
-                    n => n is VariableReference,
-                    enter: varRef =>
-                    {
-                        usages.Add(new VariableUsage { Node = varRef, Type = info.GetInputType()});
-                    });
+                _.Match<VariableReference>(
+                    varRef => usages.Add(new VariableUsage {Node = varRef, Type = info.GetInputType()})
+                );
             });
+
             var visitor = new BasicVisitor(info, listener);
             visitor.Visit(node);
 
@@ -93,10 +92,10 @@ namespace GraphQL.Validation
                     {
                         spreads.Add((FragmentSpread)selection);
                     }
-                    else if(selection is IHaveSelectionSet)
+                    else
                     {
-                        var hasSet = ((IHaveSelectionSet) selection);
-                        if (hasSet.SelectionSet != null)
+                        var hasSet = selection as IHaveSelectionSet;
+                        if (hasSet?.SelectionSet != null)
                         {
                             setsToVisit.Push(hasSet.SelectionSet);
                         }

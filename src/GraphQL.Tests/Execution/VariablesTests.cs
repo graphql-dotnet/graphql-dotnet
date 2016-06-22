@@ -347,7 +347,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            AssertQuerySuccess(query, expected);
+            AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
         }
 
         [Test]

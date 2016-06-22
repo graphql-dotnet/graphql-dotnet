@@ -9,26 +9,25 @@ namespace GraphQL.Validation.Rules
     {
         public INodeVisitor Validate(ValidationContext context)
         {
-            return new NodeVisitorMatchFuncListener<Argument>(
-                n => n is Argument,
-                argAst =>
+            return new EnterLeaveListener(_ =>
+            {
+                _.Match<Argument>(argAst =>
                 {
                     var argDef = context.TypeInfo.GetArgument();
+                    if (argDef == null) return;
 
-                    if (argDef != null)
+                    var type = context.Schema.FindType(argDef.Type);
+                    var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
+                    if (errors.Any())
                     {
-                        var type = context.Schema.FindType(argDef.Type);
-                        var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
-                        if (errors.Any())
-                        {
-                            var error = new ValidationError(
-                                "5.3.3.1",
-                                BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors));
-                            error.AddLocation(argAst.SourceLocation.Line, argAst.SourceLocation.Column);
-                            context.ReportError(error);
-                        }
+                        var error = new ValidationError(
+                            "5.3.3.1",
+                            BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors));
+                        error.AddLocation(argAst.SourceLocation.Line, argAst.SourceLocation.Column);
+                        context.ReportError(error);
                     }
                 });
+            });
         }
 
         public string BadValueMessage(

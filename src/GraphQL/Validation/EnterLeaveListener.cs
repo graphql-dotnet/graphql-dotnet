@@ -12,32 +12,31 @@ namespace GraphQL.Validation
         public Action<INode> Leave { get; set; }
     }
 
-    public class EnterLeaveFuncListener : INodeVisitor
+    public class EnterLeaveListener : INodeVisitor
     {
         private readonly List<MatchingNodeListener> _listeners =
             new List<MatchingNodeListener>();
 
-        public EnterLeaveFuncListener(Action<EnterLeaveFuncListener> configure)
+        public EnterLeaveListener(Action<EnterLeaveListener> configure)
         {
             configure(this);
         }
 
-        public void Enter(INode node)
+        void INodeVisitor.Enter(INode node)
         {
             _listeners
                 .Where(l => l.Enter != null && l.Matches(node))
                 .Apply(l => l.Enter(node));
         }
 
-        public void Leave(INode node)
+        void INodeVisitor.Leave(INode node)
         {
             _listeners
                 .Where(l => l.Leave != null && l.Matches(node))
                 .Apply(l => l.Leave(node));
         }
 
-        public void Add<T>(
-            Func<INode, bool> matches,
+        public void Match<T>(
             Action<T> enter = null,
             Action<T> leave = null)
             where T : INode
@@ -46,6 +45,8 @@ namespace GraphQL.Validation
             {
                 throw new ExecutionError("Must provide an enter or leave function.");
             }
+
+            Func<INode, bool> matches = n => n.GetType().IsAssignableFrom(typeof(T));
 
             var listener = new MatchingNodeListener
             {
@@ -63,31 +64,6 @@ namespace GraphQL.Validation
             }
 
             _listeners.Add(listener);
-        }
-    }
-
-    public class NodeVisitorMatchFuncListener<T> : INodeVisitor
-        where T : INode
-    {
-        private readonly Func<INode, bool> _match;
-        private readonly Action<T> _action;
-
-        public NodeVisitorMatchFuncListener(Func<INode, bool> match, Action<T> action)
-        {
-            _match = match;
-            _action = action;
-        }
-
-        public void Enter(INode node)
-        {
-            if (_match(node))
-            {
-                _action((T) node);
-            }
-        }
-
-        public void Leave(INode node)
-        {
         }
     }
 }

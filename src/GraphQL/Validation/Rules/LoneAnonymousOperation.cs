@@ -18,9 +18,9 @@ namespace GraphQL.Validation.Rules
         {
             var operationCount = context.Document.Operations.Count;
 
-            return new NodeVisitorMatchFuncListener<Operation>(
-                n => n is Operation,
-                op =>
+            return new EnterLeaveListener(_ =>
+            {
+                _.Match<Operation>(op =>
                 {
                     if (string.IsNullOrWhiteSpace(op.Name)
                         && operationCount > 1)
@@ -29,10 +29,10 @@ namespace GraphQL.Validation.Rules
                             "5.1.2.1",
                             AnonOperationNotAloneMessage(),
                             op);
-                        error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
                         context.ReportError(error);
                     }
                 });
+            });
         }
     }
 }

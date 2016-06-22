@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using Should;
 
@@ -77,6 +78,17 @@ namespace GraphQL.Tests.Execution
         public void throw_error_if_argument_doesnt_exist()
         {
             Expect.Throws<ExecutionError>(() => _context.Argument<string>("wat"));
+        }
+
+        [Test]
+        public void argument_returns_list_from_array()
+        {
+            _context.Arguments = "{a: ['one', 'two']}".ToInputs();
+            var result = _context.Argument<List<string>>("a");
+            result.ShouldNotBeNull();
+            result.Count.ShouldEqual(2);
+            result[0].ShouldEqual("one");
+            result[1].ShouldEqual("two");
         }
 
         enum SomeEnum
