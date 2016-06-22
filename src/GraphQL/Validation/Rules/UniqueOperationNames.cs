@@ -18,33 +18,34 @@ namespace GraphQL.Validation.Rules
         {
             var frequency = new Dictionary<string, string>();
 
-            return new NodeVisitorMatchFuncListener<Operation>(
-                n => n is Operation,
-                op =>
-                {
-                    if (context.Document.Operations.Count < 2)
+            return new EnterLeaveListener(_ =>
+            {
+                _.Match<Operation>(
+                    enter: op =>
                     {
-                        return;
-                    }
-                    if (string.IsNullOrWhiteSpace(op.Name))
-                    {
-                        return;
-                    }
+                        if (context.Document.Operations.Count < 2)
+                        {
+                            return;
+                        }
+                        if (string.IsNullOrWhiteSpace(op.Name))
+                        {
+                            return;
+                        }
 
-                    if (frequency.ContainsKey(op.Name))
-                    {
-                        var error = new ValidationError(
-                            "5.1.1.1",
-                            DuplicateOperationNameMessage(op.Name),
-                            op);
-                        error.AddLocation(op.SourceLocation.Line, op.SourceLocation.Column);
-                        context.ReportError(error);
-                    }
-                    else
-                    {
-                        frequency[op.Name] = op.Name;
-                    }
-                });
+                        if (frequency.ContainsKey(op.Name))
+                        {
+                            var error = new ValidationError(
+                                "5.1.1.1",
+                                DuplicateOperationNameMessage(op.Name),
+                                op);
+                            context.ReportError(error);
+                        }
+                        else
+                        {
+                            frequency[op.Name] = op.Name;
+                        }
+                    });
+            });
         }
     }
 }

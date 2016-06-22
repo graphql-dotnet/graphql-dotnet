@@ -33,8 +33,12 @@ namespace GraphQL.Tests.Validation
                 assert.Locations.Apply((assertLoc, locIdx) =>
                 {
                     var errorLoc = error.Locations.Skip(locIdx).First();
-                    errorLoc.Line.ShouldEqual(assertLoc.Line);
-                    errorLoc.Column.ShouldEqual(assertLoc.Column);
+                    errorLoc.Line.ShouldEqual(
+                        assertLoc.Line,
+                        $"Expected line {assertLoc.Line} does not match error - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                    errorLoc.Column.ShouldEqual(
+                        assertLoc.Column,
+                        $"Expected column {assertLoc.Column} does not match error - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
                 });
 
                 error.Locations.Count().ShouldEqual(assert.Locations.Count());

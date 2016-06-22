@@ -153,7 +153,7 @@ Console.Writeline(result);
 - [ ] Known type names
 - [x] Lone anonymous operations
 - [ ] No fragment cycle
-- [ ] No undefined variables
+- [x] No undefined variables
 - [ ] No unused fragments
 - [ ] No unused variables
 - [ ] Overlapping fields can be merged

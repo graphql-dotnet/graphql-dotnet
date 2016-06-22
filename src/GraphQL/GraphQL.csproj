@@ -155,7 +155,8 @@
     <Compile Include="GraphQLExtensions.cs" />
     <Compile Include="Validation\Rules\ArgumentsOfCorrectType.cs" />
     <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
-    <Compile Include="Validation\NodeVisitorMatchFuncListener.cs" />
+    <Compile Include="Validation\EnterLeaveListener.cs" />
+    <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
     <Compile Include="Validation\Rules\VariablesInAllowedPosition.cs" />
     <Compile Include="Validation\TypeInfo.cs" />

@@ -22,10 +22,14 @@ namespace GraphQL.Validation
         {
             ErrorCode = errorCode;
 
-            if (nodes != null)
+            nodes?.Apply(n =>
             {
-                _nodes.AddRange(nodes);
-            }
+                _nodes.Add(n);
+                if (n.SourceLocation != null)
+                {
+                    AddLocation(n.SourceLocation.Line, n.SourceLocation.Column);
+                }
+            });
         }
 
         public string ErrorCode { get; }
