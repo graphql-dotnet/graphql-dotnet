@@ -9,14 +9,14 @@ namespace GraphQL.Tests.Builders
 {
     public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestSchema>
     {
-        [Test]
+        [Fact]
         public void should_have_name()
         {
             var objectType = new ParentType();
             objectType.Fields.First().Name.ShouldEqual("connection1");
         }
 
-        [Test]
+        [Fact]
         public void should_have_optional_description()
         {
             var objectType = new ParentType();
@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Builders
             objectType.Fields.ElementAt(1).Description.ShouldEqual("RandomDescription");
         }
 
-        [Test]
+        [Fact]
         public void should_have_field_information()
         {
             var connectionType = new ConnectionType<ChildType>();
@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Builders
             connectionType.Description.ShouldEqual("A connection from an object to a list of objects of type `Child`.");
         }
 
-        [Test]
+        [Fact]
         public void should_resolve_in_query()
         {
             AssertQuerySuccess(
@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Builders
                 } } }");
         }
 
-        [Test]
+        [Fact]
         public void should_yield_pagination_information()
         {
             AssertQuerySuccess(
@@ -88,7 +88,7 @@ namespace GraphQL.Tests.Builders
                 } } }");
         }
 
-        [Test]
+        [Fact]
         public void can_define_simple_connection_with_resolver()
         {
             var type = new ObjectGraphType();

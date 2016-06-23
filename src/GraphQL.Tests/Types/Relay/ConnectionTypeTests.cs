@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Types.Relay
     {
         private ConnectionType<ObjectGraphType> type = new ConnectionType<ObjectGraphType>();
 
-        [Test]
+        [Fact]
         public void should_derive_name()
         {
             type.Name.ShouldEqual("ObjectConnection");

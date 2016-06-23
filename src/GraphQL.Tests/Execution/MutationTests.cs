@@ -149,7 +149,7 @@ namespace GraphQL.Tests.Execution
 
     public class MutationTests : QueryTestBase<MutationSchema>
     {
-        [Test]
+        [Fact]
         public void evaluates_mutations_serially()
         {
             var query = @"
@@ -194,7 +194,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: new Root(6));
         }
 
-        [Test]
+        [Fact]
         public void evaluates_mutations_correctly_in_the_presense_of_a_failed_mutation()
         {
             var query = @"

@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Execution
             _context.Arguments = new Dictionary<string, object>();
         }
 
-        [Test]
+        [Fact]
         public void argument_converts_int_to_long()
         {
             int val = 1;
@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(1);
         }
 
-        [Test]
+        [Fact]
         public void argument_converts_long_to_int()
         {
             long val = 1;
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(1);
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_boxed_string_uncast()
         {
             _context.Arguments["a"] = "one";
@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual("one");
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_long()
         {
             long val = 1000000000000001;
@@ -50,7 +50,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(1000000000000001);
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_enum()
         {
             _context.Arguments["a"] = SomeEnum.Two;
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(SomeEnum.Two);
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_enum_from_string()
         {
             _context.Arguments["a"] = "two";
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(SomeEnum.Two);
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_enum_from_number()
         {
             _context.Arguments["a"] = 1;
@@ -74,13 +74,13 @@ namespace GraphQL.Tests.Execution
             result.ShouldEqual(SomeEnum.Two);
         }
 
-        [Test]
+        [Fact]
         public void throw_error_if_argument_doesnt_exist()
         {
             Expect.Throws<ExecutionError>(() => _context.Argument<string>("wat"));
         }
 
-        [Test]
+        [Fact]
         public void argument_returns_list_from_array()
         {
             _context.Arguments = "{a: ['one', 'two']}".ToInputs();

@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Utilities
     {
         private readonly AstPrintVisitor _printer = new AstPrintVisitor();
 
-        [Test]
+        [Fact]
         public void prints_ast()
         {
             var query = @"{
@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldNotBeNull();
         }
 
-        [Test]
+        [Fact]
         public void prints_variables()
         {
             var query = @"
@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldNotBeNull();
         }
 
-        [Test]
+        [Fact]
         public void prints_int_value()
         {
             int value = 3;
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldEqual(value);
         }
 
-        [Test]
+        [Fact]
         public void prints_long_value()
         {
             long value = 3;
@@ -62,7 +62,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldEqual(value);
         }
 
-        [Test]
+        [Fact]
         public void prints_float_value()
         {
             double value = 3.33;

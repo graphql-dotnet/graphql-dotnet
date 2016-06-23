@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Execution
             };
         }
 
-        [Test]
+        [Fact]
         public void can_introspect_on_union_and_intersection_types()
         {
             var query = @"
@@ -112,7 +112,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void executes_using_union_types()
         {
             // NOTE: This is an *invalid* query, but it should be an *executable* query.
@@ -144,7 +144,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: _john);
         }
 
-        [Test]
+        [Fact]
         public void executes_union_types_with_inline_fragments()
         {
             // This is the valid version of the query in the above test.
@@ -181,7 +181,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: _john);
         }
 
-        [Test]
+        [Fact]
         public void executes_using_interface_types()
         {
             // NOTE: This is an *invalid* query, but it should be an *executable* query.
@@ -213,7 +213,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, root: _john);
         }
 
-        [Test]
+        [Fact]
         public void allows_fragment_conditions_to_be_abstract_types()
         {
             var query = @"

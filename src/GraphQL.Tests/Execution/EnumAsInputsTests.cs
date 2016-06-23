@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Execution
 {
     public class EnumAsInputsTests : QueryTestBase<EnumMutationSchema>
     {
-        [Test]
+        [Fact]
         public void mutation_input()
         {
             AssertQuerySuccess(
@@ -29,7 +29,7 @@ namespace GraphQL.Tests.Execution
                 }");
         }
 
-        [Test]
+        [Fact]
         public void mutation_input_from_variables()
         {
             var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Execution
                 }", inputs);
         }
 
-        [Test]
+        [Fact]
         public void query_can_get_enum_argument()
         {
             AssertQuerySuccess(
@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Execution
                 }");
         }
 
-        [Test]
+        [Fact]
         public void query_can_get_long_variable()
         {
             var inputs = "{ 'userId': 1000000000000000001 }".ToInputs();
@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Execution
                 }", inputs);
         }
 
-        [Test]
+        [Fact]
         public void query_can_get_long_inline()
         {
             AssertQuerySuccess(
@@ -93,7 +93,7 @@ namespace GraphQL.Tests.Execution
                 }");
         }
 
-        [Test]
+        [Fact]
         public void query_can_get_int_variable()
         {
             var inputs = "{ 'userId': 3 }".ToInputs();

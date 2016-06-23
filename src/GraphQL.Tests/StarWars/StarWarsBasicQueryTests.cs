@@ -2,7 +2,7 @@ namespace GraphQL.Tests.StarWars
 {
     public class StarWarsBasicQueryTests : StarWarsTestBase
     {
-        [Test]
+        [Fact]
         public void identifies_r2_as_the_hero()
         {
             var query = @"
@@ -22,7 +22,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void can_query_without_query_name()
         {
             var query = @"
@@ -42,7 +42,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void can_query_for_the_id_and_friends_of_r2()
         {
             var query = @"
@@ -75,7 +75,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void can_query_for_humans()
         {
             var query = @"
@@ -97,7 +97,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void can_query_for_friends_of_humans()
         {
             var query = @"
@@ -125,7 +125,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void can_query_for_droids()
         {
             var query = @"
@@ -145,7 +145,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void create_generic_query_that_fetches_luke()
         {
             var query = @"
@@ -168,7 +168,7 @@ namespace GraphQL.Tests.StarWars
             AssertQuerySuccess(query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void query_same_root_field_using_alias()
         {
             var query = @"

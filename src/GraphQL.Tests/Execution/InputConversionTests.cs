@@ -55,7 +55,7 @@ namespace GraphQL.Tests.Execution
             public string A { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void converts_small_numbers_to_int()
         {
             var json = @"{'a': 1}";
@@ -64,7 +64,7 @@ namespace GraphQL.Tests.Execution
             inputs["a"].GetType().ShouldEqual(typeof(int));
         }
 
-        [Test]
+        [Fact]
         public void converts_large_numbers_to_long()
         {
             var json = @"{'a': 1000000000000000001}";
@@ -73,7 +73,7 @@ namespace GraphQL.Tests.Execution
             inputs["a"].GetType().ShouldEqual(typeof(long));
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_and_specific_object()
         {
             var json = @"{'a': 1, 'b': '2'}";
@@ -91,7 +91,7 @@ namespace GraphQL.Tests.Execution
             myInput.B.ShouldEqual("2");
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_array()
         {
             var json = @"{'a': 1, 'b': '2', 'c': ['foo']}";
@@ -113,7 +113,7 @@ namespace GraphQL.Tests.Execution
             myInput.C.First().ShouldEqual("foo");
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_nullable_array()
         {
             var json = @"{'a': 1, 'b': '2', 'c': ['foo'], 'f': [1,null]}";
@@ -131,7 +131,7 @@ namespace GraphQL.Tests.Execution
             myInput.F[1].ShouldEqual(null);
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_nested_nullable_array()
         {
             var json = @"{'a': 1, 'b': '2', 'c': ['foo'], 'g': [[1,null], [null, 1]]}";
@@ -155,7 +155,7 @@ namespace GraphQL.Tests.Execution
             myInput.G[1][1].ShouldEqual(1);
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_nullable_int()
         {
             var json = @"{'a': 1, 'b': '2', 'd': '5'}";
@@ -166,7 +166,7 @@ namespace GraphQL.Tests.Execution
             myInput.D.ShouldEqual(5);
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_guid()
         {
             var json = @"{'a': 1, 'b': '2', 'e': '920a1b6d-f75a-4594-8567-e2c457b29cc0'}";
@@ -177,7 +177,7 @@ namespace GraphQL.Tests.Execution
             myInput.E.ShouldEqual(new Guid("920a1b6d-f75a-4594-8567-e2c457b29cc0"));
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_enum_string()
         {
             var json = @"{'a': 'three'}";
@@ -193,7 +193,7 @@ namespace GraphQL.Tests.Execution
             myInput.B.ShouldBeNull();
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_enum_string_exact()
         {
             var json = @"{'a': 'Two'}";
@@ -208,7 +208,7 @@ namespace GraphQL.Tests.Execution
             myInput.A.ShouldEqual(Numbers.Two);
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_enum_number()
         {
             var json = @"{'a': '2'}";
@@ -224,7 +224,7 @@ namespace GraphQL.Tests.Execution
             myInput.B.ShouldBeNull();
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_enum_long_number()
         {
             var json = @"{'a': 2, 'b': 2}";
@@ -237,7 +237,7 @@ namespace GraphQL.Tests.Execution
             myInput.B.Value.ShouldEqual(Numbers2.Three);
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_child_object_list()
         {
             var json = @"{'a': 'foo', 'b':[{'a':'bar'}], 'c': 'baz'}";
@@ -251,7 +251,7 @@ namespace GraphQL.Tests.Execution
             myInput.B[0].A.ShouldEqual("bar");
         }
 
-        [Test]
+        [Fact]
         public void can_convert_json_to_input_object_with_child_object()
         {
             var json = @"{ 'input': {'a': 'foo', 'b':[{'a':'bar'}], 'c': 'baz'}}";

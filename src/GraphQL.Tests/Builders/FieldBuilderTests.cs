@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Builders
 {
     public class FieldBuilderTests
     {
-        [Test]
+        [Fact]
         public void should_have_name()
         {
             var objectType = new ObjectGraphType();
@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Builders
             fields[0].Type.ShouldEqual(typeof(StringGraphType));
         }
 
-        [Test]
+        [Fact]
         public void should_have_name_and_description()
         {
             var objectType = new ObjectGraphType();
@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Builders
             fields[0].Type.ShouldEqual(typeof(StringGraphType));
         }
 
-        [Test]
+        [Fact]
         public void should_return_the_right_type()
         {
             var objectType = new ObjectGraphType();
@@ -56,7 +56,7 @@ namespace GraphQL.Tests.Builders
             fields[0].Resolve(context).ShouldEqual("SomeString");
         }
 
-        [Test]
+        [Fact]
         public void can_be_defined_of_graphtype()
         {
             var objectType = new ObjectGraphType();
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Builders
             fields[2].Type.ShouldEqual(typeof(DateGraphType));
         }
 
-        [Test]
+        [Fact]
         public void can_have_a_default_value()
         {
             var objectType = new ObjectGraphType();
@@ -88,7 +88,7 @@ namespace GraphQL.Tests.Builders
             objectType.Fields.First().DefaultValue.ShouldEqual(15);
         }
 
-        [Test]
+        [Fact]
         public void can_have_arguments_with_and_without_default_values()
         {
             var objectType = new ObjectGraphType();
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Builders
             field.Arguments[2].DefaultValue.ShouldEqual(null);
         }
 
-        [Test]
+        [Fact]
         public void can_determine_whether_argument_exists_in_resolver()
         {
             var objectType = new ObjectGraphType();
@@ -146,7 +146,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void getting_unspecified_argument_in_resolver_yields_null()
         {
             var objectType = new ObjectGraphType();
@@ -166,7 +166,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void getting_unspecified_argument_in_resolver_yields_overridden_default_value()
         {
             var objectType = new ObjectGraphType();
@@ -186,7 +186,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_get_nullable_argument_with_value()
         {
             var objectType = new ObjectGraphType();
@@ -209,7 +209,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_get_nullable_argument_with_null_value()
         {
             var objectType = new ObjectGraphType();
@@ -232,7 +232,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_get_nullable_argument_missing_value()
         {
             var objectType = new ObjectGraphType();
@@ -252,7 +252,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_get_enum_argument()
         {
             var objectType = new ObjectGraphType();
@@ -275,7 +275,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_get_enum_argument_with_overriden_default_value()
         {
             var objectType = new ObjectGraphType();
@@ -295,7 +295,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void getting_specified_argument_in_resolver_overrides_default_value()
         {
             var objectType = new ObjectGraphType();
@@ -318,7 +318,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_access_object()
         {
             var objectType = new ObjectGraphType();
@@ -337,7 +337,7 @@ namespace GraphQL.Tests.Builders
             });
         }
 
-        [Test]
+        [Fact]
         public void can_access_object_with_custom_resolver()
         {
             var objectType = new ObjectGraphType();

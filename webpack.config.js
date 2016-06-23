@@ -11,13 +11,13 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['', '.js', '.json'],
+    extensions: ['', '.js', '.json']
   },
 
   module: {
     loaders: [
       { test: /\.js/, loader: 'babel', exclude: /node_modules/ }
     ]
-  },
+  }
 
 };

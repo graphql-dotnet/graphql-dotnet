@@ -11,7 +11,7 @@ namespace GraphQL.Tests
                 .NameEndsWith("Tests");
 
             Methods
-                .HasOrInherits<TestAttribute>();
+                .HasOrInherits<FactAttribute>();
         }
     }
 }

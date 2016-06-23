@@ -2,62 +2,42 @@
 
 namespace GraphQL.Tests.Validation
 {
-    public class LoneAnonymousOperationTests : ValidationTestBase<ValidationSchema>
+    public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOperation, ValidationSchema>
     {
-        private readonly LoneAnonymousOperation _rule = new LoneAnonymousOperation();
-
-        [Test]
+        [Fact]
         public void no_operations()
         {
-            var query = @"
+            ShouldPassRule(@"
                 fragment fragA on Type {
                   field
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void one_anon_operation()
         {
-            var query = @"
+            ShouldPassRule(@"
                 {
                   field
                 }
-                ";
+                ");
+       }
 
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
-        }
-
-        [Test]
+        [Fact]
         public void one_named_operation()
         {
-            var query = @"
+            ShouldPassRule(@"
                 query Foo {
                   field
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void multiple_operations()
         {
-            var query = @"
+            ShouldPassRule(@"
                 query Foo {
                   field
                 }
@@ -65,19 +45,13 @@ namespace GraphQL.Tests.Validation
                 query Bar {
                   field
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void one_anon_with_fragment()
         {
-            var query = @"
+            ShouldPassRule(@"
                 {
                   ...Foo
                 }
@@ -85,16 +59,10 @@ namespace GraphQL.Tests.Validation
                 fragment Foo on Type {
                   field
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void multiple_anon_operations()
         {
             var query = @"
@@ -110,13 +78,12 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
-                _.Error(_rule.AnonOperationNotAloneMessage(), 2, 17);
-                _.Error(_rule.AnonOperationNotAloneMessage(), 6, 17);
+                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(Rule.AnonOperationNotAloneMessage(), 6, 17);
             });
         }
 
-        [Test]
+        [Fact]
         public void anon_operation_with_mutation()
         {
             var query = @"
@@ -132,12 +99,11 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
-                _.Error(_rule.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
             });
         }
 
-        [Test]
+        [Fact]
         public void anon_operation_with_subscription()
         {
             var query = @"
@@ -153,8 +119,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
-                _.Error(_rule.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
             });
         }
     }

@@ -2,7 +2,7 @@
 {
     public class StarWarsFragmentTests : StarWarsTestBase
     {
-        [Test]
+        [Fact]
         public void use_fragment_spread_to_avoid_duplicate_content()
         {
             var query = @"
@@ -32,7 +32,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void use_inline_fragment_on_interface()
         {
             var query = @"

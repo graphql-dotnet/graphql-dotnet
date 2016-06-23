@@ -4,7 +4,7 @@ namespace GraphQL.Tests
 {
     public class GraphQLExtensionsTester
     {
-        [Test]
+        [Fact]
         public void trims_nonnull_bang()
         {
             var nonNullName = "Human!";
@@ -12,7 +12,7 @@ namespace GraphQL.Tests
             nonNullName.TrimGraphQLTypes().ShouldEqual("Human");
         }
 
-        [Test]
+        [Fact]
         public void trims_array()
         {
             var nonNullName = "[Human]";
@@ -20,7 +20,7 @@ namespace GraphQL.Tests
             nonNullName.TrimGraphQLTypes().ShouldEqual("Human");
         }
 
-        [Test]
+        [Fact]
         public void trims_combo()
         {
             var nonNullName = "[Human]!";

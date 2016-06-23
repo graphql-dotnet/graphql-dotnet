@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Types
 {
     public class SchemaTests
     {
-        [Test]
+        [Fact]
         public void registers_interfaces_when_not_used_in_fields()
         {
             var schema = new AnInterfaceSchema();
@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Types
             result.ShouldNotBeNull("Interface type should be registered");
         }
 
-        [Test]
+        [Fact]
         public void recursively_registers_children()
         {
             var schema = new ARootSchema();
@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Types
                 "DSchemaType");
         }
 
-        [Test]
+        [Fact]
         public void registers_argument_input_objects()
         {
             var schema = new ARootSchema();
@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Types
                 "DInputType");
         }
 
-        [Test]
+        [Fact]
         public void registers_type_when_list()
         {
             var schema = new ARootSchema();
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Types
                 "DListType");
         }
 
-        [Test]
+        [Fact]
         public void registers_union_types()
         {
             var schema = new ARootSchema();
@@ -66,28 +66,28 @@ namespace GraphQL.Tests.Types
                 "WithoutIsTypeOf2Type");
         }
 
-        [Test]
+        [Fact]
         public void throw_error_on_missing_istypeof()
         {
             var schema = new InvalidUnionSchema();
             Expect.Throws<ExecutionError>(() => schema.FindType("a"));
         }
 
-        [Test]
+        [Fact]
         public void throw_error_on_non_graphtype_with_register_types()
         {
             var schema = new Schema();
             Expect.Throws<ArgumentOutOfRangeException>(() => schema.RegisterTypes(typeof(MyDto)));
         }
         
-        [Test]
+        [Fact]
         public void throw_error_on_null_with_register_types()
         {
             var schema = new Schema();
             Expect.Throws<ArgumentNullException>(() => schema.RegisterTypes(null));
         }
 
-        [Test]
+        [Fact]
         public void registers_additional_types()
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Types
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
-        [Test]
+        [Fact]
         public void registers_only_root_types()
         {
             var schema = new ARootSchema();

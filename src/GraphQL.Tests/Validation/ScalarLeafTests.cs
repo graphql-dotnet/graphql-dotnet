@@ -3,32 +3,19 @@ using GraphQL.Validation.Rules;
 
 namespace GraphQL.Tests.Validation
 {
-    public class ScalarLeafTests : ValidationTestBase<ValidationSchema>
+    public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     {
-        private readonly ScalarLeafs _rule;
-
-        public ScalarLeafTests()
-        {
-            _rule = new ScalarLeafs();
-        }
-
-        [Test]
+        [Fact]
         public void valid_scalar_selection()
         {
-            var query = @"
+            ShouldPassRule(@"
                 fragment scalarSelection on Dog {
                   barks
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void object_type_missing_selection()
         {
             var query = @"
@@ -40,15 +27,14 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.RequiredSubselectionMessage("human", "Human"),
+                    message: Rule.RequiredSubselectionMessage("human", "Human"),
                     line: 3,
                     column: 19);
             });
         }
 
-        [Test]
+        [Fact]
         public void interface_type_missing_selection()
         {
             var query = @"{
@@ -61,31 +47,24 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.RequiredSubselectionMessage("pets", "[Pet]"),
+                    message: Rule.RequiredSubselectionMessage("pets", "[Pet]"),
                     line: 3,
                     column: 21);
             });
         }
 
-        [Test]
+        [Fact]
         public void valid_scalar_selection_with_args()
         {
-            var query = @"
+            ShouldPassRule(@"
                 fragment scalarSelectionWithArgs on Dog {
                   doesKnowCommand(dogCommand: SIT)
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void scalar_selection_not_allowed_on_boolean()
         {
             var query = @"
@@ -97,15 +76,14 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.NoSubselectionAllowedMessage("barks", "Boolean"),
+                    message: Rule.NoSubselectionAllowedMessage("barks", "Boolean"),
                     line: 3,
                     column: 25);
             });
         }
 
-        [Test]
+        [Fact]
         public void scalar_selection_not_allowed_on_enum()
         {
             var query = @"
@@ -117,15 +95,14 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.NoSubselectionAllowedMessage("furColor", "FurColor"),
+                    message: Rule.NoSubselectionAllowedMessage("furColor", "FurColor"),
                     line: 3,
                     column: 28);
             });
         }
 
-        [Test]
+        [Fact]
         public void scalar_selection_not_allowed_with_args()
         {
             var query = @"
@@ -137,15 +114,14 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    message: Rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
                     line: 3,
                     column: 52);
             });
         }
 
-        [Test]
+        [Fact]
         public void scalar_selection_not_allowed_with_directives()
         {
             var query = @"
@@ -157,15 +133,14 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.NoSubselectionAllowedMessage("name", "String"),
+                    message: Rule.NoSubselectionAllowedMessage("name", "String"),
                     line: 3,
                     column: 43);
             });
         }
 
-        [Test]
+        [Fact]
         public void scalar_selection_not_allowed_with_directives_and_args()
         {
             var query = @"
@@ -177,9 +152,8 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(
-                    message: _rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    message: Rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
                     line: 3,
                     column: 71);
             });

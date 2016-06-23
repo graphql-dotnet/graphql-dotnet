@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Execution
 {
     public class SchemaLifetimeTests
     {
-        [Test]
+        [Fact]
         public void DisposingRightAway_DoesNotThrowException()
         {
             var schema = new Schema();
@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Execution
             Assert.DoesNotThrow(() => schema.Dispose());
         }
 
-        [Test]
+        [Fact]
         public async Task ExecutingThenDisposing_DoesNotThrowException()
         {
             var executer = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
