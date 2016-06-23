@@ -38,31 +38,31 @@ namespace GraphQL.Tests.Execution.Directives
     {
         private readonly DirectiveData _data = new DirectiveData();
 
-        [Test]
+        [Fact]
         public void works_without_directives()
         {
             AssertQuerySuccess("{a, b}", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void works_on_scalars()
         {
             AssertQuerySuccess("{a, b @include(if: true) }", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_false_omits_on_scalar()
         {
             AssertQuerySuccess("{a, b @include(if: false) }", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_false_includes_scalar()
         {
             AssertQuerySuccess("{a, b @skip(if: false) }", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_true_omits_scalar()
         {
             AssertQuerySuccess("{a, b @skip(if: true) }", "{a: 'a'}", null, _data);
@@ -73,7 +73,7 @@ namespace GraphQL.Tests.Execution.Directives
     {
         private readonly DirectiveData _data = new DirectiveData();
 
-        [Test]
+        [Fact]
         public void if_false_omits_fragment_spread()
         {
             AssertQuerySuccess(@"
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_true_includes_fragment_spread()
         {
             AssertQuerySuccess(@"
@@ -101,7 +101,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_false_includes_fragment_spread()
         {
             AssertQuerySuccess(@"
@@ -115,7 +115,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_true_omits_fragment_spread()
         {
             AssertQuerySuccess(@"
@@ -129,7 +129,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_false_omits_inline_fragment()
         {
             AssertQuerySuccess(@"
@@ -142,7 +142,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_true_includes_inline_fragment()
         {
             AssertQuerySuccess(@"
@@ -155,7 +155,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_true_omits_inline_fragment()
         {
             AssertQuerySuccess(@"
@@ -168,7 +168,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_false_includes_inline_fragment()
         {
             AssertQuerySuccess(@"
@@ -181,7 +181,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_false_omits_fragment()
         {
             AssertQuerySuccess(@"
@@ -195,7 +195,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void if_true_includes_fragment()
         {
             AssertQuerySuccess(@"
@@ -209,7 +209,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_false_includes_fragment()
         {
             AssertQuerySuccess(@"
@@ -223,7 +223,7 @@ namespace GraphQL.Tests.Execution.Directives
             ", "{a: 'a', b: 'b'}", null, _data);
         }
 
-        [Test]
+        [Fact]
         public void skip_true_omits_fragment()
         {
             AssertQuerySuccess(@"

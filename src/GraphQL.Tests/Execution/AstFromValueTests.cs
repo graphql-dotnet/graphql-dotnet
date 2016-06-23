@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Execution
     {
         readonly DocumentExecuter _executor = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
 
-        [Test]
+        [Fact]
         public void converts_null_to_string_value()
         {
             var result = _executor.AstFromValue(null, null, null);
@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldBeType<StringValue>();
         }
 
-        [Test]
+        [Fact]
         public void converts_string_to_string_value()
         {
             var result = _executor.AstFromValue(null, "test", null);
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldBeType<StringValue>();
         }
 
-        [Test]
+        [Fact]
         public void converts_bool_to_boolean_value()
         {
             var result = _executor.AstFromValue(null, true, null);
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldBeType<BooleanValue>();
         }
 
-        [Test]
+        [Fact]
         public void converts_long_to_long_value()
         {
             long val = 123;
@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldBeType<LongValue>();
         }
 
-        [Test]
+        [Fact]
         public void converts_int_to_int_value()
         {
             int val = 123;
@@ -51,7 +51,7 @@ namespace GraphQL.Tests.Execution
             result.ShouldBeType<IntValue>();
         }
 
-        [Test]
+        [Fact]
         public void converts_double_to_float_value()
         {
             double val = 0.42;

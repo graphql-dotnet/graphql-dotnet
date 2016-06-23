@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Utilities
             result.Replace("\r", "").ShouldEqual(expected.Replace("\r", ""));
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field()
         {
             var result = printSingleFieldSchema<StringGraphType>();
@@ -52,7 +52,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_list_field()
         {
             var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
@@ -64,7 +64,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_non_null_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
@@ -76,7 +76,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_non_null_list_of_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
@@ -88,7 +88,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_non_null_list_of_non_null_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
@@ -100,7 +100,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_object_field()
         {
             var root = new ObjectGraphType {Name = "Root"};
@@ -119,7 +119,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_int_arg()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -136,7 +136,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_int_arg_with_default()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -153,7 +153,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_non_null_int_arg()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -170,7 +170,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_multiple_args()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -188,7 +188,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_multiple_args_first_has_default()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -207,7 +207,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_multiple_args_second_has_default()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -226,7 +226,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_string_field_with_multiple_args_third_has_default()
         {
             var result = printSingleFieldSchema<StringGraphType>(
@@ -245,7 +245,7 @@ type Root {
             AssertEqual(result, expected);
         }
 
-        [Test]
+        [Fact]
         public void prints_interface()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -268,7 +268,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_multiple_interfaces()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -295,7 +295,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_unions()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -324,7 +324,7 @@ union SingleUnion = Foo
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_input_type()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -348,7 +348,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_custom_scalar()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -365,7 +365,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_enum()
         {
             var root = new ObjectGraphType { Name = "Root" };
@@ -386,7 +386,7 @@ type Root {
 ");
         }
 
-        [Test]
+        [Fact]
         public void prints_introspection_schema()
         {
             var schema = new Schema

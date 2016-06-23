@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Types.Relay
     {
         private EdgeType<ObjectGraphType> type = new EdgeType<ObjectGraphType>();
 
-        [Test]
+        [Fact]
         public void should_derive_name()
         {
             type.Name.ShouldEqual("ObjectEdge");

@@ -2,33 +2,25 @@
 
 namespace GraphQL.Tests.Validation
 {
-    public class VariablesInAllowedPositionTests : ValidationTestBase<ValidationSchema>
+    public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAllowedPosition, ValidationSchema>
     {
-        private readonly VariablesInAllowedPosition _rule = new VariablesInAllowedPosition();
-
-        [Test]
+        [Fact]
         public void boolean_to_boolean()
         {
-            var query = @"
+            ShouldPassRule(@"
                 query Query($booleanArg: Boolean)
                 {
                   complicatedArgs {
                     booleanArgField(booleanArg: $booleanArg)
                   }
                 }
-                ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+                ");
         }
 
-        [Test]
+        [Fact]
         public void boolean_to_boolean_within_fragment()
         {
-            var query = @"
+            ShouldPassRule(@"
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $booleanArg)
               }
@@ -38,15 +30,9 @@ namespace GraphQL.Tests.Validation
                   ...booleanArgFrag
                 }
               }
-            ";
+            ");
 
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
-
-            var query2 = @"
+            ShouldPassRule(@"
               query Query($booleanArg: Boolean)
               {
                 complicatedArgs {
@@ -56,38 +42,26 @@ namespace GraphQL.Tests.Validation
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $booleanArg)
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query2;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void nonnull_boolean_to_boolean()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($nonNullBooleanArg: Boolean!)
               {
                 complicatedArgs {
                   booleanArgField(booleanArg: $nonNullBooleanArg)
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void nonnull_boolean_to_boolean_within_fragment()
         {
-            var query = @"
+            ShouldPassRule(@"
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $nonNullBooleanArg)
               }
@@ -97,183 +71,123 @@ namespace GraphQL.Tests.Validation
                   ...booleanArgFrag
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void int_to_int_with_default()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($intArg: Int = 1)
               {
                 complicatedArgs {
                   nonNullIntArgField(nonNullIntArg: $intArg)
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void string_list_to_string_list()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($stringListVar: [String])
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: $stringListVar)
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void nonnull_string_list_to_string_list()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($stringListVar: [String!])
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: $stringListVar)
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void string_to_string_list_in_item_position()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($stringVar: String)
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: [$stringVar])
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void nonnull_string_to_string_list_in_item_position()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($stringVar: String!)
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: [$stringVar])
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void complexinput_to_complexinput()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($complexVar: ComplexInput)
               {
                 complicatedArgs {
                   complexArgField(complexArg: $complexVar)
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void complexinput_to_complexinput_in_field_position()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($boolVar: Boolean = false)
               {
                 complicatedArgs {
                   complexArgField(complexArg: {requiredArg: $boolVar})
                 }
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void nullable_boolean_to_nullable_boolean_in_directive()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($boolVar: Boolean!)
               {
                 dog @include(if: $boolVar)
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void boolean_to_nullable_boolean_in_directive_with_default()
         {
-            var query = @"
+            ShouldPassRule(@"
               query Query($boolVar: Boolean = false)
               {
                 dog @include(if: $boolVar)
               }
-            ";
-
-            ShouldPassRule(_ =>
-            {
-                _.Query = query;
-                _.Rule(_rule);
-            });
+            ");
         }
 
-        [Test]
+        [Fact]
         public void int_to_nonnull_int()
         {
             var query = @"
@@ -287,17 +201,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(2, 27);
                     err.Loc(4, 53);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void int_to_nonnull_int_within_fragment()
         {
             var query = @"
@@ -315,17 +228,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(6, 27);
                     err.Loc(3, 51);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void int_to_nonnull_int_within_nested_fragment()
         {
             var query = @"
@@ -347,17 +259,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(10, 27);
                     err.Loc(7, 51);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void string_over_boolean()
         {
             var query = @"
@@ -371,17 +282,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "Boolean");
+                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "Boolean");
                     err.Loc(2, 27);
                     err.Loc(4, 47);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void string_to_string_list()
         {
             var query = @"
@@ -395,17 +305,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "[String]");
+                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "[String]");
                     err.Loc(2, 27);
                     err.Loc(4, 53);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void boolean_to_nonnull_boolean_in_directive()
         {
             var query = @"
@@ -417,17 +326,16 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("boolVar", "Boolean", "Boolean!");
+                    err.Message = Rule.BadVarPosMessage("boolVar", "Boolean", "Boolean!");
                     err.Loc(2, 27);
                     err.Loc(3, 34);
                 });
             });
         }
 
-        [Test]
+        [Fact]
         public void string_to_nonnull_boolean_in_directive()
         {
             var query = @"
@@ -439,10 +347,9 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Rule(_rule);
                 _.Error(err =>
                 {
-                    err.Message = _rule.BadVarPosMessage("stringVar", "String", "Boolean!");
+                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "Boolean!");
                     err.Loc(2, 27);
                     err.Loc(3, 34);
                 });

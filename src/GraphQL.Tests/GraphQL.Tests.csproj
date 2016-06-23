@@ -79,7 +79,7 @@
     <Compile Include="CustomConvention.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTestBase.cs" />
-    <Compile Include="TestAttribute.cs" />
+    <Compile Include="FactAttribute.cs" />
     <Compile Include="Expect.cs" />
     <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />

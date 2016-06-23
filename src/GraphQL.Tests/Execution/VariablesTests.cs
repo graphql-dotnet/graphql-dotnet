@@ -124,7 +124,7 @@ namespace GraphQL.Tests.Execution
 
     public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema>
     {
-        [Test]
+        [Fact]
         public void executes_with_complex_input()
         {
             var query = @"
@@ -137,7 +137,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void properly_parses_single_value_to_list()
         {
             var query = @"
@@ -150,7 +150,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void does_not_use_incorrect_value()
         {
             var query = @"
@@ -172,7 +172,7 @@ namespace GraphQL.Tests.Execution
             }
         ";
 
-        [Test]
+        [Fact]
         public void executes_with_complex_input()
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
@@ -182,7 +182,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(_query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void properly_parses_single_value_to_list()
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
@@ -192,7 +192,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(_query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void uses_default_value_when_not_provided()
         {
             var queryWithDefaults = @"
@@ -206,7 +206,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(queryWithDefaults, expected);
         }
 
-        [Test]
+        [Fact]
         public void executes_with_complex_scalar_input()
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
@@ -216,7 +216,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(_query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void errors_on_null_for_nested_non_null()
         {
             string expected = null;
@@ -231,7 +231,7 @@ namespace GraphQL.Tests.Execution
             caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
-        [Test]
+        [Fact]
         public void errors_on_incorrect_type()
         {
             string expected = null;
@@ -247,7 +247,7 @@ namespace GraphQL.Tests.Execution
             caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
-        [Test]
+        [Fact]
         public void errors_on_omission_of_nested_non_null()
         {
             string expected = null;
@@ -262,7 +262,7 @@ namespace GraphQL.Tests.Execution
             caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
-        [Test]
+        [Fact]
         public void errors_on_addition_of_unknown_input_field()
         {
             string expected = null;
@@ -277,7 +277,7 @@ namespace GraphQL.Tests.Execution
             caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
-        [Test]
+        [Fact]
         public void executes_with_injected_input_variables()
         {
             var query = @"
@@ -296,7 +296,7 @@ namespace GraphQL.Tests.Execution
 
     public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     {
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_ommited()
         {
             var query = @"
@@ -314,7 +314,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_ommited_in_a_variable()
         {
             var query = @"
@@ -332,7 +332,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_ommited_in_an_unlisted_variable()
         {
             var query = @"
@@ -350,7 +350,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
         }
 
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_set_to_null_in_a_variable()
         {
             var query = @"
@@ -370,7 +370,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_set_to_a_value_in_a_variable()
         {
             var query = @"
@@ -390,7 +390,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void allows_nullable_inputs_to_be_set_to_a_value_directly()
         {
             var query = @"
@@ -411,7 +411,7 @@ namespace GraphQL.Tests.Execution
 
     public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     {
-        [Test]
+        [Fact]
         public void does_not_allow_non_nullable_inputs_to_be_omitted_in_a_variable()
         {
             var query = @"
@@ -430,7 +430,7 @@ namespace GraphQL.Tests.Execution
             caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
         }
 
-        [Test]
+        [Fact]
         public void does_not_allow_non_nullable_inputs_to_be_set_to_null_in_a_variable()
         {
             var query = @"
@@ -451,7 +451,7 @@ namespace GraphQL.Tests.Execution
             caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
         }
 
-        [Test]
+        [Fact]
         public void allows_non_nullable_inputs_to_be_set_to_a_value_in_a_variable()
         {
             var query = @"
@@ -471,7 +471,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected, inputs);
         }
 
-        [Test]
+        [Fact]
         public void allows_non_nullable_inputs_to_be_set_to_a_value_directly()
         {
             var query = @"
@@ -492,7 +492,7 @@ namespace GraphQL.Tests.Execution
 
     public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
     {
-        [Test]
+        [Fact]
         public void when_no_argument_provided()
         {
             var query = @"
@@ -510,7 +510,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void when_nullable_variable_provided()
         {
             var query = @"
@@ -528,7 +528,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void when_argument_provided_cannot_be_parsed()
         {
             var query = @"

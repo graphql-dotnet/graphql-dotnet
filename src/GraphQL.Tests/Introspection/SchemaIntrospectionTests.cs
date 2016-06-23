@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Introspection
 {
     public class SchemaIntrospectionTests
     {
-        [Test]
+        [Fact]
         public void validate_core_schema()
         {
             var documentExecuter = new DocumentExecuter();

@@ -2,7 +2,7 @@
 {
     public class StarWarsIntrospectionTests : StarWarsTestBase
     {
-        [Test]
+        [Fact]
         public void provides_typename()
         {
             var query = "{ hero { __typename name } }";
@@ -12,7 +12,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_schema_for_an_object_kind()
         {
             var query = @"
@@ -34,7 +34,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_schema_for_an_interface_kind()
         {
             var query = @"
@@ -56,7 +56,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_schema_for_possibleTypes_of_an_interface()
         {
             var query = @"
@@ -86,7 +86,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_the_schema_for_object_fields()
         {
             var query = @"
@@ -150,7 +150,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_the_schema_for_documentation()
         {
             var query = @"
@@ -171,7 +171,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_the_schema()
         {
             var query = @"
@@ -297,7 +297,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void allows_querying_field_args()
         {
             var query = @"
@@ -376,7 +376,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        [Test]
+        [Fact]
         public void full_schema_query()
         {
             var query = @"

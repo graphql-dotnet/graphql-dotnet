@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Execution.Cancellation
 
     public class CancellationTests : QueryTestBase<CancellationSchema>
     {
-        [Test]
+        [Fact]
         public void cancellation_token_in_context()
         {
             using (var tokenSource = new CancellationTokenSource())
@@ -56,7 +56,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             }
         }
 
-        [Test]
+        [Fact]
         public void cancellation_is_propagated()
         {
             using (var tokenSource = new CancellationTokenSource())

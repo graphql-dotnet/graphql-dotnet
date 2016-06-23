@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Types
 {
     public class NonNullGraphTypeTests : QueryTestBase<NullableSchema>
     {
-        [Test]
+        [Fact]
         public void nullable_fields_with_values_never_complain()
         {
             AssertQuerySuccess(
@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Types
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
-        [Test]
+        [Fact]
         public void nullable_fields_without_values_never_complain()
         {
             AssertQuerySuccess(
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
                 root: new ExampleContext(null, null, null));
         }
 
-        [Test]
+        [Fact]
         public void nonnullable_fields_with_values_never_complain()
         {
             AssertQuerySuccess(
@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Types
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
-        [Test]
+        [Fact]
         public void nonnullable_fields_without_values_do_complain()
         {
             var result = AssertQueryWithErrors(

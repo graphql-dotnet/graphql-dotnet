@@ -5,6 +5,12 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Argument values of correct type
+    /// 
+    /// A GraphQL document is only valid if all field argument literal values are
+    /// of the type expected by their position.
+    /// </summary>
     public class ArgumentsOfCorrectType : IValidationRule
     {
         public INodeVisitor Validate(ValidationContext context)

@@ -20,19 +20,19 @@ namespace GraphQL.Tests.Bugs
             return _executer.ExecuteAsync(schema, null, query, null, null, CancellationToken.None).Result;
         }
 
-        [Test]
+        [Fact]
         public void only_nullable_is_happy()
         {
             VerifyIntrospection(new NullableSchema(true, false));
         }
 
-        [Test]
+        [Fact]
         public void only_nonnullable_is_happy()
         {
             VerifyIntrospection(new NullableSchema(false, true));
         }
 
-        [Test]
+        [Fact]
         public void both_is_happy()
         {
             VerifyIntrospection(new NullableSchema(true, true));

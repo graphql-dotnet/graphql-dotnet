@@ -8,20 +8,27 @@ using Should;
 
 namespace GraphQL.Tests.Validation
 {
-    public class ValidationTestBase<TSchema>
+    public class ValidationTestBase<TRule, TSchema>
+        where TRule : IValidationRule, new()
         where TSchema : ISchema, new()
     {
         public ValidationTestBase()
         {
+            Rule = new TRule();
             Schema = new TSchema();
         }
+
+        protected TRule Rule { get; }
 
         protected TSchema Schema { get; }
 
         protected void ShouldFailRule(Action<ValidationTestConfig> configure)
         {
             var config = new ValidationTestConfig();
+            config.Rule(Rule);
             configure(config);
+
+            config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
             var result = Validate(config.Query, Schema, config.Rules);
 
@@ -48,10 +55,18 @@ namespace GraphQL.Tests.Validation
             result.Errors.Count.ShouldEqual(config.Assertions.Count());
         }
 
+        protected void ShouldPassRule(string query)
+        {
+            ShouldPassRule(_ => _.Query = query);
+        }
+
         protected void ShouldPassRule(Action<ValidationTestConfig> configure)
         {
             var config = new ValidationTestConfig();
+            config.Rule(Rule);
             configure(config);
+
+            config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
             var result = Validate(config.Query, Schema, config.Rules);
             if (result.Errors?.Any() == true)
