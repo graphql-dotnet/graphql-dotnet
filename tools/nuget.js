@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import yargs from 'yargs';
 import { exec } from 'child-process-promise';
@@ -24,6 +25,10 @@ let sourceOptions = sources.map(source=> {
   return path.join(inputDir, source);
 }).join(' ');
 
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir);
+}
+
 let ilRepackCommand = `${ilMerge} ${versionFlag} /target:library /targetplatform:v4 /internalize ${outFlag}  ${sourceOptions}`;
 
 console.log(ilRepackCommand);
@@ -37,5 +42,5 @@ exec(ilRepackCommand)
       console.log(result.stdout);
     })
     .fail(function (err) {
-        console.error('ERROR: ', err);
+        console.error('ERROR: ', err.stdout);
     });
