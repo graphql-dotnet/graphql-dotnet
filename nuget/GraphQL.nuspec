@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>GraphQL</id>
     <version>0.9.3.0</version>
@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>GraphQL for .NET</description>
-    <releaseNotes><![CDATA[* Add NoUndefinedVariables rule]]></releaseNotes>
+    <releaseNotes><![CDATA[]]></releaseNotes>
     <tags>GraphQL json api</tags>
   </metadata>
 </package>

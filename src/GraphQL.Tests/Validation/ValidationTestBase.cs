@@ -69,11 +69,12 @@ namespace GraphQL.Tests.Validation
             config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
             var result = Validate(config.Query, Schema, config.Rules);
+            var message = "";
             if (result.Errors?.Any() == true)
             {
-                Console.WriteLine(string.Join(", ", result.Errors.Select(x=>x.Message)));
+                message = string.Join(", ", result.Errors.Select(x => x.Message));
             }
-            result.IsValid.ShouldBeTrue();
+            result.IsValid.ShouldBeTrue(message);
         }
 
         private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules)
