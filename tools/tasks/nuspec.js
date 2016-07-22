@@ -22,7 +22,8 @@ export default (options) => {
   })
   .end({ pretty: true })
   .replace('&lt;', '<')
-  .replace('&gt;', '>');
+  .replace('&gt;', '>')
+  .replace(/&#xD;/g, '');
 
   // console.log(`\n${xml}\n`);
 

@@ -191,7 +191,7 @@ Console.Writeline(result);
 
 ```
 npm run setVersion 0.10.0
-write release notes
+write release notes in release-notes.md
 git commit/push
 download nuget from AppVeyor
 upload nuget package to github
