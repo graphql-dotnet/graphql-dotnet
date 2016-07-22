@@ -186,3 +186,14 @@ Console.Writeline(result);
   - [x] mutationType
   - [ ] subscriptionType
   - [x] directives
+
+### Deployment Process
+
+```
+npm run setVersion 0.10.0
+write release notes
+git commit/push
+download nuget from AppVeyor
+upload nuget package to github
+upload nuget package to nuget.org
+```

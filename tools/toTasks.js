@@ -21,6 +21,6 @@ function tasksFromObject(obj, target) {
   }, []);
 }
 
-export default function getTasks(obj, target) {
+export default function toTasks(obj, target) {
   return [].concat(tasksFromObject(obj, target));
 }
