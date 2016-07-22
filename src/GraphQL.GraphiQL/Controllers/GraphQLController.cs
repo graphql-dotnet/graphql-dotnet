@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace GraphQL.GraphiQL.Controllers
         private readonly ISchema _schema;
         private readonly IDocumentExecuter _executer;
         private readonly IDocumentWriter _writer;
+        private readonly IDictionary<string, string> _namedQueries;
 
         public GraphQLController(
             IDocumentExecuter executer,
@@ -23,6 +25,11 @@ namespace GraphQL.GraphiQL.Controllers
             _executer = executer;
             _writer = writer;
             _schema = schema;
+
+            _namedQueries = new Dictionary<string, string>
+            {
+                ["a-query"] = @"query foo { hero { name } }"
+            };
         }
 
         // This will display an example error
@@ -34,7 +41,14 @@ namespace GraphQL.GraphiQL.Controllers
         public async Task<HttpResponseMessage> Post(HttpRequestMessage request, GraphQLQuery query)
         {
             var inputs = query.Variables.ToInputs();
-            var result = await Execute(_schema, null, query.Query, query.OperationName, inputs);
+            var queryToExecute = query.Query;
+
+            if (!string.IsNullOrWhiteSpace(query.NamedQuery))
+            {
+                queryToExecute = _namedQueries[query.NamedQuery];
+            }
+
+            var result = await Execute(_schema, null, queryToExecute, query.OperationName, inputs);
 
             var httpResult = result.Errors?.Count > 0
                 ? HttpStatusCode.BadRequest
@@ -62,6 +76,7 @@ namespace GraphQL.GraphiQL.Controllers
     public class GraphQLQuery
     {
         public string OperationName { get; set; }
+        public string NamedQuery { get; set; }
         public string Query { get; set; }
         public string Variables { get; set; }
     }

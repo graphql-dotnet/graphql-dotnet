@@ -1,5 +1,16 @@
-before_build:
-  - nuget restore
+version: 0.9.3.{build}
+environment:
+  CI: true
+nuget:
+  account_feed: true
+  project_feed: true
+  disable_publish_on_pr: true
+build_script:
+- cmd: >-
+    npm install -g npm
 
-after_build:
-  - powershell ".\test.ps1"
+    npm --version
+
+    node --version
+
+    npm run build-ci

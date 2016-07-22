@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Builders
                     edges { cursor node { field1 field2 } }
                     items { field1 field2 }
                   }
-                }",
+                }}",
                 @"{ parent: {
                 connection1: {
                   totalCount: 3,
@@ -69,7 +69,7 @@ namespace GraphQL.Tests.Builders
                     pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
                     edges { cursor node { field1 field2 } }
                     items { field1 field2 }
-                  } }",
+                  } }}",
                 @"{ parent: {
                 connection2: {
                   totalCount: 3,

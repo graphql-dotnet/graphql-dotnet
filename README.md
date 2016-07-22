@@ -18,11 +18,11 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 0.8.0 - [upgrade guide](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
-There is a sample web api project hosting the GraphiQL interface.  `npm install` and build `webpack` from the root of the project.
+There is a sample web api project hosting the GraphiQL interface.  `npm install` and build `webpack` from the root of the repository.
 
 ```
 > npm install
-> webpack --progress
+> npm start
 ```
 ![](http://i.imgur.com/2uGdVAj.png)
 

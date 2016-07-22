@@ -76,7 +76,9 @@ namespace GraphQL.Tests
             var writtenResult = Writer.Write(new ExecutionResult {Data = runResult.Data});
             var expectedResult = Writer.Write(expectedExecutionResult);
 
+#if DEBUG
             Console.WriteLine(writtenResult);
+#endif
 
             writtenResult.ShouldEqual(expectedResult);
 
@@ -108,7 +110,9 @@ namespace GraphQL.Tests
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);
 
+#if DEBUG
             Console.WriteLine(writtenResult);
+#endif
 
             writtenResult.ShouldEqual(expectedResult);
 

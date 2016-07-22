@@ -67,9 +67,10 @@ namespace GraphQL.Types
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }
 
-                GraphType result;
-                _types.TryGetValue(typeName.TrimGraphQLTypes(), out result);
-                return result;
+                GraphType type;
+                var name = typeName.TrimGraphQLTypes();
+                _types.TryGetValue(name, out type);
+                return type;
             }
             set
             {
@@ -102,8 +103,9 @@ namespace GraphQL.Types
                 type => (GraphType) Activator.CreateInstance(type),
                 (name, type, _) =>
                 {
-                    _types[name] = type;
-                    _?.AddType(name, type, null);
+                    var trimmed = name.TrimGraphQLTypes();
+                    _types[trimmed] = type;
+                    _?.AddType(trimmed, type, null);
                 });
 
             AddType<TType>(context);
@@ -129,7 +131,7 @@ namespace GraphQL.Types
                 throw new ExecutionError("Only add root types.");
             }
 
-            var name = type.CollectTypes(context);
+            var name = type.CollectTypes(context).TrimGraphQLTypes();
             _types[name] = type;
 
             type.Fields.Apply(field =>
