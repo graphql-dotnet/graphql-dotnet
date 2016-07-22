@@ -10,6 +10,7 @@ import {
   runSerial,
   settings,
   setVersion,
+  appVeyorVersion,
   version
 } from './tasks';
 
@@ -40,7 +41,8 @@ const tasks = {
   artifacts: ['nuspec', 'nuget', artifacts],
   compile: ['restore', compile],
   test: fixie,
-  version,
+  appVeyorVersion,
+  version: [version, appVeyorVersion],
   nuspec: buildNuspec,
   nuget,
   restore,

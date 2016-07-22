@@ -8,6 +8,7 @@ import restore from './restore';
 import runSerial from './runSerial';
 import settings from './settings';
 import setVersion from './setVersion';
+import appVeyorVersion from './appVeyorVersion';
 import version from './version';
 
 export default {
@@ -21,5 +22,6 @@ export default {
   runSerial,
   settings,
   setVersion,
+  appVeyorVersion,
   version
 };
