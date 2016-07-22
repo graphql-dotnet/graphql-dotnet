@@ -1,23 +1,18 @@
-import yargs from 'yargs';
+import make from './make';
 import {
   artifacts,
   compile,
   fixie,
-  getTasks,
   nuget,
   nuspec,
   restore,
-  runSerial,
   settings,
   setVersion,
   appVeyorVersion,
   version
 } from './tasks';
 
-const args = yargs
-  .default('t', 'default')
-  .alias('t', 'target')
-  .argv;
+const args = process.argv.slice(2);
 
 function buildNuspec() {
   return nuspec({
@@ -46,9 +41,9 @@ const tasks = {
   nuspec: buildNuspec,
   nuget,
   restore,
-  setVersion: () => setVersion(args._[0]),
+  setVersion: () => setVersion(args[1]),
   'default': 'compile test',
   ci: 'version default artifacts'
 };
 
-runSerial(getTasks(tasks, args.target));
+make(tasks);

@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --progress",
-    "test": "babel-node tools/build.js --t test",
-    "build": "babel-node tools/build.js --t default",
-    "build-release": "set CONFIGURATION=Release&& babel-node tools/build.js --t default",
-    "build-ci": "set CONFIGURATION=Release&& npm install && babel-node tools/build.js --t ci",
-    "build-nuget": "babel-node tools/build.js --t nuget",
-    "release": "set CONFIGURATION=Release&& babel-node tools/build.js --t ci",
-    "restore": "babel-node tools/build.js --t restore",
-    "setVersion": "babel-node tools/build.js --t setVersion"
+    "test": "babel-node tools/build.js test",
+    "build": "babel-node tools/build.js",
+    "build-release": "set CONFIGURATION=Release&& babel-node tools/build.js",
+    "build-ci": "set CONFIGURATION=Release&& npm install && babel-node tools/build.js ci",
+    "build-nuget": "babel-node tools/build.js nuget",
+    "release": "set CONFIGURATION=Release&& babel-node tools/build.js ci",
+    "restore": "babel-node tools/build.js restore",
+    "setVersion": "babel-node tools/build.js setVersion"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,6 @@
     "rimraf": "^2.5.2",
     "superagent": "^2.0.0",
     "webpack": "^1.13.0",
-    "xmlbuilder": "^8.2.2",
-    "yargs": "^3.15.0"
+    "xmlbuilder": "^8.2.2"
   }
 }
