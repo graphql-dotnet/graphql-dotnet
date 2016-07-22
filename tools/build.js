@@ -29,7 +29,10 @@ function buildNuspec() {
     licenseUrl: 'https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md',
     projectUrl: 'https://github.com/graphql-dotnet/graphql-dotnet',
     tags: 'GraphQL json api',
-    releaseNotes: '* Add NoUndefinedVariables rule'
+    releaseNotes:
+      '* Nuget package structure has changed - the DLLs now reside in a net45 folder\n' +
+      '* Created new build process to help expedite deployment of new versions\n' +
+      '* Fixed a bug where type names with beginning or ending spaces would not get resolved'
   });
 }
 
