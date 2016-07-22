@@ -13,7 +13,7 @@ namespace GraphQL
     {
         public static string TrimGraphQLTypes(this string name)
         {
-            return Regex.Replace(name, "[\\[!\\]]", "");
+            return Regex.Replace(name, "[\\[!\\]]", "").Trim();
         }
 
         public static bool IsLeafType(this GraphType type, ISchema schema)
