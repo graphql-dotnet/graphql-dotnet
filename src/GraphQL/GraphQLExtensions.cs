@@ -22,6 +22,14 @@ namespace GraphQL
             return namedType is ScalarGraphType || namedType is EnumerationGraphType;
         }
 
+        public static bool IsInputType(this GraphType type, ISchema schema)
+        {
+            var namedType = type.GetNamedType(schema);
+            return namedType is ScalarGraphType ||
+                   namedType is EnumerationGraphType ||
+                   namedType is InputObjectGraphType;
+        }
+
         public static GraphType GetNamedType(this GraphType type, ISchema schema)
         {
             GraphType unmodifiedType = type;

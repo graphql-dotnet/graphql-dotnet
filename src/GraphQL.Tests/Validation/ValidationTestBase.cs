@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Validation
             });
 
             result.IsValid.ShouldBeFalse();
-            result.Errors.Count.ShouldEqual(config.Assertions.Count());
+            result.Errors.Count.ShouldEqual(config.Assertions.Count(), "The number of errors found does not match the number of errors expected.");
         }
 
         protected void ShouldPassRule(string query)
