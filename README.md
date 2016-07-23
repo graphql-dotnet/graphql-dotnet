@@ -165,7 +165,7 @@ Console.Writeline(result);
 - [ ] Unique input field names
 - [x] Unique operation names
 - [ ] Unique variable names
-- [ ] Variables are input types
+- [x] Variables are input types
 - [x] Variables in allowed position
 
 ### Schema Introspection

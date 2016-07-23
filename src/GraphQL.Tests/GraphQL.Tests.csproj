@@ -97,8 +97,10 @@
     <Compile Include="Validation\ScalarLeafTests.cs" />
     <Compile Include="Validation\UniqueOperationNamesTests.cs" />
     <Compile Include="Validation\ValidationErrorAssertion.cs" />
+    <Compile Include="Validation\ValidationSchema.cs" />
     <Compile Include="Validation\ValidationTestBase.cs" />
     <Compile Include="Validation\ValidationTestConfig.cs" />
+    <Compile Include="Validation\VariablesAreInputTypesTests.cs" />
     <Compile Include="Validation\VariablesInAllowedPositionTests.cs" />
   </ItemGroup>
   <ItemGroup>
