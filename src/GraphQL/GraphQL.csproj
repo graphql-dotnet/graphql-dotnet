@@ -160,6 +160,7 @@
     <Compile Include="Validation\EnterLeaveListener.cs" />
     <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
+    <Compile Include="Validation\Rules\UniqueInputFieldNames.cs" />
     <Compile Include="Validation\Rules\VariablesAreInputTypes.cs" />
     <Compile Include="Validation\Rules\VariablesInAllowedPosition.cs" />
     <Compile Include="Validation\TypeInfo.cs" />

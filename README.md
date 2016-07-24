@@ -162,7 +162,7 @@ Console.Writeline(result);
 - [x] Scalar leafs
 - [ ] Unique argument names
 - [ ] Unique fragment names
-- [ ] Unique input field names
+- [x] Unique input field names
 - [x] Unique operation names
 - [ ] Unique variable names
 - [x] Variables are input types
