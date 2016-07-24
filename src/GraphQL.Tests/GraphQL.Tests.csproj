@@ -91,7 +91,9 @@
     <Compile Include="Types\Relay\EdgeTypeTests.cs" />
     <Compile Include="Types\Relay\ConnectionTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
+    <Compile Include="Utilities\StringUtilsTests.cs" />
     <Compile Include="Validation\ArgumentsOfCorrectTypeTests.cs" />
+    <Compile Include="Validation\KnownTypeNamesTests.cs" />
     <Compile Include="Validation\LoneAnonymousOperationTests.cs" />
     <Compile Include="Validation\NoUndefinedVariablesTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />

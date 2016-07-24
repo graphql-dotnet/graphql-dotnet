@@ -53,14 +53,15 @@ namespace GraphQL.Validation
         {
             var rules = new List<IValidationRule>
             {
-                new ArgumentsOfCorrectType(),
                 new UniqueOperationNames(),
                 new LoneAnonymousOperation(),
-                new NoUndefinedVariables(),
-                new ScalarLeafs(),
-                new UniqueInputFieldNames(),
+                new KnownTypeNames(),
                 new VariablesAreInputTypes(),
-                new VariablesInAllowedPosition()
+                new ScalarLeafs(),
+                new NoUndefinedVariables(),
+                new ArgumentsOfCorrectType(),
+                new VariablesInAllowedPosition(),
+                new UniqueInputFieldNames()
             };
             return rules;
         }

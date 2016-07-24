@@ -150,7 +150,7 @@ Console.Writeline(result);
 - [ ] Known argument names
 - [ ] Known directives
 - [ ] Known fragment names
-- [ ] Known type names
+- [x] Known type names
 - [x] Lone anonymous operations
 - [ ] No fragment cycle
 - [x] No undefined variables
