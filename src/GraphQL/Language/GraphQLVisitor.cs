@@ -179,6 +179,7 @@ namespace GraphQL.Language
                 var name = item.NAME().GetText();
                 var val = Visit(item.value()) as IValue;
                 var field = new ObjectField(name, val);
+                NewNode(field, context);
                 fields.Add(field);
             }
 
@@ -197,6 +198,7 @@ namespace GraphQL.Language
                 var name = item.NAME().GetText();
                 var val = Visit(item.valueWithVariable()) as IValue;
                 var field = new ObjectField(name, val);
+                NewNode(field, context);
                 fields.Add(field);
             }
 

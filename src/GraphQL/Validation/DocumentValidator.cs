@@ -58,6 +58,8 @@ namespace GraphQL.Validation
                 new LoneAnonymousOperation(),
                 new NoUndefinedVariables(),
                 new ScalarLeafs(),
+                new UniqueInputFieldNames(),
+                new VariablesAreInputTypes(),
                 new VariablesInAllowedPosition()
             };
             return rules;

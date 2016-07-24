@@ -95,6 +95,7 @@
     <Compile Include="Validation\LoneAnonymousOperationTests.cs" />
     <Compile Include="Validation\NoUndefinedVariablesTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
+    <Compile Include="Validation\UniqueInputFieldNamesTests.cs" />
     <Compile Include="Validation\UniqueOperationNamesTests.cs" />
     <Compile Include="Validation\ValidationErrorAssertion.cs" />
     <Compile Include="Validation\ValidationSchema.cs" />

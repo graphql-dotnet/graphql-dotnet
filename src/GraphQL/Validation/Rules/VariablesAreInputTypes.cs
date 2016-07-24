@@ -4,6 +4,12 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Variables are input types
+    /// 
+    /// A GraphQL operation is only valid if all the variables it defines are of
+    /// input types (scalar, enum, or input object).
+    /// </summary>
     public class VariablesAreInputTypes : IValidationRule
     {
         public Func<string, string, string> UndefinedVarMessage = (variableName, typeName) =>
@@ -19,7 +25,7 @@ namespace GraphQL.Validation.Rules
 
                     if (!type.IsInputType(context.Schema))
                     {
-                        context.ReportError(new ValidationError("", UndefinedVarMessage(varDef.Name, context.Print(type)), varDef));
+                        context.ReportError(new ValidationError("5.7.3", UndefinedVarMessage(varDef.Name, context.Print(type)), varDef));
                     }
                 });
             });
