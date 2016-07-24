@@ -564,6 +564,8 @@ namespace GraphQL
                     var val = ValueFromScalar((ScalarGraphType) type, input);
                     return val != null;
                 }
+
+                astType = ((NonNullType) astType).Type;
             }
 
             if (input == null)

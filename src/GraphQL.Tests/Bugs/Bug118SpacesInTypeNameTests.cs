@@ -5,11 +5,11 @@ namespace GraphQL.Tests.Bugs
     public class Bug118SpacesInTypeNameTests : QueryTestBase<MutationSchema>
     {
         [Fact]
-        public void supports_partially_nullable_inputs()
+        public void supports_partially_nullable_inputs_when_parent_non_null()
         {
             var inputs = "{'input_0': {'id':'123', 'foo': null, 'bar': null} }".ToInputs();
             var query = @"
-mutation M($input_0: MyInput) {
+mutation M($input_0: MyInput!) {
   run(input: $input_0)
 }
 ";
