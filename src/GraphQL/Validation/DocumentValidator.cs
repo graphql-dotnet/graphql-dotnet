@@ -60,6 +60,7 @@ namespace GraphQL.Validation
                 new ScalarLeafs(),
                 new NoUndefinedVariables(),
                 new ArgumentsOfCorrectType(),
+                new DefaultValuesOfCorrectType(),
                 new VariablesInAllowedPosition(),
                 new UniqueInputFieldNames()
             };

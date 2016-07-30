@@ -13,14 +13,13 @@ namespace GraphQL.Utilities
         {
             var itemsArray = items.Take(maxLength).ToArray();
             var index = 0;
-            var result = itemsArray
+            return itemsArray
                 .Select(x => $"\"{x}\"")
                 .Aggregate((list, quoted) =>
                     list +
                     (itemsArray.Length > 2 ? ", " : " ") +
                     (++index == itemsArray.Length - 1 ? "or " : "") +
                     quoted);
-            return result;
         }
 
         /// <summary>
