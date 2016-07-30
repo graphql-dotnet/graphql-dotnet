@@ -1,3 +1,5 @@
-* Nuget package structure has changed - the DLLs now reside in a net45 folder
-* Created new build process to help expedite deployment of new versions
-* Fixed a bug where type names with beginning or ending spaces would not get resolved
+* Fix validation check for non-null input types
+* Add Unique input field names validation rule
+* Add Variables are input types validation rule
+* Add Known type names validation rule
+* Add Default values of correct type validation rule

@@ -144,7 +144,7 @@ Console.Writeline(result);
 
 ### Validation
 - [x] Arguments of correct type
-- [ ] Default values of correct type
+- [x] Default values of correct type
 - [ ] Fields on correct type
 - [ ] Fragments on composite type
 - [ ] Known argument names
