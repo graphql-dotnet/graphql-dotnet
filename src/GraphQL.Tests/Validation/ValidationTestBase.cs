@@ -42,17 +42,19 @@ namespace GraphQL.Tests.Validation
                     var errorLoc = error.Locations.Skip(locIdx).First();
                     errorLoc.Line.ShouldEqual(
                         assertLoc.Line,
-                        $"Expected line {assertLoc.Line} does not match error - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
                     errorLoc.Column.ShouldEqual(
                         assertLoc.Column,
-                        $"Expected column {assertLoc.Column} does not match error - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
                 });
 
                 error.Locations.Count().ShouldEqual(assert.Locations.Count());
             });
 
             result.IsValid.ShouldBeFalse();
-            result.Errors.Count.ShouldEqual(config.Assertions.Count(), "The number of errors found does not match the number of errors expected.");
+            result.Errors.Count.ShouldEqual(
+                config.Assertions.Count(),
+                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
         }
 
         protected void ShouldPassRule(string query)
