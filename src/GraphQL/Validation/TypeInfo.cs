@@ -13,12 +13,18 @@ namespace GraphQL.Validation
         private readonly Stack<GraphType> _inputTypeStack = new Stack<GraphType>();
         private readonly Stack<GraphType> _parentTypeStack = new Stack<GraphType>();
         private readonly Stack<FieldType> _fieldDefStack = new Stack<FieldType>();
+        private readonly Stack<INode> _ancestorStack = new Stack<INode>();
         private DirectiveGraphType _directive;
         private QueryArgument _argument;
 
         public TypeInfo(ISchema schema)
         {
             _schema = schema;
+        }
+
+        public INode[] GetAncestors()
+        {
+            return _ancestorStack.Select(x => x).Skip(1).Reverse().ToArray();
         }
 
         public GraphType GetLastType()
@@ -53,6 +59,8 @@ namespace GraphQL.Validation
 
         public void Enter(INode node)
         {
+            _ancestorStack.Push(node);
+
             if (node is SelectionSet)
             {
                 _parentTypeStack.Push(GetLastType());
@@ -160,6 +168,8 @@ namespace GraphQL.Validation
 
         public void Leave(INode node)
         {
+            _ancestorStack.Pop();
+
             if (node is SelectionSet)
             {
                 _parentTypeStack.Pop();
