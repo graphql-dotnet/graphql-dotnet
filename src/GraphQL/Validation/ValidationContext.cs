@@ -16,6 +16,8 @@ namespace GraphQL.Validation
         private readonly Dictionary<Operation, IEnumerable<VariableUsage>> _variables =
             new Dictionary<Operation, IEnumerable<VariableUsage>>();
 
+        private SchemaPrinter _schemaPrinter;
+
         public string OperationName { get; set; }
         public ISchema Schema { get; set; }
         public Document Document { get; set; }
@@ -29,6 +31,7 @@ namespace GraphQL.Validation
 
         public void ReportError(ValidationError error)
         {
+            Invariant.Check(error != null, "Must provide a validation error.");
             _errors.Add(error);
         }
 
@@ -151,8 +154,11 @@ namespace GraphQL.Validation
 
         public string Print(GraphType type)
         {
-            var printer = new SchemaPrinter(Schema);
-            return printer.ResolveName(type);
+            if (_schemaPrinter == null)
+            {
+                _schemaPrinter = new SchemaPrinter(Schema);
+            }
+            return _schemaPrinter.ResolveName(type);
         }
     }
 

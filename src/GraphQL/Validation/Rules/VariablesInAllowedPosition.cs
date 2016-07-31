@@ -5,6 +5,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Variables passed to field arguments conform to type
+    /// </summary>
     public class VariablesInAllowedPosition : IValidationRule
     {
         public Func<string, string, string, string> BadVarPosMessage =>
@@ -56,7 +59,9 @@ namespace GraphQL.Validation.Rules
             });
         }
 
-        // if a variable defintion has a default value, it is effectively non-null.
+        /// <summary>
+        /// if a variable defintion has a default value, it is effectively non-null.
+        /// </summary>
         private GraphType effectiveType(GraphType varType, VariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)

@@ -14,12 +14,12 @@ namespace GraphQL.Language
 
         public override string ToString()
         {
-            return "Argument{{name={0},value={1}}}".ToFormat(Name, Value);
+            return $"Argument{{name={Name},value={Value}}}";
         }
 
         protected bool Equals(Argument other)
         {
-            return base.Equals(other) && string.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name);
         }
 
         public override bool IsEqualTo(INode obj)
