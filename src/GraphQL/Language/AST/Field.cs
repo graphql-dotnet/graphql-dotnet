@@ -1,12 +1,27 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class Field : AbstractNode, ISelection, IHaveSelectionSet
     {
+        public Field()
+        {
+        }
+
+        public Field(NameNode alias, NameNode name)
+        {
+            Alias = alias?.Name;
+            AliasNode = alias;
+            Name = name.Name;
+            NameNode = name;
+        }
+
         public string Name { get; set; }
+        public NameNode NameNode { get; }
 
         public string Alias { get; set; }
+        public NameNode AliasNode { get; }
 
         public Directives Directives { get; set; }
 

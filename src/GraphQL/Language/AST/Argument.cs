@@ -1,10 +1,22 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class Argument : AbstractNode
     {
+        public Argument()
+        {
+        }
+
+        public Argument(NameNode name)
+        {
+            Name = name.Name;
+            NamedNode = name;
+        }
+
         public string Name { get; set; }
+        public NameNode NamedNode { get; }
         public IValue Value { get; set; }
 
         public override IEnumerable<INode> Children

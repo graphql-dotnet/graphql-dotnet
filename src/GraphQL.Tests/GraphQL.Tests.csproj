@@ -68,6 +68,7 @@
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
     <Compile Include="Types\StringGraphTypeTests.cs" />
+    <Compile Include="Language\ParserTests.cs" />
     <Compile Include="Utilities\GraphQLExtensionsTester.cs" />
     <Compile Include="Introspection\IntrospectionResult.cs" />
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
@@ -135,9 +136,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Language\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

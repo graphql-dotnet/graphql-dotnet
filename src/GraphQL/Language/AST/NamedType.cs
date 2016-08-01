@@ -1,13 +1,22 @@
-﻿namespace GraphQL.Language
+﻿using GraphQL.Language.AST;
+
+namespace GraphQL.Language
 {
     public class NamedType : AbstractNode, IType
     {
+        public NamedType(NameNode node)
+            : this(node.Name)
+        {
+            NameNode = node;
+        }
+
         public NamedType(string name)
         {
             Name = name;
         }
 
         public string Name { get; }
+        public NameNode NameNode { get; }
 
         public override string ToString()
         {

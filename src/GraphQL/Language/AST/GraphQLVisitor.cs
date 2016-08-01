@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
+using GraphQL.Language.AST;
 using GraphQL.Parsing;
 
 namespace GraphQL.Language
@@ -148,8 +149,8 @@ namespace GraphQL.Language
 
         public override object VisitVariable(GraphQLParser.VariableContext context)
         {
-            var variable = new VariableReference();
-            variable.Name = context.NAME().GetText();
+            var name = context.NAME().GetText();
+            var variable = new VariableReference(new NameNode(name));
             NewNode(variable, context);
             return variable;
         }

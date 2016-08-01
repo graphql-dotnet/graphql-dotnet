@@ -1,9 +1,17 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class Operation : AbstractNode, IDefinition, IHaveSelectionSet
     {
+        public Operation(NameNode name)
+            : this()
+        {
+            Name = name?.Name;
+            NameNode = name;
+        }
+
         public Operation()
         {
             OperationType = OperationType.Query;
@@ -12,6 +20,7 @@ namespace GraphQL.Language
         }
 
         public string Name { get; set; }
+        public NameNode NameNode { get; }
 
         public OperationType OperationType { get; set; }
 
