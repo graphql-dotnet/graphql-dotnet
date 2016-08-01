@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
@@ -147,12 +148,19 @@ namespace GraphQL.Language
 
     public class EnumValue : AbstractNode, IValue
     {
+        public EnumValue(NameNode name)
+        {
+            Name = name.Name;
+            NameNode = name;
+        }
+
         public EnumValue(string name)
         {
             Name = name;
         }
 
         public string Name { get; }
+        public NameNode NameNode { get; }
 
         public override string ToString()
         {
@@ -238,6 +246,12 @@ namespace GraphQL.Language
 
     public class ObjectField : AbstractNode
     {
+        public ObjectField(NameNode name, IValue value)
+            : this(name.Name, value)
+        {
+            NameNode = name;
+        }
+
         public ObjectField(string name, IValue value)
         {
             Name = name;
@@ -245,6 +259,7 @@ namespace GraphQL.Language
         }
 
         public string Name { get; }
+        public NameNode NameNode { get; }
         public IValue Value { get; }
 
         public override IEnumerable<INode> Children

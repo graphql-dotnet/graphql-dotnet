@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
@@ -50,7 +51,14 @@ namespace GraphQL.Language
 
     public class VariableReference : AbstractNode, IValue
     {
-        public string Name { get; set; }
+        public VariableReference(NameNode name)
+        {
+            Name = name.Name;
+            NameNode = name;
+        }
+
+        public string Name { get; }
+        public NameNode NameNode { get; }
 
         public override string ToString()
         {

@@ -1,15 +1,25 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class FragmentDefinition : AbstractNode, IDefinition, IHaveSelectionSet
     {
+        public FragmentDefinition(NameNode node)
+            : this()
+        {
+            Name = node.Name;
+            NameNode = node;
+        }
+
         public FragmentDefinition()
         {
             Directives = new Directives();
         }
 
         public string Name { get; set; }
+
+        public NameNode NameNode { get; }
 
         public NamedType Type { get; set; }
 

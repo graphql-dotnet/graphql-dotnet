@@ -1,15 +1,24 @@
 using System.Collections.Generic;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class FragmentSpread : AbstractNode, IFragment
     {
+        public FragmentSpread(NameNode node)
+            : this()
+        {
+            Name = node.Name;
+            NameNode = node;
+        }
+
         public FragmentSpread()
         {
             Directives = new Directives();
         }
 
         public string Name { get; set; }
+        public NameNode NameNode { get; }
 
         public Directives Directives { get; set; }
 

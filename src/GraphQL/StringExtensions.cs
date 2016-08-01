@@ -7,6 +7,11 @@ namespace GraphQL
 {
     public static class StringExtensions
     {
+        public static string ToStr(this IEnumerable<char> chars)
+        {
+            return new string(chars.ToArray());
+        }
+
         public static string ToFormat(this string format, params object[] args)
         {
             return string.Format(format, args);
