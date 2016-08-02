@@ -12,7 +12,7 @@ using Should;
 
 namespace GraphQL.Tests
 {
-    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, AntlrDocumentBuilder>
+    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, SpracheDocumentBuilder>
         where TSchema : ISchema
     {
     }

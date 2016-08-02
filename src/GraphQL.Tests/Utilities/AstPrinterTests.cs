@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Utilities
                 intArgField(intArg: 2)
               }
             }";
-            var builder = new AntlrDocumentBuilder();
+            var builder = new SpracheDocumentBuilder();
             var document = builder.Build(query);
 
             var result = _printer.Visit(document);
@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Utilities
             }
             ";
 
-            var builder = new AntlrDocumentBuilder();
+            var builder = new SpracheDocumentBuilder();
             var document = builder.Build(query);
 
             var result = _printer.Visit(document);

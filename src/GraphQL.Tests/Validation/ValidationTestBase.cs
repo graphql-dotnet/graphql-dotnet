@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Validation
 
         private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules)
         {
-            var documentBuilder = new AntlrDocumentBuilder();
+            var documentBuilder = new SpracheDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
             return validator.Validate(schema, document, rules);

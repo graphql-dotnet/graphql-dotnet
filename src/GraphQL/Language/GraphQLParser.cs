@@ -47,14 +47,14 @@ namespace GraphQL.Language
                 Parse.Ref(() => SelectionSet.Token()),
                 (type, name, variables, directives, selection) =>
                 {
-                    var operation = new Operation(name.Value.GetOrDefault()).WithLocation(type.Position);
+                    var operation = new Operation(name.Value.GetOrDefault()).WithLocation(type.Position.Line, type.Position.Column);
                     operation.Variables = variables.Value.GetOrElse(new VariableDefinitions());
                     operation.Directives = directives.Value.GetOrElse(new Directives());
                     operation.SelectionSet = selection.Value;
                     return operation;
                 }).Or(SelectionSet.Return(s =>
                 {
-                    var operation = new Operation().WithLocation(s.Position);
+                    var operation = new Operation().WithLocation(s.Position.Line, s.Position.Column);
                     operation.SelectionSet = s.Value;
                     return operation;
                 }));
@@ -174,31 +174,31 @@ namespace GraphQL.Language
             Parse.Regex("(on)").Token().Then(NamedType, (on, type) => type.Value);
 
         public static Parser<ListValue> ListValue =>
-            Parse.EmptyBrackets(pos =>
+            Parse.Ref(() => Value.Token().Many()).Brackets((pos, values) =>
             {
-                var list = new ListValue(Enumerable.Empty<IValue>()).WithLocation(pos);
+                var list = new ListValue(values.Value).WithLocation(pos.Line, pos.Column);
                 return list;
             })
-            .Or(Value.Many().Brackets((pos, values) =>
+            .Or(Parse.EmptyBrackets(pos =>
             {
-                var list = new ListValue(values.Value).WithLocation(pos);
+                var list = new ListValue(Enumerable.Empty<IValue>()).WithLocation(pos.Line, pos.Column);
                 return list;
             }));
 
         public static Parser<ObjectValue> ObjectValue =>
             Parse.EmptyBraces((pos, rest) =>
             {
-                var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos);
+                var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos.Line, pos.Column);
                 return value;
             })
             .Or(ObjectField.Many().Braces((pos, fields) =>
             {
-                var value = new ObjectValue(fields.Value).WithLocation(pos);
+                var value = new ObjectValue(fields.Value).WithLocation(pos.Line, pos.Column);
                 return value;
             }));
 
         public static Parser<ObjectField> ObjectField =>
-            Name.Then(Parse.Colon.Token(), Value, (name, colon, value) =>
+            Name.Then(Parse.Colon.Token(), Parse.Ref(() => Value), (name, colon, value) =>
             {
                 var objField = new ObjectField(name.Value, value.Value).WithLocation(name.Position);
                 return objField;
@@ -207,30 +207,29 @@ namespace GraphQL.Language
         public static Parser<ListValue> ListValueWithVariable =>
             Parse.EmptyBrackets(pos =>
             {
-                var list = new ListValue(Enumerable.Empty<IValue>()).WithLocation(pos);
+                var list = new ListValue(Enumerable.Empty<IValue>()).WithLocation(pos.Line, pos.Column);
                 return list;
             })
-            .Or(ValueWithVariable.Many().Brackets((pos, values) =>
+            .Or(Parse.Ref(() => ValueWithVariable.Token().Many()).Brackets((pos, values) =>
             {
-                var list = new ListValue(values.Value).WithLocation(pos);
+                var list = new ListValue(values.Value).WithLocation(pos.Line, pos.Column);
                 return list;
             }));
 
         public static Parser<ObjectValue> ObjectValueWithVariable =>
             Parse.EmptyBraces((pos, rest) =>
             {
-                var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos);
+                var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos.Line, pos.Column);
                 return value;
             })
-            .Or(ObjectFieldWithVariable.Many().Braces((pos, fields) =>
+            .Or(Parse.Ref(() => ObjectFieldWithVariable.Many()).Braces((pos, fields) =>
             {
-                var value = new ObjectValue(fields.Value).WithLocation(pos);
+                var value = new ObjectValue(fields.Value).WithLocation(pos.Line, pos.Column);
                 return value;
             }));
 
-
         public static Parser<ObjectField> ObjectFieldWithVariable =>
-            Name.Then(Parse.Colon.Token(), ValueWithVariable, (name, colon, value) =>
+            Name.Then(Parse.Colon.Token(), Parse.Ref(() => ValueWithVariable), (name, colon, value) =>
             {
                 var objField = new ObjectField(name.Value, value.Value).WithLocation(name.Position);
                 return objField;
@@ -279,17 +278,17 @@ namespace GraphQL.Language
             .Or(IntValue)
             .Or(StringValue)
             .Or(BooleanValue)
-            .Or(EnumValue);
-//            .Or(ListValueWithVariable)
-//            .Or(ObjectValueWithVariable);
+            .Or(EnumValue)
+            .Or(ListValueWithVariable)
+            .Or(ObjectValueWithVariable);
 
         public static Parser<IValue> Value => FloatValue
             .Or(IntValue)
             .Or(StringValue)
             .Or(BooleanValue)
-            .Or(EnumValue);
-//            .Or(ListValue)
-//            .Or(ObjectValue);
+            .Or(EnumValue)
+            .Or(ListValue)
+            .Or(ObjectValue);
 
         public static Parser<VariableDefinitions> VariableDefinitions =>
             VariableDefinition.Many().Parens((pos, defs) =>
@@ -300,11 +299,12 @@ namespace GraphQL.Language
             });
 
         public static Parser<VariableDefinition> VariableDefinition =>
-            Variable.Then(Parse.Colon.Token(), Type.Token(), (variable, colon, type) =>
+            Variable.Then(Parse.Colon.Token(), Type.Token(), DefaultValue.Optional().Token(), (variable, colon, type, defaultValue) =>
             {
                 var def = new VariableDefinition().WithLocation(variable.Position);
                 def.Name = variable.Value.Name;
                 def.Type = type.Value;
+                def.DefaultValue = defaultValue.Value.GetOrDefault();
                 return def;
             });
 

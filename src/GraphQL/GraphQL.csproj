@@ -56,6 +56,8 @@
     </Compile>
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
+    <Compile Include="Execution\AntlrDocumentBuilder.cs" />
+    <Compile Include="Execution\SpracheDocumentBuilder.cs" />
     <Compile Include="Invariant.cs" />
     <Compile Include="Language\AST\Alias.cs" />
     <Compile Include="Language\AST\NameNode.cs" />
@@ -70,7 +72,6 @@
     <Compile Include="Language\Result.cs" />
     <Compile Include="Language\SourceInput.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
-    <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />

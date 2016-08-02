@@ -1,13 +1,11 @@
-﻿using GraphQL.Execution;
-using GraphQL.Language;
-using GraphQL.Validation;
+﻿using GraphQL.Language;
 using Should;
 
 namespace GraphQL.Tests.Execution
 {
     public class AstFromValueTests
     {
-        readonly DocumentExecuter _executor = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+        readonly DocumentExecuter _executor = new DocumentExecuter();
 
         [Fact]
         public void converts_null_to_string_value()
