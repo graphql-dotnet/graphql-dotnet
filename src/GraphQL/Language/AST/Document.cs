@@ -20,6 +20,9 @@ namespace GraphQL.Language
 
         public override IEnumerable<INode> Children => _definitions;
 
+        public IEnumerable<string> Expectations { get; set; }
+        public bool WasSuccessful { get; set; }
+
         public Operations Operations { get; }
 
         public Fragments Fragments { get; }

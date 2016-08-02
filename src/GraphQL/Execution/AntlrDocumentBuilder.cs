@@ -30,7 +30,12 @@ namespace GraphQL.Execution
         {
             var input = new SourceInput(data);
             var result = GraphQLParser2.Document(input);
-            return result.Value;
+
+            var document = result.WasSuccessful ? result.Value : new Document();
+            document.WasSuccessful = result.WasSuccessful;
+            document.Expectations = result.Expectations;
+
+            return document;
         }
     }
 }
