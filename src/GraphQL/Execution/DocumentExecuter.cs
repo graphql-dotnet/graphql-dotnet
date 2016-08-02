@@ -32,7 +32,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
 
         public DocumentExecuter()
-            : this(new AntlrDocumentBuilder(), new DocumentValidator())
+            : this(new SpracheDocumentBuilder(), new DocumentValidator())
         {
         }
 

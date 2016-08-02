@@ -375,8 +375,7 @@ namespace GraphQL.Tests.Language
         {
             var input = new SourceInput("TruE");
             var result = Parse.Bool(input);
-            result.WasSuccessful.ShouldBeTrue();
-            result.Value.ShouldBeTrue();
+            result.WasSuccessful.ShouldBeFalse();
         }
 
         [Fact]
@@ -393,14 +392,13 @@ namespace GraphQL.Tests.Language
         {
             var input = new SourceInput("FaLse");
             var result = Parse.Bool(input);
-            result.WasSuccessful.ShouldBeTrue();
-            result.Value.ShouldBeFalse();
+            result.WasSuccessful.ShouldBeFalse();
         }
 
         [Fact]
         public void boolean_value()
         {
-            var input = new SourceInput("  True  ");
+            var input = new SourceInput("  true  ");
             var result = GraphQLParser2.BooleanValue.Token()(input);
             result.WasSuccessful.ShouldBeTrue();
             result.Value.Value.ShouldBeTrue();
@@ -463,11 +461,33 @@ namespace GraphQL.Tests.Language
         }
 
         [Fact]
-        public void field_with_arguments()
+        public void field_with_int_argument()
         {
             var input = new SourceInput("  { name (id:1) }  ");
             var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
             result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<IntValue>();
+            val.Value.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void field_with_boolean_argument()
+        {
+            var input = new SourceInput("  { name (id: true) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<BooleanValue>();
+            val.Value.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void field_with_enum_argument()
+        {
+            var input = new SourceInput("  { name (id: TRUE) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<EnumValue>();
+            val.Name.ShouldEqual("TRUE");
         }
 
         [Fact]
@@ -477,7 +497,7 @@ namespace GraphQL.Tests.Language
             var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
             result.WasSuccessful.ShouldBeTrue();
             var val = result.Value.Arguments.ValueFor("id").As<StringValue>();
-            val.Value.ShouldEqual("1");
+            val.Value.ShouldEqual("\"1\"");
         }
 
         [Fact]
@@ -488,6 +508,35 @@ namespace GraphQL.Tests.Language
             result.WasSuccessful.ShouldBeTrue();
             var val = result.Value.Arguments.ValueFor("id").As<VariableReference>();
             val.Name.ShouldEqual("id");
+        }
+
+        [Fact]
+        public void field_with_empty_list_argument()
+        {
+            var input = new SourceInput("  { name (id: []) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<ListValue>();
+            val.Values.Count().ShouldEqual(0);
+        }
+
+        [Fact]
+        public void field_with_int_list_argument()
+        {
+            var input = new SourceInput("  { name (id: [1, 2]) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<ListValue>();
+            val.Values.Count().ShouldEqual(2);
+        }
+
+        [Fact]
+        public void list_value_ints()
+        {
+            var input = new SourceInput(" [1, \"2\"] ");
+            var result = GraphQLParser2.ListValue.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.Values.Count().ShouldEqual(2);
         }
 
         [Fact]

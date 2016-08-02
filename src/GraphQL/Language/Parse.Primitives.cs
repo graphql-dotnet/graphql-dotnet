@@ -8,7 +8,7 @@ namespace GraphQL.Language
     {
         public static Parser<string> StringLiteral
             => Char('"').Then(CharExcept('"').Many(), Char('"'), (start, middle, end)
-                => middle.Value.ToStr());
+                => $"\"{middle.Value.ToStr()}\"");
 
         public static Parser<object> IntOrLong =>
             IntegerPart.Return<string, object>(f =>
@@ -79,7 +79,7 @@ namespace GraphQL.Language
             });
 
         public static Parser<bool> Bool =>
-            Parse.Regex(new Regex("(true|false)", RegexOptions.IgnoreCase), "boolean").Return(f =>
+            Parse.Regex(new Regex("(true|false)"), "boolean").Return(f =>
             {
                 bool value;
                 bool.TryParse(f.Value, out value);

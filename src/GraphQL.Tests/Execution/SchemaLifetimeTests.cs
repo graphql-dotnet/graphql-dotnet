@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
-using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQL.Validation;
 using Should.Core.Assertions;
 
 namespace GraphQL.Tests.Execution
@@ -19,7 +17,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public async Task ExecutingThenDisposing_DoesNotThrowException()
         {
-            var executer = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+            var executer = new DocumentExecuter();
             var schema = new Schema();
 
             await executer.ExecuteAsync(schema, null, "{noop}", null).ConfigureAwait(false);
