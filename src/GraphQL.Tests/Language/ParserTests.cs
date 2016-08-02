@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Language
             var result = GraphQLParser2.Name.Token()(input);
             result.WasSuccessful.ShouldBeFalse();
             result.Message.ShouldEqual("unexpected '1'");
-            result.Expectations.Single().ShouldEqual("[_A-Za-z]");
+            result.Expectations.Single().ShouldEqual("start of name [_A-Za-z]");
         }
 
         [Fact]
@@ -52,6 +52,50 @@ namespace GraphQL.Tests.Language
             var input = new SourceInput("  $1one");
             var result = GraphQLParser2.Variable.Token()(input);
             result.WasSuccessful.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void variable_definition_named_type()
+        {
+            var input = new SourceInput("  $one : String");
+            var result = GraphQLParser2.VariableDefinition.Token()(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var def = result.Value;
+            def.Name.ShouldEqual("one");
+            def.Type.ShouldBeType<NamedType>();
+            def.Type.As<NamedType>().Name.ShouldEqual("String");
+        }
+
+        [Fact]
+        public void variable_definition_nonnull_type()
+        {
+            var input = new SourceInput("  $one : String!");
+            var result = GraphQLParser2.VariableDefinition.Token()(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var def = result.Value;
+            def.Name.ShouldEqual("one");
+            def.Type.ShouldBeType<NonNullType>();
+            def.Type.As<NonNullType>().Type.ShouldBeType<NamedType>();
+            def.Type.As<NonNullType>().Type.As<NamedType>().Name.ShouldEqual("String");
+        }
+
+        [Fact]
+        public void variable_definition_list_type()
+        {
+            var input = new SourceInput("  $one : [String]");
+            var result = GraphQLParser2.VariableDefinition.Token()(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var def = result.Value;
+            def.Name.ShouldEqual("one");
+            def.Type.ShouldBeType<ListType>();
+            def.Type.As<ListType>().Type.ShouldBeType<NamedType>();
+            def.Type.As<ListType>().Type.As<NamedType>().Name.ShouldEqual("String");
         }
 
         [Fact]
@@ -392,6 +436,104 @@ namespace GraphQL.Tests.Language
             result.Value.ShouldBeType<BooleanValue>();
             result.Value.As<BooleanValue>().Value.ShouldEqual(true);
             result.Value.As<BooleanValue>().SourceLocation.Column.ShouldEqual(5);
+        }
+
+        [Fact]
+        public void braces_empty()
+        {
+            var input = new SourceInput("  { }  ");
+            var result = Parse.EmptyBraces((pos, rest) => Result.Success("{}", pos, rest)).Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void braces_with_name()
+        {
+            var input = new SourceInput("  { abcd }  ");
+            var result = GraphQLParser2.Name.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void braces_with_field()
+        {
+            var input = new SourceInput("  { abcd }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void field_with_arguments()
+        {
+            var input = new SourceInput("  { name (id:1) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void field_with_string_argument()
+        {
+            var input = new SourceInput("  { name (id:\"1\") }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<StringValue>();
+            val.Value.ShouldEqual("1");
+        }
+
+        [Fact]
+        public void field_with_variable_argument()
+        {
+            var input = new SourceInput("  { name (id: $id) }  ");
+            var result = GraphQLParser2.Field.Braces((l, name)=> name.Value)(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var val = result.Value.Arguments.ValueFor("id").As<VariableReference>();
+            val.Name.ShouldEqual("id");
+        }
+
+        [Fact]
+        public void selection_set()
+        {
+            var input = new SourceInput("  { abcd }  ");
+            var result = GraphQLParser2.SelectionSet(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.Selections.Count().ShouldEqual(1);
+            result.Value.Selections.First().As<Field>().Name.ShouldEqual("abcd");
+        }
+
+        [Fact]
+        public void selection_set_aliased_field()
+        {
+            var input = new SourceInput("  { one : two { abcd } }  ");
+            var result = GraphQLParser2.SelectionSet(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var set = result.Value;
+            set.Selections.Count().ShouldEqual(1);
+
+            var field = set.Selections.First().As<Field>();
+            field.Name.ShouldEqual("two");
+            field.Alias.ShouldEqual("one");
+
+            field.SelectionSet.ShouldNotBeNull();
+            field.SelectionSet.Selections.Count().ShouldEqual(1);
+            field.SelectionSet.Selections.Single().As<Field>().Name.ShouldEqual("abcd");
+        }
+
+        [Fact]
+        public void operation_definition()
+        {
+            var input = new SourceInput("  query aname { one : two }");
+            var result = GraphQLParser2.OperationDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void operation_definition_with_variables()
+        {
+            var input = new SourceInput("  query aname ($id: String) { one : two }");
+            var result = GraphQLParser2.OperationDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
         }
     }
 }

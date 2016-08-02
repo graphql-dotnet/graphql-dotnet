@@ -95,6 +95,37 @@ namespace GraphQL.Language
         public static readonly Parser<char> Comma = Char(c => c == ',', "comma");
 
         /// <summary>
+        /// Parse a single character except those matching <paramref name="predicate"/>.
+        /// </summary>
+        /// <param name="predicate">Characters not to match.</param>
+        /// <param name="description">Description of characters that don't match.</param>
+        /// <returns>A parser for characters except those matching <paramref name="predicate"/>.</returns>
+        public static Parser<char> CharExcept(Predicate<char> predicate, string description)
+        {
+            return Char(c => !predicate(c), "any character except " + description);
+        }
+
+        /// <summary>
+        /// Parse a single character c.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static Parser<char> Char(char c)
+        {
+            return Char(ch => c == ch, char.ToString(c));
+        }
+
+        /// <summary>
+        /// Parse a single character except c.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static Parser<char> CharExcept(char c)
+        {
+            return CharExcept(ch => c == ch, char.ToString(c));
+        }
+
+        /// <summary>
         /// TryParse a single character matching 'predicate'
         /// </summary>
         /// <param name="predicate"></param>
@@ -129,6 +160,25 @@ namespace GraphQL.Language
         }
 
         /// <summary>
+        /// Parse end-of-input.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parser"></param>
+        /// <returns></returns>
+        public static Parser<T> End<T>(this Parser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException("parser");
+
+            return i => parser(i).IfSuccess(s =>
+                s.Remainder.AtEnd
+                    ? s
+                    : Result.Failure<T>(
+                        s.Remainder,
+                        string.Format("unexpected '{0}'", s.Remainder.Current),
+                        new[] { "end of input" }));
+        }
+
+        /// <summary>
         /// Parse first, if it succeeds, return first, otherwise try second.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -153,6 +203,23 @@ namespace GraphQL.Language
 
                 return fr;
             };
+        }
+
+        /// <summary>
+        /// Names part of the grammar for help with error messages.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parser"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Parser<T> Named<T>(this Parser<T> parser, string name)
+        {
+            if (parser == null) throw new ArgumentNullException("parser");
+            if (name == null) throw new ArgumentNullException("name");
+
+            return i => parser(i).IfFailure(f => f.Remainder.Equals(i) ?
+                Result.Failure<T>(f.Remainder, f.Message, new[] { name }) :
+                f);
         }
 
         /// <summary>
@@ -208,6 +275,19 @@ namespace GraphQL.Language
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
             return parser.Select(r => (IEnumerable<T>)new[] { r });
+        }
+
+        /// <summary>
+        /// TryParse a stream of elements with at least one item.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parser"></param>
+        /// <returns></returns>
+        public static Parser<IEnumerable<T>> AtLeastOnce<T>(this Parser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException("parser");
+
+            return parser.Once().Then(t1 => parser.Many().Select(ts => t1.Concat(ts)));
         }
 
         public static Parser<IEnumerable<T>> Many<T>(this Parser<T> parser)

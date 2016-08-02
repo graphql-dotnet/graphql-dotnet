@@ -8,9 +8,14 @@ namespace GraphQL.Language
     public static class GraphQLParser2
     {
         public static Parser<Document> Document =>
-            Definition.Many().Brackets((pos, defs) =>
+            Definition.Many().Return(defs =>
             {
-                var document = new Document().WithLocation(pos);
+                var document = new Document();
+                var first = defs.Value.FirstOrDefault();
+                if (first != null)
+                {
+                    document.WithLocation(first.SourceLocation.Line, first.SourceLocation.Column);
+                }
                 defs.Value.Apply(def =>
                 {
                     document.AddDefinition(def);
@@ -18,11 +23,13 @@ namespace GraphQL.Language
                     if (def is FragmentDefinition)
                     {
                         document.Fragments.Add((FragmentDefinition) def);
+                        return;
                     }
 
                     if (def is Operation)
                     {
                         document.Operations.Add((Operation) def);
+                        return;
                     }
 
                     throw new ExecutionError($"Unhandled document definition {def}.");
@@ -33,18 +40,22 @@ namespace GraphQL.Language
         public static Parser<IDefinition> Definition => OperationDefinition.Or<IDefinition>(FragmentDefinition);
 
         public static Parser<Operation> OperationDefinition =>
-            SelectionSet.Return(s =>
-            {
-                var operation = new Operation().WithLocation(s.Position);
-                operation.SelectionSet = s.Value;
-                return operation;
-            }).Or(OperationType.Then(Name.Optional().Token(), VariableDefinitions.Optional().Token(), Directives.Optional().Token(), SelectionSet.Token(),
+            OperationType.Token().Then(
+                Parse.Ref(() => Name.Optional().Token()),
+                VariableDefinitions.Optional().Token(),
+                Directives.Optional().Token(),
+                Parse.Ref(() => SelectionSet.Token()),
                 (type, name, variables, directives, selection) =>
                 {
                     var operation = new Operation(name.Value.GetOrDefault()).WithLocation(type.Position);
                     operation.Variables = variables.Value.GetOrElse(new VariableDefinitions());
                     operation.Directives = directives.Value.GetOrElse(new Directives());
                     operation.SelectionSet = selection.Value;
+                    return operation;
+                }).Or(SelectionSet.Return(s =>
+                {
+                    var operation = new Operation().WithLocation(s.Position);
+                    operation.SelectionSet = s.Value;
                     return operation;
                 }));
 
@@ -57,30 +68,54 @@ namespace GraphQL.Language
                     return type;
                 });
 
-        public static Parser<SelectionSet> SelectionSet => Selection.Many().Brackets((pos, selection) =>
+        public static Parser<SelectionSet> SelectionSet => Selection.Many().Braces((pos, selection) =>
         {
             var set = new SelectionSet().WithLocation(pos);
             selection.Value.Apply(set.Add);
             return set;
-        });
+        }).Named("selction set");
 
-        public static Parser<ISelection> Selection => Field.Or<ISelection>(InlineFragment).Or(FragmentSpread);
+        public static Parser<ISelection> Selection => FieldWithAlias.Or<ISelection>(Field).Or(InlineFragment).Or(FragmentSpread);
 
         public static Parser<Field> Field =>
-            Alias.Optional().Then(Name.Token(), Arguments.Optional().Token(), Directives.Optional().Token(), SelectionSet.Optional().Token(),
-                (alias, name, args, directives, selection) =>
+                Name.Token().Then(
+                    Arguments.Optional(),
+                    Directives.Optional(),
+                    Parse.Ref(()=>SelectionSet).Optional(),
+                    (name, args, directives, set)=>
                 {
-                    var field = new Field(alias.Value.GetOrDefault(), name.Value)
-                        .WithLocation(alias.Value.IsDefined ? alias.Position : name.Position);
+                    var field = new Field(null, name.Value)
+                        .WithLocation(name.Position);
 
                     field.Arguments = args.Value.GetOrDefault();
                     field.Directives = directives.Value.GetOrDefault();
-                    field.SelectionSet = selection.Value.GetOrDefault();
+                    field.SelectionSet = set.Value.GetOrDefault();
 
                     return field;
-                });
+                }).Named("field");
 
-        public static Parser<NameNode> Alias => Name.Token().Return(name => name.Value);
+        public static Parser<Field> FieldWithAlias =>
+                Alias.Then(
+                    Arguments.Optional(),
+                    Directives.Optional(),
+                    Parse.Ref(()=>SelectionSet).Optional(),
+                    (alias, args, directives, set)=>
+                {
+                    var field = new Field(alias.Value.Al, alias.Value.Name)
+                        .WithLocation(alias.Position);
+
+                    field.Arguments = args.Value.GetOrDefault();
+                    field.Directives = directives.Value.GetOrDefault();
+                    field.SelectionSet = set.Value.GetOrDefault();
+
+                    return field;
+                }).Named("field with alias");
+
+        public static Parser<Alias> Alias =>
+            Name.Token().Then(Parse.Colon.Token(), Name.Token(), (alias, colon, name) =>
+        {
+            return new Alias(alias.Value, name.Value);
+        }).Named("alias");
 
         public static Parser<Arguments> Arguments =>
             Argument.Many().Parens((pos, args) =>
@@ -99,7 +134,7 @@ namespace GraphQL.Language
             });
 
         public static Parser<FragmentSpread> FragmentSpread =>
-            Parse.Regex("(...)").Then(FragmentName.Token(), Directives.Optional().Token(), (dots, name, directives) =>
+            Parse.Regex("(\\.\\.\\.)").Then(FragmentName.Token(), Directives.Optional().Token(), (dots, name, directives) =>
             {
                 var spread = new FragmentSpread(name.Value).WithLocation(dots.Position);
                 if (directives.Value.IsDefined)
@@ -110,8 +145,8 @@ namespace GraphQL.Language
             });
 
         public static Parser<InlineFragment> InlineFragment =>
-            Parse.Regex("...")
-                .Then(TypeCondition.Optional().Token(), Directives.Optional().Token(), SelectionSet.Token(),
+            Parse.Regex("\\.\\.\\.")
+                .Then(TypeCondition.Optional().Token(), Directives.Optional().Token(), Parse.Ref(()=> SelectionSet).Token(),
                     (dots, type, directives, selection) =>
                     {
                         var frag = new InlineFragment().WithLocation(dots.Position);
@@ -151,7 +186,7 @@ namespace GraphQL.Language
             }));
 
         public static Parser<ObjectValue> ObjectValue =>
-            Parse.EmptyBraces(pos =>
+            Parse.EmptyBraces((pos, rest) =>
             {
                 var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos);
                 return value;
@@ -182,7 +217,7 @@ namespace GraphQL.Language
             }));
 
         public static Parser<ObjectValue> ObjectValueWithVariable =>
-            Parse.EmptyBraces(pos =>
+            Parse.EmptyBraces((pos, rest) =>
             {
                 var value = new ObjectValue(Enumerable.Empty<ObjectField>()).WithLocation(pos);
                 return value;
@@ -201,9 +236,9 @@ namespace GraphQL.Language
                 return objField;
             });
 
-        public static Parser<IType> Type => NamedType
-            .Or<IType>(ListType)
-            .Or(NonNullType);
+        public static Parser<IType> Type => Parse.Ref(() => ListType)
+            .Or<IType>(Parse.Ref(() => NonNullType))
+            .Or(Parse.Ref(() => NamedType));
 
         public static Parser<IValue> DefaultValue => Parse.Eq.Once().Then(Value.Token(), (eq, value) => value.Value);
 
@@ -219,37 +254,39 @@ namespace GraphQL.Language
             .Or(ListType.Then(Parse.Bang, (list, bang) => new NonNullType(list.Value).WithLocation(list.Position)));
 
         public static Parser<NamedType> NamedType =>
-            Name.Return(n => new NamedType(n.Value).WithLocation(n.Position));
+            Parse.Ref(() => Name).Return(n => new NamedType(n.Value).WithLocation(n.Position));
 
         public static Parser<NameNode> Name
         {
             get
             {
-                var allowedStart = Parse.CharRegex("[_A-Za-z]", "[_A-Za-z]").Once();
-                var allowedNext = Parse.CharRegex("[_0-9A-Za-z]", "[_0-9A-Za-z]").Many();
+                var allowedStart = Parse.CharRegex("[_A-Za-z]", "start of name [_A-Za-z]").Once();
+                var allowedNext = Parse.CharRegex("[_0-9A-Za-z]", "rest of name [_0-9A-Za-z]").Many();
                 return allowedStart.Then(allowedNext, (first, rest) =>
                     new NameNode(first.Value.Concat(rest.Value).ToStr()).WithLocation(first.Position));
             }
         }
 
         public static Parser<EnumValue> EnumValue =>
-            Name.Token().Return(name =>
+            Parse.Ref(() => Name).Token().Return(name =>
             {
                 var value = new EnumValue(name.Value).WithLocation(name.Position);
                 return value;
             });
 
         public static Parser<IValue> ValueWithVariable => Variable
-            .Or<IValue>(BooleanValue)
-            .Or(FloatValue)
+            .Or<IValue>(FloatValue)
             .Or(IntValue)
+            .Or(StringValue)
+            .Or(BooleanValue)
             .Or(EnumValue);
 //            .Or(ListValueWithVariable)
 //            .Or(ObjectValueWithVariable);
 
-        public static Parser<IValue> Value => BooleanValue
-            .Or<IValue>(FloatValue)
+        public static Parser<IValue> Value => FloatValue
             .Or(IntValue)
+            .Or(StringValue)
+            .Or(BooleanValue)
             .Or(EnumValue);
 //            .Or(ListValue)
 //            .Or(ObjectValue);
@@ -263,7 +300,7 @@ namespace GraphQL.Language
             });
 
         public static Parser<VariableDefinition> VariableDefinition =>
-            Variable.Then(Parse.Colon, Type, (variable, colon, type) =>
+            Variable.Then(Parse.Colon.Token(), Type.Token(), (variable, colon, type) =>
             {
                 var def = new VariableDefinition().WithLocation(variable.Position);
                 def.Name = variable.Value.Name;
@@ -291,6 +328,9 @@ namespace GraphQL.Language
 
         public static Parser<FloatValue> FloatValue =>
             Parse.Double.Return(f => new FloatValue(f.Value).WithLocation(f.Position.Line, f.Position.Column));
+
+        public static Parser<StringValue> StringValue =>
+            Parse.StringLiteral.Return(s => new StringValue(s.Value).WithLocation(s.Position.Line, s.Position.Column));
 
         public static Parser<BooleanValue> BooleanValue =>
             Parse.Bool.Return(f => new BooleanValue(f.Value).WithLocation(f.Position.Line, f.Position.Column));

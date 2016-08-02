@@ -57,6 +57,7 @@
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
     <Compile Include="Invariant.cs" />
+    <Compile Include="Language\AST\Alias.cs" />
     <Compile Include="Language\AST\NameNode.cs" />
     <Compile Include="Language\NodeExtensions.cs" />
     <Compile Include="Language\GraphQLParser.cs" />

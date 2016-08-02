@@ -6,6 +6,10 @@ namespace GraphQL.Language
 {
     partial class Parse
     {
+        public static Parser<string> StringLiteral
+            => Char('"').Then(CharExcept('"').Many(), Char('"'), (start, middle, end)
+                => middle.Value.ToStr());
+
         public static Parser<object> IntOrLong =>
             IntegerPart.Return<string, object>(f =>
             {
@@ -83,18 +87,18 @@ namespace GraphQL.Language
             });
 
         public static Parser<U> Parens<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftParen.Once().Then(parser, RightParen.Once().Token(), (l, p, r) => result(l.Position, p));
+            LeftParen.Once().Token().Then(parser, RightParen.Once().Token(), (l, p, r) => result(l.Position, p));
 
         public static Parser<U> Brackets<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftBracket.Then(parser, RightBracket.Token(), (l, p, r) => result(l.Position, p));
+            LeftBracket.Token().Then(parser, RightBracket.Token(), (l, p, r) => result(l.Position, p));
 
         public static Parser<U> Braces<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftBrace.Then(parser, RightBrace.Token(), (l, p, r) => result(l.Position, p));
+            LeftBrace.Token().Then(parser, RightBrace.Token(), (l, p, r) => result(l.Position, p));
 
-        public static Parser<U> EmptyBraces<U>(Func<Position, U> result) =>
-            LeftBrace.Then(RightBrace.Token(), (l, r) => result(l.Position));
+        public static Parser<U> EmptyBraces<U>(Func<Position, IInput, U> result) =>
+            LeftBrace.Token().Then(RightBrace.Token(), (l, r) => result(l.Position, r.Remainder));
 
         public static Parser<U> EmptyBrackets<U>(Func<Position, U> result) =>
-            LeftBracket.Then(RightBracket.Token(), (l, r) => result(l.Position));
+            LeftBracket.Token().Then(RightBracket.Token(), (l, r) => result(l.Position));
     }
 }
