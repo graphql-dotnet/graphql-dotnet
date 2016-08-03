@@ -465,7 +465,7 @@ namespace GraphQL
 
         public object GetVariableValue(ISchema schema, VariableDefinition variable, IValue input)
         {
-            var type = schema.FindType(variable.Type.Name());
+            var type = variable.Type.GraphTypeFromType(schema);
 
             var value = input ?? variable.DefaultValue;
             if (IsValidValue(schema, type, variable.Type, input))

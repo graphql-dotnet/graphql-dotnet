@@ -296,6 +296,29 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void can_get_list_argument()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
+                .Resolve(context =>
+                {
+                    context.GetArgument<IEnumerable<string>>("episodes").ShouldEqual(new List<string> { "JEDI", "EMPIRE" });
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>
+                {
+                    {"episodes", new object[] {"JEDI", "EMPIRE" } }
+                },
+                FieldDefinition = field
+            });
+        }
+
+        [Fact]
         public void getting_specified_argument_in_resolver_overrides_default_value()
         {
             var objectType = new ObjectGraphType();

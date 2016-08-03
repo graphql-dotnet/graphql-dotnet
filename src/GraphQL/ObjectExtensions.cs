@@ -40,10 +40,13 @@ namespace GraphQL
                 return propertyValue;
             }
 
+            var enumerableInterface = fieldType.Name == "IEnumerable`1"
+              ? fieldType
+              : fieldType.GetInterface("IEnumerable`1");
             if (fieldType.Name != "String"
-                && fieldType.GetInterface("IEnumerable`1") != null)
+                && enumerableInterface != null)
             {
-                var elementType = fieldType.GetGenericArguments()[0];
+                var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var genericListType = typeof(List<>).MakeGenericType(elementType);
                 var newArray = (IList) Activator.CreateInstance(genericListType);
