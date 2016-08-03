@@ -1,5 +1,6 @@
 ﻿using GraphQL.Execution;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using Should;
 

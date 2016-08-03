@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Introspection;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;

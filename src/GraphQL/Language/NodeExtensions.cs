@@ -1,4 +1,6 @@
-﻿namespace GraphQL.Language
+﻿using GraphQL.Language.AST;
+
+namespace GraphQL.Language
 {
     public static class NodeExtensions
     {

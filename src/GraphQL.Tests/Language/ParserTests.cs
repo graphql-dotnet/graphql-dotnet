@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using Should;
 
 namespace GraphQL.Tests.Language

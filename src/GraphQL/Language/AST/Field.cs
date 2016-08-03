@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using GraphQL.Language.AST;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public class Field : AbstractNode, ISelection, IHaveSelectionSet
     {

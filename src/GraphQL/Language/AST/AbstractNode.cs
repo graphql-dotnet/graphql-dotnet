@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public abstract class AbstractNode : INode
     {

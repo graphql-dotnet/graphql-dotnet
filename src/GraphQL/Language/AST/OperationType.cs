@@ -1,4 +1,4 @@
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public enum OperationType
     {
