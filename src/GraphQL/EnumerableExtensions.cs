@@ -20,14 +20,12 @@ namespace GraphQL
             return mappedItems.ToList();
         }
 
-        public static async Task<IEnumerable> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
+        public static Task<object[]> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
         {
             var tasks = items
                 .Cast<object>()
-                .Select(map)
-                .ToArray();
-
-            return await Task.WhenAll(tasks).ConfigureAwait(false);
+                .Select(map);
+            return Task.WhenAll(tasks);
         }
 
         public static void Apply<T>(this IEnumerable<T> items, Action<T> action)

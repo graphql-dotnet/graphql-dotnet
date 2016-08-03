@@ -124,7 +124,7 @@ namespace GraphQL
             return context;
         }
 
-        public Task<object> ExecuteOperationAsync(ExecutionContext context)
+        public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Schema, context.Operation);
             var fields = CollectFields(
@@ -137,11 +137,10 @@ namespace GraphQL
             return ExecuteFields(context, rootType, context.RootValue, fields);
         }
 
-        public async Task<object> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
-        {
-            return await fields.ToDictionaryAsync<KeyValuePair<string, Fields>,string, ResolveFieldResult<object>, object>(
+        public Task<Dictionary<string, object>> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
+            return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
-                pair => ResolveField(context, rootType, source, pair.Value)).ConfigureAwait(false);
+                pair => ResolveField(context, rootType, source, pair.Value));
         }
 
         public async Task<ResolveFieldResult<object>> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
