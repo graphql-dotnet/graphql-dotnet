@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
-using GraphQL.Language.AST;
 using GraphQL.Parsing;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public class GraphQLVisitor : GraphQLBaseVisitor<object>
     {

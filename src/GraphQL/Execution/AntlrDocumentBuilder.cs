@@ -1,11 +1,14 @@
+using System;
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Parsing;
 
 namespace GraphQL.Execution
 {
+    [Obsolete("This document builder is now obsolete and will be removed in the next major version.  Please use the SpracheDocumentBuilder.")]
     public class AntlrDocumentBuilder : IDocumentBuilder
     {
         public Document Build(string data)

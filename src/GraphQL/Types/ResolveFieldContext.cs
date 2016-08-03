@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GraphQL.Language;
 using System.Threading;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {

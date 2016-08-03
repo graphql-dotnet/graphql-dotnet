@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public class Directive : AbstractNode
     {

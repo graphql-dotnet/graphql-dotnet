@@ -64,7 +64,7 @@ namespace GraphQL.Language
             Parse.Regex(new Regex("(query|mutation|subscription)", RegexOptions.IgnoreCase))
                 .Return(r =>
                 {
-                    GraphQL.Language.OperationType type;
+                    OperationType type;
                     Enum.TryParse(r.Value, true, out type);
                     return type;
                 });

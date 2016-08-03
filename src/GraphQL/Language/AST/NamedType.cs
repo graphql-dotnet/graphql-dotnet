@@ -1,6 +1,4 @@
-﻿using GraphQL.Language.AST;
-
-namespace GraphQL.Language
+﻿namespace GraphQL.Language.AST
 {
     public class NamedType : AbstractNode, IType
     {

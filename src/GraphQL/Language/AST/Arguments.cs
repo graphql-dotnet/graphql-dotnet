@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {

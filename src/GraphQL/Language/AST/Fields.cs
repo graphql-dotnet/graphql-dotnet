@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace GraphQL.Language
+namespace GraphQL.Language.AST
 {
     public class Fields : IEnumerable<Field>
     {

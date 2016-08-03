@@ -1,4 +1,5 @@
 using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
