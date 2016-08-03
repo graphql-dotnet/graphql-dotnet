@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
 using GraphQL.Types;
@@ -193,6 +194,16 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void properly_parses_multiple_values_to_list()
+        {
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+
+            var inputs = "{'input': {'a':'foo', 'b':['bar', 'qux'], 'c': 'baz'} }".ToInputs();
+
+            AssertQuerySuccess(_query, expected, inputs);
+        }
+
+        [Fact]
         public void uses_default_value_when_not_provided()
         {
             var queryWithDefaults = @"
@@ -281,14 +292,14 @@ namespace GraphQL.Tests.Execution
         public void executes_with_injected_input_variables()
         {
             var query = @"
-                query q($argC: String!, $argD: ComplexScalar) {
-                  fieldWithObjectInput(input: { c: $argC, d: $argD })
+                query q($argB: [String!]!, $argC: String!, $argD: ComplexScalar) {
+                  fieldWithObjectInput(input: { b: $argB, c: $argC, d: $argD,  })
                 }
             ";
 
-            var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+            var expected = "{ \"fieldWithObjectInput\": \"{\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
 
-            var inputs = "{'argC': 'foo', 'argD': 'SerializedValue'}".ToInputs();
+            var inputs = "{'argB':['bar', 'qux'], 'argC': 'foo', 'argD': 'SerializedValue'}".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -427,7 +438,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
         }
 
         [Fact]
@@ -448,7 +459,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String' was not provided.");
+            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
         }
 
         [Fact]
