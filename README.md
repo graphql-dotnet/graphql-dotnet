@@ -3,6 +3,8 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/graphql-dotnet/graphql-dotnet?branch=master&svg=true)](https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet)
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+**This forks goal is to add attribute based and assembly based created off the models.
+
 This is a work-in-progress implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
 This project uses [Antlr4](https://github.com/tunnelvisionlabs/antlr4cs) for the GraphQL grammar definition.
