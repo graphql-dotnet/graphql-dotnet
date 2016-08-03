@@ -32,6 +32,11 @@ namespace GraphQL.Tests.Validation
 
             var result = Validate(config.Query, Schema, config.Rules);
 
+            result.Errors.Count.ShouldEqual(
+                config.Assertions.Count(),
+                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
+            result.IsValid.ShouldBeFalse();
+
             config.Assertions.Apply((assert, idx) =>
             {
                 var error = result.Errors.Skip(idx).First();
@@ -50,11 +55,6 @@ namespace GraphQL.Tests.Validation
 
                 error.Locations.Count().ShouldEqual(assert.Locations.Count());
             });
-
-            result.IsValid.ShouldBeFalse();
-            result.Errors.Count.ShouldEqual(
-                config.Assertions.Count(),
-                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
         }
 
         protected void ShouldPassRule(string query)

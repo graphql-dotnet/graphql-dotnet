@@ -219,7 +219,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void errors_on_null_for_nested_non_null()
         {
-            string expected = null;
+            const string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': null} }".ToInputs();
 
@@ -234,7 +234,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void errors_on_incorrect_type()
         {
-            string expected = null;
+            const string expected = null;
 
             var inputs = "{'input': 'foo bar'}".ToInputs();
 
@@ -250,7 +250,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void errors_on_omission_of_nested_non_null()
         {
-            string expected = null;
+            const string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar'} }".ToInputs();
 
@@ -265,7 +265,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void errors_on_addition_of_unknown_input_field()
         {
-            string expected = null;
+            const string expected = null;
 
             var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'e': 'dog'} }".ToInputs();
 
