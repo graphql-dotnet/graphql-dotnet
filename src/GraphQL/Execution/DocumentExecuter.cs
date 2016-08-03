@@ -68,7 +68,7 @@ namespace GraphQL
                         return result;
                     }
 
-                    result.Data = await ExecuteOperation(context);
+                    result.Data = await ExecuteOperationAsync(context).ConfigureAwait(false);
                     if (context.Errors.Any())
                     {
                         result.Errors = context.Errors;
@@ -124,7 +124,7 @@ namespace GraphQL
             return context;
         }
 
-        public Task<object> ExecuteOperation(ExecutionContext context)
+        public Task<object> ExecuteOperationAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Schema, context.Operation);
             var fields = CollectFields(
@@ -141,7 +141,7 @@ namespace GraphQL
         {
             return await fields.ToDictionaryAsync<KeyValuePair<string, Fields>,string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
-                pair => ResolveField(context, rootType, source, pair.Value));
+                pair => ResolveField(context, rootType, source, pair.Value)).ConfigureAwait(false);
         }
 
         public async Task<ResolveFieldResult<object>> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
@@ -191,7 +191,7 @@ namespace GraphQL
                 if(result is Task)
                 {
                     var task = result as Task;
-                    await task;
+                    await task.ConfigureAwait(false);
 
                     result = GetProperyValue(task, "Result");
                 }
@@ -201,7 +201,7 @@ namespace GraphQL
                     result = context.Schema.FindType(result as Type);
                 }
 
-                resolveResult.Value = await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result);
+                resolveResult.Value = await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
@@ -232,7 +232,7 @@ namespace GraphQL
             if (nonNullType != null)
             {
                 var type = context.Schema.FindType(nonNullType.Type);
-                var completed = await CompleteValue(context, type, fields, result);
+                var completed = await CompleteValue(context, type, fields, result).ConfigureAwait(false);
                 if (completed == null)
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
@@ -270,10 +270,7 @@ namespace GraphQL
                 var listType = fieldType as ListGraphType;
                 var itemType = context.Schema.FindType(listType.Type);
 
-                var results = await list.MapAsync(async item =>
-                {
-                    return await CompleteValue(context, itemType, fields, item);
-                });
+                var results = await list.MapAsync(async item => await CompleteValue(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
 
                 return results;
             }
@@ -317,7 +314,7 @@ namespace GraphQL
                 subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
             });
 
-            return await ExecuteFields(context, objectType, result, subFields);
+            return await ExecuteFields(context, objectType, result, subFields).ConfigureAwait(false);
         }
 
         public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

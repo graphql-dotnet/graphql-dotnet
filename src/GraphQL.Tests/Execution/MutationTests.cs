@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Execution
 
         public async Task<NumberHolder> PromiseAndFailToChangeTheNumber(int number)
         {
-            await Task.Delay(100);
+            await Task.Delay(100).ConfigureAwait(false);
             throw new InvalidOperationException("Cannot change the number");
         }
     }

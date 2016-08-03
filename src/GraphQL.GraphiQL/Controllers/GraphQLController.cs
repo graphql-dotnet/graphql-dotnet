@@ -35,7 +35,7 @@ namespace GraphQL.GraphiQL.Controllers
         // This will display an example error
         public async Task<HttpResponseMessage> Get(HttpRequestMessage request)
         {
-            return await Post(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" });
+            return await Post(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" }).ConfigureAwait(true);
         }
 
         public async Task<HttpResponseMessage> Post(HttpRequestMessage request, GraphQLQuery query)
@@ -48,7 +48,7 @@ namespace GraphQL.GraphiQL.Controllers
                 queryToExecute = _namedQueries[query.NamedQuery];
             }
 
-            var result = await Execute(_schema, null, queryToExecute, query.OperationName, inputs);
+            var result = await Execute(_schema, null, queryToExecute, query.OperationName, inputs).ConfigureAwait(true);
 
             var httpResult = result.Errors?.Count > 0
                 ? HttpStatusCode.BadRequest
@@ -69,7 +69,7 @@ namespace GraphQL.GraphiQL.Controllers
           string operationName = null,
           Inputs inputs = null)
         {
-            return await _executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
+            return await _executer.ExecuteAsync(schema, rootObject, query, operationName, inputs).ConfigureAwait(false);
         }
     }
 

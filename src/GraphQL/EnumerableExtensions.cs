@@ -27,7 +27,7 @@ namespace GraphQL
                 .Select(map)
                 .ToArray();
 
-            return await Task.WhenAll(tasks);
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public static void Apply<T>(this IEnumerable<T> items, Action<T> action)
@@ -56,11 +56,11 @@ namespace GraphQL
             var tasks = items
                 .Select(async item => new {
                     Key = keyFunc(item),
-                    Result = await valueFunc(item)
+                    Result = await valueFunc(item).ConfigureAwait(false)
                 })
                 .ToArray();
 
-            var keyValuePairs = await Task.WhenAll(tasks);
+            var keyValuePairs = await Task.WhenAll(tasks).ConfigureAwait(false);
             keyValuePairs = keyValuePairs.Where(x => !x.Result.Skip).ToArray();
 
             return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);
