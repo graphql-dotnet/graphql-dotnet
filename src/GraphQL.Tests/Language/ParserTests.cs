@@ -99,6 +99,43 @@ namespace GraphQL.Tests.Language
         }
 
         [Fact]
+        public void variable_definition_default_value()
+        {
+            var input = new SourceInput("  $one : [String] = 1");
+            var result = GraphQLParser2.VariableDefinition.Token()(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var def = result.Value;
+            def.Name.ShouldEqual("one");
+            def.Type.ShouldBeType<ListType>();
+            def.Type.As<ListType>().Type.ShouldBeType<NamedType>();
+            def.Type.As<ListType>().Type.As<NamedType>().Name.ShouldEqual("String");
+            def.DefaultValue.ShouldBeType<IntValue>();
+            def.DefaultValue.As<IntValue>().Value.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void variable_definition_default_value_is_object_value()
+        {
+            var input = new SourceInput(@"
+                $input: TestInputObject = {a: ""foo"", b: [""bar""] c: ""baz""}
+            ");
+            var result = GraphQLParser2.VariableDefinition.Token()(input);
+
+            result.WasSuccessful.ShouldBeTrue();
+
+            var def = result.Value;
+            def.Name.ShouldEqual("input");
+            def.Type.ShouldBeType<NamedType>();
+            def.Type.As<NamedType>().Name.ShouldEqual("TestInputObject");
+            def.DefaultValue.ShouldBeType<ObjectValue>();
+            def.DefaultValue.As<ObjectValue>().FieldNames.ShouldContain("a");
+            def.DefaultValue.As<ObjectValue>().FieldNames.ShouldContain("b");
+            def.DefaultValue.As<ObjectValue>().FieldNames.ShouldContain("c");
+        }
+
+        [Fact]
         public void directive_valid()
         {
             var input = new SourceInput("  @skip(");
@@ -570,11 +607,21 @@ namespace GraphQL.Tests.Language
         }
 
         [Fact]
-        public void operation_definition()
+        public void operation_definition_query()
         {
             var input = new SourceInput("  query aname { one : two }");
             var result = GraphQLParser2.OperationDefinition.Token()(input);
             result.WasSuccessful.ShouldBeTrue();
+            result.Value.OperationType.ShouldEqual(OperationType.Query);
+        }
+
+        [Fact]
+        public void operation_definition_mutation()
+        {
+            var input = new SourceInput("  mutation aname { one : two }");
+            var result = GraphQLParser2.OperationDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.OperationType.ShouldEqual(OperationType.Mutation);
         }
 
         [Fact]
@@ -582,6 +629,133 @@ namespace GraphQL.Tests.Language
         {
             var input = new SourceInput("  query aname ($id: String) { one : two }");
             var result = GraphQLParser2.OperationDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void field_with_object_argument()
+        {
+            var input = new SourceInput(@"
+                  createUser(userInput:{
+                    profileImage:""myimage.png"",
+                    gender: Female
+                  })");
+
+            var result = GraphQLParser2.Field.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void field_with_list_argument()
+        {
+            var input = new SourceInput(@"{
+                  complicatedArgs {
+                    stringListArgField(stringListArg: [""one"", 2])
+                  }
+                }");
+
+            var result = GraphQLParser2.OperationDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+
+            var field = result.Value.SelectionSet.Selections.First().As<Field>();
+            var selection = field.SelectionSet.Selections.First().As<Field>();
+            selection.Arguments.ShouldNotBeNull();
+            selection.Arguments.Count().ShouldEqual(1);
+            var value = selection.Arguments.ValueFor("stringListArg");
+            value.ShouldBeType<ListValue>();
+            value.As<ListValue>().Values.Count().ShouldEqual(2);
+        }
+
+        [Fact]
+        public void object_value_with_variable()
+        {
+            var input = new SourceInput(@"
+                  {
+                    profileImage:""myimage.png"",
+                    gender: Female
+                  }");
+
+            var result = GraphQLParser2.ObjectValueWithVariable.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.ObjectFields.Count().ShouldEqual(2);
+            result.Value.FieldNames.ShouldContain("profileImage");
+            result.Value.FieldNames.ShouldContain("gender");
+        }
+
+        [Fact]
+        public void type_condition()
+        {
+            var input = new SourceInput(@"on Type");
+            var result = GraphQLParser2.TypeCondition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.Name.ShouldEqual("Type");
+        }
+
+        [Fact]
+        public void fragment_definition()
+        {
+            var input = new SourceInput(@"
+                  fragment oneGoodArgOneInvalidArg on Dog {
+                    doesKnowCommand(whoknows: 1, dogCommand: SIT, unknown: true)
+                  }
+            ");
+            var result = GraphQLParser2.FragmentDefinition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.Name.ShouldEqual("oneGoodArgOneInvalidArg");
+            result.Value.Type.Name.ShouldEqual("Dog");
+        }
+
+        [Fact]
+        public void build_definition()
+        {
+            var input = new SourceInput(@"
+                  fragment oneGoodArgOneInvalidArg on Dog {
+                    doesKnowCommand(whoknows: 1, dogCommand: SIT, unknown: true)
+                  }
+            ");
+            var result = GraphQLParser2.Definition.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.ShouldBeType<FragmentDefinition>();
+
+            var def = result.Value.As<FragmentDefinition>();
+            def.Name.ShouldEqual("oneGoodArgOneInvalidArg");
+            def.Type.Name.ShouldEqual("Dog");
+        }
+
+        [Fact]
+        public void list_allows_nested_lists()
+        {
+            var input = new SourceInput(@"
+                [[One]]
+            ");
+            var result = GraphQLParser2.ListType.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            result.Value.Type.ShouldBeType<ListType>();
+            result.Value.Type.As<ListType>().Type.ShouldBeType<NamedType>();
+            result.Value.Type.As<ListType>().Type.As<NamedType>().Name.ShouldEqual("One");
+        }
+
+        [Fact]
+        public void type_allows_nested_nonnull()
+        {
+            var input = new SourceInput(@"
+                One!!
+            ");
+            var result = GraphQLParser2.Type.Token()(input);
+            result.WasSuccessful.ShouldBeTrue();
+            var one = result.Value.As<NonNullType>();
+            one.Type.ShouldBeType<NonNullType>();
+            one.Type.As<NonNullType>().Type.ShouldBeType<NamedType>();
+            one.Type.As<NonNullType>().Type.As<NamedType>().Name.ShouldEqual("One");
+        }
+
+        [Fact]
+        public void type_allows_nested_mix_list_nonnull()
+        {
+            var input = new SourceInput(@"
+                [[One!]!!]!
+            ");
+            var result = GraphQLParser2.Type.Token()(input);
             result.WasSuccessful.ShouldBeTrue();
         }
     }
