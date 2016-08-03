@@ -33,12 +33,14 @@ namespace GraphQL.GraphiQL.Controllers
         }
 
         // This will display an example error
-        public Task<HttpResponseMessage> Get(HttpRequestMessage request)
+        [HttpGet]
+        public Task<HttpResponseMessage> GetAsync(HttpRequestMessage request)
         {
-            return Post(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" });
+            return PostAsync(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" });
         }
 
-        public async Task<HttpResponseMessage> Post(HttpRequestMessage request, GraphQLQuery query)
+        [HttpPost]
+        public async Task<HttpResponseMessage> PostAsync(HttpRequestMessage request, GraphQLQuery query)
         {
             var inputs = query.Variables.ToInputs();
             var queryToExecute = query.Query;

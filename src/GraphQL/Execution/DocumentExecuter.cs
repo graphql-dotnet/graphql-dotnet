@@ -134,16 +134,16 @@ namespace GraphQL
                 new Dictionary<string, Fields>(), 
                 new List<string>());
 
-            return ExecuteFields(context, rootType, context.RootValue, fields);
+            return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
             return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
-                pair => ResolveField(context, rootType, source, pair.Value));
+                pair => ResolveFieldAsync(context, rootType, source, pair.Value));
         }
 
-        public async Task<ResolveFieldResult<object>> ResolveField(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -200,7 +200,7 @@ namespace GraphQL
                     result = context.Schema.FindType(result as Type);
                 }
 
-                resolveResult.Value = await CompleteValue(context, context.Schema.FindType(fieldDefinition.Type), fields, result).ConfigureAwait(false);
+                resolveResult.Value = await CompleteValueAsync(context, context.Schema.FindType(fieldDefinition.Type), fields, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
@@ -222,7 +222,7 @@ namespace GraphQL
             return val;
         }
 
-        public async Task<object> CompleteValue(ExecutionContext context, GraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValueAsync(ExecutionContext context, GraphType fieldType, Fields fields, object result)
         {
             var field = fields != null ? fields.FirstOrDefault() : null;
             var fieldName = field != null ? field.Name : null;
@@ -231,7 +231,7 @@ namespace GraphQL
             if (nonNullType != null)
             {
                 var type = context.Schema.FindType(nonNullType.Type);
-                var completed = await CompleteValue(context, type, fields, result).ConfigureAwait(false);
+                var completed = await CompleteValueAsync(context, type, fields, result).ConfigureAwait(false);
                 if (completed == null)
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
@@ -269,7 +269,7 @@ namespace GraphQL
                 var listType = fieldType as ListGraphType;
                 var itemType = context.Schema.FindType(listType.Type);
 
-                var results = await list.MapAsync(async item => await CompleteValue(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await list.MapAsync(async item => await CompleteValueAsync(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
 
                 return results;
             }
@@ -313,7 +313,7 @@ namespace GraphQL
                 subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
             });
 
-            return await ExecuteFields(context, objectType, result, subFields).ConfigureAwait(false);
+            return await ExecuteFieldsAsync(context, objectType, result, subFields).ConfigureAwait(false);
         }
 
         public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
