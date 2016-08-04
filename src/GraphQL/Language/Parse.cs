@@ -154,6 +154,23 @@ namespace GraphQL.Language
             };
         }
 
+        /// <summary>
+        /// Parse a string of characters.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static Parser<IEnumerable<char>> String(string s)
+        {
+            if (s == null) throw new ArgumentNullException("s");
+
+            return s
+                .ToEnumerable()
+                .Select(Char)
+                .Aggregate(Return(Enumerable.Empty<char>()),
+                    (a, p) => a.Concat(p.Once()))
+                .Named(s);
+        }
+
         public static Parser<char> CharRegex(string pattern, string description)
         {
             return Char(c => System.Text.RegularExpressions.Regex.IsMatch(c.ToString(), pattern), description);
@@ -275,6 +292,21 @@ namespace GraphQL.Language
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
             return parser.Select(r => (IEnumerable<T>)new[] { r });
+        }
+
+        /// <summary>
+        /// Concatenate two streams of elements.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public static Parser<IEnumerable<T>> Concat<T>(this Parser<IEnumerable<T>> first, Parser<IEnumerable<T>> second)
+        {
+            if (first == null) throw new ArgumentNullException("first");
+            if (second == null) throw new ArgumentNullException("second");
+
+            return first.Then(f => second.Select(f.Concat));
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,16 @@ namespace GraphQL
 {
     public static class StringExtensions
     {
+        public static IEnumerable<char> ToEnumerable(this string @this)
+        {
+            if (@this == null) throw new ArgumentNullException("@this");
+
+            for (var i = 0; i < @this.Length; ++i)
+            {
+                yield return @this[i];
+            }
+        }
+
         public static string ToStr(this IEnumerable<char> chars)
         {
             return new string(chars.ToArray());
