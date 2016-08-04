@@ -69,6 +69,7 @@
     <Compile Include="Execution\VariablesTests.cs" />
     <Compile Include="Types\StringGraphTypeTests.cs" />
     <Compile Include="Language\ParserTests.cs" />
+    <Compile Include="Language\ShowDownTests.cs" />
     <Compile Include="Utilities\GraphQLExtensionsTester.cs" />
     <Compile Include="Introspection\IntrospectionResult.cs" />
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />

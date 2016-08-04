@@ -74,7 +74,7 @@ namespace GraphQL.Language
             var set = new SelectionSet().WithLocation(pos.Line, pos.Column);
             selection.Value.Apply(set.Add);
             return set;
-        }).Named("selction set");
+        }).Named("selection set");
 
         public static Parser<ISelection> Selection => FieldWithAlias.Or<ISelection>(Field).Or(InlineFragment).Or(FragmentSpread);
 
