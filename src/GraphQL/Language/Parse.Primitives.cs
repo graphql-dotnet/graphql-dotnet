@@ -59,8 +59,9 @@ namespace GraphQL.Language
         public static Parser<string> FractionalPart =>
             Dot.Then(Digit.Many(), (first, rest) => $"{first.Value}{rest.Value.ToStr()}");
 
+        private static readonly Regex exponentPartRegex = new Regex("[eE]", RegexOptions.Compiled);
         public static Parser<string> ExponentPart =>
-            CharRegex("[eE]", "exponent indicator").Then(
+            CharRegex(exponentPartRegex, "exponent indicator").Then(
                 Sign.Optional(),
                 Digit.Many(),
                 (first, middle, last) =>

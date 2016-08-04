@@ -20,15 +20,17 @@ namespace GraphQL.Language
                 {
                     document.AddDefinition(def);
 
-                    if (def is FragmentDefinition)
+                    var fragment = def as FragmentDefinition;
+                    if (fragment != null)
                     {
-                        document.Fragments.Add((FragmentDefinition) def);
+                        document.Fragments.Add(fragment);
                         return;
                     }
 
-                    if (def is Operation)
+                    var operation = def as Operation;
+                    if (operation != null)
                     {
-                        document.Operations.Add((Operation) def);
+                        document.Operations.Add(operation);
                         return;
                     }
 
@@ -60,8 +62,9 @@ namespace GraphQL.Language
                     return operation;
                 }));
 
+        private static readonly Regex operationTypeRegex = new Regex("(query|mutation|subscription)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         public static Parser<OperationType> OperationType =>
-            Parse.Regex(new Regex("(query|mutation|subscription)", RegexOptions.IgnoreCase))
+            Parse.Regex(operationTypeRegex)
                 .Return(r =>
                 {
                     OperationType type;
@@ -113,10 +116,7 @@ namespace GraphQL.Language
                 }).Named("field with alias");
 
         public static Parser<Alias> Alias =>
-            Name.Token().Then(Parse.Colon.Token(), Name.Token(), (alias, colon, name) =>
-        {
-            return new Alias(alias.Value, name.Value);
-        }).Named("alias");
+            Name.Token().Then(Parse.Colon.Token(), Name.Token(), (alias, colon, name) => new Alias(alias.Value, name.Value)).Named("alias");
 
         public static Parser<Arguments> Arguments =>
             Argument.Many().Parens((pos, args) =>
@@ -134,8 +134,9 @@ namespace GraphQL.Language
                 return argument;
             });
 
+        private static readonly Regex fragmentSpreadRegex = new Regex("(\\.\\.\\.)", RegexOptions.Compiled);
         public static Parser<FragmentSpread> FragmentSpread =>
-            Parse.Regex("(\\.\\.\\.)").Then(FragmentName.Token(), Directives.Optional().Token(), (dots, name, directives) =>
+            Parse.Regex(fragmentSpreadRegex).Then(FragmentName.Token(), Directives.Optional().Token(), (dots, name, directives) =>
             {
                 var spread = new FragmentSpread(name.Value).WithLocation(dots.Position);
                 if (directives.Value.IsDefined)
@@ -145,8 +146,9 @@ namespace GraphQL.Language
                 return spread;
             });
 
+        private static readonly Regex inlineFragmentRegex = new Regex("\\.\\.\\.", RegexOptions.Compiled);
         public static Parser<InlineFragment> InlineFragment =>
-            Parse.Regex("\\.\\.\\.")
+            Parse.Regex(inlineFragmentRegex)
                 .Then(TypeCondition.Optional().Token(), Directives.Optional().Token(), Parse.Ref(()=> SelectionSet).Token(),
                     (dots, type, directives, selection) =>
                     {
@@ -157,8 +159,9 @@ namespace GraphQL.Language
                         return frag;
                     });
 
+        private static readonly Regex fragmentDefinitionRegex = new Regex("(fragment)", RegexOptions.Compiled);
         public static Parser<FragmentDefinition> FragmentDefinition =>
-            Parse.Regex("(fragment)")
+            Parse.Regex(fragmentDefinitionRegex)
                 .Then(FragmentName.Token(), TypeCondition.Token(), Directives.Optional().Token(), SelectionSet.Token(),
                     (frag, name, type, directives, selection) =>
                     {
@@ -171,8 +174,9 @@ namespace GraphQL.Language
 
         public static Parser<NameNode> FragmentName => Name.Token().Return(name => name.Value);
 
+        private static readonly Regex typeConditionRegex = new Regex("(on)", RegexOptions.Compiled);
         public static Parser<NamedType> TypeCondition =>
-            Parse.Regex("(on)").Token().Then(NamedType, (on, type) => type.Value);
+            Parse.Regex(typeConditionRegex).Token().Then(NamedType, (on, type) => type.Value);
 
         public static Parser<ListValue> ListValue =>
             Parse.Ref(() => Value.Token().Many()).Brackets((pos, values) =>
@@ -281,12 +285,14 @@ namespace GraphQL.Language
         public static Parser<NamedType> NamedType =>
             Parse.Ref(() => Name).Return(n => new NamedType(n.Value).WithLocation(n.Position));
 
+        private static readonly Regex startOfNameRegex = new Regex("[_A-Za-z]", RegexOptions.Compiled);
+        private static readonly Regex restOfNameRegex = new Regex("[_0-9A-Za-z]", RegexOptions.Compiled);
         public static Parser<NameNode> Name
         {
             get
             {
-                var allowedStart = Parse.CharRegex("[_A-Za-z]", "start of name [_A-Za-z]").Once();
-                var allowedNext = Parse.CharRegex("[_0-9A-Za-z]", "rest of name [_0-9A-Za-z]").Many();
+                var allowedStart = Parse.CharRegex(startOfNameRegex, "start of name [_A-Za-z]").Once();
+                var allowedNext = Parse.CharRegex(restOfNameRegex, "rest of name [_0-9A-Za-z]").Many();
                 return allowedStart.Then(allowedNext, (first, rest) =>
                     new NameNode(first.Value.Concat(rest.Value).ToStr()).WithLocation(first.Position));
             }

@@ -90,7 +90,8 @@ namespace GraphQL.Language
         public static readonly Parser<char> Eq = Char(c => c == '=', "equals");
         public static readonly Parser<char> Minus = Char(c => c == '-', "minus");
         public static readonly Parser<char> Sign = Char(c => c == '-' || c == '+', "minus");
-        public static readonly Parser<char> NonZeroDigit = CharRegex("[1-9]", "non zero digit");
+        private static readonly Regex nonZeroDigitRegex = new Regex("[1-9]", RegexOptions.Compiled);
+        public static readonly Parser<char> NonZeroDigit = CharRegex(nonZeroDigitRegex, "non zero digit");
         public static readonly Parser<char> Zero = Char(c => c == '0', "zero");
         public static readonly Parser<char> Comma = Char(c => c == ',', "comma");
 
@@ -171,9 +172,9 @@ namespace GraphQL.Language
                 .Named(s);
         }
 
-        public static Parser<char> CharRegex(string pattern, string description)
+        public static Parser<char> CharRegex(Regex regex, string description)
         {
-            return Char(c => System.Text.RegularExpressions.Regex.IsMatch(c.ToString(), pattern), description);
+            return Char(c => regex.IsMatch(c.ToString()), description);
         }
 
         /// <summary>
