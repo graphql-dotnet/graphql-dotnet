@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}</ProjectGuid>
+    <ProjectGuid>{0FF5301B-4CD7-409A-9D02-9390DE7BEBA3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GraphQL.StarWars</RootNamespace>
-    <AssemblyName>GraphQL.StarWars</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>GraphQl.SchemaGenerator</RootNamespace>
+    <AssemblyName>GraphQl.SchemaGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,12 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,19 +46,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="ModelData.cs" />
-    <Compile Include="Types\CharacterInterface.cs" />
-    <Compile Include="Types\DroidType.cs" />
-    <Compile Include="Types\EpisodeEnum.cs" />
-    <Compile Include="Types\HumanType.cs" />
-    <Compile Include="IoC\SimpleContainer.cs" />
-    <Compile Include="Types\StarWarsCharacter.cs" />
-    <Compile Include="StarWarsData.cs" />
-    <Compile Include="StarWarsQuery.cs" />
-    <Compile Include="StarWarsSchema.cs" />
+    <Compile Include="Attributes\GraphKnownTypeAttribute.cs" />
+    <Compile Include="Attributes\GraphRouteAttribute.cs" />
+    <Compile Include="Attributes\GraphTypeAttribute.cs" />
+    <Compile Include="Attributes\NotNullAttribute.cs" />
+    <Compile Include="Definitions\FieldDefinition.cs" />
+    <Compile Include="Extensions\AssignableExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="ModelSchemaGenerator.cs" />
+    <Compile Include="SchemaGenerator.cs" />
+    <Compile Include="Definitions\GraphControllerDefinition.cs" />
+    <Compile Include="Definitions\GraphRouteDefinition.cs" />
+    <Compile Include="GraphTypeConverter.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
+    <Compile Include="Helpers\TypeHelper.cs" />
+    <Compile Include="IGraphFieldResolver.cs" />
+    <Compile Include="ObjectGraphTypeBuilder.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Schema\GraphTypesLookup.cs" />
+    <Compile Include="Schema\IDomainSchemaTypeMapping.cs" />
+    <Compile Include="Schema\ISchemaFactory.cs" />
+    <Compile Include="Schema\SchemaBuilder.cs" />
+    <Compile Include="Types\TimeSpanGraphType.cs" />
+    <Compile Include="Wrappers\ByteArrayGraphType.cs" />
+    <Compile Include="Wrappers\EnumerationGraphTypeWrapper.cs" />
+    <Compile Include="Wrappers\InputObjectGraphTypeWrapper.cs" />
+    <Compile Include="Wrappers\InterfaceGraphTypeWrapper.cs" />
+    <Compile Include="Wrappers\IIGnore.cs" />
+    <Compile Include="Wrappers\KeyValuePairGraphType.cs" />
+    <Compile Include="Wrappers\KeyValuePairInputGraphType.cs" />
+    <Compile Include="Wrappers\ObjectGraphTypeWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
