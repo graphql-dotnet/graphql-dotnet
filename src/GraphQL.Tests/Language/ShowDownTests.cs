@@ -21,16 +21,17 @@ namespace GraphQL.Tests.Language
        }
 ";
 
-//        [Fact]
+        [Fact]
         public void antlr_builder()
         {
             buildMany(_query, new AntlrDocumentBuilder());
         }
 
-//        [Fact]
+        [Fact]
         public void sprache_builder()
         {
             var builder = new SpracheDocumentBuilder();
+            builder.CacheDocuments = false;
             buildMany(_query, builder);
         }
 

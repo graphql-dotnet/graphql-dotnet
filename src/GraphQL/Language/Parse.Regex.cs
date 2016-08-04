@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace GraphQL.Language
@@ -119,6 +120,7 @@ namespace GraphQL.Language
             };
         }
 
+        private static readonly Dictionary<string, Regex> optimizedRegexCache = new Dictionary<string, Regex>();
         /// <summary>
         /// Optimize the regex by only matching successfully at the start of the input.
         /// Do this by wrapping the whole regex in non-capturing parentheses preceded by
@@ -128,9 +130,14 @@ namespace GraphQL.Language
         /// This method is invoked via reflection in unit tests. If renamed, the tests
         /// will need to be modified or they will fail.
         /// </remarks>
-        private static Regex OptimizeRegex(Regex regex)
-        {
-            return new Regex($"^(?:{regex})", regex.Options);
+        private static Regex OptimizeRegex(Regex regex) {
+            var key = $"^(?:{regex})";
+            if(optimizedRegexCache.ContainsKey(key)) {
+                return optimizedRegexCache[key];
+            }
+            var newRegex = new Regex(key, regex.Options | RegexOptions.Compiled);
+            optimizedRegexCache.Add(key, newRegex);
+            return newRegex;
         }
     }
 }
