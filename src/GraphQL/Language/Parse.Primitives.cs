@@ -79,8 +79,9 @@ namespace GraphQL.Language
                 return $"{sign}{number}";
             });
 
+        private static readonly Regex boolRegex = new Regex("(true|false)", RegexOptions.Compiled);
         public static Parser<bool> Bool =>
-            Parse.Regex(new Regex("(true|false)"), "boolean").Return(f =>
+            Parse.Regex(boolRegex, "boolean").Return(f =>
             {
                 bool value;
                 bool.TryParse(f.Value, out value);
@@ -88,18 +89,18 @@ namespace GraphQL.Language
             });
 
         public static Parser<U> Parens<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftParen.Once().Token().Then(parser, RightParen.Once().Token(), (l, p, r) => result(l.Position, p));
+            LeftParen.Once().Token().Then(parser, RightParen.Once().Token(), (l, p, r) => result(l.Position.Value, p));
 
         public static Parser<U> Brackets<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftBracket.Token().Then(parser, RightBracket.Token(), (l, p, r) => result(l.Position, p));
+            LeftBracket.Token().Then(parser, RightBracket.Token(), (l, p, r) => result(l.Position.Value, p));
 
         public static Parser<U> Braces<T, U>(this Parser<T> parser, Func<Position, IResult<T>, U> result) =>
-            LeftBrace.Token().Then(parser, RightBrace.Token(), (l, p, r) => result(l.Position, p));
+            LeftBrace.Token().Then(parser, RightBrace.Token(), (l, p, r) => result(l.Position.Value, p));
 
         public static Parser<U> EmptyBraces<U>(Func<Position, IInput, U> result) =>
-            LeftBrace.Token().Then(RightBrace.Token(), (l, r) => result(l.Position, r.Remainder));
+            LeftBrace.Token().Then(RightBrace.Token(), (l, r) => result(l.Position.Value, r.Remainder));
 
         public static Parser<U> EmptyBrackets<U>(Func<Position, U> result) =>
-            LeftBracket.Token().Then(RightBracket.Token(), (l, r) => result(l.Position));
+            LeftBracket.Token().Then(RightBracket.Token(), (l, r) => result(l.Position.Value));
     }
 }

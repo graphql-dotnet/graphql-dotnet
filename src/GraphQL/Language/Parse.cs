@@ -450,7 +450,7 @@ namespace GraphQL.Language
             return i => first(i).IfSuccess(s =>
             {
                 var result = second(s);
-                return Result.Success(result, s.Position, s.Remainder);
+                return Result.Success(result, s.Position.Value, s.Remainder);
             });
         }
 
@@ -467,7 +467,7 @@ namespace GraphQL.Language
                 return second(s.Remainder).IfSuccess(rest =>
                 {
                     var result = success(s);
-                    return Result.Success(result, s.Position, rest.Remainder);
+                    return Result.Success(result, s.Position.Value, rest.Remainder);
                 });
             });
         }
@@ -485,7 +485,7 @@ namespace GraphQL.Language
                 return second(s.Remainder).IfSuccess(rest =>
                 {
                     var result = success(s, rest);
-                    return Result.Success(result, s.Position ?? rest.Position, rest.Remainder);
+                    return Result.Success(result, s.Position ?? rest.Position.Value, rest.Remainder);
                 });
             });
         }
@@ -506,7 +506,7 @@ namespace GraphQL.Language
                     return third(middle.Remainder).IfSuccess(rest =>
                     {
                         var result = success(s, middle, rest);
-                        return Result.Success(result, s.Position ?? middle.Position ?? rest.Position, rest.Remainder);
+                        return Result.Success(result, s.Position ?? middle.Position ?? rest.Position.Value, rest.Remainder);
                     });
                 });
             });
@@ -531,7 +531,7 @@ namespace GraphQL.Language
                         return fourth(ts.Remainder).IfSuccess(last =>
                         {
                             var result = success(fs, ss, ts, last);
-                            return Result.Success(result, fs.Position ?? ss.Position ?? ts.Position ?? last.Position, last.Remainder);
+                            return Result.Success(result, fs.Position ?? ss.Position ?? ts.Position ?? last.Position.Value, last.Remainder);
                         });
                     });
                 });
@@ -562,7 +562,7 @@ namespace GraphQL.Language
                                 var result = success(fs, ss, ts, four, last);
                                 return Result.Success(
                                     result,
-                                    fs.Position ?? ss.Position ?? ts.Position ?? four.Position ?? last.Position,
+                                    fs.Position ?? ss.Position ?? ts.Position ?? four.Position ?? last.Position.Value,
                                     last.Remainder);
                             });
                         });
@@ -618,7 +618,7 @@ namespace GraphQL.Language
                 return result.IfSuccess(s =>
                 {
                     var ws2 = WhitespaceOrComma.Many()(s.Remainder);
-                    return Result.Success(result.Value, result.Position, ws2.Remainder);
+                    return Result.Success(result.Value, result.Position.Value, ws2.Remainder);
                 });
             };
         }

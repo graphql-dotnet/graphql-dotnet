@@ -31,7 +31,7 @@ namespace GraphQL.Language
     /// <summary>
     /// Represents a position in the input.
     /// </summary>
-    public class Position : IEquatable<Position>
+    public struct Position : IEquatable<Position>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Position" /> class.
@@ -92,7 +92,10 @@ namespace GraphQL.Language
         /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object obj)
         {
-            return Equals(obj as Position);
+            if(obj is Position) {
+                return Equals((Position) obj);
+            }
+            return false;
         }
 
         /// <summary>

@@ -255,8 +255,8 @@ namespace GraphQL.Tests.Language
             var input = new SourceInput("  1023456789");
             var result = Parse.IntegerPart.Token()(input);
             result.Value.ShouldEqual("1023456789");
-            result.Position.ShouldNotBeNull();
-            result.Position.Column.ShouldEqual(3);
+            result.Position.HasValue.ShouldBeTrue();
+            result.Position.Value.Column.ShouldEqual(3);
         }
 
         [Fact]
@@ -369,7 +369,7 @@ namespace GraphQL.Tests.Language
             var input = new SourceInput(" 6.0221413e23");
             var result = Parse.Double.Token()(input);
             result.Value.ShouldEqual(6.0221413e23);
-            result.Position.Column.ShouldEqual(2);
+            result.Position.Value.Column.ShouldEqual(2);
         }
 
         [Fact]
@@ -378,7 +378,7 @@ namespace GraphQL.Tests.Language
             var input = new SourceInput("  6.0221413e23");
             var result = Parse.Double.Token()(input);
             result.Value.ShouldEqual(6.0221413e23);
-            result.Position.Column.ShouldEqual(3);
+            result.Position.Value.Column.ShouldEqual(3);
         }
 
         [Fact]

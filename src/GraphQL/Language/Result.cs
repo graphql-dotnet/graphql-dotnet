@@ -41,7 +41,7 @@ namespace GraphQL.Language
         /// </summary>
         T Value { get; }
 
-        Position Position { get; }
+        Position? Position { get; }
 
         /// <summary>
         /// Gets a value indicating whether wether parsing was successful.
@@ -126,7 +126,7 @@ namespace GraphQL.Language
             }
         }
 
-        public Position Position { get; }
+        public Position? Position { get; }
 
         public bool WasSuccessful { get { return _wasSuccessful; } }
 
