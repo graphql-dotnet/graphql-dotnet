@@ -48,7 +48,7 @@ namespace GraphQL.Language
                 var pr = parser(i);
 
                 if (pr.WasSuccessful)
-                    return Result.Success(new Some<T>(pr.Value), pr.Position, pr.Remainder);
+                    return Result.Success(new Some<T>(pr.Value), pr.Position.Value, pr.Remainder);
 
                 return Result.Success(new None<T>(), Position.FromInput(i), i);
             };

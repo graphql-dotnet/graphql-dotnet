@@ -37,12 +37,14 @@ namespace GraphQL.Tests.Language
 
         private void buildMany(string query, IDocumentBuilder builder)
         {
+            //build(query, builder, 1);
+            //build(query, builder, 10);
             build(query, builder, 100);
             build(query, builder, 1000);
             build(query, builder, 10000);
         }
 
-        private void build(string query, IDocumentBuilder builder, int count)
+        private static void build(string query, IDocumentBuilder builder, int count)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
