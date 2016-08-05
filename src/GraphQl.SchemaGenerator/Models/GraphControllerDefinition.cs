@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GraphQl.SchemaGenerator.Definitions
+namespace GraphQl.SchemaGenerator.Models
 {
     public class GraphControllerDefinition
     {

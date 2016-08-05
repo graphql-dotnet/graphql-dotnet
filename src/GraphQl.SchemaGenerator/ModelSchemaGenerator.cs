@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraphQl.SchemaGenerator.Definitions;
+using GraphQl.SchemaGenerator.Models;
 
 namespace GraphQl.SchemaGenerator
 {

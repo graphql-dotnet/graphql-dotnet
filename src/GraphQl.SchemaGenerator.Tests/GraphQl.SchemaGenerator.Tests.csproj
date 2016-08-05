@@ -40,6 +40,15 @@
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
@@ -75,6 +84,10 @@
       <Project>{0ff5301b-4cd7-409a-9d02-9390de7beba3}</Project>
       <Name>GraphQl.SchemaGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GraphQl.StarWars.Api\GraphQl.StarWars.Api.csproj">
+      <Project>{713ff943-2bb4-4a1c-b049-0894414bafa8}</Project>
+      <Name>GraphQl.StarWars.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj">
       <Project>{3255c0dc-9f24-4423-8ba3-3b979d0e90e2}</Project>
       <Name>GraphQL.StarWars</Name>
@@ -85,6 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

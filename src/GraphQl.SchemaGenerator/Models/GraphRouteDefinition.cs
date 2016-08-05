@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace GraphQl.SchemaGenerator.Definitions
+namespace GraphQl.SchemaGenerator.Models
 {
     public class GraphRouteDefinition
     {

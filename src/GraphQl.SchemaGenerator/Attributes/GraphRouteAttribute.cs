@@ -3,7 +3,7 @@
 namespace GraphQl.SchemaGenerator.Attributes
 {
     /// <summary>
-    /// 
+    ///     Attribute provided on an api endpoint can be converted into graph ql.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class GraphRouteAttribute : Attribute

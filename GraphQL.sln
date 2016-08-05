@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQl.SchemaGenerator", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQl.SchemaGenerator.Tests", "src\GraphQl.SchemaGenerator.Tests\GraphQl.SchemaGenerator.Tests.csproj", "{4052E386-847B-4F3C-957C-0B957E319127}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQl.StarWars.Api", "src\GraphQl.StarWars.Api\GraphQl.StarWars.Api.csproj", "{713FF943-2BB4-4A1C-B049-0894414BAFA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{4052E386-847B-4F3C-957C-0B957E319127}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4052E386-847B-4F3C-957C-0B957E319127}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4052E386-847B-4F3C-957C-0B957E319127}.Release|Any CPU.Build.0 = Release|Any CPU
+		{713FF943-2BB4-4A1C-B049-0894414BAFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{713FF943-2BB4-4A1C-B049-0894414BAFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{713FF943-2BB4-4A1C-B049-0894414BAFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{713FF943-2BB4-4A1C-B049-0894414BAFA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
