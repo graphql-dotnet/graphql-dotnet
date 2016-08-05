@@ -9,12 +9,13 @@ namespace GraphQL.Validation
     {
         private readonly List<INode> _nodes = new List<INode>();
 
-        public ValidationError(string errorCode, string message, params INode[] nodes)
-            : this(errorCode, message, null, nodes)
+        public ValidationError(string originalQuery, string errorCode, string message, params INode[] nodes)
+            : this(originalQuery, errorCode, message, null, nodes)
         {
         }
 
         public ValidationError(
+            string originalQuery,
             string errorCode,
             string message,
             Exception innerException,
@@ -28,7 +29,8 @@ namespace GraphQL.Validation
                 _nodes.Add(n);
                 if (n.SourceLocation != null)
                 {
-                    AddLocation(n.SourceLocation.Line, n.SourceLocation.Column);
+                    var location = new Location(new Source(originalQuery), n.SourceLocation.Start);
+                    AddLocation(location.Line, location.Column);
                 }
             });
         }

@@ -37,7 +37,12 @@ namespace GraphQL.Validation.Rules
                             bool found;
                             if (!variableNameDefined.TryGetValue(varName, out found))
                             {
-                                var error = new ValidationError("5.7.4", UndefinedVarMessage(varName, op.Name), usage.Node, op);
+                                var error = new ValidationError(
+                                    context.OriginalQuery,
+                                    "5.7.4",
+                                    UndefinedVarMessage(varName, op.Name),
+                                    usage.Node,
+                                    op);
                                 context.ReportError(error);
                             }
                         });

@@ -4,16 +4,10 @@ namespace GraphQL.Language
 {
     public static class NodeExtensions
     {
-        public static T WithLocation<T>(this T node, Position position)
+        public static T WithLocation<T>(this T node, int line, int column, int start = -1, int end = -1)
             where T : AbstractNode
         {
-            return node.WithLocation(position.Line, position.Column - 1);
-        }
-
-        public static T WithLocation<T>(this T node, int line, int column)
-            where T : AbstractNode
-        {
-            node.SourceLocation = new SourceLocation(line, column);
+            node.SourceLocation = new SourceLocation(line, column, start, end);
             return node;
         }
     }

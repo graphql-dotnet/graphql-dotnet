@@ -2,18 +2,23 @@
 {
     public class SourceLocation
     {
-        public SourceLocation(int line, int column)
+        public SourceLocation(int line, int column, int start = -1, int end = -1)
         {
             Line = line;
             Column = column;
+            Start = start;
+            End = end;
         }
 
-        public int Line { get; private set; }
-        public int Column { get; private set; }
+        public int Start { get; }
+        public int End { get; }
+
+        public int Line { get; }
+        public int Column { get; }
 
         public override string ToString()
         {
-            return "line={0}, column={1}".ToFormat(Line, Column);
+            return $"line={Line}, column={Column}, start={Start}, end={End}";
         }
 
         protected bool Equals(SourceLocation other)

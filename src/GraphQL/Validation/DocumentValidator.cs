@@ -10,6 +10,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         IValidationResult Validate(
+            string originalQuery,
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null);
@@ -18,12 +19,14 @@ namespace GraphQL.Validation
     public class DocumentValidator : IDocumentValidator
     {
         public IValidationResult Validate(
+            string originalQuery,
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null)
         {
             var context = new ValidationContext
             {
+                OriginalQuery = originalQuery,
                 Schema = schema,
                 Document = document,
                 TypeInfo = new TypeInfo(schema)

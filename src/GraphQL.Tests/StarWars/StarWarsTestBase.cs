@@ -5,7 +5,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.StarWars
 {
-    public class StarWarsTestBase : QueryTestBase<StarWarsSchema, SpracheDocumentBuilder>
+    public class StarWarsTestBase : QueryTestBase<StarWarsSchema, GraphQLDocumentBuilder>
     {
         public StarWarsTestBase()
         {

@@ -47,10 +47,19 @@ namespace GraphQL.Validation.Rules
                                     !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
                                 {
                                     var error = new ValidationError(
+                                        context.OriginalQuery,
                                         "5.7.6",
                                         BadVarPosMessage(varName, context.Print(varType), context.Print(usage.Type)));
-                                    error.AddLocation(varDef.SourceLocation.Line, varDef.SourceLocation.Column);
-                                    error.AddLocation(usage.Node.SourceLocation.Line, usage.Node.SourceLocation.Column);
+
+                                    var source = new Source(context.OriginalQuery);
+                                    var varDefPos = new Location(source, varDef.SourceLocation.Start);
+                                    var usagePos = new Location(source, usage.Node.SourceLocation.Start);
+
+                                    error.AddLocation(varDefPos.Line, varDefPos.Column);
+                                    error.AddLocation(usagePos.Line, usagePos.Column);
+
+//                                    error.AddLocation(varDef.SourceLocation.Line, varDef.SourceLocation.Column);
+//                                    error.AddLocation(usage.Node.SourceLocation.Line, usage.Node.SourceLocation.Column);
                                     context.ReportError(error);
                                 }
                             }

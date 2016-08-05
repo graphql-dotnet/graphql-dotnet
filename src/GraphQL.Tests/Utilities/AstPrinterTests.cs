@@ -1,5 +1,4 @@
 ﻿using GraphQL.Execution;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using Should;
@@ -9,40 +8,41 @@ namespace GraphQL.Tests.Utilities
     public class AstPrinterTests
     {
         private readonly AstPrintVisitor _printer = new AstPrintVisitor();
+        private readonly IDocumentBuilder _builder = new GraphQLDocumentBuilder();
 
         [Fact]
         public void prints_ast()
         {
-            var query = @"{
-              complicatedArgs {
-                intArgField(intArg: 2)
-              }
-            }";
-            var builder = new SpracheDocumentBuilder();
-            var document = builder.Build(query);
+var query = @"{
+  complicatedArgs {
+    intArgField(intArg: 2)
+  }
+}
+";
+            var document = _builder.Build(query);
 
             var result = _printer.Visit(document);
             result.ShouldNotBeNull();
+            result.ToString().ShouldEqual(MonetizeLineBreaks(query));
         }
 
         [Fact]
         public void prints_variables()
         {
-            var query = @"
-            mutation createUser($userInput: UserInput!) {
-              createUser(userInput: $userInput){
-                id
-                gender
-                profileImage
-              }
-            }
-            ";
+var query = @"mutation createUser($userInput: UserInput!) {
+  createUser(userInput: $userInput) {
+    id
+    gender
+    profileImage
+  }
+}
+";
 
-            var builder = new SpracheDocumentBuilder();
-            var document = builder.Build(query);
+            var document = _builder.Build(query);
 
             var result = _printer.Visit(document);
             result.ShouldNotBeNull();
+            result.ToString().ShouldEqual(MonetizeLineBreaks(query));
         }
 
         [Fact]
@@ -71,6 +71,13 @@ namespace GraphQL.Tests.Utilities
             var val = new FloatValue(value);
             var result = _printer.Visit(val);
             result.ShouldEqual($"{value, 0:0.0##}");
+        }
+
+        private static string MonetizeLineBreaks(string input)
+        {
+            return (input ?? string.Empty)
+                .Replace("\r\n", "\n")
+                .Replace("\r", "\n");
         }
     }
 }

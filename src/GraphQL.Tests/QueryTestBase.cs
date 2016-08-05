@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Http;
+using GraphQL.Language;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -12,7 +13,7 @@ using Should;
 
 namespace GraphQL.Tests
 {
-    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, SpracheDocumentBuilder>
+    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder>
         where TSchema : ISchema
     {
     }
@@ -114,7 +115,16 @@ namespace GraphQL.Tests
             Console.WriteLine(writtenResult);
 #endif
 
-            writtenResult.ShouldEqual(expectedResult);
+            string additionalInfo = null;
+
+            if (runResult.Errors?.Any() == true)
+            {
+                additionalInfo = string.Join(Environment.NewLine, runResult.Errors
+                    .Where(x => x.InnerException is GraphQLSyntaxErrorException)
+                    .Select(x => x.InnerException.Message));
+            }
+
+            writtenResult.ShouldEqual(expectedResult, additionalInfo);
 
             return runResult;
         }

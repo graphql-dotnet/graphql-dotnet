@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -30,7 +29,7 @@ namespace GraphQL.Types
             Values.Add(value);
         }
 
-        public EnumValues Values { get; private set; }
+        public EnumValues Values { get; }
 
         public override object Serialize(object value)
         {
@@ -58,9 +57,10 @@ namespace GraphQL.Types
             {
                 val = ((EnumValue)value).Name;
             }
-            else if (value is StringValue)
+
+            if (value is StringValue)
             {
-                val = ((StringValue)value).Value;
+                val = ((StringValue) value).Value;
             }
 
             return ParseValue(val);

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using GraphQL.Execution;
+using GraphQL.Introspection;
 
 namespace GraphQL.Tests.Language
 {
@@ -20,25 +20,24 @@ namespace GraphQL.Tests.Language
          name
        }
 ";
-
         [Fact]
         public void antlr_builder()
         {
-            buildMany(_query, new AntlrDocumentBuilder());
+            buildMany(new AntlrDocumentBuilder());
         }
 
         [Fact]
-        public void sprache_builder()
+        public void core_builder()
         {
-            var builder = new SpracheDocumentBuilder();
-            builder.CacheDocuments = false;
-            buildMany(_query, builder);
+            var builder = new GraphQLDocumentBuilder();
+            buildMany(builder);
         }
 
-        private void buildMany(string query, IDocumentBuilder builder)
+        private void buildMany(IDocumentBuilder builder)
         {
-            //build(query, builder, 1);
-            //build(query, builder, 10);
+            var query = _query; // SchemaIntrospection.IntrospectionQuery;
+            build(query, builder, 1);
+            build(query, builder, 10);
             build(query, builder, 100);
             build(query, builder, 1000);
             build(query, builder, 10000);

@@ -278,7 +278,15 @@ namespace GraphQL.Utilities
             Config<StringValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value));
+                c.Print(f =>
+                {
+                    var val = f.Arg(x => x.Value);
+                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\""))
+                    {
+                        val = $"\"{val}\"";
+                    }
+                    return val;
+                });
             });
             Config<BooleanValue>(c =>
             {

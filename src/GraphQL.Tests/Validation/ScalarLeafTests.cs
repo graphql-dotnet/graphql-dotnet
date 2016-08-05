@@ -1,5 +1,4 @@
-﻿using GraphQL.Types;
-using GraphQL.Validation.Rules;
+﻿using GraphQL.Validation.Rules;
 
 namespace GraphQL.Tests.Validation
 {

@@ -55,6 +55,7 @@ namespace GraphQL.Validation.Rules
                                 var parentType = context.TypeInfo.GetParentType();
                                 Invariant.Check(parentType != null, "Parent type must not be null.");
                                 context.ReportError(new ValidationError(
+                                    context.OriginalQuery,
                                     "5.3.1",
                                     UnknownArgMessage(
                                         node.Name,
@@ -73,6 +74,7 @@ namespace GraphQL.Validation.Rules
                             if (directiveArgDef == null)
                             {
                                 context.ReportError(new ValidationError(
+                                    context.OriginalQuery,
                                     "5.3.1",
                                     UnknownDirectiveArgMessage(
                                         node.Name,

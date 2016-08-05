@@ -33,7 +33,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
 
         public DocumentExecuter()
-            : this(new SpracheDocumentBuilder(), new DocumentValidator())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
         {
         }
 
@@ -52,14 +52,13 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
-
-            var validationResult = _documentValidator.Validate(schema, document, rules);
-
-            if (validationResult.IsValid)
+            try
             {
-                try
+                var document = _documentBuilder.Build(query);
+                var validationResult = _documentValidator.Validate(query, schema, document, rules);
+
+                if (validationResult.IsValid)
                 {
                     var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
 
@@ -75,24 +74,25 @@ namespace GraphQL
                         result.Errors = context.Errors;
                     }
                 }
-                catch (Exception exc)
+                else
                 {
-                    if (result.Errors == null)
-                    {
-                        result.Errors = new ExecutionErrors();
-                    }
-
                     result.Data = null;
-                    result.Errors.Add(new ExecutionError(exc.Message, exc));
+                    result.Errors = validationResult.Errors;
                 }
-            }
-            else
-            {
-                result.Data = null;
-                result.Errors = validationResult.Errors;
-            }
 
-            return result;
+                return result;
+            }
+            catch (Exception exc)
+            {
+                if (result.Errors == null)
+                {
+                    result.Errors = new ExecutionErrors();
+                }
+
+                result.Data = null;
+                result.Errors.Add(new ExecutionError(exc.Message, exc));
+                return result;
+            }
         }
 
         public ExecutionContext BuildExecutionContext(

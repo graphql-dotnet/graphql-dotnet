@@ -19,6 +19,8 @@ namespace GraphQL.Validation
 
         private SchemaPrinter _schemaPrinter;
 
+        public string OriginalQuery { get; set; }
+
         public string OperationName { get; set; }
         public ISchema Schema { get; set; }
         public Document Document { get; set; }

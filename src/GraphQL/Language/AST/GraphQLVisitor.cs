@@ -509,19 +509,6 @@ namespace GraphQL.Language.AST
             {
                 var definition = Visit(childContext) as IDefinition;
                 document.AddDefinition(definition);
-
-                if (definition is FragmentDefinition)
-                {
-                    document.Fragments.Add(definition as FragmentDefinition);
-                }
-                else if (definition is Operation)
-                {
-                    document.Operations.Add(definition as Operation);
-                }
-                else
-                {
-                    throw new ExecutionError("Unhandled document definition");
-                }
             });
 
             return document;

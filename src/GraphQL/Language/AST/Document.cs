@@ -13,19 +13,31 @@ namespace GraphQL.Language.AST
             Fragments = new Fragments();
         }
 
-        public void AddDefinition(IDefinition definition)
-        {
-            _definitions.Add(definition);
-        }
+        public string OriginalQuery { get; set; }
 
         public override IEnumerable<INode> Children => _definitions;
-
-        public IEnumerable<string> Expectations { get; set; }
-        public bool WasSuccessful { get; set; }
 
         public Operations Operations { get; }
 
         public Fragments Fragments { get; }
+
+        public void AddDefinition(IDefinition definition)
+        {
+            _definitions.Add(definition);
+
+            if (definition is FragmentDefinition)
+            {
+                Fragments.Add((FragmentDefinition) definition);
+            }
+            else if (definition is Operation)
+            {
+                Operations.Add((Operation) definition);
+            }
+            else
+            {
+                throw new ExecutionError("Unhandled document definition");
+            }
+        }
 
         public override string ToString()
         {

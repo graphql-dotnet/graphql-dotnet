@@ -36,6 +36,7 @@ namespace GraphQL.Validation.Rules
                         if (frequency.ContainsKey(op.Name))
                         {
                             var error = new ValidationError(
+                                context.OriginalQuery,
                                 "5.1.1.1",
                                 DuplicateOperationNameMessage(op.Name),
                                 op);

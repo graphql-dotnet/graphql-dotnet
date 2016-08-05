@@ -40,6 +40,7 @@ namespace GraphQL.Validation.Rules
                         if (knownNames.ContainsKey(objField.Name))
                         {
                             context.ReportError(new ValidationError(
+                                context.OriginalQuery,
                                 "5.5.1",
                                 DuplicateInputField(objField.Name),
                                 knownNames[objField.Name],

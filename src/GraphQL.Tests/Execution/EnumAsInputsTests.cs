@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Execution
         {
             AssertQuerySuccess(
                 @"
-                mutation createUser {
+                 mutation createUser {
                   createUser(userInput:{
                     profileImage:""myimage.png"",
                     gender: Female

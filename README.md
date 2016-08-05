@@ -6,7 +6,7 @@
 
 This is a work-in-progress implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
-This project uses [Antlr4](https://github.com/tunnelvisionlabs/antlr4cs) for the GraphQL grammar definition.
+This project uses a lexer/parser originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
 
 ## Installation
 

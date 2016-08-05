@@ -39,13 +39,13 @@ namespace GraphQL.Validation.Rules
             {
                 if (field.SelectionSet != null && field.SelectionSet.Selections.Any())
                 {
-                    var error = new ValidationError("5.2.3", NoSubselectionAllowedMessage(field.Name, context.Print(type)), field.SelectionSet);
+                    var error = new ValidationError(context.OriginalQuery, "5.2.3", NoSubselectionAllowedMessage(field.Name, context.Print(type)), field.SelectionSet);
                     context.ReportError(error);
                 }
             }
             else if(field.SelectionSet == null || !field.SelectionSet.Selections.Any())
             {
-                var error = new ValidationError("5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
+                var error = new ValidationError(context.OriginalQuery, "5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
                 context.ReportError(error);
             }
         }

@@ -58,20 +58,12 @@
     <Compile Include="Builders\FieldBuilder.cs" />
     <Compile Include="LightweightCache.cs" />
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
-    <Compile Include="Execution\SpracheDocumentBuilder.cs" />
+    <Compile Include="Execution\GraphQLDocumentBuilder.cs" />
     <Compile Include="Invariant.cs" />
     <Compile Include="Language\AST\Alias.cs" />
     <Compile Include="Language\AST\NameNode.cs" />
+    <Compile Include="Language\CoreToVanillaConverter.cs" />
     <Compile Include="Language\NodeExtensions.cs" />
-    <Compile Include="Language\GraphQLParser.cs" />
-    <Compile Include="Language\Option.cs" />
-    <Compile Include="Language\Parse.Primitives.cs" />
-    <Compile Include="Language\ResultHelper.cs" />
-    <Compile Include="Language\Position.cs" />
-    <Compile Include="Language\Parse.cs" />
-    <Compile Include="Language\Parser.cs" />
-    <Compile Include="Language\Result.cs" />
-    <Compile Include="Language\SourceInput.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />
@@ -205,11 +197,14 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>GraphQL.Parsing</CustomToolNamespace>
     </Antlr4>
-    <Compile Include="Language\Parse.Optional.cs" />
-    <Compile Include="Language\Parse.Regex.cs" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL.Language\GraphQL.Language.csproj">
+      <Project>{75885b61-3825-4ef0-bbc1-86e098518035}</Project>
+      <Name>GraphQL.Language</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

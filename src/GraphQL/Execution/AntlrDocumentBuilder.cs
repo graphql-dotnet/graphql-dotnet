@@ -2,18 +2,17 @@ using System;
 using System.IO;
 using System.Text;
 using Antlr4.Runtime;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Parsing;
 
 namespace GraphQL.Execution
 {
-    [Obsolete("This document builder is now obsolete and will be removed in the next major version.  Please use the SpracheDocumentBuilder.")]
+    [Obsolete("This document builder is now obsolete and will be removed in a future release.  Please use the GraphQLDocumentBuilder.")]
     public class AntlrDocumentBuilder : IDocumentBuilder
     {
-        public Document Build(string data)
+        public Document Build(string body)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(data)))
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(body)))
             using (var reader = new StreamReader(stream))
             {
                 var input = new AntlrInputStream(reader);

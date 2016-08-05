@@ -35,7 +35,7 @@ namespace GraphQL.Validation.Rules
                     {
                         var typeNames = context.Schema.AllTypes.Select(x => x.Name).ToArray();
                         var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
-                        context.ReportError(new ValidationError("5.4.1.2", UnknownTypeMessage(node.Name, suggestionList), node));
+                        context.ReportError(new ValidationError(context.OriginalQuery, "5.4.1.2", UnknownTypeMessage(node.Name, suggestionList), node));
                     }
                 });
             });

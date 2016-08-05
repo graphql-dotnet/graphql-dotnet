@@ -11,7 +11,18 @@ namespace GraphQL.Language.AST
 
     public class VariableDefinition : AbstractNode
     {
+        public VariableDefinition()
+        {
+        }
+
+        public VariableDefinition(NameNode node)
+        {
+            Name = node.Name;
+            NameNode = node;
+        }
+
         public string Name { get; set; }
+        public NameNode NameNode { get; set; }
         public IType Type { get; set; }
         public IValue DefaultValue { get; set; }
 

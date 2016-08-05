@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
 
                     if (!type.IsInputType(context.Schema))
                     {
-                        context.ReportError(new ValidationError("5.7.3", UndefinedVarMessage(varDef.Name, context.Print(type)), varDef));
+                        context.ReportError(new ValidationError(context.OriginalQuery, "5.7.3", UndefinedVarMessage(varDef.Name, context.Print(type)), varDef));
                     }
                 });
             });
