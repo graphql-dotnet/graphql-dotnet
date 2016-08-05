@@ -23,11 +23,11 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             Name = "CancellationTestType";
 
-            Field<StringGraphType>("one", resolve: GetOne);
-            Field<StringGraphType>("two", resolve: GetTwo);
+            Field<StringGraphType>("one", resolve: GetOneAsync);
+            Field<StringGraphType>("two", resolve: GetTwoAsync);
         }
 
-        public Task<string> GetOne(ResolveFieldContext context)
+        public Task<string> GetOneAsync(ResolveFieldContext context)
         {
             if (!context.CancellationToken.CanBeCanceled)
             {
@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             return Task.FromResult("one");
         }
 
-        public Task<string> GetTwo(ResolveFieldContext context)
+        public Task<string> GetTwoAsync(ResolveFieldContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 

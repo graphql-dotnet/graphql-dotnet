@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Execution
             return NumberHolder;
         }
 
-        public Task<NumberHolder> PromiseToChangeTheNumber(int number)
+        public Task<NumberHolder> PromiseToChangeTheNumberAsync(int number)
         {
             NumberHolder.TheNumber = number;
             return Task.FromResult(NumberHolder);
@@ -37,9 +37,9 @@ namespace GraphQL.Tests.Execution
             throw new InvalidOperationException("Cannot change the number");
         }
 
-        public async Task<NumberHolder> PromiseAndFailToChangeTheNumber(int number)
+        public async Task<NumberHolder> PromiseAndFailToChangeTheNumberAsync(int number)
         {
-            await Task.Delay(100);
+            await Task.Delay(100).ConfigureAwait(false);
             throw new InvalidOperationException("Cannot change the number");
         }
     }
@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Execution
                 {
                     var root = context.Source as Root;
                     var change = context.Argument<int>("newNumber");
-                    return root.PromiseToChangeTheNumber(change);
+                    return root.PromiseToChangeTheNumberAsync(change);
                 }
             );
 
@@ -141,7 +141,7 @@ namespace GraphQL.Tests.Execution
                 {
                     var root = context.Source as Root;
                     var change = context.Argument<int>("newNumber");
-                    return root.PromiseAndFailToChangeTheNumber(change);
+                    return root.PromiseAndFailToChangeTheNumberAsync(change);
                 }
             );
         }

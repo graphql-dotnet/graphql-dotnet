@@ -20,14 +20,12 @@ namespace GraphQL
             return mappedItems.ToList();
         }
 
-        public static async Task<IEnumerable> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
+        public static Task<object[]> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
         {
             var tasks = items
                 .Cast<object>()
-                .Select(map)
-                .ToArray();
-
-            return await Task.WhenAll(tasks);
+                .Select(map);
+            return Task.WhenAll(tasks);
         }
 
         public static void Apply<T>(this IEnumerable<T> items, Action<T> action)
@@ -56,11 +54,11 @@ namespace GraphQL
             var tasks = items
                 .Select(async item => new {
                     Key = keyFunc(item),
-                    Result = await valueFunc(item)
+                    Result = await valueFunc(item).ConfigureAwait(false)
                 })
                 .ToArray();
 
-            var keyValuePairs = await Task.WhenAll(tasks);
+            var keyValuePairs = await Task.WhenAll(tasks).ConfigureAwait(false);
             keyValuePairs = keyValuePairs.Where(x => !x.Result.Skip).ToArray();
 
             return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);

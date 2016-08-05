@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Execution
             var executer = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
             var schema = new Schema();
 
-            await executer.ExecuteAsync(schema, null, "{noop}", null);
+            await executer.ExecuteAsync(schema, null, "{noop}", null).ConfigureAwait(false);
 
             Assert.DoesNotThrow(() => schema.Dispose());
         }
