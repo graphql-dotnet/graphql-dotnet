@@ -18,21 +18,21 @@ namespace GraphQl.SchemaGenerator.Tests
             var schemaGenerator = new SchemaGenerator(null);
             var schema = schemaGenerator.CreateSchema(typeof(StarWarsController));
 
-            //var query = @"
-            //    query HeroNameQuery {
-            //      ModelData {
-            //        Test
-            //      }
-            //    }
-            //";
+            var query = @"
+                query HeroNameQuery {
+                  hero {
+                    Test
+                  }
+                }
+            ";
 
-            //var expected = @"{
-            //  ModelData: {
-            //    Test: 'test'
-            //  }
-            //}";
+            var expected = @"{
+              hero: {
+                Test: 'test'
+              }
+            }";
 
-            //GraphAssert.QuerySuccess(schema, query, expected);
+            GraphAssert.QuerySuccess(schema, query, expected);
         }
 
   

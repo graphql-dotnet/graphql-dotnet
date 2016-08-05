@@ -54,7 +54,6 @@
     <Compile Include="Models\FieldDefinition.cs" />
     <Compile Include="Extensions\AssignableExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
-    <Compile Include="ModelSchemaGenerator.cs" />
     <Compile Include="SchemaGenerator.cs" />
     <Compile Include="Models\GraphControllerDefinition.cs" />
     <Compile Include="Models\GraphRouteDefinition.cs" />

@@ -95,7 +95,7 @@ namespace GraphQl.SchemaGenerator
                 }
             }
 
-            return new GraphQL.Types.Schema
+            return new GraphQL.Types.Schema(graphType => ObjectGraphTypeBuilder.Build())
             {                
                 Mutation = mutation.Fields.Any() ? mutation : null,
                 Query = query.Fields.Any() ? query : null
