@@ -50,6 +50,8 @@
     <Compile Include="Attributes\GraphRouteAttribute.cs" />
     <Compile Include="Attributes\GraphTypeAttribute.cs" />
     <Compile Include="Attributes\NotNullAttribute.cs" />
+    <Compile Include="GraphTypeResolver.cs" />
+    <Compile Include="IGraphTypeResolver.cs" />
     <Compile Include="Models\FieldInformation.cs" />
     <Compile Include="Models\FieldDefinition.cs" />
     <Compile Include="Extensions\AssignableExtensions.cs" />

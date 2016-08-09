@@ -21,7 +21,7 @@ namespace GraphQl.SchemaGenerator.Tests
 
             var writer = new DocumentWriter(indent: true);
             var writtenResult = writer.Write(result.Data);
-            var expectedResult = writer.Write(CreateQueryResult(expected));
+            var expectedResult = writer.Write(CreateQueryResult(expected).Data);
 
             Assert.Equal(expectedResult, writtenResult);
         }

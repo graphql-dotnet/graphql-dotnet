@@ -1,11 +1,6 @@
-﻿using System;
-using System.CodeDom.Compiler;
+﻿using GraphQl.SchemaGenerator.Tests.Mocks;
 using GraphQl.StarWars.Api.Controllers;
-using GraphQL;
-using GraphQL.Execution;
-using GraphQL.Http;
 using GraphQL.StarWars;
-using GraphQL.Validation;
 using Xunit;
 
 namespace GraphQl.SchemaGenerator.Tests
@@ -15,24 +10,28 @@ namespace GraphQl.SchemaGenerator.Tests
         [Fact]
         public void BasicExample_Works()
         {
-            var schemaGenerator = new SchemaGenerator(null);
+            var data = new StarWarsData();
+            var item = data.GetDroidByIdAsync("3").Result;
+
+            var fields = new MockFieldResolver(item);
+            var schemaGenerator = new SchemaGenerator(fields, new GraphTypeResolver());
             var schema = schemaGenerator.CreateSchema(typeof(StarWarsController));
 
             var query = @"
                 query HeroNameQuery {
                   hero {
-                    Test
+                    name
                   }
                 }
             ";
 
             var expected = @"{
               hero: {
-                Test: 'test'
+                name: 'R2-D2'
               }
             }";
 
-            GraphAssert.QuerySuccess(schema, query, expected);
+           GraphAssert.QuerySuccess(schema, query, expected);
         }
 
   

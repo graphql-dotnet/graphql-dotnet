@@ -113,10 +113,21 @@ namespace GraphQl.SchemaGenerator
 
                 return typeof(ListGraphType<>).MakeGenericType(keyValuePairGraphType);
             }
+
+            if (propertyType.IsArray)
+            {
+                var itemType = propertyType.GetElementType();
+                var itemGraphType = ConvertTypeToGraphType(itemType);
+                if (itemGraphType != null)
+                {
+                    return typeof(ListGraphType<>).MakeGenericType(itemGraphType);
+                }
+            }
+
             if (propertyType.IsAssignableToGenericType(typeof(IEnumerable<>)))
             {
                 var itemType = propertyType.GetGenericArguments()[0];
-                var itemGraphType = ConvertTypeToGraphType(itemType, false);
+                var itemGraphType = ConvertTypeToGraphType(itemType);
                 if (itemGraphType != null)
                 {
                     return typeof(ListGraphType<>).MakeGenericType(itemGraphType);

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQl.SchemaGenerator.Attributes;
+using GraphQl.SchemaGenerator.Helpers;
 using GraphQl.SchemaGenerator.Models;
+using GraphQl.SchemaGenerator.Schema;
 using GraphQl.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
@@ -11,13 +13,20 @@ namespace GraphQl.SchemaGenerator
 {
     public class SchemaGenerator
     {
-        private IGraphFieldResolver FieldResolver { get; set; }
+        private IGraphFieldResolver FieldResolver { get; }
+        private IGraphTypeResolver TypeResolver { get; }
 
-        public SchemaGenerator(IGraphFieldResolver fieldResolver)
+        public SchemaGenerator(IGraphFieldResolver fieldResolver, IGraphTypeResolver typeResolver)
         {
             FieldResolver = fieldResolver;
+            TypeResolver = typeResolver;
         }
 
+        /// <summary>
+        ///     Create field definitions based off a type.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
         public IEnumerable<FieldDefinition> CreateDefinitions(params Type[] types)
         {
             var definitions = new List<FieldDefinition>();
@@ -63,7 +72,7 @@ namespace GraphQl.SchemaGenerator
             return CreateSchema(CreateDefinitions(types));
         }
 
-        public static GraphQL.Types.Schema CreateSchema(
+        public GraphQL.Types.Schema CreateSchema(
             IEnumerable<FieldDefinition> definitions)
         {
             var mutation = new ObjectGraphType();
@@ -95,14 +104,19 @@ namespace GraphQl.SchemaGenerator
                 }
             }
 
-            return new GraphQL.Types.Schema(graphType => ObjectGraphTypeBuilder.Build())
+            return new GraphQL.Types.Schema(CreateGraphType)
             {                
                 Mutation = mutation.Fields.Any() ? mutation : null,
                 Query = query.Fields.Any() ? query : null
             };
         }
 
-        private static Type EnsureGraphType(Type parameterType)
+        public GraphType CreateGraphType(Type type)
+        {
+            return TypeResolver.ResolveType(type);
+        }
+
+        public static Type EnsureGraphType(Type parameterType)
         {
             if (parameterType == null)
             {
