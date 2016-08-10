@@ -13,11 +13,4 @@ namespace GraphQL.StarWars.Types
             AddValue("JEDI", "Released in 1983.", 6);
         }
     }
-
-    public enum Episodes
-    {
-        NEWHOPE  = 4,
-        EMPIRE  = 5,
-        JEDI  = 6
-    }
 }

@@ -43,7 +43,7 @@ namespace GraphQl.SchemaGenerator
                     {
                         continue;
                     }
-
+                    
                     var parameters = method.GetParameters();
                     var arguments = CreateArguments(parameters);
                     var field = new FieldInformation
@@ -51,7 +51,8 @@ namespace GraphQl.SchemaGenerator
                         IsMutation = graphRoute.IsMutation,
                         Arguments =  arguments,
                         Name = !String.IsNullOrWhiteSpace(graphRoute.Name) ? graphRoute.Name : method.Name,
-                        Response = graphRoute.ResponseType
+                        Response = graphRoute.ResponseType,
+                        Method = method
                     };
 
                     definitions.Add(new FieldDefinition(field, (context) => FieldResolver.ResolveField(context, field)));

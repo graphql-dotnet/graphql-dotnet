@@ -16,11 +16,6 @@ namespace GraphQl.SchemaGenerator.Attributes
         /// <summary>
         /// 
         /// </summary>
-        public Type ResponseType { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsMutation { get; set; }
 
 
@@ -36,32 +31,10 @@ namespace GraphQl.SchemaGenerator.Attributes
         /// 
         /// </summary>
         /// <param name="name"></param>
-        public GraphRouteAttribute(string name)
-        {
-            Name = name;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="responseType"></param>
-        public GraphRouteAttribute(string name, Type responseType)
-        {
-            Name = name;
-            ResponseType = responseType;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="responseType"></param>
         /// <param name="isMutation"></param>
-        public GraphRouteAttribute(string name, Type responseType, bool isMutation)
+        public GraphRouteAttribute(string name, bool isMutation = false)
         {
             Name = name;
-            ResponseType = responseType;
             IsMutation = isMutation;
         }
     }

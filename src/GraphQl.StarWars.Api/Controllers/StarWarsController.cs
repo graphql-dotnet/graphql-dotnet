@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using GraphQl.SchemaGenerator.Attributes;
 using GraphQL.StarWars;
@@ -11,13 +13,13 @@ namespace GraphQl.StarWars.Api.Controllers
         [GraphRoute("hero", typeof(Droid))]
         [HttpGet]
         [Route("hero")]
-        public async Task<IHttpActionResult> Get()
+        public HttpResponseMessage GetHero()
         {
             var data = new StarWarsData();
 
-            var item = await data.GetDroidByIdAsync("3");
+            var item = data.GetDroidByIdAsync("3").Result;
 
-            return Ok(item);
+            return Request.CreateResponse(HttpStatusCode.OK, item);
         }
 
         /// <summary>

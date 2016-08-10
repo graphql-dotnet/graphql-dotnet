@@ -14,7 +14,7 @@ namespace GraphQL.StarWars.Types
                 "friends",
                 resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
             );
-            Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+            Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movies they appear in.");
             Field<StringGraphType>("homePlanet", "The home planet of the human.");
 
             Interface<CharacterInterface>();

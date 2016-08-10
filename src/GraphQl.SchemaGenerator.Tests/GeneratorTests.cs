@@ -15,7 +15,7 @@ namespace GraphQl.SchemaGenerator.Tests
 
             var fields = new MockFieldResolver(item);
             var schemaGenerator = new SchemaGenerator(fields, new GraphTypeResolver());
-            var schema = schemaGenerator.CreateSchema(typeof(StarWarsController));
+            var schema = schemaGenerator.CreateSchema(typeof(GraphQL.StarWars.StarWars));
 
             var query = @"
                 query HeroNameQuery {
@@ -34,6 +34,29 @@ namespace GraphQl.SchemaGenerator.Tests
            GraphAssert.QuerySuccess(schema, query, expected);
         }
 
-  
+        [Fact]
+        public void BasicExample_WithFieldGenerator_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockGraphFieldResolver(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(StarWarsController));
+
+            var query = @"
+                query HeroNameQuery {
+                  hero {
+                    name
+                  }
+                }
+            ";
+
+            var expected = @"{
+              hero: {
+                name: 'R2-D2'
+              }
+            }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+
     }
 }
