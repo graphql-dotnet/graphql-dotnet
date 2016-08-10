@@ -16,13 +16,13 @@ namespace GraphQL.StarWars
             {
                 Id = "1", Name = "Luke",
                 Friends = new[] {"3", "4"},
-                AppearsIn = new[] {4, 5, 6},
+                AppearsIn = new HashSet<Episode> { Episode.EMPIRE, Episode.JEDI, Episode.NEWHOPE},
                 HomePlanet = "Tatooine"
             });
             _humans.Add(new Human
             {
                 Id = "2", Name = "Vader",
-                AppearsIn = new[] {4, 5, 6},
+                AppearsIn = new HashSet<Episode> { Episode.EMPIRE, Episode.JEDI, Episode.NEWHOPE },
                 HomePlanet = "Tatooine"
             });
 
@@ -30,13 +30,13 @@ namespace GraphQL.StarWars
             {
                 Id = "3", Name = "R2-D2",
                 Friends = new[] {"1", "4"},
-                AppearsIn = new[] {4, 5, 6},
+                AppearsIn = new HashSet<Episode> { Episode.EMPIRE, Episode.JEDI, Episode.NEWHOPE },
                 PrimaryFunction = "Astromech"
             });
             _droids.Add(new Droid
             {
                 Id = "4", Name = "C-3PO",
-                AppearsIn = new[] {4, 5, 6},
+                AppearsIn = new HashSet<Episode> { Episode.EMPIRE, Episode.JEDI, Episode.NEWHOPE },
                 PrimaryFunction = "Protocol"
             });
         }

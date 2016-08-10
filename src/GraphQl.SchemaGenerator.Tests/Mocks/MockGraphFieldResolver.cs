@@ -16,18 +16,7 @@ namespace GraphQl.SchemaGenerator.Tests.Mocks
     {
         public object GetService(Type type)
         {
-            var instance = Activator.CreateInstance(type);
-            var apiInstance = instance as ApiController;
-
-            if (apiInstance == null)
-            {
-                return instance;
-            }
-
-            apiInstance.Request = new HttpRequestMessage();
-            apiInstance.Configuration = new HttpConfiguration();
-
-            return apiInstance;
+            return Activator.CreateInstance(type);
         }
     }
 }

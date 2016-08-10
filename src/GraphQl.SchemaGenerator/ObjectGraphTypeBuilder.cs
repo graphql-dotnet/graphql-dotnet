@@ -64,8 +64,7 @@ namespace GraphQl.SchemaGenerator
             var properties = type.GetProperties();
             if (hasDataContract)
             {
-                return properties.Where(p => p.ShouldIncludeMemberInGraph()
-                    && !p.GetCustomAttributes(false).Any(a => a.GetType().Name.StartsWith("JsonIgnore", StringComparison.OrdinalIgnoreCase)));
+                return properties.Where(p => p.ShouldIncludeMemberInGraph());
             }
             else
             {
@@ -78,8 +77,7 @@ namespace GraphQl.SchemaGenerator
             var fields = type.GetFields();
             if (hasDataContract)
             {
-                return fields.Where(f => f.ShouldIncludeMemberInGraph()
-                    && !f.GetCustomAttributes(false).Any(a => a.GetType().Name.StartsWith("JsonIgnore", StringComparison.OrdinalIgnoreCase)));
+                return fields.Where(f => f.ShouldIncludeMemberInGraph());
             }
             else
             {

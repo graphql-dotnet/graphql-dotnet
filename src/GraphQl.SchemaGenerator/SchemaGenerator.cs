@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQl.SchemaGenerator.Attributes;
 using GraphQl.SchemaGenerator.Helpers;
 using GraphQl.SchemaGenerator.Models;
-using GraphQl.SchemaGenerator.Schema;
 using GraphQl.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
@@ -46,12 +46,19 @@ namespace GraphQl.SchemaGenerator
                     
                     var parameters = method.GetParameters();
                     var arguments = CreateArguments(parameters);
+                    var response = method.ReturnType;
+
+                    if (response.IsGenericType && response.GetGenericTypeDefinition() == typeof(Task<>))
+                    {
+                        response = response.GenericTypeArguments.First();
+                    }
+
                     var field = new FieldInformation
                     {
                         IsMutation = graphRoute.IsMutation,
                         Arguments =  arguments,
-                        Name = !String.IsNullOrWhiteSpace(graphRoute.Name) ? graphRoute.Name : method.Name,
-                        Response = graphRoute.ResponseType,
+                        Name = !String.IsNullOrWhiteSpace(graphRoute.Name) ? graphRoute.Name : StringHelper.ConvertToCamelCase(method.Name),
+                        Response = response,
                         Method = method
                     };
 
@@ -87,6 +94,11 @@ namespace GraphQl.SchemaGenerator
                 }
 
                 var type = EnsureGraphType(definition.Field.Response);
+
+                if (type == null)
+                {
+                    continue;
+                }
 
                 if (definition.Field.IsMutation){
                     mutation.Field(

@@ -22,9 +22,17 @@ namespace GraphQl.SchemaGenerator
                 return null;
             }
 
-            if (type.GetGenericTypeDefinition() == typeof(ObjectGraphTypeWrapper<>))
+            if (type.IsGenericType)
             {
-               return Activator.CreateInstance(type) as GraphType;
+                if (type.GetGenericTypeDefinition() == typeof(InterfaceGraphTypeWrapper<>))
+                {
+                    return null;
+                }
+
+                if (type.GetGenericTypeDefinition() == typeof(ObjectGraphTypeWrapper<>))
+                {
+                    return Activator.CreateInstance(type) as GraphType;
+                }
             }
 
             if (type.IsAssignableFrom(typeof(GraphType)))
@@ -33,6 +41,12 @@ namespace GraphQl.SchemaGenerator
             }
 
             var graphType = GraphTypeConverter.ConvertTypeToGraphType(type);
+
+            if (graphType == null)
+            {
+                return null;
+            }
+
             var generic = typeof(ObjectGraphTypeWrapper<>).MakeGenericType(graphType);
 
             return Activator.CreateInstance(generic) as GraphType;

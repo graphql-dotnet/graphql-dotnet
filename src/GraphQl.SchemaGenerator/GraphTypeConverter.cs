@@ -55,9 +55,19 @@ namespace GraphQl.SchemaGenerator
         /// <exception cref="NotSupportedException">Cannot support IEnumerable when wrapping an object with GraphQL</exception>
         private static Type BaseGraphType(Type propertyType)
         {
-            if (propertyType.IsEnum)
+            //if (propertyType.IsEnum)
+            //{
+            //    return typeof(EnumerationGraphTypeWrapper<>).MakeGenericType(propertyType);
+            //}
+
+            if (propertyType == typeof(EnumValues))
             {
-                return typeof(EnumerationGraphTypeWrapper<>).MakeGenericType(propertyType);
+                return typeof(EnumerationGraphType);
+            }
+
+            if (propertyType == typeof(void))
+            {
+                return null;
             }
 
             if (propertyType == typeof(string) ||
@@ -131,9 +141,7 @@ namespace GraphQl.SchemaGenerator
                 if (itemGraphType != null)
                 {
                     return typeof(ListGraphType<>).MakeGenericType(itemGraphType);
-                }
-
-                // TODO: error?
+                }                
             }
 
             if (propertyType.IsInterface || propertyType.IsAbstract)
@@ -141,7 +149,12 @@ namespace GraphQl.SchemaGenerator
                 return typeof(InterfaceGraphTypeWrapper<>).MakeGenericType(propertyType);
             }
 
-            return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
+            if (propertyType.ShouldIncludeInGraph())
+            {
+                return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
+            }
+
+            return null;
         }
 
         private static bool isFloatType(Type type)
@@ -181,3 +194,4 @@ namespace GraphQl.SchemaGenerator
         }
     }
 }
+

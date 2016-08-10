@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Should;
@@ -257,10 +258,10 @@ namespace GraphQL.Tests.Builders
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
-                .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+                .Argument<EpisodeEnum, Episode>("episode", "episodes")
                 .Resolve(context =>
                 {
-                    context.GetArgument<Episodes>("episode").ShouldEqual(Episodes.JEDI);
+                    context.GetArgument<Episode>("episode").ShouldEqual(Episode.JEDI);
                     return null;
                 });
 
@@ -280,10 +281,10 @@ namespace GraphQL.Tests.Builders
         {
             var objectType = new ObjectGraphType();
             objectType.Field<StringGraphType>()
-                .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+                .Argument<EpisodeEnum, Episode>("episode", "episodes")
                 .Resolve(context =>
                 {
-                    context.GetArgument("episode", Episodes.EMPIRE).ShouldEqual(Episodes.EMPIRE);
+                    context.GetArgument("episode", Episode.EMPIRE).ShouldEqual(Episode.EMPIRE);
                     return null;
                 });
 

@@ -2,19 +2,17 @@
 
 namespace GraphQl.SchemaGenerator.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field)]
     public class GraphTypeAttribute : Attribute
     {
         public Type Type { get; set; }
 
-        public GraphTypeAttribute()
-        {
+        public bool Exclude { get; set; }
 
-        }
-
-        public GraphTypeAttribute(Type type)
+        public GraphTypeAttribute(Type type = null, bool exclude = false)
         {
             Type = type;
+            Exclude = exclude;
         }
     }
 }

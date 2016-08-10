@@ -45,7 +45,7 @@ namespace GraphQL.StarWars
         /// </summary>
         /// <param name="id">id of the human</param>
         /// <returns></returns>
-        [GraphRoute("human", false)]
+        [GraphRoute("droid", false)]
         public Task<Droid> GetDroidByIdAsync(string id)
         {
             var item = _data.GetDroidByIdAsync(id);

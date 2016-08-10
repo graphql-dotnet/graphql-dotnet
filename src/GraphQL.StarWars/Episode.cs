@@ -1,5 +1,8 @@
-﻿namespace GraphQL.StarWars
+﻿using GraphQl.SchemaGenerator.Attributes;
+
+namespace GraphQL.StarWars
 {
+    [GraphType]
     public enum Episode
     {
         /// <summary>
