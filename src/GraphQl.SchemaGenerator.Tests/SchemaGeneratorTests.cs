@@ -58,7 +58,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void BasicExample_WithEnums_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
-            var schema = schemaGenerator.CreateSchema(typeof(StarWars.StarWars));
+            var schema = schemaGenerator.CreateSchema(typeof(StarWarsAttributeSchema));
 
             var query = @"
                 query HeroNameQuery {
@@ -83,7 +83,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void CreateSchema_WithClassArgument_HasExpectedSchema()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
-            var schema = schemaGenerator.CreateSchema(typeof(Schema1));
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
 
             var sut = schema.AllTypes;
             Assert.True(sut.Any(t=>t.Name == "Input_Schema1Request"));
@@ -93,7 +93,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void BasicParameterExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
-            var schema = schemaGenerator.CreateSchema(typeof(Schema1));
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
 
             var query = @"{
                   testRequest {value}
@@ -110,7 +110,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithParameterExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
-            var schema = schemaGenerator.CreateSchema(typeof(Schema1));
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
 
             var query = @"{
                   testRequest(request:{echo:1}) {value}
@@ -118,6 +118,23 @@ namespace GraphQL.SchemaGenerator.Tests
 
             var expected = @"{
               testRequest: {value:1}
+                }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
+        public void WithEnumerableExample_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                  testEnumerable{value}
+                }";
+
+            var expected = @"{
+                  testEnumerable: [{value: 1},{value: 5}]
                 }";
 
             GraphAssert.QuerySuccess(schema, query, expected);

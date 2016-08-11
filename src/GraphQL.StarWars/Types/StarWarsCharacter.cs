@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using GraphQL.SchemaGenerator.Attributes;
-using Newtonsoft.Json;
 
 namespace GraphQL.StarWars.Types
 {
@@ -24,7 +22,6 @@ namespace GraphQL.StarWars.Types
         public HashSet<Episode> AppearsIn { get; set; }
     }
 
-    [GraphType]
     public class Human : StarWarsCharacter
     {
         /// <summary>
@@ -36,7 +33,6 @@ namespace GraphQL.StarWars.Types
     /// <summary>
     ///     A mechanical creature in the Star Wars universe.
     /// </summary>
-    [GraphType]
     public class Droid : StarWarsCharacter
     {
         /// <summary>

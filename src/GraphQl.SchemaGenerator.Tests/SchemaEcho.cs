@@ -8,7 +8,7 @@ using GraphQL.SchemaGenerator.Attributes;
 namespace GraphQL.SchemaGenerator.Tests
 {
     [GraphType]
-    public class Schema1
+    public class SchemaEcho
     {
         [GraphRoute]
         public SchemaResponse TestRequest(Schema1Request request)
@@ -16,6 +16,23 @@ namespace GraphQL.SchemaGenerator.Tests
             return new SchemaResponse
             {
                 Value = request?.Echo ?? 5
+            };
+        }
+
+
+        [GraphRoute]
+        public IEnumerable<SchemaResponse> TestEnumerable(Schema1Request request)
+        {
+            return new List<SchemaResponse>
+            {
+                new SchemaResponse
+                {
+                    Value = 1
+                },
+                new SchemaResponse
+                {
+                    Value = request?.Echo ?? 5
+                },
             };
         }
     }

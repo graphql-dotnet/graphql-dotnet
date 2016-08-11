@@ -34,6 +34,12 @@ namespace GraphQL.SchemaGenerator.Extensions
 
                 var arg = type.Arguments[parameter.Name];
 
+                if (arg == null)
+                {
+                    routeArguments.Add(null);
+                    continue;
+                }
+
                 if (typeof(IDictionary<string, object>).IsAssignableFrom(arg.GetType()))
                 {
                     var json = JsonConvert.SerializeObject(arg);

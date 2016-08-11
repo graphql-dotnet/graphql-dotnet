@@ -48,7 +48,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="StarWars.cs" />
     <Compile Include="Types\CharacterInterface.cs" />
     <Compile Include="Types\DroidType.cs" />
     <Compile Include="Types\EpisodeEnum.cs" />
@@ -61,10 +60,6 @@
     <Compile Include="StarWarsSchema.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQL.SchemaGenerator.csproj">
-      <Project>{0ff5301b-4cd7-409a-9d02-9390de7beba3}</Project>
-      <Name>GraphQL.SchemaGenerator</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
       <Project>{c0e08b04-8a0d-4196-967c-8850825041b0}</Project>
       <Name>GraphQL</Name>

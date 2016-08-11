@@ -76,10 +76,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
-    <Compile Include="Schema1.cs" />
+    <Compile Include="SchemaEcho.cs" />
     <Compile Include="SchemaGeneratorTests.cs" />
     <Compile Include="Mocks\MockServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StarWarsAttributeSchema.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQL.SchemaGenerator.csproj">
