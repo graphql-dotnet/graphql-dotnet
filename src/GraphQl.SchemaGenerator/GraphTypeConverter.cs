@@ -50,11 +50,6 @@ namespace GraphQL.SchemaGenerator
         /// <exception cref="NotSupportedException">Cannot support IEnumerable when wrapping an object with GraphQL</exception>
         private static Type BaseGraphType(Type propertyType)
         {
-            //if (propertyType.IsEnum)
-            //{
-            //    return typeof(EnumerationGraphTypeWrapper<>).MakeGenericType(propertyType);
-            //}
-
             if (propertyType == typeof(EnumValues))
             {
                 return typeof(EnumerationGraphType);

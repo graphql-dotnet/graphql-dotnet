@@ -156,5 +156,71 @@ namespace GraphQL.SchemaGenerator.Tests
 
             GraphAssert.QuerySuccess(schema, query, expected);
         }
+
+        [Fact]
+        public void WithNull_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                  testRequest {nullValue}
+                }";
+
+            var expected = @"{
+              testRequest: {nullValue:null}
+                }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
+        public void WithDictionary_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                  testRequest {
+                    values{
+                        key
+                        value{
+                            complicatedResponse{
+                                echo
+                            }
+                        }
+                    }
+                  }
+                }";
+
+            var expected = @"{
+              testRequest: {
+                values: [
+                  {
+                   key: ""99"",
+                    value: {
+                      complicatedResponse: {
+                        echo: 99
+                      }
+            }
+                  },
+                  {
+                    key: ""59"",
+                    value: {
+                      complicatedResponse: {
+                        echo: 59
+                      }
+                    }
+                  },
+                  {
+                    key: ""null"",
+                    value: null
+                  }
+                ]
+              }
+            }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
     }
 }

@@ -50,5 +50,19 @@ namespace GraphQL.SchemaGenerator.Tests
         public Episode Enum { get; set; } = Episode.NEWHOPE;
 
         public int Value { get; set; }
+
+        public int? NullValue { get; } = null;
+
+        public Dictionary<string, Response2> Values { get; set; } = new Dictionary<string, Response2>
+        {
+            {"99", new Response2 {ComplicatedResponse = new Schema1Request {Data = "99", Echo = 99} } },
+            {"59", new Response2 {ComplicatedResponse = new Schema1Request {Data = "59", Echo = 59} } },
+            {"null", null}
+        };
+    }
+
+    public class Response2
+    {
+        public Schema1Request ComplicatedResponse { get; set; } 
     }
 }
