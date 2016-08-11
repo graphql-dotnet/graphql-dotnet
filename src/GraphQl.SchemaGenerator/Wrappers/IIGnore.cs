@@ -1,4 +1,4 @@
-﻿namespace GraphQl.SchemaGenerator.Wrappers
+﻿namespace GraphQL.SchemaGenerator.Wrappers
 {
     public interface IIgnore
     {

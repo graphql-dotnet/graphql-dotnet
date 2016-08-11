@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphQl.SchemaGenerator.Attributes
+namespace GraphQL.SchemaGenerator.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field)]
     public class GraphTypeAttribute : Attribute

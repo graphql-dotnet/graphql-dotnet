@@ -1,7 +1,7 @@
-﻿using GraphQl.SchemaGenerator.Schema;
+﻿using GraphQL.SchemaGenerator.Schema;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Wrappers
+namespace GraphQL.SchemaGenerator.Wrappers
 {
     public class EnumerationGraphTypeWrapper<T> : EnumerationGraphType, IIgnore
     {

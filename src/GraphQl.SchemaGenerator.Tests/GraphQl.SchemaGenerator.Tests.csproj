@@ -6,8 +6,8 @@
     <ProjectGuid>{4052E386-847B-4F3C-957C-0B957E319127}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GraphQl.SchemaGenerator.Tests</RootNamespace>
-    <AssemblyName>GraphQl.SchemaGenerator.Tests</AssemblyName>
+    <RootNamespace>GraphQL.SchemaGenerator.Tests</RootNamespace>
+    <AssemblyName>GraphQL.SchemaGenerator.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -76,15 +76,15 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
+    <Compile Include="Schema1.cs" />
     <Compile Include="SchemaGeneratorTests.cs" />
-    <Compile Include="Mocks\MockGraphFieldResolver.cs" />
-    <Compile Include="Mocks\MockFieldResolver.cs" />
+    <Compile Include="Mocks\MockServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQl.SchemaGenerator.csproj">
+    <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQL.SchemaGenerator.csproj">
       <Project>{0ff5301b-4cd7-409a-9d02-9390de7beba3}</Project>
-      <Name>GraphQl.SchemaGenerator</Name>
+      <Name>GraphQL.SchemaGenerator</Name>
     </ProjectReference>
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj">
       <Project>{3255c0dc-9f24-4423-8ba3-3b979d0e90e2}</Project>

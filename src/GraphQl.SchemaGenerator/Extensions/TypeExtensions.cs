@@ -2,18 +2,19 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using GraphQl.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Attributes;
 
-namespace GraphQl.SchemaGenerator.Extensions
+namespace GraphQL.SchemaGenerator.Extensions
 {
-    //todo: allow easier customizations
-    internal static class TypeExtensions
+    //todo: allow easier customizations of this fuctionality
+    public static class TypeExtensions
     {
         public static bool ShouldIncludeInGraph(this Type type)
         {
             var types = type.GetCustomAttributes(typeof(GraphTypeAttribute), false);
+            var dataContracts = type.GetCustomAttributes(typeof(DataContractAttribute), false);
 
-            return types.Any();
+            return types.Any() || dataContracts.Any();
         }
 
         public static bool ShouldIncludeMemberInGraph(this FieldInfo field)
@@ -28,12 +29,12 @@ namespace GraphQl.SchemaGenerator.Extensions
 
         public static bool ShouldIncludeMemberInGraph(object[] attributes)
         {
-            if (attributes.Where(t => t is GraphTypeAttribute).Any(i=> ((GraphTypeAttribute)i).Exclude))
+            if (Enumerable.Any(attributes.Where(t => t is GraphTypeAttribute), i=> ((GraphTypeAttribute)i).Exclude))
             {
                 return false;
             }
 
-            var exclude = attributes.Any(a => a.GetType().Name.StartsWith("JsonIgnore", StringComparison.OrdinalIgnoreCase));
+            var exclude = Enumerable.Any(attributes, a => a.GetType().Name.StartsWith("JsonIgnore", StringComparison.OrdinalIgnoreCase));
 
             return !exclude;
         }

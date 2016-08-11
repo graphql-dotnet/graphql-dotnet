@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GraphQl.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Attributes;
 using Newtonsoft.Json;
 
 namespace GraphQL.StarWars.Types

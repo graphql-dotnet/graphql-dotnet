@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphQl.SchemaGenerator.Helpers
+namespace GraphQL.SchemaGenerator.Helpers
 {
     public static class StringHelper
     {

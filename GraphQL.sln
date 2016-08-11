@@ -11,9 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.GraphiQL", "src\Gra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars", "src\GraphQL.StarWars\GraphQL.StarWars.csproj", "{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQl.SchemaGenerator", "src\GraphQl.SchemaGenerator\GraphQl.SchemaGenerator.csproj", "{0FF5301B-4CD7-409A-9D02-9390DE7BEBA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.SchemaGenerator", "src\GraphQl.SchemaGenerator\GraphQL.SchemaGenerator.csproj", "{0FF5301B-4CD7-409A-9D02-9390DE7BEBA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQl.SchemaGenerator.Tests", "src\GraphQl.SchemaGenerator.Tests\GraphQl.SchemaGenerator.Tests.csproj", "{4052E386-847B-4F3C-957C-0B957E319127}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.SchemaGenerator.Tests", "src\GraphQl.SchemaGenerator.Tests\GraphQL.SchemaGenerator.Tests.csproj", "{4052E386-847B-4F3C-957C-0B957E319127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
-﻿using GraphQl.SchemaGenerator.Helpers;
+﻿using GraphQL.SchemaGenerator.Helpers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Wrappers
+namespace GraphQL.SchemaGenerator.Wrappers
 { 
     public class KeyValuePairGraphType<TKey, TValue> : ObjectGraphType
         where TKey : GraphType

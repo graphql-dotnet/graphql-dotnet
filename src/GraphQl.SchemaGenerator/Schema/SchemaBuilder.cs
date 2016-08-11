@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
-using GraphQl.SchemaGenerator.Helpers;
-using GraphQl.SchemaGenerator.Wrappers;
+using GraphQL.SchemaGenerator.Helpers;
+using GraphQL.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Schema
+namespace GraphQL.SchemaGenerator.Schema
 {
     public class SchemaBuilder
     {

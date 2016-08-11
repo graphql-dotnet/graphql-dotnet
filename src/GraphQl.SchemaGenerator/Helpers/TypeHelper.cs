@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using GraphQl.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Attributes;
 
-namespace GraphQl.SchemaGenerator.Helpers
+namespace GraphQL.SchemaGenerator.Helpers
 {
     public static class TypeHelper
     {

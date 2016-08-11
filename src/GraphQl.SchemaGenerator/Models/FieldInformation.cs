@@ -2,7 +2,7 @@
 using System.Reflection;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Models
+namespace GraphQL.SchemaGenerator.Models
 {
     /// <summary>
     ///    Field definition needed for a schema.

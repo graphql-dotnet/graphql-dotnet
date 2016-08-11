@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphQL;
+﻿using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Validation;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace GraphQl.SchemaGenerator.Tests
+namespace GraphQL.SchemaGenerator.Tests
 {
     public static class GraphAssert
     {
@@ -23,6 +18,9 @@ namespace GraphQl.SchemaGenerator.Tests
             var writtenResult = writer.Write(result.Data);
             var expectedResult = writer.Write(CreateQueryResult(expected).Data);
 
+            var errors = result.Errors.FirstOrDefault();
+
+            Assert.Null(errors?.Message);
             Assert.Equal(expectedResult, writtenResult);
         }
 

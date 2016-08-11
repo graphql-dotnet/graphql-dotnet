@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphQl.SchemaGenerator.Attributes
+namespace GraphQL.SchemaGenerator.Attributes
 {
     /// <summary>
     ///     Attribute provided on an api endpoint can be converted into graph ql.

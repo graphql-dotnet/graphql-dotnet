@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using GraphQl.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Attributes;
 using GraphQL.StarWars.Types;
 
 namespace GraphQL.StarWars
@@ -7,6 +7,7 @@ namespace GraphQL.StarWars
     /// <summary>
     ///     An example of the sdk that could be exposed. This is decorated with attributes to self generate a graph schema. 
     /// </summary>
+    [GraphType]
     public class StarWars
     {
         private readonly StarWarsData _data = new StarWarsData();

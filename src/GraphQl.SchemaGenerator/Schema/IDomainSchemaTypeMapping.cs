@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphQl.SchemaGenerator.Schema
+namespace GraphQL.SchemaGenerator.Schema
 {
     public interface IDomainSchemaTypeMapping
     {

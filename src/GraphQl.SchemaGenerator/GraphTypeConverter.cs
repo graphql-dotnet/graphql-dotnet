@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using GraphQl.SchemaGenerator.Attributes;
-using GraphQl.SchemaGenerator.Extensions;
-using GraphQl.SchemaGenerator.Types;
-using GraphQl.SchemaGenerator.Wrappers;
+using GraphQL.SchemaGenerator.Extensions;
+using GraphQL.SchemaGenerator.Types;
+using GraphQL.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator
+namespace GraphQL.SchemaGenerator
 {
     public class GraphTypeConverter
     {
@@ -149,12 +144,7 @@ namespace GraphQl.SchemaGenerator
                 return typeof(InterfaceGraphTypeWrapper<>).MakeGenericType(propertyType);
             }
 
-            if (propertyType.ShouldIncludeInGraph())
-            {
-                return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
-            }
-
-            return null;
+            return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);            
         }
 
         private static bool isFloatType(Type type)

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphQl.SchemaGenerator.Attributes
+namespace GraphQL.SchemaGenerator.Attributes
 {
     public class NotNullAttribute : Attribute
     {

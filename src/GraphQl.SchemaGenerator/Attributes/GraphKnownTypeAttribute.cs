@@ -1,7 +1,7 @@
 ﻿using System;
-using GraphQl.SchemaGenerator.Schema;
+using GraphQL.SchemaGenerator.Schema;
 
-namespace GraphQl.SchemaGenerator.Attributes
+namespace GraphQL.SchemaGenerator.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public class GraphKnownTypeAttribute : Attribute, IDomainSchemaTypeMapping

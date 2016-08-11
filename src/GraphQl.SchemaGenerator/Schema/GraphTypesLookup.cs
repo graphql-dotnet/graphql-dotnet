@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQl.SchemaGenerator.Extensions;
-using GraphQl.SchemaGenerator.Wrappers;
-using GraphQL;
 using GraphQL.Introspection;
+using GraphQL.SchemaGenerator.Extensions;
+using GraphQL.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Schema
+namespace GraphQL.SchemaGenerator.Schema
 {
     // Modified from GraphQL to add NonNullGraphTypes
     public class GraphTypesLookup

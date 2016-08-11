@@ -7,9 +7,9 @@
     <ProjectGuid>{0FF5301B-4CD7-409A-9D02-9390DE7BEBA3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GraphQl.SchemaGenerator</RootNamespace>
-    <AssemblyName>GraphQl.SchemaGenerator</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>GraphQL.SchemaGenerator</RootNamespace>
+    <AssemblyName>GraphQL.SchemaGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -64,7 +64,6 @@
     <Compile Include="Attributes\GraphTypeAttribute.cs" />
     <Compile Include="Attributes\NotNullAttribute.cs" />
     <Compile Include="Extensions\ResolveFieldContextExtensions.cs" />
-    <Compile Include="GraphFieldResolver.cs" />
     <Compile Include="GraphTypeResolver.cs" />
     <Compile Include="IGraphTypeResolver.cs" />
     <Compile Include="Models\FieldInformation.cs" />
@@ -75,7 +74,6 @@
     <Compile Include="GraphTypeConverter.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Helpers\TypeHelper.cs" />
-    <Compile Include="IGraphFieldResolver.cs" />
     <Compile Include="ObjectGraphTypeBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schema\GraphTypesLookup.cs" />

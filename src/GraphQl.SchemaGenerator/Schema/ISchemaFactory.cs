@@ -1,6 +1,6 @@
 ﻿using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Schema
+namespace GraphQL.SchemaGenerator.Schema
 {
     public interface ISchemaFactory
     {

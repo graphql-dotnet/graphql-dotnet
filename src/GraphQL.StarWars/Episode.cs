@@ -1,4 +1,4 @@
-﻿using GraphQl.SchemaGenerator.Attributes;
+﻿using GraphQL.SchemaGenerator.Attributes;
 
 namespace GraphQL.StarWars
 {

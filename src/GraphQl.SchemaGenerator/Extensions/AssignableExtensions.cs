@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace GraphQl.SchemaGenerator.Extensions
+namespace GraphQL.SchemaGenerator.Extensions
 {
     public static class AssignableExtensions
     {
@@ -24,10 +24,9 @@ namespace GraphQl.SchemaGenerator.Extensions
 
         private static bool hasInterfaceThatMapsToGenericTypeDefinition(this Type givenType, Type genericType)
         {
-            return givenType
-              .GetInterfaces()
-              .Where(it => it.IsGenericType)
-              .Any(it => it.GetGenericTypeDefinition() == genericType);
+            return Enumerable.Any(givenType
+                  .GetInterfaces()
+                  .Where(it => it.IsGenericType), it => it.GetGenericTypeDefinition() == genericType);
         }
 
         private static bool mapsToGenericTypeDefinition(this Type givenType, Type genericType)

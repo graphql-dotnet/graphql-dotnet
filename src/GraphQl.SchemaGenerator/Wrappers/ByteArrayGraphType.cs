@@ -2,7 +2,7 @@
 using GraphQL.Language;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Wrappers
+namespace GraphQL.SchemaGenerator.Wrappers
 {
     /// <summary>
     ///     Byte array graph type.

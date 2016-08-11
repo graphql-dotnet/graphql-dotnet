@@ -3,22 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GraphQl.SchemaGenerator.Attributes;
-using GraphQl.SchemaGenerator.Helpers;
-using GraphQl.SchemaGenerator.Models;
-using GraphQl.SchemaGenerator.Wrappers;
+using GraphQL.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Extensions;
+using GraphQL.SchemaGenerator.Helpers;
+using GraphQL.SchemaGenerator.Models;
+using GraphQL.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator
+namespace GraphQL.SchemaGenerator
 {
     public class SchemaGenerator
     {
-        private IGraphFieldResolver FieldResolver { get; }
+        private IServiceProvider ServiceProvider { get; }
         private IGraphTypeResolver TypeResolver { get; }
 
-        public SchemaGenerator(IGraphFieldResolver fieldResolver, IGraphTypeResolver typeResolver)
+        public SchemaGenerator(IServiceProvider serviceProvider, IGraphTypeResolver typeResolver)
         {
-            FieldResolver = fieldResolver;
+            ServiceProvider = serviceProvider;
             TypeResolver = typeResolver;
         }
 
@@ -62,13 +63,22 @@ namespace GraphQl.SchemaGenerator
                         Method = method
                     };
 
-                    definitions.Add(new FieldDefinition(field, (context) => FieldResolver.ResolveField(context, field)));
+                    definitions.Add(new FieldDefinition(field, (context) => ResolveField(context, field)));
                 }
             }
 
             return definitions;
         }
 
+        public object ResolveField(ResolveFieldContext context, FieldInformation field)
+        {
+            var classObject = ServiceProvider.GetService(field.Method.DeclaringType);
+            var result = field.Method.Invoke(classObject, context.Parameters(field));
+
+            //todo async support.
+
+            return result;
+        }
 
         /// <summary>
         ///     Helper method to create schema from types.
@@ -177,7 +187,10 @@ namespace GraphQl.SchemaGenerator
                 requestType = typeof(InputObjectGraphTypeWrapper<>).MakeGenericType(requestType.GetGenericArguments()[0]);
             }
 
-            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(EnsureNonNull(requestType));
+            //dont force everything to be required.
+            //var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(EnsureNonNull(requestType));
+
+            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(requestType);
 
             return requestArgumentType;
         }

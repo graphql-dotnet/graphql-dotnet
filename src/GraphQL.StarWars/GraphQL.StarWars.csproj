@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GraphQL.StarWars</RootNamespace>
     <AssemblyName>GraphQL.StarWars</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -61,9 +61,9 @@
     <Compile Include="StarWarsSchema.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQl.SchemaGenerator.csproj">
+    <ProjectReference Include="..\GraphQl.SchemaGenerator\GraphQL.SchemaGenerator.csproj">
       <Project>{0ff5301b-4cd7-409a-9d02-9390de7beba3}</Project>
-      <Name>GraphQl.SchemaGenerator</Name>
+      <Name>GraphQL.SchemaGenerator</Name>
     </ProjectReference>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj">
       <Project>{c0e08b04-8a0d-4196-967c-8850825041b0}</Project>

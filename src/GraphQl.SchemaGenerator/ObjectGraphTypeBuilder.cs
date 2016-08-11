@@ -5,12 +5,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using GraphQl.SchemaGenerator.Attributes;
-using GraphQl.SchemaGenerator.Extensions;
-using GraphQl.SchemaGenerator.Helpers;
+using GraphQL.SchemaGenerator.Attributes;
+using GraphQL.SchemaGenerator.Extensions;
+using GraphQL.SchemaGenerator.Helpers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator
+namespace GraphQL.SchemaGenerator
 {
     public static class ObjectGraphTypeBuilder
     {

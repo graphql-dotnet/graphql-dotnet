@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization;
-using GraphQl.SchemaGenerator.Models;
-using GraphQL;
-using GraphQL.Types;
+﻿using System.Collections.Generic;
 using System.Linq;
+using GraphQL.SchemaGenerator.Models;
+using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Extensions
+namespace GraphQL.SchemaGenerator.Extensions
 {
     /// <summary>
     ///     Extensions for resolve field context.

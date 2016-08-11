@@ -1,6 +1,6 @@
 ﻿using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Wrappers
+namespace GraphQL.SchemaGenerator.Wrappers
 {
     public class InputObjectGraphTypeWrapper<T> : InputObjectGraphType, IIgnore
     {

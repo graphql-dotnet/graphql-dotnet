@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraphQl.SchemaGenerator.Wrappers;
+using GraphQL.SchemaGenerator.Wrappers;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator
+namespace GraphQL.SchemaGenerator
 {
     public class GraphTypeResolver : IGraphTypeResolver
     {
@@ -27,6 +23,11 @@ namespace GraphQl.SchemaGenerator
                 if (type.GetGenericTypeDefinition() == typeof(InterfaceGraphTypeWrapper<>))
                 {
                     return null;
+                }
+
+                if (type.GetGenericTypeDefinition() == typeof(InputObjectGraphTypeWrapper<>))
+                {
+                    return Activator.CreateInstance(type) as GraphType;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(ObjectGraphTypeWrapper<>))

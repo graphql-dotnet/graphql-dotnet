@@ -2,7 +2,7 @@
 using GraphQL.Language;
 using GraphQL.Types;
 
-namespace GraphQl.SchemaGenerator.Types
+namespace GraphQL.SchemaGenerator.Types
 {
     /// <summary>
     ///     Time span graph type.
