@@ -15,14 +15,14 @@ namespace GraphQL.SchemaGenerator.Tests
         {
             return new SchemaResponse
             {
-                Value = 5
+                Value = request?.Echo ?? 5
             };
         }
     }
 
     public class Schema1Request
     {
-        public string Hi { get; set; }
+        public int? Echo { get; set; }
         public string Data { get; set; }
     }
 

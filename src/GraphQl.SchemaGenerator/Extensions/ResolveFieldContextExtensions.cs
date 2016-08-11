@@ -2,6 +2,7 @@
 using System.Linq;
 using GraphQL.SchemaGenerator.Models;
 using GraphQL.Types;
+using Newtonsoft.Json;
 
 namespace GraphQL.SchemaGenerator.Extensions
 {
@@ -11,7 +12,7 @@ namespace GraphQL.SchemaGenerator.Extensions
     internal static class ResolveFieldContextExtensions
     {
         /// <summary>
-        ///     Generate the paramets for the field.
+        ///     Generate the parameters for the field.
         /// </summary>
         /// <param name="type">Extension.</param>
         /// <param name="field">Field information.</param>
@@ -26,17 +27,21 @@ namespace GraphQL.SchemaGenerator.Extensions
             var routeArguments = new List<object>();
             foreach (var parameter in field.Method.GetParameters())
             {
-                if (type.Arguments.ContainsKey(parameter.Name))
+                if (!type.Arguments.ContainsKey(parameter.Name))
                 {
                     continue;
                 }
 
                 var arg = type.Arguments[parameter.Name];
 
-                if (parameter.ParameterType == typeof(char))
+                if (typeof(IDictionary<string, object>).IsAssignableFrom(arg.GetType()))
                 {
-                    routeArguments.Add(arg.ToString()[0]);
-                    continue;
+                    var json = JsonConvert.SerializeObject(arg);
+                    arg = JsonConvert.DeserializeObject(json, parameter.ParameterType);
+                }
+                else if (parameter.ParameterType == typeof(char))
+                {
+                    arg = arg.ToString()[0];
                 }
 
                 routeArguments.Add(arg);

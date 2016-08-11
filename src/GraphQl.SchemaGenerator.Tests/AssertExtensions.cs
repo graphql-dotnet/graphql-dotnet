@@ -18,7 +18,9 @@ namespace GraphQL.SchemaGenerator.Tests
             var writtenResult = writer.Write(result.Data);
             var expectedResult = writer.Write(CreateQueryResult(expected).Data);
 
-            var errors = result.Errors.FirstOrDefault();
+            var errors = result.Errors?.FirstOrDefault();
+            //for easy debugging
+            var allTypes = schema.AllTypes;
 
             Assert.Null(errors?.Message);
             Assert.Equal(expectedResult, writtenResult);

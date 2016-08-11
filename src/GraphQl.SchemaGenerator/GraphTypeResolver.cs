@@ -7,7 +7,7 @@ namespace GraphQL.SchemaGenerator
     public class GraphTypeResolver : IGraphTypeResolver
     {
         /// <summary>
-        ///     Resolve a type into a graph type. This implementation will dynamically resolve types needed in object graph types.
+        ///     Resolve a type into a graph type.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>

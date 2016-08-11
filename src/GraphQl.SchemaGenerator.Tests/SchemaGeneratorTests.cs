@@ -95,17 +95,30 @@ namespace GraphQL.SchemaGenerator.Tests
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
             var schema = schemaGenerator.CreateSchema(typeof(Schema1));
 
-            var query = @"
-                {
-                  testRequest{
-                      value
-                  }
-               }
-            ";
+            var query = @"{
+                  testRequest {value}
+                }";
 
             var expected = @"{
               testRequest: {value:5}
-            }";
+                }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
+        public void WithParameterExample_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(Schema1));
+
+            var query = @"{
+                  testRequest(request:{echo:1}) {value}
+                }";
+
+            var expected = @"{
+              testRequest: {value:1}
+                }";
 
             GraphAssert.QuerySuccess(schema, query, expected);
         }

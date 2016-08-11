@@ -136,7 +136,7 @@ namespace GraphQL.SchemaGenerator
                 if (itemGraphType != null)
                 {
                     return typeof(ListGraphType<>).MakeGenericType(itemGraphType);
-                }                
+                }
             }
 
             if (propertyType.IsInterface || propertyType.IsAbstract)
@@ -144,12 +144,12 @@ namespace GraphQL.SchemaGenerator
                 return typeof(InterfaceGraphTypeWrapper<>).MakeGenericType(propertyType);
             }
 
-            return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);            
+            return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
         }
 
         private static bool isFloatType(Type type)
         {
-            TypeCode typeCode = Type.GetTypeCode(type);
+            var typeCode = Type.GetTypeCode(type);
 
             switch (typeCode)
             {
@@ -164,7 +164,7 @@ namespace GraphQL.SchemaGenerator
 
         private static bool isIntegerType(Type type)
         {
-            TypeCode typeCode = Type.GetTypeCode(type);
+            var typeCode = Type.GetTypeCode(type);
 
             switch (typeCode)
             {
@@ -184,4 +184,3 @@ namespace GraphQL.SchemaGenerator
         }
     }
 }
-

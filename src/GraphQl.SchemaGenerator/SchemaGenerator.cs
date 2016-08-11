@@ -12,8 +12,13 @@ using GraphQL.Types;
 
 namespace GraphQL.SchemaGenerator
 {
+    /// <summary>
+    ///     Dynamically provides graph ql schema information.
+    /// </summary>
     public class SchemaGenerator
     {
+        #region Dependencies
+
         private IServiceProvider ServiceProvider { get; }
         private IGraphTypeResolver TypeResolver { get; }
 
@@ -22,6 +27,8 @@ namespace GraphQL.SchemaGenerator
             ServiceProvider = serviceProvider;
             TypeResolver = typeResolver;
         }
+
+        #endregion
 
         /// <summary>
         ///     Create field definitions based off a type.
@@ -70,10 +77,14 @@ namespace GraphQL.SchemaGenerator
             return definitions;
         }
 
+        /// <summary>
+        ///     Resolve the value from a field.
+        /// </summary>
         public object ResolveField(ResolveFieldContext context, FieldInformation field)
         {
             var classObject = ServiceProvider.GetService(field.Method.DeclaringType);
-            var result = field.Method.Invoke(classObject, context.Parameters(field));
+            var parameters = context.Parameters(field);
+            var result = field.Method.Invoke(classObject, parameters);
 
             //todo async support.
 
@@ -90,6 +101,9 @@ namespace GraphQL.SchemaGenerator
             return CreateSchema(CreateDefinitions(types));
         }
 
+        /// <summary>
+        ///     Create schema from the field definitions.
+        /// </summary>
         public GraphQL.Types.Schema CreateSchema(
             IEnumerable<FieldDefinition> definitions)
         {
@@ -134,11 +148,19 @@ namespace GraphQL.SchemaGenerator
             };
         }
 
+        /// <summary>
+        ///     Create a graph type based on the type. This is used to dynamically load types after schema creation.
+        /// </summary>
         public GraphType CreateGraphType(Type type)
         {
             return TypeResolver.ResolveType(type);
         }
 
+        /// <summary>
+        ///     Ensure graph type. Can return null if the type can't be used.
+        /// </summary>
+        /// <param name="parameterType"></param>
+        /// <returns></returns>
         public static Type EnsureGraphType(Type parameterType)
         {
             if (parameterType == null)
@@ -154,6 +176,9 @@ namespace GraphQL.SchemaGenerator
             return GraphTypeConverter.ConvertTypeToGraphType(parameterType);
         }
 
+        /// <summary>
+        ///     Dynamically create query arguments.
+        /// </summary>
         public static QueryArguments CreateArguments(IEnumerable<ParameterInfo> parameters)
         {
             var arguments = new List<QueryArgument>();
@@ -188,13 +213,16 @@ namespace GraphQL.SchemaGenerator
             }
 
             //dont force everything to be required.
-            //var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(EnsureNonNull(requestType));
+            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(EnsureNonNull(requestType));
 
-            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(requestType);
+            //var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(requestType);
 
             return requestArgumentType;
         }
 
+        /// <summary>
+        /// todo: remove?
+        /// </summary>
         private static Type EnsureNonNull(Type requestType)
         {
             if (!typeof(NonNullGraphType).IsAssignableFrom(requestType))
