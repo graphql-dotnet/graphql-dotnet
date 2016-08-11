@@ -8,7 +8,6 @@ namespace GraphQL.SchemaGenerator.Tests
     /// <summary>
     ///     An example of the sdk that could be exposed. This is decorated with attributes to self generate a graph schema. 
     /// </summary>
-    [GraphType]
     public class StarWarsAttributeSchema
     {
         private readonly StarWarsData _data = new StarWarsData();

@@ -30,6 +30,11 @@ namespace GraphQL.SchemaGenerator
                     return Activator.CreateInstance(type) as GraphType;
                 }
 
+                if (type.GetGenericTypeDefinition() == typeof(EnumerationGraphTypeWrapper<>))
+                {
+                    return Activator.CreateInstance(type) as GraphType;
+                }
+
                 if (type.GetGenericTypeDefinition() == typeof(ObjectGraphTypeWrapper<>))
                 {
                     return Activator.CreateInstance(type) as GraphType;

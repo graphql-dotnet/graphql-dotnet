@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GraphQL.SchemaGenerator.Attributes;
+using GraphQL.StarWars;
+using GraphQL.StarWars.Types;
 
 namespace GraphQL.SchemaGenerator.Tests
 {
@@ -45,6 +47,8 @@ namespace GraphQL.SchemaGenerator.Tests
 
     public class SchemaResponse
     {
+        public Episode Enum { get; set; } = Episode.NEWHOPE;
+
         public int Value { get; set; }
     }
 }

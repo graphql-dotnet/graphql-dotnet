@@ -33,7 +33,15 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            var found = Values.FirstOrDefault(v => v.Value.Equals(value));
+            var foundByValue = Values.FirstOrDefault(v => v.Value.Equals(value));
+
+            if (foundByValue != null)
+            {
+                return foundByValue.Name;
+            }
+
+            var found = Values.FirstOrDefault(v => v.Name.Equals(value+"", StringComparison.OrdinalIgnoreCase));
+
             return found?.Name;
         }
 

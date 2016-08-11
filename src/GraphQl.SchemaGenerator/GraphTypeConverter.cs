@@ -60,6 +60,11 @@ namespace GraphQL.SchemaGenerator
                 return typeof(EnumerationGraphType);
             }
 
+            if (propertyType.IsEnum)
+            {
+                return typeof(EnumerationGraphTypeWrapper<>).MakeGenericType(propertyType);
+            }
+
             if (propertyType == typeof(void))
             {
                 return null;
