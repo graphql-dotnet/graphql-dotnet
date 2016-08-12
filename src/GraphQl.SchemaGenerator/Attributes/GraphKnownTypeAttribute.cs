@@ -3,7 +3,7 @@ using GraphQL.SchemaGenerator.Schema;
 
 namespace GraphQL.SchemaGenerator.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = true, Inherited = true)]
     public class GraphKnownTypeAttribute : Attribute, IDomainSchemaTypeMapping
     {
         public Type DomainType { get; set; }

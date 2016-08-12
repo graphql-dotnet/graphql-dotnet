@@ -22,7 +22,7 @@ namespace GraphQL.SchemaGenerator
             {
                 if (type.GetGenericTypeDefinition() == typeof(InterfaceGraphTypeWrapper<>))
                 {
-                    return null;
+                    return Activator.CreateInstance(type) as GraphType;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(InputObjectGraphTypeWrapper<>))
@@ -46,7 +46,7 @@ namespace GraphQL.SchemaGenerator
                 }
             }
 
-            if (type.IsAssignableFrom(typeof(GraphType)))
+            if (type.IsAssignableFrom(typeof(GraphType)) || type.IsSubclassOf(typeof(GraphType)))
             {
                 return Activator.CreateInstance(type) as GraphType;
             }

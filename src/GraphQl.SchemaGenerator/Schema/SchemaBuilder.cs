@@ -39,7 +39,8 @@ namespace GraphQL.SchemaGenerator.Schema
             foreach (var e in Enum.GetValues(enumType))
             {
                 string name = e.ToString();
-                string description = String.Empty;
+                var value = Convert.ChangeType(e, typeof(int));
+                string description = $"{name}:{value}";
                 var field = enumType.GetField(name);
                 if (field != null)
                 {
@@ -49,7 +50,7 @@ namespace GraphQL.SchemaGenerator.Schema
                         description = desc.Description;
                     }
                 }
-                enumGraphType.AddValue(name, description, System.Convert.ChangeType(e, typeof(int)));
+                enumGraphType.AddValue(name, description, value);
             }
         }
     }

@@ -37,6 +37,23 @@ namespace GraphQL.SchemaGenerator.Tests
                 },
             };
         }
+
+        [GraphRoute]
+        public IResponse TestInterface()
+        {
+            return new SchemaResponse
+            {
+                Value = 8,
+                Enum = Episode.JEDI
+            };
+        }
+    }
+
+    //todo: note sure why we had two types and what they are for.
+    [GraphKnownType(typeof(SchemaResponse), typeof(SchemaResponse))]
+    public interface IResponse
+    {
+        int Value { get; }
     }
 
     public class Schema1Request
@@ -45,13 +62,19 @@ namespace GraphQL.SchemaGenerator.Tests
         public string Data { get; set; }
     }
 
-    public class SchemaResponse
+    public class SchemaResponse : IResponse
     {
         public Episode Enum { get; set; } = Episode.NEWHOPE;
 
         public int Value { get; set; }
 
         public int? NullValue { get; } = null;
+
+        public DateTimeOffset? Date { get; set; }
+
+        public TimeSpan TimeSpan { get; set; }
+
+        public byte[] ByteArray { get; set; }
 
         public Dictionary<string, Response2> Values { get; set; } = new Dictionary<string, Response2>
         {

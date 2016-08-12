@@ -51,7 +51,7 @@ namespace GraphQL.SchemaGenerator.Tests
             var manualSchema = new StarWarsSchema(type => (GraphType)container.Get(type));
 
             Assert.Equal(manualSchema.Query.Fields.Count(), schema.Query.Fields.Count());
-            Assert.Equal(manualSchema.AllTypes.Count(), schema.AllTypes.Count()+2); //todo work on interface and enum
+            Assert.Equal(manualSchema.AllTypes.Count(), schema.AllTypes.Count()+1); //todo work on enum
         }
 
         //[Fact] //skipped enums array works but not the new hashset.
@@ -219,6 +219,24 @@ namespace GraphQL.SchemaGenerator.Tests
                 ]
               }
             }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        //todo:
+        //[Fact]
+        public void BasicInterfaceExample_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                  testInterface{value}
+                }";
+
+            var expected = @"{
+              testInterface: {value:8}
+                }";
 
             GraphAssert.QuerySuccess(schema, query, expected);
         }

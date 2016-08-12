@@ -88,8 +88,6 @@ namespace GraphQL.SchemaGenerator
         private static void ProcessInterfaceType(InterfaceGraphType interfaceGraphType, Type type)
         {
             interfaceGraphType.ResolveType = CreateResolveType(type);
-            //var graphKnownTypes = TypeHelper.GetGraphKnownTypes(type);
-            // TODO: need well known types
         }
 
         private static void ProcessObjectType(ObjectGraphType objectGraphType, Type type)
