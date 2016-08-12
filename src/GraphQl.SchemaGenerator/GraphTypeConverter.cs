@@ -9,7 +9,7 @@ namespace GraphQL.SchemaGenerator
 {
     public class GraphTypeConverter
     {
-        public static Type ConvertTypeToGraphType(Type propertyType, bool isNotNull = false)
+        public static Type ConvertTypeToGraphType(Type propertyType, bool isNotNull = false, bool isInputType = false)
         {
             if (typeof(GraphType).IsAssignableFrom(propertyType))
             {
@@ -29,7 +29,7 @@ namespace GraphQL.SchemaGenerator
                 }
             }
 
-            var graphType = BaseGraphType(propertyType);
+            var graphType = BaseGraphType(propertyType, isInputType);
 
             if (graphType != null && isNotNull)
             {
@@ -48,7 +48,7 @@ namespace GraphQL.SchemaGenerator
         /// <param name="propertyType">Property type.</param>
         /// <returns>Type</returns>
         /// <exception cref="NotSupportedException">Cannot support IEnumerable when wrapping an object with GraphQL</exception>
-        private static Type BaseGraphType(Type propertyType)
+        private static Type BaseGraphType(Type propertyType, bool isInputType = false)
         {
             if (propertyType == typeof(EnumValues))
             {
@@ -110,8 +110,8 @@ namespace GraphQL.SchemaGenerator
             if (genericType != null)
             {
                 var genericArgs = propertyType.GetGenericArguments();
-                var keyGraphType = ConvertTypeToGraphType(genericArgs[0]);
-                var valueGraphType = ConvertTypeToGraphType(genericArgs[1]);
+                var keyGraphType = ConvertTypeToGraphType(genericArgs[0], isInputType: isInputType);
+                var valueGraphType = ConvertTypeToGraphType(genericArgs[1], isInputType: isInputType);
                 var keyValuePairGraphType = typeof(KeyValuePairGraphType<,>).MakeGenericType(
                     keyGraphType,
                     valueGraphType);
@@ -122,7 +122,7 @@ namespace GraphQL.SchemaGenerator
             if (propertyType.IsArray)
             {
                 var itemType = propertyType.GetElementType();
-                var itemGraphType = ConvertTypeToGraphType(itemType);
+                var itemGraphType = ConvertTypeToGraphType(itemType, isInputType: isInputType);
                 if (itemGraphType != null)
                 {
                     return typeof(ListGraphType<>).MakeGenericType(itemGraphType);
@@ -132,7 +132,7 @@ namespace GraphQL.SchemaGenerator
             if (propertyType.IsAssignableToGenericType(typeof(IEnumerable<>)))
             {
                 var itemType = propertyType.GetGenericArguments()[0];
-                var itemGraphType = ConvertTypeToGraphType(itemType);
+                var itemGraphType = ConvertTypeToGraphType(itemType, isInputType: isInputType);
                 if (itemGraphType != null)
                 {
                     return typeof(ListGraphType<>).MakeGenericType(itemGraphType);
@@ -142,6 +142,11 @@ namespace GraphQL.SchemaGenerator
             if (propertyType.IsInterface || propertyType.IsAbstract)
             {
                 return typeof(InterfaceGraphTypeWrapper<>).MakeGenericType(propertyType);
+            }
+
+            if (isInputType)
+            {
+                return typeof(InputObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
             }
 
             return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);

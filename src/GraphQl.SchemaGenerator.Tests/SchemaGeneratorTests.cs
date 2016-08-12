@@ -145,6 +145,28 @@ namespace GraphQL.SchemaGenerator.Tests
         }
 
         [Fact]
+        public void WithComplexParameters_HaveCorrectType()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                  __type(name : ""Input_InnerRequest"") {
+                    name
+                    kind
+                }";
+
+            var expected = @"{
+              __type: {
+                name: ""Input_InnerRequest"",
+                kind: ""INPUT_OBJECT""
+              }
+            }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
         public void WithEnumerableExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());

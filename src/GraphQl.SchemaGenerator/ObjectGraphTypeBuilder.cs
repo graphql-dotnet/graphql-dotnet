@@ -54,7 +54,7 @@ namespace GraphQL.SchemaGenerator
         {
             ProcessType(graphType, type);
             bool hasDataContract = type.ShouldIncludeInGraph();
-            ProcessProperties(graphType, GetProperties(hasDataContract, type));
+            ProcessProperties(graphType, GetProperties(hasDataContract, type), true);
             ProcessFields(graphType, GetFields(hasDataContract, type));
             ProcessMethods(graphType, type, type.GetMethods());
         }
@@ -151,7 +151,7 @@ namespace GraphQL.SchemaGenerator
                 instanceParam).Compile();
         }
 
-        private static void ProcessProperties(GraphType graphType, IEnumerable<PropertyInfo> properties)
+        private static void ProcessProperties(GraphType graphType, IEnumerable<PropertyInfo> properties, bool isInputType = false)
         {
             foreach (var property in properties.OrderBy(p => p.Name))
             {
@@ -160,12 +160,12 @@ namespace GraphQL.SchemaGenerator
                 var propertyGraphType = TypeHelper.GetGraphType(property);
                 if (propertyGraphType != null)
                 {
-                    propertyGraphType = GraphTypeConverter.ConvertTypeToGraphType(propertyGraphType, isNotNull);
+                    propertyGraphType = GraphTypeConverter.ConvertTypeToGraphType(propertyGraphType, isNotNull, isInputType);
                     propertyGraphType = EnsureList(property.PropertyType, propertyGraphType);
                 }
                 else
                 {
-                    propertyGraphType = GraphTypeConverter.ConvertTypeToGraphType(property.PropertyType, isNotNull);
+                    propertyGraphType = GraphTypeConverter.ConvertTypeToGraphType(property.PropertyType, isNotNull, isInputType);
                 }
 
                 var name = StringHelper.GraphName(property.Name);

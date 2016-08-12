@@ -62,6 +62,13 @@ namespace GraphQL.SchemaGenerator.Tests
         public string Data { get; set; }
 
         public IEnumerable<Schema1Request> ComplexRequests { get; set; }
+
+        public InnerRequest InnerRequest { get; set; }
+    }
+
+    public class InnerRequest
+    {
+        public string InnerData { get; set; }
     }
 
     public class SchemaResponse : IResponse
