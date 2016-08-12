@@ -376,7 +376,7 @@
             AssertQuerySuccess(query, expected);
         }
 
-        //imho this should be broken down into smaller bit sized junks we are specifically testing for.
+        //imho this should be broken down into smaller bite sized junks we are specifically testing for. Or test that it runs? Just seems like another thing to maintain.
         //[Fact]
         public void full_schema_query()
         {

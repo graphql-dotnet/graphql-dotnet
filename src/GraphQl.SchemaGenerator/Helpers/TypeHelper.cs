@@ -177,10 +177,10 @@ namespace GraphQL.SchemaGenerator.Helpers
             var displayNameAttr = type.GetCustomAttribute<DisplayNameAttribute>();
             if (displayNameAttr != null)
             {
-                return displayNameAttr.DisplayName;
+                return StringHelper.SafeString(displayNameAttr.DisplayName);
             }
 
-            return null;
+            return StringHelper.SafeString(type.Name);
         }
     }
 }

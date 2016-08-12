@@ -113,16 +113,14 @@ namespace GraphQL
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
 
-            if (type is InputObjectGraphType)
+            if (type is InputObjectGraphType || type is ObjectGraphType)
             {
                 if (!(valueAst is ObjectValue))
                 {
                     return new[] {$"Expected \"{type.Name}\", found not an object."};
                 }
 
-                var inputType = (InputObjectGraphType) type;
-
-                var fields = inputType.Fields.ToList();
+                var fields = type.Fields.ToList();
                 var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
 
                 var errors = new List<string>();
@@ -149,7 +147,12 @@ namespace GraphQL
                 return errors;
             }
 
-            var scalar = (ScalarGraphType) type;
+            var scalar = type as ScalarGraphType;
+
+            if (scalar == null)
+            {
+                return new[] { $"Expected type \"{typeof(ScalarGraphType).Name}\", found {type.Name}." };
+            }
 
             var parseResult = scalar.ParseLiteral(valueAst);
 

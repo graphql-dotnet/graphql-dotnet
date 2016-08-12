@@ -28,6 +28,12 @@ namespace GraphQL.SchemaGenerator
             TypeResolver = typeResolver;
         }
 
+        public SchemaGenerator(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+            TypeResolver = new GraphTypeResolver();
+        }
+
         #endregion
 
         /// <summary>

@@ -60,6 +60,8 @@ namespace GraphQL.SchemaGenerator.Tests
     {
         public int? Echo { get; set; }
         public string Data { get; set; }
+
+        public IEnumerable<Schema1Request> ComplexRequests { get; set; }
     }
 
     public class SchemaResponse : IResponse
@@ -70,7 +72,7 @@ namespace GraphQL.SchemaGenerator.Tests
 
         public int? NullValue { get; } = null;
 
-        public DateTimeOffset? Date { get; set; }
+        public DateTimeOffset? Date { get; set; } = new DateTime(1999,1,1);
 
         public TimeSpan TimeSpan { get; set; }
 

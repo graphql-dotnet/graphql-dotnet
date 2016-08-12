@@ -113,17 +113,8 @@ namespace GraphQL.SchemaGenerator
 
         private static void ProcessType(GraphType graphType, Type type)
         {
-            graphType.Name = TypeHelper.GetDisplayName(type) ?? type.Name;
-
-            var displayNameAttr = type.GetCustomAttribute<DisplayNameAttribute>();
-            if (displayNameAttr != null)
-            {
-                graphType.Name = displayNameAttr.DisplayName;
-            }
-            else
-            {
-                graphType.Name = type.Name;
-            }
+            graphType.Name = TypeHelper.GetDisplayName(type);
+            
             var descAttr = type.GetCustomAttribute<DescriptionAttribute>();
             if (descAttr != null)
             {
@@ -177,9 +168,10 @@ namespace GraphQL.SchemaGenerator
                     propertyGraphType = GraphTypeConverter.ConvertTypeToGraphType(property.PropertyType, isNotNull);
                 }
 
+                var name = StringHelper.GraphName(property.Name);
                 var field = graphType.Field(
                     propertyGraphType,
-                    StringHelper.ConvertToCamelCase(property.Name),
+                    name,
                     TypeHelper.GetDescription(property));
 
                 field.DefaultValue = TypeHelper.GetDefaultValue(property);
@@ -206,7 +198,7 @@ namespace GraphQL.SchemaGenerator
 
                 graphType.Field(                
                     fieldGraphType,
-                    StringHelper.ConvertToCamelCase(field.Name));
+                    StringHelper.GraphName(field.Name));
             }
         }
 
@@ -239,7 +231,7 @@ namespace GraphQL.SchemaGenerator
 
                 graphType.Field(
                     methodGraphType,
-                    StringHelper.ConvertToCamelCase(method.Name),
+                    StringHelper.GraphName(method.Name),
                     null,
                     new QueryArguments(method.GetParameters().Where(p => p.ParameterType != typeof(ResolveFieldContext)).Select(p => CreateArgument(p))),
                     // todo: need to fix method execution - not called currently so lower priority
