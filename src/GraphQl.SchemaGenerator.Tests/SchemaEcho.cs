@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace GraphQL.SchemaGenerator.Tests
     [GraphType]
     public class SchemaEcho
     {
+        [Description(@"Tests a variety or request and response types.{VerifyComment}")]
         [GraphRoute]
         public SchemaResponse TestRequest(Schema1Request request)
         {

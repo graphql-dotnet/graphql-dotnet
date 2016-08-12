@@ -96,6 +96,11 @@ namespace GraphQL.SchemaGenerator.Helpers
             return getDescriptionValue(property.GetCustomAttribute<DescriptionAttribute>());
         }
 
+        public static string GetDescription(MethodInfo method)
+        {
+            return getDescriptionValue(method.GetCustomAttribute<DescriptionAttribute>());
+        }
+
         public static string GetDescription(ParameterInfo parameter)
         {
             return getDescriptionValue(parameter.GetCustomAttribute<DescriptionAttribute>());

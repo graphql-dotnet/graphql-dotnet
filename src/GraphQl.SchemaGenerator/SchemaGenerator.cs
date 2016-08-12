@@ -134,6 +134,7 @@ namespace GraphQL.SchemaGenerator
                     mutation.Field(
                         type,
                         definition.Field.Name,
+                        description: TypeHelper.GetDescription(definition.Field.Method),
                         arguments: definition.Field.Arguments,
                         resolve: definition.Resolve);
                 }
@@ -142,6 +143,7 @@ namespace GraphQL.SchemaGenerator
                     query.Field(
                         type,
                         definition.Field.Name,
+                        description: TypeHelper.GetDescription(definition.Field.Method),
                         arguments: definition.Field.Arguments,
                         resolve: definition.Resolve);
                 }

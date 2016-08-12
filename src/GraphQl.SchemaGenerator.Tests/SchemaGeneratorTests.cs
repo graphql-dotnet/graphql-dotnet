@@ -1,9 +1,12 @@
 ﻿using System.Linq;
+using GraphQL.Execution;
+using GraphQL.Http;
 using GraphQL.SchemaGenerator.Tests.Mocks;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Validation;
 using Xunit;
 
 namespace GraphQL.SchemaGenerator.Tests
@@ -215,6 +218,36 @@ namespace GraphQL.SchemaGenerator.Tests
                 }";
 
             GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
+        public void FieldDescription_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
+            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+
+            var query = @"{
+                     __schema{
+                        types{
+                          name,
+                          fields {
+                            name
+                            description
+                          }
+                        }
+                      }
+                }";
+
+            var exec = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+            var result = exec.ExecuteAsync(schema, null, query, null).Result;
+
+            var writer = new DocumentWriter(indent: true);
+            var writtenResult = writer.Write(result.Data);
+
+            var errors = result.Errors?.FirstOrDefault();
+
+            Assert.Null(errors?.Message);
+            Assert.True(writtenResult.Contains("{VerifyComment}"));
         }
 
         [Fact]
