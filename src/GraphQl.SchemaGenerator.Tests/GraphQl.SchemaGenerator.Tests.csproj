@@ -76,8 +76,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
-    <Compile Include="SchemaEcho.cs" />
-    <Compile Include="SchemaGeneratorTests.cs" />
+    <Compile Include="EchoStateSchema.cs" />
+    <Compile Include="EchoSchema.cs" />
+    <Compile Include="MutationTests.cs" />
+    <Compile Include="QueryTests.cs" />
     <Compile Include="Mocks\MockServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StarWarsAttributeSchema.cs" />

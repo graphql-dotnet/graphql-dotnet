@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GraphQL.SchemaGenerator.Attributes;
 using GraphQL.StarWars;
-using GraphQL.StarWars.Types;
 
 namespace GraphQL.SchemaGenerator.Tests
 {
     [GraphType]
-    public class SchemaEcho
+    public class EchoSchema
     {
         [Description(@"Tests a variety or request and response types.{VerifyComment}")]
         [GraphRoute]

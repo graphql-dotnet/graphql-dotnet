@@ -32,7 +32,7 @@ namespace GraphQL.SchemaGenerator.Attributes
         /// </summary>
         /// <param name="name"></param>
         /// <param name="isMutation"></param>
-        public GraphRouteAttribute(string name, bool isMutation = false)
+        public GraphRouteAttribute(string name = null, bool isMutation = false)
         {
             Name = name;
             IsMutation = isMutation;

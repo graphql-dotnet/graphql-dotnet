@@ -11,12 +11,12 @@ using Xunit;
 
 namespace GraphQL.SchemaGenerator.Tests
 {
-    public class SchemaGeneratorTests
+    public class QueryTests
     {
         [Fact]
         public void BasicExample_Works()
         {
-            var schemaGenerator = new SchemaGenerator(new MockServiceProvider(), new GraphTypeResolver());
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
             var schema = schemaGenerator.CreateSchema(typeof(StarWarsAttributeSchema));
 
             var query = @"
@@ -86,7 +86,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void CreateSchema_WithClassArgument_HasExpectedSchema()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var sut = schema.AllTypes;
             Assert.True(sut.Any(t=>t.Name == "Input_Schema1Request"));
@@ -96,7 +96,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void BasicParameterExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest {value}
@@ -113,7 +113,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithParameterExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest(request:{echo:1}) {value}
@@ -130,7 +130,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithComplexParameters_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest(request:{
@@ -151,7 +151,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithComplexParameters_HaveCorrectType()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   __type(name : ""Input_InnerRequest"") {
@@ -173,7 +173,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithEnumerableExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testEnumerable{value}
@@ -190,7 +190,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithEnum_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest {enum}
@@ -207,7 +207,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithDateTimeOffset_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest {date{{year}}
@@ -224,7 +224,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void FieldDescription_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                      __schema{
@@ -254,7 +254,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithNull_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest {nullValue}
@@ -271,7 +271,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void WithDictionary_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testRequest {
@@ -321,7 +321,7 @@ namespace GraphQL.SchemaGenerator.Tests
         public void BasicInterfaceExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
-            var schema = schemaGenerator.CreateSchema(typeof(SchemaEcho));
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
 
             var query = @"{
                   testInterface{value}
