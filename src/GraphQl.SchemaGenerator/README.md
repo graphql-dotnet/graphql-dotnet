@@ -1,5 +1,5 @@
 ## Schema Generator
-The shema generator will automatically create a schema on existing c# models. This includes every response model, request model, and composed class in these models. This can safe a lot of time with an existing SDK or API project that is adding graph ql support.
+The shema generator will automatically create a schema on existing c# models. This includes every response model, request model, and composed classes in these models. This can save a lot of time with an existing SDK or API project that is adding graph ql support.
 
 ```
 /// <summary>
