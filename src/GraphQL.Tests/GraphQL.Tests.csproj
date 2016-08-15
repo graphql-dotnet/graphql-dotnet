@@ -102,6 +102,7 @@
     <Compile Include="Validation\ScalarLeafTests.cs" />
     <Compile Include="Validation\UniqueInputFieldNamesTests.cs" />
     <Compile Include="Validation\UniqueOperationNamesTests.cs" />
+    <Compile Include="Validation\UniqueVariableNamesTests.cs" />
     <Compile Include="Validation\ValidationErrorAssertion.cs" />
     <Compile Include="Validation\ValidationSchema.cs" />
     <Compile Include="Validation\ValidationTestBase.cs" />
