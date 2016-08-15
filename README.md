@@ -156,7 +156,7 @@ Console.Writeline(result);
 - [ ] No fragment cycle
 - [x] No undefined variables
 - [ ] No unused fragments
-- [ ] No unused variables
+- [x] No unused variables
 - [ ] Overlapping fields can be merged
 - [ ] Possible fragment spreads
 - [ ] Provide non-null arguments
