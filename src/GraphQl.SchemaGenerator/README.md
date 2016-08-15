@@ -101,7 +101,7 @@ var result = exec.ExecuteAsync(schema, null, query, null).Result;
 - [x] Key value pair
 
 ### Supported Conversions
-- [ ] Mutations
+- [x] Mutations
 - [x] Queries
 - [ ] Interfaces
 - [x] Descriptions (via description attribute)
