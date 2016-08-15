@@ -165,7 +165,7 @@ Console.Writeline(result);
 - [ ] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names
-- [ ] Unique variable names
+- [x] Unique variable names
 - [x] Variables are input types
 - [x] Variables in allowed position
 
