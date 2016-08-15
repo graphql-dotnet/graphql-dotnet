@@ -162,7 +162,7 @@ Console.Writeline(result);
 - [ ] Provide non-null arguments
 - [x] Scalar leafs
 - [ ] Unique argument names
-- [ ] Unique fragment names
+- [x] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names
 - [x] Unique variable names

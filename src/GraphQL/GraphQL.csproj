@@ -166,6 +166,7 @@
     <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
     <Compile Include="Validation\Rules\NoUnusedVariables.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
+    <Compile Include="Validation\Rules\UniqueFragmentNames.cs" />
     <Compile Include="Validation\Rules\UniqueInputFieldNames.cs" />
     <Compile Include="Validation\Rules\UniqueVariableNames.cs" />
     <Compile Include="Validation\Rules\VariablesAreInputTypes.cs" />
