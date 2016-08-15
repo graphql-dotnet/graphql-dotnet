@@ -57,7 +57,7 @@ namespace GraphQL.SchemaGenerator.Tests
             Assert.Equal(manualSchema.AllTypes.Count(), schema.AllTypes.Count()+1); //todo work on enum
         }
 
-        //[Fact] //skipped enums array works but not the new hashset.
+        [Fact]
         public void BasicExample_WithEnums_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
@@ -74,9 +74,13 @@ namespace GraphQL.SchemaGenerator.Tests
 
             var expected = @"{
               hero: {
-                appearsIn: [4,5,6],
-                friends: [1,4]
-              }
+                appearsIn: [
+                  ""NEWHOPE"",
+                  ""EMPIRE"",
+                  ""JEDI""
+                ],
+                friends: [""1"",""4""]
+                }
             }";
 
             GraphAssert.QuerySuccess(schema, query, expected);
