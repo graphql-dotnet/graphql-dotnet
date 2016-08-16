@@ -45,7 +45,7 @@ namespace GraphQL.Language
 
             if (context.FloatValue() != null)
             {
-                var val = new FloatValue(float.Parse(context.FloatValue().GetText()));
+                var val = new FloatValue(decimal.Parse(context.FloatValue().GetText()));
                 NewNode(val, context);
                 return val;
             }
@@ -109,7 +109,7 @@ namespace GraphQL.Language
 
             if (context.FloatValue() != null)
             {
-                var val = new FloatValue(float.Parse(context.FloatValue().GetText()));
+                var val = new FloatValue(decimal.Parse(context.FloatValue().GetText()));
                 NewNode(val, context);
                 return val;
             }

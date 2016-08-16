@@ -61,12 +61,12 @@ namespace GraphQL.Language
 
     public class FloatValue : AbstractNode, IValue
     {
-        public FloatValue(double value)
+        public FloatValue(decimal value)
         {
             Value = value;
         }
 
-        public double Value { get; }
+        public decimal Value { get; }
 
         public override string ToString()
         {

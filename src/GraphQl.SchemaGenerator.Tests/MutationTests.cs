@@ -52,6 +52,29 @@ namespace GraphQL.SchemaGenerator.Tests
         }
 
         [Fact]
+        public void BasicExample_WithDecimal_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
+            var schema = schemaGenerator.CreateSchema(typeof(EchoStateSchema));
+
+            var query = @"
+                mutation SetState{
+                    set(request:{decimal:24.15, data:2}){
+                        decimal
+                    }
+                }
+            ";
+
+            var expected = @"{
+              set: {
+                decimal: 24.15
+              }
+            }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
+        [Fact]
         public void AdvancedExample_WithEnums_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());

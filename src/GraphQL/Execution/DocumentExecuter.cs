@@ -456,9 +456,9 @@ namespace GraphQL
                 return new LongValue((long) value);
             }
 
-            if (value is double)
+            if (value is decimal)
             {
-                return new FloatValue((double)value);
+                return new FloatValue((decimal)value);
             }
 
             return new StringValue(value?.ToString());

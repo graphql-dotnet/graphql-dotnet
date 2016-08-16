@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void prints_float_value()
         {
-            double value = 3.33;
+            decimal value = 3.33M;
 
             var val = new FloatValue(value);
             var result = _printer.Visit(val);

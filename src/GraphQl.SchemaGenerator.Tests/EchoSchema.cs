@@ -79,6 +79,8 @@ namespace GraphQL.SchemaGenerator.Tests
 
         public int? NullValue { get; } = null;
 
+        public decimal? DecimalValue { get; set; }
+
         public DateTimeOffset? Date { get; set; } = new DateTime(1999,1,1);
 
         public TimeSpan TimeSpan { get; set; }

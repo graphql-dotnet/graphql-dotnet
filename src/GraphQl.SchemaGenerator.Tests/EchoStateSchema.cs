@@ -24,6 +24,7 @@ namespace GraphQL.SchemaGenerator.Tests
         {
             State.Data = request.Data;
             State.State = request.State ?? ValidStates.Open;
+            State.Decimal = request.Decimal;
 
             return GetState();
         }
@@ -54,12 +55,15 @@ namespace GraphQL.SchemaGenerator.Tests
     public class StateResponse
     {
         public ValidStates State { get; set; }
+        public decimal? Decimal { get; set; }
         public int Data { get; set; }
     }
 
     public class SetRequest
     {
         public ValidStates? State { get; set; }
+
+        public decimal? Decimal { get; set; }
 
         [Required]
         public int Data { get; set; }
