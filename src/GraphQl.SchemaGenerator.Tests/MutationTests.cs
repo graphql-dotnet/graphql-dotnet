@@ -76,5 +76,57 @@ namespace GraphQL.SchemaGenerator.Tests
             GraphAssert.QuerySuccess(schema, query, expected);
         }
 
+        /// <summary>
+        ///     Introspection was not working on Inputs due to a bug in GraphQl
+        /// </summary>
+        [Fact]
+        public void AdvancedExample_Introspection_Works()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
+            var schema = schemaGenerator.CreateSchema(typeof(EchoStateSchema));
+
+            var query = @"{
+                __type(name:""Input_SetRequest""){
+                        name
+                        fields{
+                            name
+                            type{
+                                kind
+                                ofType{
+                                    kind
+                                }
+                            }
+                        }
+                    }
+                }
+            ";
+
+            var expected = @"{
+              __type: {
+                name: ""Input_SetRequest"",
+                fields: [
+                  {
+                    name: ""data"",
+                    type: {
+                      kind: ""NON_NULL"",
+                      ofType: {
+                        kind: ""SCALAR""
+                      }
+            }
+                  },
+                  {
+                    name: ""state"",
+                    type: {
+                      kind: ""ENUM"",
+                      ofType: null
+                    }
+                  }
+                ]
+              }
+            }";
+
+            GraphAssert.QuerySuccess(schema, query, expected);
+        }
+
     }
 }

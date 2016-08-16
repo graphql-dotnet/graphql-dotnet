@@ -57,7 +57,7 @@ namespace GraphQL.SchemaGenerator
                     {
                         continue;
                     }
-                    
+
                     var parameters = method.GetParameters();
                     var arguments = CreateArguments(parameters);
                     var response = method.ReturnType;
@@ -70,8 +70,11 @@ namespace GraphQL.SchemaGenerator
                     var field = new FieldInformation
                     {
                         IsMutation = graphRoute.IsMutation,
-                        Arguments =  arguments,
-                        Name = !String.IsNullOrWhiteSpace(graphRoute.Name) ? graphRoute.Name : StringHelper.ConvertToCamelCase(method.Name),
+                        Arguments = arguments,
+                        Name =
+                            !String.IsNullOrWhiteSpace(graphRoute.Name)
+                                ? graphRoute.Name
+                                : StringHelper.ConvertToCamelCase(method.Name),
                         Response = response,
                         Method = method
                     };
@@ -113,8 +116,14 @@ namespace GraphQL.SchemaGenerator
         public GraphQL.Types.Schema CreateSchema(
             IEnumerable<FieldDefinition> definitions)
         {
-            var mutation = new ObjectGraphType();
-            var query = new ObjectGraphType();
+            var mutation = new ObjectGraphType
+            {
+                Name = "RootMutations"
+            };
+            var query = new ObjectGraphType
+            {
+                Name = "RootQueries"
+            };
 
             foreach (var definition in definitions)
             {
@@ -130,7 +139,8 @@ namespace GraphQL.SchemaGenerator
                     continue;
                 }
 
-                if (definition.Field.IsMutation){
+                if (definition.Field.IsMutation)
+                {
                     mutation.Field(
                         type,
                         definition.Field.Name,
@@ -149,11 +159,13 @@ namespace GraphQL.SchemaGenerator
                 }
             }
 
-            return new GraphQL.Types.Schema(CreateGraphType)
-            {                
+            var schema = new GraphQL.Types.Schema(CreateGraphType)
+            {
                 Mutation = mutation.Fields.Any() ? mutation : null,
                 Query = query.Fields.Any() ? query : null
             };
+
+            return schema;
         }
 
         /// <summary>
@@ -204,7 +216,7 @@ namespace GraphQL.SchemaGenerator
         {
             var requestArgumentType = GetRequestArgumentType(parameter.ParameterType);
 
-            var argument = (QueryArgument)Activator.CreateInstance(requestArgumentType);
+            var argument = (QueryArgument) Activator.CreateInstance(requestArgumentType);
             argument.Name = parameter.Name;
 
             return argument;
@@ -220,25 +232,9 @@ namespace GraphQL.SchemaGenerator
                 requestType = typeof(InputObjectGraphTypeWrapper<>).MakeGenericType(requestType.GetGenericArguments()[0]);
             }
 
-            //dont force everything to be required.
-            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(EnsureNonNull(requestType));
-
-            //var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(requestType);
+            var requestArgumentType = typeof(QueryArgument<>).MakeGenericType(requestType);
 
             return requestArgumentType;
-        }
-
-        /// <summary>
-        /// todo: remove?
-        /// </summary>
-        private static Type EnsureNonNull(Type requestType)
-        {
-            if (!typeof(NonNullGraphType).IsAssignableFrom(requestType))
-            {
-                return typeof(NonNullGraphType<>).MakeGenericType(requestType);
-            }
-
-            return requestType;
         }
     }
 }

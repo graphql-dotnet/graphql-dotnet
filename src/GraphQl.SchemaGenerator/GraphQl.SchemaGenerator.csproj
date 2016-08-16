@@ -76,7 +76,6 @@
     <Compile Include="Helpers\TypeHelper.cs" />
     <Compile Include="ObjectGraphTypeBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Schema\GraphTypesLookup.cs" />
     <Compile Include="Schema\IDomainSchemaTypeMapping.cs" />
     <Compile Include="Schema\ISchemaFactory.cs" />
     <Compile Include="Schema\SchemaBuilder.cs" />
