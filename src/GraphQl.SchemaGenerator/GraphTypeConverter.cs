@@ -31,7 +31,7 @@ namespace GraphQL.SchemaGenerator
 
             var graphType = BaseGraphType(propertyType, isInputType);
 
-            if (graphType != null && isNotNull)
+            if (graphType != null && isNotNull )
             {
                 if (!typeof(NonNullGraphType).IsAssignableFrom(graphType))
                 {
@@ -81,9 +81,9 @@ namespace GraphQL.SchemaGenerator
                 return typeof(IntGraphType);
             }
 
-            if (isFloatType(propertyType))
+            if (isDecimalType(propertyType))
             {
-                return typeof(FloatGraphType);
+                return typeof(DecimalGraphType);
             }
 
             if (propertyType == typeof(bool))
@@ -113,8 +113,15 @@ namespace GraphQL.SchemaGenerator
                 var keyGraphType = ConvertTypeToGraphType(genericArgs[0], isInputType: isInputType);
                 var valueGraphType = ConvertTypeToGraphType(genericArgs[1], isInputType: isInputType);
                 var keyValuePairGraphType = typeof(KeyValuePairGraphType<,>).MakeGenericType(
-                    keyGraphType,
-                    valueGraphType);
+                    keyGraphType, valueGraphType);
+
+                if (isInputType)
+                {
+                    var inputPairGraphType = typeof(KeyValuePairInputGraphType<,>).MakeGenericType(
+                        keyGraphType, valueGraphType);
+
+                    return typeof(ListGraphType<>).MakeGenericType(inputPairGraphType);
+                }
 
                 return typeof(ListGraphType<>).MakeGenericType(keyValuePairGraphType);
             }
@@ -152,7 +159,7 @@ namespace GraphQL.SchemaGenerator
             return typeof(ObjectGraphTypeWrapper<>).MakeGenericType(propertyType);
         }
 
-        private static bool isFloatType(Type type)
+        private static bool isDecimalType(Type type)
         {
             var typeCode = Type.GetTypeCode(type);
 

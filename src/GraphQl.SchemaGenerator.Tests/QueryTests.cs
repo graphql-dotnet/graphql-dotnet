@@ -174,6 +174,36 @@ namespace GraphQL.SchemaGenerator.Tests
         }
 
         [Fact]
+        public void WithDecimal_HasCorrectType()
+        {
+            var schemaGenerator = new SchemaGenerator(new MockServiceProvider());
+            var schema = schemaGenerator.CreateSchema(typeof(EchoSchema));
+
+            var query = @"{
+                  __type(name : ""Input_Schema1Request"") {
+                    name
+                    fields{
+                            name
+                            type{
+                                kind
+                                name
+                            }
+                        }
+                }";
+
+            var exec = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+            var result = exec.ExecuteAsync(schema, null, query, null).Result;
+
+            var writer = new DocumentWriter(indent: true);
+            var writtenResult = writer.Write(result.Data);
+
+            var errors = result.Errors?.FirstOrDefault();
+
+            Assert.Null(errors?.Message);
+            Assert.True(writtenResult.Contains("decimal"));
+        }
+
+        [Fact]
         public void WithEnumerableExample_Works()
         {
             var schemaGenerator = new SchemaGenerator(new MockServiceProvider());

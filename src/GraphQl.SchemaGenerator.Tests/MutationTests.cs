@@ -108,11 +108,9 @@ namespace GraphQL.SchemaGenerator.Tests
                   {
                     name: ""data"",
                     type: {
-                      kind: ""NON_NULL"",
-                      ofType: {
-                        kind: ""SCALAR""
-                      }
-            }
+                      kind: ""SCALAR"",
+                      ofType: null
+                    }
                   },
                   {
                     name: ""state"",

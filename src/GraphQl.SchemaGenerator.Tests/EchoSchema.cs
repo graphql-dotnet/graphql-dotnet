@@ -59,6 +59,8 @@ namespace GraphQL.SchemaGenerator.Tests
         public int? Echo { get; set; }
         public string Data { get; set; }
 
+        public decimal? Decimal { get; set; }
+
         public IEnumerable<Schema1Request> ComplexRequests { get; set; }
 
         public InnerRequest InnerRequest { get; set; }
