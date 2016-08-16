@@ -161,7 +161,7 @@ Console.Writeline(result);
 - [ ] Possible fragment spreads
 - [ ] Provide non-null arguments
 - [x] Scalar leafs
-- [ ] Unique argument names
+- [x] Unique argument names
 - [x] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names

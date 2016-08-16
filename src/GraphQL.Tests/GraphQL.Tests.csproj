@@ -100,6 +100,7 @@
     <Compile Include="Validation\NoUndefinedVariablesTests.cs" />
     <Compile Include="Validation\NoUnusedVariablesTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
+    <Compile Include="Validation\UniqueArgumentNamesTests.cs" />
     <Compile Include="Validation\UniqueFragmentNamesTests.cs" />
     <Compile Include="Validation\UniqueInputFieldNamesTests.cs" />
     <Compile Include="Validation\UniqueOperationNamesTests.cs" />
