@@ -39,5 +39,12 @@ namespace GraphQL.Tests.Types
             type.ParseValue("2015-11-21T19:59:32.987+0200").ShouldEqual(
                 new DateTime(2015, 11, 21, 17, 59, 32) + TimeSpan.FromMilliseconds(987));
         }
+
+        [Fact]
+        public void coerces_datetimes_to_utc()
+        {
+            ((DateTime)type.ParseValue("2015-11-21T19:59:32.987+0200")).Kind.ShouldEqual(
+                DateTimeKind.Utc);
+        }
     }
 }

@@ -21,28 +21,34 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            string inputValue;
-            DateTime dateTime;
-
             if (value is DateTime)
             {
-                inputValue = ((DateTime)value).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'");
+                DateTime dateTime = (DateTime)value;
+                return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
             }
-            else
-            {
-                inputValue = value != null ? value.ToString().Trim('"') : string.Empty;
+            
+            string inputValue = value?.ToString().Trim('"');
+
+            DateTime outputValue;
+            if (DateTime.TryParse(
+                inputValue,
+                CultureInfo.CurrentCulture,
+                DateTimeStyles.AdjustToUniversal,
+                out outputValue))
+            { 
+                return outputValue;
             }
 
-            if (DateTime.TryParse(inputValue, CultureInfo.CurrentCulture, DateTimeStyles.AdjustToUniversal,
-                out dateTime))
-            {
-                return dateTime;
-            }
             return null;
         }
 
         public override object ParseLiteral(IValue value)
         {
+            if (value is DateTimeValue)
+            {
+                return ParseValue(((DateTimeValue)value).Value);
+            }
+
             if (value is StringValue)
             {
                 return ParseValue(((StringValue)value).Value);

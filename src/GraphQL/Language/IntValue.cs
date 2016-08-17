@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GraphQL.Language
@@ -142,6 +143,35 @@ namespace GraphQL.Language
             if (obj.GetType() != this.GetType()) return false;
 
             return Equals((BooleanValue)obj);
+        }
+    }
+
+    public class DateTimeValue : AbstractNode, IValue
+    {
+        public DateTimeValue(DateTime value)
+        {
+            Value = value;
+        }
+
+        public DateTime Value { get; }
+
+        public override string ToString()
+        {
+            return "DateTimeValue{{value={0}}}".ToFormat(Value.ToString("o"));
+        }
+
+        protected bool Equals(DateTimeValue other)
+        {
+            return DateTime.Equals(Value, other.Value);
+        }
+
+        public override bool IsEqualTo(INode obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+
+            return Equals((DateTimeValue)obj);
         }
     }
 
