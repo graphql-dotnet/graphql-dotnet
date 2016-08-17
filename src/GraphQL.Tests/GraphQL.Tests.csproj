@@ -55,6 +55,13 @@
     <Compile Include="Bugs\Bug118SpacesInTypeNameTests.cs" />
     <Compile Include="Bugs\Bug138DecimalPrecisionTests.cs" />
     <Compile Include="Bugs\Bug68NonNullEnumGraphTypeTests.cs" />
+    <Compile Include="Bugs\Configuration\AdvancedEnum.cs" />
+    <Compile Include="Bugs\Configuration\AdvancedEnumType.cs" />
+    <Compile Include="Bugs\Configuration\AdvancedQuery.cs" />
+    <Compile Include="Bugs\Configuration\AdvancedSchema.cs" />
+    <Compile Include="Bugs\Configuration\AdvancedSchemaTestBase.cs" />
+    <Compile Include="Bugs\Configuration\ResultType.cs" />
+    <Compile Include="Bugs\Bug142EnumerationTests.cs" />
     <Compile Include="Builders\ConnectionBuilderTests.cs" />
     <Compile Include="Builders\FieldBuilderTests.cs" />
     <Compile Include="Execution\Cancellation\CancellationTests.cs" />
