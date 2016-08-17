@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props" Condition="Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props')" />
+  <Import Project="C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.props" Condition="Exists('C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,11 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr4.Runtime, Version=4.5.0.0, Culture=neutral, PublicKeyToken=e9931a4108ef2354, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Antlr4.Runtime.4.5-alpha002\lib\net45\Antlr4.Runtime.dll</HintPath>
+      <HintPath>C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.Runtime.4.5-alpha002\lib\net45\Antlr4.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\projects\alex\Platform\trunk\Nuget\Repository\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -191,10 +191,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props'))" />
-    <Error Condition="!Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets'))" />
+    <Error Condition="!Exists('C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.props')" Text="$([System.String]::Format('$(ErrorText)', 'C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.props'))" />
+    <Error Condition="!Exists('C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.targets')" Text="$([System.String]::Format('$(ErrorText)', 'C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.targets'))" />
   </Target>
-  <Import Project="..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets" Condition="Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets')" />
+  <Import Project="C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.targets" Condition="Exists('C:\projects\alex\Platform\trunk\Nuget\Repository\Antlr4.4.5-alpha002\build\Antlr4.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

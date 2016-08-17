@@ -25,8 +25,9 @@ namespace GraphQL.Types
             {
                 return value;
             }
+            
+            string inputValue = value.ToString();
 
-            string inputValue = (string)value;
             DateTime outputValue;
             if (DateTime.TryParse(
                 inputValue,
