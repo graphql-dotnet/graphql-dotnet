@@ -131,7 +131,7 @@ namespace GraphQL
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(), 
+                new Dictionary<string, Fields>(),
                 new List<string>());
 
             return ExecuteFields(context, rootType, context.RootValue, fields);
@@ -139,7 +139,7 @@ namespace GraphQL
 
         public async Task<object> ExecuteFields(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
         {
-            return await fields.ToDictionaryAsync<KeyValuePair<string, Fields>,string, ResolveFieldResult<object>, object>(
+            return await fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveField(context, rootType, source, pair.Value));
         }
@@ -188,7 +188,7 @@ namespace GraphQL
                 var resolve = fieldDefinition.Resolve ?? defaultResolve;
                 var result = resolve(resolveContext);
 
-                if(result is Task)
+                if (result is Task)
                 {
                     var task = result as Task;
                     await task;
@@ -411,13 +411,13 @@ namespace GraphQL
         {
             if (type is NonNullGraphType)
             {
-                var nonnull = (NonNullGraphType) type;
+                var nonnull = (NonNullGraphType)type;
                 return AstFromValue(schema, value, schema.FindType(nonnull.Type));
             }
 
             if (value is Dictionary<string, object>)
             {
-                var dict = (Dictionary<string, object>) value;
+                var dict = (Dictionary<string, object>)value;
 
                 var fields = dict
                     .Select(pair => new ObjectField(pair.Key, AstFromValue(schema, pair.Value, null)))
@@ -436,29 +436,29 @@ namespace GraphQL
                     itemType = schema.FindType(listType.Type);
                 }
 
-                var list = (IEnumerable) value;
+                var list = (IEnumerable)value;
                 var values = list.Map(item => AstFromValue(schema, item, itemType));
                 return new ListValue(values);
             }
 
             if (value is bool)
             {
-                return new BooleanValue((bool) value);
+                return new BooleanValue((bool)value);
             }
 
             if (value is int)
             {
-                return new IntValue((int) value);
+                return new IntValue((int)value);
             }
 
             if (value is long)
             {
-                return new LongValue((long) value);
+                return new LongValue((long)value);
             }
 
-            if (value is decimal)
+            if (value is double)
             {
-                return new FloatValue((decimal)value);
+                return new FloatValue((double)value);
             }
 
             return new StringValue(value?.ToString());
@@ -494,13 +494,13 @@ namespace GraphQL
 
             if (value is StringValue)
             {
-                var str = (StringValue) value;
+                var str = (StringValue)value;
                 return str.Value;
             }
 
             if (value is IntValue)
             {
-                var num = (IntValue) value;
+                var num = (IntValue)value;
                 return num.Value;
             }
 
@@ -512,13 +512,13 @@ namespace GraphQL
 
             if (value is FloatValue)
             {
-                var num = (FloatValue) value;
+                var num = (FloatValue)value;
                 return num.Value;
             }
 
             if (value is EnumValue)
             {
-                var @enum = (EnumValue) value;
+                var @enum = (EnumValue)value;
                 return @enum.Name;
             }
 
@@ -526,7 +526,7 @@ namespace GraphQL
             {
                 var objVal = (ObjectValue)value;
                 var obj = new Dictionary<string, object>();
-                objVal.FieldNames.Apply(name=>obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
+                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
                 return obj;
             }
 
@@ -542,11 +542,11 @@ namespace GraphQL
                     return false;
                 }
 
-                var nonNullType = schema.FindType(((NonNullGraphType) type).Type);
+                var nonNullType = schema.FindType(((NonNullGraphType)type).Type);
 
                 if (nonNullType is ScalarGraphType)
                 {
-                    var val = ValueFromScalar((ScalarGraphType) nonNullType, input);
+                    var val = ValueFromScalar((ScalarGraphType)nonNullType, input);
                     return val != null;
                 }
 
@@ -562,11 +562,11 @@ namespace GraphQL
 
                 if (type is ScalarGraphType)
                 {
-                    var val = ValueFromScalar((ScalarGraphType) type, input);
+                    var val = ValueFromScalar((ScalarGraphType)type, input);
                     return val != null;
                 }
 
-                astType = ((NonNullType) astType).Type;
+                astType = ((NonNullType)astType).Type;
             }
 
             if (input == null)
@@ -576,7 +576,7 @@ namespace GraphQL
 
             if (input is StringValue)
             {
-                var stringVal = (StringValue) input;
+                var stringVal = (StringValue)input;
                 if (stringVal.Value == null)
                 {
                     return true;
@@ -585,7 +585,7 @@ namespace GraphQL
 
             if (type is ListGraphType)
             {
-                var listType = (ListGraphType) type;
+                var listType = (ListGraphType)type;
                 var listItemType = schema.FindType(listType.Type);
 
                 var list = input as IEnumerable;
@@ -628,7 +628,7 @@ namespace GraphQL
 
             if (type is ScalarGraphType)
             {
-                var scalar = (ScalarGraphType) type;
+                var scalar = (ScalarGraphType)type;
                 var value = ValueFromScalar(scalar, input);
                 return value != null;
             }
@@ -727,7 +727,7 @@ namespace GraphQL
             {
                 if (selection is Field)
                 {
-                    var field = (Field) selection;
+                    var field = (Field)selection;
                     if (!ShouldIncludeNode(context, field.Directives))
                     {
                         return;
@@ -742,7 +742,7 @@ namespace GraphQL
                 }
                 else if (selection is FragmentSpread)
                 {
-                    var spread = (FragmentSpread) selection;
+                    var spread = (FragmentSpread)selection;
 
                     if (visitedFragmentNames.Contains(spread.Name)
                         || !ShouldIncludeNode(context, spread.Directives))
@@ -840,7 +840,7 @@ namespace GraphQL
 
             if (conditionalType is GraphQLAbstractType)
             {
-                var abstractType = (GraphQLAbstractType) conditionalType;
+                var abstractType = (GraphQLAbstractType)conditionalType;
                 return abstractType.IsPossibleType(type);
             }
 
