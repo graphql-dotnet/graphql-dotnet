@@ -456,6 +456,11 @@ namespace GraphQL
                 return new FloatValue((double)value);
             }
 
+            if (value is DateTime)
+            {
+                return new DateTimeValue((DateTime)value);
+            }
+
             return new StringValue(value?.ToString());
         }
 
