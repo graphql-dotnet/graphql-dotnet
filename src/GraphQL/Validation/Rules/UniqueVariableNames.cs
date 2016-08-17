@@ -12,7 +12,7 @@ namespace GraphQL.Validation.Rules
   {
     public string DuplicateVariableMessage(string variableName)
     {
-      return $"There can be only one variable named \"${variableName}\"";
+      return $"There can be only one variable named \"{variableName}\"";
     }
 
     public INodeVisitor Validate(ValidationContext context)
