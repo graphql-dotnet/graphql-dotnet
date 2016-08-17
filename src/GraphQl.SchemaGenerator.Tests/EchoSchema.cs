@@ -47,7 +47,7 @@ namespace GraphQL.SchemaGenerator.Tests
         }
     }
 
-    //todo: note sure why we had two types and what they are for.
+    //todo: note not sure why we had two types and what they are for.
     [GraphKnownType(typeof(SchemaResponse), typeof(SchemaResponse))]
     public interface IResponse
     {
@@ -98,5 +98,10 @@ namespace GraphQL.SchemaGenerator.Tests
     public class Response2
     {
         public Schema1Request ComplicatedResponse { get; set; } 
+    }
+
+    public enum Episode
+    {
+        NEWHOPE, EMPIRE, JEDI
     }
 }
