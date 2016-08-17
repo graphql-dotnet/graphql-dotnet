@@ -27,7 +27,7 @@
         public int End { get; set; }
         public TokenKind Kind { get; set; }
         public int Start { get; set; }
-        public object Value { get; set; }
+        public string Value { get; set; }
 
         public static string GetTokenKindDescription(TokenKind kind)
         {

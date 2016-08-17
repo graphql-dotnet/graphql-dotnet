@@ -282,7 +282,7 @@ namespace GraphQL.Language.Tests
         public void Lex_MultipleDecimalsIntToken_HasCorrectValue()
         {
             var token = GetMultipleDecimalsIntTokenLexer();
-            Assert.Equal(123, token.Value);
+            Assert.Equal("123", token.Value);
         }
 
         [Fact]
@@ -542,7 +542,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleDecimalIntToken_HasCorrectValue()
         {
             var token = GetSingleDecimalIntTokenLexer();
-            Assert.Equal(0, token.Value);
+            Assert.Equal("0", token.Value);
         }
 
         [Fact]
@@ -577,7 +577,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleFloatTokenLexer_HasCorrectValue()
         {
             var token = GetSingleFloatTokenLexer();
-            Assert.Equal(4.123d, token.Value);
+            Assert.Equal("4.123", token.Value);
         }
 
         [Fact]
@@ -605,7 +605,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleFloatWithExplicitlyPositiveExponentTokenLexer_HasCorrectValue()
         {
             var token = GetSingleFloatWithExplicitlyPositiveExponentTokenLexer();
-            Assert.Equal(123e4d, token.Value);
+            Assert.Equal("123e+4", token.Value);
         }
 
         [Fact]
@@ -633,7 +633,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleFloatWithExponentCapitalLetterTokenLexer_HasCorrectValue()
         {
             var token = GetSingleFloatWithExponentCapitalLetterTokenLexer();
-            Assert.Equal(123e4d, token.Value);
+            Assert.Equal("123E4", token.Value);
         }
 
         [Fact]
@@ -661,7 +661,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleFloatWithExponentTokenLexer_HasCorrectValue()
         {
             var token = GetSingleFloatWithExponentTokenLexer();
-            Assert.Equal(123e4d, token.Value);
+            Assert.Equal("123e4", token.Value);
         }
 
         [Fact]
@@ -689,7 +689,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleFloatWithNegativeExponentTokenLexer_HasCorrectValue()
         {
             var token = GetSingleFloatWithNegativeExponentTokenLexer();
-            Assert.Equal(123e-4d, token.Value);
+            Assert.Equal("123e-4", token.Value);
         }
 
         [Fact]
@@ -773,7 +773,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleNegativeFloatTokenLexer_HasCorrectValue()
         {
             var token = GetSingleNegativeFloatTokenLexer();
-            Assert.Equal(-0.123d, token.Value);
+            Assert.Equal("-0.123", token.Value);
         }
 
         [Fact]
@@ -801,7 +801,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleNegativeFloatWithExponentTokenLexer_HasCorrectValue()
         {
             var token = GetSingleNegativeFloatWithExponentTokenLexer();
-            Assert.Equal(-123e4d, token.Value);
+            Assert.Equal("-123e4", token.Value);
         }
 
         [Fact]
@@ -829,7 +829,7 @@ namespace GraphQL.Language.Tests
         public void Lex_SingleNegativeIntTokenLexer_HasCorrectValue()
         {
             var token = GetSingleNegativeIntTokenLexer();
-            Assert.Equal(-3, token.Value);
+            Assert.Equal("-3", token.Value);
         }
 
         [Fact]

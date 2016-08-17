@@ -11,5 +11,10 @@
         }
 
         public GraphQLType Type { get; set; }
+
+        public override string ToString()
+        {
+            return this.Type.ToString() + "!";
+        }
     }
 }

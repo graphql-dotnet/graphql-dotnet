@@ -4,9 +4,10 @@ namespace GraphQL.Language
 {
     public class Location
     {
+        private static Regex lineRegex = new Regex("\r\n|[\n\r]", RegexOptions.ECMAScript | RegexOptions.Compiled);
+
         public Location(ISource source, int position)
         {
-            var lineRegex = new Regex("\r\n|[\n\r]", RegexOptions.ECMAScript | RegexOptions.Compiled);
             this.Line = 1;
             this.Column = position + 1;
 

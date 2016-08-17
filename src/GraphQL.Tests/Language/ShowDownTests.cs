@@ -41,6 +41,9 @@ namespace GraphQL.Tests.Language
             build(query, builder, 100);
             build(query, builder, 1000);
             build(query, builder, 10000);
+//            build(query, builder, 15000);
+//            build(query, builder, 20000);
+//            build(query, builder, 25000);
         }
 
         private static void build(string query, IDocumentBuilder builder, int count)

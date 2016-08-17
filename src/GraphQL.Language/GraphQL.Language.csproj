@@ -57,6 +57,7 @@
     <Compile Include="AST\GraphQLInputValueDefinition.cs" />
     <Compile Include="AST\GraphQLInterfaceTypeDefinition.cs" />
     <Compile Include="AST\GraphQLListType.cs" />
+    <Compile Include="AST\GraphQLListValue.cs" />
     <Compile Include="AST\GraphQLLocation.cs" />
     <Compile Include="AST\GraphQLName.cs" />
     <Compile Include="AST\GraphQLNamedType.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="AST\GraphQLOperationDefinition.cs" />
     <Compile Include="AST\GraphQLOperationTypeDefinition.cs" />
     <Compile Include="AST\GraphQLScalarTypeDefinition.cs" />
+    <Compile Include="AST\GraphQLScalarValue.cs" />
     <Compile Include="AST\GraphQLSchemaDefinition.cs" />
     <Compile Include="AST\GraphQLSelectionSet.cs" />
     <Compile Include="AST\GraphQLType.cs" />
@@ -74,7 +76,6 @@
     <Compile Include="AST\GraphQLTypeExtensionDefinition.cs" />
     <Compile Include="AST\GraphQLUnionTypeDefinition.cs" />
     <Compile Include="AST\GraphQLValue.cs" />
-    <Compile Include="AST\GraphQLValue`1.cs" />
     <Compile Include="AST\GraphQLVariable.cs" />
     <Compile Include="AST\GraphQLVariableDefinition.cs" />
     <Compile Include="GraphQLAstVisitor.cs" />
@@ -90,6 +91,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="Token.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

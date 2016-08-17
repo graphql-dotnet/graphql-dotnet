@@ -14,7 +14,6 @@
         InlineFragment,
         FragmentDefinition,
         IntValue,
-        LongValue,
         FloatValue,
         StringValue,
         BooleanValue,

@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Language
 {
     public class GraphQLAstVisitor
     {
+        protected IDictionary<string, GraphQLFragmentDefinition> Fragments { get; private set; }
+
+        public GraphQLAstVisitor()
+        {
+            this.Fragments = new Dictionary<string, GraphQLFragmentDefinition>();
+        }
+
         public virtual GraphQLName BeginVisitAlias(GraphQLName alias)
         {
             return alias;
@@ -30,7 +36,7 @@ namespace GraphQL.Language
             return arguments;
         }
 
-        public virtual GraphQLValue<bool> BeginVisitBooleanValue(GraphQLValue<bool> value)
+        public virtual GraphQLScalarValue BeginVisitBooleanValue(GraphQLScalarValue value)
         {
             return value;
         }
@@ -54,7 +60,7 @@ namespace GraphQL.Language
             return directives;
         }
 
-        public virtual GraphQLValue<string> BeginVisitEnumValue(GraphQLValue<string> value)
+        public virtual GraphQLScalarValue BeginVisitEnumValue(GraphQLScalarValue value)
         {
             return value;
         }
@@ -66,16 +72,19 @@ namespace GraphQL.Language
             if (selection.Alias != null)
                 this.BeginVisitAlias((GraphQLName)this.BeginVisitNode(selection.Alias));
 
+            if (selection.Arguments != null)
+                this.BeginVisitArguments(selection.Arguments);
+
             if (selection.SelectionSet != null)
                 this.BeginVisitNode(selection.SelectionSet);
 
-            if (selection.Arguments != null)
-                this.BeginVisitArguments(selection.Arguments);
+            if (selection.Directives != null)
+                this.BeginVisitDirectives(selection.Directives);
 
             return this.EndVisitFieldSelection(selection);
         }
 
-        public virtual GraphQLValue<float> BeginVisitFloatValue(GraphQLValue<float> value)
+        public virtual GraphQLScalarValue BeginVisitFloatValue(GraphQLScalarValue value)
         {
             return value;
         }
@@ -83,6 +92,11 @@ namespace GraphQL.Language
         public virtual GraphQLFragmentDefinition BeginVisitFragmentDefinition(GraphQLFragmentDefinition node)
         {
             this.BeginVisitNode(node.TypeCondition);
+            this.BeginVisitNode(node.Name);
+
+            if (node.SelectionSet != null)
+                this.BeginVisitNode(node.SelectionSet);
+
             return node;
         }
 
@@ -106,7 +120,7 @@ namespace GraphQL.Language
             return inlineFragment;
         }
 
-        public virtual GraphQLValue<int> BeginVisitIntValue(GraphQLValue<int> value)
+        public virtual GraphQLScalarValue BeginVisitIntValue(GraphQLScalarValue value)
         {
             return value;
         }
@@ -127,7 +141,7 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.OperationDefinition: return this.BeginVisitOperationDefinition((GraphQLOperationDefinition)node);
                 case ASTNodeKind.SelectionSet: return this.BeginVisitSelectionSet((GraphQLSelectionSet)node);
-                case ASTNodeKind.Field: return this.BeginVisitFieldSelection((GraphQLFieldSelection)node);
+                case ASTNodeKind.Field: return this.BeginVisitNonIntrospectionFieldSelection((GraphQLFieldSelection)node);
                 case ASTNodeKind.Name: return this.BeginVisitName((GraphQLName)node);
                 case ASTNodeKind.Argument: return this.BeginVisitArgument((GraphQLArgument)node);
                 case ASTNodeKind.FragmentSpread: return this.BeginVisitFragmentSpread((GraphQLFragmentSpread)node);
@@ -136,14 +150,18 @@ namespace GraphQL.Language
                 case ASTNodeKind.NamedType: return this.BeginVisitNamedType((GraphQLNamedType)node);
                 case ASTNodeKind.Directive: return this.BeginVisitDirective((GraphQLDirective)node);
                 case ASTNodeKind.Variable: return this.BeginVisitVariable((GraphQLVariable)node);
-                case ASTNodeKind.IntValue: return this.BeginVisitIntValue((GraphQLValue<int>)node);
-                case ASTNodeKind.FloatValue: return this.BeginVisitFloatValue((GraphQLValue<float>)node);
-                case ASTNodeKind.StringValue: return this.BeginVisitStringValue((GraphQLValue<string>)node);
-                case ASTNodeKind.BooleanValue: return this.BeginVisitBooleanValue((GraphQLValue<bool>)node);
-                case ASTNodeKind.EnumValue: return this.BeginVisitEnumValue((GraphQLValue<string>)node);
+                case ASTNodeKind.IntValue: return this.BeginVisitIntValue((GraphQLScalarValue)node);
+                case ASTNodeKind.FloatValue: return this.BeginVisitFloatValue((GraphQLScalarValue)node);
+                case ASTNodeKind.StringValue: return this.BeginVisitStringValue((GraphQLScalarValue)node);
+                case ASTNodeKind.BooleanValue: return this.BeginVisitBooleanValue((GraphQLScalarValue)node);
+                case ASTNodeKind.EnumValue: return this.BeginVisitEnumValue((GraphQLScalarValue)node);
+                case ASTNodeKind.ListValue: return this.BeginVisitListValue((GraphQLListValue)node);
+                case ASTNodeKind.ObjectValue: return this.BeginVisitObjectValue((GraphQLObjectValue)node);
+                case ASTNodeKind.ObjectField: return this.BeginVisitObjectField((GraphQLObjectField)node);
+                case ASTNodeKind.VariableDefinition: return this.BeginVisitVariableDefinition((GraphQLVariableDefinition)node);
             }
 
-            throw new NotImplementedException();
+            return null;
         }
 
         public virtual GraphQLOperationDefinition BeginVisitOperationDefinition(GraphQLOperationDefinition definition)
@@ -151,7 +169,16 @@ namespace GraphQL.Language
             if (definition.Name != null)
                 this.BeginVisitNode(definition.Name);
 
+            if (definition.VariableDefinitions != null)
+                this.BeginVisitVariableDefinitions(definition.VariableDefinitions);
+
             this.BeginVisitNode(definition.SelectionSet);
+
+            return this.EndVisitOperationDefinition(definition);
+        }
+
+        public virtual GraphQLOperationDefinition EndVisitOperationDefinition(GraphQLOperationDefinition definition)
+        {
             return definition;
         }
 
@@ -163,7 +190,7 @@ namespace GraphQL.Language
             return selectionSet;
         }
 
-        public virtual GraphQLValue<string> BeginVisitStringValue(GraphQLValue<string> value)
+        public virtual GraphQLScalarValue BeginVisitStringValue(GraphQLScalarValue value)
         {
             return value;
         }
@@ -174,6 +201,22 @@ namespace GraphQL.Language
                 this.BeginVisitNode(variable.Name);
 
             return this.EndVisitVariable(variable);
+        }
+
+        public virtual GraphQLVariableDefinition BeginVisitVariableDefinition(GraphQLVariableDefinition node)
+        {
+            this.BeginVisitNode(node.Type);
+
+            return node;
+        }
+
+        public virtual IEnumerable<GraphQLVariableDefinition> BeginVisitVariableDefinitions(
+            IEnumerable<GraphQLVariableDefinition> variableDefinitions)
+        {
+            foreach (var definition in variableDefinitions)
+                this.BeginVisitNode(definition);
+
+            return variableDefinitions;
         }
 
         public virtual GraphQLArgument EndVisitArgument(GraphQLArgument argument)
@@ -194,7 +237,58 @@ namespace GraphQL.Language
         public virtual void Visit(GraphQLDocument ast)
         {
             foreach (var definition in ast.Definitions)
+            {
+                if (definition.Kind == ASTNodeKind.FragmentDefinition)
+                {
+                    var fragment = (GraphQLFragmentDefinition)definition;
+                    this.Fragments.Add(fragment.Name.Value, fragment);
+                }
+            }
+
+            foreach (var definition in ast.Definitions)
+            {
                 this.BeginVisitNode(definition);
+            }
+        }
+
+        public virtual GraphQLObjectField BeginVisitObjectField(GraphQLObjectField node)
+        {
+            this.BeginVisitNode(node.Name);
+
+            this.BeginVisitNode(node.Value);
+
+            return node;
+        }
+
+        public virtual GraphQLObjectValue BeginVisitObjectValue(GraphQLObjectValue node)
+        {
+            foreach (var field in node.Fields)
+                this.BeginVisitNode(field);
+
+            return this.EndVisitObjectValue(node);
+        }
+
+        public virtual GraphQLObjectValue EndVisitObjectValue(GraphQLObjectValue node)
+        {
+            return node;
+        }
+
+        public virtual GraphQLListValue EndVisitListValue(GraphQLListValue node)
+        {
+            return node;
+        }
+
+        private ASTNode BeginVisitListValue(GraphQLListValue node)
+        {
+            foreach (var value in node.Values)
+                this.BeginVisitNode(value);
+
+            return this.EndVisitListValue(node);
+        }
+
+        private ASTNode BeginVisitNonIntrospectionFieldSelection(GraphQLFieldSelection selection)
+        {
+            return this.BeginVisitFieldSelection(selection);
         }
     }
 }

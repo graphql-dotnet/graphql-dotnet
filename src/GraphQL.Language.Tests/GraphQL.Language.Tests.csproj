@@ -60,6 +60,8 @@
     <Compile Include="ParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceTests.cs" />
+    <Compile Include="Validation\LexerValidationTests.cs" />
+    <Compile Include="Validation\ParserValidationTests.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -73,6 +75,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

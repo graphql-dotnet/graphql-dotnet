@@ -242,9 +242,9 @@ namespace GraphQL.Language
         private GraphQLValue ParseBooleanValue(Token token)
         {
             this.Advance();
-            return new GraphQLValue<bool>(ASTNodeKind.BooleanValue)
+            return new GraphQLScalarValue(ASTNodeKind.BooleanValue)
             {
-                Value = token.Value.Equals("true"),
+                Value = token.Value,
                 Location = this.GetLocation(token.Start)
             };
         }
@@ -364,7 +364,7 @@ namespace GraphQL.Language
         private GraphQLValue ParseEnumValue(Token token)
         {
             this.Advance();
-            return new GraphQLValue<string>(ASTNodeKind.EnumValue)
+            return new GraphQLScalarValue(ASTNodeKind.EnumValue)
             {
                 Value = token.Value.ToString(),
                 Location = this.GetLocation(token.Start)
@@ -424,9 +424,9 @@ namespace GraphQL.Language
         {
             var token = this.currentToken;
             this.Advance();
-            return new GraphQLValue<double>(ASTNodeKind.FloatValue)
+            return new GraphQLScalarValue(ASTNodeKind.FloatValue)
             {
-                Value = (double)token.Value,
+                Value = token.Value,
                 Location = this.GetLocation(token.Start)
             };
         }
@@ -522,18 +522,9 @@ namespace GraphQL.Language
             var token = this.currentToken;
             this.Advance();
 
-            if (token.Value is int)
+            return new GraphQLScalarValue(ASTNodeKind.IntValue)
             {
-                return new GraphQLValue<int>(ASTNodeKind.IntValue)
-                {
-                    Value = (int)token.Value,
-                    Location = this.GetLocation(token.Start)
-                };
-            }
-
-            return new GraphQLValue<long>(ASTNodeKind.LongValue)
-            {
-                Value = (long)token.Value,
+                Value = token.Value,
                 Location = this.GetLocation(token.Start)
             };
         }
@@ -558,10 +549,11 @@ namespace GraphQL.Language
             Func<GraphQLValue> constant = () => this.ParseConstantValue();
             Func<GraphQLValue> value = () => this.ParseValueValue();
 
-            return new GraphQLValue<IEnumerable<GraphQLValue>>(ASTNodeKind.ListValue)
+            return new GraphQLListValue(ASTNodeKind.ListValue)
             {
-                Value = this.Any(TokenKind.BRACKET_L, isConstant ? constant : value, TokenKind.BRACKET_R),
-                Location = this.GetLocation(start)
+                Values = this.Any(TokenKind.BRACKET_L, isConstant ? constant : value, TokenKind.BRACKET_R),
+                Location = this.GetLocation(start),
+                AstValue = this.source.Body.Substring(start, this.currentToken.End - start - 1)
             };
         }
 
@@ -734,6 +726,21 @@ namespace GraphQL.Language
             };
         }
 
+        private GraphQLSchemaDefinition ParseSchemaDefinition()
+        {
+            var start = this.currentToken.Start;
+            this.ExpectKeyword("schema");
+            var directives = this.ParseDirectives();
+            var operationTypes = this.Many(TokenKind.BRACE_L, () => this.ParseOperationTypeDefinition(), TokenKind.BRACE_R);
+
+            return new GraphQLSchemaDefinition()
+            {
+                Directives = directives,
+                OperationTypes = operationTypes,
+                Location = this.GetLocation(start)
+            };
+        }
+
         private ASTNode ParseSelection()
         {
             return this.Peek(TokenKind.SPREAD) ?
@@ -751,28 +758,13 @@ namespace GraphQL.Language
             };
         }
 
-        private GraphQLSchemaDefinition ParseSchemaDefinition()
-        {
-            var start = this.currentToken.Start;
-            this.ExpectKeyword("schema");
-            var directives = this.ParseDirectives();
-            var operationTypes = this.Many(TokenKind.BRACE_L, () => this.ParseOperationTypeDefinition(), TokenKind.BRACE_R);
-
-            return new GraphQLSchemaDefinition()
-            {
-                Directives = directives,
-                OperationTypes = operationTypes,
-                Location = this.GetLocation(start)
-            };
-        }
-
         private GraphQLValue ParseString(bool isConstant)
         {
             var token = this.currentToken;
             this.Advance();
-            return new GraphQLValue<string>(ASTNodeKind.StringValue)
+            return new GraphQLScalarValue(ASTNodeKind.StringValue)
             {
-                Value = $"\"{token.Value}\"",
+                Value = token.Value as string,
                 Location = this.GetLocation(token.Start)
             };
         }
@@ -896,7 +888,7 @@ namespace GraphQL.Language
                 Variable = this.ParseVariable(),
                 Type = this.AdvanceThroughColonAndParseType(),
                 DefaultValue = this.SkipEqualsAndParseValueLiteral(),
-                Location = GetLocation(start)
+                Location = this.GetLocation(start)
             };
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 
@@ -171,12 +172,43 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.StringValue:
                 {
-                    var str = source as GraphQLValue<string>;
-                    return new StringValue(str.Value).WithLocation(str, _body);
+                    var str = source as GraphQLScalarValue;
+                    return new StringValue($"\"{str.Value}\"").WithLocation(str, _body);
+                }
+                case ASTNodeKind.IntValue:
+                {
+                    var str = source as GraphQLScalarValue;
+
+                    int intResult;
+                    if (int.TryParse(str.Value, out intResult))
+                    {
+                        var val = new IntValue(intResult).WithLocation(str, _body);
+                        return val;
+                    }
+
+                    // If the value doesn't fit in an integer, revert to using long...
+                    long longResult;
+                    if (long.TryParse(str.Value, out longResult))
+                    {
+                        var val = new LongValue(longResult).WithLocation(str, _body);
+                        return val;
+                    }
+
+                    throw new ExecutionError($"Invalid number {str.Value}");
+                }
+                case ASTNodeKind.FloatValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return new FloatValue(double.Parse(str.Value)).WithLocation(str, _body);
+                }
+                case ASTNodeKind.BooleanValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {
-                    var str = source as GraphQLValue<string>;
+                    var str = source as GraphQLScalarValue;
                     return new EnumValue(str.Value).WithLocation(str, _body);
                 }
                 case ASTNodeKind.Variable:
@@ -192,40 +224,10 @@ namespace GraphQL.Language
                 }
                 case ASTNodeKind.ListValue:
                 {
-                    var list = source as GraphQLValue<IEnumerable<GraphQLValue>>;
-                    var values = list.Value.Select(Value);
+                    var list = source as GraphQLListValue;
+                    var values = list.Values.Select(Value);
                     return new ListValue(values).WithLocation(list, _body);
                 }
-            }
-
-            var inte = source as GraphQLValue<int>;
-            if (inte != null)
-            {
-                return new IntValue(inte.Value).WithLocation(inte, _body); ;
-            }
-
-            var lg = source as GraphQLValue<long>;
-            if (lg != null)
-            {
-                return new LongValue(lg.Value).WithLocation(lg, _body); ;
-            }
-
-            var dbl = source as GraphQLValue<double>;
-            if (dbl != null)
-            {
-                return new FloatValue(dbl.Value).WithLocation(dbl, _body);
-            }
-
-            var flt = source as GraphQLValue<float>;
-            if (flt != null)
-            {
-                return new FloatValue(flt.Value).WithLocation(flt, _body);
-            }
-
-            var boolean = source as GraphQLValue<bool>;
-            if (boolean != null)
-            {
-                return new BooleanValue(boolean.Value).WithLocation(boolean, _body);
             }
 
             throw new ExecutionError($"Unmapped value type {source.Kind}");
