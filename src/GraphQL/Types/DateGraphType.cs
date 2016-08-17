@@ -27,7 +27,7 @@ namespace GraphQL.Types
                 return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
             }
             
-            string inputValue = value?.ToString();
+            string inputValue = value?.ToString().Trim('"');
 
             DateTime outputValue;
             if (DateTime.TryParse(
@@ -51,7 +51,7 @@ namespace GraphQL.Types
 
             if (value is StringValue)
             {
-                return ParseValue(((StringValue)value).Value.Trim('"'));
+                return ParseValue(((StringValue)value).Value);
             }
 
             return null;
