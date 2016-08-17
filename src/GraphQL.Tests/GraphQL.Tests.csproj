@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bugs\Bug118SpacesInTypeNameTests.cs" />
+    <Compile Include="Bugs\Bug138DecimalPrecisionTests.cs" />
     <Compile Include="Bugs\Bug68NonNullEnumGraphTypeTests.cs" />
     <Compile Include="Builders\ConnectionBuilderTests.cs" />
     <Compile Include="Builders\FieldBuilderTests.cs" />
