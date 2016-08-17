@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Rules
   {
     public string DuplicateArgMessage(string argName)
     {
-      return $"There can be only one argument named \"${argName}\".";
+      return $"There can be only one argument named \"{argName}\".";
     }
 
     public INodeVisitor Validate(ValidationContext context)

@@ -12,7 +12,7 @@ namespace GraphQL.Validation.Rules
   {
     public string DuplicateFragmentNameMessage(string fragName)
     {
-      return $"There can only be one fragment named \"${fragName}\"";
+      return $"There can only be one fragment named \"{fragName}\"";
     }
 
     public INodeVisitor Validate(ValidationContext context)
