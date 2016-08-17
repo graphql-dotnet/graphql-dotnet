@@ -24,7 +24,7 @@ namespace GraphQL.Types
             if (value is DateTime)
             {
                 DateTime dateTime = (DateTime)value;
-                return dateTime.Kind == DateTimeKind.Utc ? value : dateTime.ToUniversalTime();
+                return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
             }
             
             string inputValue = value?.ToString();
