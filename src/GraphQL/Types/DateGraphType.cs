@@ -23,10 +23,11 @@ namespace GraphQL.Types
         {
             if (value is DateTime)
             {
-                return value;
+                DateTime dateTime = (DateTime)value;
+                return dateTime.Kind == DateTimeKind.Utc ? value : dateTime.ToUniversalTime();
             }
             
-            string inputValue = value.ToString();
+            string inputValue = value?.ToString();
 
             DateTime outputValue;
             if (DateTime.TryParse(
@@ -45,7 +46,12 @@ namespace GraphQL.Types
         {
             if (value is DateTimeValue)
             {
-                return ((DateTimeValue)value).Value.ToString("o");
+                return ((DateTimeValue)value).Value;
+            }
+
+            if (value is StringValue)
+            {
+                return ParseValue(((StringValue)value).Value.Trim('"'));
             }
 
             return null;
