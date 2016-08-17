@@ -106,8 +106,7 @@ namespace GraphQL.SchemaGenerator
                 return typeof(ByteArrayGraphType);
             }
 
-            var genericType = propertyType.GetGenericType(typeof(IDictionary<,>));
-            if (genericType != null)
+            if (propertyType.IsAssignableToGenericType(typeof(IDictionary<,>)))
             {
                 var genericArgs = propertyType.GetGenericArguments();
                 var keyGraphType = ConvertTypeToGraphType(genericArgs[0], isInputType: isInputType);

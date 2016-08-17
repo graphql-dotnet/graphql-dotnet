@@ -87,7 +87,7 @@ namespace GraphQL.SchemaGenerator.Tests
 
         public byte[] ByteArray { get; set; }
 
-        public Dictionary<string, Response2> Values { get; set; } = new Dictionary<string, Response2>
+        public IDictionary<string, Response2> Values { get; set; } = new Dictionary<string, Response2>
         {
             {"99", new Response2 {ComplicatedResponse = new Schema1Request {Data = "99", Echo = 99} } },
             {"59", new Response2 {ComplicatedResponse = new Schema1Request {Data = "59", Echo = 59} } },
