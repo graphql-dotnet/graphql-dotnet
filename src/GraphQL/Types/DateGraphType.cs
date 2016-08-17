@@ -33,7 +33,7 @@ namespace GraphQL.Types
                 inputValue = value != null ? value.ToString().Trim('"') : string.Empty;
             }
 
-            if (DateTime.TryParse(inputValue, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,
+            if (DateTime.TryParse(inputValue, CultureInfo.CurrentCulture, DateTimeStyles.AdjustToUniversal,
                 out dateTime))
             {
                 return dateTime;
