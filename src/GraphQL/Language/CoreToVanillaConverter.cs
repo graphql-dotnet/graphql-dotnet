@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
+using OperationTypeParser = GraphQLParser.AST.OperationType;
+using OperationType = GraphQL.Language.AST.OperationType;
 
 namespace GraphQL.Language
 {
@@ -42,7 +45,7 @@ namespace GraphQL.Language
         {
             var name = source.Name != null ? Name(source.Name) : null;
             var op = new Operation(name).WithLocation(source, _body);
-            op.OperationType = source.Operation;
+            op.OperationType = ToOperationType(source.Operation);
             op.SelectionSet = SelectionSet(source.SelectionSet);
             op.Variables = VariableDefinitions(source.VariableDefinitions);
             op.Directives = Directives(source.Directives);
@@ -69,7 +72,7 @@ namespace GraphQL.Language
         public InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
             var frag = new InlineFragment().WithLocation(source, _body);
-            frag.Type = NamedType(source.TypeCondition);
+            frag.Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null;
             frag.Directives = Directives(source.Directives);
             frag.SelectionSet = SelectionSet(source.SelectionSet);
             return frag;
@@ -274,6 +277,23 @@ namespace GraphQL.Language
         public NameNode Name(GraphQLName name)
         {
             return new NameNode(name.Value).WithLocation(name, _body);
+        }
+
+        public static OperationType ToOperationType(OperationTypeParser type)
+        {
+            switch (type)
+            {
+                case OperationTypeParser.Query:
+                    return OperationType.Query;
+
+                case OperationTypeParser.Mutation:
+                    return OperationType.Mutation;
+
+                case OperationTypeParser.Subscription:
+                    return OperationType.Subscription;
+            }
+
+            throw new ExecutionError($"Unmapped operation type {type}");
         }
     }
 

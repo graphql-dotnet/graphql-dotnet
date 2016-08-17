@@ -18,7 +18,7 @@ namespace GraphQL.Execution
                 var input = new AntlrInputStream(reader);
                 var lexer = new GraphQLLexer(input);
                 var tokens = new CommonTokenStream(lexer);
-                var parser = new GraphQLParser(tokens);
+                var parser = new Parsing.GraphQLParser(tokens);
                 var documentTree = parser.document();
                 var vistor = new GraphQLVisitor();
                 return vistor.Visit(documentTree) as Document;

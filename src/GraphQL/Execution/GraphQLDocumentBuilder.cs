@@ -1,5 +1,6 @@
 ﻿using GraphQL.Language;
 using GraphQL.Language.AST;
+using GraphQLParser;
 
 namespace GraphQL.Execution
 {

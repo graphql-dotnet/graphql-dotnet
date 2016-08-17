@@ -1,4 +1,4 @@
-﻿using GraphQL.Language;
+﻿using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -34,6 +34,7 @@ namespace GraphQL.Validation.Rules
                     if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
                     {
                         context.ReportError(new ValidationError(
+                            context.OriginalQuery,
                             "5.4.2.3",
                             TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)),
                             node));
@@ -49,6 +50,7 @@ namespace GraphQL.Validation.Rules
                     if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
                     {
                         context.ReportError(new ValidationError(
+                            context.OriginalQuery,
                             "5.4.2.3",
                             TypeIncompatibleSpreadMessage(fragName, context.Print(parentType), context.Print(fragType)),
                             node));

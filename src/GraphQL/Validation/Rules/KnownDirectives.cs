@@ -1,4 +1,4 @@
-﻿using GraphQL.Language;
+﻿using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
                 {
                     if (!context.Schema.Directives.Any(x => x.Name == node.Name))
                     {
-                        context.ReportError(new ValidationError("5.6.1", UnknownDirectiveMessage(node.Name), node));
+                        context.ReportError(new ValidationError(context.OriginalQuery, "5.6.1", UnknownDirectiveMessage(node.Name), node));
                     }
                 });
             });

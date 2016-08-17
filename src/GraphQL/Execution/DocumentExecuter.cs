@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Introspection;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -132,7 +131,7 @@ namespace GraphQL
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(), 
+                new Dictionary<string, Fields>(),
                 new List<string>());
 
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);

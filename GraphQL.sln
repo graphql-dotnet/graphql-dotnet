@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.GraphiQL", "src\Gra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars", "src\GraphQL.StarWars\GraphQL.StarWars.csproj", "{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Language", "src\GraphQL.Language\GraphQL.Language.csproj", "{75885B61-3825-4EF0-BBC1-86E098518035}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Language.Tests", "src\GraphQL.Language.Tests\GraphQL.Language.Tests.csproj", "{AA8CFAB5-E9C3-42BF-9E63-CA6B191BCEFF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3255C0DC-9F24-4423-8BA3-3B979D0E90E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75885B61-3825-4EF0-BBC1-86E098518035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75885B61-3825-4EF0-BBC1-86E098518035}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75885B61-3825-4EF0-BBC1-86E098518035}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75885B61-3825-4EF0-BBC1-86E098518035}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA8CFAB5-E9C3-42BF-9E63-CA6B191BCEFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA8CFAB5-E9C3-42BF-9E63-CA6B191BCEFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA8CFAB5-E9C3-42BF-9E63-CA6B191BCEFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA8CFAB5-E9C3-42BF-9E63-CA6B191BCEFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

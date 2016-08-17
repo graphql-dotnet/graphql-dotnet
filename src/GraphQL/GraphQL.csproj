@@ -37,6 +37,10 @@
       <HintPath>..\..\packages\Antlr4.Runtime.4.5-alpha002\lib\net45\Antlr4.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GraphQLParser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\GraphQL-Parser.1.0.0\lib\net45\GraphQLParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -198,12 +202,6 @@
       <CustomToolNamespace>GraphQL.Parsing</CustomToolNamespace>
     </Antlr4>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Language\GraphQL.Language.csproj">
-      <Project>{75885b61-3825-4ef0-bbc1-86e098518035}</Project>
-      <Name>GraphQL.Language</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

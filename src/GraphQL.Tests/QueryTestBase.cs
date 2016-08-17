@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Execution;
 using GraphQL.Http;
-using GraphQL.Language;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
 using Should;
 

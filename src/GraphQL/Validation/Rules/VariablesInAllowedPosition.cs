@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -58,8 +58,6 @@ namespace GraphQL.Validation.Rules
                                     error.AddLocation(varDefPos.Line, varDefPos.Column);
                                     error.AddLocation(usagePos.Line, usagePos.Column);
 
-//                                    error.AddLocation(varDef.SourceLocation.Line, varDef.SourceLocation.Column);
-//                                    error.AddLocation(usage.Node.SourceLocation.Line, usage.Node.SourceLocation.Column);
                                     context.ReportError(error);
                                 }
                             }

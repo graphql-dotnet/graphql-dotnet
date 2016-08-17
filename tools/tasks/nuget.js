@@ -18,7 +18,7 @@ export default (options) => {
   const outputDir = 'nuget/lib/net45';
   const inputDir = `src/GraphQL/bin/${releaseConfig}`;
   const outputName = 'GraphQL.dll';
-  const sources = ['GraphQL.dll', 'Antlr4.Runtime.dll', 'Newtonsoft.Json.dll'];
+  const sources = ['GraphQL.dll', 'GraphQLParser.dll', 'Antlr4.Runtime.dll', 'Newtonsoft.Json.dll'];
   const outFlag = `/out:${path.join(outputDir, outputName)}`;
   const versionFlag = `/ver:${options.version}`;
 

@@ -1,4 +1,4 @@
-﻿using GraphQL.Language;
+﻿using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -42,7 +42,9 @@ namespace GraphQL.Validation.Rules
                         if (argAst == null && type is NonNullGraphType)
                         {
                             context.ReportError(
-                                new ValidationError("5.3.3.2",
+                                new ValidationError(
+                                    context.OriginalQuery,
+                                    "5.3.3.2",
                                     MissingFieldArgMessage(node.Name, arg.Name, context.Print(type)),
                                     node));
                         }
@@ -66,7 +68,9 @@ namespace GraphQL.Validation.Rules
                         if (argAst == null && type is NonNullGraphType)
                         {
                             context.ReportError(
-                                new ValidationError("5.3.3.2",
+                                new ValidationError(
+                                    context.OriginalQuery,
+                                    "5.3.3.2",
                                     MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(type)),
                                     node));
                         }

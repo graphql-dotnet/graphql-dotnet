@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Rules
 {
-    /// <summary>
-    /// Fields on correct type
-    /// 
-    /// A GraphQL document is only valid if all fields selected are defined by the
-    /// parent type, or are an allowed meta field such as __typename
-    /// </summary>
-    public class FieldsOnCorrectType : IValidationRule
+  /// <summary>
+  /// Fields on correct type
+  ///
+  /// A GraphQL document is only valid if all fields selected are defined by the
+  /// parent type, or are an allowed meta field such as __typename
+  /// </summary>
+  public class FieldsOnCorrectType : IValidationRule
     {
         public string UndefinedFieldMessage(
             string fieldName,
@@ -61,6 +61,7 @@ namespace GraphQL.Validation.Rules
 
                             // Retport an error, including helpful suggestions.
                             context.ReportError(new ValidationError(
+                                context.OriginalQuery,
                                 "5.2.1",
                                 UndefinedFieldMessage(fieldName, type.Name, suggestedTypeNames, suggestedFieldNames),
                                 node

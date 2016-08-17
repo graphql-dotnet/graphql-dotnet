@@ -1,7 +1,6 @@
-﻿using GraphQL.Language;
-using GraphQL.Types;
-using System.Threading;
+﻿using System.Threading;
 using GraphQL.Language.AST;
+using GraphQL.Types;
 
 namespace GraphQL.Execution
 {

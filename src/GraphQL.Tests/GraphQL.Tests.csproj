@@ -34,6 +34,10 @@
       <HintPath>..\..\packages\Fixie.1.0.0.33\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GraphQLParser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\GraphQL-Parser.1.0.0\lib\net45\GraphQLParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -124,10 +128,6 @@
     <Compile Include="Validation\VariablesInAllowedPositionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Language\GraphQL.Language.csproj">
-      <Project>{75885b61-3825-4ef0-bbc1-86e098518035}</Project>
-      <Name>GraphQL.Language</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj">
       <Project>{3255c0dc-9f24-4423-8ba3-3b979d0e90e2}</Project>
       <Name>GraphQL.StarWars</Name>
