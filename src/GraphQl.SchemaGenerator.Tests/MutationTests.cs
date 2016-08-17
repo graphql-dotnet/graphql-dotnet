@@ -131,10 +131,17 @@ namespace GraphQL.SchemaGenerator.Tests
                   {
                     name: ""data"",
                     type: {
-                      kind: ""SCALAR"",
-                      ofType: null
+                      kind: ""NON_NULL"",
+                      ofType: {kind:""SCALAR""}
                     }
                   },
+                    {
+                        name: ""decimal"",
+                        type: {
+                                kind: ""SCALAR"",
+                          ofType: null
+                        }
+                    },
                   {
                     name: ""state"",
                     type: {
