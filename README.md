@@ -155,7 +155,7 @@ Console.Writeline(result);
 - [x] Lone anonymous operations
 - [ ] No fragment cycle
 - [x] No undefined variables
-- [ ] No unused fragments
+- [x] No unused fragments
 - [x] No unused variables
 - [ ] Overlapping fields can be merged
 - [ ] Possible fragment spreads
