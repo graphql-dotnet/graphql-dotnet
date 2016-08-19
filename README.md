@@ -150,7 +150,7 @@ Console.Writeline(result);
 - [ ] Fragments on composite type
 - [x] Known argument names
 - [ ] Known directives
-- [ ] Known fragment names
+- [x] Known fragment names
 - [x] Known type names
 - [x] Lone anonymous operations
 - [ ] No fragment cycle

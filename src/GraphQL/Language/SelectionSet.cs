@@ -30,7 +30,7 @@ namespace GraphQL.Language
 
         public override string ToString()
         {
-            var sel = string.Join(", ", _selections.Select(s => s.ToString()));
+            var sel = string.Join(", ", _selections.Select(s => s?.ToString() ?? "null"));
             return $"SelectionSet{{selections={sel}}}";
         }
     }
