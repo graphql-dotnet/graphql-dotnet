@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language
 {
-    public class InlineFragment : AbstractNode, IFragment
+    public class InlineFragment : AbstractNode, IFragment, IHaveSelectionSet
     {
         public NamedType Type { get; set; }
 
