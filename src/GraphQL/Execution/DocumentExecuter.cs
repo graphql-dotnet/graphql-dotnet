@@ -766,8 +766,10 @@ namespace GraphQL
                 {
                     var inline = (InlineFragment)selection;
 
+                    var name = inline.Type != null ? inline.Type.Name : specificType.Name;
+
                     if (!ShouldIncludeNode(context, inline.Directives)
-                      || !DoesFragmentConditionMatch(context, inline.Type.Name, specificType))
+                      || !DoesFragmentConditionMatch(context, name, specificType))
                     {
                         return;
                     }
