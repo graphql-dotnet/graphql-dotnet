@@ -361,7 +361,10 @@ namespace GraphQL.Language
             var fragment = new InlineFragment();
             NewNode(fragment, context);
 
-            fragment.Type = Visit(context.typeCondition().typeName()) as NamedType;
+            if (context.typeCondition() != null)
+            {
+                fragment.Type = Visit(context.typeCondition().typeName()) as NamedType;
+            }
 
             if (context.directives() != null)
             {

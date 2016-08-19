@@ -53,5 +53,27 @@
 
             AssertQuerySuccess(query, expected);
         }
+
+        [Fact]
+        public void use_unnamed_inline_fragment_on_interface()
+        {
+            var query = @"
+               query SomeDroids {
+                  r2d2: droid(id: ""3"") {
+                    ... {
+                      name
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+              'r2d2': {
+                name: 'R2-D2'
+              },
+            }";
+
+            AssertQuerySuccess(query, expected);
+        }
     }
 }

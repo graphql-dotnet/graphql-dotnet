@@ -14,7 +14,10 @@ namespace GraphQL.Language
         {
             get
             {
-                yield return Type;
+                if (Type != null)
+                {
+                    yield return Type;
+                }
 
                 if (Directives != null)
                 {

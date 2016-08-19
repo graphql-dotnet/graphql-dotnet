@@ -114,7 +114,7 @@ namespace GraphQL.Validation
             if (node is InlineFragment)
             {
                 var def = (InlineFragment) node;
-                var type = _schema.FindType(def.Type.Name);
+                var type = def.Type != null ? _schema.FindType(def.Type.Name) : GetLastType();
                 _typeStack.Push(type);
                 return;
             }
