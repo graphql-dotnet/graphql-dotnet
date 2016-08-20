@@ -149,7 +149,7 @@ Console.Writeline(result);
 - [ ] Fields on correct type
 - [ ] Fragments on composite type
 - [x] Known argument names
-- [ ] Known directives
+- [x] Known directives
 - [x] Known fragment names
 - [x] Known type names
 - [x] Lone anonymous operations

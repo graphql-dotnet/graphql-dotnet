@@ -161,6 +161,7 @@
     <Compile Include="Validation\Rules\DefaultValuesOfCorrectType.cs" />
     <Compile Include="Validation\Rules\KnownArgumentNames.cs" />
     <Compile Include="Validation\Rules\KnownFragmentNames.cs" />
+    <Compile Include="Validation\Rules\KnownDirectives.cs" />
     <Compile Include="Validation\Rules\KnownTypeNames.cs" />
     <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
     <Compile Include="Validation\EnterLeaveListener.cs" />
