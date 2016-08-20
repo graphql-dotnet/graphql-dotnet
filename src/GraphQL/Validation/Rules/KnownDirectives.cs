@@ -1,16 +1,21 @@
-﻿using System;
-using GraphQL.Language;
+﻿using GraphQL.Language;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Known directives
+    /// 
+    /// A GraphQL document is only valid if all `@directives` are known by the
+    /// schema and legally positioned.
+    /// </summary>
     public class KnownDirectives : IValidationRule
     {
-        public static string UnknownDirectiveMessage(string directiveName)
+        public string UnknownDirectiveMessage(string directiveName)
         {
             return $"Unknown directive \"{directiveName}\".";
         }
 
-        public static string MisplacedDirectiveMessage(string directiveName, string location)
+        public string MisplacedDirectiveMessage(string directiveName, string location)
         {
             return $"Directive \"{directiveName}\" may not be used on {location}.";
         }

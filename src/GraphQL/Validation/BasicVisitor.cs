@@ -27,7 +27,7 @@ namespace GraphQL.Validation
                 node.Children.Apply(Visit);
             }
 
-            _visitors.Apply(l => l.Leave(node));
+            _visitors.ApplyReverse(l => l.Leave(node));
         }
     }
 }

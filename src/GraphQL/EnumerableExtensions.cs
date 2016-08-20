@@ -45,6 +45,16 @@ namespace GraphQL
                 count++;
             }
         }
+
+        public static void ApplyReverse<T>(this IEnumerable<T> items, Action<T> action)
+        {
+            var list = items.ToList();
+
+            for (var i = list.Count - 1; i >= 0; i--)
+            {
+                action(list[i]);
+            }
+        }
         
         public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
             this IEnumerable<TSource> items,
