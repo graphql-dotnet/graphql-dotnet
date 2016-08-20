@@ -10,6 +10,7 @@
     "build-release": "set CONFIGURATION=Release&& babel-node tools/build.js",
     "build-ci": "set CONFIGURATION=Release&& npm install && babel-node tools/build.js ci",
     "build-nuget": "babel-node tools/build.js nuget",
+    "build-nuspec": "babel-node tools/build.js nuspec",
     "build-artifacts": "babel-node tools/build.js artifacts",
     "release": "set CONFIGURATION=Release&& babel-node tools/build.js ci",
     "restore": "babel-node tools/build.js restore",
