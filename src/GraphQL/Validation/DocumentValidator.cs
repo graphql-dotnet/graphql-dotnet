@@ -68,6 +68,7 @@ namespace GraphQL.Validation
                 new KnownArgumentNames(),
                 new UniqueArgumentNames(),
                 new ArgumentsOfCorrectType(),
+                new ProvidedNonNullArguments(),
                 new DefaultValuesOfCorrectType(),
                 new VariablesInAllowedPosition(),
                 new UniqueInputFieldNames()

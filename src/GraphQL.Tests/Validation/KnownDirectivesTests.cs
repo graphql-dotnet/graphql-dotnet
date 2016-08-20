@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Validation
     {
         private void unknownDirective(ValidationTestConfig _, string name, int line, int column)
         {
-            _.Error(KnownDirectives.UnknownDirectiveMessage(name), line, column);
+            _.Error(Rule.UnknownDirectiveMessage(name), line, column);
         }
 
         [Fact]
