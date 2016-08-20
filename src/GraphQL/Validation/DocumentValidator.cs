@@ -64,6 +64,7 @@ namespace GraphQL.Validation
                 new NoUndefinedVariables(),
                 new NoUnusedVariables(),
                 new UniqueVariableNames(),
+                new KnownDirectives(),
                 new KnownArgumentNames(),
                 new UniqueArgumentNames(),
                 new ArgumentsOfCorrectType(),
