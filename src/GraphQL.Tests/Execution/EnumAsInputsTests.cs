@@ -30,6 +30,26 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void mutation_enum_input()
+        {
+            AssertQuerySuccess(
+                @"
+                mutation createGender {
+                  createGender(
+                    gender:Female
+                  ){
+                    gender
+                  }
+                }
+                ",
+                @"{
+                'createGender': {
+                  'gender': 'Female'
+                 }
+                }");
+        }
+
+        [Fact]
         public void mutation_input_from_variables()
         {
             var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
@@ -184,9 +204,9 @@ namespace GraphQL.Tests.Execution
         {
             Name = "Gender";
             Description = "User gender";
-            AddValue("NotSpecified", "NotSpecified gender.", Gender.NotSpecified);
-            AddValue("Male", "gender Male", Gender.Male);
-            AddValue("Female", "gender female", Gender.Female);
+            AddValue("NotSpecified", "NotSpecified gender.", (int)Gender.NotSpecified);
+            AddValue("Male", "gender Male", (int)Gender.Male);
+            AddValue("Female", "gender female", (int)Gender.Female);
         }
     }
 
@@ -215,6 +235,24 @@ namespace GraphQL.Tests.Execution
                         Gender = input.Gender
                     };
                 });
+
+            Field<UserType>("createGender", "create gender",
+               new QueryArguments(
+                   new QueryArgument<NonNullGraphType<GenderEnum>>
+                   {
+                       Name = "gender",
+                       Description = "gender to create"
+                   }
+               ),
+               context =>
+               {
+                   var input = context.Argument<Gender>("gender");
+                   return new User
+                   {
+                       Id = 1,
+                       Gender = input
+                   };
+               });
         }
     }
 
