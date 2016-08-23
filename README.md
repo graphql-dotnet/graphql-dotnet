@@ -158,8 +158,8 @@ Console.Writeline(result);
 - [x] No unused fragments
 - [x] No unused variables
 - [ ] Overlapping fields can be merged
-- [ ] Possible fragment spreads
-- [ ] Provide non-null arguments
+- [x] Possible fragment spreads
+- [x] Provide non-null arguments
 - [x] Scalar leafs
 - [x] Unique argument names
 - [x] Unique fragment names

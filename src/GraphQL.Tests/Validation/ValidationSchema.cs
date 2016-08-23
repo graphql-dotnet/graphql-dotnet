@@ -128,6 +128,45 @@ namespace GraphQL.Tests.Validation
         }
     }
 
+    public class Alien : ObjectGraphType
+    {
+        public Alien()
+        {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(
+                    new QueryArgument<BooleanGraphType> {Name = "surname"}
+                ));
+            Field<ListGraphType<Pet>>("pets");
+            Field<ListGraphType<Human>>("relatives");
+            Field<IntGraphType>("iq");
+            Field<IntGraphType>("numEyes");
+
+            Interface<Being>();
+            Interface<Intelligent>();
+
+            IsTypeOf = obj => true;
+        }
+    }
+
+    public class DogOrHuman : UnionGraphType
+    {
+        public DogOrHuman()
+        {
+            Type<Dog>();
+            Type<Human>();
+        }
+    }
+
+    public class HumanOrAlien : UnionGraphType
+    {
+        public HumanOrAlien()
+        {
+            Type<Human>();
+            Type<Alien>();
+        }
+    }
+
     public class ComplexInput : InputObjectGraphType
     {
         public ComplexInput()
@@ -229,6 +268,8 @@ namespace GraphQL.Tests.Validation
             Field<Dog>("dog");
             Field<Cat>("cat");
             Field<CatOrDog>("catOrDog");
+            Field<DogOrHuman>("dogOrHuman");
+            Field<HumanOrAlien>("humanOrAlien");
             Field<ComplicatedArgs>("complicatedArgs");
         }
     }

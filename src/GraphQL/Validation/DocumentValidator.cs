@@ -61,6 +61,7 @@ namespace GraphQL.Validation
                 new UniqueFragmentNames(),
                 new KnownFragmentNames(),
                 new NoUnusedFragments(),
+                new PossibleFragmentSpreads(),
                 new NoUndefinedVariables(),
                 new NoUnusedVariables(),
                 new UniqueVariableNames(),
