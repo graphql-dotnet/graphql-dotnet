@@ -103,6 +103,7 @@
     <Compile Include="Validation\LoneAnonymousOperationTests.cs" />
     <Compile Include="Validation\NoUndefinedVariablesTests.cs" />
     <Compile Include="Validation\NoUnusedVariablesTests.cs" />
+    <Compile Include="Validation\PossibleFragmentSpreadsTests.cs" />
     <Compile Include="Validation\ProvidedNonNullArgumentsTests.cs" />
     <Compile Include="Validation\ScalarLeafTests.cs" />
     <Compile Include="Validation\UniqueArgumentNamesTests.cs" />

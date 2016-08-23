@@ -168,6 +168,7 @@
     <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
     <Compile Include="Validation\Rules\NoUnusedFragments.cs" />
     <Compile Include="Validation\Rules\NoUnusedVariables.cs" />
+    <Compile Include="Validation\Rules\PossibleFragmentSpreads.cs" />
     <Compile Include="Validation\Rules\ProvidedNonNullArguments.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
     <Compile Include="Validation\Rules\UniqueArgumentNames.cs" />

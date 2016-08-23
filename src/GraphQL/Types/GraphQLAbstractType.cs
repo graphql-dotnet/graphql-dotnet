@@ -15,13 +15,7 @@ namespace GraphQL.Types
 
         public Func<object, ObjectGraphType> ResolveType { get; set; }
 
-        public virtual IEnumerable<ObjectGraphType> PossibleTypes
-        {
-            get
-            {
-                return _possibleTypes;
-            }
-        }
+        public virtual IEnumerable<ObjectGraphType> PossibleTypes => _possibleTypes;
 
         public virtual void AddPossibleType(ObjectGraphType type)
         {

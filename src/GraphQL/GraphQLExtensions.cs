@@ -167,6 +167,10 @@ namespace GraphQL
             return member.Member.Name;
         }
 
+        /// <summary>
+        /// Provided a type and a super type, return true if the first type is either
+        /// equal or a subset of the second super type (covariant).
+        /// </summary>
         public static bool IsSubtypeOf(this GraphType maybeSubType, GraphType superType, ISchema schema)
         {
             if (maybeSubType.Equals(superType))
@@ -216,6 +220,43 @@ namespace GraphQL
                 maybeSubType is ObjectGraphType)
             {
                 return ((GraphQLAbstractType) superType).IsPossibleType(maybeSubType);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Provided two composite types, determine if they "overlap". Two composite
+        /// types overlap when the Sets of possible concrete types for each intersect.
+        ///
+        /// This is often used to determine if a fragment of a given type could possibly
+        /// be visited in a context of another type.
+        ///
+        /// This function is commutative.
+        /// </summary>
+        public static bool DoTypesOverlap(this ISchema schema, GraphType typeA, GraphType typeB)
+        {
+            if (typeA.Equals(typeB))
+            {
+                return true;
+            }
+
+            var a = typeA as GraphQLAbstractType;
+            var b = typeB as GraphQLAbstractType;
+
+            if (a != null)
+            {
+                if (b != null)
+                {
+                    return a.PossibleTypes.Any(type => b.IsPossibleType(type));
+                }
+
+                return a.IsPossibleType(typeB);
+            }
+
+            if (b != null)
+            {
+                return b.IsPossibleType(typeA);
             }
 
             return false;
