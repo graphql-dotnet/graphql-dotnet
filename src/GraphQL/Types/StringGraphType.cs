@@ -29,9 +29,9 @@ namespace GraphQL.Types
         private string ProcessString(string value)
         {
             value = value.Replace("\\\"", "\"");
-            if (value.StartsWith("\"") && value.EndsWith("\""))
+            if (value.StartsWith("\"") && value.EndsWith("\"") && value.Length > 1)
             {
-                value = value.Substring(1, value.Length - 2);
+                value = value.Trim('"');
             }
             return value;
         }
