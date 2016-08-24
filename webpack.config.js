@@ -1,3 +1,6 @@
+var webpack = require('webpack');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 var output = './src/GraphQL.GraphiQL/public';
 
 module.exports = {
@@ -16,7 +19,12 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.js/, loader: 'babel', exclude: /node_modules/ }
+      { test: /\.js/, loader: 'babel', exclude: /node_modules/ },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') }
     ]
-  }
+  },
+
+  plugins: [
+    new ExtractTextPlugin('style.css', { allChunks: true })
+  ]
 };
