@@ -147,7 +147,7 @@ Console.Writeline(result);
 - [x] Arguments of correct type
 - [x] Default values of correct type
 - [x] Fields on correct type
-- [ ] Fragments on composite type
+- [x] Fragments on composite types
 - [x] Known argument names
 - [x] Known directives
 - [x] Known fragment names
