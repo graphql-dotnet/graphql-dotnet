@@ -56,6 +56,7 @@ namespace GraphQL.Validation
                 new UniqueOperationNames(),
                 new LoneAnonymousOperation(),
                 new KnownTypeNames(),
+                new FragmentsOnCompositeTypes(),
                 new VariablesAreInputTypes(),
                 new ScalarLeafs(),
                 new FieldsOnCorrectType(),

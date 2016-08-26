@@ -16,6 +16,13 @@ namespace GraphQL
             return Regex.Replace(name, "[\\[!\\]]", "").Trim();
         }
 
+        public static bool IsCompositeType(this GraphType type)
+        {
+            return type is ObjectGraphType ||
+                   type is InterfaceGraphType ||
+                   type is UnionGraphType;
+        }
+
         public static bool IsLeafType(this GraphType type, ISchema schema)
         {
             var namedType = type.GetNamedType(schema);
