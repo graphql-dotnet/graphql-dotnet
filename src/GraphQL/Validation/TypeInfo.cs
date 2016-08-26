@@ -70,7 +70,7 @@ namespace GraphQL.Validation
             if (node is Field)
             {
                 var field = (Field) node;
-                var parentType = _parentTypeStack.Peek();
+                var parentType = _parentTypeStack.Peek().GetNamedType(_schema);
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
                 var targetType = _schema.FindType(fieldType?.Type);

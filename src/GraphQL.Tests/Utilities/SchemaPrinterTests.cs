@@ -26,7 +26,14 @@ namespace GraphQL.Tests.Utilities
                 Query = root
             };
 
-            return print(schema);
+            var result = print(schema);
+
+            // ensure schema isn't disposed
+            if (schema.Query.Name == "")
+            {
+            }
+
+            return result;
         }
 
         private string print(ISchema schema)

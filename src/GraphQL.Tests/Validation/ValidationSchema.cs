@@ -57,7 +57,9 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(new QueryArgument<StringGraphType> {Name = "surname"}));
+            Field<StringGraphType>("nickname");
             Field<BooleanGraphType>("barks");
+            Field<IntGraphType>("barkVolume");
             Field<BooleanGraphType>(
                 "doesKnowCommand",
                 arguments: new QueryArguments(new QueryArgument<DogCommand> {Name = "dogCommand"}));
@@ -86,7 +88,17 @@ namespace GraphQL.Tests.Validation
     {
         public Cat()
         {
+            Field<StringGraphType>(
+                "name",
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> {Name = "surname"}));
+            Field<StringGraphType>("nickname");
+            Field<BooleanGraphType>("meows");
+            Field<IntGraphType>("meowVolume");
             Field<FurColor>("furColor");
+            Interface<Being>();
+            Interface<Pet>();
+
+            IsTypeOf = obj => true;
         }
     }
 

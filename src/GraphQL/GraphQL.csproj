@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
+    <Compile Include="LightweightCache.cs" />
     <Compile Include="Invariant.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Execution\AntlrDocumentBuilder.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="GraphQLExtensions.cs" />
     <Compile Include="Validation\Rules\ArgumentsOfCorrectType.cs" />
     <Compile Include="Validation\Rules\DefaultValuesOfCorrectType.cs" />
+    <Compile Include="Validation\Rules\FieldsOnCorrectType.cs" />
     <Compile Include="Validation\Rules\KnownArgumentNames.cs" />
     <Compile Include="Validation\Rules\KnownFragmentNames.cs" />
     <Compile Include="Validation\Rules\KnownDirectives.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using GraphQL.Validation;
 
 namespace GraphQL.Tests.Execution
 {
@@ -141,7 +142,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john);
+            AssertQuerySuccess(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>());
         }
 
         [Fact]
@@ -210,7 +211,7 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
-            AssertQuerySuccess(query, expected, root: _john);
+            AssertQuerySuccess(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>());
         }
 
         [Fact]
