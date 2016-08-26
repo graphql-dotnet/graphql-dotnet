@@ -172,7 +172,6 @@
     <Content Include="app\app.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="public\app.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -188,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="public\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

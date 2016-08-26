@@ -58,7 +58,7 @@ namespace GraphQL.Validation.Rules
                                     UnknownArgMessage(
                                         node.Name,
                                         fieldDef.Name,
-                                        parentType.Name,
+                                        context.Print(parentType),
                                         StringUtils.SuggestionList(node.Name, fieldDef.Arguments.Select(q => q.Name))),
                                     node));
                             }

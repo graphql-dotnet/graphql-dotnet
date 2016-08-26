@@ -58,6 +58,7 @@ namespace GraphQL.Validation
                 new KnownTypeNames(),
                 new VariablesAreInputTypes(),
                 new ScalarLeafs(),
+                new FieldsOnCorrectType(),
                 new UniqueFragmentNames(),
                 new KnownFragmentNames(),
                 new NoUnusedFragments(),

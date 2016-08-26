@@ -78,6 +78,7 @@
     <Compile Include="Types\FloatGraphTypeTests.cs" />
     <Compile Include="Types\QueryArgumentTests.cs" />
     <Compile Include="Utilities\AstPrinterTests.cs" />
+    <Compile Include="Validation\FieldsOnCorrectTypeTests.cs" />
     <Compile Include="Validation\KnownDirectivesTests.cs" />
     <Compile Include="Validation\NoUnusedFragmentsTests.cs" />
     <Compile Include="Utilities\SchemaPrinterTests.cs" />

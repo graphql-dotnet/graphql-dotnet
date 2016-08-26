@@ -22,6 +22,11 @@ namespace GraphQL.Types
             }
         }
 
+        public bool HasField(string name)
+        {
+            return _fields.Any(x => string.Equals(x.Name, name));
+        }
+
         public FieldBuilder<TGraphType, object, TGraphType> Field<TGraphType>()
             where TGraphType : GraphType
         {
