@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -88,6 +88,7 @@ namespace GraphQL.Validation.Rules
                     var nodes = cyclePath.OfType<INode>().Concat(new[] {spreadNode}).ToArray();
 
                     context.ReportError(new ValidationError(
+                        context.OriginalQuery,
                         "5.4",
                         CycleErrorMessage(spreadName, cyclePath.Select(x => x.Name).ToArray()),
                         nodes));

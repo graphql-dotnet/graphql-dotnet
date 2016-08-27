@@ -1,5 +1,6 @@
 ﻿using System;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -26,6 +27,7 @@ namespace GraphQL.Validation.Rules
                         && operationCount > 1)
                     {
                         var error = new ValidationError(
+                            context.OriginalQuery,
                             "5.1.2.1",
                             AnonOperationNotAloneMessage(),
                             op);

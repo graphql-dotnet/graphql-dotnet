@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL
 {

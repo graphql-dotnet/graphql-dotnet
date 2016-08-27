@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
-  /// <summary>
-  /// No unused fragments
-  /// 
-  /// A GraphQL document is only valid if all fragment definitions are spread
-  /// within operations, or spread within other fragments spread within operations.
-  /// </summary>
-  public class NoUnusedFragments : IValidationRule
+    /// <summary>
+    /// No unused fragments
+    /// 
+    /// A GraphQL document is only valid if all fragment definitions are spread
+    /// within operations, or spread within other fragments spread within operations.
+    /// </summary>
+    public class NoUnusedFragments : IValidationRule
   {
     public string UnusedFragMessage(string fragName)
     {
@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Rules
               var fragName = fragmentDef.Name;
               if (!fragmentNameUsed.Contains(fragName))
               {
-                var error = new ValidationError("5.4.1.4", UnusedFragMessage(fragName), fragmentDef);
+                var error = new ValidationError(context.OriginalQuery, "5.4.1.4", UnusedFragMessage(fragName), fragmentDef);
                 context.ReportError(error);
               }
             });

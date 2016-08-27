@@ -3,17 +3,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-using GraphQL.Execution;
 using GraphQL.Introspection;
 using GraphQL.Types;
-using GraphQL.Validation;
 using Should;
 
 namespace GraphQL.Tests.Bugs
 {
     public class Bug68NonNullEnumGraphTypeTests
     {
-        private readonly IDocumentExecuter _executer = new DocumentExecuter(new AntlrDocumentBuilder(), new DocumentValidator());
+        private readonly IDocumentExecuter _executer = new DocumentExecuter();
 
         ExecutionResult ExecuteQuery(ISchema schema, string query)
         {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -17,6 +18,8 @@ namespace GraphQL.Validation
             new Dictionary<Operation, IEnumerable<VariableUsage>>();
 
         private SchemaPrinter _schemaPrinter;
+
+        public string OriginalQuery { get; set; }
 
         public string OperationName { get; set; }
         public ISchema Schema { get; set; }

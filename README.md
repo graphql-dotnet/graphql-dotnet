@@ -6,7 +6,7 @@
 
 This is a work-in-progress implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
-This project uses [Antlr4](https://github.com/tunnelvisionlabs/antlr4cs) for the GraphQL grammar definition.
+This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
 
 ## Installation
 
@@ -85,7 +85,7 @@ public class DroidType : ObjectGraphType
 Executing a query.
 
 ```csharp
-public string Execute(
+public async Task<string> Execute(
   Schema schema,
   object rootObject,
   string query,
@@ -95,7 +95,7 @@ public string Execute(
   var executer = new DocumentExecuter();
   var writer = new DocumentWriter();
 
-  var result = executer.Execute(schema, rootObject, query, operationName, inputs);
+  var result = await executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
   return writer.Write(result);
 }
 
@@ -109,7 +109,7 @@ var query = @"
   }
 ";
 
-var result = Execute(schema, null, query);
+var result = await Execute(schema, null, query);
 
 Console.Writeline(result);
 

@@ -1,4 +1,4 @@
-﻿using GraphQL.Language;
+﻿using GraphQL.Language.AST;
 using Should;
 
 namespace GraphQL.Tests.Execution

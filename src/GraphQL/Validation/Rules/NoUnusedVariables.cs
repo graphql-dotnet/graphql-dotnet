@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
-  /// <summary>
-  /// No unused variables
-  /// 
-  /// A GraphQL operation is only valid if all variables defined by that operation
-  /// are used in that operation or a fragment transitively included by that
-  /// operation. 
-  /// </summary>
-  public class NoUnusedVariables : IValidationRule
+    /// <summary>
+    /// No unused variables
+    /// 
+    /// A GraphQL operation is only valid if all variables defined by that operation
+    /// are used in that operation or a fragment transitively included by that
+    /// operation. 
+    /// </summary>
+    public class NoUnusedVariables : IValidationRule
   {
     public string UnusedVariableMessage(string varName, string opName)
     {
@@ -38,7 +38,7 @@ namespace GraphQL.Validation.Rules
               var variableName = variableDef.Name;
               if (!usages.Contains(variableName))
               {
-                var error = new ValidationError("5.7.5", UnusedVariableMessage(variableName, op.Name), variableDef);
+                var error = new ValidationError(context.OriginalQuery, "5.7.5", UnusedVariableMessage(variableName, op.Name), variableDef);
                 context.ReportError(error);
               }
             });

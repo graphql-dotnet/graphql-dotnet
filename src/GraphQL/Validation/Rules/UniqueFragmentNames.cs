@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
-  /// <summary>
-  /// Unique fragment names
-  /// 
-  /// A GraphQL document is only valid if all defined fragments have unique names.
-  /// </summary>
-  public class UniqueFragmentNames : IValidationRule
+    /// <summary>
+    /// Unique fragment names
+    /// 
+    /// A GraphQL document is only valid if all defined fragments have unique names.
+    /// </summary>
+    public class UniqueFragmentNames : IValidationRule
   {
     public string DuplicateFragmentNameMessage(string fragName)
     {
@@ -26,8 +26,12 @@ namespace GraphQL.Validation.Rules
           var fragmentName = fragmentDefinition.Name;
           if (knownFragments.ContainsKey(fragmentName))
           {
-            var error = new ValidationError("5.4.1.1", DuplicateFragmentNameMessage(fragmentName),
-                                            knownFragments[fragmentName], fragmentDefinition);
+              var error = new ValidationError(
+                  context.OriginalQuery,
+                  "5.4.1.1",
+                  DuplicateFragmentNameMessage(fragmentName),
+                  knownFragments[fragmentName],
+                  fragmentDefinition);
             context.ReportError(error);
           }
           else

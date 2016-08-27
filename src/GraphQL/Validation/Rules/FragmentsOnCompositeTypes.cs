@@ -1,10 +1,10 @@
-﻿using GraphQL.Language;
+﻿using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Fragments on composite type
-    /// 
+    ///
     /// Fragments use a type condition to determine if they apply, since fragments
     /// can only be spread into a composite type (object, interface, or union), the
     /// type condition must also be a composite type.
@@ -31,6 +31,7 @@ namespace GraphQL.Validation.Rules
                     if (node.Type != null && type != null && !type.IsCompositeType())
                     {
                         context.ReportError(new ValidationError(
+                            context.OriginalQuery,
                             "5.4.1.3",
                             InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)),
                             node.Type));
@@ -43,6 +44,7 @@ namespace GraphQL.Validation.Rules
                     if (type != null && !type.IsCompositeType())
                     {
                         context.ReportError(new ValidationError(
+                            context.OriginalQuery,
                             "5.4.1.3",
                             FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)),
                             node.Type));

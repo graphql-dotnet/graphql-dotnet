@@ -34,6 +34,10 @@
       <HintPath>..\..\packages\Fixie.1.0.0.33\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GraphQLParser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\GraphQL-Parser.1.0.0\lib\net45\GraphQLParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -68,6 +72,7 @@
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
     <Compile Include="Types\StringGraphTypeTests.cs" />
+    <Compile Include="Language\ShowDownTests.cs" />
     <Compile Include="Utilities\GraphQLExtensionsTester.cs" />
     <Compile Include="Introspection\IntrospectionResult.cs" />
     <Compile Include="Introspection\SchemaIntrospectionTests.cs" />
@@ -135,9 +140,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Language\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
