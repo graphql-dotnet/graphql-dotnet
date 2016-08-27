@@ -168,6 +168,7 @@
     <Compile Include="Validation\Rules\KnownTypeNames.cs" />
     <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
     <Compile Include="Validation\EnterLeaveListener.cs" />
+    <Compile Include="Validation\Rules\NoFragmentCycles.cs" />
     <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
     <Compile Include="Validation\Rules\NoUnusedFragments.cs" />
     <Compile Include="Validation\Rules\NoUnusedVariables.cs" />

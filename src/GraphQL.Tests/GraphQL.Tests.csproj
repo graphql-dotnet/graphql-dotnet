@@ -81,6 +81,7 @@
     <Compile Include="Validation\FieldsOnCorrectTypeTests.cs" />
     <Compile Include="Validation\FragmentsOnCompositeTypesTests.cs" />
     <Compile Include="Validation\KnownDirectivesTests.cs" />
+    <Compile Include="Validation\NoFragmentCyclesTests.cs" />
     <Compile Include="Validation\NoUnusedFragmentsTests.cs" />
     <Compile Include="Utilities\SchemaPrinterTests.cs" />
     <Compile Include="CustomConvention.cs" />

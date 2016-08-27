@@ -137,11 +137,15 @@ Console.Writeline(result);
 - [x] Variables
 - [x] Fragments
 - [x] Directives
+  - [x] Include
+  - [x] Skip
+  - [ ] Custom
 - [x] Enumerations
 - [x] Input Objects
 - [x] Mutations
 - [x] Unions
 - [x] Async execution
+- [ ] Subscriptions
 
 ### Validation
 - [x] Arguments of correct type
@@ -153,7 +157,7 @@ Console.Writeline(result);
 - [x] Known fragment names
 - [x] Known type names
 - [x] Lone anonymous operations
-- [ ] No fragment cycle
+- [x] No fragment cycles
 - [x] No undefined variables
 - [x] No unused fragments
 - [x] No unused variables
