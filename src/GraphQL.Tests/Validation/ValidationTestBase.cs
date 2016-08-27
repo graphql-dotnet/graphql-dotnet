@@ -42,15 +42,17 @@ namespace GraphQL.Tests.Validation
                 var error = result.Errors.Skip(idx).First();
                 error.Message.ShouldEqual(assert.Message);
 
+                var allLocations = string.Join("", error.Locations.Select(l => $"({l.Line},{l.Column})"));
+
                 assert.Locations.Apply((assertLoc, locIdx) =>
                 {
                     var errorLoc = error.Locations.Skip(locIdx).First();
                     errorLoc.Line.ShouldEqual(
                         assertLoc.Line,
-                        $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} {allLocations}");
                     errorLoc.Column.ShouldEqual(
                         assertLoc.Column,
-                        $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} {allLocations}");
                 });
 
                 error.Locations.Count().ShouldEqual(assert.Locations.Count());
