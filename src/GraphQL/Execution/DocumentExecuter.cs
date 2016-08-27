@@ -389,7 +389,7 @@ namespace GraphQL
                 object variableValue;
                 if (inputs != null && inputs.TryGetValue(v.Name, out variableValue))
                 {
-                    var valueAst = AstFromValue(schema, variableValue, v.Type.GraphTypeFromType(schema));
+                    var valueAst = variableValue.AstFromValue(schema, v.Type.GraphTypeFromType(schema));
                     variable.Value = GetVariableValue(schema, v, valueAst);
                 }
                 else
@@ -400,68 +400,6 @@ namespace GraphQL
                 variables.Add(variable);
             });
             return variables;
-        }
-
-        public IValue AstFromValue(ISchema schema, object value, GraphType type)
-        {
-            if (type is NonNullGraphType)
-            {
-                var nonnull = (NonNullGraphType) type;
-                return AstFromValue(schema, value, schema.FindType(nonnull.Type));
-            }
-
-            if (value is Dictionary<string, object>)
-            {
-                var dict = (Dictionary<string, object>) value;
-
-                var fields = dict
-                    .Select(pair => new ObjectField(pair.Key, AstFromValue(schema, pair.Value, null)))
-                    .ToList();
-
-                return new ObjectValue(fields);
-            }
-
-            if (!(value is string) && value is IEnumerable)
-            {
-                GraphType itemType = null;
-
-                var listType = type as ListGraphType;
-                if (listType != null)
-                {
-                    itemType = schema.FindType(listType.Type);
-                }
-
-                var list = (IEnumerable) value;
-                var values = list.Map(item => AstFromValue(schema, item, itemType));
-                return new ListValue(values);
-            }
-
-            if (value is bool)
-            {
-                return new BooleanValue((bool) value);
-            }
-
-            if (value is int)
-            {
-                return new IntValue((int) value);
-            }
-
-            if (value is long)
-            {
-                return new LongValue((long) value);
-            }
-
-            if (value is double)
-            {
-                return new FloatValue((double)value);
-            }
-
-            if (value is DateTime)
-            {
-                return new DateTimeValue((DateTime)value);
-            }
-
-            return new StringValue(value?.ToString());
         }
 
         public object GetVariableValue(ISchema schema, VariableDefinition variable, IValue input)

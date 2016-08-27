@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -267,6 +268,68 @@ namespace GraphQL
             }
 
             return false;
+        }
+
+        public static IValue AstFromValue(this object value, ISchema schema, GraphType type)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nonnull = (NonNullGraphType)type;
+                return AstFromValue(value, schema, schema.FindType(nonnull.Type));
+            }
+
+            if (value is Dictionary<string, object>)
+            {
+                var dict = (Dictionary<string, object>)value;
+
+                var fields = dict
+                    .Select(pair => new ObjectField(pair.Key, AstFromValue(pair.Value, schema, null)))
+                    .ToList();
+
+                return new ObjectValue(fields);
+            }
+
+            if (!(value is string) && value is IEnumerable)
+            {
+                GraphType itemType = null;
+
+                var listType = type as ListGraphType;
+                if (listType != null)
+                {
+                    itemType = schema.FindType(listType.Type);
+                }
+
+                var list = (IEnumerable)value;
+                var values = list.Map(item => AstFromValue(item, schema, itemType));
+                return new ListValue(values);
+            }
+
+            if (value is bool)
+            {
+                return new BooleanValue((bool)value);
+            }
+
+            if (value is int)
+            {
+                return new IntValue((int)value);
+            }
+
+            if (value is long)
+            {
+                return new LongValue((long)value);
+            }
+
+            if (value is double)
+            {
+                return new FloatValue((double)value);
+            }
+
+            if (value is DateTime)
+            {
+                return new DateTimeValue((DateTime)value);
+            }
+
+            return new StringValue(value?.ToString());
         }
     }
 }
