@@ -20,13 +20,7 @@ namespace GraphQL.Tests.Language
          name
        }
 ";
-        [Fact]
-        public void antlr_builder()
-        {
-            buildMany(new AntlrDocumentBuilder());
-        }
-
-        [Fact]
+//        [Fact]
         public void core_builder()
         {
             var builder = new GraphQLDocumentBuilder();
