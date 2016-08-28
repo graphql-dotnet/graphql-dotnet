@@ -10,7 +10,9 @@ namespace GraphQL.Types
 
         ObjectGraphType Mutation { get; set; }
 
-        IEnumerable<DirectiveGraphType> Directives { get; }
+        ObjectGraphType Subscription { get; set; }
+
+        IEnumerable<DirectiveGraphType> Directives { get; set; }
 
         IEnumerable<GraphType> AllTypes { get; }
 
@@ -33,6 +35,7 @@ namespace GraphQL.Types
     {
         private readonly Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
+        private readonly List<DirectiveGraphType> _directives;
 
         public Schema()
             : this(type => (GraphType) Activator.CreateInstance(type))
@@ -45,11 +48,19 @@ namespace GraphQL.Types
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
+            _directives = new List<DirectiveGraphType>
+            {
+                DirectiveGraphType.Include,
+                DirectiveGraphType.Skip,
+                DirectiveGraphType.Deprecated
+            };
         }
 
         public ObjectGraphType Query { get; set; }
 
         public ObjectGraphType Mutation { get; set; }
+
+        public ObjectGraphType Subscription { get; set; }
 
         public Func<Type, GraphType> ResolveType { get; set; }
 
@@ -57,11 +68,17 @@ namespace GraphQL.Types
         {
             get
             {
-                return new List<DirectiveGraphType>
+                return _directives;
+            }
+            set
+            {
+                if (value == null)
                 {
-                    DirectiveGraphType.Include,
-                    DirectiveGraphType.Skip
-                };
+                    return;
+                }
+
+                _directives.Clear();
+                _directives.Fill(value);
             }
         }
 
@@ -137,6 +154,7 @@ namespace GraphQL.Types
             ResolveType = null;
             Query = null;
             Mutation = null;
+            Subscription = null;
 
             if (_lookup.IsValueCreated)
             {
@@ -161,7 +179,8 @@ namespace GraphQL.Types
             var types = new List<GraphType>
             {
                 Query,
-                Mutation
+                Mutation,
+                Subscription
             }
             .Concat(resolvedTypes)
             .Where(x => x != null)

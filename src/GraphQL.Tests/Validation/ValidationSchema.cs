@@ -294,6 +294,32 @@ namespace GraphQL.Tests.Validation
             RegisterType<Dog>();
             RegisterType<Cat>();
             RegisterType<Human>();
+            RegisterType<Alien>();
+
+            Directives = new []
+            {
+                DirectiveGraphType.Include,
+                DirectiveGraphType.Skip,
+                DirectiveGraphType.Deprecated,
+                new DirectiveGraphType("onQuery", new []{ DirectiveLocation.Query }),
+                new DirectiveGraphType("onMutation", new []{ DirectiveLocation.Mutation }),
+                new DirectiveGraphType("onSubscription", new []{ DirectiveLocation.Subscription }),
+                new DirectiveGraphType("onField", new []{ DirectiveLocation.Field }),
+                new DirectiveGraphType("onFragmentDefinition", new []{ DirectiveLocation.FragmentDefinition }),
+                new DirectiveGraphType("onFragmentSpread", new []{ DirectiveLocation.FragmentSpread }),
+                new DirectiveGraphType("onInlineFragment", new []{ DirectiveLocation.InlineFragment }),
+                new DirectiveGraphType("onSchema", new []{ DirectiveLocation.Schema }),
+                new DirectiveGraphType("onScalar", new []{ DirectiveLocation.Scalar }),
+                new DirectiveGraphType("onObject", new []{ DirectiveLocation.Object }),
+                new DirectiveGraphType("onFieldDefinition", new []{ DirectiveLocation.FieldDefinition }),
+                new DirectiveGraphType("onArgumentDefinition", new []{ DirectiveLocation.ArgumentDefinition }),
+                new DirectiveGraphType("onInterface", new []{ DirectiveLocation.Interface }),
+                new DirectiveGraphType("onUnion", new []{ DirectiveLocation.Union }),
+                new DirectiveGraphType("onEnum", new []{ DirectiveLocation.Enum }),
+                new DirectiveGraphType("onEnumValue", new []{ DirectiveLocation.EnumValue }),
+                new DirectiveGraphType("onInputObject", new []{ DirectiveLocation.InputObject }),
+                new DirectiveGraphType("onInputFieldDefinition", new []{ DirectiveLocation.InputFieldDefinition })
+            };
         }
     }
 }

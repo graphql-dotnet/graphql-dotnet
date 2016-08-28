@@ -253,6 +253,10 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'OBJECT'
                 },
                 {
+                  'name': '__DirectiveLocation',
+                  'kind': 'ENUM'
+                },
+                {
                   'name': 'Query',
                   'kind': 'OBJECT'
                 },
@@ -292,6 +296,13 @@ namespace GraphQL.Tests.StarWars
                   'onOperation': false,
                   'onFragment': true,
                   'onField': true
+                },
+                {
+                  'name': 'deprecated',
+                  'description': 'Marks an element of a GraphQL schema as no longer supported.',
+                  'onOperation': false,
+                  'onFragment': false,
+                  'onField': false
                 }
               ]
             }
