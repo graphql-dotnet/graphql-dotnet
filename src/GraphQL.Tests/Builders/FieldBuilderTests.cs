@@ -38,6 +38,18 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void should_have_deprecation_reason()
+        {
+            var objectType = new ObjectGraphType();
+
+            objectType.Field<StringGraphType>()
+                .DeprecationReason("Old field");
+
+            objectType.Fields
+                .First().DeprecationReason.ShouldEqual("Old field");
+        }
+
+        [Fact]
         public void should_return_the_right_type()
         {
             var objectType = new ObjectGraphType();

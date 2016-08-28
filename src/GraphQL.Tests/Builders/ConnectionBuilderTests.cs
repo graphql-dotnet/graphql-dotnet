@@ -25,6 +25,14 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void should_have_optional_deprecation_reason()
+        {
+            var objectType = new ParentType();
+            objectType.Fields.ElementAt(0).DeprecationReason.ShouldEqual("Deprecated");
+            objectType.Fields.ElementAt(1).DeprecationReason.ShouldEqual(null);
+        }
+
+        [Fact]
         public void should_have_field_information()
         {
             var connectionType = new ConnectionType<ChildType>();
@@ -149,6 +157,7 @@ namespace GraphQL.Tests.Builders
                     .Name("connection1")
                     .WithObject<Parent>()
                     .Unidirectional()
+                    .DeprecationReason("Deprecated")
                     .Resolve(context => context.Object.Connection1);
 
                 Connection<ChildType>()
