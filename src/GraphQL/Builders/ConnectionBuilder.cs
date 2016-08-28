@@ -152,6 +152,12 @@ namespace GraphQL.Builders
             return this;
         }
 
+        public ConnectionBuilder<TGraphType, TObjectType> DeprecationReason(string deprecationReason)
+        {
+            FieldType.DeprecationReason = deprecationReason;
+            return this;
+        }
+
         public ConnectionBuilder<TGraphType, TObjectType> PageSize(int pageSize)
         {
             _pageSize = pageSize;

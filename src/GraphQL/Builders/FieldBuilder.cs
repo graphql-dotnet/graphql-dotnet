@@ -96,6 +96,12 @@ namespace GraphQL.Builders
             return this;
         }
 
+        public FieldBuilder<TGraphType, TObjectType, TReturnType> DeprecationReason(string deprecationReason)
+        {
+            FieldType.DeprecationReason = deprecationReason;
+            return this;
+        }
+
         public FieldBuilder<TGraphType, TObjectType, TReturnType> DefaultValue(TReturnType defaultValue = default(TReturnType))
         {
             FieldType.DefaultValue = defaultValue;
