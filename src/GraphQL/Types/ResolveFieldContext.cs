@@ -5,7 +5,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext
+    public class ResolveFieldContext<TSource>
     {
         public string FieldName { get; set; }
 
@@ -21,7 +21,7 @@ namespace GraphQL.Types
 
         public object RootValue { get; set; }
 
-        public object Source { get; set; }
+        public TSource Source { get; set; }
 
         public ISchema Schema { get; set; }
 
@@ -33,16 +33,30 @@ namespace GraphQL.Types
 
         public CancellationToken CancellationToken { get; set; }
 
-        public TType Argument<TType>(string name)
+        public ResolveFieldContext() { }
+
+        public ResolveFieldContext(ResolveFieldContext context)
         {
-            if (!Arguments.ContainsKey(name))
+            Source = (TSource)context.Source;
+            FieldName = context.FieldName;
+            FieldAst = context.FieldAst;
+            FieldDefinition = context.FieldDefinition;
+            ReturnType = context.ReturnType;
+            ParentType = context.ParentType;
+            Arguments = context.Arguments;
+            Schema = context.Schema;
+            Fragments = context.Fragments;
+            RootValue = context.RootValue;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+        }
+
+        public TType GetArgument<TType>(string name, TType defaultValue = default(TType))
+        {
+            if (!HasArgument(name))
             {
-                var error = new ExecutionError($"An argument with name \"{name}\" does not exist.");
-                if (FieldAst?.SourceLocation != null)
-                {
-                    error.AddLocation(FieldAst.SourceLocation.Line, FieldAst.SourceLocation.Column);
-                }
-                throw error;
+                return defaultValue;
             }
 
             var arg = Arguments[name];
@@ -60,5 +74,12 @@ namespace GraphQL.Types
 
             return arg.GetPropertyValue<TType>();
         }
+
+        public bool HasArgument(string argumentName)
+        {
+            return Arguments?.ContainsKey(argumentName) ?? false;
+        }
     }
+
+    public class ResolveFieldContext : ResolveFieldContext<object> {}
 }

@@ -62,6 +62,7 @@
     <Compile Include="Language\AST\NameNode.cs" />
     <Compile Include="Language\CoreToVanillaConverter.cs" />
     <Compile Include="Language\NodeExtensions.cs" />
+    <Compile Include="Builders\ResolveConnectionContext.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />

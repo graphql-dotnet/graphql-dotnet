@@ -30,7 +30,13 @@ namespace GraphQL.Types
         public FieldBuilder<TGraphType, object, TGraphType> Field<TGraphType>()
             where TGraphType : GraphType
         {
-            var builder = FieldBuilder.Create<TGraphType>();
+            return Field<TGraphType, object>();
+        }
+
+        public FieldBuilder<TGraphType, TSourceType, TGraphType> Field<TGraphType, TSourceType>()
+            where TGraphType : GraphType
+        {
+            var builder = FieldBuilder.Create<TGraphType, TSourceType>();
             _fields.Add(builder.FieldType);
             return builder;
         }
@@ -38,7 +44,13 @@ namespace GraphQL.Types
         public ConnectionBuilder<TGraphType, object> Connection<TGraphType>()
             where TGraphType : ObjectGraphType
         {
-            var builder = ConnectionBuilder.Create<TGraphType>();
+            return Connection<TGraphType, object>();
+        }
+
+        public ConnectionBuilder<TGraphType, TSourceType> Connection<TGraphType, TSourceType>()
+            where TGraphType : ObjectGraphType
+        {
+            var builder = ConnectionBuilder.Create<TGraphType, TSourceType>();
             _fields.Add(builder.FieldType);
             return builder;
         }
@@ -86,6 +98,21 @@ namespace GraphQL.Types
         {
             return Field(typeof(TType), name, description, arguments, resolve, deprecationReason);
         }
+
+        public FieldType Field<TSource, TType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSource>, object> resolve = null,
+            string deprecationReason = null)
+            where TType : GraphType
+        {
+            Func<ResolveFieldContext, object> resolver = 
+                context => resolve(new ResolveFieldContext<TSource>(context));
+
+            return Field(typeof(TType), name, description, arguments, resolver, deprecationReason);
+        }
+
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {

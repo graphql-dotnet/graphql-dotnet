@@ -76,7 +76,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
+                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
                     return result;
                 });
 
@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var val = context.Argument<object>("input");
+                    var val = context.GetArgument<object>("input");
                     var result = JsonConvert.SerializeObject(val);
                     return result;
                 });
@@ -99,7 +99,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
+                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
                     return result;
                 });
 
@@ -110,7 +110,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.Argument<object>("input"));
+                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
                     return result;
                 });
         }

@@ -15,14 +15,14 @@ namespace GraphQL.StarWars
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
                 ),
-                resolve: context => data.GetHumanByIdAsync(context.Argument<string>("id"))
+                resolve: context => data.GetHumanByIdAsync(context.GetArgument<string>("id"))
             );
             Field<DroidType>(
                 "droid",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
                 ),
-                resolve: context => data.GetDroidByIdAsync(context.Argument<string>("id"))
+                resolve: context => data.GetDroidByIdAsync(context.GetArgument<string>("id"))
             );
         }
     }

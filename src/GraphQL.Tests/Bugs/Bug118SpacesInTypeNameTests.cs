@@ -36,7 +36,7 @@ mutation M($input_0: MyInput!) {
             Field<StringGraphType>(
                 "run",
                 arguments: new QueryArguments(new QueryArgument<MyInput> {Name = "input"}),
-                resolve: ctx => ctx.Argument<MyInputClass>("input").Id);
+                resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
         }
     }
 

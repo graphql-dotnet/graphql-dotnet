@@ -5,120 +5,64 @@ namespace GraphQL.Builders
 {
     public static class FieldBuilder
     {
-        public static FieldBuilder<TGraphType, object, TGraphType> Create<TGraphType>()
+        public static FieldBuilder<TGraphType, TSourceType, TGraphType> Create<TGraphType, TSourceType>()
             where TGraphType : GraphType
         {
-            return FieldBuilder<TGraphType, object, TGraphType>.Create();
+            return FieldBuilder<TGraphType, TSourceType, TGraphType>.Create();
         }
     }
 
-    public class FieldBuilder<TGraphType, TObjectType, TReturnType>
+    public class FieldBuilder<TGraphType, TSourceType, TReturnType>
         where TGraphType : GraphType
     {
-        public class ResolutionArguments
-        {
-            private readonly ResolveFieldContext _context;
-
-            internal ResolutionArguments(ResolveFieldContext context, Func<object, TObjectType> objectResolver = null)
-            {
-                _context = context;
-
-                if (objectResolver != null)
-                {
-                    Object = objectResolver(context.Source);
-                }
-                else if (context?.Source is TObjectType)
-                {
-                    Object = (TObjectType)context.Source;
-                }
-            }
-
-            public ISchema Schema => _context.Schema;
-
-            public ResolveFieldContext ResolveFieldContext => _context;
-
-            public object Source => _context.Source;
-
-            public TObjectType Object { get; set; }
-
-            public T GetArgument<T>(string argumentName)
-            {
-                return HasArgument(argumentName)
-                    ? _context.Argument<T>(argumentName)
-                    : default(T);
-            }
-
-            public T GetArgument<T>(string argumentName, T defaultValue)
-            {
-                if (HasArgument(argumentName))
-                {
-                    return _context.Argument<T>(argumentName);
-                }
-
-                return defaultValue;
-            }
-
-            public bool HasArgument(string argumentName)
-            {
-                return _context?.Arguments?.ContainsKey(argumentName) ?? false;
-            }
-        }
-
-        private readonly Func<object, TObjectType> _objectResolver;
 
         public FieldType FieldType { get; protected set; }
 
-        private FieldBuilder(FieldType fieldType, Func<object, TObjectType> objectResolver)
+        private FieldBuilder(FieldType fieldType)
         {
-            _objectResolver = objectResolver;
             FieldType = fieldType;
         }
 
-        public static FieldBuilder<TGraphType, TObjectType, TReturnType> Create()
+        public static FieldBuilder<TGraphType, TSourceType, TReturnType> Create()
         {
             var fieldType = new FieldType
             {
                 Type = typeof(TGraphType),
                 Arguments = new QueryArguments(),
             };
-            return new FieldBuilder<TGraphType, TObjectType, TReturnType>(fieldType, null);
+            return new FieldBuilder<TGraphType, TSourceType, TReturnType>(fieldType);
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> Name(string name)
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;
             return this;
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> Description(string description)
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> Description(string description)
         {
             FieldType.Description = description;
             return this;
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> DeprecationReason(string deprecationReason)
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> DeprecationReason(string deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> DefaultValue(TReturnType defaultValue = default(TReturnType))
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default(TReturnType))
         {
             FieldType.DefaultValue = defaultValue;
             return this;
         }
 
-        public FieldBuilder<TGraphType, TNewObjectType, TReturnType> WithObject<TNewObjectType>(Func<object, TNewObjectType> objectResolver = null)
+        public FieldBuilder<TGraphType, TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
-            return new FieldBuilder<TGraphType, TNewObjectType, TReturnType>(FieldType, objectResolver ?? (obj => (TNewObjectType)obj));
+            return new FieldBuilder<TGraphType, TSourceType, TNewReturnType>(FieldType);
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TNewReturnType> Returns<TNewReturnType>()
-        {
-            return new FieldBuilder<TGraphType, TObjectType, TNewReturnType>(FieldType, _objectResolver);
-        }
-
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> Argument<TArgumentGraphType>(string name, string description)
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description)
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
@@ -128,7 +72,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TGraphType, TObjectType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
+        public FieldBuilder<TGraphType, TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default(TArgumentType))
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
@@ -140,9 +84,9 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public void Resolve(Func<ResolutionArguments, TReturnType> resolver)
+        public void Resolve(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
-            FieldType.Resolve = context => resolver(new ResolutionArguments(context, _objectResolver));
+            FieldType.Resolve = context => resolver(new ResolveFieldContext<TSourceType>(context));
         }
     }
 }

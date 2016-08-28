@@ -129,7 +129,7 @@ namespace GraphQL.Tests.Builders
             var field = type.Fields.Single();
             field.Name.ShouldEqual("testConnection");
             field.Type.ShouldEqual(typeof(ConnectionType<ObjectGraphType>));
-            var result = field.Resolve(null) as Connection<Child>;
+            var result = field.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
@@ -153,19 +153,17 @@ namespace GraphQL.Tests.Builders
             {
                 Name = "Parent";
 
-                Connection<ChildType>()
+                Connection<ChildType, Parent>()
                     .Name("connection1")
-                    .WithObject<Parent>()
                     .Unidirectional()
                     .DeprecationReason("Deprecated")
-                    .Resolve(context => context.Object.Connection1);
+                    .Resolve(context => context.Source.Connection1);
 
-                Connection<ChildType>()
+                Connection<ChildType, Parent>()
                     .Name("connection2")
                     .Description("RandomDescription")
-                    .WithObject<Parent>()
                     .Bidirectional()
-                    .Resolve(context => context.Object.Connection2);
+                    .Resolve(context => context.Source.Connection2);
             }
         }
 
