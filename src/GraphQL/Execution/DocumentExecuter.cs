@@ -358,6 +358,8 @@ namespace GraphQL
         {
             ObjectGraphType type;
 
+            ExecutionError error;
+
             switch (operation.OperationType)
             {
                 case OperationType.Query:
@@ -366,13 +368,28 @@ namespace GraphQL
 
                 case OperationType.Mutation:
                     type = schema.Mutation;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for mutations");
+                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        throw error;
+                    }
                     break;
 
                 case OperationType.Subscription:
-                    throw new ExecutionError("Subscriptions are not yet supported.");
+                    type = schema.Subscription;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        throw error;
+                    }
+                    break;
 
                 default:
-                    throw new ExecutionError("Can only execute queries and mutations");
+                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
+                    error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                    throw error;
             }
 
             return type;

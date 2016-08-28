@@ -4,17 +4,12 @@ namespace GraphQL.Language.AST
 {
     public class Directive : AbstractNode
     {
-        public Directive()
-        {
-        }
-
         public Directive(NameNode node)
         {
-            Name = node.Name;
             NameNode = node;
         }
 
-        public string Name { get; set; }
+        public string Name => NameNode.Name;
         public NameNode NameNode { get; set; }
 
         public Arguments Arguments { get; set; }

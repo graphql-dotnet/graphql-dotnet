@@ -98,6 +98,7 @@ namespace GraphQL.Validation
                 }
                 else if (op.OperationType == OperationType.Subscription)
                 {
+                    type = _schema.Subscription;
                 }
                 _typeStack.Push(type);
                 return;

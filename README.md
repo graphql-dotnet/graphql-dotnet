@@ -134,19 +134,19 @@ Console.Writeline(result);
 - [x] Objects
 - [x] Lists of objects/interfaces
 - [x] Interfaces
+- [x] Unions
 - [x] Arguments
 - [x] Variables
 - [x] Fragments
 - [x] Directives
   - [x] Include
   - [x] Skip
-  - [ ] Custom
+  - [x] Custom
 - [x] Enumerations
 - [x] Input Objects
 - [x] Mutations
-- [x] Unions
+- [x] Subscriptions
 - [x] Async execution
-- [ ] Subscriptions
 
 ### Validation
 - [x] Arguments of correct type
@@ -190,7 +190,7 @@ Console.Writeline(result);
   - [x] types
   - [x] queryType
   - [x] mutationType
-  - [ ] subscriptionType
+  - [x] subscriptionType
   - [x] directives
 
 ### Deployment Process

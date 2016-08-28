@@ -47,6 +47,14 @@ namespace GraphQL.Introspection
                     return context.Schema.Mutation;
                 });
 
+            Field<__Type>(
+                "subscriptionType",
+                "If this server supports subscription, the type that subscription operations will be rooted at.",
+                resolve: context =>
+                {
+                    return context.Schema.Subscription;
+                });
+
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
                 "directives",
                 "A list of all directives supported by this server.",
