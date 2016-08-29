@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using GraphQL.Validation;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {

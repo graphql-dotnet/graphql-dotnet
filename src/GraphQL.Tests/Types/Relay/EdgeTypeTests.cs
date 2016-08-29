@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using GraphQL.Types.Relay;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types.Relay
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Tests.Types.Relay
         [Fact]
         public void should_derive_name()
         {
-            type.Name.ShouldEqual("ObjectEdge");
+            type.Name.ShouldBe("ObjectEdge");
         }
     }
 }

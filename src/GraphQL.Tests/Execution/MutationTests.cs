@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -239,8 +240,8 @@ namespace GraphQL.Tests.Execution
                 }";
 
             var result = AssertQueryWithErrors(query, expected, root: new Root(6), expectedErrorCount: 2);
-            result.Errors.First().InnerException.Message.ShouldEqual("Cannot change the number");
-            result.Errors.Last().InnerException.Message.ShouldEqual("Cannot change the number");
+            result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number");
+            result.Errors.Last().InnerException.Message.ShouldBe("Cannot change the number");
         }
     }
 }

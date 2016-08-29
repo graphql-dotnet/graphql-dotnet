@@ -1,7 +1,8 @@
 ﻿using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -23,7 +24,7 @@ var query = @"{
 
             var result = _printer.Visit(document);
             result.ShouldNotBeNull();
-            result.ToString().ShouldEqual(MonetizeLineBreaks(query));
+            result.ToString().ShouldBe(MonetizeLineBreaks(query));
         }
 
         [Fact]
@@ -42,7 +43,7 @@ var query = @"mutation createUser($userInput: UserInput!) {
 
             var result = _printer.Visit(document);
             result.ShouldNotBeNull();
-            result.ToString().ShouldEqual(MonetizeLineBreaks(query));
+            result.ToString().ShouldBe(MonetizeLineBreaks(query));
         }
 
         [Fact]
@@ -51,7 +52,7 @@ var query = @"mutation createUser($userInput: UserInput!) {
             int value = 3;
             var val = new IntValue(value);
             var result = _printer.Visit(val);
-            result.ShouldEqual(value);
+            result.ShouldBe(value);
         }
 
         [Fact]
@@ -60,7 +61,7 @@ var query = @"mutation createUser($userInput: UserInput!) {
             long value = 3;
             var val = new LongValue(value);
             var result = _printer.Visit(val);
-            result.ShouldEqual(value);
+            result.ShouldBe(value);
         }
 
         [Fact]
@@ -70,7 +71,7 @@ var query = @"mutation createUser($userInput: UserInput!) {
 
             var val = new FloatValue(value);
             var result = _printer.Visit(val);
-            result.ShouldEqual($"{value, 0:0.0##}");
+            result.ShouldBe($"{value, 0:0.0##}");
         }
 
         private static string MonetizeLineBreaks(string input)

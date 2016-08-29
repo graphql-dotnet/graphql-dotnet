@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language;
+﻿using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Newtonsoft.Json;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -240,7 +238,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Fact]
@@ -256,7 +254,7 @@ namespace GraphQL.Tests.Execution
 
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Fact]
@@ -271,7 +269,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Fact]
@@ -286,7 +284,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldEqual("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
         }
 
         [Fact]
@@ -439,7 +437,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' of required type 'String!' was not provided.");
         }
 
         [Fact]
@@ -460,7 +458,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldEqual("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' of required type 'String!' was not provided.");
         }
 
         [Fact]

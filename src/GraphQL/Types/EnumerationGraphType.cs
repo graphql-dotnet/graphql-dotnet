@@ -51,7 +51,7 @@ namespace GraphQL.Types
             }
 
             var found = Values.FirstOrDefault(v =>
-                StringComparer.InvariantCultureIgnoreCase.Equals(v.Name, value.ToString()));
+                StringComparer.OrdinalIgnoreCase.Equals(v.Name, value.ToString()));
             return found?.Value;
         }
 

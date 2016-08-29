@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -10,25 +11,25 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_null_to_null()
         {
-            type.ParseValue(null).ShouldEqual(null);
+            type.ParseValue(null).ShouldBe(null);
         }
 
         [Fact]
         public void coerces_integer_to_decimal()
         {
-            type.ParseValue(0).ShouldEqual((decimal)0);
+            type.ParseValue(0).ShouldBe((decimal)0);
         }
 
         [Fact]
         public void coerces_invalid_string_to_null()
         {
-            type.ParseValue("abcd").ShouldEqual(null);
+            type.ParseValue("abcd").ShouldBe(null);
         }
 
         [Fact]
         public void coerces_numeric_string_to_decimal()
         {
-            type.ParseValue("12345").ShouldEqual((decimal)12345);
+            type.ParseValue("12345").ShouldBe((decimal)12345);
         }
     }
 }

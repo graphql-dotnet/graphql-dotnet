@@ -1,6 +1,7 @@
 *.DS_Store
 
 .vs/
+.idea/
 *.user
 *.suo
 *.nupkg

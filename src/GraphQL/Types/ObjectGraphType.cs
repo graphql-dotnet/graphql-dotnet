@@ -1,6 +1,7 @@
 using GraphQL.Builders;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace GraphQL.Types
 {   
@@ -82,7 +83,7 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(IInterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }
