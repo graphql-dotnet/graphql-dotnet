@@ -153,7 +153,7 @@ namespace GraphQL.Utilities
             return "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
-        public string PrintFields(GraphType type)
+        public string PrintFields(ComplexGraphType type)
         {
             var fields = type.Fields
                 .Select(x =>

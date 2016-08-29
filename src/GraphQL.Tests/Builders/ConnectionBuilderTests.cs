@@ -147,19 +147,19 @@ namespace GraphQL.Tests.Builders
             }
         }
 
-        public class ParentType : ObjectGraphType
+        public class ParentType : ObjectGraphType<Parent>
         {
             public ParentType()
             {
                 Name = "Parent";
 
-                Connection<ChildType, Parent>()
+                Connection<ChildType>()
                     .Name("connection1")
                     .Unidirectional()
                     .DeprecationReason("Deprecated")
                     .Resolve(context => context.Source.Connection1);
 
-                Connection<ChildType, Parent>()
+                Connection<ChildType>()
                     .Name("connection2")
                     .Description("RandomDescription")
                     .Bidirectional()

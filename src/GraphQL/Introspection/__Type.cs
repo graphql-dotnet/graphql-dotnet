@@ -61,8 +61,9 @@ namespace GraphQL.Introspection
                 {
                     if (context.Source is ObjectGraphType || context.Source is InterfaceGraphType)
                     {
+                        
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
-                        var type = context.Source as GraphType;
+                        var type = context.Source as ComplexGraphType;
                         return !includeDeprecated
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
@@ -76,9 +77,9 @@ namespace GraphQL.Introspection
             });
             Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
-                if (context.Source is GraphQLAbstractType)
+                if (context.Source is IAbstractGraphType)
                 {
-                    var type = (GraphQLAbstractType)context.Source;
+                    var type = (IAbstractGraphType)context.Source;
                     return type.PossibleTypes;
                 }
 
