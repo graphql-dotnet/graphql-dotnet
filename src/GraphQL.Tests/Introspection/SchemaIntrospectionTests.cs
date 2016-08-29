@@ -1,7 +1,8 @@
 ﻿using GraphQL.Http;
 using GraphQL.Introspection;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Introspection
 {
@@ -14,7 +15,7 @@ namespace GraphQL.Tests.Introspection
             var executionResult = documentExecuter.ExecuteAsync(new Schema(), null, SchemaIntrospection.IntrospectionQuery, null).Result;
             var json = new DocumentWriter(true).Write(executionResult.Data);
 
-            json.ShouldEqual(IntrospectionResult.Data);
+            json.ShouldBe(IntrospectionResult.Data);
         }
     }
 }

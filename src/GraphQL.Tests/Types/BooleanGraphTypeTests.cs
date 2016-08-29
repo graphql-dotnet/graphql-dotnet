@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -10,37 +11,37 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_0_to_false()
         {
-            type.ParseValue(0).ShouldEqual(false);
+            type.ParseValue(0).ShouldBe(false);
         }
 
         [Fact]
         public void coerces_1_to_true()
         {
-            type.ParseValue(1).ShouldEqual(true);
+            type.ParseValue(1).ShouldBe(true);
         }
 
         [Fact]
         public void coerces_string_false()
         {
-            type.ParseValue("false").ShouldEqual(false);
+            type.ParseValue("false").ShouldBe(false);
         }
 
         [Fact]
         public void coerces_string_False()
         {
-            type.ParseValue("False").ShouldEqual(false);
+            type.ParseValue("False").ShouldBe(false);
         }
 
         [Fact]
         public void coerces_string_true()
         {
-            type.ParseValue("true").ShouldEqual(true);
+            type.ParseValue("true").ShouldBe(true);
         }
 
         [Fact]
         public void coerces_string_True()
         {
-            type.ParseValue("True").ShouldEqual(true);
+            type.ParseValue("True").ShouldBe(true);
         }
     }
 }

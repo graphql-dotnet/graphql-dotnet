@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -70,21 +71,21 @@ namespace GraphQL.Tests.Types
         public void throw_error_on_missing_istypeof()
         {
             var schema = new InvalidUnionSchema();
-            Expect.Throws<ExecutionError>(() => schema.FindType("a"));
+            Should.Throw<ExecutionError>(() => schema.FindType("a"));
         }
 
         [Fact]
         public void throw_error_on_non_graphtype_with_register_types()
         {
             var schema = new Schema();
-            Expect.Throws<ArgumentOutOfRangeException>(() => schema.RegisterTypes(typeof(MyDto)));
+            Should.Throw<ArgumentOutOfRangeException>(() => schema.RegisterTypes(typeof(MyDto)));
         }
-        
+
         [Fact]
         public void throw_error_on_null_with_register_types()
         {
             var schema = new Schema();
-            Expect.Throws<ArgumentNullException>(() => schema.RegisterTypes(null));
+            Should.Throw<ArgumentNullException>(() => schema.RegisterTypes(null));
         }
 
         [Fact]
@@ -119,7 +120,7 @@ namespace GraphQL.Tests.Types
             typeNames.Apply(typeName =>
             {
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
-                type.ShouldEqual(null, "Found {0} in type lookup.".ToFormat(typeName));
+                type.ShouldBe(null, "Found {0} in type lookup.".ToFormat(typeName));
             });
         }
     }

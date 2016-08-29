@@ -3,7 +3,8 @@ using System.Linq;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Builders
 {
@@ -13,31 +14,31 @@ namespace GraphQL.Tests.Builders
         public void should_have_name()
         {
             var objectType = new ParentType();
-            objectType.Fields.First().Name.ShouldEqual("connection1");
+            objectType.Fields.First().Name.ShouldBe("connection1");
         }
 
         [Fact]
         public void should_have_optional_description()
         {
             var objectType = new ParentType();
-            objectType.Fields.ElementAt(0).Description.ShouldEqual(null);
-            objectType.Fields.ElementAt(1).Description.ShouldEqual("RandomDescription");
+            objectType.Fields.ElementAt(0).Description.ShouldBe(null);
+            objectType.Fields.ElementAt(1).Description.ShouldBe("RandomDescription");
         }
 
         [Fact]
         public void should_have_optional_deprecation_reason()
         {
             var objectType = new ParentType();
-            objectType.Fields.ElementAt(0).DeprecationReason.ShouldEqual("Deprecated");
-            objectType.Fields.ElementAt(1).DeprecationReason.ShouldEqual(null);
+            objectType.Fields.ElementAt(0).DeprecationReason.ShouldBe("Deprecated");
+            objectType.Fields.ElementAt(1).DeprecationReason.ShouldBe(null);
         }
 
         [Fact]
         public void should_have_field_information()
         {
             var connectionType = new ConnectionType<ChildType>();
-            connectionType.Name.ShouldEqual("ChildConnection");
-            connectionType.Description.ShouldEqual("A connection from an object to a list of objects of type `Child`.");
+            connectionType.Name.ShouldBe("ChildConnection");
+            connectionType.Description.ShouldBe("A connection from an object to a list of objects of type `Child`.");
         }
 
         [Fact]
@@ -127,23 +128,23 @@ namespace GraphQL.Tests.Builders
                     });
 
             var field = type.Fields.Single();
-            field.Name.ShouldEqual("testConnection");
-            field.Type.ShouldEqual(typeof(ConnectionType<ObjectGraphType>));
+            field.Name.ShouldBe("testConnection");
+            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType>));
             var result = field.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
             {
-                result.TotalCount.ShouldEqual(1);
-                result.PageInfo.HasNextPage.ShouldEqual(true);
-                result.PageInfo.HasPreviousPage.ShouldEqual(false);
-                result.PageInfo.StartCursor.ShouldEqual("01");
-                result.PageInfo.EndCursor.ShouldEqual("01");
-                result.Edges.Count.ShouldEqual(1);
-                result.Edges.First().Cursor.ShouldEqual("01");
-                result.Edges.First().Node.Field1.ShouldEqual("abcd");
-                result.Items.Count.ShouldEqual(1);
-                result.Items.First().Field1.ShouldEqual("abcd");
+                result.TotalCount.ShouldBe(1);
+                result.PageInfo.HasNextPage.ShouldBe(true);
+                result.PageInfo.HasPreviousPage.ShouldBe(false);
+                result.PageInfo.StartCursor.ShouldBe("01");
+                result.PageInfo.EndCursor.ShouldBe("01");
+                result.Edges.Count.ShouldBe(1);
+                result.Edges.First().Cursor.ShouldBe("01");
+                result.Edges.First().Node.Field1.ShouldBe("abcd");
+                result.Items.Count.ShouldBe(1);
+                result.Items.First().Field1.ShouldBe("abcd");
             }
         }
 

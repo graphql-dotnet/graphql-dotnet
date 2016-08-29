@@ -1,11 +1,12 @@
 {
   "name": "graphql-dotnet",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
     "start": "webpack --progress",
     "test": "babel-node tools/build.js test",
+    "test-release": "set CONFIGURATION=Release&& babel-node tools/build.js test",
     "build": "babel-node tools/build.js",
     "build-release": "set CONFIGURATION=Release&& babel-node tools/build.js",
     "build-ci": "set CONFIGURATION=Release&& npm install && babel-node tools/build.js ci",
@@ -46,6 +47,7 @@
     "moment": "^2.13.0",
     "postcss-loader": "^0.10.1",
     "rimraf": "^2.5.2",
+    "shelljs": "^0.7.4",
     "style-loader": "^0.13.1",
     "superagent": "^2.0.0",
     "webpack": "^1.13.0",

@@ -1,5 +1,7 @@
 ﻿using System;
 using GraphQL.Types;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -8,13 +10,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void throws_exception_with_null_type()
         {
-            Expect.Throws<ArgumentOutOfRangeException>(() => new QueryArgument(null));
+            Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(null));
         }
 
         [Fact]
         public void throws_exception_with_invalid_type()
         {
-            Expect.Throws<ArgumentOutOfRangeException>(() => new QueryArgument(typeof(string)));
+            Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(typeof(string)));
         }
 
         [Fact]

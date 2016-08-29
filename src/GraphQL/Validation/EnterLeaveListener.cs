@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using GraphQL.Language;
 using GraphQL.Language.AST;
 
@@ -47,7 +48,7 @@ namespace GraphQL.Validation
                 throw new ExecutionError("Must provide an enter or leave function.");
             }
 
-            Func<INode, bool> matches = n => n.GetType().IsAssignableFrom(typeof(T));
+            Func<INode, bool> matches = n => n.GetType().GetTypeInfo().IsAssignableFrom(typeof(T));
 
             var listener = new MatchingNodeListener
             {

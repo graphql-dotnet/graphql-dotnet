@@ -1,14 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Conversion;
 
 namespace GraphQL
 {
     public static class ObjectExtensions
     {
+        private static readonly Lazy<Conversions> _conversions = new Lazy<Conversions>(() => new Conversions());
+
         public static T ToObject<T>(this IDictionary<string, object> source)
             where T : class, new()
         {
@@ -21,7 +23,7 @@ namespace GraphQL
 
             foreach (var item in source)
             {
-                var propertyType = type.GetProperty(item.Key,
+                var propertyType = type.GetTypeInfo().GetProperty(item.Key,
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyType != null)
                 {
@@ -42,11 +44,11 @@ namespace GraphQL
 
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
-              : fieldType.GetInterface("IEnumerable`1");
+              : fieldType.GetTypeInfo().GetInterface("IEnumerable`1");
             if (fieldType.Name != "String"
                 && enumerableInterface != null)
             {
-                var elementType = enumerableInterface.GetGenericArguments()[0];
+                var elementType = enumerableInterface.GetTypeInfo().GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var genericListType = typeof(List<>).MakeGenericType(elementType);
                 var newArray = (IList) Activator.CreateInstance(genericListType);
@@ -71,7 +73,7 @@ namespace GraphQL
                 return ToObject(propertyValue as Dictionary<string, object>, fieldType);
             }
 
-            if (fieldType.IsEnum)
+            if (fieldType.GetTypeInfo().IsEnum)
             {
                 if (value == null)
                 {
@@ -95,10 +97,11 @@ namespace GraphQL
         {
             if (value == null) return null;
 
-            var text = value as string;
-            return text != null
-              ? TypeDescriptor.GetConverter(fieldType).ConvertFromInvariantString(text)
-              : Convert.ChangeType(value, fieldType);
+            var text = value.ToString();
+            return _conversions.Value.Convert(fieldType, text);
+//            return text != null
+//                ? conv.Convert(fieldType, text)
+//                : Convert.ChangeType(value, fieldType);
         }
 
         public static T GetPropertyValue<T>(this object value)
@@ -137,6 +140,7 @@ namespace GraphQL
         {
             return source
                 .GetType()
+                .GetTypeInfo()
                 .GetProperties(flags)
                 .ToDictionary
                 (

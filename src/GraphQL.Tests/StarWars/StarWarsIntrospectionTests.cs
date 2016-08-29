@@ -1,5 +1,4 @@
-﻿using GraphQL.Introspection;
-using GraphQL.Tests.Introspection;
+﻿using Xunit;
 
 namespace GraphQL.Tests.StarWars
 {

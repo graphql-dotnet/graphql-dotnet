@@ -8,6 +8,27 @@ namespace GraphQL
 {
     public static class StringExtensions
     {
+        public static bool IsEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        public static string[] ToDelimitedArray(this string content)
+        {
+            return content.ToDelimitedArray(',');
+        }
+
+        public static string[] ToDelimitedArray(this string content, char delimiter)
+        {
+            var array = content.Split(delimiter);
+            for (var i = 0; i < array.Length; i++)
+            {
+                array[i] = array[i].Trim();
+            }
+
+            return array;
+        }
+
         public static IEnumerable<char> ToEnumerable(this string @this)
         {
             if (@this == null) throw new ArgumentNullException("@this");
