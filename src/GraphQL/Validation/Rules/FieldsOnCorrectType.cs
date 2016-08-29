@@ -82,12 +82,12 @@ namespace GraphQL.Validation.Rules
           GraphType type,
           string fieldName)
         {
-            if (type is InterfaceGraphType || type is UnionGraphType)
+            if (type is IAbstractGraphType)
             {
                 var suggestedObjectTypes = new List<string>();
                 var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
 
-                var absType = type as GraphQLAbstractType;
+                var absType = type as IAbstractGraphType;
                 absType.PossibleTypes.Apply(possibleType =>
                 {
                     if (!possibleType.HasField(fieldName))
@@ -102,13 +102,13 @@ namespace GraphQL.Validation.Rules
                     {
                         var possibleInterface = schema.FindType(possibleInterfaceType);
 
-                        if (!possibleInterface.HasField(fieldName))
+                        if (
+                            possibleInterface is ComplexGraphType && 
+                            ((ComplexGraphType) possibleInterface).HasField(fieldName))
                         {
-                            return;
+                            // This interface type defines this field.
+                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
                         }
-
-                        // This interface type defines this field.
-                        interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
                     });
                 });
 
@@ -129,7 +129,8 @@ namespace GraphQL.Validation.Rules
         {
             if (type is ObjectGraphType || type is InterfaceGraphType)
             {
-                return StringUtils.SuggestionList(fieldName, type.Fields.Select(x => x.Name));
+                var complexType = type as ComplexGraphType;
+                return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
             }
 
             return Enumerable.Empty<string>();

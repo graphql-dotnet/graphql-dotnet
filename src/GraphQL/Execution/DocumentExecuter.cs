@@ -276,9 +276,9 @@ namespace GraphQL
 
             var objectType = fieldType as ObjectGraphType;
 
-            if (fieldType is GraphQLAbstractType)
+            if (fieldType is IAbstractGraphType)
             {
-                var abstractType = fieldType as GraphQLAbstractType;
+                var abstractType = fieldType as IAbstractGraphType;
                 objectType = abstractType.GetObjectType(result);
 
                 if (objectType != null && !abstractType.IsPossibleType(objectType))
@@ -533,6 +533,8 @@ namespace GraphQL
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
+                var complexType = type as ComplexGraphType;
+
                 if (dict == null)
                 {
                     return false;
@@ -540,12 +542,12 @@ namespace GraphQL
 
                 // ensure every provided field is defined
                 if (type is InputObjectGraphType
-                    && dict.Keys.Any(key => type.Fields.FirstOrDefault(field => field.Name == key) == null))
+                    && dict.Keys.Any(key => complexType.Fields.FirstOrDefault(field => field.Name == key) == null))
                 {
                     return false;
                 }
 
-                return type.Fields.All(field =>
+                return complexType.Fields.All(field =>
                 {
                     object fieldValue = null;
                     dict.TryGetValue(field.Name, out fieldValue);
@@ -609,6 +611,7 @@ namespace GraphQL
 
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
+                var complexType = type as ComplexGraphType;
                 var obj = new Dictionary<string, object>();
 
                 var objectValue = input as ObjectValue;
@@ -617,7 +620,7 @@ namespace GraphQL
                     return null;
                 }
 
-                type.Fields.Apply(field =>
+                complexType.Fields.Apply(field =>
                 {
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
@@ -770,9 +773,9 @@ namespace GraphQL
                 return true;
             }
 
-            if (conditionalType is GraphQLAbstractType)
+            if (conditionalType is IAbstractGraphType)
             {
-                var abstractType = (GraphQLAbstractType) conditionalType;
+                var abstractType = (IAbstractGraphType) conditionalType;
                 return abstractType.IsPossibleType(type);
             }
 

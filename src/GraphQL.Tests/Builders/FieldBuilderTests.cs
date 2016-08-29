@@ -356,8 +356,9 @@ namespace GraphQL.Tests.Builders
         [Fact]
         public void can_access_object()
         {
-            var objectType = new ObjectGraphType();
-            objectType.Field<StringGraphType, int>()
+            var objectType = new ObjectGraphType<int>();
+
+            objectType.Field<StringGraphType>()
                 .Resolve(context =>
                 {
                     context.Source.ShouldEqual(12345);

@@ -134,15 +134,19 @@ namespace GraphQL.Types
             var name = type.CollectTypes(context).TrimGraphQLTypes();
             _types[name] = type;
 
-            type.Fields.Apply(field =>
+            if (type is ComplexGraphType)
             {
-                AddTypeIfNotRegistered(field.Type, context);
-
-                field.Arguments?.Apply(arg =>
+                var complexType = type as ComplexGraphType;
+                complexType.Fields.Apply(field =>
                 {
-                    AddTypeIfNotRegistered(arg.Type, context);
+                    AddTypeIfNotRegistered(field.Type, context);
+
+                    field.Arguments?.Apply(arg =>
+                    {
+                        AddTypeIfNotRegistered(arg.Type, context);
+                    });
                 });
-            });
+            }
 
             if (type is ObjectGraphType)
             {

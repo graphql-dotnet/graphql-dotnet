@@ -5,10 +5,10 @@ namespace GraphQL.Builders
 {
     public static class FieldBuilder
     {
-        public static FieldBuilder<TGraphType, TSourceType, TGraphType> Create<TGraphType, TSourceType>()
+        public static FieldBuilder<TGraphType, TSourceType, object> Create<TGraphType, TSourceType>()
             where TGraphType : GraphType
         {
-            return FieldBuilder<TGraphType, TSourceType, TGraphType>.Create();
+            return FieldBuilder<TGraphType, TSourceType, object>.Create();
         }
     }
 
