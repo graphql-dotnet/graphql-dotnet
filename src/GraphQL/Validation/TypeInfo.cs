@@ -159,7 +159,8 @@ namespace GraphQL.Validation
 
                 if (objectType is InputObjectGraphType)
                 {
-                    var inputField = objectType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
+                    var complexType = objectType as ComplexGraphType;
+                    var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
                     fieldType = inputField != null ? _schema.FindType(inputField.Type) : null;
                 }
 
@@ -244,7 +245,8 @@ namespace GraphQL.Validation
 
             if (parentType is ObjectGraphType || parentType is InterfaceGraphType)
             {
-                return parentType.Fields.FirstOrDefault(x => x.Name == field.Name);
+                var complexType = parentType as ComplexGraphType;
+                return complexType.Fields.FirstOrDefault(x => x.Name == field.Name);
             }
 
             return null;

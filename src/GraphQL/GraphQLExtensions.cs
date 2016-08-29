@@ -224,10 +224,10 @@ namespace GraphQL
 
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
-            if (superType is GraphQLAbstractType &&
+            if (superType is IAbstractGraphType &&
                 maybeSubType is ObjectGraphType)
             {
-                return ((GraphQLAbstractType) superType).IsPossibleType(maybeSubType);
+                return ((IAbstractGraphType) superType).IsPossibleType(maybeSubType);
             }
 
             return false;
@@ -249,8 +249,8 @@ namespace GraphQL
                 return true;
             }
 
-            var a = typeA as GraphQLAbstractType;
-            var b = typeB as GraphQLAbstractType;
+            var a = typeA as IAbstractGraphType;
+            var b = typeB as IAbstractGraphType;
 
             if (a != null)
             {

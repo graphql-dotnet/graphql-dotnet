@@ -63,6 +63,8 @@
     <Compile Include="Language\CoreToVanillaConverter.cs" />
     <Compile Include="Language\NodeExtensions.cs" />
     <Compile Include="Builders\ResolveConnectionContext.cs" />
+    <Compile Include="Types\ComplexGraphType.cs" />
+    <Compile Include="Types\IAbstractGraphType.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />
@@ -106,7 +108,6 @@
     <Compile Include="Types\FieldType.cs" />
     <Compile Include="Types\DecimalGraphType.cs" />
     <Compile Include="Types\FloatGraphType.cs" />
-    <Compile Include="Types\GraphQLAbstractType.cs" />
     <Compile Include="Types\GraphType.cs" />
     <Compile Include="Types\GraphTypesLookup.cs" />
     <Compile Include="Types\IdGraphType.cs" />
