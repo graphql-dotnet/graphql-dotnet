@@ -1,5 +1,5 @@
 {
-  "version": "0.12.0-*",
+  "version": "0.12.0-alpha-*",
   "description": "GraphQL for .NET",
 
   "packOptions": {
