@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using GraphQL.Builders;
 
 namespace GraphQL.Types
@@ -68,7 +69,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(name), $"A field with the name '{name}' is already registered.");
             }
 
-            if (!type.IsSubclassOf(typeof(GraphType)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(GraphType)))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Field type must derive from GraphType.");
             }

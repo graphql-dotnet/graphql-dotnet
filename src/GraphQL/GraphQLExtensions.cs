@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -59,11 +60,11 @@ namespace GraphQL
 
         public static Type GetNamedType(this Type type)
         {
-            if (type.IsGenericType
+            if (type.GetTypeInfo().IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>) ||
                     type.GetGenericTypeDefinition() == typeof(ListGraphType<>)))
             {
-                return GetNamedType(type.GetGenericArguments()[0]);
+                return GetNamedType(type.GenericTypeArguments[0]);
             }
 
             return type;

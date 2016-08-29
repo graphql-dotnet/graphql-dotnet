@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -15,19 +16,19 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void trims_quotes()
         {
-            _type.ParseValue("\"one two\"").ShouldEqual("one two");
+            _type.ParseValue("\"one two\"").ShouldBe("one two");
         }
 
         [Fact]
         public void keeps_quotes_in_string()
         {
-            _type.ParseValue("one \" two").ShouldEqual("one \" two");
+            _type.ParseValue("one \" two").ShouldBe("one \" two");
         }
 
         [Fact]
         public void keeps_single_quote()
         {
-            _type.ParseValue("\"").ShouldEqual("\"");
+            _type.ParseValue("\"").ShouldBe("\"");
         }
     }
 }

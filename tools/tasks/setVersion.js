@@ -11,5 +11,10 @@ export default function setVersion(version) {
     'Updating appveyor.yml version',
     './appveyor.yml',
     data => data.replace(/version: (.*)\./, `version: ${version}.`)
+  )).then(updateFile(
+    version,
+    'Updating GraphQL.project.json version',
+    './src/GraphQL/project.json',
+    data => data.replace(/"version": "(.*)"/, `"version": "${version}-*"`)
   ));
 }

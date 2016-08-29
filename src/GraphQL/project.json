@@ -1,0 +1,51 @@
+{
+  "version": "0.12.0-*",
+  "description": "GraphQL for .NET",
+
+  "packOptions": {
+    "authors": [
+      "Joe McBride"
+    ],
+    "tags": [
+      "GraphQL",
+      "json",
+      "api"
+    ],
+    "projectUrl": "https://github.com/graphql-dotnet/graphql-dotnet",
+    "licenseUrl": "https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md"
+  },
+
+  "buildOptions": {
+    "compile": [
+      "**/*.cs",
+      "../CommonAssemblyInfo.cs"
+    ]
+  },
+
+  "dependencies": {
+    "GraphQL-Parser": "1.0.0",
+    "Newtonsoft.Json": "9.0.1"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "dependencies": {
+          "NETStandard.Library": "1.6.0"
+      },
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    },
+    "net451": {
+      "System.Threading.Tasks": ""
+    },
+    "net46": {
+      "System.Threading.Tasks": ""
+    }
+  },
+
+  "runtimes": {
+    "win": {}
+  }
+}

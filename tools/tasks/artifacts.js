@@ -8,7 +8,7 @@ import settings from './settings';
 export default function nugetRestore() {
   const deferred = new Deferred();
 
-  const nuget = path.resolve(`./nuget/GraphQL.${settings.version}.nupkg`);
+  const nuget = path.resolve(`./nuget/GraphQL.${settings.nugetVersion}.nupkg`);
   const command = `appveyor PushArtifact ${nuget}`;
   console.log(command);
 

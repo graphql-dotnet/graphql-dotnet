@@ -1,6 +1,7 @@
 ﻿using System;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -12,7 +13,7 @@ namespace GraphQL.Tests.Types
             var graphType = new ObjectGraphType();
             graphType.Field<StringGraphType>("id");
 
-            Expect.Throws<ArgumentOutOfRangeException>(
+            Should.Throw<ArgumentOutOfRangeException>(
                 () => graphType.Field<StringGraphType>("id")
             );
         }
@@ -21,7 +22,7 @@ namespace GraphQL.Tests.Types
         public void can_register_field_of_compatible_type()
         {
             var graphType = new ObjectGraphType();
-            graphType.Field(typeof(BooleanGraphType), "isValid").Type.ShouldEqual(typeof(BooleanGraphType));
+            graphType.Field(typeof(BooleanGraphType), "isValid").Type.ShouldBe(typeof(BooleanGraphType));
         }
 
         [Fact]
@@ -29,7 +30,7 @@ namespace GraphQL.Tests.Types
         {
             var graphType = new ObjectGraphType();
 
-            Expect.Throws<ArgumentOutOfRangeException>(
+            Should.Throw<ArgumentOutOfRangeException>(
                 () => graphType.Field(typeof(string), "id")
             );
         }

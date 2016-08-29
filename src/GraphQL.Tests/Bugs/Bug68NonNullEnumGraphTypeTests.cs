@@ -5,7 +5,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using GraphQL.Introspection;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
@@ -88,7 +89,7 @@ namespace GraphQL.Tests.Bugs
     {
         public EnumType()
         {
-            if (!typeof(T).IsEnum)
+            if (!typeof(T).GetTypeInfo().IsEnum)
             {
                 throw new ArgumentException($"{typeof(T).Name} must be of type enum");
             }
@@ -96,7 +97,7 @@ namespace GraphQL.Tests.Bugs
             var type = typeof(T);
             Name = DeriveGraphQlName(type.Name);
 
-            foreach (var enumName in type.GetEnumNames())
+            foreach (var enumName in type.GetTypeInfo().GetEnumNames())
             {
                 var enumMember = type
                   .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -112,8 +113,8 @@ namespace GraphQL.Tests.Bugs
         {
             var found = Values.FirstOrDefault(
               v =>
-                StringComparer.InvariantCultureIgnoreCase.Equals(PureValue(v.Name), PureValue(value)) ||
-                StringComparer.InvariantCultureIgnoreCase.Equals(PureValue(v.Value.ToString()), PureValue(value)));
+                StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Name), PureValue(value)) ||
+                StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Value.ToString()), PureValue(value)));
             return found?.Name;
         }
 
@@ -121,7 +122,7 @@ namespace GraphQL.Tests.Bugs
         {
             var found =
               Values.FirstOrDefault(
-                v => StringComparer.InvariantCultureIgnoreCase.Equals(PureValue(v.Name), PureValue(value)));
+                v => StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Name), PureValue(value)));
             return found?.Value;
         }
 

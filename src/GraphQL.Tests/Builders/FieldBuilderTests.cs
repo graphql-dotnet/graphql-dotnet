@@ -2,7 +2,8 @@
 using System.Linq;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Builders
 {
@@ -16,10 +17,10 @@ namespace GraphQL.Tests.Builders
                 .Name("TheName");
 
             var fields = objectType.Fields.ToList();
-            fields.Count.ShouldEqual(1);
-            fields[0].Name.ShouldEqual("TheName");
-            fields[0].Description.ShouldEqual(null);
-            fields[0].Type.ShouldEqual(typeof(StringGraphType));
+            fields.Count.ShouldBe(1);
+            fields[0].Name.ShouldBe("TheName");
+            fields[0].Description.ShouldBe(null);
+            fields[0].Type.ShouldBe(typeof(StringGraphType));
         }
 
         [Fact]
@@ -31,10 +32,10 @@ namespace GraphQL.Tests.Builders
                 .Description("TheDescription");
 
             var fields = objectType.Fields.ToList();
-            fields.Count.ShouldEqual(1);
-            fields[0].Name.ShouldEqual("TheName");
-            fields[0].Description.ShouldEqual("TheDescription");
-            fields[0].Type.ShouldEqual(typeof(StringGraphType));
+            fields.Count.ShouldBe(1);
+            fields[0].Name.ShouldBe("TheName");
+            fields[0].Description.ShouldBe("TheDescription");
+            fields[0].Type.ShouldBe(typeof(StringGraphType));
         }
 
         [Fact]
@@ -46,7 +47,7 @@ namespace GraphQL.Tests.Builders
                 .DeprecationReason("Old field");
 
             objectType.Fields
-                .First().DeprecationReason.ShouldEqual("Old field");
+                .First().DeprecationReason.ShouldBe("Old field");
         }
 
         [Fact]
@@ -59,13 +60,13 @@ namespace GraphQL.Tests.Builders
                 .Resolve(_ => "SomeString");
 
             var fields = objectType.Fields.ToList();
-            fields.Count.ShouldEqual(1);
-            fields[0].Name.ShouldEqual("TheName");
-            fields[0].Type.ShouldEqual(typeof(StringGraphType));
+            fields.Count.ShouldBe(1);
+            fields[0].Name.ShouldBe("TheName");
+            fields[0].Type.ShouldBe(typeof(StringGraphType));
 
             var context = new ResolveFieldContext();
-            fields[0].Resolve(context).GetType().ShouldEqual(typeof(string));
-            fields[0].Resolve(context).ShouldEqual("SomeString");
+            fields[0].Resolve(context).GetType().ShouldBe(typeof(string));
+            fields[0].Resolve(context).ShouldBe("SomeString");
         }
 
         [Fact]
@@ -80,13 +81,13 @@ namespace GraphQL.Tests.Builders
                 .Name("Field3");
 
             var fields = objectType.Fields.ToList();
-            fields.Count.ShouldEqual(3);
-            fields[0].Name.ShouldEqual("Field1");
-            fields[0].Type.ShouldEqual(typeof(IntGraphType));
-            fields[1].Name.ShouldEqual("Field2");
-            fields[1].Type.ShouldEqual(typeof(FloatGraphType));
-            fields[2].Name.ShouldEqual("Field3");
-            fields[2].Type.ShouldEqual(typeof(DateGraphType));
+            fields.Count.ShouldBe(3);
+            fields[0].Name.ShouldBe("Field1");
+            fields[0].Type.ShouldBe(typeof(IntGraphType));
+            fields[1].Name.ShouldBe("Field2");
+            fields[1].Type.ShouldBe(typeof(FloatGraphType));
+            fields[2].Name.ShouldBe("Field3");
+            fields[2].Type.ShouldBe(typeof(DateGraphType));
         }
 
         [Fact]
@@ -97,7 +98,7 @@ namespace GraphQL.Tests.Builders
                 .Returns<int>()
                 .DefaultValue(15);
 
-            objectType.Fields.First().DefaultValue.ShouldEqual(15);
+            objectType.Fields.First().DefaultValue.ShouldBe(15);
         }
 
         [Fact]
@@ -110,22 +111,22 @@ namespace GraphQL.Tests.Builders
                 .Argument<IntGraphType>("arg3", "desc3");
 
             var field = objectType.Fields.First();
-            field.Arguments.Count.ShouldEqual(3);
+            field.Arguments.Count.ShouldBe(3);
 
-            field.Arguments[0].Name.ShouldEqual("arg1");
-            field.Arguments[0].Description.ShouldEqual("desc1");
-            field.Arguments[0].Type.ShouldEqual(typeof(StringGraphType));
-            field.Arguments[0].DefaultValue.ShouldEqual("12345");
+            field.Arguments[0].Name.ShouldBe("arg1");
+            field.Arguments[0].Description.ShouldBe("desc1");
+            field.Arguments[0].Type.ShouldBe(typeof(StringGraphType));
+            field.Arguments[0].DefaultValue.ShouldBe("12345");
 
-            field.Arguments[1].Name.ShouldEqual("arg2");
-            field.Arguments[1].Description.ShouldEqual("desc2");
-            field.Arguments[1].Type.ShouldEqual(typeof(IntGraphType));
-            field.Arguments[1].DefaultValue.ShouldEqual(9);
+            field.Arguments[1].Name.ShouldBe("arg2");
+            field.Arguments[1].Description.ShouldBe("desc2");
+            field.Arguments[1].Type.ShouldBe(typeof(IntGraphType));
+            field.Arguments[1].DefaultValue.ShouldBe(9);
 
-            field.Arguments[2].Name.ShouldEqual("arg3");
-            field.Arguments[2].Description.ShouldEqual("desc3");
-            field.Arguments[2].Type.ShouldEqual(typeof(IntGraphType));
-            field.Arguments[2].DefaultValue.ShouldEqual(null);
+            field.Arguments[2].Name.ShouldBe("arg3");
+            field.Arguments[2].Description.ShouldBe("desc3");
+            field.Arguments[2].Type.ShouldBe(typeof(IntGraphType));
+            field.Arguments[2].DefaultValue.ShouldBe(null);
         }
 
         [Fact]
@@ -137,18 +138,18 @@ namespace GraphQL.Tests.Builders
                 .Returns<int>()
                 .Resolve(context =>
                 {
-                    context.HasArgument("arg1").ShouldEqual(true);
-                    context.HasArgument("arg0").ShouldEqual(false);
+                    context.HasArgument("arg1").ShouldBe(true);
+                    context.HasArgument("arg0").ShouldBe(false);
                     return 0;
                 });
 
             var field = objectType.Fields.First();
-            field.Arguments.Count.ShouldEqual(1);
+            field.Arguments.Count.ShouldBe(1);
 
-            field.Arguments[0].Name.ShouldEqual("arg1");
-            field.Arguments[0].Description.ShouldEqual("desc1");
-            field.Arguments[0].Type.ShouldEqual(typeof(StringGraphType));
-            field.Arguments[0].DefaultValue.ShouldEqual("12345");
+            field.Arguments[0].Name.ShouldBe("arg1");
+            field.Arguments[0].Description.ShouldBe("desc1");
+            field.Arguments[0].Type.ShouldBe(typeof(StringGraphType));
+            field.Arguments[0].DefaultValue.ShouldBe("12345");
             field.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
@@ -166,7 +167,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<StringGraphType, string>("arg1", "desc1")
                 .Resolve(context =>
                 {
-                    context.GetArgument<string>("arg1").ShouldEqual(null);
+                    context.GetArgument<string>("arg1").ShouldBe(null);
                     return null;
                 });
 
@@ -186,7 +187,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<StringGraphType, string>("arg1", "desc1", "default")
                 .Resolve(context =>
                 {
-                    context.GetArgument("arg1", "default2").ShouldEqual("default2");
+                    context.GetArgument("arg1", "default2").ShouldBe("default2");
                     return null;
                 });
 
@@ -206,7 +207,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<IntGraphType, int?>("skip", "desc1", 1)
                 .Resolve(context =>
                 {
-                    context.GetArgument<int?>("skip").ShouldEqual(1);
+                    context.GetArgument<int?>("skip").ShouldBe(1);
                     return null;
                 });
 
@@ -229,7 +230,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<IntGraphType, int?>("skip", "desc1")
                 .Resolve(context =>
                 {
-                    context.GetArgument<int?>("skip").ShouldEqual(null);
+                    context.GetArgument<int?>("skip").ShouldBe(null);
                     return null;
                 });
 
@@ -252,7 +253,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<IntGraphType, int?>("skip", "desc1")
                 .Resolve(context =>
                 {
-                    context.GetArgument<int?>("skip").ShouldEqual(null);
+                    context.GetArgument<int?>("skip").ShouldBe(null);
                     return null;
                 });
 
@@ -272,7 +273,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<EpisodeEnum, Episodes>("episode", "episodes")
                 .Resolve(context =>
                 {
-                    context.GetArgument<Episodes>("episode").ShouldEqual(Episodes.JEDI);
+                    context.GetArgument<Episodes>("episode").ShouldBe(Episodes.JEDI);
                     return null;
                 });
 
@@ -295,7 +296,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<EpisodeEnum, Episodes>("episode", "episodes")
                 .Resolve(context =>
                 {
-                    context.GetArgument("episode", Episodes.EMPIRE).ShouldEqual(Episodes.EMPIRE);
+                    context.GetArgument("episode", Episodes.EMPIRE).ShouldBe(Episodes.EMPIRE);
                     return null;
                 });
 
@@ -315,7 +316,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
                 .Resolve(context =>
                 {
-                    context.GetArgument<IEnumerable<string>>("episodes").ShouldEqual(new List<string> { "JEDI", "EMPIRE" });
+                    context.GetArgument<IEnumerable<string>>("episodes").ShouldBe(new List<string> { "JEDI", "EMPIRE" });
                     return null;
                 });
 
@@ -338,7 +339,7 @@ namespace GraphQL.Tests.Builders
                 .Argument<StringGraphType, string>("arg1", "desc1", "default")
                 .Resolve(context =>
                 {
-                    context.GetArgument("arg1", "default2").ShouldEqual("arg1value");
+                    context.GetArgument("arg1", "default2").ShouldBe("arg1value");
                     return null;
                 });
 
@@ -360,7 +361,7 @@ namespace GraphQL.Tests.Builders
             objectType.Field<StringGraphType, int>()
                 .Resolve(context =>
                 {
-                    context.Source.ShouldEqual(12345);
+                    context.Source.ShouldBe(12345);
                     return null;
                 });
 

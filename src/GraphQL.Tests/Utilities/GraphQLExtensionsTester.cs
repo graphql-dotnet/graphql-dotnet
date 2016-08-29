@@ -1,4 +1,5 @@
-﻿using Should;
+﻿using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests
 {
@@ -9,7 +10,7 @@ namespace GraphQL.Tests
         {
             var nonNullName = "Human!";
 
-            nonNullName.TrimGraphQLTypes().ShouldEqual("Human");
+            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
         }
 
         [Fact]
@@ -17,7 +18,7 @@ namespace GraphQL.Tests
         {
             var nonNullName = "[Human]";
 
-            nonNullName.TrimGraphQLTypes().ShouldEqual("Human");
+            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
         }
 
         [Fact]
@@ -25,7 +26,7 @@ namespace GraphQL.Tests
         {
             var nonNullName = "[Human]!";
 
-            nonNullName.TrimGraphQLTypes().ShouldEqual("Human");
+            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
         }
     }
 }

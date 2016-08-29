@@ -9,7 +9,7 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
-using Should;
+using Shouldly;
 
 namespace GraphQL.Tests
 {
@@ -81,11 +81,11 @@ namespace GraphQL.Tests
             Console.WriteLine(writtenResult);
 #endif
 
-            writtenResult.ShouldEqual(expectedResult);
+            writtenResult.ShouldBe(expectedResult);
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
-            errors.Count().ShouldEqual(expectedErrorCount);
+            errors.Count().ShouldBe(expectedErrorCount);
 
             return runResult;
         }
@@ -124,7 +124,7 @@ namespace GraphQL.Tests
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldEqual(expectedResult, additionalInfo);
+            writtenResult.ShouldBe(expectedResult, additionalInfo);
 
             return runResult;
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -36,7 +37,7 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.IsSubclassOf(typeof(InterfaceGraphType)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(InterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement InterfaceGraphType", nameof(type));
             }

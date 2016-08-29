@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Execution
             int val = 1;
             _context.Arguments["a"] = val;
             var result = _context.GetArgument<long>("a");
-            result.ShouldEqual(1);
+            result.ShouldBe(1);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Execution
             long val = 1;
             _context.Arguments["a"] = val;
             var result = _context.GetArgument<int>("a");
-            result.ShouldEqual(1);
+            result.ShouldBe(1);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace GraphQL.Tests.Execution
         {
             _context.Arguments["a"] = "one";
             var result = _context.GetArgument<object>("a");
-            result.ShouldEqual("one");
+            result.ShouldBe("one");
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Execution
             long val = 1000000000000001;
             _context.Arguments["a"] = val;
             var result = _context.GetArgument<long>("a");
-            result.ShouldEqual(1000000000000001);
+            result.ShouldBe(1000000000000001);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace GraphQL.Tests.Execution
         {
             _context.Arguments["a"] = SomeEnum.Two;
             var result = _context.GetArgument<SomeEnum>("a");
-            result.ShouldEqual(SomeEnum.Two);
+            result.ShouldBe(SomeEnum.Two);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace GraphQL.Tests.Execution
         {
             _context.Arguments["a"] = "two";
             var result = _context.GetArgument<SomeEnum>("a");
-            result.ShouldEqual(SomeEnum.Two);
+            result.ShouldBe(SomeEnum.Two);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Execution
         {
             _context.Arguments["a"] = 1;
             var result = _context.GetArgument<SomeEnum>("a");
-            result.ShouldEqual(SomeEnum.Two);
+            result.ShouldBe(SomeEnum.Two);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_provided_default_when_missing()
         {
-            _context.GetArgument<string>("wat", "foo").ShouldEqual("foo");
+            _context.GetArgument<string>("wat", "foo").ShouldBe("foo");
         }
 
         [Fact]
@@ -92,9 +92,9 @@ namespace GraphQL.Tests.Execution
             _context.Arguments = "{a: ['one', 'two']}".ToInputs();
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
-            result.Count.ShouldEqual(2);
-            result[0].ShouldEqual("one");
-            result[1].ShouldEqual("two");
+            result.Count.ShouldBe(2);
+            result[0].ShouldBe("one");
+            result[1].ShouldBe("two");
         }
 
         enum SomeEnum

@@ -1,4 +1,6 @@
-﻿namespace GraphQL.Tests.StarWars
+﻿using Xunit;
+
+namespace GraphQL.Tests.StarWars
 {
     public class StarWarsFragmentTests : StarWarsTestBase
     {

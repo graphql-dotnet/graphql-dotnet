@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -15,7 +16,7 @@ namespace GraphQL.Types
     {
         public QueryArgument(Type type)
         {
-            if (type == null || !typeof(GraphType).IsAssignableFrom(type))
+            if (type == null || !typeof(GraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required and must derive from GraphType.");
             }
