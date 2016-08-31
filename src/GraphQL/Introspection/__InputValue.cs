@@ -3,7 +3,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
-    public class __InputValue : ObjectGraphType
+    public class __InputValue : ObjectGraphType<IHaveDefaultValue>
     {
         public __InputValue()
         {
@@ -20,8 +20,8 @@ namespace GraphQL.Introspection
                 "A GraphQL-formatted string representing the default value for this input value.",
                 resolve: context =>
                 {
-                    var hasDefault = context.Source as IHaveDefaultValue;
-                    if (hasDefault == null) return null;
+                    var hasDefault = context.Source;
+                    if (context.Source == null) return null;
 
                     var ast = hasDefault.DefaultValue.AstFromValue(context.Schema, context.Schema.FindType(hasDefault.Type));
                     var result = AstPrinter.Print(ast);

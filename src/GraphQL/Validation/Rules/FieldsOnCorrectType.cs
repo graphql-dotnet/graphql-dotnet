@@ -79,7 +79,7 @@ namespace GraphQL.Validation.Rules
         /// </summary>
         private IEnumerable<string> getSuggestedTypeNames(
           ISchema schema,
-          GraphType type,
+          IGraphType type,
           string fieldName)
         {
             if (type is IAbstractGraphType)
@@ -103,8 +103,8 @@ namespace GraphQL.Validation.Rules
                         var possibleInterface = schema.FindType(possibleInterfaceType);
 
                         if (
-                            possibleInterface is ComplexGraphType && 
-                            ((ComplexGraphType) possibleInterface).HasField(fieldName))
+                            possibleInterface is IComplexGraphType && 
+                            ((IComplexGraphType) possibleInterface).HasField(fieldName))
                         {
                             // This interface type defines this field.
                             interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
@@ -124,12 +124,12 @@ namespace GraphQL.Validation.Rules
         /// that may be the result of a typo.
         /// </summary>
         private IEnumerable<string> getSuggestedFieldNames(
-          GraphType type,
+          IGraphType type,
           string fieldName)
         {
-            if (type is ObjectGraphType || type is InterfaceGraphType)
+            if (type is IComplexGraphType)
             {
-                var complexType = type as ComplexGraphType;
+                var complexType = type as IComplexGraphType;
                 return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
             }
 

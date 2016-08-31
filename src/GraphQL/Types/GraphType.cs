@@ -4,11 +4,13 @@ using GraphQL.Builders;
 
 namespace GraphQL.Types
 {
-    public abstract class GraphType
+    public abstract class GraphType : IGraphType
     {
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public string DeprecationReason { get; set; }
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
@@ -20,7 +22,7 @@ namespace GraphQL.Types
             return Name;
         }
 
-        protected bool Equals(GraphType other)
+        protected bool Equals(IGraphType other)
         {
             return string.Equals(Name, other.Name);
         }
@@ -29,9 +31,9 @@ namespace GraphQL.Types
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
 
-            return Equals((GraphType)obj);
+            return Equals((IGraphType)obj);
         }
 
         public override int GetHashCode()
@@ -46,14 +48,14 @@ namespace GraphQL.Types
     public class TypeCollectionContext
     {
         public TypeCollectionContext(
-            Func<Type, GraphType> resolver,
-            Action<string, GraphType, TypeCollectionContext> addType)
+            Func<Type, IGraphType> resolver,
+            Action<string, IGraphType, TypeCollectionContext> addType)
         {
             ResolveType = resolver;
             AddType = addType;
         }
 
-        public Func<Type, GraphType> ResolveType { get; private set; }
-        public Action<string, GraphType, TypeCollectionContext> AddType { get; private set; }
+        public Func<Type, IGraphType> ResolveType { get; private set; }
+        public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
     }
 }

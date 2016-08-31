@@ -11,6 +11,7 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
+using GraphQL.Resolvers;
 
 namespace GraphQL
 {
@@ -137,13 +138,13 @@ namespace GraphQL
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, ObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
             return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveFieldAsync(context, rootType, source, pair.Value));
         }
 
-        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, ObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Fields fields)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -163,11 +164,6 @@ namespace GraphQL
 
             var arguments = GetArgumentValues(context.Schema, fieldDefinition.Arguments, field.Arguments, context.Variables);
 
-            Func<ResolveFieldContext, object> defaultResolve =
-                ctx => ctx.Source != null
-                    ? GetProperyValue(ctx.Source, ctx.FieldAst.Name)
-                    : null;
-
             try
             {
                 var resolveContext = new ResolveFieldContext();
@@ -184,8 +180,8 @@ namespace GraphQL
                 resolveContext.Operation = context.Operation;
                 resolveContext.Variables = context.Variables;
                 resolveContext.CancellationToken = context.CancellationToken;
-                var resolve = fieldDefinition.Resolve ?? defaultResolve;
-                var result = resolve(resolveContext);
+                var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
+                var result = resolver.Resolve(resolveContext);
 
                 if(result is Task)
                 {
@@ -222,7 +218,7 @@ namespace GraphQL
             return val;
         }
 
-        public async Task<object> CompleteValueAsync(ExecutionContext context, GraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)
         {
             var field = fields != null ? fields.FirstOrDefault() : null;
             var fieldName = field != null ? field.Name : null;
@@ -274,7 +270,7 @@ namespace GraphQL
                 return results;
             }
 
-            var objectType = fieldType as ObjectGraphType;
+            var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is IAbstractGraphType)
             {
@@ -336,7 +332,7 @@ namespace GraphQL
             });
         }
 
-        public FieldType GetFieldDefinition(ISchema schema, ObjectGraphType parentType, Field field)
+        public FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
             {
@@ -354,9 +350,9 @@ namespace GraphQL
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
         }
 
-        public ObjectGraphType GetOperationRootType(ISchema schema, Operation operation)
+        public IObjectGraphType GetOperationRootType(ISchema schema, Operation operation)
         {
-            ObjectGraphType type;
+            IObjectGraphType type;
 
             ExecutionError error;
 
@@ -491,7 +487,7 @@ namespace GraphQL
             return null;
         }
 
-        public bool IsValidValue(ISchema schema, GraphType type, object input)
+        public bool IsValidValue(ISchema schema, IGraphType type, object input)
         {
             if (type is NonNullGraphType)
             {
@@ -530,10 +526,10 @@ namespace GraphQL
                 return IsValidValue(schema, listItemType, input);
             }
 
-            if (type is ObjectGraphType || type is InputObjectGraphType)
+            if (type is IObjectGraphType || type is InputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
-                var complexType = type as ComplexGraphType;
+                var complexType = type as IComplexGraphType;
 
                 if (dict == null)
                 {
@@ -578,7 +574,7 @@ namespace GraphQL
             return scalar.ParseValue(input);
         }
 
-        public object CoerceValue(ISchema schema, GraphType type, IValue input, Variables variables = null)
+        public object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
         {
             if (type is NonNullGraphType)
             {
@@ -609,9 +605,9 @@ namespace GraphQL
                     : new[] { CoerceValue(schema, listItemType, input, variables) };
             }
 
-            if (type is ObjectGraphType || type is InputObjectGraphType)
+            if (type is IObjectGraphType || type is InputObjectGraphType)
             {
-                var complexType = type as ComplexGraphType;
+                var complexType = type as IComplexGraphType;
                 var obj = new Dictionary<string, object>();
 
                 var objectValue = input as ObjectValue;
@@ -646,7 +642,7 @@ namespace GraphQL
 
         public Dictionary<string, Fields> CollectFields(
             ExecutionContext context,
-            GraphType specificType,
+            IGraphType specificType,
             SelectionSet selectionSet,
             Dictionary<string, Fields> fields,
             List<string> visitedFragmentNames)
@@ -754,7 +750,7 @@ namespace GraphQL
             return true;
         }
 
-        public bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, GraphType type)
+        public bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
         {
             if (string.IsNullOrWhiteSpace(fragmentName))
             {

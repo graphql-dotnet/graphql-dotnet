@@ -70,11 +70,11 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// if a variable defintion has a default value, it is effectively non-null.
         /// </summary>
-        private GraphType effectiveType(GraphType varType, VariableDefinition varDef)
+        private GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)
             {
-                return varType;
+                return (GraphType)varType;
             }
 
             var type = varType.GetType();

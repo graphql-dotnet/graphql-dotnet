@@ -3,7 +3,7 @@ using System;
 namespace GraphQL.Types
 {
     public class ListGraphType<T> : ListGraphType
-        where T : GraphType
+        where T : IGraphType
     {
         public ListGraphType()
             : base(typeof(T))

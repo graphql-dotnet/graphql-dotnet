@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GraphQL.Introspection
 {
-    public class __Directive : ObjectGraphType
+    public class __Directive : ObjectGraphType<DirectiveGraphType>
     {
         public __Directive()
         {
@@ -16,38 +16,31 @@ namespace GraphQL.Introspection
                 "execution behavior in ways field arguments will not suffice, such as " +
                 "conditionally including or skipping a field. Directives provide this by " +
                 "describing additional information to the executor.";
-            Field<NonNullGraphType<StringGraphType>>("name");
-            Field<StringGraphType>("description");
+
+            Field(f => f.Name);
+            Field(f => f.Description, nullable: true);
+
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args", resolve: context =>
-            {
-                var fieldType = (DirectiveGraphType) context.Source;
-                return fieldType.Arguments ?? Enumerable.Empty<QueryArgument>();
-            });
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args", 
+                resolve: context => 
+                    context.Source.Arguments ?? Enumerable.Empty<QueryArgument>()
+            );
             Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
-                resolve: context =>
-                {
-                    var directive = context.Source.As<DirectiveGraphType>();
-                    return directive.Locations.Any(l =>
+                resolve: context => context
+                    .Source.Locations.Any(l =>
                         l == DirectiveLocation.Query ||
                         l == DirectiveLocation.Mutation ||
-                        l == DirectiveLocation.Subscription);
-                });
+                        l == DirectiveLocation.Subscription));
             Field<NonNullGraphType<BooleanGraphType>>("onFragment", deprecationReason: "Use 'locations'.",
-                resolve: context =>
-                {
-                    var directive = context.Source.As<DirectiveGraphType>();
-                    return directive.Locations.Any(l =>
+                resolve: context => context
+                    .Source.Locations.Any(l =>
                         l == DirectiveLocation.FragmentSpread ||
                         l == DirectiveLocation.InlineFragment ||
-                        l == DirectiveLocation.FragmentDefinition);
-                });
+                        l == DirectiveLocation.FragmentDefinition));
+
             Field<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
                 resolve: context =>
-                {
-                    var directive = context.Source.As<DirectiveGraphType>();
-                    return directive.Locations.Any(l => l == DirectiveLocation.Field);
-                });
+                    context.Source.Locations.Any(l => l == DirectiveLocation.Field));
         }
     }
 

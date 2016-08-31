@@ -2,7 +2,7 @@
 
 namespace GraphQL.Types
 {
-    public class InputObjectGraphType : ComplexGraphType
+    public class InputObjectGraphType : ComplexGraphType<object>
     {
     }
 }

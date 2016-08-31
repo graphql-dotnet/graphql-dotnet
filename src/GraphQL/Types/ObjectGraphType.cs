@@ -3,8 +3,13 @@ using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
-{
-    public class ObjectGraphType : ComplexGraphType, IImplementInterfaces
+{   
+    public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
+    {
+        Func<object, bool> IsTypeOf { get; set; }
+    }
+
+    public class ObjectGraphType : ComplexGraphType<object>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();
 
@@ -21,7 +26,7 @@ namespace GraphQL.Types
         }
 
         public void Interface<TInterface>()
-            where TInterface : InterfaceGraphType
+            where TInterface : IInterfaceGraphType
         {
             _interfaces.Add(typeof(TInterface));
         }
@@ -32,66 +37,63 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.IsSubclassOf(typeof(InterfaceGraphType)))
+            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
             {
-                throw new ArgumentException("Interface must implement InterfaceGraphType", nameof(type));
+                throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }
             _interfaces.Add(type);
         }
 
-        public ConnectionBuilder<TGraphType, object> Connection<TGraphType>()
-            where TGraphType : ObjectGraphType
+        public ConnectionBuilder<TNodeType, object> Connection<TNodeType>()
+            where TNodeType : IObjectGraphType
         {
-            var builder = ConnectionBuilder.Create<TGraphType, object>();
-            Field(builder.FieldType);
+            var builder = ConnectionBuilder.Create<TNodeType, object>();
+            AddField(builder.FieldType);
             return builder;
         }
     }
 
-    public class ObjectGraphType<TSourceType> : ObjectGraphType
+    public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
-        public FieldType Field(
-            Type type,
-            string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
+        private readonly List<Type> _interfaces = new List<Type>();
+
+        public Func<object, bool> IsTypeOf { get; set; } 
+            = type => type is TSourceType;
+
+        public IEnumerable<Type> Interfaces
         {
-            return Field(
-                type,
-                name,
-                description,
-                arguments,
-                resolve: context => resolve(new ResolveFieldContext<TSourceType>(context)),
-                deprecationReason: deprecationReason
-            );
+            get { return _interfaces; }
+            set
+            {
+                _interfaces.Clear();
+                _interfaces.AddRange(value);
+            }
         }
 
-        public FieldType Field<TType>(
-            string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
-            where TType : GraphType
+        public void Interface<TInterface>()
+            where TInterface : IInterfaceGraphType
         {
-            return Field(typeof(TType), name, description, arguments, resolve, deprecationReason);
+            _interfaces.Add(typeof(TInterface));
         }
 
-        public new FieldBuilder<TGraphType, TSourceType, object> Field<TGraphType>()
-            where TGraphType : GraphType
+        public void Interface(Type type)
         {
-            var builder = FieldBuilder.Create<TGraphType, TSourceType>();
-            Field(builder.FieldType);
-            return builder;
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
+            {
+                throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
+            }
+            _interfaces.Add(type);
         }
 
-        public new ConnectionBuilder<TGraphType, TSourceType> Connection<TGraphType>()
-            where TGraphType : ObjectGraphType
+        public ConnectionBuilder<TNodeType, TSourceType> Connection<TNodeType>()
+            where TNodeType : IObjectGraphType
         {
-            var builder = ConnectionBuilder.Create<TGraphType, TSourceType>();
-            Field(builder.FieldType);
+            var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
+            AddField(builder.FieldType);
             return builder;
         }
     }

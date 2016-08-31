@@ -3,7 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.StarWars
 {
-    public class StarWarsQuery : ObjectGraphType
+    public class StarWarsQuery : ObjectGraphType<object>
     {
         public StarWarsQuery(StarWarsData data)
         {

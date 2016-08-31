@@ -69,35 +69,37 @@ namespace GraphQL.Tests.Types
     public class NullableSchema : Schema
     {
         public NullableSchema()
-        {
-            Query = new ObjectGraphType();
-            Query.Field<NullableSchemaType>("nullable",
+        {   var query = new ObjectGraphType();
+
+            query.Field<NullableSchemaType>("nullable",
                 resolve: c => new NullableSchemaType { Data = c.Source as ExampleContext });
-            Query.Field<NonNullableSchemaType>("nonNullable",
+            query.Field<NonNullableSchemaType>("nonNullable",
                 resolve: c => new NonNullableSchemaType { Data = c.Source as ExampleContext });
+
+            Query = query;
         }
     }
 
-    public class NullableSchemaType : ObjectGraphType
+    public class NullableSchemaType : ObjectGraphType<NullableSchemaType>
     {
         public NullableSchemaType()
         {
-            Field<IntGraphType>("a", resolve: _ => ((NullableSchemaType)_.Source).Data.A);
-            Field<BooleanGraphType>("b", resolve: _ => ((NullableSchemaType)_.Source).Data.B);
-            Field<StringGraphType>("c", resolve: _ => ((NullableSchemaType)_.Source).Data.C);
+            Field<IntGraphType>("a", resolve: _ => _.Source.Data.A);
+            Field<BooleanGraphType>("b", resolve: _ => _.Source.Data.B);
+            Field<StringGraphType>("c", resolve: _ => _.Source.Data.C);
         }
 
         public ExampleContext Data { get; set; }
     }
 
-    public class NonNullableSchemaType : ObjectGraphType
+    public class NonNullableSchemaType : ObjectGraphType<NonNullableSchemaType>
     {
         public NonNullableSchemaType()
         {
 
-            Field<NonNullGraphType<IntGraphType>>("a", resolve: _ => ((NonNullableSchemaType)_.Source).Data.A);
-            Field<NonNullGraphType<BooleanGraphType>>("b", resolve: _ => ((NonNullableSchemaType)_.Source).Data.B);
-            Field<NonNullGraphType<StringGraphType>>("c", resolve: _ => ((NonNullableSchemaType)_.Source).Data.C);
+            Field<NonNullGraphType<IntGraphType>>("a", resolve: _ => _.Source.Data.A);
+            Field<NonNullGraphType<BooleanGraphType>>("b", resolve: _ => _.Source.Data.B);
+            Field<NonNullGraphType<StringGraphType>>("c", resolve: _ => _.Source.Data.C);
         }
 
         public ExampleContext Data { get; set; }

@@ -13,9 +13,9 @@ namespace GraphQL.Types
 
         public FieldType FieldDefinition { get; set; }
 
-        public GraphType ReturnType { get; set; }
+        public IGraphType ReturnType { get; set; }
 
-        public ObjectGraphType ParentType { get; set; }
+        public IObjectGraphType ParentType { get; set; }
 
         public Dictionary<string, object> Arguments { get; set; }
 
@@ -81,5 +81,10 @@ namespace GraphQL.Types
         }
     }
 
-    public class ResolveFieldContext : ResolveFieldContext<object> {}
+    public class ResolveFieldContext : ResolveFieldContext<object> {
+        internal ResolveFieldContext<TSourceType> As<TSourceType>()
+        {
+            return new ResolveFieldContext<TSourceType>(this);
+        }
+    }
 }

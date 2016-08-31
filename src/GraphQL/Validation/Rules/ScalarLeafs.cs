@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
             });
         }
 
-        private void Field(GraphType type, Field field, ValidationContext context)
+        private void Field(IGraphType type, Field field, ValidationContext context)
         {
             if (type == null)
             {

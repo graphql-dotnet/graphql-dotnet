@@ -59,11 +59,11 @@ namespace GraphQL.Introspection
                     }),
                 context =>
                 {
-                    if (context.Source is ObjectGraphType || context.Source is InterfaceGraphType)
+                    if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
                         
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
-                        var type = context.Source as ComplexGraphType;
+                        var type = context.Source as IComplexGraphType;
                         return !includeDeprecated
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
@@ -149,11 +149,11 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.SCALAR;
             }
-            if (type is ObjectGraphType)
+            if (type is IObjectGraphType)
             {
                 return TypeKind.OBJECT;
             }
-            if (type is InterfaceGraphType)
+            if (type is IInterfaceGraphType)
             {
                 return TypeKind.INTERFACE;
             }
@@ -187,11 +187,11 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.SCALAR;
             }
-            if (typeof(ObjectGraphType).IsAssignableFrom(type))
+            if (typeof(IObjectGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.OBJECT;
             }
-            if (typeof(InterfaceGraphType).IsAssignableFrom(type))
+            if (typeof(IInterfaceGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.INTERFACE;
             }

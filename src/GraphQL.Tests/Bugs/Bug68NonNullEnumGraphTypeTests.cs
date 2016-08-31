@@ -54,11 +54,13 @@ namespace GraphQL.Tests.Bugs
         {
             public NullableSchema(bool includeNullable, bool includeNonNullable)
             {
-                Query = new ObjectGraphType();
+                var query = new ObjectGraphType();
                 if (includeNullable)
-                    Query.Field<NullableSchemaType>("nullable", resolve: c => new NullableSchemaType());
+                    query.Field<NullableSchemaType>("nullable", resolve: c => new NullableSchemaType());
                 if (includeNonNullable)
-                    Query.Field<NonNullableSchemaType>("nonNullable", resolve: c => new NonNullableSchemaType());
+                    query.Field<NonNullableSchemaType>("nonNullable", resolve: c => new NonNullableSchemaType());
+
+                Query = query;
             }
         }
 

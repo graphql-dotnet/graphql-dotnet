@@ -63,8 +63,13 @@
     <Compile Include="Language\CoreToVanillaConverter.cs" />
     <Compile Include="Language\NodeExtensions.cs" />
     <Compile Include="Builders\ResolveConnectionContext.cs" />
+    <Compile Include="Resolvers\ExpressionFieldResolver.cs" />
+    <Compile Include="Resolvers\NameFieldResolver.cs" />
+    <Compile Include="Resolvers\FuncFieldResolver.cs" />
+    <Compile Include="Resolvers\IFieldResolver.cs" />
     <Compile Include="Types\ComplexGraphType.cs" />
     <Compile Include="Types\IAbstractGraphType.cs" />
+    <Compile Include="Types\IGraphType.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />

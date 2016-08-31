@@ -9,9 +9,9 @@ namespace GraphQL.Validation
     public class TypeInfo : INodeVisitor
     {
         private readonly ISchema _schema;
-        private readonly Stack<GraphType> _typeStack = new Stack<GraphType>();
-        private readonly Stack<GraphType> _inputTypeStack = new Stack<GraphType>();
-        private readonly Stack<GraphType> _parentTypeStack = new Stack<GraphType>();
+        private readonly Stack<IGraphType> _typeStack = new Stack<IGraphType>();
+        private readonly Stack<IGraphType> _inputTypeStack = new Stack<IGraphType>();
+        private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
         private readonly Stack<FieldType> _fieldDefStack = new Stack<FieldType>();
         private readonly Stack<INode> _ancestorStack = new Stack<INode>();
         private DirectiveGraphType _directive;
@@ -27,17 +27,17 @@ namespace GraphQL.Validation
             return _ancestorStack.Select(x => x).Skip(1).Reverse().ToArray();
         }
 
-        public GraphType GetLastType()
+        public IGraphType GetLastType()
         {
             return _typeStack.Any() ? _typeStack.Peek() : null;
         }
 
-        public GraphType GetInputType()
+        public IGraphType GetInputType()
         {
             return _inputTypeStack.Any() ? _inputTypeStack.Peek() : null;
         }
 
-        public GraphType GetParentType()
+        public IGraphType GetParentType()
         {
             return _parentTypeStack.Any() ? _parentTypeStack.Peek() : null;
         }
@@ -87,7 +87,7 @@ namespace GraphQL.Validation
             if (node is Operation)
             {
                 var op = (Operation) node;
-                GraphType type = null;
+                IGraphType type = null;
                 if (op.OperationType == OperationType.Query)
                 {
                     type = _schema.Query;
@@ -132,7 +132,7 @@ namespace GraphQL.Validation
             {
                 var argAst = (Argument) node;
                 QueryArgument argDef = null;
-                GraphType argType = null;
+                IGraphType argType = null;
 
                 var args = GetDirective() != null ? GetDirective()?.Arguments : GetFieldDef()?.Arguments;
 
@@ -155,11 +155,11 @@ namespace GraphQL.Validation
             if (node is ObjectField)
             {
                 var objectType = GetInputType().GetNamedType(_schema);
-                GraphType fieldType = null;
+                IGraphType fieldType = null;
 
                 if (objectType is InputObjectGraphType)
                 {
-                    var complexType = objectType as ComplexGraphType;
+                    var complexType = objectType as IComplexGraphType;
                     var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
                     fieldType = inputField != null ? _schema.FindType(inputField.Type) : null;
                 }
@@ -219,7 +219,7 @@ namespace GraphQL.Validation
             }
         }
 
-        private FieldType GetFieldDef(ISchema schema, GraphType parentType, Field field)
+        private FieldType GetFieldDef(ISchema schema, IGraphType parentType, Field field)
         {
             var name = field.Name;
 
@@ -235,17 +235,14 @@ namespace GraphQL.Validation
                 return SchemaIntrospection.TypeMeta;
             }
 
-            if (name == SchemaIntrospection.TypeNameMeta.Name
-                && (parentType is ObjectGraphType
-                    || parentType is InterfaceGraphType
-                    || parentType is UnionGraphType))
+            if (name == SchemaIntrospection.TypeNameMeta.Name && parentType.IsCompositeType())
             {
                 return SchemaIntrospection.TypeNameMeta;
             }
 
-            if (parentType is ObjectGraphType || parentType is InterfaceGraphType)
+            if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)
             {
-                var complexType = parentType as ComplexGraphType;
+                var complexType = parentType as IComplexGraphType;
                 return complexType.Fields.FirstOrDefault(x => x.Name == field.Name);
             }
 

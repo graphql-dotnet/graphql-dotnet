@@ -4,13 +4,41 @@ using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
-    public class InterfaceGraphType : ComplexGraphType, IAbstractGraphType
+    public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType
     {
-        private readonly List<ObjectGraphType> _possibleTypes = new List<ObjectGraphType>();
+    }
 
-        public List<ObjectGraphType> PossibleTypes => _possibleTypes;
+    public class InterfaceGraphType : ComplexGraphType<object>, IInterfaceGraphType
+    {
+        private readonly List<IObjectGraphType> _possibleTypes = new List<IObjectGraphType>();
 
-        public Func<object, ObjectGraphType> ResolveType { get; set; }
+        public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
 
+        public Func<object, IObjectGraphType> ResolveType { get; set; }
+
+        public void AddPossibleType(IObjectGraphType type)
+        {
+            if (type != null && !_possibleTypes.Contains(type))
+            {
+                _possibleTypes.Add(type);
+            }
+        }
+    }
+
+    public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
+    {
+        private readonly List<IObjectGraphType> _possibleTypes = new List<IObjectGraphType>();
+
+        public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
+
+        public Func<object, IObjectGraphType> ResolveType { get; set; }
+
+        public void AddPossibleType(IObjectGraphType type)
+        {
+            if (type != null && !_possibleTypes.Contains(type))
+            {
+                _possibleTypes.Add(type);
+            }
+        }
     }
 }
