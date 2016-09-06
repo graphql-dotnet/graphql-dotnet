@@ -285,7 +285,7 @@ namespace GraphQL.Tests.Execution
                ),
                context =>
                {
-                   var input = context.Argument<Gender>("gender");
+                   var input = context.GetArgument<Gender>("gender");
                    return new User
                    {
                        Id = 1,
@@ -303,7 +303,7 @@ namespace GraphQL.Tests.Execution
                ),
                context =>
                {
-                   var input = context.Argument<HairColor>("hairColor");
+                   var input = context.GetArgument<HairColor>("hairColor");
                    return new User
                    {
                        Id = 1,
