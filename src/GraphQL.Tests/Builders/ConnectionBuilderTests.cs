@@ -25,6 +25,14 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void should_have_optional_deprecation_reason()
+        {
+            var objectType = new ParentType();
+            objectType.Fields.ElementAt(0).DeprecationReason.ShouldEqual("Deprecated");
+            objectType.Fields.ElementAt(1).DeprecationReason.ShouldEqual(null);
+        }
+
+        [Fact]
         public void should_have_field_information()
         {
             var connectionType = new ConnectionType<ChildType>();
@@ -121,7 +129,7 @@ namespace GraphQL.Tests.Builders
             var field = type.Fields.Single();
             field.Name.ShouldEqual("testConnection");
             field.Type.ShouldEqual(typeof(ConnectionType<ObjectGraphType>));
-            var result = field.Resolve(null) as Connection<Child>;
+            var result = field.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
@@ -145,18 +153,17 @@ namespace GraphQL.Tests.Builders
             {
                 Name = "Parent";
 
-                Connection<ChildType>()
+                Connection<ChildType, Parent>()
                     .Name("connection1")
-                    .WithObject<Parent>()
                     .Unidirectional()
-                    .Resolve(context => context.Object.Connection1);
+                    .DeprecationReason("Deprecated")
+                    .Resolve(context => context.Source.Connection1);
 
-                Connection<ChildType>()
+                Connection<ChildType, Parent>()
                     .Name("connection2")
                     .Description("RandomDescription")
-                    .WithObject<Parent>()
                     .Bidirectional()
-                    .Resolve(context => context.Object.Connection2);
+                    .Resolve(context => context.Source.Connection2);
             }
         }
 

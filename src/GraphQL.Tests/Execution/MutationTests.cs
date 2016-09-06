@@ -89,7 +89,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var root = context.Source as Root;
-                    var change = context.Argument<int>("newNumber");
+                    var change = context.GetArgument<int>("newNumber");
                     return root.ImmediatelyChangeTheNumber(change);
                 }
             );
@@ -106,7 +106,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var root = context.Source as Root;
-                    var change = context.Argument<int>("newNumber");
+                    var change = context.GetArgument<int>("newNumber");
                     return root.PromiseToChangeTheNumberAsync(change);
                 }
             );
@@ -123,7 +123,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var root = context.Source as Root;
-                    var change = context.Argument<int>("newNumber");
+                    var change = context.GetArgument<int>("newNumber");
                     return root.FailToChangeTheNumber(change);
                 }
             );
@@ -140,7 +140,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var root = context.Source as Root;
-                    var change = context.Argument<int>("newNumber");
+                    var change = context.GetArgument<int>("newNumber");
                     return root.PromiseAndFailToChangeTheNumberAsync(change);
                 }
             );

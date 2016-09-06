@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
@@ -27,7 +28,7 @@ namespace GraphQL.Validation
                 node.Children.Apply(Visit);
             }
 
-            _visitors.Apply(l => l.Leave(node));
+            _visitors.ApplyReverse(l => l.Leave(node));
         }
     }
 }

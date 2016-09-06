@@ -38,7 +38,7 @@ namespace GraphQL.Tests.Bugs
                 arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request"}),
                 resolve: context =>
                 {
-                    var val = context.Argument<decimal>("request");
+                    var val = context.GetArgument<decimal>("request");
                     return val;
                 });
         }

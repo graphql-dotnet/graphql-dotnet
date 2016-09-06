@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props" Condition="Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -33,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime, Version=4.5.0.0, Culture=neutral, PublicKeyToken=e9931a4108ef2354, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Antlr4.Runtime.4.5-alpha002\lib\net45\Antlr4.Runtime.dll</HintPath>
+    <Reference Include="GraphQLParser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\GraphQL-Parser.1.0.0\lib\net45\GraphQLParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -56,9 +55,15 @@
     </Compile>
     <Compile Include="Builders\ConnectionBuilder.cs" />
     <Compile Include="Builders\FieldBuilder.cs" />
+    <Compile Include="LightweightCache.cs" />
+    <Compile Include="Execution\GraphQLDocumentBuilder.cs" />
     <Compile Include="Invariant.cs" />
+    <Compile Include="Language\AST\Alias.cs" />
+    <Compile Include="Language\AST\NameNode.cs" />
+    <Compile Include="Language\CoreToVanillaConverter.cs" />
+    <Compile Include="Language\NodeExtensions.cs" />
+    <Compile Include="Builders\ResolveConnectionContext.cs" />
     <Compile Include="Utilities\StringUtils.cs" />
-    <Compile Include="Execution\AntlrDocumentBuilder.cs" />
     <Compile Include="Execution\ExecutionResultJsonConverter.cs" />
     <Compile Include="Execution\ResolveFieldResult.cs" />
     <Compile Include="Introspection\SchemaIntrospection.cs" />
@@ -72,17 +77,17 @@
     <Compile Include="Introspection\__InputValue.cs" />
     <Compile Include="Introspection\__Type.cs" />
     <Compile Include="Introspection\__TypeKind.cs" />
-    <Compile Include="Language\AbstractNode.cs" />
-    <Compile Include="Language\IDefinition.cs" />
-    <Compile Include="Language\IHaveSelectionSet.cs" />
-    <Compile Include="Language\INode.cs" />
-    <Compile Include="Language\IntValue.cs" />
-    <Compile Include="Language\IType.cs" />
-    <Compile Include="Language\ListType.cs" />
-    <Compile Include="Language\NamedType.cs" />
-    <Compile Include="Language\NonNullType.cs" />
-    <Compile Include="Language\SourceLocation.cs" />
-    <Compile Include="Language\IValue.cs" />
+    <Compile Include="Language\AST\AbstractNode.cs" />
+    <Compile Include="Language\AST\IDefinition.cs" />
+    <Compile Include="Language\AST\IHaveSelectionSet.cs" />
+    <Compile Include="Language\AST\INode.cs" />
+    <Compile Include="Language\AST\IntValue.cs" />
+    <Compile Include="Language\AST\IType.cs" />
+    <Compile Include="Language\AST\ListType.cs" />
+    <Compile Include="Language\AST\NamedType.cs" />
+    <Compile Include="Language\AST\NonNullType.cs" />
+    <Compile Include="Language\AST\SourceLocation.cs" />
+    <Compile Include="Language\AST\IValue.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Types\BooleanGraphType.cs" />
@@ -130,26 +135,25 @@
     <Compile Include="Validation\DocumentValidator.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Execution\IDocumentBuilder.cs" />
-    <Compile Include="Language\Argument.cs" />
-    <Compile Include="Language\Arguments.cs" />
-    <Compile Include="Language\Directive.cs" />
-    <Compile Include="Language\Directives.cs" />
-    <Compile Include="Language\Document.cs" />
-    <Compile Include="Language\Field.cs" />
-    <Compile Include="Language\Fields.cs" />
-    <Compile Include="Language\FragmentDefinition.cs" />
-    <Compile Include="Language\Fragments.cs" />
-    <Compile Include="Language\FragmentSpread.cs" />
-    <Compile Include="Language\GraphQLVisitor.cs" />
-    <Compile Include="Language\IFragment.cs" />
-    <Compile Include="Language\InlineFragment.cs" />
-    <Compile Include="Language\Operation.cs" />
-    <Compile Include="Language\Operations.cs" />
-    <Compile Include="Language\OperationType.cs" />
-    <Compile Include="Language\Selection.cs" />
-    <Compile Include="Language\SelectionSet.cs" />
-    <Compile Include="Language\Variable.cs" />
-    <Compile Include="Language\Variables.cs" />
+    <Compile Include="Language\AST\Argument.cs" />
+    <Compile Include="Language\AST\Arguments.cs" />
+    <Compile Include="Language\AST\Directive.cs" />
+    <Compile Include="Language\AST\Directives.cs" />
+    <Compile Include="Language\AST\Document.cs" />
+    <Compile Include="Language\AST\Field.cs" />
+    <Compile Include="Language\AST\Fields.cs" />
+    <Compile Include="Language\AST\FragmentDefinition.cs" />
+    <Compile Include="Language\AST\Fragments.cs" />
+    <Compile Include="Language\AST\FragmentSpread.cs" />
+    <Compile Include="Language\AST\IFragment.cs" />
+    <Compile Include="Language\AST\InlineFragment.cs" />
+    <Compile Include="Language\AST\Operation.cs" />
+    <Compile Include="Language\AST\Operations.cs" />
+    <Compile Include="Language\AST\OperationType.cs" />
+    <Compile Include="Language\AST\Selection.cs" />
+    <Compile Include="Language\AST\SelectionSet.cs" />
+    <Compile Include="Language\AST\Variable.cs" />
+    <Compile Include="Language\AST\Variables.cs" />
     <Compile Include="Execution\DocumentExecuter.cs" />
     <Compile Include="Http\DocumentWriter.cs" />
     <Compile Include="Validation\IValidationResult.cs" />
@@ -159,12 +163,20 @@
     <Compile Include="GraphQLExtensions.cs" />
     <Compile Include="Validation\Rules\ArgumentsOfCorrectType.cs" />
     <Compile Include="Validation\Rules\DefaultValuesOfCorrectType.cs" />
+    <Compile Include="Validation\Rules\FieldsOnCorrectType.cs" />
+    <Compile Include="Validation\Rules\FragmentsOnCompositeTypes.cs" />
     <Compile Include="Validation\Rules\KnownArgumentNames.cs" />
+    <Compile Include="Validation\Rules\KnownFragmentNames.cs" />
+    <Compile Include="Validation\Rules\KnownDirectives.cs" />
     <Compile Include="Validation\Rules\KnownTypeNames.cs" />
     <Compile Include="Validation\Rules\LoneAnonymousOperation.cs" />
     <Compile Include="Validation\EnterLeaveListener.cs" />
+    <Compile Include="Validation\Rules\NoFragmentCycles.cs" />
     <Compile Include="Validation\Rules\NoUndefinedVariables.cs" />
+    <Compile Include="Validation\Rules\NoUnusedFragments.cs" />
     <Compile Include="Validation\Rules\NoUnusedVariables.cs" />
+    <Compile Include="Validation\Rules\PossibleFragmentSpreads.cs" />
+    <Compile Include="Validation\Rules\ProvidedNonNullArguments.cs" />
     <Compile Include="Validation\Rules\ScalarLeafs.cs" />
     <Compile Include="Validation\Rules\UniqueArgumentNames.cs" />
     <Compile Include="Validation\Rules\UniqueFragmentNames.cs" />
@@ -179,23 +191,15 @@
     <Compile Include="Validation\ValidationResult.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Antlr4 Include="GraphQL.g4">
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>GraphQL.Parsing</CustomToolNamespace>
-    </Antlr4>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.props'))" />
-    <Error Condition="!Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets'))" />
   </Target>
-  <Import Project="..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets" Condition="Exists('..\..\packages\Antlr4.4.5-alpha002\build\Antlr4.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

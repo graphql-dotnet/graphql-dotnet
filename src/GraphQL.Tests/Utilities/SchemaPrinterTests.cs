@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Should;
@@ -26,7 +27,14 @@ namespace GraphQL.Tests.Utilities
                 Query = root
             };
 
-            return print(schema);
+            var result = print(schema);
+
+            // ensure schema isn't disposed
+            if (schema.Query.Name == "")
+            {
+            }
+
+            return result;
         }
 
         private string print(ISchema schema)
@@ -400,6 +408,27 @@ type Root {
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
+enum __DirectiveLocation {
+  QUERY
+  MUTATION
+  SUBSCRIPTION
+  FIELD
+  FRAGMENT_DEFINITION
+  FRAGMENT_SPREAD
+  INLINE_FRAGMENT
+  SCHEMA
+  SCALAR
+  OBJECT
+  FIELD_DEFINITION
+  ARGUMENT_DEFINITION
+  INTERFACE
+  UNION
+  ENUM
+  ENUM_VALUE
+  INPUT_OBJECT
+  INPUT_FIELD_DEFINITION
+}
+
 enum __TypeKind {
   SCALAR
   OBJECT
@@ -414,6 +443,7 @@ enum __TypeKind {
 type __Directive {
   name: String!
   description: String
+  locations: [__DirectiveLocation!]!
   args: [__InputValue!]!
   onOperation: Boolean!
   onFragment: Boolean!
@@ -447,6 +477,7 @@ type __Schema {
   types: [__Type!]!
   queryType: __Type!
   mutationType: __Type
+  subscriptionType: __Type
   directives: [__Directive!]!
 }
 

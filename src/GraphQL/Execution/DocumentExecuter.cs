@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Introspection;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
@@ -32,7 +32,7 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
 
         public DocumentExecuter()
-            : this(new AntlrDocumentBuilder(), new DocumentValidator())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
         {
         }
 
@@ -51,14 +51,13 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var document = _documentBuilder.Build(query);
             var result = new ExecutionResult();
-
-            var validationResult = _documentValidator.Validate(schema, document, rules);
-
-            if (validationResult.IsValid)
+            try
             {
-                try
+                var document = _documentBuilder.Build(query);
+                var validationResult = _documentValidator.Validate(query, schema, document, rules);
+
+                if (validationResult.IsValid)
                 {
                     var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
 
@@ -74,24 +73,25 @@ namespace GraphQL
                         result.Errors = context.Errors;
                     }
                 }
-                catch (Exception exc)
+                else
                 {
-                    if (result.Errors == null)
-                    {
-                        result.Errors = new ExecutionErrors();
-                    }
-
                     result.Data = null;
-                    result.Errors.Add(new ExecutionError(exc.Message, exc));
+                    result.Errors = validationResult.Errors;
                 }
-            }
-            else
-            {
-                result.Data = null;
-                result.Errors = validationResult.Errors;
-            }
 
-            return result;
+                return result;
+            }
+            catch (Exception exc)
+            {
+                if (result.Errors == null)
+                {
+                    result.Errors = new ExecutionErrors();
+                }
+
+                result.Data = null;
+                result.Errors.Add(new ExecutionError(exc.Message, exc));
+                return result;
+            }
         }
 
         public ExecutionContext BuildExecutionContext(
@@ -131,7 +131,7 @@ namespace GraphQL
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(), 
+                new Dictionary<string, Fields>(),
                 new List<string>());
 
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
@@ -358,6 +358,8 @@ namespace GraphQL
         {
             ObjectGraphType type;
 
+            ExecutionError error;
+
             switch (operation.OperationType)
             {
                 case OperationType.Query:
@@ -366,13 +368,28 @@ namespace GraphQL
 
                 case OperationType.Mutation:
                     type = schema.Mutation;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for mutations");
+                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        throw error;
+                    }
                     break;
 
                 case OperationType.Subscription:
-                    throw new ExecutionError("Subscriptions are not yet supported.");
+                    type = schema.Subscription;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        throw error;
+                    }
+                    break;
 
                 default:
-                    throw new ExecutionError("Can only execute queries and mutations");
+                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
+                    error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                    throw error;
             }
 
             return type;
@@ -389,7 +406,7 @@ namespace GraphQL
                 object variableValue;
                 if (inputs != null && inputs.TryGetValue(v.Name, out variableValue))
                 {
-                    var valueAst = AstFromValue(schema, variableValue, v.Type.GraphTypeFromType(schema));
+                    var valueAst = variableValue.AstFromValue(schema, v.Type.GraphTypeFromType(schema));
                     variable.Value = GetVariableValue(schema, v, valueAst);
                 }
                 else
@@ -400,68 +417,6 @@ namespace GraphQL
                 variables.Add(variable);
             });
             return variables;
-        }
-
-        public IValue AstFromValue(ISchema schema, object value, GraphType type)
-        {
-            if (type is NonNullGraphType)
-            {
-                var nonnull = (NonNullGraphType) type;
-                return AstFromValue(schema, value, schema.FindType(nonnull.Type));
-            }
-
-            if (value is Dictionary<string, object>)
-            {
-                var dict = (Dictionary<string, object>) value;
-
-                var fields = dict
-                    .Select(pair => new ObjectField(pair.Key, AstFromValue(schema, pair.Value, null)))
-                    .ToList();
-
-                return new ObjectValue(fields);
-            }
-
-            if (!(value is string) && value is IEnumerable)
-            {
-                GraphType itemType = null;
-
-                var listType = type as ListGraphType;
-                if (listType != null)
-                {
-                    itemType = schema.FindType(listType.Type);
-                }
-
-                var list = (IEnumerable) value;
-                var values = list.Map(item => AstFromValue(schema, item, itemType));
-                return new ListValue(values);
-            }
-
-            if (value is bool)
-            {
-                return new BooleanValue((bool) value);
-            }
-
-            if (value is int)
-            {
-                return new IntValue((int) value);
-            }
-
-            if (value is long)
-            {
-                return new LongValue((long) value);
-            }
-
-            if (value is double)
-            {
-                return new FloatValue((double)value);
-            }
-
-            if (value is DateTime)
-            {
-                return new DateTimeValue((DateTime)value);
-            }
-
-            return new StringValue(value?.ToString());
         }
 
         public object GetVariableValue(ISchema schema, VariableDefinition variable, IValue input)
@@ -766,8 +721,10 @@ namespace GraphQL
                 {
                     var inline = (InlineFragment)selection;
 
+                    var name = inline.Type != null ? inline.Type.Name : specificType.Name;
+
                     if (!ShouldIncludeNode(context, inline.Directives)
-                      || !DoesFragmentConditionMatch(context, inline.Type.Name, specificType))
+                      || !DoesFragmentConditionMatch(context, name, specificType))
                     {
                         return;
                     }

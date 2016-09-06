@@ -1,10 +1,18 @@
 import fs from 'fs';
 import builder from 'xmlbuilder';
 
+function escapeRegExp(str) {
+    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 export default (options) => {
   console.log('Writing nuspec');
 
-  const xml = builder.create({
+  let xml = builder.create({
     package: {
       metadata: {
         id: options.id,
@@ -20,10 +28,11 @@ export default (options) => {
       }
     }
   })
-  .end({ pretty: true })
-  .replace('&lt;', '<')
-  .replace('&gt;', '>')
-  .replace(/&#xD;/g, '');
+  .end({ pretty: true });
+
+  xml = replaceAll(xml, '&lt;', '<');
+  xml = replaceAll(xml, '&gt;', '>');
+  xml = replaceAll(xml, '&#xD;', '');
 
   // console.log(`\n${xml}\n`);
 

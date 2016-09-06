@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Rules;
 
@@ -9,6 +10,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         IValidationResult Validate(
+            string originalQuery,
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null);
@@ -17,12 +19,14 @@ namespace GraphQL.Validation
     public class DocumentValidator : IDocumentValidator
     {
         public IValidationResult Validate(
+            string originalQuery,
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null)
         {
             var context = new ValidationContext
             {
+                OriginalQuery = originalQuery,
                 Schema = schema,
                 Document = document,
                 TypeInfo = new TypeInfo(schema)
@@ -56,15 +60,23 @@ namespace GraphQL.Validation
                 new UniqueOperationNames(),
                 new LoneAnonymousOperation(),
                 new KnownTypeNames(),
+                new FragmentsOnCompositeTypes(),
                 new VariablesAreInputTypes(),
                 new ScalarLeafs(),
+                new FieldsOnCorrectType(),
                 new UniqueFragmentNames(),
+                new KnownFragmentNames(),
+                new NoUnusedFragments(),
+                new PossibleFragmentSpreads(),
+                new NoFragmentCycles(),
                 new NoUndefinedVariables(),
                 new NoUnusedVariables(),
                 new UniqueVariableNames(),
+                new KnownDirectives(),
                 new KnownArgumentNames(),
                 new UniqueArgumentNames(),
                 new ArgumentsOfCorrectType(),
+                new ProvidedNonNullArguments(),
                 new DefaultValuesOfCorrectType(),
                 new VariablesInAllowedPosition(),
                 new UniqueInputFieldNames()

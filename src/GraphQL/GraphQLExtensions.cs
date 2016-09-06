@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -14,6 +15,13 @@ namespace GraphQL
         public static string TrimGraphQLTypes(this string name)
         {
             return Regex.Replace(name, "[\\[!\\]]", "").Trim();
+        }
+
+        public static bool IsCompositeType(this GraphType type)
+        {
+            return type is ObjectGraphType ||
+                   type is InterfaceGraphType ||
+                   type is UnionGraphType;
         }
 
         public static bool IsLeafType(this GraphType type, ISchema schema)
@@ -167,6 +175,10 @@ namespace GraphQL
             return member.Member.Name;
         }
 
+        /// <summary>
+        /// Provided a type and a super type, return true if the first type is either
+        /// equal or a subset of the second super type (covariant).
+        /// </summary>
         public static bool IsSubtypeOf(this GraphType maybeSubType, GraphType superType, ISchema schema)
         {
             if (maybeSubType.Equals(superType))
@@ -219,6 +231,105 @@ namespace GraphQL
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Provided two composite types, determine if they "overlap". Two composite
+        /// types overlap when the Sets of possible concrete types for each intersect.
+        ///
+        /// This is often used to determine if a fragment of a given type could possibly
+        /// be visited in a context of another type.
+        ///
+        /// This function is commutative.
+        /// </summary>
+        public static bool DoTypesOverlap(this ISchema schema, GraphType typeA, GraphType typeB)
+        {
+            if (typeA.Equals(typeB))
+            {
+                return true;
+            }
+
+            var a = typeA as GraphQLAbstractType;
+            var b = typeB as GraphQLAbstractType;
+
+            if (a != null)
+            {
+                if (b != null)
+                {
+                    return a.PossibleTypes.Any(type => b.IsPossibleType(type));
+                }
+
+                return a.IsPossibleType(typeB);
+            }
+
+            if (b != null)
+            {
+                return b.IsPossibleType(typeA);
+            }
+
+            return false;
+        }
+
+        public static IValue AstFromValue(this object value, ISchema schema, GraphType type)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nonnull = (NonNullGraphType)type;
+                return AstFromValue(value, schema, schema.FindType(nonnull.Type));
+            }
+
+            if (value is Dictionary<string, object>)
+            {
+                var dict = (Dictionary<string, object>)value;
+
+                var fields = dict
+                    .Select(pair => new ObjectField(pair.Key, AstFromValue(pair.Value, schema, null)))
+                    .ToList();
+
+                return new ObjectValue(fields);
+            }
+
+            if (!(value is string) && value is IEnumerable)
+            {
+                GraphType itemType = null;
+
+                var listType = type as ListGraphType;
+                if (listType != null)
+                {
+                    itemType = schema.FindType(listType.Type);
+                }
+
+                var list = (IEnumerable)value;
+                var values = list.Map(item => AstFromValue(item, schema, itemType));
+                return new ListValue(values);
+            }
+
+            if (value is bool)
+            {
+                return new BooleanValue((bool)value);
+            }
+
+            if (value is int)
+            {
+                return new IntValue((int)value);
+            }
+
+            if (value is long)
+            {
+                return new LongValue((long)value);
+            }
+
+            if (value is double)
+            {
+                return new FloatValue((double)value);
+            }
+
+            if (value is DateTime)
+            {
+                return new DateTimeValue((DateTime)value);
+            }
+
+            return new StringValue(value?.ToString());
         }
     }
 }

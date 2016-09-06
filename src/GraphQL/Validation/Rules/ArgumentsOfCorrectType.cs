@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -27,9 +27,10 @@ namespace GraphQL.Validation.Rules
                     if (errors.Any())
                     {
                         var error = new ValidationError(
+                            context.OriginalQuery,
                             "5.3.3.1",
-                            BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors));
-                        error.AddLocation(argAst.SourceLocation.Line, argAst.SourceLocation.Column);
+                            BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors),
+                            argAst);
                         context.ReportError(error);
                     }
                 });

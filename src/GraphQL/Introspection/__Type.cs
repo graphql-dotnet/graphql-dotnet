@@ -9,13 +9,22 @@ namespace GraphQL.Introspection
         public __Type()
         {
             Name = "__Type";
+            Description =
+                "The fundamental unit of any GraphQL Schema is the type. There are " +
+                "many kinds of types in GraphQL as represented by the `__TypeKind` enum." +
+                $"{Environment.NewLine}{Environment.NewLine}Depending on the kind of a type, certain fields describe " +
+                "information about that type. Scalar types provide no information " +
+                "beyond a name and description, while Enum types provide their values. " +
+                "Object and Interface types provide the fields they describe. Abstract " +
+                "types, Union and Interface, provide the Object types possible " +
+                "at runtime. List and NonNull types compose other types.";
             Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
                 if (context.Source is GraphType)
                 {
                     return KindForInstance((GraphType)context.Source);
                 }
-                else if (context.Source is Type)
+                if (context.Source is Type)
                 {
                     return KindForType((Type)context.Source);
                 }
@@ -42,31 +51,28 @@ namespace GraphQL.Introspection
             });
             Field<StringGraphType>("description");
             Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
-                new QueryArguments(new[]
-                {
+                new QueryArguments(
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
                         DefaultValue = false
-                    }
-                }),
+                    }),
                 context =>
                 {
                     if (context.Source is ObjectGraphType || context.Source is InterfaceGraphType)
                     {
-                        var includeDeprecated = context.Argument<bool>("includeDeprecated");
+                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var type = context.Source as GraphType;
                         return !includeDeprecated
-                            ? type.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
-                            : type.Fields;
+                            ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
+                            : type?.Fields;
                     }
-
                     return null;
                 });
             Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: context =>
             {
                 var type = context.Source as IImplementInterfaces;
-                return type != null ? type.Interfaces : null;
+                return type?.Interfaces;
             });
             Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
@@ -79,20 +85,17 @@ namespace GraphQL.Introspection
                 return null;
             });
             Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
-                new QueryArguments(new[]
+                new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
-                    new QueryArgument<BooleanGraphType>
-                    {
-                        Name = "includeDeprecated",
-                        DefaultValue = false
-                    }
+                    Name = "includeDeprecated",
+                    DefaultValue = false
                 }),
                 context =>
                 {
                     var type = context.Source as EnumerationGraphType;
                     if (type != null)
                     {
-                        var includeDeprecated = context.Argument<bool>("includeDeprecated");
+                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var values = !includeDeprecated
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
@@ -104,7 +107,7 @@ namespace GraphQL.Introspection
             Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
             {
                 var type = context.Source as InputObjectGraphType;
-                return type != null ? type.Fields : null;
+                return type?.Fields;
             });
             Field<__Type>("ofType", resolve: context =>
             {

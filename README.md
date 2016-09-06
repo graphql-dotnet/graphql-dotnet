@@ -6,7 +6,7 @@
 
 This is a work-in-progress implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
-This project uses [Antlr4](https://github.com/tunnelvisionlabs/antlr4cs) for the GraphQL grammar definition.
+This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
 
 ## Installation
 
@@ -16,7 +16,8 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 
 ## Upgrade Guide
 
-0.8.0 - [upgrade guide](/upgrade-guides/v0.8.0.md)
+* [0.11.0](/upgrade-guides/v0.11.0.md)
+* [0.8.0](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
 There is a sample web api project hosting the GraphiQL interface.  `npm install` and build `webpack` from the root of the repository.
@@ -85,7 +86,7 @@ public class DroidType : ObjectGraphType
 Executing a query.
 
 ```csharp
-public string Execute(
+public async Task<string> Execute(
   Schema schema,
   object rootObject,
   string query,
@@ -95,7 +96,7 @@ public string Execute(
   var executer = new DocumentExecuter();
   var writer = new DocumentWriter();
 
-  var result = executer.Execute(schema, rootObject, query, operationName, inputs);
+  var result = await executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
   return writer.Write(result);
 }
 
@@ -109,7 +110,7 @@ var query = @"
   }
 ";
 
-var result = Execute(schema, null, query);
+var result = await Execute(schema, null, query);
 
 Console.Writeline(result);
 
@@ -133,33 +134,37 @@ Console.Writeline(result);
 - [x] Objects
 - [x] Lists of objects/interfaces
 - [x] Interfaces
+- [x] Unions
 - [x] Arguments
 - [x] Variables
 - [x] Fragments
 - [x] Directives
+  - [x] Include
+  - [x] Skip
+  - [x] Custom
 - [x] Enumerations
 - [x] Input Objects
 - [x] Mutations
-- [x] Unions
+- [x] Subscriptions
 - [x] Async execution
 
 ### Validation
 - [x] Arguments of correct type
 - [x] Default values of correct type
-- [ ] Fields on correct type
-- [ ] Fragments on composite type
+- [x] Fields on correct type
+- [x] Fragments on composite types
 - [x] Known argument names
-- [ ] Known directives
-- [ ] Known fragment names
+- [x] Known directives
+- [x] Known fragment names
 - [x] Known type names
 - [x] Lone anonymous operations
-- [ ] No fragment cycle
+- [x] No fragment cycles
 - [x] No undefined variables
-- [ ] No unused fragments
+- [x] No unused fragments
 - [x] No unused variables
 - [ ] Overlapping fields can be merged
-- [ ] Possible fragment spreads
-- [ ] Provide non-null arguments
+- [x] Possible fragment spreads
+- [x] Provide non-null arguments
 - [x] Scalar leafs
 - [x] Unique argument names
 - [x] Unique fragment names
@@ -185,7 +190,7 @@ Console.Writeline(result);
   - [x] types
   - [x] queryType
   - [x] mutationType
-  - [ ] subscriptionType
+  - [x] subscriptionType
   - [x] directives
 
 ### Deployment Process

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Introspection;
-using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation
@@ -70,7 +70,7 @@ namespace GraphQL.Validation
             if (node is Field)
             {
                 var field = (Field) node;
-                var parentType = _parentTypeStack.Peek();
+                var parentType = _parentTypeStack.Peek().GetNamedType(_schema);
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
                 var targetType = _schema.FindType(fieldType?.Type);
@@ -98,6 +98,7 @@ namespace GraphQL.Validation
                 }
                 else if (op.OperationType == OperationType.Subscription)
                 {
+                    type = _schema.Subscription;
                 }
                 _typeStack.Push(type);
                 return;
@@ -114,7 +115,7 @@ namespace GraphQL.Validation
             if (node is InlineFragment)
             {
                 var def = (InlineFragment) node;
-                var type = _schema.FindType(def.Type.Name);
+                var type = def.Type != null ? _schema.FindType(def.Type.Name) : GetLastType();
                 _typeStack.Push(type);
                 return;
             }

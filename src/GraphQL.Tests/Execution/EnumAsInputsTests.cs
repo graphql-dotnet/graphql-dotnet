@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Execution
         {
             AssertQuerySuccess(
                 @"
-                mutation createUser {
+                 mutation createUser {
                   createUser(userInput:{
                     profileImage:""myimage.png"",
                     gender: Female
@@ -182,7 +182,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 context =>
                 {
-                    var id = context.Argument<int>("userId");
+                    var id = context.GetArgument<int>("userId");
                     return new User
                     {
                         Id = id
@@ -200,7 +200,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 context =>
                 {
-                    var id = context.Argument<long>("userId");
+                    var id = context.GetArgument<long>("userId");
                     return new User
                     {
                         IdLong = id
@@ -266,7 +266,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 context =>
                 {
-                    var input = context.Argument<CreateUser>("userInput");
+                    var input = context.GetArgument<CreateUser>("userInput");
                     return new User
                     {
                         Id = 1,
@@ -328,7 +328,7 @@ namespace GraphQL.Tests.Execution
                 arguments: new QueryArguments(new QueryArgument<GenderEnum> {Name = "g"}),
                 resolve: c =>
                 {
-                    var gender = c.Argument<Gender>("g");
+                    var gender = c.GetArgument<Gender>("g");
                     return $"gender: {gender}";
                 });
         }

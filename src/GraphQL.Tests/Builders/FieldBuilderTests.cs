@@ -38,6 +38,18 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
+        public void should_have_deprecation_reason()
+        {
+            var objectType = new ObjectGraphType();
+
+            objectType.Field<StringGraphType>()
+                .DeprecationReason("Old field");
+
+            objectType.Fields
+                .First().DeprecationReason.ShouldEqual("Old field");
+        }
+
+        [Fact]
         public void should_return_the_right_type()
         {
             var objectType = new ObjectGraphType();
@@ -345,30 +357,10 @@ namespace GraphQL.Tests.Builders
         public void can_access_object()
         {
             var objectType = new ObjectGraphType();
-            objectType.Field<StringGraphType>()
-                .WithObject<int>()
+            objectType.Field<StringGraphType, int>()
                 .Resolve(context =>
                 {
-                    context.Object.ShouldEqual(12345);
-                    return null;
-                });
-
-            var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
-            {
-                Source = 12345
-            });
-        }
-
-        [Fact]
-        public void can_access_object_with_custom_resolver()
-        {
-            var objectType = new ObjectGraphType();
-            objectType.Field<StringGraphType>()
-                .WithObject(obj => (int)obj + 1)
-                .Resolve(context =>
-                {
-                    context.Object.ShouldEqual(12346);
+                    context.Source.ShouldEqual(12345);
                     return null;
                 });
 

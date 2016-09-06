@@ -187,9 +187,9 @@ namespace GraphQL.Tests.Execution.Directives
             AssertQuerySuccess(@"
                 query Q {
                   a
-                  ...Frag
+                  ...Frag @include(if: false)
                 }
-                fragment Frag on TestType @include(if: false) {
+                fragment Frag on TestType {
                   b
                 }
             ", "{a: 'a'}", null, _data);
@@ -201,9 +201,9 @@ namespace GraphQL.Tests.Execution.Directives
             AssertQuerySuccess(@"
                 query Q {
                   a
-                  ...Frag
+                  ...Frag @include(if: true)
                 }
-                fragment Frag on TestType @include(if: true) {
+                fragment Frag on TestType {
                   b
                 }
             ", "{a: 'a', b: 'b'}", null, _data);
@@ -215,9 +215,9 @@ namespace GraphQL.Tests.Execution.Directives
             AssertQuerySuccess(@"
                 query Q {
                   a
-                  ...Frag
+                  ...Frag @skip(if: false)
                 }
-                fragment Frag on TestType @skip(if: false) {
+                fragment Frag on TestType {
                   b
                 }
             ", "{a: 'a', b: 'b'}", null, _data);
@@ -229,9 +229,9 @@ namespace GraphQL.Tests.Execution.Directives
             AssertQuerySuccess(@"
                 query Q {
                   a
-                  ...Frag
+                  ...Frag @skip(if: true)
                 }
-                fragment Frag on TestType @skip(if: true) {
+                fragment Frag on TestType {
                   b
                 }
             ", "{a: 'a'}", null, _data);

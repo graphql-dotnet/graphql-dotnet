@@ -490,7 +490,7 @@ namespace GraphQL.Tests.Validation
         }
 
         // this is currently allowed
-//        [Test]
+//        [Fact]
 //        public void different_case_enum_value_into_enum()
 //        {
 //            var query = @"{

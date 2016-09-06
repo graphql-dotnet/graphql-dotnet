@@ -32,29 +32,31 @@ namespace GraphQL.Tests.Validation
 
             var result = Validate(config.Query, Schema, config.Rules);
 
+            result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
+            result.Errors.Count.ShouldEqual(
+                config.Assertions.Count(),
+                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
+
             config.Assertions.Apply((assert, idx) =>
             {
                 var error = result.Errors.Skip(idx).First();
                 error.Message.ShouldEqual(assert.Message);
+
+                var allLocations = string.Join("", error.Locations.Select(l => $"({l.Line},{l.Column})"));
 
                 assert.Locations.Apply((assertLoc, locIdx) =>
                 {
                     var errorLoc = error.Locations.Skip(locIdx).First();
                     errorLoc.Line.ShouldEqual(
                         assertLoc.Line,
-                        $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} {allLocations}");
                     errorLoc.Column.ShouldEqual(
                         assertLoc.Column,
-                        $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} ({errorLoc.Line},{errorLoc.Column})");
+                        $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} {allLocations}");
                 });
 
                 error.Locations.Count().ShouldEqual(assert.Locations.Count());
             });
-
-            result.IsValid.ShouldBeFalse();
-            result.Errors.Count.ShouldEqual(
-                config.Assertions.Count(),
-                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
         }
 
         protected void ShouldPassRule(string query)
@@ -81,10 +83,10 @@ namespace GraphQL.Tests.Validation
 
         private IValidationResult Validate(string query, ISchema schema, IEnumerable<IValidationRule> rules)
         {
-            var documentBuilder = new AntlrDocumentBuilder();
+            var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.Validate(schema, document, rules);
+            return validator.Validate(query, schema, document, rules);
         }
     }
 }

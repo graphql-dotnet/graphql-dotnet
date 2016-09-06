@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -40,6 +41,7 @@ namespace GraphQL.Validation.Rules
                     {
                         var nonNullType = (NonNullGraphType) inputType;
                         context.ReportError(new ValidationError(
+                            context.OriginalQuery,
                             "5.7.2",
                             BadValueForNonNullArgMessage(
                                 name,
@@ -54,6 +56,7 @@ namespace GraphQL.Validation.Rules
                         if (errors.Any())
                         {
                             context.ReportError(new ValidationError(
+                                context.OriginalQuery,
                                 "5.7.2",
                                 BadValueForDefaultArgMessage(
                                     name,
