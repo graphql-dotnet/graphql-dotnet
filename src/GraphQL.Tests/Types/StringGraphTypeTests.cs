@@ -29,5 +29,20 @@ namespace GraphQL.Tests.Types
         {
             _type.ParseValue("\"").ShouldEqual("\"");
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Fact]
+        public void parses_backslash()
+        {
+            _type.ParseValue(@"\\").ShouldEqual(@"\");
+        }
+
+        [Fact]
+        public void keeps_backslash_in_string()
+        {
+            _type.ParseValue(@"c:\\\\windows\\test").ShouldEqual(@"c:\\windows\test");
+        }
     }
 }
