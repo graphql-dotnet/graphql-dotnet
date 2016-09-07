@@ -45,6 +45,9 @@
     },
     "net46": {
       "System.Threading.Tasks": ""
+    },
+    "net461": {
+      "System.Threading.Tasks": ""
     }
   },
 
