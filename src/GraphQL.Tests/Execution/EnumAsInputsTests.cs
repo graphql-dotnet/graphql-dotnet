@@ -30,6 +30,49 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void mutation_enum_input()
+        {
+            AssertQuerySuccess(
+                @"
+                mutation createGender {
+                  createGender(
+                    gender:Female
+                  ){
+                    gender
+                  }
+                }
+                ",
+                @"{
+                'createGender': {
+                  'gender': 'Female'
+                 }
+                }");
+        }
+
+        /// <summary>
+        ///     Verify enums stored as integer based values work.
+        /// </summary>
+        [Fact]
+        public void mutation_shortenum_input()
+        {
+            AssertQuerySuccess(
+                @"
+                mutation createWithAttributes {
+                  createWithAttributes(
+                    hairColor:Blonde
+                  ){
+                    hairColor
+                  }
+                }
+                ",
+                @"{
+                'createWithAttributes': {
+                  'hairColor': 'Blonde'
+                 }
+                }");
+        }
+
+        [Fact]
         public void mutation_input_from_variables()
         {
             var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
@@ -175,6 +218,7 @@ namespace GraphQL.Tests.Execution
             Description = "User information for user creation";
             Field<StringGraphType>("profileImage", "profileImage of user.");
             Field<GenderEnum>("gender", "user gender.");
+            Field<HairColorEnum>("hairColor", "hair color.");
         }
     }
 
@@ -187,6 +231,21 @@ namespace GraphQL.Tests.Execution
             AddValue("NotSpecified", "NotSpecified gender.", Gender.NotSpecified);
             AddValue("Male", "gender Male", Gender.Male);
             AddValue("Female", "gender female", Gender.Female);
+        }
+    }
+
+    public class HairColorEnum : EnumerationGraphType
+    {
+        public HairColorEnum()
+        {
+            Name = "Gender";
+            Description = "User gender";
+            AddValue("NotSpecified", "NotSpecified.", (short)HairColor.NotSpecified);
+            AddValue("Black", "Black", (short)HairColor.Black);
+            AddValue("Blonde", "Blonde", (short)HairColor.Blonde);
+            AddValue("Brunette", "Brunette", (short)HairColor.Brunette);
+            AddValue("Red", "Red", (short)HairColor.Red);
+            AddValue("Other", "Other", (short)HairColor.Other);
         }
     }
 
@@ -215,6 +274,42 @@ namespace GraphQL.Tests.Execution
                         Gender = input.Gender
                     };
                 });
+
+            Field<UserType>("createGender", "create gender",
+               new QueryArguments(
+                   new QueryArgument<NonNullGraphType<GenderEnum>>
+                   {
+                       Name = "gender",
+                       Description = "gender to create"
+                   }
+               ),
+               context =>
+               {
+                   var input = context.GetArgument<Gender>("gender");
+                   return new User
+                   {
+                       Id = 1,
+                       Gender = input
+                   };
+               });
+
+            Field<UserType>("createWithAttributes", "create with attributes",
+               new QueryArguments(
+                   new QueryArgument<NonNullGraphType<HairColorEnum>>
+                   {
+                       Name = "hairColor",
+                       Description = "hair color"
+                   }
+               ),
+               context =>
+               {
+                   var input = context.GetArgument<HairColor>("hairColor");
+                   return new User
+                   {
+                       Id = 1,
+                       HairColor = input
+                   };
+               });
         }
     }
 
@@ -227,6 +322,7 @@ namespace GraphQL.Tests.Execution
             Field<IntGraphType>("idLong");
             Field<StringGraphType>("profileImage");
             Field<GenderEnum>("gender");
+            Field<HairColorEnum>("hairColor");
             Field<StringGraphType>(
                 "printGender",
                 arguments: new QueryArguments(new QueryArgument<GenderEnum> {Name = "g"}),
@@ -244,6 +340,7 @@ namespace GraphQL.Tests.Execution
         public long IdLong { get; set; }
         public string ProfileImage { get; set; }
         public Gender Gender { get; set; }
+        public HairColor HairColor { get; set; }
     }
 
     public class CreateUser
@@ -257,5 +354,15 @@ namespace GraphQL.Tests.Execution
         NotSpecified,
         Male,
         Female
+    }
+
+    public enum HairColor:short
+    {
+        NotSpecified = 0,
+        Blonde=1,	
+        Black=2,	
+        Brunette=3,
+        Red=4,	
+        Other=5
     }
 }
