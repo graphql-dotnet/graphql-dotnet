@@ -1,0 +1,29 @@
+﻿{
+  "buildOptions": {
+    "embed": {
+      "includeFiles": [
+        "index.html"
+      ]
+    }
+  },
+  "dependencies": {
+    "Microsoft.AspNetCore.Http": "1.0.0",
+    "NETStandard.Library": "1.6.0"
+  },
+  "description": "ASP.NET Core middleware for GraphiQL.",
+  "frameworks": {
+    "net451": {},
+    "netstandard1.3": {}
+  },
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/graphql-dotnet/graphql-dotnet"
+    },
+    "tags": [
+      "GraphiQL",
+      "GraphQL"
+    ]
+  },
+  "version": "1.0.0-alpha1"
+}
