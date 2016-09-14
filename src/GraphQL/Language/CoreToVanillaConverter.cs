@@ -176,7 +176,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.StringValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return new StringValue($"\"{str.Value}\"").WithLocation(str, _body);
+                    return new StringValue($"{str.Value}").WithLocation(str, _body);
                 }
                 case ASTNodeKind.IntValue:
                 {

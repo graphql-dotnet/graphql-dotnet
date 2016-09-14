@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
-    "graphiql": "^0.7.5",
-    "graphql": "^0.6.0",
+    "graphiql": "^0.7.8",
+    "graphql": "^0.7.0",
     "isomorphic-fetch": "^2.1.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1"

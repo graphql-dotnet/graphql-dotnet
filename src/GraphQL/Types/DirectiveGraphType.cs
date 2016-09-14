@@ -110,7 +110,7 @@ namespace GraphQL.Types
             })
         {
             Description = "Marks an element of a GraphQL schema as no longer supported.";
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
+            Arguments = new QueryArguments(new QueryArgument<StringGraphType>
             {
                 Name = "reason",
                 Description =

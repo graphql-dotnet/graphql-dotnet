@@ -33,6 +33,12 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
+            var foundByName = Values.FirstOrDefault(v => v.Name.Equals(value + "", StringComparison.OrdinalIgnoreCase));
+            if (foundByName != null)
+            {
+                return foundByName.Name;
+            }
+
             var found = Values.FirstOrDefault(v => v.Value.Equals(value));
             return found?.Name;
         }
@@ -51,19 +57,8 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value)
         {
-            object val = null;
-
-            if (value is EnumValue)
-            {
-                val = ((EnumValue)value).Name;
-            }
-
-            if (value is StringValue)
-            {
-                val = ((StringValue) value).Value;
-            }
-
-            return ParseValue(val);
+            var enumValue = value as EnumValue;
+            return enumValue == null ? null : ParseValue(enumValue.Name);
         }
     }
 
