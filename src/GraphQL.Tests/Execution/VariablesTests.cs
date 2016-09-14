@@ -393,7 +393,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'a'
+              'fieldWithNullableStringInput': '""a""'
             }
             ";
 
@@ -413,7 +413,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'a'
+              'fieldWithNullableStringInput': '""a""'
             }
             ";
 
@@ -474,7 +474,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'a'
+              'fieldWithNullableStringInput': '""a""'
             }
             ";
 
@@ -494,7 +494,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'a'
+              'fieldWithNullableStringInput': '""a""'
             }
             ";
 
@@ -515,7 +515,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': ""Hello World""
+              'fieldWithDefaultArgumentValue': '""Hello World""'
             }
             ";
 
@@ -533,7 +533,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': ""Hello World""
+              'fieldWithDefaultArgumentValue': '""Hello World""'
             }
             ";
 
@@ -551,7 +551,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': ""Hello World""
+              'fieldWithDefaultArgumentValue': '""Hello World""'
             }
             ";
 

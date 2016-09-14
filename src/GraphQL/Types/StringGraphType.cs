@@ -1,4 +1,3 @@
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -12,29 +11,18 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            return ParseValue(value);
+            return value;
         }
 
         public override object ParseValue(object value)
         {
-            return value != null ? ProcessString(value.ToString()) : null;
+            return value?.ToString();
         }
 
         public override object ParseLiteral(IValue value)
         {
             var stringValue = value as StringValue;
-
-            return stringValue != null && stringValue.Value != null ? ProcessString(stringValue.Value) : null;
-        }
-
-        private string ProcessString(string value)
-        {
-            value = value.Replace("\\\"", "\"");
-            if (value.StartsWith("\"") && value.EndsWith("\"") && value.Length > 1)
-            {
-                value = value.Trim('"');
-            }
-            return value;
+            return stringValue?.Value;
         }
     }
 }

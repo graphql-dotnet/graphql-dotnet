@@ -403,36 +403,33 @@ namespace GraphQL
                 var variable = new Variable();
                 variable.Name = v.Name;
 
-                object variableValue;
-                if (inputs != null && inputs.TryGetValue(v.Name, out variableValue))
-                {
-                    var valueAst = variableValue.AstFromValue(schema, v.Type.GraphTypeFromType(schema));
-                    variable.Value = GetVariableValue(schema, v, valueAst);
-                }
-                else
-                {
-                    variable.Value = GetVariableValue(schema, v, v.DefaultValue);
-                }
+                object variableValue = null;
+                inputs?.TryGetValue(v.Name, out variableValue);
+                variable.Value = GetVariableValue(schema, v, variableValue);
 
                 variables.Add(variable);
             });
             return variables;
         }
 
-        public object GetVariableValue(ISchema schema, VariableDefinition variable, IValue input)
+        public object GetVariableValue(ISchema schema, VariableDefinition variable, object input)
         {
             var type = variable.Type.GraphTypeFromType(schema);
 
-            var value = input ?? variable.DefaultValue;
-            if (IsValidValue(schema, type, variable.Type, input))
+            if (IsValidValue(schema, type, input))
             {
-                var coercedValue = CoerceValue(schema, type, value);
+                if (input == null)
+                {
+                    if (variable.DefaultValue != null)
+                    {
+                        return ValueFromAst(variable.DefaultValue);
+                    }
+                }
+                var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
                 return coercedValue;
             }
 
-            var val = ValueFromAst(value);
-
-            if (val == null)
+            if (input == null)
             {
                 throw new ExecutionError("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName()));
             }
@@ -485,10 +482,16 @@ namespace GraphQL
                 return obj;
             }
 
+            if (value is ListValue)
+            {
+                var list = (ListValue)value;
+                return list.Values.Select(ValueFromAst).ToList();
+            }
+
             return null;
         }
 
-        public bool IsValidValue(ISchema schema, GraphType type, IType astType, object input)
+        public bool IsValidValue(ISchema schema, GraphType type, object input)
         {
             if (type is NonNullGraphType)
             {
@@ -505,37 +508,12 @@ namespace GraphQL
                     return val != null;
                 }
 
-                return IsValidValue(schema, nonNullType, astType, input);
-            }
-
-            if (astType is NonNullType)
-            {
-                if (input == null)
-                {
-                    return false;
-                }
-
-                if (type is ScalarGraphType)
-                {
-                    var val = ValueFromScalar((ScalarGraphType) type, input);
-                    return val != null;
-                }
-
-                astType = ((NonNullType) astType).Type;
+                return IsValidValue(schema, nonNullType, input);
             }
 
             if (input == null)
             {
                 return true;
-            }
-
-            if (input is StringValue)
-            {
-                var stringVal = (StringValue) input;
-                if (stringVal.Value == null)
-                {
-                    return true;
-                }
             }
 
             if (type is ListGraphType)
@@ -546,21 +524,15 @@ namespace GraphQL
                 var list = input as IEnumerable;
                 if (list != null && !(input is string))
                 {
-                    return list.All(item => IsValidValue(schema, listItemType, astType, item));
+                    return list.All(item => IsValidValue(schema, listItemType, item));
                 }
 
-                var listValue = input as ListValue;
-                if (listValue != null)
-                {
-                    return listValue.Values.All(item => IsValidValue(schema, listItemType, astType, item));
-                }
-
-                return IsValidValue(schema, listItemType, astType, input);
+                return IsValidValue(schema, listItemType, input);
             }
 
             if (type is ObjectGraphType || type is InputObjectGraphType)
             {
-                var dict = input as ObjectValue;
+                var dict = input as Dictionary<string, object>;
                 if (dict == null)
                 {
                     return false;
@@ -568,17 +540,20 @@ namespace GraphQL
 
                 // ensure every provided field is defined
                 if (type is InputObjectGraphType
-                    && dict.FieldNames.Any(key => type.Fields.FirstOrDefault(field => field.Name == key) == null))
+                    && dict.Keys.Any(key => type.Fields.FirstOrDefault(field => field.Name == key) == null))
                 {
                     return false;
                 }
 
                 return type.Fields.All(field =>
-                    IsValidValue(
+                {
+                    object fieldValue = null;
+                    dict.TryGetValue(field.Name, out fieldValue);
+                    return IsValidValue(
                         schema,
                         schema.FindType(field.Type),
-                        astType,
-                        dict.Field(field.Name)?.Value));
+                        fieldValue);
+                });
             }
 
             if (type is ScalarGraphType)

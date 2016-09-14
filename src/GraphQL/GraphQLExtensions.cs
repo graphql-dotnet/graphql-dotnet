@@ -278,58 +278,102 @@ namespace GraphQL
                 return AstFromValue(value, schema, schema.FindType(nonnull.Type));
             }
 
-            if (value is Dictionary<string, object>)
+            if (value == null || type == null)
             {
+                return null;
+            }
+
+            // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
+            // the value is not an IEnumerable, convert the value using the list's item type.
+            if (type is ListGraphType)
+            {
+                var listType = (ListGraphType) type;
+                var itemType = schema.FindType(listType.Type);
+
+                if (!(value is string) && value is IEnumerable)
+                {
+                    var list = (IEnumerable)value;
+                    var values = list.Map(item => AstFromValue(item, schema, itemType));
+                    return new ListValue(values);
+                }
+
+                return AstFromValue(value, schema, itemType);
+            }
+
+            // Populate the fields of the input object by creating ASTs from each value
+            // in the dictionary according to the fields in the input type.
+            if (type is InputObjectGraphType)
+            {
+                if (!(value is Dictionary<string, object>))
+                {
+                    return null;
+                }
+
+                var input = (InputObjectGraphType) type;
                 var dict = (Dictionary<string, object>)value;
 
                 var fields = dict
-                    .Select(pair => new ObjectField(pair.Key, AstFromValue(pair.Value, schema, null)))
+                    .Select(pair =>
+                    {
+                        var field = input.Fields.FirstOrDefault(x => x.Name == pair.Key);
+                        var fieldType = field != null ? schema.FindType(field.Type) : null;
+                        return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
+                    })
                     .ToList();
 
                 return new ObjectValue(fields);
             }
 
-            if (!(value is string) && value is IEnumerable)
-            {
-                GraphType itemType = null;
+            Invariant.Check(
+                type.IsInputType(schema),
+                $"Must provide Input Type, cannot use: {type}");
 
-                var listType = type as ListGraphType;
-                if (listType != null)
+            var inputType = type as ScalarGraphType;
+
+            // Since value is an internally represented value, it must be serialized
+            // to an externally represented value before converting into an AST.
+            var serialized = inputType.Serialize(value);
+            if (serialized == null)
+            {
+                return null;
+            }
+
+            if (serialized is bool)
+            {
+                return new BooleanValue((bool)serialized);
+            }
+
+            if (serialized is int)
+            {
+                return new IntValue((int)serialized);
+            }
+
+            if (serialized is long)
+            {
+                return new LongValue((long)serialized);
+            }
+
+            if (serialized is double)
+            {
+                return new FloatValue((double)serialized);
+            }
+
+            if (serialized is DateTime)
+            {
+                return new DateTimeValue((DateTime)serialized);
+            }
+
+            if (serialized is string)
+            {
+                if (type is EnumerationGraphType)
                 {
-                    itemType = schema.FindType(listType.Type);
+                    return new EnumValue(serialized.ToString());
                 }
 
-                var list = (IEnumerable)value;
-                var values = list.Map(item => AstFromValue(item, schema, itemType));
-                return new ListValue(values);
+                return new StringValue(serialized.ToString());
             }
 
-            if (value is bool)
-            {
-                return new BooleanValue((bool)value);
-            }
-
-            if (value is int)
-            {
-                return new IntValue((int)value);
-            }
-
-            if (value is long)
-            {
-                return new LongValue((long)value);
-            }
-
-            if (value is double)
-            {
-                return new FloatValue((double)value);
-            }
-
-            if (value is DateTime)
-            {
-                return new DateTimeValue((DateTime)value);
-            }
-
-            return new StringValue(value?.ToString());
+            throw new ExecutionError($"Cannot convert value to AST: {serialized}");
         }
     }
 }

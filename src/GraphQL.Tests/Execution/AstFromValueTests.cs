@@ -1,4 +1,5 @@
 ﻿using GraphQL.Language.AST;
+using GraphQL.Types;
 using Should;
 
 namespace GraphQL.Tests.Execution
@@ -6,18 +7,17 @@ namespace GraphQL.Tests.Execution
     public class AstFromValueTests
     {
         [Fact]
-        public void converts_null_to_string_value()
+        public void converts_null_to_null()
         {
             object value = null;
             var result = value.AstFromValue(null, null);
-            result.ShouldNotBeNull();
-            result.ShouldBeType<StringValue>();
+            result.ShouldBeNull();
         }
 
         [Fact]
         public void converts_string_to_string_value()
         {
-            var result = "test".AstFromValue(null, null);
+            var result = "test".AstFromValue(null, new StringGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeType<StringValue>();
         }
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void converts_bool_to_boolean_value()
         {
-            var result = true.AstFromValue(null, null);
+            var result = true.AstFromValue(null, new BooleanGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeType<BooleanValue>();
         }
@@ -33,8 +33,8 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void converts_long_to_long_value()
         {
-            long val = 123;
-            var result = val.AstFromValue(null, null);
+            long val = 12345678910111213;
+            var result = val.AstFromValue(null, new IntGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeType<LongValue>();
         }
@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Execution
         public void converts_int_to_int_value()
         {
             int val = 123;
-            var result = val.AstFromValue(null, null);
+            var result = val.AstFromValue(null, new IntGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeType<IntValue>();
         }
@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Execution
         public void converts_double_to_float_value()
         {
             double val = 0.42;
-            var result = val.AstFromValue(null, null);
+            var result = val.AstFromValue(null, new FloatGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeType<FloatValue>();
         }

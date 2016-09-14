@@ -13,9 +13,15 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void trims_quotes()
+        public void serialize_keeps_quotes()
         {
-            _type.ParseValue("\"one two\"").ShouldEqual("one two");
+            _type.Serialize("\"one\"").ShouldEqual("\"one\"");
+        }
+
+        [Fact]
+        public void parse_value_keeps__quotes()
+        {
+            _type.ParseValue("\"one\"").ShouldEqual("\"one\"");
         }
 
         [Fact]
