@@ -33,6 +33,12 @@ There is a sample web api project hosting the GraphiQL interface.  `npm install`
 Define your type system with a top level query object.
 
 ```csharp
+using GraphQL.Http;
+using GraphQL.Types;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 public class StarWarsSchema : Schema
 {
   public StarWarsSchema()
@@ -49,7 +55,7 @@ public class StarWarsQuery : ObjectGraphType
     Name = "Query";
     Field<CharacterInterface>(
       "hero",
-      resolve: context => data.GetDroidById("3")
+      resolve: context => data.GetDroidByIdAsync("3")
     );
   }
 }
@@ -74,12 +80,94 @@ public class DroidType : ObjectGraphType
     Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
     Field<NonNullGraphType<StringGraphType>>("name", "The name of the droid.");
     Field<ListGraphType<CharacterInterface>>(
-        "friends",
-        resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
+      "friends",
+      resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
     );
     Interface<CharacterInterface>();
     IsTypeOf = value => value is Droid;
   }
+}
+
+public class StarWarsData
+{
+  private readonly List<Human> _humans = new List<Human>();
+  private readonly List<Droid> _droids = new List<Droid>();
+
+  public StarWarsData()
+  {
+    _humans.Add(new Human
+    {
+      Id = "1", Name = "Luke",
+      Friends = new[] {"3", "4"},
+      AppearsIn = new[] {4, 5, 6},
+      HomePlanet = "Tatooine"
+    });
+    _humans.Add(new Human
+    {
+      Id = "2", Name = "Vader",
+      AppearsIn = new[] {4, 5, 6},
+      HomePlanet = "Tatooine"
+    });
+
+  _droids.Add(new Droid
+  {
+    Id = "3", Name = "R2-D2",
+    Friends = new[] {"1", "4"},
+    AppearsIn = new[] {4, 5, 6},
+    PrimaryFunction = "Astromech"
+  });
+  _droids.Add(new Droid
+  {
+    Id = "4", Name = "C-3PO",
+    AppearsIn = new[] {4, 5, 6},
+    PrimaryFunction = "Protocol"
+  });
+}
+
+  public IEnumerable<StarWarsCharacter> GetFriends(StarWarsCharacter character)
+  {
+    if (character == null)
+    {
+      return null;
+    }
+  
+    var friends = new List<StarWarsCharacter>();
+    var lookup = character.Friends;
+    if (lookup != null)
+    {
+      _humans.Where(h => lookup.Contains(h.Id)).Apply(friends.Add);
+      _droids.Where(d => lookup.Contains(d.Id)).Apply(friends.Add);
+    }
+    return friends;
+  }
+
+  public Task<Human> GetHumanByIdAsync(string id)
+  {
+    return Task.FromResult(_humans.FirstOrDefault(h => h.Id == id));
+  }
+
+  public Task<Droid> GetDroidByIdAsync(string id)
+  {
+    return Task.FromResult(_droids.FirstOrDefault(h => h.Id == id));
+  }
+}
+
+public abstract class StarWarsCharacter
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public string[] Friends { get; set; }
+  public int[] AppearsIn { get; set; }
+}
+
+public class Human : StarWarsCharacter
+{
+  public string HomePlanet { get; set; }
+}
+
+public class Droid : StarWarsCharacter
+{
+  public string PrimaryFunction { get; set; }
 }
 ```
 
