@@ -41,133 +41,192 @@ using System.Threading.Tasks;
 
 public class StarWarsSchema : Schema
 {
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-  }
+    public StarWarsSchema()
+    {
+        Query = new StarWarsQuery(new StarWarsData());
+    }
 }
 
 public class StarWarsQuery : ObjectGraphType
 {
-  public StarWarsQuery()
-  {
-    var data = new StarWarsData();
-    Name = "Query";
-    Field<CharacterInterface>(
-      "hero",
-      resolve: context => data.GetDroidByIdAsync("3")
-    );
-  }
+    public StarWarsQuery()
+    {
+    }
+
+    public StarWarsQuery(StarWarsData data)
+    {
+        Name = "Query";
+
+        Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
+        Field<HumanType>(
+            "human",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
+            ),
+            resolve: context => data.GetHumanByIdAsync(context.Argument<string>("id"))
+        );
+        Field<DroidType>(
+            "droid",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+            ),
+            resolve: context => data.GetDroidByIdAsync(context.Argument<string>("id"))
+        );
+    }
 }
 
 public class CharacterInterface : InterfaceGraphType
 {
-  public CharacterInterface()
-  {
-    Name = "Character";
-    Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
-    Field<NonNullGraphType<StringGraphType>>("name", "The name of the character.");
-    Field<ListGraphType<CharacterInterface>>("friends");
-  }
+    public CharacterInterface()
+    {
+        Name = "Character";
+        Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
+        Field<NonNullGraphType<StringGraphType>>("name", "The name of the character.");
+        Field<ListGraphType<CharacterInterface>>("friends");
+    }
 }
 
 public class DroidType : ObjectGraphType
 {
-  public DroidType()
-  {
-    var data = new StarWarsData();
-    Name = "Droid";
-    Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
-    Field<NonNullGraphType<StringGraphType>>("name", "The name of the droid.");
-    Field<ListGraphType<CharacterInterface>>(
-      "friends",
-      resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
-    );
-    Interface<CharacterInterface>();
-    IsTypeOf = value => value is Droid;
-  }
+    public DroidType()
+    {
+        var data = new StarWarsData();
+        Name = "Droid";
+        Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
+        Field<NonNullGraphType<StringGraphType>>("name", "The name of the droid.");
+        Field<ListGraphType<CharacterInterface>>(
+            "friends",
+            resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
+        );
+        Interface<CharacterInterface>();
+        IsTypeOf = value => value is Droid;
+    }
+}
+
+public class HumanType : ObjectGraphType
+{
+    public HumanType()
+    {
+    }
+
+    public HumanType(StarWarsData data)
+    {
+        Name = "Human";
+
+        Field<NonNullGraphType<StringGraphType>>("id", "The id of the human.");
+        Field<StringGraphType>("name", "The name of the human.");
+        Field<ListGraphType<CharacterInterface>>(
+            "friends",
+            resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
+        );
+        Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+        Field<StringGraphType>("homePlanet", "The home planet of the human.");
+
+        Interface<CharacterInterface>();
+
+        IsTypeOf = value => value is Human;
+    }
 }
 
 public class StarWarsData
 {
-  private readonly List<Human> _humans = new List<Human>();
-  private readonly List<Droid> _droids = new List<Droid>();
+    private readonly List<Human> _humans = new List<Human>();
+    private readonly List<Droid> _droids = new List<Droid>();
 
-  public StarWarsData()
-  {
-    _humans.Add(new Human
+    public StarWarsData()
     {
-      Id = "1", Name = "Luke",
-      Friends = new[] {"3", "4"},
-      AppearsIn = new[] {4, 5, 6},
-      HomePlanet = "Tatooine"
-    });
-    _humans.Add(new Human
-    {
-      Id = "2", Name = "Vader",
-      AppearsIn = new[] {4, 5, 6},
-      HomePlanet = "Tatooine"
-    });
+        _humans.Add(new Human
+        {
+            Id = "1", Name = "Luke",
+            Friends = new[] {"3", "4"},
+            AppearsIn = new[] {4, 5, 6},
+            HomePlanet = "Tatooine"
+        });
+        _humans.Add(new Human
+        {
+            Id = "2", Name = "Vader",
+            AppearsIn = new[] {4, 5, 6},
+            HomePlanet = "Tatooine"
+        });
 
-  _droids.Add(new Droid
-  {
-    Id = "3", Name = "R2-D2",
-    Friends = new[] {"1", "4"},
-    AppearsIn = new[] {4, 5, 6},
-    PrimaryFunction = "Astromech"
-  });
-  _droids.Add(new Droid
-  {
-    Id = "4", Name = "C-3PO",
-    AppearsIn = new[] {4, 5, 6},
-    PrimaryFunction = "Protocol"
-  });
-}
-
-  public IEnumerable<StarWarsCharacter> GetFriends(StarWarsCharacter character)
-  {
-    if (character == null)
-    {
-      return null;
+        _droids.Add(new Droid
+        {
+            Id = "3", Name = "R2-D2",
+            Friends = new[] {"1", "4"},
+            AppearsIn = new[] {4, 5, 6},
+            PrimaryFunction = "Astromech"
+        });
+        _droids.Add(new Droid
+        {
+            Id = "4", Name = "C-3PO",
+            AppearsIn = new[] {4, 5, 6},
+            PrimaryFunction = "Protocol"
+        });
     }
-  
-    var friends = new List<StarWarsCharacter>();
-    var lookup = character.Friends;
-    if (lookup != null)
+
+    public IEnumerable<StarWarsCharacter> GetFriends(StarWarsCharacter character)
     {
-      _humans.Where(h => lookup.Contains(h.Id)).Apply(friends.Add);
-      _droids.Where(d => lookup.Contains(d.Id)).Apply(friends.Add);
+        if (character == null)
+        {
+            return null;
+        }
+
+        var friends = new List<StarWarsCharacter>();
+        var lookup = character.Friends;
+        if (lookup != null)
+        {
+            _humans.Where(h => lookup.Contains(h.Id)).Apply(friends.Add);
+            _droids.Where(d => lookup.Contains(d.Id)).Apply(friends.Add);
+        }
+        return friends;
     }
-    return friends;
-  }
 
-  public Task<Human> GetHumanByIdAsync(string id)
-  {
-    return Task.FromResult(_humans.FirstOrDefault(h => h.Id == id));
-  }
+    public Task<Human> GetHumanByIdAsync(string id)
+    {
+        return Task.FromResult(_humans.FirstOrDefault(h => h.Id == id));
+    }
 
-  public Task<Droid> GetDroidByIdAsync(string id)
-  {
-    return Task.FromResult(_droids.FirstOrDefault(h => h.Id == id));
-  }
+    public Task<Droid> GetDroidByIdAsync(string id)
+    {
+        return Task.FromResult(_droids.FirstOrDefault(h => h.Id == id));
+    }
 }
 
 public abstract class StarWarsCharacter
 {
-  public string Id { get; set; }
-  public string Name { get; set; }
-  public string[] Friends { get; set; }
-  public int[] AppearsIn { get; set; }
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string[] Friends { get; set; }
+    public int[] AppearsIn { get; set; }
 }
 
 public class Human : StarWarsCharacter
 {
-  public string HomePlanet { get; set; }
+    public string HomePlanet { get; set; }
 }
 
 public class Droid : StarWarsCharacter
 {
-  public string PrimaryFunction { get; set; }
+    public string PrimaryFunction { get; set; }
+}
+
+public class EpisodeEnum : EnumerationGraphType
+{
+    public EpisodeEnum()
+    {
+        Name = "Episode";
+        Description = "One of the films in the Star Wars Trilogy.";
+        AddValue("NEWHOPE", "Released in 1977.", 4);
+        AddValue("EMPIRE", "Released in 1980.", 5);
+        AddValue("JEDI", "Released in 1983.", 6);
+    }
+}
+
+public enum Episodes
+{
+    NEWHOPE = 4,
+    EMPIRE = 5,
+    JEDI = 6
 }
 ```
 
