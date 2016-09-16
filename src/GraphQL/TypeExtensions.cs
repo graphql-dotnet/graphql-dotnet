@@ -62,6 +62,11 @@ namespace GraphQL
                 graphType = typeof(BooleanGraphType);
             }
 
+            if (type == typeof(DateTime))
+            {
+                graphType = typeof(DateGraphType);
+            }
+
             if (graphType == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Unknown input type.");
