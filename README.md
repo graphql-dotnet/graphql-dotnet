@@ -30,94 +30,95 @@ There is a sample web api project hosting the GraphiQL interface.  `npm install`
 
 ## Usage
 
-Define your type system with a top level query object.
+Define your schema with a top level query object then execute that query.
 
 ```csharp
-public class StarWarsSchema : Schema
+namespace ConsoleApplication
 {
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-  }
-}
+    using System;
+    using System.Threading.Tasks;
+    using GraphQL;
+    using GraphQL.Http;
+    using GraphQL.Types;
 
-public class StarWarsQuery : ObjectGraphType
-{
-  public StarWarsQuery()
-  {
-    var data = new StarWarsData();
-    Name = "Query";
-    Field<CharacterInterface>(
-      "hero",
-      resolve: context => data.GetDroidById("3")
-    );
-  }
-}
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+          Run();
+        }
 
-public class CharacterInterface : InterfaceGraphType
-{
-  public CharacterInterface()
-  {
-    Name = "Character";
-    Field<NonNullGraphType<StringGraphType>>("id", "The id of the character.");
-    Field<NonNullGraphType<StringGraphType>>("name", "The name of the character.");
-    Field<ListGraphType<CharacterInterface>>("friends");
-  }
-}
+        private async static void Run()
+        {
+          Console.WriteLine("Hello GraphQL!");
 
-public class DroidType : ObjectGraphType
-{
-  public DroidType()
-  {
-    var data = new StarWarsData();
-    Name = "Droid";
-    Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
-    Field<NonNullGraphType<StringGraphType>>("name", "The name of the droid.");
-    Field<ListGraphType<CharacterInterface>>(
-        "friends",
-        resolve: context => data.GetFriends(context.Source as StarWarsCharacter)
-    );
-    Interface<CharacterInterface>();
-    IsTypeOf = value => value is Droid;
-  }
+          var schema = new Schema { Query = new StarWarsQuery() };
+
+          var result = await ExecuteQuery(
+            schema, @"
+            query {
+              hero {
+                id
+                name
+              }
+            }
+          ");
+          Console.WriteLine(result);
+        }
+
+      private static async Task<string> ExecuteQuery(
+        Schema schema,
+        string query,
+        object rootObject = null,
+        string operationName = null,
+        Inputs inputs = null)
+      {
+        var executer = new DocumentExecuter();
+        var writer = new DocumentWriter(indent: true);
+
+        var result = await executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
+        return writer.Write(result);
+      }
+    }
+
+    public class Droid
+    {
+      public string Id { get; set; }
+      public string Name { get; set; }
+    }
+
+    public class StarWarsQuery : ObjectGraphType
+    {
+      public StarWarsQuery()
+      {
+        Name = "Query";
+        Field<DroidType>(
+          "hero",
+          resolve: context => new Droid { Id = "1", Name = "R2-D2" }
+        );
+      }
+    }
+
+    public class DroidType : ObjectGraphType
+    {
+      public DroidType()
+      {
+        Name = "Droid";
+        Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
+        Field<StringGraphType>("name", "The name of the droid.");
+        IsTypeOf = value => value is Droid;
+      }
+    }
 }
 ```
 
-Executing a query.
-
-```csharp
-public async Task<string> Execute(
-  Schema schema,
-  object rootObject,
-  string query,
-  string operationName = null,
-  Inputs inputs = null)
-{
-  var executer = new DocumentExecuter();
-  var writer = new DocumentWriter();
-
-  var result = await executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
-  return writer.Write(result);
-}
-
-var schema = new StarWarsSchema();
-
-var query = @"
-  query HeroNameQuery {
-    hero {
-      name
-    }
-  }
-";
-
-var result = await Execute(schema, null, query);
-
-Console.Writeline(result);
-
-// prints
+Output
+```
+Hello GraphQL!
 {
   "data": {
     "hero": {
+      "id": "1",
       "name": "R2-D2"
     }
   }
