@@ -46,14 +46,14 @@ namespace GraphQL
 
         public static bool IsGraphType(this Type type)
         {
-            return type.GetInterfaces().Contains(typeof(IGraphType));
+            return type.GetTypeInfo().GetInterfaces().Contains(typeof(IGraphType));
         }
 
 		public static string GraphQLName(this Type type)
         {
             string typeName = type.Name;
 
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
