@@ -80,7 +80,7 @@ namespace GraphQL.Utilities
             return _scalars.Contains(typeName);
         }
 
-        public string PrintType(GraphType type)
+        public string PrintType(IGraphType type)
         {
             if (type is EnumerationGraphType)
             {
@@ -92,14 +92,14 @@ namespace GraphQL.Utilities
                 return PrintScalar((ScalarGraphType)type);
             }
 
-            if (type is ObjectGraphType)
+            if (type is IObjectGraphType)
             {
-                return PrintObject((ObjectGraphType)type);
+                return PrintObject((IObjectGraphType)type);
             }
 
-            if (type is InterfaceGraphType)
+            if (type is IInterfaceGraphType)
             {
-                return PrintInterface((InterfaceGraphType)type);
+                return PrintInterface((IInterfaceGraphType)type);
             }
 
             if (type is UnionGraphType)
@@ -120,7 +120,7 @@ namespace GraphQL.Utilities
             return "scalar {0}".ToFormat(type.Name);
         }
 
-        public string PrintObject(ObjectGraphType type)
+        public string PrintObject(IObjectGraphType type)
         {
             var interfaces = type.Interfaces.Select(x => Schema.FindType(x).Name).ToList();
             var implementedInterfaces = interfaces.Any()
@@ -130,7 +130,7 @@ namespace GraphQL.Utilities
             return "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
         }
 
-        public string PrintInterface(InterfaceGraphType type)
+        public string PrintInterface(IInterfaceGraphType type)
         {
             return "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
@@ -153,7 +153,7 @@ namespace GraphQL.Utilities
             return "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
-        public string PrintFields(GraphType type)
+        public string PrintFields(IComplexGraphType type)
         {
             var fields = type.Fields
                 .Select(x =>
@@ -218,7 +218,7 @@ namespace GraphQL.Utilities
             return "{0}".ToFormat(value);
         }
 
-        public string ResolveName(GraphType type)
+        public string ResolveName(IGraphType type)
         {
             if (type is NonNullGraphType)
             {

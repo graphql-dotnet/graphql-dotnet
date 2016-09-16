@@ -7,7 +7,7 @@ namespace GraphQL.Types
 {
     public class GraphTypesLookup
     {
-        private readonly Dictionary<string, GraphType> _types = new Dictionary<string, GraphType>();
+        private readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
         public GraphTypesLookup()
         {
@@ -28,7 +28,7 @@ namespace GraphQL.Types
             AddType<__TypeKind>();
         }
 
-        public static GraphTypesLookup Create(IEnumerable<GraphType> types, Func<Type, GraphType> resolveType)
+        public static GraphTypesLookup Create(IEnumerable<IGraphType> types, Func<Type, IGraphType> resolveType)
         {
             var lookup = new GraphTypesLookup();
 
@@ -53,12 +53,12 @@ namespace GraphQL.Types
             _types.Clear();
         }
 
-        public IEnumerable<GraphType> All()
+        public IEnumerable<IGraphType> All()
         {
             return _types.Values;
         }
 
-        public GraphType this[string typeName]
+        public IGraphType this[string typeName]
         {
             get
             {
@@ -67,7 +67,7 @@ namespace GraphQL.Types
                     throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
                 }
 
-                GraphType type;
+                IGraphType type;
                 var name = typeName.TrimGraphQLTypes();
                 _types.TryGetValue(name, out type);
                 return type;
@@ -78,7 +78,7 @@ namespace GraphQL.Types
             }
         }
 
-        public GraphType this[Type type]
+        public IGraphType this[Type type]
         {
             get
             {
@@ -87,17 +87,17 @@ namespace GraphQL.Types
             }
         }
 
-        public IEnumerable<GraphType> FindImplemenationsOf(Type type)
+        public IEnumerable<IGraphType> FindImplemenationsOf(Type type)
         {
             return _types
                 .Values
-                .Where(t => t is ObjectGraphType && t.As<ObjectGraphType>().Interfaces.Any(i => i == type))
+                .Where(t => t is IImplementInterfaces && t.As<IImplementInterfaces>().Interfaces.Any(i => i == type))
                 .Select(x => x)
                 .ToList();
         }
 
         public void AddType<TType>()
-            where TType : GraphType, new()
+            where TType : IGraphType, new()
         {
             var context = new TypeCollectionContext(
                 type => (GraphType) Activator.CreateInstance(type),
@@ -112,14 +112,14 @@ namespace GraphQL.Types
         }
 
         public void AddType<TType>(TypeCollectionContext context)
-            where TType : GraphType
+            where TType : IGraphType
         {
             var type = typeof(TType).GetNamedType();
             var instance = context.ResolveType(type);
             AddType(instance, context);
         }
 
-        public void AddType(GraphType type, TypeCollectionContext context)
+        public void AddType(IGraphType type, TypeCollectionContext context)
         {
             if (type == null)
             {
@@ -134,24 +134,28 @@ namespace GraphQL.Types
             var name = type.CollectTypes(context).TrimGraphQLTypes();
             _types[name] = type;
 
-            type.Fields.Apply(field =>
+            if (type is IComplexGraphType)
             {
-                AddTypeIfNotRegistered(field.Type, context);
-
-                field.Arguments?.Apply(arg =>
+                var complexType = type as IComplexGraphType;
+                complexType.Fields.Apply(field =>
                 {
-                    AddTypeIfNotRegistered(arg.Type, context);
-                });
-            });
+                    AddTypeIfNotRegistered(field.Type, context);
 
-            if (type is ObjectGraphType)
+                    field.Arguments?.Apply(arg =>
+                    {
+                        AddTypeIfNotRegistered(arg.Type, context);
+                    });
+                });
+            }
+
+            if (type is IObjectGraphType)
             {
-                var obj = (ObjectGraphType) type;
+                var obj = (IObjectGraphType) type;
                 obj.Interfaces.Apply(objectInterface =>
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
-                    var interfaceInstance = this[objectInterface] as InterfaceGraphType;
+                    var interfaceInstance = this[objectInterface] as IInterfaceGraphType;
                     if (interfaceInstance != null)
                     {
                         interfaceInstance.AddPossibleType(obj);
@@ -181,7 +185,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(unionedType, context);
 
-                    var objType = this[unionedType] as ObjectGraphType;
+                    var objType = this[unionedType] as IObjectGraphType;
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {

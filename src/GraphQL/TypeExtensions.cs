@@ -1,5 +1,6 @@
 ﻿using System;
 using GraphQL.Types;
+using System.Linq;
 
 namespace GraphQL
 {
@@ -11,16 +12,73 @@ namespace GraphQL
             return item as T;
         }
 
-        public static string GraphQLName(this Type type, bool useInTypeName = false)
+        public static bool IsGraphType(this Type type)
         {
-            if (useInTypeName && type.Name == nameof(ObjectGraphType))
+            return type.GetInterfaces().Contains(typeof(IGraphType));
+        }
+
+        public static string GraphQLName(this Type type)
+        {
+            string typeName = type.Name;
+
+            if (type.IsGenericType)
             {
-                return string.Empty;
+                typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
-            var typeName = type.Name.Replace(nameof(GraphType), nameof(Type));
+
+            typeName = typeName.Replace(nameof(GraphType), nameof(Type));
+
             return typeName.EndsWith(nameof(Type))
                 ? typeName.Remove(typeName.Length - nameof(Type).Length)
                 : typeName;
+        }
+
+        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
+        {
+            Type graphType = null;
+
+            if (type == typeof(int))
+            {
+                graphType = typeof(IntGraphType);
+            }
+
+            if (type == typeof(long))
+            {
+                graphType = typeof(IntGraphType);
+            }
+
+            if (type == typeof(double))
+            {
+                graphType = typeof(FloatGraphType);
+            }
+
+            if (type == typeof(string))
+            {
+                graphType = typeof(StringGraphType);
+            }
+
+            if (type == typeof(bool))
+            {
+                graphType = typeof(BooleanGraphType);
+            }
+
+            if (type == typeof(DateTime))
+            {
+                graphType = typeof(DateGraphType);
+            }
+
+            if (graphType == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), "Unknown input type.");
+            }
+
+            if (!isNullable)
+            {
+                var nullType = typeof(NonNullGraphType<>);
+                graphType = nullType.MakeGenericType(graphType);
+            }
+
+            return graphType;
         }
     }
 }

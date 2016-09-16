@@ -17,20 +17,20 @@ namespace GraphQL
             return Regex.Replace(name, "[\\[!\\]]", "").Trim();
         }
 
-        public static bool IsCompositeType(this GraphType type)
+        public static bool IsCompositeType(this IGraphType type)
         {
-            return type is ObjectGraphType ||
-                   type is InterfaceGraphType ||
+            return type is IObjectGraphType ||
+                   type is IInterfaceGraphType ||
                    type is UnionGraphType;
         }
 
-        public static bool IsLeafType(this GraphType type, ISchema schema)
+        public static bool IsLeafType(this IGraphType type, ISchema schema)
         {
             var namedType = type.GetNamedType(schema);
             return namedType is ScalarGraphType || namedType is EnumerationGraphType;
         }
 
-        public static bool IsInputType(this GraphType type, ISchema schema)
+        public static bool IsInputType(this IGraphType type, ISchema schema)
         {
             var namedType = type.GetNamedType(schema);
             return namedType is ScalarGraphType ||
@@ -38,9 +38,9 @@ namespace GraphQL
                    namedType is InputObjectGraphType;
         }
 
-        public static GraphType GetNamedType(this GraphType type, ISchema schema)
+        public static IGraphType GetNamedType(this IGraphType type, ISchema schema)
         {
-            GraphType unmodifiedType = type;
+            IGraphType unmodifiedType = type;
 
             if (type is NonNullGraphType)
             {
@@ -69,7 +69,7 @@ namespace GraphQL
             return type;
         }
 
-        public static IEnumerable<string> IsValidLiteralValue(this GraphType type, IValue valueAst, ISchema schema)
+        public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             if (type is NonNullGraphType)
             {
@@ -179,7 +179,7 @@ namespace GraphQL
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
-        public static bool IsSubtypeOf(this GraphType maybeSubType, GraphType superType, ISchema schema)
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema)
         {
             if (maybeSubType.Equals(superType))
             {
@@ -224,10 +224,10 @@ namespace GraphQL
 
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
-            if (superType is GraphQLAbstractType &&
-                maybeSubType is ObjectGraphType)
+            if (superType is IAbstractGraphType &&
+                maybeSubType is IObjectGraphType)
             {
-                return ((GraphQLAbstractType) superType).IsPossibleType(maybeSubType);
+                return ((IAbstractGraphType) superType).IsPossibleType(maybeSubType);
             }
 
             return false;
@@ -242,15 +242,15 @@ namespace GraphQL
         ///
         /// This function is commutative.
         /// </summary>
-        public static bool DoTypesOverlap(this ISchema schema, GraphType typeA, GraphType typeB)
+        public static bool DoTypesOverlap(this ISchema schema, IGraphType typeA, IGraphType typeB)
         {
             if (typeA.Equals(typeB))
             {
                 return true;
             }
 
-            var a = typeA as GraphQLAbstractType;
-            var b = typeB as GraphQLAbstractType;
+            var a = typeA as IAbstractGraphType;
+            var b = typeB as IAbstractGraphType;
 
             if (a != null)
             {
@@ -270,7 +270,7 @@ namespace GraphQL
             return false;
         }
 
-        public static IValue AstFromValue(this object value, ISchema schema, GraphType type)
+        public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
         {
             if (type is NonNullGraphType)
             {
@@ -324,9 +324,11 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
+
             Invariant.Check(
                 type.IsInputType(schema),
                 $"Must provide Input Type, cannot use: {type}");
+
 
             var inputType = type as ScalarGraphType;
 

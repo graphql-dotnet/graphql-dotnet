@@ -1,6 +1,6 @@
 ﻿namespace GraphQL.Types.Relay
 {
-    public class PageInfoType : ObjectGraphType
+    public class PageInfoType : ObjectGraphType<object>
     {
         public PageInfoType()
         {

@@ -100,6 +100,7 @@ namespace GraphQL.Tests.Builders
         public void can_define_simple_connection_with_resolver()
         {
             var type = new ObjectGraphType();
+
             type.Connection<ObjectGraphType>()
                 .Name("testConnection")
                 .Resolve(resArgs =>
@@ -129,7 +130,8 @@ namespace GraphQL.Tests.Builders
             var field = type.Fields.Single();
             field.Name.ShouldEqual("testConnection");
             field.Type.ShouldEqual(typeof(ConnectionType<ObjectGraphType>));
-            var result = field.Resolve(new ResolveFieldContext()) as Connection<Child>;
+
+            var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
@@ -147,19 +149,19 @@ namespace GraphQL.Tests.Builders
             }
         }
 
-        public class ParentType : ObjectGraphType
+        public class ParentType : ObjectGraphType<Parent>
         {
             public ParentType()
             {
                 Name = "Parent";
 
-                Connection<ChildType, Parent>()
+                Connection<ChildType>()
                     .Name("connection1")
                     .Unidirectional()
                     .DeprecationReason("Deprecated")
                     .Resolve(context => context.Source.Connection1);
 
-                Connection<ChildType, Parent>()
+                Connection<ChildType>()
                     .Name("connection2")
                     .Description("RandomDescription")
                     .Bidirectional()
@@ -167,7 +169,7 @@ namespace GraphQL.Tests.Builders
             }
         }
 
-        public class ChildType : ObjectGraphType
+        public class ChildType : ObjectGraphType<Child>
         {
             public ChildType()
             {
@@ -237,7 +239,6 @@ namespace GraphQL.Tests.Builders
 
                 Field<ParentType>()
                     .Name("parent")
-                    .Returns<Parent>()
                     .Resolve(_ => new Parent());
             }
         }

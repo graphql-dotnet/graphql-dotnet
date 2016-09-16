@@ -152,7 +152,7 @@ namespace GraphQL.Validation
             return AstPrinter.Print(node);
         }
 
-        public string Print(GraphType type)
+        public string Print(IGraphType type)
         {
             if (_schemaPrinter == null)
             {
@@ -165,6 +165,6 @@ namespace GraphQL.Validation
     public struct VariableUsage
     {
         public VariableReference Node;
-        public GraphType Type;
+        public IGraphType Type;
     }
 }

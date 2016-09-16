@@ -79,15 +79,15 @@ namespace GraphQL.Validation.Rules
         /// </summary>
         private IEnumerable<string> getSuggestedTypeNames(
           ISchema schema,
-          GraphType type,
+          IGraphType type,
           string fieldName)
         {
-            if (type is InterfaceGraphType || type is UnionGraphType)
+            if (type is IAbstractGraphType)
             {
                 var suggestedObjectTypes = new List<string>();
                 var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
 
-                var absType = type as GraphQLAbstractType;
+                var absType = type as IAbstractGraphType;
                 absType.PossibleTypes.Apply(possibleType =>
                 {
                     if (!possibleType.HasField(fieldName))
@@ -102,13 +102,13 @@ namespace GraphQL.Validation.Rules
                     {
                         var possibleInterface = schema.FindType(possibleInterfaceType);
 
-                        if (!possibleInterface.HasField(fieldName))
+                        if (
+                            possibleInterface is IComplexGraphType && 
+                            ((IComplexGraphType) possibleInterface).HasField(fieldName))
                         {
-                            return;
+                            // This interface type defines this field.
+                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
                         }
-
-                        // This interface type defines this field.
-                        interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
                     });
                 });
 
@@ -124,12 +124,13 @@ namespace GraphQL.Validation.Rules
         /// that may be the result of a typo.
         /// </summary>
         private IEnumerable<string> getSuggestedFieldNames(
-          GraphType type,
+          IGraphType type,
           string fieldName)
         {
-            if (type is ObjectGraphType || type is InterfaceGraphType)
+            if (type is IComplexGraphType)
             {
-                return StringUtils.SuggestionList(fieldName, type.Fields.Select(x => x.Name));
+                var complexType = type as IComplexGraphType;
+                return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
             }
 
             return Enumerable.Empty<string>();

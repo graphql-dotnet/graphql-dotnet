@@ -39,7 +39,7 @@ namespace GraphQL.Validation.Rules
 
         public string BadValueMessage(
             string argName,
-            GraphType type,
+            IGraphType type,
             string value,
             IEnumerable<string> verboseErrors)
         {

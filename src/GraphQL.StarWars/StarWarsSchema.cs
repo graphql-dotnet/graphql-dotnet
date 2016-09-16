@@ -8,7 +8,7 @@ namespace GraphQL.StarWars
         public StarWarsSchema(Func<Type, GraphType> resolveType)
             : base(resolveType)
         {
-            Query = (ObjectGraphType)resolveType(typeof (StarWarsQuery));
+            Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
         }
     }
 }

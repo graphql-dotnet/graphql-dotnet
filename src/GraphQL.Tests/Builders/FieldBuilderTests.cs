@@ -64,8 +64,8 @@ namespace GraphQL.Tests.Builders
             fields[0].Type.ShouldEqual(typeof(StringGraphType));
 
             var context = new ResolveFieldContext();
-            fields[0].Resolve(context).GetType().ShouldEqual(typeof(string));
-            fields[0].Resolve(context).ShouldEqual("SomeString");
+            fields[0].Resolver.Resolve(context).GetType().ShouldEqual(typeof(string));
+            fields[0].Resolver.Resolve(context).ShouldEqual("SomeString");
         }
 
         [Fact]
@@ -149,7 +149,7 @@ namespace GraphQL.Tests.Builders
             field.Arguments[0].Description.ShouldEqual("desc1");
             field.Arguments[0].Type.ShouldEqual(typeof(StringGraphType));
             field.Arguments[0].DefaultValue.ShouldEqual("12345");
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
                 FieldDefinition = field
@@ -191,7 +191,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
                 FieldDefinition = field
@@ -211,7 +211,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -234,7 +234,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -257,7 +257,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
                 FieldDefinition = field
@@ -277,7 +277,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -300,7 +300,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
                 FieldDefinition = field
@@ -320,7 +320,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -343,7 +343,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {
@@ -356,8 +356,9 @@ namespace GraphQL.Tests.Builders
         [Fact]
         public void can_access_object()
         {
-            var objectType = new ObjectGraphType();
-            objectType.Field<StringGraphType, int>()
+            var objectType = new ObjectGraphType<int>();
+
+            objectType.Field<StringGraphType>()
                 .Resolve(context =>
                 {
                     context.Source.ShouldEqual(12345);
@@ -365,7 +366,7 @@ namespace GraphQL.Tests.Builders
                 });
 
             var field = objectType.Fields.First();
-            field.Resolve(new ResolveFieldContext
+            field.Resolver.Resolve(new ResolveFieldContext
             {
                 Source = 12345
             });

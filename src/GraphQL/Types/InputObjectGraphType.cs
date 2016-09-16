@@ -1,6 +1,8 @@
-﻿namespace GraphQL.Types
+﻿using GraphQL.Builders;
+
+namespace GraphQL.Types
 {
-    public class InputObjectGraphType : GraphType
+    public class InputObjectGraphType : ComplexGraphType<object>
     {
     }
 }

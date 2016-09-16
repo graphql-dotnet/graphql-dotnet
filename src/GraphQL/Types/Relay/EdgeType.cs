@@ -1,7 +1,7 @@
 ﻿namespace GraphQL.Types.Relay
 {
-    public class EdgeType<TTo> : ObjectGraphType
-        where TTo : ObjectGraphType
+    public class EdgeType<TTo> : ObjectGraphType<object>
+        where TTo : IObjectGraphType
     {
         public EdgeType()
         {

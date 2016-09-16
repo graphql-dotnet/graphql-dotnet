@@ -1,20 +1,21 @@
 ﻿using System;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using GraphQL.Resolvers;
 
 namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
         public static ConnectionBuilder<TGraphType, TSourceType> Create<TGraphType, TSourceType>()
-            where TGraphType : ObjectGraphType
+            where TGraphType : IObjectGraphType
         {
             return ConnectionBuilder<TGraphType, TSourceType>.Create();
         }
     }
 
     public class ConnectionBuilder<TGraphType, TSourceType>
-        where TGraphType : ObjectGraphType
+        where TGraphType : IObjectGraphType
     {
         
         private readonly Func<object, TSourceType> _objectResolver;
@@ -144,12 +145,12 @@ namespace GraphQL.Builders
 
         public void Resolve(Func<ResolveConnectionContext<TSourceType>, object> resolver)
         {
-            FieldType.Resolve = context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
                 var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
                 return resolver(args);
-            };
+            });
         }
 
         private void CheckForErrors(ResolveConnectionContext<TSourceType> args)

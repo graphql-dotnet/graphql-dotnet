@@ -6,7 +6,7 @@ namespace GraphQL.Types
 {
     public static class TypeExtensions
     {
-        public static GraphType GraphTypeFromType(this IType type, ISchema schema)
+        public static IGraphType GraphTypeFromType(this IType type, ISchema schema)
         {
             if (type is NonNullType)
             {

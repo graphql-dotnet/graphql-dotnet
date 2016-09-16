@@ -304,7 +304,7 @@ namespace GraphQL.Tests.Execution
         }
     }
 
-    public class DogType : ObjectGraphType
+    public class DogType : ObjectGraphType<Dog>
     {
         public DogType()
         {
@@ -319,7 +319,7 @@ namespace GraphQL.Tests.Execution
         }
     }
 
-    public class CatType : ObjectGraphType
+    public class CatType : ObjectGraphType<Cat>
     {
         public CatType()
         {
@@ -345,7 +345,7 @@ namespace GraphQL.Tests.Execution
         }
     }
 
-    public class PersonType : ObjectGraphType
+    public class PersonType : ObjectGraphType<Person>
     {
         public PersonType()
         {
@@ -366,7 +366,7 @@ namespace GraphQL.Tests.Execution
         public UnionSchema(Func<Type, GraphType> resolveType)
             : base(resolveType)
         {
-            Query = (ObjectGraphType)resolveType(typeof(PersonType));
+            Query = (PersonType)resolveType(typeof(PersonType));
         }
     }
 }

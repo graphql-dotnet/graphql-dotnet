@@ -1,7 +1,7 @@
 ﻿namespace GraphQL.Types.Relay
 {
-    public class ConnectionType<TTo> : ObjectGraphType
-        where TTo : ObjectGraphType
+    public class ConnectionType<TTo> : ObjectGraphType<object>
+        where TTo : IObjectGraphType
     {
         public ConnectionType()
         {

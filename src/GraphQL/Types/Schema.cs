@@ -6,29 +6,29 @@ namespace GraphQL.Types
 {
     public interface ISchema : IDisposable
     {
-        ObjectGraphType Query { get; set; }
+        IObjectGraphType Query { get; set; }
 
-        ObjectGraphType Mutation { get; set; }
+        IObjectGraphType Mutation { get; set; }
 
-        ObjectGraphType Subscription { get; set; }
+        IObjectGraphType Subscription { get; set; }
 
         IEnumerable<DirectiveGraphType> Directives { get; set; }
 
-        IEnumerable<GraphType> AllTypes { get; }
+        IEnumerable<IGraphType> AllTypes { get; }
 
-        GraphType FindType(string name);
+        IGraphType FindType(string name);
 
-        GraphType FindType(Type type);
+        IGraphType FindType(Type type);
 
-        IEnumerable<GraphType> FindTypes(IEnumerable<Type> types);
+        IEnumerable<IGraphType> FindTypes(IEnumerable<Type> types);
 
-        IEnumerable<GraphType> FindImplementationsOf(Type type);
+        IEnumerable<IGraphType> FindImplementationsOf(Type type);
 
         IEnumerable<Type> AdditionalTypes { get; }
 
         void RegisterTypes(params Type[] types);
 
-        void RegisterType<T>() where T : GraphType;
+        void RegisterType<T>() where T : IGraphType;
     }
 
     public class Schema : ISchema
@@ -42,7 +42,7 @@ namespace GraphQL.Types
         {
         }
 
-        public Schema(Func<Type, GraphType> resolveType)
+        public Schema(Func<Type, IGraphType> resolveType)
         {
             ResolveType = resolveType;
 
@@ -56,13 +56,13 @@ namespace GraphQL.Types
             };
         }
 
-        public ObjectGraphType Query { get; set; }
+        public IObjectGraphType Query { get; set; }
 
-        public ObjectGraphType Mutation { get; set; }
+        public IObjectGraphType Mutation { get; set; }
 
-        public ObjectGraphType Subscription { get; set; }
+        public IObjectGraphType Subscription { get; set; }
 
-        public Func<Type, GraphType> ResolveType { get; set; }
+        public Func<Type, IGraphType> ResolveType { get; set; }
 
         public IEnumerable<DirectiveGraphType> Directives
         {
@@ -82,7 +82,7 @@ namespace GraphQL.Types
             }
         }
 
-        public IEnumerable<GraphType> AllTypes
+        public IEnumerable<IGraphType> AllTypes
         {
             get
             {
@@ -105,12 +105,12 @@ namespace GraphQL.Types
             types.Apply(RegisterType);
         }
 
-        public void RegisterType<T>() where T : GraphType
+        public void RegisterType<T>() where T : IGraphType
         {
             RegisterType(typeof(T));
         }
 
-        public GraphType FindType(string name)
+        public IGraphType FindType(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -120,7 +120,7 @@ namespace GraphQL.Types
             return _lookup.Value[name];
         }
 
-        public GraphType FindType(Type type)
+        public IGraphType FindType(Type type)
         {
             if (type == null)
             {
@@ -139,12 +139,12 @@ namespace GraphQL.Types
             return _lookup.Value[type] ?? AddType(type);
         }
 
-        public IEnumerable<GraphType> FindTypes(IEnumerable<Type> types)
+        public IEnumerable<IGraphType> FindTypes(IEnumerable<Type> types)
         {
             return types.Select(FindType).ToList();
         }
 
-        public IEnumerable<GraphType> FindImplementationsOf(Type type)
+        public IEnumerable<IGraphType> FindImplementationsOf(Type type)
         {
             return _lookup.Value.FindImplemenationsOf(type);
         }
@@ -176,7 +176,7 @@ namespace GraphQL.Types
         {
             var resolvedTypes = _additionalTypes.Select(t => ResolveType(t.GetNamedType())).ToList();
 
-            var types = new List<GraphType>
+            var types = new List<IGraphType>
             {
                 Query,
                 Mutation,
@@ -189,7 +189,7 @@ namespace GraphQL.Types
             return GraphTypesLookup.Create(types, ResolveType);
         }
 
-        private GraphType AddType(Type type)
+        private IGraphType AddType(Type type)
         {
             if (type == null)
             {

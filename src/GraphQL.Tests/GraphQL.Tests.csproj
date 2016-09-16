@@ -71,6 +71,7 @@
     <Compile Include="Execution\SchemaLifetimeTests.cs" />
     <Compile Include="Execution\UnionInterfaceTests.cs" />
     <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="Types\ComplexGraphTypeTests.cs" />
     <Compile Include="Types\StringGraphTypeTests.cs" />
     <Compile Include="Language\ShowDownTests.cs" />
     <Compile Include="Utilities\GraphQLExtensionsTester.cs" />

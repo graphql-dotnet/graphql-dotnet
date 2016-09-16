@@ -1,3 +1,4 @@
+using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -9,11 +10,11 @@ namespace GraphQL.Introspection
             Name = "__schema";
             Type = typeof (__Schema);
             Description = "Access the current type schema of this server.";
-            Resolve = context => context.Schema;
+            Resolver = new FuncFieldResolver<ISchema>(context => context.Schema);
         }
     }
 
-    public class __Schema : ObjectGraphType
+    public class __Schema : ObjectGraphType<object>
     {
         public __Schema()
         {
