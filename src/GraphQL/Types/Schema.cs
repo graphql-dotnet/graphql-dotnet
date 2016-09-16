@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace GraphQL.Types
-{
+{   
+
     public interface ISchema : IDisposable
     {
         IObjectGraphType Query { get; set; }
@@ -175,7 +176,7 @@ namespace GraphQL.Types
         private GraphTypesLookup CreateTypesLookup()
         {
             var resolvedTypes = _additionalTypes.Select(t => ResolveType(t.GetNamedType())).ToList();
-
+            
             var types = new List<IGraphType>
             {
                 Query,

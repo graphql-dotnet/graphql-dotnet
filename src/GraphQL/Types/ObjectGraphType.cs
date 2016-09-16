@@ -25,6 +25,11 @@ namespace GraphQL.Types
             }
         }
 
+        public ObjectGraphType(Action<ObjectGraphType> configure)
+        {
+            configure(this);
+        }
+
         public void Interface<TInterface>()
             where TInterface : IInterfaceGraphType
         {
@@ -68,6 +73,11 @@ namespace GraphQL.Types
                 _interfaces.Clear();
                 _interfaces.AddRange(value);
             }
+        }
+
+        public ObjectGraphType(Action<ObjectGraphType<TSourceType>> configure)
+        {
+            configure(this);
         }
 
         public void Interface<TInterface>()

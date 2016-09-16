@@ -1,3 +1,4 @@
+
 namespace GraphQL.Tests.StarWars
 {
     public class StarWarsBasicQueryTests : StarWarsTestBase

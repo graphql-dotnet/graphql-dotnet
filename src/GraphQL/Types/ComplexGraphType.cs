@@ -31,6 +31,12 @@ namespace GraphQL.Types
             }
         }
 
+        public ComplexGraphType() { }
+
+        public ComplexGraphType(Action<ComplexGraphType<TSourceType>> configure) {
+            configure(this);
+        }
+
         public bool HasField(string name)
         {
             return _fields.Any(x => string.Equals(x.Name, name));
