@@ -20,7 +20,7 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
-There is a sample web api project hosting the GraphiQL interface.  `npm install` and build `webpack` from the root of the repository.
+There is a sample web api project hosting the GraphiQL interface.  `npm install` and `npm start` from the root of the repository, then run the web project from Visual Studio.
 
 ```
 > npm install
@@ -32,7 +32,7 @@ There is a sample web api project hosting the GraphiQL interface.  `npm install`
 
 Define your schema with a top level query object then execute that query.
 
-Full example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
+A more full-featured example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
 
 ```csharp
 namespace ConsoleApplication
@@ -78,7 +78,12 @@ namespace ConsoleApplication
         var executer = new DocumentExecuter();
         var writer = new DocumentWriter(indent: true);
 
-        var result = await executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
+        var result = await executer.ExecuteAsync(
+          schema,
+          rootObject,
+          query,
+          operationName,
+          inputs).ConfigureAwait(false);
         return writer.Write(result);
       }
     }
