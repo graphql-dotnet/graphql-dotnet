@@ -32,6 +32,8 @@ There is a sample web api project hosting the GraphiQL interface.  `npm install`
 
 Define your schema with a top level query object then execute that query.
 
+Full example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
+
 ```csharp
 namespace ConsoleApplication
 {
