@@ -40,7 +40,13 @@
         "portable-net45+win8"
       ]
     },
+    "net45": {
+      "System.Threading.Tasks": ""
+    },
     "net451": {
+      "System.Threading.Tasks": ""
+    },
+    "net452": {
       "System.Threading.Tasks": ""
     },
     "net46": {
