@@ -50,7 +50,7 @@ namespace ConsoleApplication
           Run();
         }
 
-        private async static void Run()
+        private static async void Run()
         {
           Console.WriteLine("Hello GraphQL!");
 
