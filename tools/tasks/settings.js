@@ -7,7 +7,8 @@ const target = process.env.CONFIGURATION || 'debug';
 const buildNumber = process.env.APPVEYOR_BUILD_NUMBER;
 let version = pjson.version;
 const revision = buildNumber || moment().format('HHmm');
-version = `${version}.${revision}`;
+const assemblyVersion = `${version}.${revision}`;
+const nugetVersion = `${version}-alpha-${revision}`;
 
 const testOutput = path.resolve('./fixie-results.xml');
 const appVeyorJobId = process.env.APPVEYOR_JOB_ID;
@@ -18,6 +19,7 @@ export default {
   CI,
   target,
   revision,
-  version,
+  nugetVersion,
+  version: assemblyVersion,
   testOutput
 };

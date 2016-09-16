@@ -1,9 +1,10 @@
 using GraphQL.Builders;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace GraphQL.Types
-{   
+{
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
         Func<object, bool> IsTypeOf { get; set; }
@@ -37,7 +38,7 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(IInterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }
@@ -57,7 +58,7 @@ namespace GraphQL.Types
     {
         private readonly List<Type> _interfaces = new List<Type>();
 
-        public Func<object, bool> IsTypeOf { get; set; } 
+        public Func<object, bool> IsTypeOf { get; set; }
             = type => type is TSourceType;
 
         public IEnumerable<Type> Interfaces
@@ -82,7 +83,7 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(IInterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }

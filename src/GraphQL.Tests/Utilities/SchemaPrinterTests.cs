@@ -4,7 +4,8 @@ using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -45,7 +46,7 @@ namespace GraphQL.Tests.Utilities
 
         private void AssertEqual(string result, string expected)
         {
-            result.Replace("\r", "").ShouldEqual(expected.Replace("\r", ""));
+            result.Replace("\r", "").ShouldBe(expected.Replace("\r", ""));
         }
 
         [Fact]

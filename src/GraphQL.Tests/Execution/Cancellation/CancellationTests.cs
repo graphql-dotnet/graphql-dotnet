@@ -1,11 +1,10 @@
-﻿using GraphQL.Types;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Should;
+using GraphQL.Types;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution.Cancellation
 {
@@ -64,7 +63,7 @@ namespace GraphQL.Tests.Execution.Cancellation
                 tokenSource.Cancel();
                 var result = AssertQueryWithErrors("{two}", null, cancellationToken: tokenSource.Token, expectedErrorCount: 1);
                 var aggExc = result.Errors.Single();
-                aggExc.InnerException.ShouldBeType<OperationCanceledException>();
+                aggExc.InnerException.ShouldBeOfType<OperationCanceledException>();
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using GraphQL.Language.AST;
 using GraphQL.Types;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -19,7 +20,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = "test".AstFromValue(null, new StringGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeType<StringValue>();
+            result.ShouldBeOfType<StringValue>();
         }
 
         [Fact]
@@ -27,7 +28,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = true.AstFromValue(null, new BooleanGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeType<BooleanValue>();
+            result.ShouldBeOfType<BooleanValue>();
         }
 
         [Fact]
@@ -36,7 +37,7 @@ namespace GraphQL.Tests.Execution
             long val = 12345678910111213;
             var result = val.AstFromValue(null, new IntGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeType<LongValue>();
+            result.ShouldBeOfType<LongValue>();
         }
 
         [Fact]
@@ -45,7 +46,7 @@ namespace GraphQL.Tests.Execution
             int val = 123;
             var result = val.AstFromValue(null, new IntGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeType<IntValue>();
+            result.ShouldBeOfType<IntValue>();
         }
 
         [Fact]
@@ -54,7 +55,7 @@ namespace GraphQL.Tests.Execution
             double val = 0.42;
             var result = val.AstFromValue(null, new FloatGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeType<FloatValue>();
+            result.ShouldBeOfType<FloatValue>();
         }
     }
 }

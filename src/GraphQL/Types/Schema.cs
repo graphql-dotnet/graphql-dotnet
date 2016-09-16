@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -127,7 +128,7 @@ namespace GraphQL.Types
                 return null;
             }
 
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 var genericDef = type.GetGenericTypeDefinition();
                 if (genericDef == typeof(ListGraphType<>) || genericDef == typeof(NonNullGraphType<>))
@@ -164,7 +165,7 @@ namespace GraphQL.Types
 
         private void RegisterType(Type type)
         {
-            if (!typeof (GraphType).IsAssignableFrom(type))
+            if (!typeof (GraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
             }

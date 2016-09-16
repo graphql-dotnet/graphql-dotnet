@@ -15,13 +15,9 @@ namespace GraphQL.Resolvers
         public object Resolve(ResolveFieldContext context)
         {
             var source = context.Source;
-            if (source == null)
-            {
-                return null;
-            }
 
-            return source
-                .GetType()
+            return source?.GetType()
+                .GetTypeInfo()
                 .GetProperty(context.FieldAst.Name, _flags)
                 .GetValue(source, null);
         }

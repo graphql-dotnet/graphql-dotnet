@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -13,18 +14,18 @@ namespace GraphQL.Tests.Types
     {
         internal class ComplexType<T> : ComplexGraphType<T> { }
 
- 
+
         [Fact]
         public void accepts_property_expressions()
         {
             var type = new ComplexType<Droid>();
             var field = type.Field(d => d.Name);
 
-            type.Fields.Last().Name.ShouldEqual("name");
-            type.Fields.Last().Type.ShouldEqual(typeof(NonNullGraphType<StringGraphType>));
+            type.Fields.Last().Name.ShouldBe("name");
+            type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
         }
 
-    
+
         [Fact]
         public void allows_custom_name()
         {
@@ -32,7 +33,7 @@ namespace GraphQL.Tests.Types
             var field = type.Field(d => d.Name)
                 .Name("droid");
 
-            type.Fields.Last().Name.ShouldEqual("droid");
+            type.Fields.Last().Name.ShouldBe("droid");
         }
 
         [Fact]
@@ -42,7 +43,7 @@ namespace GraphQL.Tests.Types
 
             type.Field("appearsIn", d => d.AppearsIn.First(), nullable: true);
 
-            type.Fields.Last().Type.ShouldEqual(typeof(IntGraphType));
+            type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<Droid>();
 
-            Expect.Throws<ArgumentException>(() =>
+            Should.Throw<ArgumentException>(() =>
                 type.Field(d => d.AppearsIn.First())
             );
         }
@@ -59,11 +60,11 @@ namespace GraphQL.Tests.Types
         public void create_field_with_func_resolver()
         {
             var type = new ComplexType<Droid>();
-            var field = type.Field<StringGraphType>("name", 
+            var field = type.Field<StringGraphType>("name",
                 resolve: context => context.Source.Name
             );
 
-            type.Fields.Last().Type.ShouldEqual(typeof(StringGraphType));
+            type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
         }
     }
 }

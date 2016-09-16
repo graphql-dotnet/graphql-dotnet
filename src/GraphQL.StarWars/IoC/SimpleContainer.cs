@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace GraphQL.StarWars.IoC
 {
@@ -65,7 +66,7 @@ namespace GraphQL.StarWars.IoC
                 return creator();
             }
 
-            if (!serviceType.IsAbstract)
+            if (!serviceType.GetTypeInfo().IsAbstract)
             {
                 return CreateInstance(serviceType);
             }
@@ -80,7 +81,7 @@ namespace GraphQL.StarWars.IoC
 
         private object CreateInstance(Type implementationType)
         {
-            var ctor = implementationType.GetConstructors().Single();
+            var ctor = implementationType.GetTypeInfo().GetConstructors().Single();
             var parameterTypes = ctor.GetParameters().Select(p => p.ParameterType);
             var dependencies = parameterTypes.Select(Get).ToArray();
             return Activator.CreateInstance(implementationType, dependencies);

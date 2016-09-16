@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -37,8 +38,8 @@ namespace GraphQL.Introspection
                 {
                     var type = (Type) context.Source;
 
-                    if (typeof (NonNullGraphType).IsAssignableFrom(type)
-                        || typeof (ListGraphType).IsAssignableFrom(type))
+                    if (typeof (NonNullGraphType).GetTypeInfo().IsAssignableFrom(type)
+                        || typeof (ListGraphType).GetTypeInfo().IsAssignableFrom(type))
                     {
                         return null;
                     }
@@ -117,8 +118,8 @@ namespace GraphQL.Introspection
                 if (context.Source is Type)
                 {
                     var type = (Type) context.Source;
-                    var genericType = type.IsConstructedGenericType ? type.GetGenericArguments()[0] : null;
-                    if (genericType != null && typeof(GraphType).IsAssignableFrom(genericType))
+                    var genericType = type.IsConstructedGenericType ? type.GetTypeInfo().GetGenericArguments()[0] : null;
+                    if (genericType != null && typeof(GraphType).GetTypeInfo().IsAssignableFrom(genericType))
                     {
                         return genericType;
                     }
@@ -179,35 +180,35 @@ namespace GraphQL.Introspection
 
         public TypeKind KindForType(Type type)
         {
-            if (typeof(EnumerationGraphType).IsAssignableFrom(type))
+            if (typeof(EnumerationGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.ENUM;
             }
-            if (typeof(ScalarGraphType).IsAssignableFrom(type))
+            if (typeof(ScalarGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.SCALAR;
             }
-            if (typeof(IObjectGraphType).IsAssignableFrom(type))
+            if (typeof(IObjectGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.OBJECT;
             }
-            if (typeof(IInterfaceGraphType).IsAssignableFrom(type))
+            if (typeof(IInterfaceGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.INTERFACE;
             }
-            if (typeof(UnionGraphType).IsAssignableFrom(type))
+            if (typeof(UnionGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.UNION;
             }
-            if (typeof (InputObjectGraphType).IsAssignableFrom(type))
+            if (typeof (InputObjectGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.INPUT_OBJECT;
             }
-            if (typeof (ListGraphType).IsAssignableFrom(type))
+            if (typeof (ListGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.LIST;
             }
-            if (typeof(NonNullGraphType).IsAssignableFrom(type))
+            if (typeof(NonNullGraphType).GetTypeInfo().IsAssignableFrom(type))
             {
                 return TypeKind.NON_NULL;
             }

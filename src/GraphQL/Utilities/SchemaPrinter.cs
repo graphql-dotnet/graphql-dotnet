@@ -5,9 +5,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    public class SchemaPrinter
+    public class SchemaPrinter : IDisposable
     {
-        private readonly WeakReference<ISchema> _schemaReference;
+        private ISchema _schema;
 
         private readonly List<string> _scalars = new List<string>(
             new[]
@@ -25,7 +25,7 @@ namespace GraphQL.Utilities
 
         public SchemaPrinter(ISchema schema, IEnumerable<string> customScalars = null)
         {
-            _schemaReference = new WeakReference<ISchema>(schema);
+            _schema = schema;
 
             if (customScalars != null)
             {
@@ -33,17 +33,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private ISchema Schema
-        {
-            get
-            {
-                ISchema schema;
-
-                _schemaReference.TryGetTarget(out schema);
-
-                return schema;
-            }
-        }
+        private ISchema Schema => _schema;
 
         public string Print()
         {
@@ -155,7 +145,7 @@ namespace GraphQL.Utilities
 
         public string PrintFields(IComplexGraphType type)
         {
-            var fields = type.Fields
+            var fields = type?.Fields
                 .Select(x =>
                 new
                 {
@@ -164,7 +154,7 @@ namespace GraphQL.Utilities
                     Args = PrintArgs(x)
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields.Select(f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
+            return string.Join(Environment.NewLine, fields?.Select(f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
         }
 
         public string PrintArgs(FieldType field)
@@ -233,6 +223,11 @@ namespace GraphQL.Utilities
             }
 
             return type.Name;
+        }
+
+        public void Dispose()
+        {
+            _schema = null;
         }
     }
 }

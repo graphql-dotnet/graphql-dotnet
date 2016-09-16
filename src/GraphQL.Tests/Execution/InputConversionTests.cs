@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Should;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -60,8 +61,8 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{'a': 1}";
             var inputs = json.ToInputs();
-            inputs["a"].ShouldEqual(1);
-            inputs["a"].GetType().ShouldEqual(typeof(int));
+            inputs["a"].ShouldBe(1);
+            inputs["a"].GetType().ShouldBe(typeof(int));
         }
 
         [Fact]
@@ -69,8 +70,8 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{'a': 1000000000000000001}";
             var inputs = json.ToInputs();
-            inputs["a"].ShouldEqual(1000000000000000001);
-            inputs["a"].GetType().ShouldEqual(typeof(long));
+            inputs["a"].ShouldBe(1000000000000000001);
+            inputs["a"].GetType().ShouldBe(typeof(long));
         }
 
         [Fact]
@@ -81,14 +82,14 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldEqual((int)1);
-            inputs["b"].ShouldEqual("2");
+            inputs["a"].ShouldBe((int)1);
+            inputs["b"].ShouldBe("2");
 
             var myInput = inputs.ToObject<MyInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.A.ShouldEqual(1);
-            myInput.B.ShouldEqual("2");
+            myInput.A.ShouldBe(1);
+            myInput.B.ShouldBe("2");
         }
 
         [Fact]
@@ -99,18 +100,18 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldEqual((int)1);
-            inputs["b"].ShouldEqual("2");
-            inputs["c"].ShouldBeType<List<object>>();
+            inputs["a"].ShouldBe((int)1);
+            inputs["b"].ShouldBe("2");
+            inputs["c"].ShouldBeOfType<List<object>>();
 
             var myInput = inputs.ToObject<MyInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.A.ShouldEqual(1);
-            myInput.B.ShouldEqual("2");
+            myInput.A.ShouldBe(1);
+            myInput.B.ShouldBe("2");
             myInput.C.ShouldNotBeNull();
-            myInput.C.Count.ShouldEqual(1);
-            myInput.C.First().ShouldEqual("foo");
+            myInput.C.Count.ShouldBe(1);
+            myInput.C.First().ShouldBe("foo");
         }
 
         [Fact]
@@ -121,14 +122,14 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["f"].ShouldBeType<List<object>>();
+            inputs["f"].ShouldBeOfType<List<object>>();
 
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
             myInput.F.ShouldNotBeNull();
-            myInput.F.Count.ShouldEqual(2);
-            myInput.F[0].ShouldEqual(1);
-            myInput.F[1].ShouldEqual(null);
+            myInput.F.Count.ShouldBe(2);
+            myInput.F[0].ShouldBe(1);
+            myInput.F[1].ShouldBe(null);
         }
 
         [Fact]
@@ -139,20 +140,20 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["g"].ShouldBeType<List<object>>();
+            inputs["g"].ShouldBeOfType<List<object>>();
 
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
             myInput.G.ShouldNotBeNull();
-            myInput.G.Count.ShouldEqual(2);
+            myInput.G.Count.ShouldBe(2);
 
-            myInput.G[0].Count.ShouldEqual(2);
-            myInput.G[0][0].ShouldEqual(1);
+            myInput.G[0].Count.ShouldBe(2);
+            myInput.G[0][0].ShouldBe(1);
             myInput.G[0][1].ShouldBeNull();
 
-            myInput.G[1].Count.ShouldEqual(2);
+            myInput.G[1].Count.ShouldBe(2);
             myInput.G[1][0].ShouldBeNull();
-            myInput.G[1][1].ShouldEqual(1);
+            myInput.G[1][1].ShouldBe(1);
         }
 
         [Fact]
@@ -163,7 +164,7 @@ namespace GraphQL.Tests.Execution
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
-            myInput.D.ShouldEqual(5);
+            myInput.D.ShouldBe(5);
         }
 
         [Fact]
@@ -174,7 +175,7 @@ namespace GraphQL.Tests.Execution
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
-            myInput.E.ShouldEqual(new Guid("920a1b6d-f75a-4594-8567-e2c457b29cc0"));
+            myInput.E.ShouldBe(new Guid("920a1b6d-f75a-4594-8567-e2c457b29cc0"));
         }
 
         [Fact]
@@ -189,7 +190,7 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<EnumInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.A.ShouldEqual(Numbers.Three);
+            myInput.A.ShouldBe(Numbers.Three);
             myInput.B.ShouldBeNull();
         }
 
@@ -205,7 +206,7 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<EnumInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.A.ShouldEqual(Numbers.Two);
+            myInput.A.ShouldBe(Numbers.Two);
         }
 
         [Fact]
@@ -220,7 +221,7 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<EnumInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.A.ShouldEqual(Numbers.Three);
+            myInput.A.ShouldBe(Numbers.Three);
             myInput.B.ShouldBeNull();
         }
 
@@ -234,7 +235,7 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<EnumInput>();
 
             myInput.ShouldNotBeNull();
-            myInput.B.Value.ShouldEqual(Numbers2.Three);
+            myInput.B.Value.ShouldBe(Numbers2.Three);
         }
 
         [Fact]
@@ -247,8 +248,8 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<Parent>();
 
             myInput.ShouldNotBeNull();
-            myInput.B.Count.ShouldEqual(1);
-            myInput.B[0].A.ShouldEqual("bar");
+            myInput.B.Count.ShouldBe(1);
+            myInput.B[0].A.ShouldBe("bar");
         }
 
         [Fact]
@@ -261,8 +262,8 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<Parent2>();
 
             myInput.ShouldNotBeNull();
-            myInput.Input.B.Count.ShouldEqual(1);
-            myInput.Input.B[0].A.ShouldEqual("bar");
+            myInput.Input.B.Count.ShouldBe(1);
+            myInput.Input.B[0].A.ShouldBe("bar");
         }
     }
 }

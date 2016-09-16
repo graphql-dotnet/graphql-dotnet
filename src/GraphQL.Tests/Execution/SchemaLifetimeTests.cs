@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using GraphQL.Types;
-using Should.Core.Assertions;
+using Shouldly;
+using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Tests.Execution
         {
             var schema = new Schema();
 
-            Assert.DoesNotThrow(() => schema.Dispose());
+            Should.NotThrow(() => schema.Dispose());
         }
 
         [Fact]
@@ -22,7 +23,7 @@ namespace GraphQL.Tests.Execution
 
             await executer.ExecuteAsync(schema, null, "{noop}", null).ConfigureAwait(false);
 
-            Assert.DoesNotThrow(() => schema.Dispose());
+            Should.NotThrow(() => schema.Dispose());
         }
     }
 }
