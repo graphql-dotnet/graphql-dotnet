@@ -5,6 +5,6 @@ namespace GraphQL.Types
 {
     public interface IImplementInterfaces
     {
-        IEnumerable<Type> Interfaces { get; }
+        IEnumerable<IInterfaceGraphType> Interfaces { get; }
     }
 }

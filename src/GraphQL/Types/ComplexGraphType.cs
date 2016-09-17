@@ -49,18 +49,13 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name), "A field with that name is already registered.");
             }
 
-            if (!fieldType.Type.IsGraphType())
-            {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Type), "Field type must derive from GraphType.");
-            }
-
             _fields.Add(fieldType);
 
             return fieldType;
         }
 
         public FieldType Field(
-            Type type,
+            IGraphType type,
             string name,
             string description = null,
             QueryArguments arguments = null,
@@ -81,46 +76,26 @@ namespace GraphQL.Types
             });
         }
 
-        public FieldType Field<TGraphType>(
-            string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
-            where TGraphType : IGraphType
-        {
-            return AddField(new FieldType
-            {
-                Name = name,
-                Description = description,
-                DeprecationReason = deprecationReason,
-                Type = typeof(TGraphType),
-                Arguments = arguments,
-                Resolver = resolve != null
-                    ? new FuncFieldResolver<TSourceType, object>(resolve)
-                    : null,
-            });
-        }
 
-        public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
-        {
-            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType));
-            AddField(builder.FieldType);
-            return builder;
-        }
+        //public FieldBuilder<TSourceType, TReturnType> Field<TReturnType>()
+        //{
+        //    var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType));
+        //    AddField(builder.FieldType);
+        //    return builder;
+        //}
 
-        public FieldBuilder<TSourceType, object> Field<TGraphType>()
-        {
-            var builder = FieldBuilder.Create<TSourceType, object>(typeof(TGraphType));
-            AddField(builder.FieldType);
-            return builder;
-        }
+        //public FieldBuilder<TSourceType, object> Field<TGraphType>()
+        //{
+        //    var builder = FieldBuilder.Create<TSourceType, object>(typeof(TGraphType));
+        //    AddField(builder.FieldType);
+        //    return builder;
+        //}
 
         public FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
            bool nullable = false,
-           Type type = null)
+           IGraphType type = null)
         {
             type = type ?? typeof(TProperty).GetGraphTypeFromType(nullable);
 
@@ -135,16 +110,19 @@ namespace GraphQL.Types
         public FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
-            Type type = null)
+            IGraphType type = null)
         {
             string name;
-            try {
+            try
+            {
                 name = expression.NameOf().ToCamelCase();
             }
-            catch {
+            catch
+            {
                 throw new ArgumentException("Cannot infer a Field name from the provided expression");
             }
             return Field(name, expression, nullable, type);
         }
+
     }
 }

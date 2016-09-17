@@ -5,7 +5,7 @@ namespace GraphQL.Types
 {
     public class UnionGraphType : GraphType, IAbstractGraphType
     {
-        private readonly List<Type> _types;
+        private readonly List<IGraphType> _types;
         private readonly List<IObjectGraphType> _possibleTypes;
 
         public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
@@ -14,7 +14,7 @@ namespace GraphQL.Types
 
         public UnionGraphType()
         {
-            _types = new List<Type>();
+            _types = new List<IGraphType>();
             _possibleTypes = new List<IObjectGraphType>();
         }
 
@@ -26,7 +26,7 @@ namespace GraphQL.Types
             }
         }
 
-        public IEnumerable<Type> Types
+        public IEnumerable<IGraphType> Types
         {
             get { return _types; }
             set
@@ -36,10 +36,9 @@ namespace GraphQL.Types
             }
         }
 
-        public void Type<TType>()
-            where TType : IObjectGraphType
+        public void Type(IGraphType type)
         {
-            _types.Add(typeof(TType));
+            _types.Add(type);
         }
     }
 }

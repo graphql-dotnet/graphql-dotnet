@@ -7,7 +7,7 @@ namespace GraphQL.Builders
 {
     public static class FieldBuilder
     {
-        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(Type type = null)
+        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(IGraphType type = null)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
@@ -25,7 +25,7 @@ namespace GraphQL.Builders
             _fieldType = fieldType;
         }
 
-        public static FieldBuilder<TSourceType, TReturnType> Create(Type type = null)
+        public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type = null)
         {
             var fieldType = new FieldType
             {
@@ -75,9 +75,9 @@ namespace GraphQL.Builders
             return new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description)
+        public FieldBuilder<TSourceType, TReturnType> Argument(IGraphType type, string name, string description)
         {
-            _fieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            _fieldType.Arguments.Add(new QueryArgument(type)
             {
                 Name = name,
                 Description = description,
@@ -85,16 +85,16 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default(TArgumentType))
-        {
-            _fieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
-            {
-                Name = name,
-                Description = description,
-                DefaultValue = defaultValue,
-            });
-            return this;
+        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentType>(
+            string name, 
+            string description,
+            TArgumentType defaultValue = default(TArgumentType)
+        ) {
+            return Argument(
+                type: typeof(TArgumentType).GetGraphTypeFromType(),
+                name: name,
+                description: description
+            );
         }
     }
 }

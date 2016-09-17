@@ -33,38 +33,38 @@ namespace GraphQL
                 : typeName;
         }
 
-        public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
+        public static IGraphType GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
-            Type graphType = null;
+            IGraphType graphType = null;
 
             if (type == typeof(int))
             {
-                graphType = typeof(IntGraphType);
+                graphType = ScalarGraphTypes.Int;
             }
 
             if (type == typeof(long))
             {
-                graphType = typeof(IntGraphType);
+                graphType = ScalarGraphTypes.Int;
             }
 
             if (type == typeof(double))
             {
-                graphType = typeof(FloatGraphType);
+                graphType = ScalarGraphTypes.Float;
             }
 
             if (type == typeof(string))
             {
-                graphType = typeof(StringGraphType);
+                graphType = ScalarGraphTypes.String;
             }
 
             if (type == typeof(bool))
             {
-                graphType = typeof(BooleanGraphType);
+                graphType = ScalarGraphTypes.Boolean;
             }
 
             if (type == typeof(DateTime))
             {
-                graphType = typeof(DateGraphType);
+                graphType = ScalarGraphTypes.Date;
             }
 
             if (graphType == null)
@@ -74,8 +74,7 @@ namespace GraphQL
 
             if (!isNullable)
             {
-                var nullType = typeof(NonNullGraphType<>);
-                graphType = nullType.MakeGenericType(graphType);
+                graphType = new NonNullGraphType(graphType);
             }
 
             return graphType;

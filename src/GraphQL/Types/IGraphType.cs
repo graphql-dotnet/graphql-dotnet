@@ -11,8 +11,6 @@ namespace GraphQL.Types
         string Name { get; }
         string Description { get; }
         string DeprecationReason { get; }
-
-        string CollectTypes(TypeCollectionContext context);
     }
 
     public interface IOutputGraphType : IGraphType

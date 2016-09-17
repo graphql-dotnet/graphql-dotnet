@@ -6,20 +6,15 @@ namespace GraphQL.Types
         where TType : GraphType
     {
         public QueryArgument()
-            : base(typeof(TType))
+            : base(typeof(TType).GetGraphTypeFromType)
         {
         }
     }
 
     public class QueryArgument : IHaveDefaultValue
     {
-        public QueryArgument(Type type)
+        public QueryArgument(IGraphType type)
         {
-            if (type == null || !typeof(GraphType).IsAssignableFrom(type))
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required and must derive from GraphType.");
-            }
-
             Type = type;
         }
 
@@ -29,6 +24,6 @@ namespace GraphQL.Types
 
         public object DefaultValue { get; set; }
 
-        public Type Type { get; private set; }
+        public IGraphType Type { get; private set; }
     }
 }

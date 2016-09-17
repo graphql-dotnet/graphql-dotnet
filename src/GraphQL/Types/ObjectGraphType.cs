@@ -11,11 +11,11 @@ namespace GraphQL.Types
 
     public class ObjectGraphType : ComplexGraphType<object>, IObjectGraphType
     {
-        private readonly List<Type> _interfaces = new List<Type>();
+        private readonly List<IInterfaceGraphType> _interfaces = new List<IInterfaceGraphType>();
 
         public Func<object, bool> IsTypeOf { get; set; }
 
-        public IEnumerable<Type> Interfaces
+        public IEnumerable<IInterfaceGraphType> Interfaces
         {
             get { return _interfaces; }
             set
@@ -25,27 +25,17 @@ namespace GraphQL.Types
             }
         }
 
+        public ObjectGraphType()
+        {
+        }
+
         public ObjectGraphType(Action<ObjectGraphType> configure)
         {
             configure(this);
         }
 
-        public void Interface<TInterface>()
-            where TInterface : IInterfaceGraphType
+        public void Interface(IInterfaceGraphType type)
         {
-            _interfaces.Add(typeof(TInterface));
-        }
-
-        public void Interface(Type type)
-        {
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
-            {
-                throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
-            }
             _interfaces.Add(type);
         }
 
@@ -60,12 +50,12 @@ namespace GraphQL.Types
 
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
-        private readonly List<Type> _interfaces = new List<Type>();
+        private readonly List<IInterfaceGraphType> _interfaces = new List<IInterfaceGraphType>();
 
         public Func<object, bool> IsTypeOf { get; set; } 
             = type => type is TSourceType;
 
-        public IEnumerable<Type> Interfaces
+        public IEnumerable<IInterfaceGraphType> Interfaces
         {
             get { return _interfaces; }
             set
@@ -75,27 +65,18 @@ namespace GraphQL.Types
             }
         }
 
+        public ObjectGraphType()
+        {
+        }
+
         public ObjectGraphType(Action<ObjectGraphType<TSourceType>> configure)
         {
             configure(this);
         }
 
-        public void Interface<TInterface>()
-            where TInterface : IInterfaceGraphType
-        {
-            _interfaces.Add(typeof(TInterface));
-        }
 
-        public void Interface(Type type)
+        public void Interface(IInterfaceGraphType type)
         {
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-            if (!type.IsSubclassOf(typeof(IInterfaceGraphType)))
-            {
-                throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
-            }
             _interfaces.Add(type);
         }
 

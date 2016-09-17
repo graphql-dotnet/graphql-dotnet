@@ -2,35 +2,17 @@ using System;
 
 namespace GraphQL.Types
 {
-    public class NonNullGraphType<T> : NonNullGraphType
-        where T : GraphType
-    {
-        public NonNullGraphType()
-            : base(typeof(T))
-        {
-        }
-    }
 
-    public abstract class NonNullGraphType : GraphType
+    public class NonNullGraphType : WrappingGraphType
     {
-        protected NonNullGraphType(Type type)
+        public NonNullGraphType(IGraphType type)
         {
-            if (type == typeof (NonNullGraphType))
+            if (type is NonNullGraphType)
             {
                 throw new ArgumentException("Cannot nest NonNull inside NonNull.", "type");
             }
 
             Type = type;
-        }
-
-        public Type Type { get; private set; }
-
-        public override string CollectTypes(TypeCollectionContext context)
-        {
-            var innerType = context.ResolveType(Type);
-            var name = innerType.CollectTypes(context);
-            context.AddType(name, innerType, context);
-            return "{0}!".ToFormat(name);
         }
     }
 }

@@ -40,6 +40,11 @@ namespace GraphQL.Types
         {
             return Name?.GetHashCode() ?? 0;
         }
+
+        public virtual void CollectType(Action<IGraphType> addType)
+        {
+            addType(this);
+        }
     }
 
     /// <summary>
