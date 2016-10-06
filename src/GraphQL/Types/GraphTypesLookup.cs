@@ -28,7 +28,10 @@ namespace GraphQL.Types
             AddType<__TypeKind>();
         }
 
-        public static GraphTypesLookup Create(IEnumerable<IGraphType> types, Func<Type, IGraphType> resolveType)
+        public static GraphTypesLookup Create(
+            IEnumerable<IGraphType> types,
+            IEnumerable<DirectiveGraphType> directives,
+            Func<Type, IGraphType> resolveType)
         {
             var lookup = new GraphTypesLookup();
 
@@ -43,6 +46,23 @@ namespace GraphQL.Types
             types.Apply(type =>
             {
                 lookup.AddType(type, ctx);
+            });
+
+            lookup.HandleField(SchemaIntrospection.SchemaMeta, ctx);
+            lookup.HandleField(SchemaIntrospection.TypeMeta, ctx);
+            lookup.HandleField(SchemaIntrospection.TypeNameMeta, ctx);
+
+            directives.Apply(directive =>
+            {
+                directive.Arguments?.Apply(arg =>
+                {
+                    if (arg.ResolvedType != null)
+                    {
+                        return;
+                    }
+
+                    arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                });
             });
 
             return lookup;
@@ -87,20 +107,14 @@ namespace GraphQL.Types
             }
         }
 
-        public IEnumerable<IGraphType> FindImplemenationsOf(Type type)
-        {
-            return _types
-                .Values
-                .Where(t => t is IImplementInterfaces && t.As<IImplementInterfaces>().Interfaces.Any(i => i == type))
-                .Select(x => x)
-                .ToList();
-        }
-
         public void AddType<TType>()
             where TType : IGraphType, new()
         {
             var context = new TypeCollectionContext(
-                type => (GraphType) Activator.CreateInstance(type),
+                type =>
+                {
+                    return BuildNamedType(type, t => (IGraphType) Activator.CreateInstance(t));
+                },
                 (name, type, _) =>
                 {
                     var trimmed = name.TrimGraphQLTypes();
@@ -109,6 +123,21 @@ namespace GraphQL.Types
                 });
 
             AddType<TType>(context);
+        }
+
+        private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver)
+        {
+            return type.BuildNamedType(t =>
+            {
+                var exists = this[t];
+
+                if (exists != null)
+                {
+                    return exists;
+                }
+
+                return resolver(t);
+            });
         }
 
         public void AddType<TType>(TypeCollectionContext context)
@@ -139,12 +168,7 @@ namespace GraphQL.Types
                 var complexType = type as IComplexGraphType;
                 complexType.Fields.Apply(field =>
                 {
-                    AddTypeIfNotRegistered(field.Type, context);
-
-                    field.Arguments?.Apply(arg =>
-                    {
-                        AddTypeIfNotRegistered(arg.Type, context);
-                    });
+                    HandleField(field, context);
                 });
             }
 
@@ -158,6 +182,7 @@ namespace GraphQL.Types
                     var interfaceInstance = this[objectInterface] as IInterfaceGraphType;
                     if (interfaceInstance != null)
                     {
+                        obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);
 
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
@@ -199,6 +224,26 @@ namespace GraphQL.Types
                     union.AddPossibleType(objType);
                 });
             }
+        }
+
+        private void HandleField(FieldType field, TypeCollectionContext context)
+        {
+            if (field.ResolvedType == null)
+            {
+                AddTypeIfNotRegistered(field.Type, context);
+                field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
+            }
+
+            field.Arguments?.Apply(arg =>
+            {
+                if (arg.ResolvedType != null)
+                {
+                    return;
+                }
+
+                AddTypeIfNotRegistered(arg.Type, context);
+                arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+            });
         }
 
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)

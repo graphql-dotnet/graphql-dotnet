@@ -46,16 +46,43 @@ namespace GraphQL
             if (type is NonNullGraphType)
             {
                 var nonNull = (NonNullGraphType) type;
-                return GetNamedType(schema.FindType(nonNull.Type), schema);
+                return GetNamedType(nonNull.ResolvedType, schema);
             }
 
             if (type is ListGraphType)
             {
                 var list = (ListGraphType) type;
-                return GetNamedType(schema.FindType(list.Type), schema);
+                return GetNamedType(list.ResolvedType, schema);
             }
 
             return unmodifiedType;
+        }
+
+        public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
+        {
+            if (resolve == null)
+            {
+                resolve = t => (IGraphType) Activator.CreateInstance(t);
+            }
+
+            if (type.GetTypeInfo().IsGenericType)
+            {
+                if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
+                {
+                    var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
+                    nonNull.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    return nonNull;
+                }
+
+                if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
+                {
+                    var list = (ListGraphType)Activator.CreateInstance(type);
+                    list.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    return list;
+                }
+            }
+
+            return resolve(type);
         }
 
         public static Type GetNamedType(this Type type)
@@ -75,7 +102,7 @@ namespace GraphQL
             if (type is NonNullGraphType)
             {
                 var nonNull = (NonNullGraphType) type;
-                var ofType = schema.FindType(nonNull.Type);
+                var ofType = nonNull.ResolvedType;
 
                 if (valueAst == null)
                 {
@@ -105,7 +132,7 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var list = (ListGraphType)type;
-                var ofType = schema.FindType(list.Type);
+                var ofType = list.ResolvedType;
 
                 if (valueAst is ListValue)
                 {
@@ -150,7 +177,7 @@ namespace GraphQL
                 fields.Apply(field =>
                 {
                     var fieldAst = fieldAsts.FirstOrDefault(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(schema.FindType(field.Type), fieldAst?.Value, schema);
+                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value, schema);
 
                     errors.AddRange(result.Map(err=> $"In field \"{field.Name}\": {err}"));
                 });
@@ -194,7 +221,7 @@ namespace GraphQL
                 {
                     var sub = (NonNullGraphType) maybeSubType;
                     var sup = (NonNullGraphType) superType;
-                    return IsSubtypeOf(schema.FindType(sub.Type), schema.FindType(sup.Type), schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
                 }
 
                 return false;
@@ -202,7 +229,7 @@ namespace GraphQL
             else if (maybeSubType is NonNullGraphType)
             {
                 var sub = (NonNullGraphType) maybeSubType;
-                return IsSubtypeOf(schema.FindType(sub.Type), superType, schema);
+                return IsSubtypeOf(sub.ResolvedType, superType, schema);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -212,7 +239,7 @@ namespace GraphQL
                 {
                     var sub = (ListGraphType) maybeSubType;
                     var sup = (ListGraphType) superType;
-                    return IsSubtypeOf(schema.FindType(sub.Type), schema.FindType(sup.Type), schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
                 }
 
                 return false;
@@ -276,7 +303,7 @@ namespace GraphQL
             if (type is NonNullGraphType)
             {
                 var nonnull = (NonNullGraphType)type;
-                return AstFromValue(value, schema, schema.FindType(nonnull.Type));
+                return AstFromValue(value, schema, nonnull.ResolvedType);
             }
 
             if (value == null || type == null)
@@ -289,7 +316,7 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = (ListGraphType) type;
-                var itemType = schema.FindType(listType.Type);
+                var itemType = listType.ResolvedType;
 
                 if (!(value is string) && value is IEnumerable)
                 {
@@ -317,7 +344,7 @@ namespace GraphQL
                     .Select(pair =>
                     {
                         var field = input.Fields.FirstOrDefault(x => x.Name == pair.Key);
-                        var fieldType = field != null ? schema.FindType(field.Type) : null;
+                        var fieldType = field != null ? field.ResolvedType : null;
                         return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
                     })
                     .ToList();

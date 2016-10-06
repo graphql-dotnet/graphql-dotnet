@@ -9,6 +9,7 @@ namespace GraphQL.Types
         string Description { get; set; }
         string DeprecationReason { get; set; }
         QueryArguments Arguments { get; set; }
+        IGraphType ResolvedType { get; set; }
     }
 
     public class FieldType : IFieldType
@@ -18,6 +19,7 @@ namespace GraphQL.Types
         public string DeprecationReason { get; set; }
         public object DefaultValue { get; set; }
         public Type Type { get; set; }
+        public IGraphType ResolvedType { get; set; }
         public QueryArguments Arguments { get; set; }
         public IFieldResolver Resolver { get; set; }
     }

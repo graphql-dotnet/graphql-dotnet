@@ -85,7 +85,8 @@ namespace GraphQL.Tests.Types
         public void throw_error_on_null_with_register_types()
         {
             var schema = new Schema();
-            Should.Throw<ArgumentNullException>(() => schema.RegisterTypes(null));
+            Type[] types = null;
+            Should.Throw<ArgumentNullException>(() => schema.RegisterTypes(types));
         }
 
         [Fact]

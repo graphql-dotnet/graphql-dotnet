@@ -73,7 +73,7 @@ namespace GraphQL.Validation
                 var parentType = _parentTypeStack.Peek().GetNamedType(_schema);
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
-                var targetType = _schema.FindType(fieldType?.Type);
+                var targetType = fieldType?.ResolvedType;
                 _typeStack.Push(targetType);
                 return;
             }
@@ -139,7 +139,7 @@ namespace GraphQL.Validation
                 if (args != null)
                 {
                     argDef = args.Find(argAst.Name);
-                    argType = _schema.FindType(argDef?.Type);
+                    argType = argDef?.ResolvedType;
                 }
 
                 _argument = argDef;
@@ -161,7 +161,7 @@ namespace GraphQL.Validation
                 {
                     var complexType = objectType as IComplexGraphType;
                     var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
-                    fieldType = inputField != null ? _schema.FindType(inputField.Type) : null;
+                    fieldType = inputField?.ResolvedType;
                 }
 
                 _inputTypeStack.Push(fieldType);

@@ -14,7 +14,7 @@ namespace GraphQL.Introspection
                 "and optionally a default value.";
             Field<NonNullGraphType<StringGraphType>>("name");
             Field<StringGraphType>("description");
-            Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Schema.FindType(ctx.Source.Type));
+            Field<NonNullGraphType<__Type>>("type", resolve: context => context.Source.ResolvedType);
             Field<StringGraphType>(
                 "defaultValue",
                 "A GraphQL-formatted string representing the default value for this input value.",
@@ -23,7 +23,7 @@ namespace GraphQL.Introspection
                     var hasDefault = context.Source;
                     if (context.Source == null) return null;
 
-                    var ast = hasDefault.DefaultValue.AstFromValue(context.Schema, context.Schema.FindType(hasDefault.Type));
+                    var ast = hasDefault.DefaultValue.AstFromValue(context.Schema, hasDefault.ResolvedType);
                     var result = AstPrinter.Print(ast);
                     return string.IsNullOrWhiteSpace(result) ? null : result;
                 });

@@ -24,6 +24,11 @@ namespace GraphQL.Validation
             Document document,
             IEnumerable<IValidationRule> rules = null)
         {
+            if (!schema.Initialized)
+            {
+                schema.Initialize();
+            }
+
             var context = new ValidationContext
             {
                 OriginalQuery = originalQuery,

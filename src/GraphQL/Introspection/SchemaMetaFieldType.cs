@@ -1,3 +1,4 @@
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 

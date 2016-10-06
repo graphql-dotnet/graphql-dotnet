@@ -43,7 +43,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name), "A field with that name is already registered.");
             }
 
-            if (!fieldType.Type.IsGraphType())
+            if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Type), "Field type must derive from GraphType.");
             }
@@ -61,7 +61,6 @@ namespace GraphQL.Types
             Func<ResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
         {
-
             return AddField(new FieldType
             {
                 Name = name,
@@ -69,8 +68,8 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = type,
                 Arguments = arguments,
-                Resolver = resolve != null 
-                    ? new FuncFieldResolver<TSourceType, object>(resolve) 
+                Resolver = resolve != null
+                    ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
             });
         }

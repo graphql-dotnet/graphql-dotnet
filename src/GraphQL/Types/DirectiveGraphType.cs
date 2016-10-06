@@ -44,8 +44,7 @@ namespace GraphQL.Types
             _directiveLocations.AddRange(locations);
         }
 
-        public string Name { get; }
-
+        public string Name { get; set; }
         public string Description { get; set; }
 
         public QueryArguments Arguments { get; set; }
