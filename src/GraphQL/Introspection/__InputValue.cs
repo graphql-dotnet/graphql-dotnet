@@ -14,7 +14,7 @@ namespace GraphQL.Introspection
                 "and optionally a default value.";
             Field<NonNullGraphType<StringGraphType>>("name");
             Field<StringGraphType>("description");
-            Field<NonNullGraphType<__Type>>("type");
+            Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Schema.FindType(ctx.Source.Type));
             Field<StringGraphType>(
                 "defaultValue",
                 "A GraphQL-formatted string representing the default value for this input value.",
