@@ -1,23 +1,22 @@
 ﻿using System;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
-using GraphQL.Resolvers;
 
 namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
         public static ConnectionBuilder<TGraphType, TSourceType> Create<TGraphType, TSourceType>()
-            where TGraphType : IObjectGraphType
+            where TGraphType : IGraphType
         {
             return ConnectionBuilder<TGraphType, TSourceType>.Create();
         }
     }
 
     public class ConnectionBuilder<TGraphType, TSourceType>
-        where TGraphType : IObjectGraphType
+        where TGraphType : IGraphType
     {
-        
+
         private readonly Func<object, TSourceType> _objectResolver;
 
         private bool _isUnidirectional;
@@ -120,7 +119,7 @@ namespace GraphQL.Builders
         }
 
         public ConnectionBuilder<TGraphType, TSourceType> Argument<TArgumentGraphType>(string name, string description)
-            where TArgumentGraphType : GraphType
+            where TArgumentGraphType : IGraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
@@ -132,7 +131,7 @@ namespace GraphQL.Builders
 
         public ConnectionBuilder<TGraphType, TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default(TArgumentType))
-            where TArgumentGraphType : GraphType
+            where TArgumentGraphType : IGraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {
