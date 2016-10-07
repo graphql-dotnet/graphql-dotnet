@@ -46,7 +46,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TNodeType, object> Connection<TNodeType>()
-            where TNodeType : IObjectGraphType
+            where TNodeType : IGraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, object>();
             AddField(builder.FieldType);
@@ -91,7 +91,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TNodeType, TSourceType> Connection<TNodeType>()
-            where TNodeType : IObjectGraphType
+            where TNodeType : IGraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
             AddField(builder.FieldType);
