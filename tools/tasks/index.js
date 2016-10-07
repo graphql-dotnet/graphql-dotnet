@@ -8,7 +8,6 @@ import nuspec from './nuspec';
 import restore from './restore';
 import settings from './settings';
 import setVersion from './setVersion';
-import appVeyorVersion from './appVeyorVersion';
 import version from './version';
 
 export default {
@@ -22,6 +21,5 @@ export default {
   restore,
   settings,
   setVersion,
-  appVeyorVersion,
   version
 };
