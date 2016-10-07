@@ -15,13 +15,7 @@
         "NETStandard.Library": "1.6.0"
       }
     },
-    "net451": {
-      "System.Threading.Tasks": ""
-    },
-    "net46": {
-      "System.Threading.Tasks": ""
-    },
-    "net461": {
+    "net45": {
       "System.Threading.Tasks": ""
     }
   },
