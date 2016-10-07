@@ -4,6 +4,7 @@ import {
   compile,
   dotnetPack,
   dotnetTest,
+  projectVersion,
   restore,
   setVersion,
   version
@@ -15,7 +16,7 @@ const tasks = {
   artifacts: ['nuget', artifacts],
   compile: ['restore', compile],
   test: dotnetTest,
-  version,
+  version: [version, projectVersion],
   nuget: dotnetPack,
   restore,
   setVersion: () => setVersion(args[1]),

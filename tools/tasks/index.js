@@ -9,6 +9,7 @@ import restore from './restore';
 import settings from './settings';
 import setVersion from './setVersion';
 import version from './version';
+import projectVersion from './projectVersion';
 
 export default {
   artifacts,
@@ -18,6 +19,7 @@ export default {
   dotnetTest,
   nuget: () => nuget({ version: settings.version, target: settings.target }),
   nuspec,
+  projectVersion,
   restore,
   settings,
   setVersion,
