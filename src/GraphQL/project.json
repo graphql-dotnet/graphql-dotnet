@@ -1,5 +1,5 @@
 {
-  "version": "0.12.2-alpha-*",
+  "version": "0.12.2",
   "description": "GraphQL for .NET",
   "authors": [
     "Joe McBride"
@@ -41,18 +41,6 @@
       ]
     },
     "net45": {
-      "System.Threading.Tasks": ""
-    },
-    "net451": {
-      "System.Threading.Tasks": ""
-    },
-    "net452": {
-      "System.Threading.Tasks": ""
-    },
-    "net46": {
-      "System.Threading.Tasks": ""
-    },
-    "net461": {
       "System.Threading.Tasks": ""
     }
   },

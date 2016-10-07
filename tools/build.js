@@ -4,9 +4,9 @@ import {
   compile,
   dotnetPack,
   dotnetTest,
+  projectVersion,
   restore,
   setVersion,
-  appVeyorVersion,
   version
 } from './tasks';
 
@@ -16,8 +16,7 @@ const tasks = {
   artifacts: ['nuget', artifacts],
   compile: ['restore', compile],
   test: dotnetTest,
-  appVeyorVersion,
-  version: [version, appVeyorVersion],
+  version: [version, projectVersion],
   nuget: dotnetPack,
   restore,
   setVersion: () => setVersion(args[1]),

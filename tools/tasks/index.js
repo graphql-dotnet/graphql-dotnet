@@ -8,8 +8,8 @@ import nuspec from './nuspec';
 import restore from './restore';
 import settings from './settings';
 import setVersion from './setVersion';
-import appVeyorVersion from './appVeyorVersion';
 import version from './version';
+import projectVersion from './projectVersion';
 
 export default {
   artifacts,
@@ -19,9 +19,9 @@ export default {
   dotnetTest,
   nuget: () => nuget({ version: settings.version, target: settings.target }),
   nuspec,
+  projectVersion,
   restore,
   settings,
   setVersion,
-  appVeyorVersion,
   version
 };
