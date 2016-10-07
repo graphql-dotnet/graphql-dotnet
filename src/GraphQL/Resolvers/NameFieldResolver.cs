@@ -1,10 +1,6 @@
-﻿using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
@@ -16,10 +12,21 @@ namespace GraphQL.Resolvers
         {
             var source = context.Source;
 
-            return source?.GetType()
+            if (source == null)
+            {
+                return null;
+            }
+
+            var prop = source.GetType()
                 .GetTypeInfo()
-                .GetProperty(context.FieldAst.Name, _flags)
-                .GetValue(source, null);
+                .GetProperty(context.FieldAst.Name, _flags);
+
+            if (prop == null)
+            {
+                throw new InvalidOperationException($"Expected to find property {context.FieldAst.Name} on {context.Source.GetType().Name} but it does not exist.");
+            }
+
+            return prop.GetValue(source, null);
         }
     }
 }
