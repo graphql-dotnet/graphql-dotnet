@@ -11,12 +11,13 @@ nuget:
 build_script:
 - cmd: >-
     npm install -g npm
+    npm install -g yarn
 
-    npm --version
+    yarn --version
 
     node --version
 
-    npm run build-ci
+    yarn run build-ci
 test: off
 deploy:
 - provider: NuGet
