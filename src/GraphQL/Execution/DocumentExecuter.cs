@@ -211,7 +211,7 @@ namespace GraphQL
 
         public object GetProperyValue(object obj, string propertyName)
         {
-            var val = obj.GetType().GetTypeInfo()
+            var val = obj.GetType()
                 .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
                 .GetValue(obj, null);
 

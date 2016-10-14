@@ -20,11 +20,12 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
-There is a sample web api project hosting the GraphiQL interface.  `npm install` and `npm start` from the root of the repository, then run the web project from Visual Studio.
+There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
 
 ```
-> npm install
-> npm start
+> npm install -g yarn
+> yarn install
+> yarn start
 ```
 ![](http://i.imgur.com/2uGdVAj.png)
 
@@ -204,10 +205,10 @@ Hello GraphQL!
 ### Deployment Process
 
 ```
-npm run setVersion 0.10.0
+yarn run setVersion 0.12.0
 write release notes in release-notes.md
 git commit/push
 download nuget from AppVeyor
 upload nuget package to github
-upload nuget package to nuget.org
+publish nuget from MyGet
 ```

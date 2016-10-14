@@ -13,7 +13,7 @@ namespace GraphQL.Conversion
             {
                 return null;
             }
-            var constructor = type.GetTypeInfo().GetConstructor(new[] { typeof(string) });
+            var constructor = type.GetConstructor(new[] { typeof(string) });
             if (constructor == null)
             {
                 return null;

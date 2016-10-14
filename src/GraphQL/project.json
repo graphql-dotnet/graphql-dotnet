@@ -1,5 +1,5 @@
 {
-  "version": "0.12.3",
+  "version": "0.13.0",
   "description": "GraphQL for .NET",
   "authors": [
     "Joe McBride"
@@ -26,14 +26,16 @@
   },
 
   "dependencies": {
-    "GraphQL-Parser": "1.0.0",
+    "GraphQL-Parser": "2.0.0",
     "Newtonsoft.Json": "9.0.1"
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.1": {
       "dependencies": {
-          "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.0.0"
       },
       "imports": [
         "dnxcore50",
@@ -46,6 +48,5 @@
   },
 
   "runtimes": {
-    "win": {}
   }
 }

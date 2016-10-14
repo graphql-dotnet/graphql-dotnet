@@ -18,7 +18,6 @@ namespace GraphQL.Resolvers
             }
 
             var prop = source.GetType()
-                .GetTypeInfo()
                 .GetProperty(context.FieldAst.Name, _flags);
 
             if (prop == null)

@@ -1,4 +1,4 @@
-version: 0.12.3.{build}
+version: 0.13.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
@@ -12,9 +12,21 @@ build_script:
 - cmd: >-
     npm install -g npm
 
-    npm --version
+    npm install -g yarn
+
+    yarn --version
 
     node --version
 
-    npm run build-ci
+    yarn run build-ci
 test: off
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/graphql-dotnet/api/v2/package
+  api_key:
+    secure: +l1vfBMajn1WfmXkQ2LdILKxK4fQ5AHSnnU1kf11Bn1xRGUOTCdPhLwHx232piEn
+  skip_symbols: true
+  on:
+    branch:
+      - master
+      - dev

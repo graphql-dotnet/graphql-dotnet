@@ -165,7 +165,7 @@ namespace GraphQL.Types
 
         private void RegisterType(Type type)
         {
-            if (!typeof (GraphType).GetTypeInfo().IsAssignableFrom(type))
+            if (!typeof (GraphType).IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
             }
