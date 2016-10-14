@@ -81,7 +81,7 @@ namespace GraphQL.StarWars.IoC
 
         private object CreateInstance(Type implementationType)
         {
-            var ctor = implementationType.GetTypeInfo().GetConstructors().Single();
+            var ctor = implementationType.GetConstructors().OrderByDescending(x => x.GetParameters().Length).First();
             var parameterTypes = ctor.GetParameters().Select(p => p.ParameterType);
             var dependencies = parameterTypes.Select(Get).ToArray();
             return Activator.CreateInstance(implementationType, dependencies);
