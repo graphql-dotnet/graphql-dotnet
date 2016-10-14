@@ -21,7 +21,12 @@ namespace GraphQL.Conversion
             RegisterConversion(bool.Parse);
             RegisterConversion(byte.Parse);
             RegisterConversion(sbyte.Parse);
-            RegisterConversion(char.Parse);
+            RegisterConversion(x =>
+            {
+                char c;
+                char.TryParse(x, out c);
+                return c;
+            });
             RegisterConversion(decimal.Parse);
             RegisterConversion(double.Parse);
             RegisterConversion(float.Parse);

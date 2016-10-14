@@ -23,7 +23,7 @@ namespace GraphQL
 
             foreach (var item in source)
             {
-                var propertyType = type.GetTypeInfo().GetProperty(item.Key,
+                var propertyType = type.GetProperty(item.Key,
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyType != null)
                 {
@@ -44,11 +44,11 @@ namespace GraphQL
 
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
-              : fieldType.GetTypeInfo().GetInterface("IEnumerable`1");
+              : fieldType.GetInterface("IEnumerable`1");
             if (fieldType.Name != "String"
                 && enumerableInterface != null)
             {
-                var elementType = enumerableInterface.GetTypeInfo().GetGenericArguments()[0];
+                var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var genericListType = typeof(List<>).MakeGenericType(elementType);
                 var newArray = (IList) Activator.CreateInstance(genericListType);
@@ -91,6 +91,11 @@ namespace GraphQL
             }
 
             return ConvertValue(value, fieldType);
+        }
+
+        public static Type GetInterface(this Type type, string name)
+        {
+            return type.GetInterfaces().FirstOrDefault(x => x.Name == name);
         }
 
         public static object ConvertValue(object value, Type fieldType)
@@ -140,7 +145,6 @@ namespace GraphQL
         {
             return source
                 .GetType()
-                .GetTypeInfo()
                 .GetProperties(flags)
                 .ToDictionary
                 (

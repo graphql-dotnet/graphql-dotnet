@@ -18,3 +18,13 @@ build_script:
 
     npm run build-ci
 test: off
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/graphql-dotnet/api/v2/package
+  api_key:
+    secure: +l1vfBMajn1WfmXkQ2LdILKxK4fQ5AHSnnU1kf11Bn1xRGUOTCdPhLwHx232piEn
+  skip_symbols: true
+  on:
+    branch:
+      - master
+      - dev

@@ -18,7 +18,7 @@ namespace GraphQL.Conversion
         {
             if (!type.IsNullable()) return null;
 
-            var innerType = type.GetTypeInfo().GetGenericArguments().First();
+            var innerType = type.GetGenericArguments().First();
             var inner = _conversions.FindConverter(innerType);
 
             return str =>

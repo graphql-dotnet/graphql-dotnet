@@ -9,7 +9,7 @@
     "xunit": "2.2.0-beta2-build3300",
     "xunit.runner.reporters": "2.2.0-beta2-build3300",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "GraphQL-Parser": "1.0.0",
+    "GraphQL-Parser": "2.0.0",
     "Newtonsoft.Json": "9.0.1",
     "Shouldly": "2.8.2"
   },
@@ -35,6 +35,5 @@
   },
 
   "runtimes": {
-    "win": {}
   }
 }
