@@ -1,4 +1,4 @@
-version: 0.12.3.{build}
+version: 0.13.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
@@ -11,6 +11,7 @@ nuget:
 build_script:
 - cmd: >-
     npm install -g npm
+
     npm install -g yarn
 
     yarn --version
