@@ -6,7 +6,7 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.1": {
       "imports": [
         "dnxcore50",
         "portable-net45+win8"
@@ -21,6 +21,5 @@
   },
 
   "runtimes": {
-    "win": {}
   }
 }
