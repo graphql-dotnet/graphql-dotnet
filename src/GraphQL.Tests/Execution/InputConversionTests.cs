@@ -17,6 +17,7 @@ namespace GraphQL.Tests.Execution
             public Guid E { get; set; }
             public List<int?> F { get; set; }
             public List<List<int?>> G { get; set; }
+            public DateTime H { get; set; }
         }
 
         public class EnumInput
@@ -265,5 +266,32 @@ namespace GraphQL.Tests.Execution
             myInput.Input.B.Count.ShouldBe(1);
             myInput.Input.B[0].A.ShouldBe("bar");
         }
+
+        [Fact]
+        public void can_convert_utc_date_to_datetime_with_correct_kind()
+        {
+            var json = @"{ 'h': '2016-10-21T13:32:15.753Z' }";
+            var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15.753"), DateTimeKind.Utc);
+
+            var inputs = json.ToInputs();
+            var myInput = inputs.ToObject<MyInput>();
+
+            myInput.ShouldNotBeNull();
+            myInput.H.ShouldBe(expected);
+        }
+
+        [Fact]
+        public void can_convert_unspecified_date_to_datetime_with_correct_kind()
+        {
+            var json = @"{ 'h': '2016-10-21T13:32:15' }";
+            var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15"), DateTimeKind.Unspecified);
+
+            var inputs = json.ToInputs();
+            var myInput = inputs.ToObject<MyInput>();
+
+            myInput.ShouldNotBeNull();
+            myInput.H.ShouldBe(expected);
+        }
+
     }
 }
