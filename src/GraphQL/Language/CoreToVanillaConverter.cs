@@ -304,10 +304,5 @@ namespace GraphQL.Language
         {
             return node.WithLocation(0, 0, astNode?.Location.Start ?? -1, astNode?.Location.End ?? -1);
         }
-
-        public static Location Location(this ASTNode node, ISource source)
-        {
-            return new Location(source, node.Location.Start);
-        }
     }
 }

@@ -104,6 +104,7 @@ namespace GraphQL
             CancellationToken cancellationToken)
         {
             var context = new ExecutionContext();
+            context.Document = document;
             context.Schema = schema;
             context.RootValue = root;
 
@@ -118,7 +119,7 @@ namespace GraphQL
             }
 
             context.Operation = operation;
-            context.Variables = GetVariableValues(schema, operation.Variables, inputs);
+            context.Variables = GetVariableValues(document, schema, operation.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
 
@@ -127,7 +128,7 @@ namespace GraphQL
 
         public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Schema, context.Operation);
+            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var fields = CollectFields(
                 context,
                 rootType,
@@ -202,7 +203,7 @@ namespace GraphQL
             catch (Exception exc)
             {
                 var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
-                error.AddLocation(field.SourceLocation.Line, field.SourceLocation.Column);
+                error.AddLocation(field, context.Document);
                 context.Errors.Add(error);
                 resolveResult.Skip = false;
                 return resolveResult;
@@ -232,7 +233,7 @@ namespace GraphQL
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
                         .ToFormat(fieldName, type.Name));
-                    error.AddLocation(field);
+                    error.AddLocation(field, context.Document);
                     throw error;
                 }
 
@@ -258,7 +259,7 @@ namespace GraphQL
                 if (list == null)
                 {
                     var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                    error.AddLocation(field);
+                    error.AddLocation(field, context.Document);
                     throw error;
                 }
 
@@ -282,7 +283,7 @@ namespace GraphQL
                     var error = new ExecutionError(
                         "Runtime Object type \"{0}\" is not a possible type for \"{1}\""
                         .ToFormat(objectType, abstractType));
-                    error.AddLocation(field);
+                    error.AddLocation(field, context.Document);
                     throw error;
                 }
             }
@@ -297,7 +298,7 @@ namespace GraphQL
                 var error = new ExecutionError(
                     "Expected value of type \"{0}\" but got: {1}."
                     .ToFormat(objectType, result));
-                error.AddLocation(field);
+                error.AddLocation(field, context.Document);
                 throw error;
             }
 
@@ -350,7 +351,7 @@ namespace GraphQL
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
         }
 
-        public IObjectGraphType GetOperationRootType(ISchema schema, Operation operation)
+        public IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
         {
             IObjectGraphType type;
 
@@ -367,7 +368,7 @@ namespace GraphQL
                     if (type == null)
                     {
                         error = new ExecutionError("Schema is not configured for mutations");
-                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
@@ -377,21 +378,21 @@ namespace GraphQL
                     if (type == null)
                     {
                         error = new ExecutionError("Schema is not configured for subscriptions");
-                        error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                        error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
 
                 default:
                     error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation.SourceLocation.Line, operation.SourceLocation.Column);
+                    error.AddLocation(operation, document);
                     throw error;
             }
 
             return type;
         }
 
-        public Variables GetVariableValues(ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
+        public Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
             variableDefinitions.Apply(v =>
@@ -401,14 +402,14 @@ namespace GraphQL
 
                 object variableValue = null;
                 inputs?.TryGetValue(v.Name, out variableValue);
-                variable.Value = GetVariableValue(schema, v, variableValue);
+                variable.Value = GetVariableValue(document, schema, v, variableValue);
 
                 variables.Add(variable);
             });
             return variables;
         }
 
-        public object GetVariableValue(ISchema schema, VariableDefinition variable, object input)
+        public object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
         {
             var type = variable.Type.GraphTypeFromType(schema);
 
@@ -427,10 +428,14 @@ namespace GraphQL
 
             if (input == null)
             {
-                throw new ExecutionError("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName()));
+                var error2 = new ExecutionError("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName()));
+                error2.AddLocation(variable, document);
+                throw error2;
             }
 
-            throw new ExecutionError("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName()));
+            var error = new ExecutionError("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName()));
+            error.AddLocation(variable, document);
+            throw error;
         }
 
         private object ValueFromAst(IValue value)

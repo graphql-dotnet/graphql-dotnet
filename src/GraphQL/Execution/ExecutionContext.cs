@@ -12,6 +12,8 @@ namespace GraphQL.Execution
             Errors = new ExecutionErrors();
         }
 
+        public Document Document { get; set; }
+
         public ISchema Schema { get; set; }
 
         public object RootValue { get; set; }
