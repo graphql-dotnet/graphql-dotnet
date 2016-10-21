@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
+using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
 {
@@ -302,7 +303,18 @@ namespace GraphQL.Language
         public static T WithLocation<T>(this T node, ASTNode astNode, ISource source)
             where T : AbstractNode
         {
-            return node.WithLocation(0, 0, astNode?.Location.Start ?? -1, astNode?.Location.End ?? -1);
+            if (astNode == null)
+            {
+                return node.WithLocation(0, 0);
+            }
+
+            var startText = source.Body.Substring(0, astNode.Location.Start);
+            var lastLine = startText.Split(new[] { "\n" }, StringSplitOptions.None).Last();
+
+            var line = startText.ToCharArray().Count(x => x == '\n') + 1;
+            var column = astNode.Location.Start - startText.Substring(0, startText.Length - lastLine.Length).Length + 1;
+
+            return node.WithLocation(line, column, astNode.Location.Start, astNode.Location.End);
         }
 
         public static Location Location(this ASTNode node, ISource source)
