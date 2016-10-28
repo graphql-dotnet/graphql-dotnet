@@ -45,11 +45,12 @@ namespace GraphQL.Tests
             string expected,
             Inputs inputs = null,
             object root = null,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, cancellationToken, rules);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -57,11 +58,12 @@ namespace GraphQL.Tests
             string expected,
             Inputs inputs = null,
             object root = null,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             int expectedErrorCount = 0)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, cancellationToken, expectedErrorCount);
+            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, userContext, cancellationToken, expectedErrorCount);
         }
 
         public ExecutionResult AssertQueryIgnoreErrors(
@@ -69,10 +71,11 @@ namespace GraphQL.Tests
             ExecutionResult expectedExecutionResult,
             Inputs inputs,
             object root,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             int expectedErrorCount = 0)
         {
-            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, cancellationToken).Result;
+            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, userContext, cancellationToken).Result;
 
             var writtenResult = Writer.Write(new ExecutionResult {Data = runResult.Data});
             var expectedResult = Writer.Write(expectedExecutionResult);
@@ -95,15 +98,17 @@ namespace GraphQL.Tests
             ExecutionResult expectedExecutionResult,
             Inputs inputs,
             object root,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
             var runResult = Executer.ExecuteAsync(
                 Schema,
-                root, 
+                root,
                 query,
                 null,
                 inputs,
+                userContext,
                 cancellationToken,
                 rules
                 ).Result;

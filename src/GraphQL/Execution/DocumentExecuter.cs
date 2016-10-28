@@ -23,6 +23,7 @@ namespace GraphQL
             string query,
             string operationName,
             Inputs inputs = null,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null);
     }
@@ -49,6 +50,7 @@ namespace GraphQL
             string query,
             string operationName,
             Inputs inputs = null,
+            object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
@@ -60,7 +62,7 @@ namespace GraphQL
 
                 if (validationResult.IsValid)
                 {
-                    var context = BuildExecutionContext(schema, root, document, operationName, inputs, cancellationToken);
+                    var context = BuildExecutionContext(schema, root, document, operationName, inputs, userContext, cancellationToken);
 
                     if (context.Errors.Any())
                     {
@@ -101,12 +103,14 @@ namespace GraphQL
             Document document,
             string operationName,
             Inputs inputs,
+            object userContext,
             CancellationToken cancellationToken)
         {
             var context = new ExecutionContext();
             context.Document = document;
             context.Schema = schema;
             context.RootValue = root;
+            context.UserContext = userContext;
 
             var operation = !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)
@@ -176,8 +180,10 @@ namespace GraphQL
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
                 resolveContext.Schema = context.Schema;
+                resolveContext.Document = context.Document;
                 resolveContext.Fragments = context.Fragments;
                 resolveContext.RootValue = context.RootValue;
+                resolveContext.UserContext = context.UserContext;
                 resolveContext.Operation = context.Operation;
                 resolveContext.Variables = context.Variables;
                 resolveContext.CancellationToken = context.CancellationToken;
