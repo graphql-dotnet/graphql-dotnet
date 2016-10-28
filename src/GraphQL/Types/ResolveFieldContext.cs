@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GraphQL.Language;
 using System.Threading;
 using GraphQL.Language.AST;
 
@@ -20,6 +19,8 @@ namespace GraphQL.Types
         public Dictionary<string, object> Arguments { get; set; }
 
         public object RootValue { get; set; }
+
+        public object UserContext { get; set; }
 
         public TSource Source { get; set; }
 
@@ -47,6 +48,7 @@ namespace GraphQL.Types
             Schema = context.Schema;
             Fragments = context.Fragments;
             RootValue = context.RootValue;
+            UserContext = context.UserContext;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
@@ -81,7 +83,8 @@ namespace GraphQL.Types
         }
     }
 
-    public class ResolveFieldContext : ResolveFieldContext<object> {
+    public class ResolveFieldContext : ResolveFieldContext<object>
+    {
         internal ResolveFieldContext<TSourceType> As<TSourceType>()
         {
             return new ResolveFieldContext<TSourceType>(this);

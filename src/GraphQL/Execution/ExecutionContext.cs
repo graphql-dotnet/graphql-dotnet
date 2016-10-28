@@ -18,6 +18,8 @@ namespace GraphQL.Execution
 
         public object RootValue { get; set; }
 
+        public object UserContext { get; set; }
+
         public Operation Operation { get; set; }
 
         public Fragments Fragments { get; set; }
