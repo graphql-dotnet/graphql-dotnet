@@ -74,7 +74,8 @@ namespace ConsoleApplication
         string query,
         object rootObject = null,
         string operationName = null,
-        Inputs inputs = null)
+        Inputs inputs = null,
+        object userContext = null)
       {
         var executer = new DocumentExecuter();
         var writer = new DocumentWriter(indent: true);
@@ -84,7 +85,8 @@ namespace ConsoleApplication
           rootObject,
           query,
           operationName,
-          inputs).ConfigureAwait(false);
+          inputs,
+          userContext).ConfigureAwait(false);
         return writer.Write(result);
       }
     }
