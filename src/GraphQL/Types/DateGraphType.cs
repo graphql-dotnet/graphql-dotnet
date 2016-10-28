@@ -27,7 +27,7 @@ namespace GraphQL.Types
                 DateTime dateTime = (DateTime)value;
                 return dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
             }
-            
+
             string inputValue = value?.ToString().Trim('"');
 
             DateTime outputValue;
@@ -36,7 +36,7 @@ namespace GraphQL.Types
                 CultureInfo.CurrentCulture,
                 DateTimeStyles.AdjustToUniversal,
                 out outputValue))
-            { 
+            {
                 return outputValue;
             }
 

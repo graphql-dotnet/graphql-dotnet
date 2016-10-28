@@ -45,6 +45,7 @@ namespace GraphQL
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
+
             if (fieldType.Name != "String"
                 && enumerableInterface != null)
             {
@@ -105,9 +106,6 @@ namespace GraphQL
 
             var text = value.ToString();
             return _conversions.Value.Convert(fieldType, text);
-//            return text != null
-//                ? conv.Convert(fieldType, text)
-//                : Convert.ChangeType(value, fieldType);
         }
 
         public static T GetPropertyValue<T>(this object value)

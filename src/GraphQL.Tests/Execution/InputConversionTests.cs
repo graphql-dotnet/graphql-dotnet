@@ -292,6 +292,5 @@ namespace GraphQL.Tests.Execution
             myInput.ShouldNotBeNull();
             myInput.H.ShouldBe(expected);
         }
-
     }
 }

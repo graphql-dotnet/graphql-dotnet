@@ -59,7 +59,11 @@ namespace GraphQL
 
         private static Dictionary<string, object> ToDictionary(this string json)
         {
-            var values = JsonConvert.DeserializeObject(json);
+            var values = JsonConvert.DeserializeObject(json,
+                new JsonSerializerSettings
+                {
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat
+                });
             return GetValue(values) as Dictionary<string, object>;
         }
 

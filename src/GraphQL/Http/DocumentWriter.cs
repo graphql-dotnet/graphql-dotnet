@@ -30,7 +30,7 @@ namespace GraphQL.Http
         {
         }
 
-        internal DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
+        public DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
         {
             _formatting = formatting;
             _settings = settings;
