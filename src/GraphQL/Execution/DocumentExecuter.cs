@@ -180,6 +180,7 @@ namespace GraphQL
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
                 resolveContext.Schema = context.Schema;
+                resolveContext.Document = context.Document;
                 resolveContext.Fragments = context.Fragments;
                 resolveContext.RootValue = context.RootValue;
                 resolveContext.UserContext = context.UserContext;

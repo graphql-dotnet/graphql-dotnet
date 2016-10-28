@@ -26,6 +26,8 @@ namespace GraphQL.Types
 
         public ISchema Schema { get; set; }
 
+        public Document Document { get; set; }
+
         public Operation Operation { get; set; }
 
         public Fragments Fragments { get; set; }
@@ -46,6 +48,7 @@ namespace GraphQL.Types
             ParentType = context.ParentType;
             Arguments = context.Arguments;
             Schema = context.Schema;
+            Document = context.Document;
             Fragments = context.Fragments;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
