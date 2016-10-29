@@ -1,3 +1,4 @@
+using GraphQL.Instrumentation;
 using Newtonsoft.Json;
 
 namespace GraphQL
@@ -8,5 +9,7 @@ namespace GraphQL
         public object Data { get; set; }
 
         public ExecutionErrors Errors { get; set; }
+
+        public PerfRecord[] Perf { get; set; }
     }
 }

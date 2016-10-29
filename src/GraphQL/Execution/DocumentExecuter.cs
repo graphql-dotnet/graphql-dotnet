@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -54,20 +55,46 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
+            var timings = new Timings();
+            SchemaExtensions.Instrument(schema, timings);
+            timings.Start(operationName);
+
             var result = new ExecutionResult();
             try
             {
                 if (!schema.Initialized)
                 {
-                    schema.Initialize();
+                    using (timings.Subject("schema", "Initializing schema"))
+                    {
+                        schema.Initialize();
+                    }
                 }
 
-                var document = _documentBuilder.Build(query);
-                var validationResult = _documentValidator.Validate(query, schema, document, rules);
+                Document document;
+                using (timings.Subject("document", "Building document"))
+                {
+                    document = _documentBuilder.Build(query);
+                }
+
+                IValidationResult validationResult;
+                using (timings.Subject("document", "Validating document"))
+                {
+                    validationResult = _documentValidator.Validate(query, schema, document, rules);
+                }
 
                 if (validationResult.IsValid)
                 {
-                    var context = BuildExecutionContext(schema, root, document, operationName, inputs, userContext, cancellationToken);
+                    var operation = GetOperation(operationName, document);
+
+                    if (operation == null)
+                    {
+                        throw new ExecutionError("Unknown operation name: {0}".ToFormat(operationName));
+                    }
+
+                    timings.SetOperationName(operation.Name);
+
+                    var context = BuildExecutionContext(schema, root, document, operation, inputs, userContext,
+                        cancellationToken);
 
                     if (context.Errors.Any())
                     {
@@ -75,7 +102,11 @@ namespace GraphQL
                         return result;
                     }
 
-                    result.Data = await ExecuteOperationAsync(context).ConfigureAwait(false);
+                    using (timings.Subject("execution", "Executing operation"))
+                    {
+                        result.Data = await ExecuteOperationAsync(context).ConfigureAwait(false);
+                    }
+
                     if (context.Errors.Any())
                     {
                         result.Errors = context.Errors;
@@ -100,13 +131,17 @@ namespace GraphQL
                 result.Errors.Add(new ExecutionError(exc.Message, exc));
                 return result;
             }
+            finally
+            {
+                result.Perf = timings.Finish().ToArray();
+            }
         }
 
         public ExecutionContext BuildExecutionContext(
             ISchema schema,
             object root,
             Document document,
-            string operationName,
+            Operation operation,
             Inputs inputs,
             object userContext,
             CancellationToken cancellationToken)
@@ -117,22 +152,22 @@ namespace GraphQL
             context.RootValue = root;
             context.UserContext = userContext;
 
-            var operation = !string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.WithName(operationName)
-                : document.Operations.FirstOrDefault();
-
-            if (operation == null)
-            {
-                context.Errors.Add(new ExecutionError("Unknown operation name: {0}".ToFormat(operationName)));
-                return context;
-            }
-
             context.Operation = operation;
             context.Variables = GetVariableValues(document, schema, operation.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
 
             return context;
+        }
+
+        private Operation GetOperation(string operationName, Document document)
+        {
+            var operation = !string.IsNullOrWhiteSpace(operationName)
+                ? document.Operations.WithName(operationName)
+                : document.Operations.FirstOrDefault();
+
+            return operation;
+
         }
 
         public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
@@ -195,20 +230,16 @@ namespace GraphQL
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
-                if(result is Task)
+                if (result is Task)
                 {
                     var task = result as Task;
                     await task.ConfigureAwait(false);
 
-                    result = GetProperyValue(task, "Result");
+                    result = task.GetProperyValue("Result");
                 }
 
-//                if (parentType is __Field && result is Type)
-//                {
-//                    result = context.Schema.FindType(result as Type);
-//                }
-
-                resolveResult.Value = await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
+                resolveResult.Value =
+                    await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
@@ -219,15 +250,6 @@ namespace GraphQL
                 resolveResult.Skip = false;
                 return resolveResult;
             }
-        }
-
-        public object GetProperyValue(object obj, string propertyName)
-        {
-            var val = obj.GetType()
-                .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
-                .GetValue(obj, null);
-
-            return val;
         }
 
         public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)

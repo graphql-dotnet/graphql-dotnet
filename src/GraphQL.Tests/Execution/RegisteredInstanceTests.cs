@@ -109,7 +109,10 @@ namespace GraphQL.Tests.Execution
             schema.RegisterTypes(person);
 
             var printed = new SchemaPrinter(schema).Print();
+
+#if DEBUG
             Console.WriteLine(printed);
+#endif
 
             AssertQuerySuccess(
                 schema,

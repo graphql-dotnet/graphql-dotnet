@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Introspection;
 
 namespace GraphQL.Types
 {
     public interface ISchema : IDisposable
     {
         bool Initialized { get; }
+
         void Initialize();
 
         IObjectGraphType Query { get; set; }
@@ -90,16 +90,11 @@ namespace GraphQL.Types
             }
         }
 
-        public IEnumerable<IGraphType> AllTypes
-        {
-            get
-            {
-                return _lookup
-                    .Value
-                    .All()
-                    .ToList();
-            }
-        }
+        public IEnumerable<IGraphType> AllTypes =>
+            _lookup
+                .Value
+                .All()
+                .ToList();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
@@ -150,7 +145,7 @@ namespace GraphQL.Types
 
         private void RegisterType(Type type)
         {
-            if (!typeof (GraphType).IsAssignableFrom(type))
+            if (!typeof (IGraphType).IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
             }
@@ -174,24 +169,6 @@ namespace GraphQL.Types
                 .ToList();
 
             return GraphTypesLookup.Create(types, _directives, ResolveType);
-        }
-
-        private IGraphType AddType(Type type)
-        {
-            if (type == null)
-            {
-                return null;
-            }
-
-            var ctx = new TypeCollectionContext(ResolveType, (name, graphType, context) =>
-            {
-                _lookup.Value.AddType(graphType, context);
-            });
-
-            var namedType = type.GetNamedType();
-            var instance = ResolveType(namedType);
-            _lookup.Value.AddType(instance, ctx);
-            return instance;
         }
     }
 }

@@ -9,7 +9,6 @@ namespace GraphQL.Types
         string Description { get; set; }
         string DeprecationReason { get; set; }
         QueryArguments Arguments { get; set; }
-        IGraphType ResolvedType { get; set; }
     }
 
     public class FieldType : IFieldType
