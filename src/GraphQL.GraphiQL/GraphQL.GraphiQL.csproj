@@ -47,15 +47,15 @@
   <ItemGroup>
     <Reference Include="GraphQL, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\GraphQL.StarWars\bin\Debug\net461\GraphQL.dll</HintPath>
+      <HintPath>..\GraphQL\bin\Debug\net45\GraphQL.dll</HintPath>
     </Reference>
     <Reference Include="GraphQL.StarWars, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\GraphQL.StarWars\bin\Debug\net461\GraphQL.StarWars.dll</HintPath>
+      <HintPath>..\GraphQL.StarWars\bin\Debug\net45\GraphQL.StarWars.dll</HintPath>
     </Reference>
-    <Reference Include="GraphQLParser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GraphQL-Parser, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\GraphQL.StarWars\bin\Debug\net461\GraphQLParser.dll</HintPath>
+      <HintPath>..\GraphQL.StarWars\bin\Debug\net45\GraphQL-Parser.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
