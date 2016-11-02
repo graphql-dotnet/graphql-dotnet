@@ -19,6 +19,16 @@ namespace GraphQL.Validation
         private readonly int _maxRecursionCount;
         private int _loopCounter;
 
+        /// <summary>
+        /// Creates a new instance of ComplexityAnalyzer
+        /// </summary>
+        /// <param name="avgImpact">
+        /// Average number of entries per GraphType.
+        /// If a hard limit is imposed by your application data access layer on number of entities returned then use that number.
+        /// </param>
+        /// <param name="maxRecursionCount">
+        /// Max. number of times to traverse tree nodes. GraphiQL queries take ~95 iterations, adjust as needed.
+        /// </param>
         public ComplexityAnalyzer(double avgImpact = 2.0d, int maxRecursionCount = 100)
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
@@ -26,6 +36,11 @@ namespace GraphQL.Validation
             _avgImpact = avgImpact;
             _maxRecursionCount = maxRecursionCount;
         }
+
+
+        /// <summary>
+        /// Analyzes the complexity of a document.
+        /// </summary>
         public ComplexityResult Analyze(Document doc)
         {
             TreeIterator(doc, _avgImpact);
