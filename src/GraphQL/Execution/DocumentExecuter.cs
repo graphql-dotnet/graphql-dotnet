@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -32,14 +33,14 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
-        private readonly ComplexityAnalyzer _complexityAnalyzer;
+        private readonly IComplexityAnalyzer _complexityAnalyzer;
 
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, ComplexityAnalyzer complexityAnalyzer)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
@@ -61,6 +62,10 @@ namespace GraphQL
             {
                 var document = _documentBuilder.Build(query);
                 var complexityResult = _complexityAnalyzer.Analyze(document);
+#if DEBUG
+                Debug.WriteLine($"Complexity: {complexityResult.Complexity}"); // (~1500 [=750*2] would be the full introspection query used by GraphiQL and others)
+                Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}"); // Does not work with non-inline fragments yet!
+#endif
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
 
                 if (validationResult.IsValid)
