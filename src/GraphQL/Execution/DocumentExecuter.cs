@@ -32,16 +32,18 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
+        private readonly ComplexityAnalyzer _complexityAnalyzer;
 
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, ComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
+            _complexityAnalyzer = complexityAnalyzer;
         }
 
         public async Task<ExecutionResult> ExecuteAsync(
@@ -58,10 +60,8 @@ namespace GraphQL
             try
             {
                 var document = _documentBuilder.Build(query);
+                var complexityResult = _complexityAnalyzer.Analyze(document);
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
-
-                var complexityReducer = new ComplexityReducer();
-                complexityReducer.Calculate(document);
 
                 if (validationResult.IsValid)
                 {
