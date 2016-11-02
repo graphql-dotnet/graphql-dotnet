@@ -5,7 +5,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
-    public class ComplexityAnalyzer
+    public class ComplexityAnalyzer : IComplexityAnalyzer
     {
         public class ComplexityResult
         {
