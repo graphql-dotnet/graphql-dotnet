@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 
@@ -7,13 +6,6 @@ namespace GraphQL.Validation
 {
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
-        public class ComplexityResult
-        {
-            public Dictionary<INode, double> ComplexityMap { get; } = new Dictionary<INode, double>();
-            public double Complexity { get; set; }
-            public int TotalQueryDepth { get; set; }
-        }
-
         private ComplexityResult _result = new ComplexityResult();
         private readonly double _avgImpact;
         private readonly int _maxRecursionCount;
