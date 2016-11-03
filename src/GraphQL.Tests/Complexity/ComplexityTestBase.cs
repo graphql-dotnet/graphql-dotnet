@@ -9,6 +9,6 @@ namespace GraphQL.Tests.Complexity
         public ComplexityAnalyzer Analyzer { get; } = new ComplexityAnalyzer(2.0d, 50);
         public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder();
 
-        protected ComplexityAnalyzer.ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query));
+        protected ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query));
     }
 }
