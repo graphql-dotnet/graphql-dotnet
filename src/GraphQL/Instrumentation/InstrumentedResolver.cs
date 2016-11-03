@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -17,7 +18,10 @@ namespace GraphQL.Instrumentation
 
         public object Resolve(ResolveFieldContext context)
         {
-            using (_timings.Subject("field", context.FieldName))
+            bool isObject = context.FieldAst.SelectionSet != null && context.FieldAst.SelectionSet.Selections.Any();
+            var type = isObject ? "object" : "field";
+
+            using (_timings.Subject(type, context.FieldName))
             {
                 var result = _next.Resolve(context);
 
