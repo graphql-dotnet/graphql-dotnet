@@ -4,6 +4,6 @@ namespace GraphQL.Validation
 {
     public interface IComplexityAnalyzer
     {
-        ComplexityAnalyzer.ComplexityResult Analyze(Document doc);
+        ComplexityResult Analyze(Document doc);
     }
 }
