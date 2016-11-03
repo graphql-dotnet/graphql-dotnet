@@ -40,7 +40,7 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// Analyzes the complexity of a document.
-        /// </summary>
+        /// </summary>  
         public ComplexityResult Analyze(Document doc)
         {
             TreeIterator(doc, _avgImpact);
