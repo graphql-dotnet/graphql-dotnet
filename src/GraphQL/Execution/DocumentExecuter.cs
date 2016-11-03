@@ -65,6 +65,7 @@ namespace GraphQL
 #if DEBUG
                 Debug.WriteLine($"Complexity: {complexityResult.Complexity}"); // (~1500 [=750*2] would be the full introspection query used by GraphiQL and others)
                 Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}"); // Does not work with non-inline fragments yet!
+                foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
 #endif
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
 
