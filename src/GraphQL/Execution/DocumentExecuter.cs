@@ -27,7 +27,7 @@ namespace GraphQL
         public CancellationToken CancellationToken { get; set; } = default(CancellationToken);
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public object UserContext { get; set; }
-        public Task AfterPipeline { get; set; }
+        public Func<Task> AfterPipeline { get; set; }
     }
 
     public interface IDocumentExecuter
@@ -153,7 +153,8 @@ namespace GraphQL
 
                         if (config.AfterPipeline != null)
                         {
-                            await config.AfterPipeline;
+                            var after = config.AfterPipeline();
+                            await after;
                         }
 
                         result.Data = await task;
