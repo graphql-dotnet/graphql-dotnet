@@ -16,6 +16,20 @@ using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
+    public class ExecutionParameters
+    {
+        public ISchema Schema { get; set; }
+        public object Root { get; set; }
+        public string Query { get; set; }
+        public string OperationName { get; set; }
+        public Document Document { get; set; }
+        public Inputs Inputs { get; set; }
+        public CancellationToken CancellationToken { get; set; } = default(CancellationToken);
+        public IEnumerable<IValidationRule> ValidationRules { get; set; }
+        public object UserContext { get; set; }
+        public Task AfterPipeline { get; set; }
+    }
+
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
@@ -27,6 +41,8 @@ namespace GraphQL
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null);
+
+        Task<ExecutionResult> ExecuteAsync(ExecutionParameters parameters);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -45,7 +61,7 @@ namespace GraphQL
             _documentValidator = documentValidator;
         }
 
-        public async Task<ExecutionResult> ExecuteAsync(
+        public Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,
             string query,
@@ -55,26 +71,44 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
+            return ExecuteAsync(new ExecutionParameters
+            {
+                Schema = schema,
+                Root = root,
+                Query = query,
+                OperationName = operationName,
+                Inputs = inputs,
+                UserContext = userContext,
+                CancellationToken = cancellationToken,
+                ValidationRules = rules
+            });
+        }
+
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionParameters config)
+        {
             var timings = new Timings();
-            schema.Instrument(timings);
-            timings.Start(operationName);
+            config.Schema.Instrument(timings);
+            timings.Start(config.OperationName);
 
             var result = new ExecutionResult();
-            result.Query = query;
+            result.Query = config.Query;
             try
             {
-                if (!schema.Initialized)
+                if (!config.Schema.Initialized)
                 {
                     using (timings.Subject("schema", "Initializing schema"))
                     {
-                        schema.Initialize();
+                        config.Schema.Initialize();
                     }
                 }
 
-                Document document;
+                var document = config.Document;
                 using (timings.Subject("document", "Building document"))
                 {
-                    document = _documentBuilder.Build(query);
+                    if (document == null)
+                    {
+                        document = _documentBuilder.Build(config.Query);
+                    }
                 }
 
                 result.Document = document;
@@ -82,24 +116,30 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (timings.Subject("document", "Validating document"))
                 {
-                    validationResult = _documentValidator.Validate(query, schema, document, rules);
+                    validationResult = _documentValidator.Validate(config.Query, config.Schema, document, config.ValidationRules);
                 }
 
                 if (validationResult.IsValid)
                 {
-                    var operation = GetOperation(operationName, document);
+                    var operation = GetOperation(config.OperationName, document);
 
                     if (operation == null)
                     {
-                        throw new ExecutionError("Unknown operation name: {0}".ToFormat(operationName));
+                        throw new ExecutionError("Unknown operation name: {0}".ToFormat(config.OperationName));
                     }
 
                     result.Operation = operation;
 
                     timings.SetOperationName(operation.Name);
 
-                    var context = BuildExecutionContext(schema, root, document, operation, inputs, userContext,
-                        cancellationToken);
+                    var context = BuildExecutionContext(
+                        config.Schema,
+                        config.Root,
+                        document,
+                        operation,
+                        config.Inputs,
+                        config.UserContext,
+                        config.CancellationToken);
 
                     if (context.Errors.Any())
                     {
@@ -109,7 +149,14 @@ namespace GraphQL
 
                     using (timings.Subject("execution", "Executing operation"))
                     {
-                        result.Data = await ExecuteOperationAsync(context).ConfigureAwait(false);
+                        var task = ExecuteOperationAsync(context).ConfigureAwait(false);
+
+                        if (config.AfterPipeline != null)
+                        {
+                            await config.AfterPipeline;
+                        }
+
+                        result.Data = await task;
                     }
 
                     if (context.Errors.Any())
@@ -172,7 +219,6 @@ namespace GraphQL
                 : document.Operations.FirstOrDefault();
 
             return operation;
-
         }
 
         public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
