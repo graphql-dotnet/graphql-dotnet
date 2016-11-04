@@ -55,7 +55,7 @@ namespace GraphQL
                 action(list[i]);
             }
         }
-        
+
         public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
             this IEnumerable<TSource> items,
             Func<TSource, TKey> keyFunc,

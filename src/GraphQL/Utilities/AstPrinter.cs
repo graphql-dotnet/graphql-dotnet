@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Utilities

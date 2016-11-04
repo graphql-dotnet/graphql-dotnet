@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
-using GraphQL.Resolvers;
+using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
@@ -56,10 +56,11 @@ namespace GraphQL
             IEnumerable<IValidationRule> rules = null)
         {
             var timings = new Timings();
-            SchemaExtensions.Instrument(schema, timings);
+            schema.Instrument(timings);
             timings.Start(operationName);
 
             var result = new ExecutionResult();
+            result.Query = query;
             try
             {
                 if (!schema.Initialized)
@@ -76,6 +77,8 @@ namespace GraphQL
                     document = _documentBuilder.Build(query);
                 }
 
+                result.Document = document;
+
                 IValidationResult validationResult;
                 using (timings.Subject("document", "Validating document"))
                 {
@@ -90,6 +93,8 @@ namespace GraphQL
                     {
                         throw new ExecutionError("Unknown operation name: {0}".ToFormat(operationName));
                     }
+
+                    result.Operation = operation;
 
                     timings.SetOperationName(operation.Name);
 

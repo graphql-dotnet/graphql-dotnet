@@ -327,7 +327,7 @@ namespace GraphQL.Utilities
             return "{0}".ToFormat(value);
         }
 
-        public string ResolveName(IGraphType type)
+        public static string ResolveName(IGraphType type)
         {
             if (type is NonNullGraphType)
             {

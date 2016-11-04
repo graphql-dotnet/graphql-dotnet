@@ -4,7 +4,7 @@ namespace GraphQL.Instrumentation
 {
     public static class SchemaExtensions
     {
-        public static void Instrument(ISchema schema, Timings timings)
+        public static void Instrument(this ISchema schema, Timings timings)
         {
             schema.AllTypes.Apply(item =>
             {

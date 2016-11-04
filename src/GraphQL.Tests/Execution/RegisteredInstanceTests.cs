@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using GraphQL.Http;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;

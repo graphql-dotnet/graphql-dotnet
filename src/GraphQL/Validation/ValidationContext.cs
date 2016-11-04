@@ -154,11 +154,7 @@ namespace GraphQL.Validation
 
         public string Print(IGraphType type)
         {
-            if (_schemaPrinter == null)
-            {
-                _schemaPrinter = new SchemaPrinter(Schema);
-            }
-            return _schemaPrinter.ResolveName(type);
+            return SchemaPrinter.ResolveName(type);
         }
     }
 

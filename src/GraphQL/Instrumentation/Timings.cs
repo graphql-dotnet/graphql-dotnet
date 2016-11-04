@@ -23,9 +23,9 @@ namespace GraphQL.Instrumentation
             _main.Subject = name;
         }
 
-        public IDisposable Subject(string type, string subject)
+        public IDisposable Subject(string category, string subject, Dictionary<string, object> metadata = null)
         {
-            var record = new PerfRecord(type, subject, _stopwatch.ElapsedMilliseconds);
+            var record = new PerfRecord(category, subject, _stopwatch.ElapsedMilliseconds, metadata);
             _records.Add(record);
             return new Marker(record, _stopwatch);
         }
