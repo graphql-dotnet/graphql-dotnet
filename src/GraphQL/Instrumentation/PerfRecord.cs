@@ -57,15 +57,15 @@ namespace GraphQL.Instrumentation
 
     public class FieldStat
     {
-        private readonly List<long> _latency = new List<long>();
-
         public string Name { get; set; }
         public string ReturnType { get; set; }
-        public long Latency => _latency.Sum();
+
+        // TODO: switch this to a histogram
+        public long Latency { get; set; }
 
         public void AddLatency(long duration)
         {
-            _latency.Add(duration);
+            Latency += duration;
         }
     }
 
