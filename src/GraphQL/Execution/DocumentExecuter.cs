@@ -151,10 +151,10 @@ namespace GraphQL
                     {
                         var task = ExecuteOperationAsync(context).ConfigureAwait(false);
 
+                        // TODO: refactor this to a list of listeners
                         if (config.AfterPipeline != null)
                         {
-                            var after = config.AfterPipeline();
-                            await after;
+                            await config.AfterPipeline();
                         }
 
                         result.Data = await task;

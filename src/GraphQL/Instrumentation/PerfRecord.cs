@@ -76,7 +76,19 @@ namespace GraphQL.Instrumentation
 
         public string Name { get; set; }
 
-        public FieldStat[] Fields => _fields.GetAll();
+        public FieldStat[] Fields
+        {
+            get { return _fields.GetAll(); }
+            set
+            {
+                _fields.Clear();
+
+                value.Apply(f =>
+                {
+                    _fields[f.Name] = f;
+                });
+            }
+        }
 
         public FieldStat this[string fieldName] => _fields[fieldName];
     }

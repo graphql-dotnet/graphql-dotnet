@@ -104,6 +104,13 @@ namespace GraphQL
                 graphType = typeof(DateGraphType);
             }
 
+            if (type.IsArray)
+            {
+                var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
+                var listType = typeof(NonNullGraphType<>);
+                graphType = listType.MakeGenericType(elementType);
+            }
+
             if (graphType == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Unknown input type.");
