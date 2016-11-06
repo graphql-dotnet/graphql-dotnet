@@ -2,30 +2,23 @@ using System;
 using System.Linq;
 using GraphQL.Language.AST;
 
-namespace GraphQL.Validation
+namespace GraphQL.Validation.Complexity
 {
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
         private ComplexityResult _result = new ComplexityResult();
-        private readonly double _avgImpact;
         private readonly int _maxRecursionCount;
         private int _loopCounter;
 
         /// <summary>
         /// Creates a new instance of ComplexityAnalyzer
         /// </summary>
-        /// <param name="avgImpact">
-        /// Average number of entries per GraphType.
-        /// If a hard limit is imposed by your application data access layer on number of entities returned then use that number.
-        /// </param>
         /// <param name="maxRecursionCount">
         /// Max. number of times to traverse tree nodes. GraphiQL queries take ~95 iterations, adjust as needed.
         /// </param>
-        public ComplexityAnalyzer(double avgImpact = 2.0d, int maxRecursionCount = 100)
+        /// 
+        public ComplexityAnalyzer(int maxRecursionCount = 100)
         {
-            if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
-
-            _avgImpact = avgImpact;
             _maxRecursionCount = maxRecursionCount;
         }
 
@@ -33,9 +26,11 @@ namespace GraphQL.Validation
         /// <summary>
         /// Analyzes the complexity of a document.
         /// </summary>  
-        public ComplexityResult Analyze(Document doc)
+        public ComplexityResult Analyze(Document doc, double avgImpact = 2.0d)
         {
-            TreeIterator(doc, _avgImpact);
+            if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
+
+            TreeIterator(doc, avgImpact, avgImpact);
 
             // Cleanup in case Analyze is called again
             _loopCounter = 0;
@@ -45,7 +40,7 @@ namespace GraphQL.Validation
             return retVal;
         }
 
-        private void TreeIterator(INode node, double impact)
+        private void TreeIterator(INode node, double avgImpact, double currentImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
                 throw new InvalidOperationException("Query is too complex to validate.");
@@ -55,16 +50,16 @@ namespace GraphQL.Validation
                 if (node is Field)
                 {
                     _result.TotalQueryDepth++;
-                    RecordFieldComplexity(node, impact);
+                    RecordFieldComplexity(node, currentImpact);
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        TreeIterator(nodeChild, _avgImpact * impact);
+                        TreeIterator(nodeChild, avgImpact, currentImpact * avgImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        TreeIterator(nodeChild, impact);
+                        TreeIterator(nodeChild, avgImpact, currentImpact);
             }
             else if (node is Field)
-                RecordFieldComplexity(node, impact);
+                RecordFieldComplexity(node, currentImpact);
         }
 
         private void RecordFieldComplexity(INode node, double impact)

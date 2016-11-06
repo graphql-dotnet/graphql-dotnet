@@ -1,9 +1,9 @@
 ﻿using GraphQL.Language.AST;
 
-namespace GraphQL.Validation
+namespace GraphQL.Validation.Complexity
 {
     public interface IComplexityAnalyzer
     {
-        ComplexityResult Analyze(Document doc);
+        ComplexityResult Analyze(Document doc, double avgImpact = 2);
     }
 }
