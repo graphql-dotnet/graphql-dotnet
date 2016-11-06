@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Complexity
         /// <param name="maxRecursionCount">
         /// Max. number of times to traverse tree nodes. GraphiQL queries take ~95 iterations, adjust as needed.
         /// </param>
-        public ComplexityAnalyzer(int maxRecursionCount = 100)
+        public ComplexityAnalyzer(int maxRecursionCount = 250)
         {
             _maxRecursionCount = maxRecursionCount;
         }
@@ -44,7 +44,7 @@ namespace GraphQL.Validation.Complexity
             if (complexityParameters.MaxComplexity.HasValue &&
                 complexityResult.Complexity > complexityParameters.MaxComplexity.Value)
                 throw new InvalidOperationException(
-                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderBy(pair => pair.Value).First()}");
+                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First()}");
 
             if (complexityParameters.MaxDepth.HasValue &&
                 complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
