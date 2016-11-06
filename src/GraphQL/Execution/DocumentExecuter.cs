@@ -64,22 +64,7 @@ namespace GraphQL
             try
             {
                 var document = _documentBuilder.Build(query);
-                if (complexityConfiguration != null)
-                {
-                    var complexityResult = _complexityAnalyzer.Analyze(document, complexityConfiguration.AverageImpact ?? 2.0f);
-#if DEBUG
-                    Debug.WriteLine($"Complexity: {complexityResult.Complexity}");
-                    Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}");
-                    foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
-#endif
-                    if (complexityConfiguration.MaxDepth.HasValue &&
-                        complexityResult.TotalQueryDepth > complexityConfiguration.MaxDepth)
-                        throw new InvalidOperationException("Query is too complex to execute. Reduce nesting.");
-                    if (complexityConfiguration.MaxComplexity.HasValue &&
-                        complexityResult.Complexity > complexityConfiguration.MaxComplexity.Value)
-                        throw new InvalidOperationException("Query is too complex to execute.");
-                }
-
+                if (complexityConfiguration != null) _complexityAnalyzer.Validate(document, complexityConfiguration);
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
 
                 if (validationResult.IsValid)

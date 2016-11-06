@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using GraphQL.Language.AST;
 
@@ -19,6 +20,27 @@ namespace GraphQL.Validation.Complexity
         public ComplexityAnalyzer(int maxRecursionCount = 100)
         {
             _maxRecursionCount = maxRecursionCount;
+        }
+
+        public void Validate(Document document, ComplexityConfiguration complexityParameters)
+        {
+            if (complexityParameters == null) return;
+
+            var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f);
+
+#if DEBUG
+            Debug.WriteLine($"Complexity: {complexityResult.Complexity}");
+            Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}");
+            foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
+#endif
+
+            if (complexityParameters.MaxComplexity.HasValue &&
+                complexityResult.Complexity > complexityParameters.MaxComplexity.Value)
+                throw new InvalidOperationException($"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderBy(pair => pair.Value).First()}");
+
+            if (complexityParameters.MaxDepth.HasValue &&
+                complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
+                throw new InvalidOperationException("Query is too complex to execute. Reduce nesting.");
         }
 
 
