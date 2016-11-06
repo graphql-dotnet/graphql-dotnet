@@ -16,7 +16,6 @@ namespace GraphQL.Validation.Complexity
         /// <param name="maxRecursionCount">
         /// Max. number of times to traverse tree nodes. GraphiQL queries take ~95 iterations, adjust as needed.
         /// </param>
-        /// 
         public ComplexityAnalyzer(int maxRecursionCount = 100)
         {
             _maxRecursionCount = maxRecursionCount;
