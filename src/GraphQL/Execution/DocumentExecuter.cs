@@ -13,6 +13,7 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 using GraphQL.Resolvers;
+using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {

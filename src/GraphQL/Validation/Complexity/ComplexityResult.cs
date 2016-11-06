@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
-namespace GraphQL.Validation
+namespace GraphQL.Validation.Complexity
 {
     public class ComplexityResult
     {

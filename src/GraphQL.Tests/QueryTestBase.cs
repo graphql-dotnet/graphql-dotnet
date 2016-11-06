@@ -7,6 +7,7 @@ using GraphQL.Http;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
 using Shouldly;
