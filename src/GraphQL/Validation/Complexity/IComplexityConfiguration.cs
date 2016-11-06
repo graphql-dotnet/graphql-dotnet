@@ -4,6 +4,6 @@
     {
         public int? MaxDepth { get; set; }
         public int? MaxComplexity { get; set; }
-        public double? AverageImpact { get; set; }
+        public double? FieldImpact { get; set; }
     }
 }
