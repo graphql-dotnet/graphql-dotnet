@@ -27,7 +27,8 @@ namespace GraphQL
             Inputs inputs = null,
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
-            IEnumerable<IValidationRule> rules = null);
+            IEnumerable<IValidationRule> rules = null,
+            ComplexityConfiguration complexityConfiguration = null);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -56,18 +57,29 @@ namespace GraphQL
             Inputs inputs = null,
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
-            IEnumerable<IValidationRule> rules = null)
+            IEnumerable<IValidationRule> rules = null,
+            ComplexityConfiguration complexityConfiguration = null)
         {
             var result = new ExecutionResult();
             try
             {
                 var document = _documentBuilder.Build(query);
-                var complexityResult = _complexityAnalyzer.Analyze(document);
+                if (complexityConfiguration != null)
+                {
+                    var complexityResult = _complexityAnalyzer.Analyze(document, complexityConfiguration.AverageImpact ?? 2.0f);
 #if DEBUG
-                Debug.WriteLine($"Complexity: {complexityResult.Complexity}"); // (~1500 [=750*2] would be the full introspection query used by GraphiQL and others)
-                Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}"); // Does not work with non-inline fragments yet!
-                foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
+                    Debug.WriteLine($"Complexity: {complexityResult.Complexity}");
+                    Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}");
+                    foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
 #endif
+                    if (complexityConfiguration.MaxDepth.HasValue &&
+                        complexityResult.TotalQueryDepth > complexityConfiguration.MaxDepth)
+                        throw new InvalidOperationException("Query is too complex to execute. Reduce nesting.");
+                    if (complexityConfiguration.MaxComplexity.HasValue &&
+                        complexityResult.Complexity > complexityConfiguration.MaxComplexity.Value)
+                        throw new InvalidOperationException("Query is too complex to execute.");
+                }
+
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
 
                 if (validationResult.IsValid)
