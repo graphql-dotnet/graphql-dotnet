@@ -16,20 +16,6 @@ using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
-    public class ExecutionParameters
-    {
-        public ISchema Schema { get; set; }
-        public object Root { get; set; }
-        public string Query { get; set; }
-        public string OperationName { get; set; }
-        public Document Document { get; set; }
-        public Inputs Inputs { get; set; }
-        public CancellationToken CancellationToken { get; set; } = default(CancellationToken);
-        public IEnumerable<IValidationRule> ValidationRules { get; set; }
-        public object UserContext { get; set; }
-        public Func<Task> AfterPipeline { get; set; }
-    }
-
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
@@ -42,7 +28,8 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null);
 
-        Task<ExecutionResult> ExecuteAsync(ExecutionParameters parameters);
+        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
+        Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -71,7 +58,7 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            return ExecuteAsync(new ExecutionParameters
+            return ExecuteAsync(new ExecutionOptions
             {
                 Schema = schema,
                 Root = root,
@@ -84,7 +71,14 @@ namespace GraphQL
             });
         }
 
-        public async Task<ExecutionResult> ExecuteAsync(ExecutionParameters config)
+        public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure)
+        {
+            var options = new ExecutionOptions();
+            configure(options);
+            return ExecuteAsync(options);
+        }
+
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
             var timings = new Timings();
             config.Schema.Instrument(timings);
@@ -113,25 +107,23 @@ namespace GraphQL
 
                 result.Document = document;
 
+                var operation = GetOperation(config.OperationName, document);
+                result.Operation = operation;
+                timings.SetOperationName(operation?.Name);
+
                 IValidationResult validationResult;
                 using (timings.Subject("document", "Validating document"))
                 {
                     validationResult = _documentValidator.Validate(config.Query, config.Schema, document, config.ValidationRules);
                 }
 
+                foreach (var listener in config.Listeners)
+                {
+                    await listener.AfterValidation(validationResult, config.CancellationToken).ConfigureAwait(false);
+                }
+
                 if (validationResult.IsValid)
                 {
-                    var operation = GetOperation(config.OperationName, document);
-
-                    if (operation == null)
-                    {
-                        throw new ExecutionError("Unknown operation name: {0}".ToFormat(config.OperationName));
-                    }
-
-                    result.Operation = operation;
-
-                    timings.SetOperationName(operation.Name);
-
                     var context = BuildExecutionContext(
                         config.Schema,
                         config.Root,
@@ -149,15 +141,24 @@ namespace GraphQL
 
                     using (timings.Subject("execution", "Executing operation"))
                     {
+                        foreach (var listener in config.Listeners)
+                        {
+                            await listener.BeforeExecution(config.CancellationToken).ConfigureAwait(false);
+                        }
+
                         var task = ExecuteOperationAsync(context).ConfigureAwait(false);
 
-                        // TODO: refactor this to a list of listeners
-                        if (config.AfterPipeline != null)
+                        foreach (var listener in config.Listeners)
                         {
-                            await config.AfterPipeline();
+                            await listener.BeforeExecutionAwaited(config.CancellationToken).ConfigureAwait(false);
                         }
 
                         result.Data = await task;
+
+                        foreach (var listener in config.Listeners)
+                        {
+                            await listener.AfterExecution(config.CancellationToken).ConfigureAwait(false);
+                        }
                     }
 
                     if (context.Errors.Any())
