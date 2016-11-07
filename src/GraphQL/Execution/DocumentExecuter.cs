@@ -119,7 +119,11 @@ namespace GraphQL
 
                 foreach (var listener in config.Listeners)
                 {
-                    await listener.AfterValidation(validationResult, config.CancellationToken).ConfigureAwait(false);
+                    await listener.AfterValidation(
+                            config.UserContext,
+                            validationResult,
+                            config.CancellationToken)
+                        .ConfigureAwait(false);
                 }
 
                 if (validationResult.IsValid)
@@ -143,21 +147,21 @@ namespace GraphQL
                     {
                         foreach (var listener in config.Listeners)
                         {
-                            await listener.BeforeExecution(config.CancellationToken).ConfigureAwait(false);
+                            await listener.BeforeExecution(config.UserContext, config.CancellationToken).ConfigureAwait(false);
                         }
 
                         var task = ExecuteOperationAsync(context).ConfigureAwait(false);
 
                         foreach (var listener in config.Listeners)
                         {
-                            await listener.BeforeExecutionAwaited(config.CancellationToken).ConfigureAwait(false);
+                            await listener.BeforeExecutionAwaited(config.UserContext, config.CancellationToken).ConfigureAwait(false);
                         }
 
                         result.Data = await task;
 
                         foreach (var listener in config.Listeners)
                         {
-                            await listener.AfterExecution(config.CancellationToken).ConfigureAwait(false);
+                            await listener.AfterExecution(config.UserContext, config.CancellationToken).ConfigureAwait(false);
                         }
                     }
 
