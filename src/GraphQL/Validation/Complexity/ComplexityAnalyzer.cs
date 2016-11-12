@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -7,6 +8,13 @@ namespace GraphQL.Validation.Complexity
 {
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
+        private class FragmentComplexity
+        {
+            public int Depth { get; set; }
+            public double Complexity { get; set; }
+        }
+
+        private Dictionary<string, FragmentComplexity> _fragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
         private ComplexityResult _result = new ComplexityResult();
         private readonly int _maxRecursionCount;
         private int _loopCounter;
@@ -25,7 +33,6 @@ namespace GraphQL.Validation.Complexity
         public void Validate(Document document, ComplexityConfiguration complexityParameters)
         {
             if (complexityParameters == null) return;
-
             var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f);
 
 #if DEBUG
@@ -37,7 +44,7 @@ namespace GraphQL.Validation.Complexity
             Validate(complexityResult, complexityParameters);
         }
 
-        public void Validate(ComplexityResult complexityResult, ComplexityConfiguration complexityParameters)
+        public static void Validate(ComplexityResult complexityResult, ComplexityConfiguration complexityParameters)
         {
             if (complexityParameters == null) return;
 
@@ -59,7 +66,14 @@ namespace GraphQL.Validation.Complexity
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
-            TreeIterator(doc, avgImpact, avgImpact);
+            doc.Children.Where(node => node is FragmentDefinition).Apply(node =>
+            {
+                var fragResult = new FragmentComplexity();
+                FragmentIterator(node, fragResult, avgImpact, avgImpact);
+                _fragmentMap[(node as FragmentDefinition)?.Name] = fragResult;
+            });
+
+            TreeIterator(doc, _result, avgImpact, avgImpact);
 
             // Cleanup in case Analyze is called again
             _loopCounter = 0;
@@ -69,35 +83,65 @@ namespace GraphQL.Validation.Complexity
             return retVal;
         }
 
-        private void TreeIterator(INode node, double avgImpact, double currentImpact)
+        private void FragmentIterator(INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
                 throw new InvalidOperationException("Query is too complex to validate.");
 
-            if (node.Children != null && node.Children.Any(n => n is Field || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
+            if (node.Children != null &&
+                node.Children.Any(
+                    n => n is Field || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
             {
                 if (node is Field)
                 {
-                    _result.TotalQueryDepth++;
-                    RecordFieldComplexity(node, currentImpact);
+                    qDepthComplexity.Depth++;
+                    qDepthComplexity.Complexity += currentImpact;
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        TreeIterator(nodeChild, avgImpact, currentImpact * avgImpact);
+                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact * avgImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        TreeIterator(nodeChild, avgImpact, currentImpact);
+                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact);
             }
             else if (node is Field)
-                RecordFieldComplexity(node, currentImpact);
+                qDepthComplexity.Complexity += currentImpact;
         }
 
-        private void RecordFieldComplexity(INode node, double impact)
+        private void TreeIterator(INode node, ComplexityResult result, double avgImpact, double currentImpact)
         {
-            _result.Complexity += impact;
-            if (_result.ComplexityMap.ContainsKey(node))
-                _result.ComplexityMap[node] += impact;
+            if (_loopCounter++ > _maxRecursionCount)
+                throw new InvalidOperationException("Query is too complex to validate.");
+
+            if (node.Children != null && node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
+            {
+                if (node is Field)
+                {
+                    result.TotalQueryDepth++;
+                    RecordFieldComplexity(node, result, currentImpact);
+                    foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
+                        TreeIterator(nodeChild, result, avgImpact, currentImpact * avgImpact);
+                }
+                else if (node is FragmentSpread)
+                {
+                    var fragmentComplexity = _fragmentMap[((FragmentSpread)node).Name];
+                    result.Complexity += fragmentComplexity.Complexity;
+                    result.TotalQueryDepth += fragmentComplexity.Depth;
+                }
+                else
+                    foreach (var nodeChild in node.Children)
+                        TreeIterator(nodeChild, result, avgImpact, currentImpact);
+            }
+            else if (node is Field)
+                RecordFieldComplexity(node, result, currentImpact);
+        }
+
+        private static void RecordFieldComplexity(INode node, ComplexityResult result, double impact)
+        {
+            result.Complexity += impact;
+            if (result.ComplexityMap.ContainsKey(node))
+                result.ComplexityMap[node] += impact;
             else
-                _result.ComplexityMap.Add(node, impact);
+                result.ComplexityMap.Add(node, impact);
         }
     }
 }
