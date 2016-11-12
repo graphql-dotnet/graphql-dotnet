@@ -34,20 +34,11 @@ namespace GraphQL.Validation.Complexity
         {
             if (complexityParameters == null) return;
             var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f);
-
 #if DEBUG
             Debug.WriteLine($"Complexity: {complexityResult.Complexity}");
             Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}");
             foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
 #endif
-
-            Validate(complexityResult, complexityParameters);
-        }
-
-        public static void Validate(ComplexityResult complexityResult, ComplexityConfiguration complexityParameters)
-        {
-            if (complexityParameters == null) return;
-
             if (complexityParameters.MaxComplexity.HasValue &&
                 complexityResult.Complexity > complexityParameters.MaxComplexity.Value)
                 throw new InvalidOperationException(
@@ -62,7 +53,7 @@ namespace GraphQL.Validation.Complexity
         /// <summary>
         /// Analyzes the complexity of a document.
         /// </summary>  
-        public ComplexityResult Analyze(Document doc, double avgImpact = 2.0d)
+        internal ComplexityResult Analyze(Document doc, double avgImpact = 2.0d)
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
