@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
@@ -32,6 +29,43 @@ namespace GraphQL.Tests.Complexity
             var woFrag =
                 AnalyzeComplexity(
                     @"{ leftComparison: hero(episode: EMPIRE) { name appearsIn friends { name } } rightComparison: hero(episode: JEDI) { name appearsIn friends { name } } }");
+
+            withFrag.Complexity.ShouldBe(woFrag.Complexity);
+            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+        }
+
+        [Fact]
+        public void fragment_test_nested()
+        {
+            var withFrag = AnalyzeComplexity(@"
+			{
+			  A {
+			    W {
+			      ...X
+			    }
+			  }
+			}
+
+			fragment X on Y {
+			  B
+			  C
+			  D {
+			    E
+			  }
+			}");
+
+            var woFrag = AnalyzeComplexity(@"
+			{
+			  A {
+			    W {
+			      B
+			      C
+			      D {
+			        E
+			      }
+			    }
+			  }
+		    }");
 
             withFrag.Complexity.ShouldBe(woFrag.Complexity);
             withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
