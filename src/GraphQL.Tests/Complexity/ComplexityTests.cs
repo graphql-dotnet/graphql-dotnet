@@ -33,10 +33,8 @@ namespace GraphQL.Tests.Complexity
                 AnalyzeComplexity(
                     @"{ leftComparison: hero(episode: EMPIRE) { name appearsIn friends { name } } rightComparison: hero(episode: JEDI) { name appearsIn friends { name } } }");
 
-            // TODO: Non-inline fragments are not handled yet.
-            
-            // withFrag.Complexity.ShouldBe(woFrag.Complexity);
-            // withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
+            withFrag.Complexity.ShouldBe(woFrag.Complexity);
+            withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
         }
 
         [Fact]
@@ -51,6 +49,6 @@ namespace GraphQL.Tests.Complexity
             {
                 ex.Message.ShouldBe("Query is too complex to validate.");
             }
-        }        
+        }
     }
 }

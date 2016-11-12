@@ -111,6 +111,7 @@ namespace GraphQL.Validation.Complexity
         {
             if (_loopCounter++ > _maxRecursionCount)
                 throw new InvalidOperationException("Query is too complex to validate.");
+            if (node is FragmentDefinition) return;
 
             if (node.Children != null && node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
             {
@@ -121,18 +122,17 @@ namespace GraphQL.Validation.Complexity
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
                         TreeIterator(nodeChild, result, avgImpact, currentImpact * avgImpact);
                 }
-                else if (node is FragmentSpread)
-                {
-                    var fragmentComplexity = _fragmentMap[((FragmentSpread)node).Name];
-                    result.Complexity += fragmentComplexity.Complexity;
-                    result.TotalQueryDepth += fragmentComplexity.Depth;
-                }
-                else
-                    foreach (var nodeChild in node.Children)
+                else foreach (var nodeChild in node.Children)
                         TreeIterator(nodeChild, result, avgImpact, currentImpact);
             }
             else if (node is Field)
                 RecordFieldComplexity(node, result, currentImpact);
+            else if (node is FragmentSpread)
+            {
+                var fragmentComplexity = _fragmentMap[((FragmentSpread)node).Name];
+                result.Complexity += (currentImpact / avgImpact) * fragmentComplexity.Complexity;
+                result.TotalQueryDepth += fragmentComplexity.Depth;
+            }
         }
 
         private static void RecordFieldComplexity(INode node, ComplexityResult result, double impact)
