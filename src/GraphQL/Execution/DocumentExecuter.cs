@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -64,6 +63,10 @@ namespace GraphQL
             try
             {
                 var document = _documentBuilder.Build(query);
+#if DEBUG
+                // Always run complexity analysis in debug mode.
+                complexityConfiguration = complexityConfiguration ?? new ComplexityConfiguration { FieldImpact = 2.0f };
+#endif
                 if (complexityConfiguration != null) _complexityAnalyzer.Validate(document, complexityConfiguration);
                 var validationResult = _documentValidator.Validate(query, schema, document, rules);
 
