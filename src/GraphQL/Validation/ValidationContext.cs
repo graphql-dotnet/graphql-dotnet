@@ -26,6 +26,8 @@ namespace GraphQL.Validation
 
         public TypeInfo TypeInfo { get; set; }
 
+        public object UserContext { get; set; }
+
         public IEnumerable<ValidationError> Errors => _errors;
 
         public void ReportError(ValidationError error)

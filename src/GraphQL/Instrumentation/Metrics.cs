@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GraphQL.Instrumentation
 {
-    public class Timings : IDisposable
+    public class Metrics : IDisposable
     {
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly IList<PerfRecord> _records = new List<PerfRecord>();

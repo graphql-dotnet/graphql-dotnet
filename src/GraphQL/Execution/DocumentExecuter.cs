@@ -80,9 +80,10 @@ namespace GraphQL
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
-            var timings = new Timings();
-            config.Schema.Instrument(timings);
-            timings.Start(config.OperationName);
+            var metrics = new Metrics();
+            metrics.Start(config.OperationName);
+
+            config.Schema.Instrument();
 
             var result = new ExecutionResult();
             result.Query = config.Query;
@@ -90,14 +91,14 @@ namespace GraphQL
             {
                 if (!config.Schema.Initialized)
                 {
-                    using (timings.Subject("schema", "Initializing schema"))
+                    using (metrics.Subject("schema", "Initializing schema"))
                     {
                         config.Schema.Initialize();
                     }
                 }
 
                 var document = config.Document;
-                using (timings.Subject("document", "Building document"))
+                using (metrics.Subject("document", "Building document"))
                 {
                     if (document == null)
                     {
@@ -109,10 +110,10 @@ namespace GraphQL
 
                 var operation = GetOperation(config.OperationName, document);
                 result.Operation = operation;
-                timings.SetOperationName(operation?.Name);
+                metrics.SetOperationName(operation?.Name);
 
                 IValidationResult validationResult;
-                using (timings.Subject("document", "Validating document"))
+                using (metrics.Subject("document", "Validating document"))
                 {
                     validationResult = _documentValidator.Validate(config.Query, config.Schema, document, config.ValidationRules);
                 }
@@ -135,7 +136,8 @@ namespace GraphQL
                         operation,
                         config.Inputs,
                         config.UserContext,
-                        config.CancellationToken);
+                        config.CancellationToken,
+                        metrics);
 
                     if (context.Errors.Any())
                     {
@@ -143,7 +145,7 @@ namespace GraphQL
                         return result;
                     }
 
-                    using (timings.Subject("execution", "Executing operation"))
+                    using (metrics.Subject("execution", "Executing operation"))
                     {
                         foreach (var listener in config.Listeners)
                         {
@@ -191,7 +193,7 @@ namespace GraphQL
             }
             finally
             {
-                result.Perf = timings.Finish().ToArray();
+                result.Perf = metrics.Finish().ToArray();
             }
         }
 
@@ -202,7 +204,8 @@ namespace GraphQL
             Operation operation,
             Inputs inputs,
             object userContext,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            Metrics metrics)
         {
             var context = new ExecutionContext();
             context.Document = document;
@@ -214,6 +217,8 @@ namespace GraphQL
             context.Variables = GetVariableValues(document, schema, operation.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
+
+            context.Metrics = metrics;
 
             return context;
         }
@@ -284,6 +289,8 @@ namespace GraphQL
                 resolveContext.Operation = context.Operation;
                 resolveContext.Variables = context.Variables;
                 resolveContext.CancellationToken = context.CancellationToken;
+                resolveContext.Metrics = context.Metrics;
+
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
