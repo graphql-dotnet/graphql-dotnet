@@ -115,7 +115,12 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    validationResult = _documentValidator.Validate(config.Query, config.Schema, document, config.ValidationRules);
+                    validationResult = _documentValidator.Validate(
+                        config.Query,
+                        config.Schema,
+                        document,
+                        config.ValidationRules,
+                        config.UserContext);
                 }
 
                 foreach (var listener in config.Listeners)
