@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -19,5 +20,6 @@ namespace GraphQL
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public object UserContext { get; set; }
         public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
+        public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
     }
 }

@@ -83,7 +83,7 @@ namespace GraphQL
             var metrics = new Metrics();
             metrics.Start(config.OperationName);
 
-            config.Schema.Instrument();
+            config.FieldMiddleware.ApplyTo(config.Schema);
 
             var result = new ExecutionResult();
             result.Query = config.Query;
