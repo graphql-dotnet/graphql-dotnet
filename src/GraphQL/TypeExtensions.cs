@@ -84,6 +84,11 @@ namespace GraphQL
                 graphType = typeof(FloatGraphType);
             }
 
+            if (type == typeof(decimal))
+            {
+                graphType = typeof(DecimalGraphType);
+            }
+
             if (type == typeof(string))
             {
                 graphType = typeof(StringGraphType);
