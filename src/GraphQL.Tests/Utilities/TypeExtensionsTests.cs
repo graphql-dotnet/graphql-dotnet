@@ -11,5 +11,11 @@ namespace GraphQL.Tests.Utilities
         {
             typeof(decimal).GetGraphTypeFromType(true).ShouldBe(typeof(DecimalGraphType));
         }
+
+        [Fact]
+        public void supports_float_type()
+        {
+            typeof(float).GetGraphTypeFromType(true).ShouldBe(typeof(FloatGraphType));
+        }
     }
 }

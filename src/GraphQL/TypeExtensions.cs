@@ -79,7 +79,7 @@ namespace GraphQL
                 graphType = typeof(IntGraphType);
             }
 
-            if (type == typeof(double))
+            if (type == typeof(double) || type == typeof(float))
             {
                 graphType = typeof(FloatGraphType);
             }
