@@ -84,7 +84,7 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.GetTypeInfo().IsSubclassOf(typeof(IInterfaceGraphType)))
+            if (!type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IInterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }
