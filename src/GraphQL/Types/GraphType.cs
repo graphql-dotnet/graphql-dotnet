@@ -5,18 +5,13 @@ namespace GraphQL.Types
 {
     public abstract class GraphType : IGraphType
     {
-        protected GraphType()
-        {
-            Metadata = new Dictionary<string, object>();
-        }
-
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         public string DeprecationReason { get; set; }
 
-        public IDictionary<string, object> Metadata { get; set; }
+        public IDictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
         {

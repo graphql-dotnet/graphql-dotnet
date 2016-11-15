@@ -2,15 +2,11 @@
 
 namespace GraphQL.Types
 {
-    public interface IGraphType
+    public interface IGraphType : IProvideMetadata
     {
         string Name { get; }
         string Description { get; }
         string DeprecationReason { get; }
-        IDictionary<string, object> Metadata { get; }
-
-        TType GetMetadata<TType>(string key, TType defaultValue = default(TType));
-        bool HasMetadata(string key);
 
         string CollectTypes(TypeCollectionContext context);
     }
