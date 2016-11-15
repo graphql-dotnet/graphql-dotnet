@@ -25,34 +25,34 @@ namespace GraphQL
                    type is UnionGraphType;
         }
 
-        public static bool IsLeafType(this IGraphType type, ISchema schema)
+        public static bool IsLeafType(this IGraphType type)
         {
-            var namedType = type.GetNamedType(schema);
+            var namedType = type.GetNamedType();
             return namedType is ScalarGraphType || namedType is EnumerationGraphType;
         }
 
-        public static bool IsInputType(this IGraphType type, ISchema schema)
+        public static bool IsInputType(this IGraphType type)
         {
-            var namedType = type.GetNamedType(schema);
+            var namedType = type.GetNamedType();
             return namedType is ScalarGraphType ||
                    namedType is EnumerationGraphType ||
                    namedType is InputObjectGraphType;
         }
 
-        public static IGraphType GetNamedType(this IGraphType type, ISchema schema)
+        public static IGraphType GetNamedType(this IGraphType type)
         {
             IGraphType unmodifiedType = type;
 
             if (type is NonNullGraphType)
             {
                 var nonNull = (NonNullGraphType) type;
-                return GetNamedType(nonNull.ResolvedType, schema);
+                return GetNamedType(nonNull.ResolvedType);
             }
 
             if (type is ListGraphType)
             {
                 var list = (ListGraphType) type;
-                return GetNamedType(list.ResolvedType, schema);
+                return GetNamedType(list.ResolvedType);
             }
 
             return unmodifiedType;
@@ -344,7 +344,7 @@ namespace GraphQL
                     .Select(pair =>
                     {
                         var field = input.Fields.FirstOrDefault(x => x.Name == pair.Key);
-                        var fieldType = field != null ? field.ResolvedType : null;
+                        var fieldType = field?.ResolvedType;
                         return new ObjectField(pair.Key, AstFromValue(pair.Value, schema, fieldType));
                     })
                     .ToList();
@@ -354,7 +354,7 @@ namespace GraphQL
 
 
             Invariant.Check(
-                type.IsInputType(schema),
+                type.IsInputType(),
                 $"Must provide Input Type, cannot use: {type}");
 
 

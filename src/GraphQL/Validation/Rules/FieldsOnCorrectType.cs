@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
             {
                 _.Match<Field>(node =>
                 {
-                    var type = context.TypeInfo.GetParentType().GetNamedType(context.Schema);
+                    var type = context.TypeInfo.GetParentType().GetNamedType();
 
                     if (type != null)
                     {

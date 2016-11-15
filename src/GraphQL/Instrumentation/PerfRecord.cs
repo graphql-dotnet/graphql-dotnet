@@ -142,7 +142,7 @@ namespace GraphQL.Instrumentation
             {
                 _.Match<AstField>(f =>
                 {
-                    var parent = typeInfo.GetParentType().GetNamedType(schema);
+                    var parent = typeInfo.GetParentType().GetNamedType();
                     var parentType = parent.Name;
                     var fieldName = f.Name;
 

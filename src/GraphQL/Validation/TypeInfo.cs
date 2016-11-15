@@ -70,7 +70,7 @@ namespace GraphQL.Validation
             if (node is Field)
             {
                 var field = (Field) node;
-                var parentType = _parentTypeStack.Peek().GetNamedType(_schema);
+                var parentType = _parentTypeStack.Peek().GetNamedType();
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
                 var targetType = fieldType?.ResolvedType;
@@ -148,13 +148,13 @@ namespace GraphQL.Validation
 
             if (node is ListValue)
             {
-                var type = GetInputType().GetNamedType(_schema);
+                var type = GetInputType().GetNamedType();
                 _inputTypeStack.Push(type);
             }
 
             if (node is ObjectField)
             {
-                var objectType = GetInputType().GetNamedType(_schema);
+                var objectType = GetInputType().GetNamedType();
                 IGraphType fieldType = null;
 
                 if (objectType is InputObjectGraphType)
