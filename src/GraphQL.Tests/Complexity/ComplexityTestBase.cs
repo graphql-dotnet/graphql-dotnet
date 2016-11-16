@@ -17,6 +17,11 @@ namespace GraphQL.Tests.Complexity
         protected ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query));
 
         public async Task<ExecutionResult> Execute(ComplexityConfiguration complexityConfig, string query) =>
-            await StarWarsTestBase.Executer.ExecuteAsync(new StarWarsTestBase().Schema, null, query, null, complexityConfiguration: complexityConfig);
+            await StarWarsTestBase.Executer.ExecuteAsync(options =>
+            {
+                options.Schema = new StarWarsTestBase().Schema;
+                options.Query = query;
+                options.ComplexityConfiguration = complexityConfig;
+            });
     }
 }
