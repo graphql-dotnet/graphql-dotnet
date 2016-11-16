@@ -241,7 +241,8 @@ namespace GraphQL.Tests.Execution
 
             var result = AssertQueryWithErrors(query, expected, root: new Root(6), expectedErrorCount: 2);
             result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number");
-            result.Errors.Last().InnerException.Message.ShouldBe("Cannot change the number");
+            var last = result.Errors.Last();
+            last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number");
         }
     }
 }

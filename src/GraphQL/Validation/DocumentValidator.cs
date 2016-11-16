@@ -13,7 +13,8 @@ namespace GraphQL.Validation
             string originalQuery,
             ISchema schema,
             Document document,
-            IEnumerable<IValidationRule> rules = null);
+            IEnumerable<IValidationRule> rules = null,
+            object userContext = null);
     }
 
     public class DocumentValidator : IDocumentValidator
@@ -22,14 +23,21 @@ namespace GraphQL.Validation
             string originalQuery,
             ISchema schema,
             Document document,
-            IEnumerable<IValidationRule> rules = null)
+            IEnumerable<IValidationRule> rules = null,
+            object userContext = null)
         {
+            if (!schema.Initialized)
+            {
+                schema.Initialize();
+            }
+
             var context = new ValidationContext
             {
                 OriginalQuery = originalQuery,
                 Schema = schema,
                 Document = document,
-                TypeInfo = new TypeInfo(schema)
+                TypeInfo = new TypeInfo(schema),
+                UserContext = userContext
             };
 
             if (rules == null)

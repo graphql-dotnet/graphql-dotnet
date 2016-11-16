@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Argument values of correct type
-    /// 
+    ///
     /// A GraphQL document is only valid if all field argument literal values are
     /// of the type expected by their position.
     /// </summary>
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
                     var argDef = context.TypeInfo.GetArgument();
                     if (argDef == null) return;
 
-                    var type = context.Schema.FindType(argDef.Type);
+                    var type = argDef.ResolvedType;
                     var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
                     if (errors.Any())
                     {

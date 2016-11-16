@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
                 _.Match<InlineFragment>(node =>
                 {
                     var fragType = context.TypeInfo.GetLastType();
-                    var parentType = context.TypeInfo.GetParentType().GetNamedType(context.Schema);
+                    var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
                     if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
                     {
@@ -45,7 +45,7 @@ namespace GraphQL.Validation.Rules
                 {
                     var fragName = node.Name;
                     var fragType = getFragmentType(context, fragName);
-                    var parentType = context.TypeInfo.GetParentType().GetNamedType(context.Schema);
+                    var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
                     if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
                     {

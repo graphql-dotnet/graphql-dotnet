@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraphQL.Language;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Utilities
             var args = arguments != null ? new QueryArguments(arguments) : null;
 
             var root = new ObjectGraphType();
-            root.Name = "Root";
+            root.Name = "Query";
             root.Field<T>(
                 "singleField",
                 arguments: args);
@@ -50,11 +50,27 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void prints_directive()
+        {
+            var printer = new SchemaPrinter(null);
+            var arg = DirectiveGraphType.Skip.Arguments.First();
+            arg.ResolvedType = arg.Type.BuildNamedType();
+
+            var result = printer.PrintDirective(DirectiveGraphType.Skip);
+            const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
+directive @skip(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
+
+            AssertEqual(result, expected);
+        }
+
+        [Fact]
         public void prints_string_field()
         {
             var result = printSingleFieldSchema<StringGraphType>();
             const string expected = @"
-type Root {
+type Query {
   singleField: String
 }
 ";
@@ -66,7 +82,7 @@ type Root {
         {
             var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
             const string expected = @"
-type Root {
+type Query {
   singleField: [String]
 }
 ";
@@ -78,7 +94,7 @@ type Root {
         {
             var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
             const string expected = @"
-type Root {
+type Query {
   singleField: String!
 }
 ";
@@ -90,7 +106,7 @@ type Root {
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
             const string expected = @"
-type Root {
+type Query {
   singleField: [String]!
 }
 ";
@@ -102,7 +118,7 @@ type Root {
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
             const string expected = @"
-type Root {
+type Query {
   singleField: [String!]!
 }
 ";
@@ -112,7 +128,7 @@ type Root {
         [Fact]
         public void prints_object_field()
         {
-            var root = new ObjectGraphType {Name = "Root"};
+            var root = new ObjectGraphType {Name = "Query"};
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
@@ -122,7 +138,7 @@ type Foo {
   str: String
 }
 
-type Root {
+type Query {
   foo: Foo
 }
 ");
@@ -138,7 +154,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int): String
 }
 ";
@@ -155,7 +171,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int = 2): String
 }
 ";
@@ -172,7 +188,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int!): String
 }
 ";
@@ -190,7 +206,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int, argTwo: String): String
 }
 ";
@@ -209,7 +225,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
 }
 ";
@@ -228,7 +244,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int, argTwo: String = ""foo"", argThree: Boolean): String
 }
 ";
@@ -247,7 +263,7 @@ type Root {
                 });
 
             const string expected = @"
-type Root {
+type Query {
   singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
 }
 ";
@@ -263,11 +279,15 @@ type Root {
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), @"
-interface Foo {
-  str: String
+schema {
+  query: Root
 }
 
 type Bar implements Foo {
+  str: String
+}
+
+interface Foo {
   str: String
 }
 
@@ -280,7 +300,7 @@ type Root {
         [Fact]
         public void prints_multiple_interfaces()
         {
-            var root = new ObjectGraphType { Name = "Root" };
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<BarMultipleType>("bar");
 
             var schema = new Schema { Query = root };
@@ -290,15 +310,15 @@ interface Baaz {
   int: Int
 }
 
-interface Foo {
-  str: String
-}
-
 type Bar implements Foo, Baaz {
   str: String
 }
 
-type Root {
+interface Foo {
+  str: String
+}
+
+type Query {
   bar: Bar
 }
 ");
@@ -307,27 +327,27 @@ type Root {
         [Fact]
         public void prints_unions()
         {
-            var root = new ObjectGraphType { Name = "Root" };
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<SingleUnion>("single");
             root.Field<MultipleUnion>("multiple");
 
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), @"
-interface Foo {
-  str: String
-}
-
 type Bar implements Foo {
   str: String
 }
 
-type Root {
-  single: SingleUnion
-  multiple: MultipleUnion
+interface Foo {
+  str: String
 }
 
 union MultipleUnion = Foo | Bar
+
+type Query {
+  single: SingleUnion
+  multiple: MultipleUnion
+}
 
 union SingleUnion = Foo
 ");
@@ -336,13 +356,10 @@ union SingleUnion = Foo
         [Fact]
         public void prints_input_type()
         {
-            var root = new ObjectGraphType { Name = "Root" };
-            root.Field<StringGraphType>(
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
                 "str",
-                arguments: new QueryArguments(new QueryArgument[]
-                {
-                    new QueryArgument<InputType> {Name = "argOne"},
-                }));
+                arguments: new QueryArguments(new QueryArgument<InputType> {Name = "argOne"}));
 
             var schema = new Schema { Query = root };
 
@@ -351,8 +368,8 @@ input InputType {
   int: Int
 }
 
-type Root {
-  str(argOne: InputType): String
+type Query {
+  str(argOne: InputType): String!
 }
 ");
         }
@@ -360,7 +377,7 @@ type Root {
         [Fact]
         public void prints_custom_scalar()
         {
-            var root = new ObjectGraphType { Name = "Root" };
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<OddType>("odd");
 
             var schema = new Schema { Query = root };
@@ -368,7 +385,7 @@ type Root {
             AssertEqual(print(schema), @"
 scalar Odd
 
-type Root {
+type Query {
   odd: Odd
 }
 ");
@@ -377,20 +394,20 @@ type Root {
         [Fact]
         public void prints_enum()
         {
-            var root = new ObjectGraphType { Name = "Root" };
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<RgbEnum>("rgb");
 
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), @"
+type Query {
+  rgb: RGB
+}
+
 enum RGB {
   RED
   GREEN
   BLUE
-}
-
-type Root {
-  rgb: RGB
 }
 ");
         }
@@ -409,6 +426,43 @@ type Root {
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
+schema {
+  query: Root
+}
+
+# Directs the executor to include this field or fragment only when the 'if' argument is true.
+directive @include(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+# Directs the executor to skip this field or fragment when the 'if' argument is true.
+directive @skip(
+  if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+# Marks an element of a GraphQL schema as no longer supported.
+directive @deprecated(
+  reason: String = ""No longer supported""
+) on FIELD_DEFINITION | ENUM_VALUE
+
+# A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
+#
+# In some cases, you need to provide options to alter GraphQL's execution behavior
+# in ways field arguments will not suffice, such as conditionally including or
+# skipping a field. Directives provide this by describing additional information
+# to the executor.
+type __Directive {
+  name: String!
+  description: String
+  locations: [__DirectiveLocation!]!
+  args: [__InputValue!]!
+  onOperation: Boolean!
+  onFragment: Boolean!
+  onField: Boolean!
+}
+
+# A Directive can be adjacent to many parts of the GraphQL language, a
+# __DirectiveLocation describes one such possible adjacencies.
 enum __DirectiveLocation {
   QUERY
   MUTATION
@@ -430,27 +484,9 @@ enum __DirectiveLocation {
   INPUT_FIELD_DEFINITION
 }
 
-enum __TypeKind {
-  SCALAR
-  OBJECT
-  INTERFACE
-  UNION
-  ENUM
-  INPUT_OBJECT
-  LIST
-  NON_NULL
-}
-
-type __Directive {
-  name: String!
-  description: String
-  locations: [__DirectiveLocation!]!
-  args: [__InputValue!]!
-  onOperation: Boolean!
-  onFragment: Boolean!
-  onField: Boolean!
-}
-
+# One possible value for a given Enum. Enum values are unique values, not a
+# placeholder for a string or numeric value. However an Enum value is returned in
+# a JSON response as a string.
 type __EnumValue {
   name: String!
   description: String
@@ -458,6 +494,8 @@ type __EnumValue {
   deprecationReason: String
 }
 
+# Object and Interface types are described by a list of Fields, each of which has
+# a name, potentially a list of arguments, and a return type.
 type __Field {
   name: String!
   description: String
@@ -467,6 +505,9 @@ type __Field {
   deprecationReason: String
 }
 
+# Arguments provided to Fields or Directives and the input fields of an
+# InputObject are represented as Input Values which describe their type and
+# optionally a default value.
 type __InputValue {
   name: String!
   description: String
@@ -474,6 +515,9 @@ type __InputValue {
   defaultValue: String
 }
 
+# A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all
+# available types and directives on the server, as well as the entry points for
+# query, mutation, and subscription operations.
 type __Schema {
   types: [__Type!]!
   queryType: __Type!
@@ -482,6 +526,14 @@ type __Schema {
   directives: [__Directive!]!
 }
 
+# The fundamental unit of any GraphQL Schema is the type. There are many kinds of
+# types in GraphQL as represented by the `__TypeKind` enum.
+#
+# Depending on the kind of a type, certain fields describe information about that
+# type. Scalar types provide no information beyond a name and description, while
+# Enum types provide their values. Object and Interface types provide the fields
+# they describe. Abstract types, Union and Interface, provide the Object types
+# possible at runtime. List and NonNull types compose other types.
 type __Type {
   kind: __TypeKind!
   name: String
@@ -492,6 +544,18 @@ type __Type {
   enumValues(includeDeprecated: Boolean = false): [__EnumValue!]
   inputFields: [__InputValue!]
   ofType: __Type
+}
+
+# An enum describing what kind of type a given __Type is.
+enum __TypeKind {
+  SCALAR
+  OBJECT
+  INTERFACE
+  UNION
+  ENUM
+  INPUT_OBJECT
+  LIST
+  NON_NULL
 }
 ";
 

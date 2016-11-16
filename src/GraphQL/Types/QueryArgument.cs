@@ -30,6 +30,7 @@ namespace GraphQL.Types
 
         public object DefaultValue { get; set; }
 
+        public IGraphType ResolvedType { get; set; }
         public Type Type { get; private set; }
     }
 }

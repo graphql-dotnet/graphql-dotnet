@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace GraphQL.Types
 {
@@ -43,7 +44,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name), "A field with that name is already registered.");
             }
 
-            if (!fieldType.Type.IsGraphType())
+            if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Type), "Field type must derive from GraphType.");
             }
@@ -61,7 +62,6 @@ namespace GraphQL.Types
             Func<ResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
         {
-
             return AddField(new FieldType
             {
                 Name = name,
@@ -69,8 +69,8 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = type,
                 Arguments = arguments,
-                Resolver = resolve != null 
-                    ? new FuncFieldResolver<TSourceType, object>(resolve) 
+                Resolver = resolve != null
+                    ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
             });
         }
@@ -92,6 +92,27 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
+                    : null,
+            });
+        }
+
+        public FieldType FieldAsync<TGraphType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSourceType>, Task<object>> resolve = null,
+            string deprecationReason = null)
+            where TGraphType : IGraphType
+        {
+            return AddField(new FieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = typeof(TGraphType),
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new FuncFieldResolver<TSourceType, Task<object>>(resolve)
                     : null,
             });
         }

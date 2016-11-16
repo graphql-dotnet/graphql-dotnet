@@ -1,5 +1,4 @@
 ﻿using System;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -13,7 +12,9 @@ namespace GraphQL.Types
                 var nonnull = (NonNullType)type;
                 var ofType = GraphTypeFromType(nonnull.Type, schema);
                 var nonnullGraphType = typeof(NonNullGraphType<>).MakeGenericType(ofType.GetType());
-                return (GraphType)Activator.CreateInstance(nonnullGraphType);
+                var instance = (NonNullGraphType)Activator.CreateInstance(nonnullGraphType);
+                instance.ResolvedType = ofType;
+                return instance;
             }
 
             if (type is ListType)
@@ -21,7 +22,9 @@ namespace GraphQL.Types
                 var list = (ListType)type;
                 var ofType = GraphTypeFromType(list.Type, schema);
                 var listGraphType = typeof(ListGraphType<>).MakeGenericType(ofType.GetType());
-                return (GraphType)Activator.CreateInstance(listGraphType);
+                var instance = (ListGraphType)Activator.CreateInstance(listGraphType);
+                instance.ResolvedType = ofType;
+                return instance;
             }
 
             if (type is NamedType)

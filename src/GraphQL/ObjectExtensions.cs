@@ -94,6 +94,16 @@ namespace GraphQL
             return ConvertValue(value, fieldType);
         }
 
+        public static object GetProperyValue(this object obj, string propertyName)
+        {
+            var val = obj.GetType()
+                .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
+                .GetValue(obj, null);
+
+            return val;
+        }
+
+
         public static Type GetInterface(this Type type, string name)
         {
             return type.GetInterfaces().FirstOrDefault(x => x.Name == name);

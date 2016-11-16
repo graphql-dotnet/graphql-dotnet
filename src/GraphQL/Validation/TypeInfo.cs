@@ -70,10 +70,10 @@ namespace GraphQL.Validation
             if (node is Field)
             {
                 var field = (Field) node;
-                var parentType = _parentTypeStack.Peek().GetNamedType(_schema);
+                var parentType = _parentTypeStack.Peek().GetNamedType();
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
-                var targetType = _schema.FindType(fieldType?.Type);
+                var targetType = fieldType?.ResolvedType;
                 _typeStack.Push(targetType);
                 return;
             }
@@ -139,7 +139,7 @@ namespace GraphQL.Validation
                 if (args != null)
                 {
                     argDef = args.Find(argAst.Name);
-                    argType = _schema.FindType(argDef?.Type);
+                    argType = argDef?.ResolvedType;
                 }
 
                 _argument = argDef;
@@ -148,20 +148,20 @@ namespace GraphQL.Validation
 
             if (node is ListValue)
             {
-                var type = GetInputType().GetNamedType(_schema);
+                var type = GetInputType().GetNamedType();
                 _inputTypeStack.Push(type);
             }
 
             if (node is ObjectField)
             {
-                var objectType = GetInputType().GetNamedType(_schema);
+                var objectType = GetInputType().GetNamedType();
                 IGraphType fieldType = null;
 
                 if (objectType is InputObjectGraphType)
                 {
                     var complexType = objectType as IComplexGraphType;
                     var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
-                    fieldType = inputField != null ? _schema.FindType(inputField.Type) : null;
+                    fieldType = inputField?.ResolvedType;
                 }
 
                 _inputTypeStack.Push(fieldType);
