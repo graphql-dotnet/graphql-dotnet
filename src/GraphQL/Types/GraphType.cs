@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
@@ -11,7 +12,7 @@ namespace GraphQL.Types
 
         public string DeprecationReason { get; set; }
 
-        public IDictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
         {

@@ -4,6 +4,7 @@ pull_requests:
 skip_tags: true
 environment:
   CI: true
+  nodejs_version: "6.9.1"
 nuget:
   account_feed: true
   project_feed: true

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace GraphQL.Types
+﻿namespace GraphQL.Types
 {
     public interface IGraphType : IProvideMetadata
     {

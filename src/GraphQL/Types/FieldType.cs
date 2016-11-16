@@ -1,6 +1,7 @@
-using GraphQL.Resolvers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -22,7 +23,7 @@ namespace GraphQL.Types
         public IGraphType ResolvedType { get; set; }
         public QueryArguments Arguments { get; set; }
         public IFieldResolver Resolver { get; set; }
-        public IDictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
         {
