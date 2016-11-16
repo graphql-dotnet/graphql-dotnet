@@ -8,6 +8,7 @@ using GraphQL.Http;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.Types;
+using GraphQL.Validation.Complexity;
 
 namespace GraphQL.GraphiQL.Controllers
 {
@@ -58,6 +59,7 @@ namespace GraphQL.GraphiQL.Controllers
                 _.OperationName = query.OperationName;
                 _.Inputs = inputs;
 
+                _.ComplexityConfiguration = new ComplexityConfiguration { MaxDepth = 15 };
                 _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
 
             }).ConfigureAwait(false);
