@@ -12,8 +12,6 @@ build_script:
 - cmd: >-
     npm install -g npm
 
-    npm install -g yarn
-
     yarn --version
 
     node --version
