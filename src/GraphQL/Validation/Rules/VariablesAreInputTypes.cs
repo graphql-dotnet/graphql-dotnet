@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Variables are input types
-    /// 
+    ///
     /// A GraphQL operation is only valid if all the variables it defines are of
     /// input types (scalar, enum, or input object).
     /// </summary>
@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Rules
                 {
                     var type = varDef.Type.GraphTypeFromType(context.Schema);
 
-                    if (!type.IsInputType(context.Schema))
+                    if (!type.IsInputType())
                     {
                         context.ReportError(new ValidationError(context.OriginalQuery, "5.7.3", UndefinedVarMessage(varDef.Name, context.Print(type)), varDef));
                     }

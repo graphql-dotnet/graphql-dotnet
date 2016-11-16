@@ -20,7 +20,10 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
-There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
+There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio. 
+
+> Note: Before running the GraphiQL project: make sure you Build the entire solution so that all the project references get built. (GraphQL, GraphQL-Parser, etc) to avoid missing reference/assembly errors.
+
 
 ```
 > npm install -g yarn

@@ -79,9 +79,14 @@ namespace GraphQL
                 graphType = typeof(IntGraphType);
             }
 
-            if (type == typeof(double))
+            if (type == typeof(double) || type == typeof(float))
             {
                 graphType = typeof(FloatGraphType);
+            }
+
+            if (type == typeof(decimal))
+            {
+                graphType = typeof(DecimalGraphType);
             }
 
             if (type == typeof(string))
@@ -97,6 +102,13 @@ namespace GraphQL
             if (type == typeof(DateTime))
             {
                 graphType = typeof(DateGraphType);
+            }
+
+            if (type.IsArray)
+            {
+                var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
+                var listType = typeof(NonNullGraphType<>);
+                graphType = listType.MakeGenericType(elementType);
             }
 
             if (graphType == null)

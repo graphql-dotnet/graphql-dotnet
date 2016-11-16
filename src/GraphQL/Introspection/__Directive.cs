@@ -12,7 +12,7 @@ namespace GraphQL.Introspection
             Description =
                 "A Directive provides a way to describe alternate runtime execution and " +
                 "type validation behavior in a GraphQL document." +
-                $"{Environment.NewLine}{Environment.NewLine}In some cases, you need to provide options to alter GraphQL\"s " +
+                $"{Environment.NewLine}{Environment.NewLine}In some cases, you need to provide options to alter GraphQL's " +
                 "execution behavior in ways field arguments will not suffice, such as " +
                 "conditionally including or skipping a field. Directives provide this by " +
                 "describing additional information to the executor.";
@@ -21,8 +21,8 @@ namespace GraphQL.Introspection
             Field(f => f.Description, nullable: true);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args", 
-                resolve: context => 
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
+                resolve: context =>
                     context.Source.Arguments ?? Enumerable.Empty<QueryArgument>()
             );
             Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",

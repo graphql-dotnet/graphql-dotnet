@@ -20,7 +20,7 @@ namespace GraphQL.Introspection
                 {
                     return context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
                 });
-            Field<NonNullGraphType<__Type>>("type");
+            Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", null, null, context =>
             {
                 return !string.IsNullOrWhiteSpace(context.Source.DeprecationReason);

@@ -10,13 +10,11 @@ namespace GraphQL.Introspection
             Name = "__type";
             Type = typeof(__Type);
             Description = "Request the type information of a single type.";
-            Arguments = new QueryArguments(new[]
-            {
+            Arguments = new QueryArguments(
                 new QueryArgument<NonNullGraphType<StringGraphType>>
                 {
                     Name = "name"
-                }
-            });
+                });
             Resolver = new FuncFieldResolver<object>(context => context.Schema.FindType((string) context.Arguments["name"]));
         }
     }
