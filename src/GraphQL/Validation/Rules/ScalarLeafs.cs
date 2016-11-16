@@ -35,7 +35,7 @@ namespace GraphQL.Validation.Rules
                 return;
             }
 
-            if (type.IsLeafType(context.Schema))
+            if (type.IsLeafType())
             {
                 if (field.SelectionSet != null && field.SelectionSet.Selections.Any())
                 {

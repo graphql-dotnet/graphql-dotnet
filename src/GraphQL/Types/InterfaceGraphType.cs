@@ -1,4 +1,3 @@
-using GraphQL.Builders;
 using System;
 using System.Collections.Generic;
 
@@ -18,10 +17,7 @@ namespace GraphQL.Types
 
         public void AddPossibleType(IObjectGraphType type)
         {
-            if (type != null && !_possibleTypes.Contains(type))
-            {
-                _possibleTypes.Add(type);
-            }
+            _possibleTypes.Fill(type);
         }
     }
 
@@ -35,10 +31,7 @@ namespace GraphQL.Types
 
         public void AddPossibleType(IObjectGraphType type)
         {
-            if (type != null && !_possibleTypes.Contains(type))
-            {
-                _possibleTypes.Add(type);
-            }
+            _possibleTypes.Fill(type);
         }
     }
 }

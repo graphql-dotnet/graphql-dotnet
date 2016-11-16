@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
             {
                 _.Match<Field>(node =>
                 {
-                    var type = context.TypeInfo.GetParentType().GetNamedType(context.Schema);
+                    var type = context.TypeInfo.GetParentType().GetNamedType();
 
                     if (type != null)
                     {
@@ -98,13 +98,9 @@ namespace GraphQL.Validation.Rules
                     // This object defines this field.
                     suggestedObjectTypes.Add(possibleType.Name);
 
-                    possibleType.Interfaces.Apply(possibleInterfaceType =>
+                    possibleType.ResolvedInterfaces.Apply(possibleInterface =>
                     {
-                        var possibleInterface = schema.FindType(possibleInterfaceType);
-
-                        if (
-                            possibleInterface is IComplexGraphType && 
-                            ((IComplexGraphType) possibleInterface).HasField(fieldName))
+                        if (possibleInterface.HasField(fieldName))
                         {
                             // This interface type defines this field.
                             interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;

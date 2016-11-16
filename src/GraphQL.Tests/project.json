@@ -19,6 +19,7 @@
       "dependencies": {
         "NETStandard.Library": "1.6.0",
         "System.Diagnostics.TraceSource": "4.0.0",
+        "System.Linq.Expressions": "4.1.0",
         "Microsoft.Extensions.PlatformAbstractions": "1.0.0",
         "Microsoft.NETCore.App": {
           "type": "platform",
@@ -31,6 +32,9 @@
       ]
     },
     "net451": {
+      "dependencies": {
+        "System.Linq.Expressions": "4.0.0"
+      }
     }
   },
 

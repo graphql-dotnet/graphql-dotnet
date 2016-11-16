@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using GraphQL.Http;
+using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.Types;
 
@@ -50,7 +51,16 @@ namespace GraphQL.GraphiQL.Controllers
                 queryToExecute = _namedQueries[query.NamedQuery];
             }
 
-            var result = await ExecuteAsync(_schema, null, queryToExecute, query.OperationName, inputs).ConfigureAwait(true);
+            var result = await _executer.ExecuteAsync(_ =>
+            {
+                _.Schema = _schema;
+                _.Query = queryToExecute;
+                _.OperationName = query.OperationName;
+                _.Inputs = inputs;
+
+                _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+
+            }).ConfigureAwait(false);
 
             var httpResult = result.Errors?.Count > 0
                 ? HttpStatusCode.BadRequest
@@ -62,16 +72,6 @@ namespace GraphQL.GraphiQL.Controllers
             response.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
             return response;
-        }
-
-        public Task<ExecutionResult> ExecuteAsync(
-          ISchema schema,
-          object rootObject,
-          string query,
-          string operationName = null,
-          Inputs inputs = null)
-        {
-            return _executer.ExecuteAsync(schema, rootObject, query, operationName, inputs);
         }
     }
 

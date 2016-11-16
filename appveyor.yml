@@ -12,8 +12,6 @@ build_script:
 - cmd: >-
     npm install -g npm
 
-    yarn --version
-
     node --version
 
     yarn run build-ci

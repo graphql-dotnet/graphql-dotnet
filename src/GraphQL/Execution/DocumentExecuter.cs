@@ -2,16 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
-using GraphQL.Resolvers;
+using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
@@ -26,6 +27,9 @@ namespace GraphQL
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null);
+
+        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
+        Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
     }
 
     public class DocumentExecuter : IDocumentExecuter
@@ -44,7 +48,7 @@ namespace GraphQL
             _documentValidator = documentValidator;
         }
 
-        public async Task<ExecutionResult> ExecuteAsync(
+        public Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,
             string query,
@@ -54,15 +58,91 @@ namespace GraphQL
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
+            return ExecuteAsync(new ExecutionOptions
+            {
+                Schema = schema,
+                Root = root,
+                Query = query,
+                OperationName = operationName,
+                Inputs = inputs,
+                UserContext = userContext,
+                CancellationToken = cancellationToken,
+                ValidationRules = rules
+            });
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure)
+        {
+            var options = new ExecutionOptions();
+            configure(options);
+            return ExecuteAsync(options);
+        }
+
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
+        {
+            var metrics = new Metrics();
+            metrics.Start(config.OperationName);
+
+            config.FieldMiddleware.ApplyTo(config.Schema);
+
             var result = new ExecutionResult();
+            result.Query = config.Query;
             try
             {
-                var document = _documentBuilder.Build(query);
-                var validationResult = _documentValidator.Validate(query, schema, document, rules);
+                if (!config.Schema.Initialized)
+                {
+                    using (metrics.Subject("schema", "Initializing schema"))
+                    {
+                        config.Schema.Initialize();
+                    }
+                }
+
+                var document = config.Document;
+                using (metrics.Subject("document", "Building document"))
+                {
+                    if (document == null)
+                    {
+                        document = _documentBuilder.Build(config.Query);
+                    }
+                }
+
+                result.Document = document;
+
+                var operation = GetOperation(config.OperationName, document);
+                result.Operation = operation;
+                metrics.SetOperationName(operation?.Name);
+
+                IValidationResult validationResult;
+                using (metrics.Subject("document", "Validating document"))
+                {
+                    validationResult = _documentValidator.Validate(
+                        config.Query,
+                        config.Schema,
+                        document,
+                        config.ValidationRules,
+                        config.UserContext);
+                }
+
+                foreach (var listener in config.Listeners)
+                {
+                    await listener.AfterValidationAsync(
+                            config.UserContext,
+                            validationResult,
+                            config.CancellationToken)
+                        .ConfigureAwait(false);
+                }
 
                 if (validationResult.IsValid)
                 {
-                    var context = BuildExecutionContext(schema, root, document, operationName, inputs, userContext, cancellationToken);
+                    var context = BuildExecutionContext(
+                        config.Schema,
+                        config.Root,
+                        document,
+                        operation,
+                        config.Inputs,
+                        config.UserContext,
+                        config.CancellationToken,
+                        metrics);
 
                     if (context.Errors.Any())
                     {
@@ -70,7 +150,28 @@ namespace GraphQL
                         return result;
                     }
 
-                    result.Data = await ExecuteOperationAsync(context).ConfigureAwait(false);
+                    using (metrics.Subject("execution", "Executing operation"))
+                    {
+                        foreach (var listener in config.Listeners)
+                        {
+                            await listener.BeforeExecutionAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
+                        }
+
+                        var task = ExecuteOperationAsync(context).ConfigureAwait(false);
+
+                        foreach (var listener in config.Listeners)
+                        {
+                            await listener.BeforeExecutionAwaitedAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
+                        }
+
+                        result.Data = await task;
+
+                        foreach (var listener in config.Listeners)
+                        {
+                            await listener.AfterExecutionAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
+                        }
+                    }
+
                     if (context.Errors.Any())
                     {
                         result.Errors = context.Errors;
@@ -95,16 +196,21 @@ namespace GraphQL
                 result.Errors.Add(new ExecutionError(exc.Message, exc));
                 return result;
             }
+            finally
+            {
+                result.Perf = metrics.Finish().ToArray();
+            }
         }
 
         public ExecutionContext BuildExecutionContext(
             ISchema schema,
             object root,
             Document document,
-            string operationName,
+            Operation operation,
             Inputs inputs,
             object userContext,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            Metrics metrics)
         {
             var context = new ExecutionContext();
             context.Document = document;
@@ -112,22 +218,23 @@ namespace GraphQL
             context.RootValue = root;
             context.UserContext = userContext;
 
-            var operation = !string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.WithName(operationName)
-                : document.Operations.FirstOrDefault();
-
-            if (operation == null)
-            {
-                context.Errors.Add(new ExecutionError("Unknown operation name: {0}".ToFormat(operationName)));
-                return context;
-            }
-
             context.Operation = operation;
             context.Variables = GetVariableValues(document, schema, operation.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
 
+            context.Metrics = metrics;
+
             return context;
+        }
+
+        private Operation GetOperation(string operationName, Document document)
+        {
+            var operation = !string.IsNullOrWhiteSpace(operationName)
+                ? document.Operations.WithName(operationName)
+                : document.Operations.FirstOrDefault();
+
+            return operation;
         }
 
         public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
@@ -175,7 +282,7 @@ namespace GraphQL
                 resolveContext.FieldName = field.Name;
                 resolveContext.FieldAst = field;
                 resolveContext.FieldDefinition = fieldDefinition;
-                resolveContext.ReturnType = context.Schema.FindType(fieldDefinition.Type);
+                resolveContext.ReturnType = fieldDefinition.ResolvedType;
                 resolveContext.ParentType = parentType;
                 resolveContext.Arguments = arguments;
                 resolveContext.Source = source;
@@ -187,23 +294,21 @@ namespace GraphQL
                 resolveContext.Operation = context.Operation;
                 resolveContext.Variables = context.Variables;
                 resolveContext.CancellationToken = context.CancellationToken;
+                resolveContext.Metrics = context.Metrics;
+
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
-                if(result is Task)
+                if (result is Task)
                 {
                     var task = result as Task;
                     await task.ConfigureAwait(false);
 
-                    result = GetProperyValue(task, "Result");
+                    result = task.GetProperyValue("Result");
                 }
 
-                if (parentType is __Field && result is Type)
-                {
-                    result = context.Schema.FindType(result as Type);
-                }
-
-                resolveResult.Value = await CompleteValueAsync(context, context.Schema.FindType(fieldDefinition.Type), fields, result).ConfigureAwait(false);
+                resolveResult.Value =
+                    await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
@@ -216,15 +321,6 @@ namespace GraphQL
             }
         }
 
-        public object GetProperyValue(object obj, string propertyName)
-        {
-            var val = obj.GetType()
-                .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
-                .GetValue(obj, null);
-
-            return val;
-        }
-
         public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)
         {
             var field = fields != null ? fields.FirstOrDefault() : null;
@@ -233,7 +329,7 @@ namespace GraphQL
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
-                var type = context.Schema.FindType(nonNullType.Type);
+                var type = nonNullType.ResolvedType;
                 var completed = await CompleteValueAsync(context, type, fields, result).ConfigureAwait(false);
                 if (completed == null)
                 {
@@ -270,7 +366,7 @@ namespace GraphQL
                 }
 
                 var listType = fieldType as ListGraphType;
-                var itemType = context.Schema.FindType(listType.Type);
+                var itemType = listType.ResolvedType;
 
                 var results = await list.MapAsync(async item => await CompleteValueAsync(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
 
@@ -328,8 +424,8 @@ namespace GraphQL
 
             return definitionArguments.Aggregate(new Dictionary<string, object>(), (acc, arg) =>
             {
-                var value = astArguments != null ? astArguments.ValueFor(arg.Name) : null;
-                var type = schema.FindType(arg.Type);
+                var value = astArguments?.ValueFor(arg.Name);
+                var type = arg.ResolvedType;
 
                 var coercedValue = CoerceValue(schema, type, value, variables);
                 coercedValue = coercedValue ?? arg.DefaultValue;
@@ -507,7 +603,7 @@ namespace GraphQL
                     return false;
                 }
 
-                var nonNullType = schema.FindType(((NonNullGraphType) type).Type);
+                var nonNullType = ((NonNullGraphType) type).ResolvedType;
 
                 if (nonNullType is ScalarGraphType)
                 {
@@ -526,7 +622,7 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = (ListGraphType) type;
-                var listItemType = schema.FindType(listType.Type);
+                var listItemType = listType.ResolvedType;
 
                 var list = input as IEnumerable;
                 if (list != null && !(input is string))
@@ -560,7 +656,7 @@ namespace GraphQL
                     dict.TryGetValue(field.Name, out fieldValue);
                     return IsValidValue(
                         schema,
-                        schema.FindType(field.Type),
+                        field.ResolvedType,
                         fieldValue);
                 });
             }
@@ -590,7 +686,7 @@ namespace GraphQL
             if (type is NonNullGraphType)
             {
                 var nonNull = type as NonNullGraphType;
-                return CoerceValue(schema, schema.FindType(nonNull.Type), input, variables);
+                return CoerceValue(schema, nonNull.ResolvedType, input, variables);
             }
 
             if (input == null)
@@ -609,7 +705,7 @@ namespace GraphQL
             if (type is ListGraphType)
             {
                 var listType = type as ListGraphType;
-                var listItemType = schema.FindType(listType.Type);
+                var listItemType = listType.ResolvedType;
                 var list = input as ListValue;
                 return list != null
                     ? list.Values.Map(item => CoerceValue(schema, listItemType, item, variables)).ToArray()
@@ -632,7 +728,7 @@ namespace GraphQL
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        var fieldValue = CoerceValue(schema, schema.FindType(field.Type), objectField.Value, variables);
+                        var fieldValue = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
                         fieldValue = fieldValue ?? field.DefaultValue;
 
                         obj[field.Name] = fieldValue;

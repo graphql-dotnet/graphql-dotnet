@@ -1,6 +1,8 @@
-﻿namespace GraphQL.Types
+﻿using System.Collections.Generic;
+
+namespace GraphQL.Types
 {
-    public interface IGraphType
+    public interface IGraphType : IProvideMetadata
     {
         string Name { get; }
         string Description { get; }

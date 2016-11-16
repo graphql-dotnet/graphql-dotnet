@@ -5,7 +5,7 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Provided required arguments
-    /// 
+    ///
     /// A field or directive is only valid if all required (non-null) field arguments
     /// have been provided.
     /// </summary>
@@ -37,7 +37,7 @@ namespace GraphQL.Validation.Rules
                     fieldDef.Arguments?.Apply(arg =>
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = context.Schema.FindType(arg.Type);
+                        var type = arg.ResolvedType;
 
                         if (argAst == null && type is NonNullGraphType)
                         {
@@ -63,7 +63,7 @@ namespace GraphQL.Validation.Rules
                     directive.Arguments?.Apply(arg =>
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = context.Schema.FindType(arg.Type);
+                        var type = arg.ResolvedType;
 
                         if (argAst == null && type is NonNullGraphType)
                         {

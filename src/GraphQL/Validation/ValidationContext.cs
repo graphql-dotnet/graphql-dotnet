@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -17,15 +16,17 @@ namespace GraphQL.Validation
         private readonly Dictionary<Operation, IEnumerable<VariableUsage>> _variables =
             new Dictionary<Operation, IEnumerable<VariableUsage>>();
 
-        private SchemaPrinter _schemaPrinter;
-
         public string OriginalQuery { get; set; }
 
         public string OperationName { get; set; }
+
         public ISchema Schema { get; set; }
+
         public Document Document { get; set; }
 
         public TypeInfo TypeInfo { get; set; }
+
+        public object UserContext { get; set; }
 
         public IEnumerable<ValidationError> Errors => _errors;
 
@@ -154,11 +155,7 @@ namespace GraphQL.Validation
 
         public string Print(IGraphType type)
         {
-            if (_schemaPrinter == null)
-            {
-                _schemaPrinter = new SchemaPrinter(Schema);
-            }
-            return _schemaPrinter.ResolveName(type);
+            return SchemaPrinter.ResolveName(type);
         }
     }
 

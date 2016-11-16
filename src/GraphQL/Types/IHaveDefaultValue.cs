@@ -6,5 +6,6 @@ namespace GraphQL.Types
     {
         object DefaultValue { get; }
         Type Type { get; }
+        IGraphType ResolvedType { get; }
     }
 }

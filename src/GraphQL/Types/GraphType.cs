@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
@@ -9,6 +10,29 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         public string DeprecationReason { get; set; }
+
+        public IDictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
+
+        public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
+        {
+            if (!HasMetadata(key))
+            {
+                return defaultValue;
+            }
+
+            object item;
+            if (Metadata.TryGetValue(key, out item))
+            {
+                return (TType) item;
+            }
+
+            return defaultValue;
+        }
+
+        public bool HasMetadata(string key)
+        {
+            return Metadata?.ContainsKey(key) ?? false;
+        }
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
