@@ -1,12 +1,11 @@
 ﻿using System;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Lone anonymous operation
-    /// 
+    ///
     /// A GraphQL document is only valid if when it contains an anonymous operation
     /// (the query short-hand) that it contains only that one operation definition.
     /// </summary>

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Unique input field names
-    /// 
+    ///
     /// A GraphQL input object value is only valid if all supplied fields are
     /// uniquely named.
     /// </summary>
