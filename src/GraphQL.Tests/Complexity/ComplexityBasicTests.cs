@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A }");
             res.TotalQueryDepth.ShouldBe(0);
-            res.Complexity.ShouldBe(2d);
+            res.Complexity.ShouldBe(1d);
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A { B } }");
             res.TotalQueryDepth.ShouldBe(1);
-            res.Complexity.ShouldBe(6);
+            res.Complexity.ShouldBe(4);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A { B C D } }");
             res.TotalQueryDepth.ShouldBe(1);
-            res.Complexity.ShouldBe(14);
+            res.Complexity.ShouldBe(8);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A { B { C } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(14);
+            res.Complexity.ShouldBe(10);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { F A { B D { C E } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(28);
+            res.Complexity.ShouldBe(17);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A { B { C { D } } } }");
             res.TotalQueryDepth.ShouldBe(3);
-            res.Complexity.ShouldBe(30);
+            res.Complexity.ShouldBe(22);
         }
     }
 }

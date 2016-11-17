@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A(first: 10) { B } }");
             res.TotalQueryDepth.ShouldBe(1);
-            res.Complexity.ShouldBe(30);
+            res.Complexity.ShouldBe(20);
         }
 
         [Fact]
@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A(first: 10) }");
             res.TotalQueryDepth.ShouldBe(0);
-            res.Complexity.ShouldBe(2);
+            res.Complexity.ShouldBe(1);
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { A(id: \"iyIGiygiyg\") { B { C } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(7);
+            res.Complexity.ShouldBe(5);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { F A { B D(first: 3) { C E } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(38);
+            res.Complexity.ShouldBe(23);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { F A { B D(last:100, first: 3) { C E } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(38);
+            res.Complexity.ShouldBe(23);
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("query { F A { B D(last:100, id:10, first: 3) { C } } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(14);
+            res.Complexity.ShouldBe(9);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Complexity
         {
             var res = AnalyzeComplexity("{ F A { B ...X } } fragment X on Y { D(first: 3) { C E } }");
             res.TotalQueryDepth.ShouldBe(2);
-            res.Complexity.ShouldBe(38);
+            res.Complexity.ShouldBe(23);
         }
     }
 }

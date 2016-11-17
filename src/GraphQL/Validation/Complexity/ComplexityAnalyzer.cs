@@ -60,11 +60,11 @@ namespace GraphQL.Validation.Complexity
             doc.Children.Where(node => node is FragmentDefinition).Apply(node =>
             {
                 var fragResult = new FragmentComplexity();
-                FragmentIterator(node, fragResult, avgImpact, avgImpact);
+                FragmentIterator(node, fragResult, avgImpact, avgImpact, 1d);
                 _fragmentMap[(node as FragmentDefinition)?.Name] = fragResult;
             });
 
-            TreeIterator(doc, _result, avgImpact, avgImpact);
+            TreeIterator(doc, _result, avgImpact, avgImpact, 1d);
 
             // Cleanup in case Analyze is called again
             _loopCounter = 0;
@@ -74,7 +74,7 @@ namespace GraphQL.Validation.Complexity
             return retVal;
         }
 
-        private void FragmentIterator(INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentImpact)
+        private void FragmentIterator(INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
                 throw new InvalidOperationException("Query is too complex to validate.");
@@ -87,19 +87,19 @@ namespace GraphQL.Validation.Complexity
                 {
                     qDepthComplexity.Depth++;
                     var impactFromArgs = GetImpactFromArgs(node);
-                    qDepthComplexity.Complexity += impactFromArgs / avgImpact * currentImpact ?? currentImpact;
+                    qDepthComplexity.Complexity += currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact;
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact * (impactFromArgs ?? avgImpact));
+                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact);
+                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
             }
             else if (node is Field)
-                qDepthComplexity.Complexity += currentImpact;
+                qDepthComplexity.Complexity += currentEndNodeImpact;
         }
 
-        private void TreeIterator(INode node, ComplexityResult result, double avgImpact, double currentImpact)
+        private void TreeIterator(INode node, ComplexityResult result, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
                 throw new InvalidOperationException("Query is too complex to validate.");
@@ -112,20 +112,20 @@ namespace GraphQL.Validation.Complexity
                 {
                     result.TotalQueryDepth++;
                     var impactFromArgs = GetImpactFromArgs(node);
-                    RecordFieldComplexity(node, result, impactFromArgs / avgImpact * currentImpact ?? currentImpact);
+                    RecordFieldComplexity(node, result, currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact);
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        TreeIterator(nodeChild, result, avgImpact, currentImpact * (impactFromArgs ?? avgImpact));
+                        TreeIterator(nodeChild, result, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        TreeIterator(nodeChild, result, avgImpact, currentImpact);
+                        TreeIterator(nodeChild, result, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
             }
             else if (node is Field)
-                RecordFieldComplexity(node, result, currentImpact);
+                RecordFieldComplexity(node, result, currentEndNodeImpact);
             else if (node is FragmentSpread)
             {
                 var fragmentComplexity = _fragmentMap[((FragmentSpread)node).Name];
-                result.Complexity += (currentImpact / avgImpact) * fragmentComplexity.Complexity;
+                result.Complexity += (currentSubSelectionImpact / avgImpact) * fragmentComplexity.Complexity;
                 result.TotalQueryDepth += fragmentComplexity.Depth;
             }
         }
