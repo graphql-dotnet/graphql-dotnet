@@ -125,7 +125,7 @@ namespace GraphQL.Validation.Complexity
             else if (node is FragmentSpread)
             {
                 var fragmentComplexity = _fragmentMap[((FragmentSpread)node).Name];
-                result.Complexity += (currentSubSelectionImpact / avgImpact) * fragmentComplexity.Complexity;
+                RecordFieldComplexity(node, result, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
                 result.TotalQueryDepth += fragmentComplexity.Depth;
             }
         }
