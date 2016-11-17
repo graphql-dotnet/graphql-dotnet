@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Complexity
             if (complexityParameters.MaxComplexity.HasValue &&
                 complexityResult.Complexity > complexityParameters.MaxComplexity.Value)
                 throw new InvalidOperationException(
-                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First()}");
+                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key}");
 
             if (complexityParameters.MaxDepth.HasValue &&
                 complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
@@ -86,9 +86,10 @@ namespace GraphQL.Validation.Complexity
                 if (node is Field)
                 {
                     qDepthComplexity.Depth++;
-                    qDepthComplexity.Complexity += currentImpact;
+                    var impactFromArgs = GetImpactFromArgs(node);
+                    qDepthComplexity.Complexity += impactFromArgs / avgImpact * currentImpact ?? currentImpact;
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact * avgImpact);
+                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentImpact * (impactFromArgs ?? avgImpact));
                 }
                 else
                     foreach (var nodeChild in node.Children)
@@ -104,16 +105,19 @@ namespace GraphQL.Validation.Complexity
                 throw new InvalidOperationException("Query is too complex to validate.");
             if (node is FragmentDefinition) return;
 
-            if (node.Children != null && node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
+            if (node.Children != null &&
+                node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
             {
                 if (node is Field)
                 {
                     result.TotalQueryDepth++;
-                    RecordFieldComplexity(node, result, currentImpact);
+                    var impactFromArgs = GetImpactFromArgs(node);
+                    RecordFieldComplexity(node, result, impactFromArgs / avgImpact * currentImpact ?? currentImpact);
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        TreeIterator(nodeChild, result, avgImpact, currentImpact * avgImpact);
+                        TreeIterator(nodeChild, result, avgImpact, currentImpact * (impactFromArgs ?? avgImpact));
                 }
-                else foreach (var nodeChild in node.Children)
+                else
+                    foreach (var nodeChild in node.Children)
                         TreeIterator(nodeChild, result, avgImpact, currentImpact);
             }
             else if (node is Field)
@@ -124,6 +128,26 @@ namespace GraphQL.Validation.Complexity
                 result.Complexity += (currentImpact / avgImpact) * fragmentComplexity.Complexity;
                 result.TotalQueryDepth += fragmentComplexity.Depth;
             }
+        }
+
+        private static double? GetImpactFromArgs(INode node)
+        {
+            double? newImpact = null;
+            var args = node.Children.First(n => n is Arguments) as Arguments;
+            if (args == null) return null;
+
+            if (args.ValueFor("id") != null) newImpact = 1;
+            else
+            {
+                var firstValue = args.ValueFor("first") as IntValue;
+                if (firstValue != null) newImpact = firstValue.Value;
+                else
+                {
+                    var lastValue = args.ValueFor("last") as IntValue;
+                    if (lastValue != null) newImpact = lastValue.Value;
+                }
+            }
+            return newImpact;
         }
 
         private static void RecordFieldComplexity(INode node, ComplexityResult result, double impact)
