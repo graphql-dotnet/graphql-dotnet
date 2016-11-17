@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Complexity
         {
             var withFrag =
                 AnalyzeComplexity(
-                    @"{ leftComparison: hero(episode: EMPIRE) { ...comparisonFields } rightComparison: hero(episode: JEDI) { ...comparisonFields} } fragment comparisonFields on Character { name appearsIn friends { name } }");
+                    @"{ leftComparison: hero(episode: EMPIRE) { ...comparisonFields } rightComparison: hero(episode: JEDI) { ...comparisonFields } } fragment comparisonFields on Character { name appearsIn friends { name } }");
             var woFrag =
                 AnalyzeComplexity(
                     @"{ leftComparison: hero(episode: EMPIRE) { name appearsIn friends { name } } rightComparison: hero(episode: JEDI) { name appearsIn friends { name } } }");
