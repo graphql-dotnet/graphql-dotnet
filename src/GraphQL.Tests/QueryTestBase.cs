@@ -7,6 +7,7 @@ using GraphQL.Http;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
 using Shouldly;
@@ -25,7 +26,7 @@ namespace GraphQL.Tests
         public QueryTestBase()
         {
             Services = new SimpleContainer();
-            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
+            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
             Writer = new DocumentWriter(indent: true);
         }
 
@@ -77,7 +78,7 @@ namespace GraphQL.Tests
         {
             var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, userContext, cancellationToken).Result;
 
-            var writtenResult = Writer.Write(new ExecutionResult {Data = runResult.Data});
+            var writtenResult = Writer.Write(new ExecutionResult { Data = runResult.Data });
             var expectedResult = Writer.Write(expectedExecutionResult);
 
 // #if DEBUG

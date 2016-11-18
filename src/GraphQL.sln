@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.GraphiQL", "GraphQL.GraphiQL\GraphQL.GraphiQL.csproj", "{EE557888-1CD2-4E87-BD87-06834C988B23}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1DD5E10B-2361-467A-82AC-36EFB8C61A1D} = {1DD5E10B-2361-467A-82AC-36EFB8C61A1D}
+	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GraphQL", "GraphQL\GraphQL.xproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
