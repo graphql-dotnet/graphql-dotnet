@@ -5,6 +5,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
@@ -19,7 +20,9 @@ namespace GraphQL
         public CancellationToken CancellationToken { get; set; } = default(CancellationToken);
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public object UserContext { get; set; }
-        public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
+        public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
+
+        public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
     }
 }

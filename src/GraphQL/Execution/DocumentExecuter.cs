@@ -11,6 +11,7 @@ using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 using Field = GraphQL.Language.AST.Field;
 
@@ -36,16 +37,18 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
+        private readonly IComplexityAnalyzer _complexityAnalyzer;
 
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
+            _complexityAnalyzer = complexityAnalyzer;
         }
 
         public Task<ExecutionResult> ExecuteAsync(
@@ -85,8 +88,7 @@ namespace GraphQL
 
             config.FieldMiddleware.ApplyTo(config.Schema);
 
-            var result = new ExecutionResult();
-            result.Query = config.Query;
+            var result = new ExecutionResult { Query = config.Query };
             try
             {
                 if (!config.Schema.Initialized)
@@ -111,6 +113,12 @@ namespace GraphQL
                 var operation = GetOperation(config.OperationName, document);
                 result.Operation = operation;
                 metrics.SetOperationName(operation?.Name);
+
+                if (config.ComplexityConfiguration != null)
+                {
+                    using (metrics.Subject("document", "Analyzing complexity"))
+                        _complexityAnalyzer.Validate(document, config.ComplexityConfiguration);
+                }
 
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
@@ -250,7 +258,8 @@ namespace GraphQL
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields) {
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
+        {
             return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveFieldAsync(context, rootType, source, pair.Value));
@@ -549,13 +558,13 @@ namespace GraphQL
 
             if (value is StringValue)
             {
-                var str = (StringValue) value;
+                var str = (StringValue)value;
                 return str.Value;
             }
 
             if (value is IntValue)
             {
-                var num = (IntValue) value;
+                var num = (IntValue)value;
                 return num.Value;
             }
 
@@ -567,13 +576,13 @@ namespace GraphQL
 
             if (value is FloatValue)
             {
-                var num = (FloatValue) value;
+                var num = (FloatValue)value;
                 return num.Value;
             }
 
             if (value is EnumValue)
             {
-                var @enum = (EnumValue) value;
+                var @enum = (EnumValue)value;
                 return @enum.Name;
             }
 
@@ -581,7 +590,7 @@ namespace GraphQL
             {
                 var objVal = (ObjectValue)value;
                 var obj = new Dictionary<string, object>();
-                objVal.FieldNames.Apply(name=>obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
+                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
                 return obj;
             }
 
@@ -603,11 +612,11 @@ namespace GraphQL
                     return false;
                 }
 
-                var nonNullType = ((NonNullGraphType) type).ResolvedType;
+                var nonNullType = ((NonNullGraphType)type).ResolvedType;
 
                 if (nonNullType is ScalarGraphType)
                 {
-                    var val = ValueFromScalar((ScalarGraphType) nonNullType, input);
+                    var val = ValueFromScalar((ScalarGraphType)nonNullType, input);
                     return val != null;
                 }
 
@@ -621,7 +630,7 @@ namespace GraphQL
 
             if (type is ListGraphType)
             {
-                var listType = (ListGraphType) type;
+                var listType = (ListGraphType)type;
                 var listItemType = listType.ResolvedType;
 
                 var list = input as IEnumerable;
@@ -663,7 +672,7 @@ namespace GraphQL
 
             if (type is ScalarGraphType)
             {
-                var scalar = (ScalarGraphType) type;
+                var scalar = (ScalarGraphType)type;
                 var value = ValueFromScalar(scalar, input);
                 return value != null;
             }
@@ -763,7 +772,7 @@ namespace GraphQL
             {
                 if (selection is Field)
                 {
-                    var field = (Field) selection;
+                    var field = (Field)selection;
                     if (!ShouldIncludeNode(context, field.Directives))
                     {
                         return;
@@ -778,7 +787,7 @@ namespace GraphQL
                 }
                 else if (selection is FragmentSpread)
                 {
-                    var spread = (FragmentSpread) selection;
+                    var spread = (FragmentSpread)selection;
 
                     if (visitedFragmentNames.Contains(spread.Name)
                         || !ShouldIncludeNode(context, spread.Directives))
@@ -878,7 +887,7 @@ namespace GraphQL
 
             if (conditionalType is IAbstractGraphType)
             {
-                var abstractType = (IAbstractGraphType) conditionalType;
+                var abstractType = (IAbstractGraphType)conditionalType;
                 return abstractType.IsPossibleType(type);
             }
 
