@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -8,7 +7,7 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Known argument names
-    /// 
+    ///
     /// A GraphQL field is only valid if all supplied arguments are defined by
     /// that field.
     /// </summary>

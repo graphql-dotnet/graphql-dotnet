@@ -1,7 +1,6 @@
 ﻿using System;
 using GraphQL.Types;
 using GraphQL.Resolvers;
-using System.Linq.Expressions;
 
 namespace GraphQL.Builders
 {

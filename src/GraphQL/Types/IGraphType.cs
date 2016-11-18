@@ -2,9 +2,9 @@
 {
     public interface IGraphType : IProvideMetadata
     {
-        string Name { get; }
-        string Description { get; }
-        string DeprecationReason { get; }
+        string Name { get; set; }
+        string Description { get; set; }
+        string DeprecationReason { get; set; }
 
         string CollectTypes(TypeCollectionContext context);
     }

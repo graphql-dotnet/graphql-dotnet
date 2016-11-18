@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -40,6 +42,15 @@ namespace GraphQL.Types
             where TType : IObjectGraphType
         {
             _types.Add(typeof(TType));
+        }
+
+        public void Type(Type type)
+        {
+            if (!type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IObjectGraphType)))
+            {
+                throw new ArgumentException($"Added union type must implement {nameof(IObjectGraphType)}", nameof(type));
+            }
+            _types.Add(type);
         }
     }
 }

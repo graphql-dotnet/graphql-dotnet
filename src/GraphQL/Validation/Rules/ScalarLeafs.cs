@@ -1,5 +1,4 @@
 ﻿using System;
-using GraphQL.Language;
 using GraphQL.Types;
 using System.Linq;
 using GraphQL.Language.AST;
