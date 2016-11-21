@@ -20,6 +20,10 @@ namespace GraphQL.Instrumentation
             if (result is Task)
             {
                 var task = result as Task;
+                if (task.IsFaulted)
+                {
+                    throw task.Exception;
+                }
                 await task.ConfigureAwait(false);
                 result = task.GetProperyValue("Result");
             }
