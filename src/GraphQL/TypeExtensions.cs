@@ -67,8 +67,20 @@ namespace GraphQL
 
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
+            TypeInfo info = type.GetTypeInfo();
             Type graphType = null;
 
+            if (info.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                type = type.GetGenericArguments()[0];
+                if (isNullable == false)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(isNullable),
+                        $"Explicitly nullable type: Nullable<{type.Name}> cannot be coerced to a non nullable GraphQL type. \n");
+                }
+            }
+
+  
             if (type == typeof(int))
             {
                 graphType = typeof(IntGraphType);
@@ -113,7 +125,8 @@ namespace GraphQL
 
             if (graphType == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Unknown input type.");
+                throw new ArgumentOutOfRangeException(nameof(type), 
+                    $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
             }
 
             if (!isNullable)
