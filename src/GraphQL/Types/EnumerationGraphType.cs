@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
+using System.Reflection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -59,6 +61,26 @@ namespace GraphQL.Types
         {
             var enumValue = value as EnumValue;
             return enumValue == null ? null : ParseValue(enumValue.Name);
+        }
+    }
+
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType
+    {
+        public EnumerationGraphType()
+        {
+            var type = typeof(TEnum);
+            var typeInfo = type.GetTypeInfo();
+
+            Name = Name ?? StringUtils.ToPascalCase(type.Name);
+
+            foreach (var enumName in Enum.GetNames(type))
+            {
+                var enumMember = type
+                    .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .First();
+
+                AddValue(StringUtils.ToConstantCase(enumMember.Name), null, Enum.Parse(type, enumName));
+            }
         }
     }
 
