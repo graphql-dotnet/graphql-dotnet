@@ -313,7 +313,11 @@ namespace GraphQL
                     var task = result as Task;
                     if (task.IsFaulted)
                     {
-                        throw task.Exception;
+                        var aggregateException = task.Exception;
+                        var exception = aggregateException.InnerExceptions.Count == 1
+                            ? aggregateException.InnerException
+                            : aggregateException;
+                        return GenerateError(resolveResult, field, context, exception);
                     }
                     await task.ConfigureAwait(false);
 
@@ -326,12 +330,17 @@ namespace GraphQL
             }
             catch (Exception exc)
             {
-                var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
-                error.AddLocation(field, context.Document);
-                context.Errors.Add(error);
-                resolveResult.Skip = false;
-                return resolveResult;
+                return GenerateError(resolveResult, field, context, exc);
             }
+        }
+
+        private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc)
+        {
+            var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
+            error.AddLocation(field, context.Document);
+            context.Errors.Add(error);
+            resolveResult.Skip = false;
+            return resolveResult;
         }
 
         public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)
