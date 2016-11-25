@@ -9,6 +9,8 @@ namespace GraphQL.Types
     {
         private readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
+        private readonly object _lock = new object();
+
         public GraphTypesLookup()
         {
             AddType<StringGraphType>();
@@ -70,12 +72,18 @@ namespace GraphQL.Types
 
         public void Clear()
         {
-            _types.Clear();
+            lock (_lock)
+            {
+                _types.Clear();
+            }
         }
 
         public IEnumerable<IGraphType> All()
         {
-            return _types.Values;
+            lock (_lock)
+            {
+                return _types.Values.ToList();
+            }
         }
 
         public IGraphType this[string typeName]
@@ -89,12 +97,18 @@ namespace GraphQL.Types
 
                 IGraphType type;
                 var name = typeName.TrimGraphQLTypes();
-                _types.TryGetValue(name, out type);
+                lock (_lock)
+                {
+                    _types.TryGetValue(name, out type);
+                }
                 return type;
             }
             set
             {
-                _types[typeName.TrimGraphQLTypes()] = value;
+                lock (_lock)
+                {
+                    _types[typeName.TrimGraphQLTypes()] = value;
+                }
             }
         }
 
@@ -102,8 +116,11 @@ namespace GraphQL.Types
         {
             get
             {
-                var result = _types.FirstOrDefault(x => x.Value.GetType() == type);
-                return result.Value;
+                lock (_lock)
+                {
+                    var result = _types.FirstOrDefault(x => x.Value.GetType() == type);
+                    return result.Value;
+                }
             }
         }
 
@@ -118,7 +135,10 @@ namespace GraphQL.Types
                 (name, type, _) =>
                 {
                     var trimmed = name.TrimGraphQLTypes();
-                    _types[trimmed] = type;
+                    lock (_lock)
+                    {
+                        _types[trimmed] = type;
+                    }
                     _?.AddType(trimmed, type, null);
                 });
 
@@ -161,7 +181,10 @@ namespace GraphQL.Types
             }
 
             var name = type.CollectTypes(context).TrimGraphQLTypes();
-            _types[name] = type;
+            lock (_lock)
+            {
+                _types[name] = type;
+            }
 
             if (type is IComplexGraphType)
             {
