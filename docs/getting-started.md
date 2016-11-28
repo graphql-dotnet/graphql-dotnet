@@ -25,25 +25,21 @@ namespace ConsoleApplication
           Console.WriteLine("Hello GraphQL!");
 
           var schema = new Schema { Query = new StarWarsQuery() };
-          var executer = new DocumentExecuter();
 
-          var query = @"
-            query {
-              hero {
-                id
-                name
-              }
-            }
-          ";
-
-          var result = await executer.ExecuteAsync( _ =>
+          var result = await new DocumentExecuter().ExecuteAsync( _ =>
           {
             _.Schema = schema;
-            _.Query = query;
+            _.Query = @"
+                query {
+                  hero {
+                    id
+                    name
+                  }
+                }
+              ";
           }).ConfigureAwait(false);
 
-          var writer = new DocumentWriter(indent: true);
-          var json = writer.Write(result);
+          var json = new DocumentWriter(indent: true).Write(result);
 
           Console.WriteLine(json);
         }
@@ -68,7 +64,6 @@ namespace ConsoleApplication
     {
       public StarWarsQuery()
       {
-        Name = "Query";
         Field<DroidType>(
           "hero",
           resolve: context => new Droid { Id = "1", Name = "R2-D2" }
@@ -91,13 +86,41 @@ Hello GraphQL!
 }
 ```
 
+# GraphiQL
+
+TODO
+
+# Queries
+
+TODO
+
+# Mutations
+
+TODO
+
+# Interfaces
+
+TODO
+
+# IsTypeOf
+
+TODO
+
+# Unions
+
+TODO
+
+# ResolveType
+
+TODO
+
+# Variables
+
+TODO
+
 # Schema Generation
 
 There is currently nothing built-in to do GraphQL Schema generation based off of existing C# classes.  There are other community projects which do so.
 
 * [GraphQL Conventions](https://github.com/graphql-dotnet/conventions) by [Tommy Lillehagen](https://github.com/tlil87)
 * [GraphQL Annotations](https://github.com/dlukez/graphql-dotnet-annotations) by [Daniel Zimmermann](https://github.com/dlukez)
-
-# Relay
-
-TODO

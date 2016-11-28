@@ -20,7 +20,7 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
 ## GraphiQL
-There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio. 
+There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
 
 > Note: Before running the GraphiQL project: make sure you Build the entire solution so that all the project references get built. (GraphQL, GraphQL-Parser, etc) to avoid missing reference/assembly errors.
 
@@ -60,38 +60,23 @@ namespace ConsoleApplication
 
           var schema = new Schema { Query = new StarWarsQuery() };
 
-          var result = await ExecuteQuery(
-            schema, @"
-            query {
-              hero {
-                id
-                name
-              }
-            }
-          ");
-          Console.WriteLine(result);
+          var result = await new DocumentExecuter().ExecuteAsync( _ =>
+          {
+            _.Schema = schema;
+            _.Query = @"
+                query {
+                  hero {
+                    id
+                    name
+                  }
+                }
+              ";
+          }).ConfigureAwait(false);
+
+          var json = new DocumentWriter(indent: true).Write(result);
+
+          Console.WriteLine(json);
         }
-
-      private static async Task<string> ExecuteQuery(
-        Schema schema,
-        string query,
-        object rootObject = null,
-        string operationName = null,
-        Inputs inputs = null,
-        object userContext = null)
-      {
-        var executer = new DocumentExecuter();
-        var writer = new DocumentWriter(indent: true);
-
-        var result = await executer.ExecuteAsync(
-          schema,
-          rootObject,
-          query,
-          operationName,
-          inputs,
-          userContext).ConfigureAwait(false);
-        return writer.Write(result);
-      }
     }
 
     public class Droid
@@ -100,26 +85,23 @@ namespace ConsoleApplication
       public string Name { get; set; }
     }
 
+    public class DroidType : ObjectGraphType<Droid>
+    {
+      public DroidType()
+      {
+        Field(x => x.Id).Description("The Id of the Droid.");
+        Field(x => x.Name, nullable: true).Description("The name of the Droid.");
+      }
+    }
+
     public class StarWarsQuery : ObjectGraphType
     {
       public StarWarsQuery()
       {
-        Name = "Query";
         Field<DroidType>(
           "hero",
           resolve: context => new Droid { Id = "1", Name = "R2-D2" }
         );
-      }
-    }
-
-    public class DroidType : ObjectGraphType
-    {
-      public DroidType()
-      {
-        Name = "Droid";
-        Field<NonNullGraphType<StringGraphType>>("id", "The id of the droid.");
-        Field<StringGraphType>("name", "The name of the droid.");
-        IsTypeOf = value => value is Droid;
       }
     }
 }
@@ -141,7 +123,7 @@ Hello GraphQL!
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be complete.
+- Grammar and AST for the GraphQL language should be compatible with the April 2016 specification.
 
 ### Operation Execution
 - [x] Scalars
@@ -181,6 +163,7 @@ Hello GraphQL!
 - [x] Provide non-null arguments
 - [x] Scalar leafs
 - [x] Unique argument names
+- [ ] Unique directives per location
 - [x] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names
