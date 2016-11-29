@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Introspection
             var executionResult = documentExecuter.ExecuteAsync(new Schema(), null, SchemaIntrospection.IntrospectionQuery, null).Result;
             var json = new DocumentWriter(true).Write(executionResult.Data);
 
-            json.ShouldBe(IntrospectionResult.Data);
+            ShouldBe(json, IntrospectionResult.Data);
         }
 
         [Fact]
@@ -26,7 +26,16 @@ namespace GraphQL.Tests.Introspection
             var json = new DocumentWriter(true).Write(executionResult.Data);
             executionResult.Errors.ShouldBeNull();
 
-            json.ShouldBe(InputObjectBugResult);
+            ShouldBe(json, InputObjectBugResult);
+        }
+
+        private static void ShouldBe(string actual, string expected)
+        {
+            Assert.Equal(
+                expected.Replace("\\r", "").Replace("\\n", ""),
+                actual.Replace("\\r", "").Replace("\\n", ""),
+                ignoreLineEndingDifferences: true,
+                ignoreWhiteSpaceDifferences: true);
         }
 
         public static readonly string InputObjectBugQuery = @"
