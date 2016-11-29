@@ -197,6 +197,7 @@ namespace GraphQL.Tests.Validation
         public ComplicatedArgs()
         {
             Name = "ComplicatedArgs";
+            Field<StringGraphType>("noArgsField");
             Field<StringGraphType>(
                 "intArgField",
                 arguments: new QueryArguments(

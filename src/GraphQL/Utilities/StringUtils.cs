@@ -86,9 +86,14 @@ namespace GraphQL.Utilities
         /// </summary>
         public static string[] SuggestionList(string input, IEnumerable<string> options)
         {
+            if (options == null)
+            {
+                return new string[0];
+            }
+
             var optionsByDistance = new Dictionary<string, int>();
             var inputThreshold = input.Length / 2;
-            options.Apply(t =>
+            options?.Apply(t =>
             {
                 var distance = DamerauLevenshteinDistance(input, t, inputThreshold);
                 var threshold = Math.Max(inputThreshold, Math.Max(t.Length / 2, 1));
@@ -126,7 +131,7 @@ namespace GraphQL.Utilities
             // Return trivial case - difference in string lengths exceeds threshhold
             if (Math.Abs(length1 - length2) > threshold) { return int.MaxValue; }
 
-            // Ensure arrays [i] / length1 use shorter length 
+            // Ensure arrays [i] / length1 use shorter length
             if (length1 > length2)
             {
                 Swap(ref target, ref source);
