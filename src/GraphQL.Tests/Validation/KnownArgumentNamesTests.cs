@@ -16,6 +16,16 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
+        public void no_args_are_known()
+        {
+            ShouldPassRule(@"
+              fragment multipleArgs on ComplicatedArgs {
+                noArgsField
+              }
+            ");
+        }
+
+        [Fact]
         public void multiple_args_are_known()
         {
             ShouldPassRule(@"
@@ -82,6 +92,20 @@ namespace GraphQL.Tests.Validation
                 dog @skip(if: true)
               }
             ");
+        }
+
+        [Fact]
+        public void field_with_no_args_given_arg_is_invalid()
+        {
+            ShouldFailRule(_ =>
+            {
+                _.Query = @"
+                  fragment multipleArgs on ComplicatedArgs {
+                    noArgsField(first: 1)
+                  }
+                ";
+                _.Error(Rule.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 3, 33);
+            });
         }
 
         [Fact]

@@ -59,9 +59,9 @@ namespace GraphQL.Tests.Execution
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);
 
-#if DEBUG
-            Console.WriteLine(writtenResult);
-#endif
+//#if DEBUG
+//            Console.WriteLine(writtenResult);
+//#endif
 
             string additionalInfo = null;
 
@@ -109,12 +109,6 @@ namespace GraphQL.Tests.Execution
 
             schema.Query = root;
             schema.RegisterTypes(person);
-
-            var printed = new SchemaPrinter(schema).Print();
-
-#if DEBUG
-            Console.WriteLine(printed);
-#endif
 
             AssertQuerySuccess(
                 schema,
