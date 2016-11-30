@@ -1,14 +1,70 @@
 # Error Handling
 
-TODO
+The `ExecutionResult` provides an `Errors` property which includes any errors encountered during exectution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
+
+You can provide additional error handling or logging for fields by adding Field Middleware.
 
 # User Context
 
-TODO
+You can provide a `UserContext` to provide access to your specific data.  The `UserContext` is accessible in field resolvers and validation rules.
+
+```csharp
+public class GraphQLUserContext
+{
+}
+
+var result = await _executer.ExecuteAsync(_ =>
+{
+    _.UserContext = new GraphQLUserContext();
+}).ConfigureAwait(false);
+
+Field<ListGraphType<DinnerType>>(
+    "popularDinners",
+    resolve: context =>
+    {
+        var userContext = context.UserContext.As<GraphQLUserContext>();
+    });
+```
 
 # Dependency Injection
 
-TODO
+GraphQL .NET supports dependency injection through a simple resolve function on the Schema class.  Internally when trying to resolve a type the library will call this resolve function.
+
+
+
+The default implementation uses `Activator.CreateInstance`.
+
+```csharp
+type => (GraphType) Activator.CreateInstance(type)
+```
+
+How you integrate this into your system will depend on the dependency injection framework you are using.  Registering your schema with a resolve function that accesses your container may look something like this:
+
+```csharp
+// Nancy TinyIoCContainer
+container.Register((c, overloads) =>
+{
+    return new NerdDinnerSchema(type => c.Resolve(type) as IGraphType);
+});
+
+// SimpleContainer
+var container = new SimpleContainer();
+container.Singleton(new StarWarsSchema(type => container.Get(type) as IGraphType));
+```
+
+[The GraphiQL sample application uses Dependency Injection.](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.GraphiQL/Bootstrapper.cs)
+
+```csharp
+public class NerdDinnerSchema : GraphQL.Types.Schema
+{
+    public NerdDinnerSchema(Func<Type, IGraphType> resolve)
+        : base(resolve)
+    {
+        Query = (IObjectGraphType)resolve(typeof(Query));
+        Mutation = (IObjectGraphType)resolve(typeof(Mutation));
+    }
+}
+```
 
 # Object/Field Metadata
 
@@ -241,4 +297,6 @@ var report = StatsReport.From(schema, result.Operation, result.Perf, start);
 
 # Relay
 
-TODO
+The core project provides a few classes to help with Relay.  You can find more types and helpers [here](https://github.com/graphql-dotnet/relay).
+
+(Example needed)
