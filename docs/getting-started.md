@@ -348,15 +348,31 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 
 # Variables
 
-TODO
+You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
+
+```csharp
+var inputs = variablesJson.ToInputs();
+
+var result = await executer.ExecuteAsync(_ =>
+{
+    _.Inputs = inputs;
+});
+```
 
 # Query Validation
 
-TODO
+There [are a number of query validation rules](http://facebook.github.io/graphql/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by accessing the `ValidationRules` property.
+
+```csharp
+var result = await executer.ExecuteAsync(_ =>
+{
+    _.ValidationRules = new[] {new RequiresAuthValidationRule()}.Concat(DocumentValidator.CoreRules());
+});
+```
 
 # Subscriptions
 
-The Schema class supports a Subscription property and the parser supports the `subscription` type.  Subscriptions are an experimental feature of the GraphQL specification.
+The Schema class supports a Subscription graph type and the parser supports the `subscription` keyword.  Subscriptions are an experimental feature of the GraphQL specification.
 
 ```graphql
 subscription comments($repoName: String!) {
