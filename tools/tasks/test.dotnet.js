@@ -4,7 +4,14 @@ import settings from './settings';
 
 export default function testDotnet() {
   const deferred = new Deferred();
-  exec(`dotnet test src/GraphQL.Tests -c ${settings.target}`, {async:true}, (code, stdout, stderr)=> {
+
+  const platform = process.platform === 'darwin'
+    ? '-f netcoreapp1.0'
+    : '';
+  const test = `dotnet test src/GraphQL.Tests ${platform} -c ${settings.target}`;
+  console.log(test)
+
+  exec(test, {async:true}, (code, stdout, stderr)=> {
     if(code === 0) {
       deferred.resolve();
     } else {
