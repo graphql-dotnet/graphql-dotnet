@@ -233,8 +233,10 @@ public static class GraphQLExtensions
 ```
 
 # Protection Against Malicious Queries
+GraphQL allows the client to bundle and nest many queries into a single request. While this is quite convenenit it also makes GraphQL endpoints suseptible to Denial of Service attacks.
 
-TODO
+To mitigate this graphql-dotnet provides a few options that can be tweaked to set the upper bound of nesting and complexity of incoming queries so that the endpoint would only try to resolve queries that meet the set criteria and discard any overly complex and possibly malicious query that you don't expect your clients to make thus protecting your server resources agaisnt depletion by a denial of service attacks.
+
 
 # Query Batching
 
