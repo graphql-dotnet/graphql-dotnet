@@ -237,6 +237,31 @@ GraphQL allows the client to bundle and nest many queries into a single request.
 
 To mitigate this graphql-dotnet provides a few options that can be tweaked to set the upper bound of nesting and complexity of incoming queries so that the endpoint would only try to resolve queries that meet the set criteria and discard any overly complex and possibly malicious query that you don't expect your clients to make thus protecting your server resources agaisnt depletion by a denial of service attacks.
 
+These options are passed to the ``` DocumentExecutor.ExecuteAsync(...)``` via an instance of ```GraphQL.Validation.Complexity.ComplexityConfiguration``` <sub><sup>[*(click here for an example)*](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.GraphiQL/Controllers/GraphQLController.cs#L62)</sup></sub>. You can leave any of options null to go with the default value and disable that specific test. The available options are the following:
+```csharp
+public int? MaxDepth { get; set; }
+public int? MaxComplexity { get; set; }
+public double? FieldImpact { get; set; }
+```
+```MaxDepth``` will enforce the total maximum nesting across all queries in a request. For example the following query will have a query depth of 2. Note that fragments are taken into consideration when making these calculations.
+```graphql
+{
+  Product {  # This has a depth of 2 (which loosely translates to two distinct queries
+  			 # to the datasource, first one to return the list of products and second
+             # one (which will be executed once for each returned product) to grab
+             # the product's first 3 locations.     
+    Title
+    ...X  # The depth of this fragment is calculated first and added to the total.             
+  }
+}
+
+fragment X on Product { # This fragment has a depth of only 1.
+  Location(first: 3) {
+    lat
+    long
+  }
+}
+```   
 
 # Query Batching
 
