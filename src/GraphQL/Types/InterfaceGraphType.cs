@@ -7,7 +7,7 @@ namespace GraphQL.Types
     {
     }
 
-    public class InterfaceGraphType : ComplexGraphType<object>, IInterfaceGraphType
+    public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
     {
         private readonly List<IObjectGraphType> _possibleTypes = new List<IObjectGraphType>();
 
@@ -21,17 +21,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
+    public class InterfaceGraphType : InterfaceGraphType<object>
     {
-        private readonly List<IObjectGraphType> _possibleTypes = new List<IObjectGraphType>();
-
-        public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
-
-        public Func<object, IObjectGraphType> ResolveType { get; set; }
-
-        public void AddPossibleType(IObjectGraphType type)
-        {
-            _possibleTypes.Fill(type);
-        }
     }
 }
