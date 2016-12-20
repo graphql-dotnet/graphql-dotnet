@@ -119,7 +119,7 @@ namespace GraphQL
             if (type.IsArray)
             {
                 var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
-                var listType = typeof(NonNullGraphType<>);
+                var listType = typeof(ListGraphType<>);
                 graphType = listType.MakeGenericType(elementType);
             }
 
