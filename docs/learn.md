@@ -65,6 +65,88 @@ public class NerdDinnerSchema : GraphQL.Types.Schema
     }
 }
 ```
+# Dependency Injection (Autofac)
+It is assumed that you already know how to add Autofac to the GraphQL.GraphiQL ASP.NET MVC5 project.
+The following code shows how you can register the same StarWars types in the Autofac way.
+
+In the GraphQL.GraphiQL project do the following;
+
+*  Delete SimpleContainerDependencyResolver.cs and remove all code that was relying on it.  This will remove the SimpleContainer as our DI Resolver.
+*  Using the Bootrap.cs file as refernce, as what gets registered may change, add the following Autofac ContainerBuilder extension code;
+```csharp
+public static class GraphQLStarWarsExtension
+{
+    public static void RegisterGraphQLTypes(this ContainerBuilder builder)
+    {
+        builder.RegisterInstance(new DocumentExecuter()).As<IDocumentExecuter>();
+        builder.RegisterInstance(new DocumentWriter()).As<IDocumentWriter>();
+        builder.RegisterInstance(new StarWarsData()).As<StarWarsData>();
+
+        builder.RegisterType<StarWarsQuery>().AsSelf();
+        builder.RegisterType<HumanType>().AsSelf();
+        builder.RegisterType<DroidType>().AsSelf();
+        builder.RegisterType<EpisodeEnum>().AsSelf();
+
+        builder.RegisterType<CharacterInterface>().AsSelf();
+        builder.RegisterType<StarWarsQuery>().AsSelf();
+        builder.RegisterType<StarWarsSchema>().AsSelf();
+        builder.Register<Func<Type, GraphType>>(c =>
+        {
+            var context = c.Resolve<IComponentContext>();
+            return t => {
+                            var res = context.Resolve(t);
+                            return (GraphType)res;
+            };
+        });
+
+    }
+}
+```
+The most interesting part of the SimpleContainer vs Autofac differnce was that SimpleContainer doesn't have a notion of a build method to make the container usable for resolving.  I opted to register the Func<Type, GraphType> Type, which will get injected when the StarWarsSchema type is resolved.  I also had to register EpisodeEnum in Autofac, where SimpleContainer didn't need it.
+
+*  Add RegisterGraphQLTypes to the Autofac registration pipeline;
+```csharp
+public partial class Startup
+{
+    public void Configuration(IAppBuilder app)
+    {
+        var builder = new ContainerBuilder();
+        // Get your HttpConfiguration.
+        var config = GlobalConfiguration.Configuration;
+
+        // Register your Web API controllers.
+        builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+
+        // Register your MVC controllers. (MvcApplication is the name of
+        // the class in Global.asax.)
+        builder.RegisterControllers(typeof(WebApiApplication).Assembly);
+
+        // OPTIONAL: Register model binders that require DI.
+        builder.RegisterModelBinders(typeof(WebApiApplication).Assembly);
+        builder.RegisterModelBinderProvider();
+
+        // OPTIONAL: Register web abstractions like HttpContextBase.
+        builder.RegisterModule<AutofacWebTypesModule>();
+
+           
+        builder.RegisterGraphQLTypes();
+        // Register dependencies, then...
+        var container = builder.Build();
+            
+        config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+        DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+
+
+        // Register the Autofac middleware FIRST. This also adds
+        // Autofac-injected middleware registered with the container.
+        app.UseAutofacMiddleware(container);
+
+        // ...then register your other middleware not registered
+        // with Autofac.
+    }
+}
+```
+
 
 # Object/Field Metadata
 
