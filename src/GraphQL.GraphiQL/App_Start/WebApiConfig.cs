@@ -6,9 +6,6 @@ namespace GraphQL.GraphiQL
     {
         public static void Register(HttpConfiguration config)
         {
-            var bootstrapper = new Bootstrapper();
-            config.DependencyResolver = bootstrapper.Resolver();
-
             // Web API routes
             config.MapHttpAttributeRoutes();
 
