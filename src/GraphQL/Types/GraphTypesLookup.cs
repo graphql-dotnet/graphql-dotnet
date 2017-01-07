@@ -224,10 +224,24 @@ namespace GraphQL.Types
             {
                 var union = (UnionGraphType) type;
 
-                if (!union.Types.Any())
+                if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
                     throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
                 }
+
+                union.PossibleTypes.Apply(unionedType =>
+                {
+                    AddTypeIfNotRegistered(unionedType, context);
+
+                    if (union.ResolveType == null && unionedType.IsTypeOf == null)
+                    {
+                        throw new ExecutionError((
+                            "Union type {0} does not provide a \"resolveType\" function" +
+                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                            "There is no way to resolve this possible type during execution.")
+                            .ToFormat(union, unionedType));
+                    }
+                });
 
                 union.Types.Apply(unionedType =>
                 {
@@ -256,11 +270,16 @@ namespace GraphQL.Types
                 AddTypeIfNotRegistered(field.Type, context);
                 field.ResolvedType = BuildNamedType(field.Type, context.ResolveType);
             }
+            else
+            {
+                AddTypeIfNotRegistered(field.ResolvedType, context);
+            }
 
             field.Arguments?.Apply(arg =>
             {
                 if (arg.ResolvedType != null)
                 {
+                    AddTypeIfNotRegistered(arg.ResolvedType, context);
                     return;
                 }
 
@@ -276,6 +295,16 @@ namespace GraphQL.Types
             if (foundType == null)
             {
                 AddType(context.ResolveType(namedType), context);
+            }
+        }
+
+        private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
+        {
+            var namedType = type.GetNamedType().Name;
+            var foundType = this[namedType];
+            if(foundType == null)
+            {
+                AddType(type, context);
             }
         }
     }
