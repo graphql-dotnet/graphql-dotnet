@@ -117,6 +117,42 @@ namespace GraphQL.Tests.Execution
                 root: new SomeObject { Name = "Quinn"});
         }
 
+        [Fact]
+        public void build_union()
+        {
+            var schema = new Schema();
+
+            var person = new ObjectGraphType();
+            person.Name = "Person";
+            person.Field("name", new StringGraphType());
+            person.IsTypeOf = type => true;
+
+            var robot = new ObjectGraphType();
+            robot.Name = "Robot";
+            robot.Field("name", new StringGraphType());
+            robot.IsTypeOf = type => true;
+
+            var personOrRobot = new UnionGraphType();
+            personOrRobot.Name = "PersonOrRobot";
+            personOrRobot.AddPossibleType(person);
+            personOrRobot.AddPossibleType(robot);
+
+            var root = new ObjectGraphType();
+            root.Name = "Root";
+            root.Field("hero", personOrRobot, resolve: ctx => ctx.RootValue);
+
+            schema.Query = root;
+
+            AssertQuerySuccess(
+                schema,
+                @"{ hero {
+                    ... on Person { name }
+                    ... on Robot { name }
+                } }",
+                @"{ hero: { name : 'Quinn' }}",
+                root: new SomeObject { Name = "Quinn"});
+        }
+
         public class SomeObject
         {
             public string Name { get; set; }
