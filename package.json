@@ -1,6 +1,6 @@
 {
   "name": "graphql-dotnet",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "description": "GraphQL for .NET",
   "main": "index.js",
   "scripts": {
