@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Http;
-using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -153,6 +151,107 @@ namespace GraphQL.Tests.Execution
                 root: new SomeObject { Name = "Quinn"});
         }
 
+        [Fact]
+        public void build_nested_type_with_list()
+        {
+            build_schema("list").ShouldBeCrossPlat(@"schema {
+  query: root
+}
+
+type NestedObjType {
+  intField: Int
+}
+
+type root {
+  listOfObjField: [NestedObjType]
+}
+");
+        }
+
+        [Fact]
+        public void build_nested_type_with_non_null()
+        {
+            build_schema("non-null").ShouldBeCrossPlat(@"schema {
+  query: root
+}
+
+type NestedObjType {
+  intField: Int
+}
+
+type root {
+  listOfObjField: NestedObjType!
+}
+");
+        }
+
+        [Fact]
+        public void build_nested_type_with_base()
+        {
+            build_schema("none").ShouldBeCrossPlat(@"schema {
+  query: root
+}
+
+type NestedObjType {
+  intField: Int
+}
+
+type root {
+  listOfObjField: NestedObjType
+}
+");
+        }
+
+        private string build_schema(string propType)
+        {
+            var nestedObjType = new ObjectGraphType()
+            {
+                Name = "NestedObjType"
+            };
+            nestedObjType.AddField(new FieldType()
+            {
+                ResolvedType = new IntGraphType(),
+                Name = "intField"
+            });
+            var rootType = new ObjectGraphType {Name = "root"};
+            IGraphType resolvedType;
+            switch (propType)
+            {
+                case "none":
+                {
+                    resolvedType = nestedObjType;
+                    break;
+                }
+                case "list":
+                {
+                    resolvedType = new ListGraphType(nestedObjType);
+                    break;
+                }
+                case "non-null":
+                {
+                    resolvedType = new NonNullGraphType(nestedObjType);
+                    break;
+                }
+                default:
+                {
+                    throw new NotSupportedException();
+                }
+            }
+
+            rootType.AddField(new FieldType()
+            {
+                Name = "listOfObjField",
+                ResolvedType = resolvedType
+            });
+
+            var s = new Schema()
+            {
+                Query = rootType
+            };
+            var schema = new SchemaPrinter(s).Print();
+            return schema;
+        }
+
         public class SomeObject
         {
             public string Name { get; set; }
@@ -176,6 +275,16 @@ namespace GraphQL.Tests.Execution
             field.ResolvedType = type;
             field.Resolver = resolve != null ? new FuncFieldResolver<object>(resolve) : null;
             obj.AddField(field);
+        }
+    }
+
+    public static class AssertionExtensions
+    {
+        public static void ShouldBeCrossPlat(this string a, string b)
+        {
+            var aa = a?.Replace("\r\n", "\n");
+            var bb = b?.Replace("\r\n", "\n");
+            aa.ShouldBe(bb);
         }
     }
 }
