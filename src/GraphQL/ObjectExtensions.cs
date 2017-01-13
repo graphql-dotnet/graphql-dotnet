@@ -67,7 +67,18 @@ namespace GraphQL
 
             var value = propertyValue;
 
-            fieldType = Nullable.GetUnderlyingType(fieldType) ?? fieldType;
+            var nullableFieldType = Nullable.GetUnderlyingType(fieldType);
+
+            // if this is a nullable type and the value is null, return null
+            if(nullableFieldType != null && value == null)
+            {
+                return null;
+            }
+
+            if(nullableFieldType != null)
+            {
+                fieldType = nullableFieldType;
+            }
 
             if (propertyValue is Dictionary<string, object>)
             {
