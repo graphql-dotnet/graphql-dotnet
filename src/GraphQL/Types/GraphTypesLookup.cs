@@ -300,11 +300,11 @@ namespace GraphQL.Types
 
         private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
         {
-            var namedType = type.GetNamedType().Name;
-            var foundType = this[namedType];
+            var namedType = type.GetNamedType();
+            var foundType = this[namedType.Name];
             if(foundType == null)
             {
-                AddType(type, context);
+                AddType(namedType, context);
             }
         }
     }
