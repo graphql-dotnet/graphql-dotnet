@@ -537,29 +537,25 @@ namespace GraphQL
         {
             var type = variable.Type.GraphTypeFromType(schema);
 
-            if (IsValidValue(schema, type, input))
+            try
             {
-                if (input == null)
-                {
-                    if (variable.DefaultValue != null)
-                    {
-                        return ValueFromAst(variable.DefaultValue);
-                    }
-                }
-                var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
-                return coercedValue;
+                AssertValidValue(schema, type, input, variable.Name); 
+            }
+            catch (InvalidValueException error)
+            {
+                error.AddLocation(variable, document);
+                throw;
             }
 
             if (input == null)
             {
-                var error2 = new ExecutionError("Variable '${0}' of required type '{1}' was not provided.".ToFormat(variable.Name, type.Name ?? variable.Type.FullName()));
-                error2.AddLocation(variable, document);
-                throw error2;
+                if (variable.DefaultValue != null)
+                {
+                    return ValueFromAst(variable.DefaultValue);
+                }
             }
-
-            var error = new ExecutionError("Variable '${0}' expected value of type '{1}'.".ToFormat(variable.Name, type?.Name ?? variable.Type.FullName()));
-            error.AddLocation(variable, document);
-            throw error;
+            var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
+            return coercedValue;
         }
 
         private object ValueFromAst(IValue value)
@@ -616,29 +612,34 @@ namespace GraphQL
             return null;
         }
 
-        public bool IsValidValue(ISchema schema, IGraphType type, object input)
+
+        public void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
         {
             if (type is NonNullGraphType)
             {
-                if (input == null)
-                {
-                    return false;
-                }
-
                 var nonNullType = ((NonNullGraphType)type).ResolvedType;
 
-                if (nonNullType is ScalarGraphType)
+                if (input == null)
                 {
-                    var val = ValueFromScalar((ScalarGraphType)nonNullType, input);
-                    return val != null;
+                    throw new InvalidValueException(fieldName, "Received a null input for a non-null field.");
                 }
 
-                return IsValidValue(schema, nonNullType, input);
+                AssertValidValue(schema, nonNullType, input, fieldName);
+                return;
             }
 
             if (input == null)
             {
-                return true;
+                return;
+            }
+
+            if (type is ScalarGraphType)
+            {
+                var scalar = (ScalarGraphType)type;
+                if (ValueFromScalar(scalar, input) == null)
+                    throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
+
+                return;
             }
 
             if (type is ListGraphType)
@@ -649,48 +650,49 @@ namespace GraphQL
                 var list = input as IEnumerable;
                 if (list != null && !(input is string))
                 {
-                    return list.All(item => IsValidValue(schema, listItemType, item));
+                    var index = -1;
+                    foreach (var item in list)
+                        AssertValidValue(schema, listItemType, item, $"{fieldName}[{++index}]");
                 }
-
-                return IsValidValue(schema, listItemType, input);
+                else
+                {
+                    AssertValidValue(schema, listItemType, input, fieldName);
+                }
+                return;
             }
 
             if (type is IObjectGraphType || type is InputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
-                var complexType = type as IComplexGraphType;
+                var complexType = (IComplexGraphType)type;
 
                 if (dict == null)
                 {
-                    return false;
+                    throw new InvalidValueException(fieldName,
+                        $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
                 // ensure every provided field is defined
-                if (type is InputObjectGraphType
-                    && dict.Keys.Any(key => complexType.Fields.FirstOrDefault(field => field.Name == key) == null))
+                var unknownFields = type is InputObjectGraphType
+                    ? dict.Keys.Where(key => complexType.Fields.All(field => field.Name != key)).ToArray()
+                    : null;
+
+                if (unknownFields != null && unknownFields.Any())
                 {
-                    return false;
+                    throw new InvalidValueException(fieldName,
+                        $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
                 }
 
-                return complexType.Fields.All(field =>
+                foreach (var field in complexType.Fields)
                 {
-                    object fieldValue = null;
+                    object fieldValue;
                     dict.TryGetValue(field.Name, out fieldValue);
-                    return IsValidValue(
-                        schema,
-                        field.ResolvedType,
-                        fieldValue);
-                });
+                    AssertValidValue(schema, field.ResolvedType, fieldValue, $"{fieldName}.{field.Name}");
+                }
+                return;
             }
 
-            if (type is ScalarGraphType)
-            {
-                var scalar = (ScalarGraphType)type;
-                var value = ValueFromScalar(scalar, input);
-                return value != null;
-            }
-
-            return false;
+            throw new InvalidValueException(fieldName ?? "input", "Invalid input");
         }
 
         private object ValueFromScalar(ScalarGraphType scalar, object input)
