@@ -627,18 +627,19 @@ namespace GraphQL
 
                 var nonNullType = ((NonNullGraphType)type).ResolvedType;
 
-                if (nonNullType is ScalarGraphType)
-                {
-                    var val = ValueFromScalar((ScalarGraphType)nonNullType, input);
-                    return val != null;
-                }
-
                 return IsValidValue(schema, nonNullType, input);
             }
 
             if (input == null)
             {
                 return true;
+            }
+
+            if (type is ScalarGraphType)
+            {
+                var scalar = (ScalarGraphType)type;
+                var value = ValueFromScalar(scalar, input);
+                return value != null;
             }
 
             if (type is ListGraphType)
@@ -658,7 +659,7 @@ namespace GraphQL
             if (type is IObjectGraphType || type is InputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
-                var complexType = type as IComplexGraphType;
+                var complexType = (IComplexGraphType)type;
 
                 if (dict == null)
                 {
@@ -683,12 +684,7 @@ namespace GraphQL
                 });
             }
 
-            if (type is ScalarGraphType)
-            {
-                var scalar = (ScalarGraphType)type;
-                var value = ValueFromScalar(scalar, input);
-                return value != null;
-            }
+            
 
             return false;
         }
