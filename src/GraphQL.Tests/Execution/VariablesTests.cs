@@ -238,7 +238,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -254,7 +254,8 @@ namespace GraphQL.Tests.Execution
 
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe(
+                "Variable '$input' is invalid. Unable to parse input as a 'TestInputObject' type. Did you provide a List or Scalar value accidentally?");
         }
 
         [Fact]
@@ -269,7 +270,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -284,7 +285,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input' expected value of type 'TestInputObject'.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e' for type 'TestInputObject'.");
         }
 
         [Fact]
@@ -437,7 +438,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -458,7 +459,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' of required type 'String!' was not provided.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
