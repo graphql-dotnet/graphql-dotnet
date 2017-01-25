@@ -383,6 +383,11 @@ namespace GraphQL
                 return new LongValue((long)serialized);
             }
 
+            if (serialized is decimal)
+            {
+                return new DecimalValue((decimal)serialized);
+            }
+
             if (serialized is double)
             {
                 return new FloatValue((double)serialized);
