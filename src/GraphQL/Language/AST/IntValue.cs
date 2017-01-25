@@ -60,6 +60,34 @@ namespace GraphQL.Language.AST
         }
     }
 
+    public class DecimalValue : AbstractNode, IValue
+    {
+        public DecimalValue(decimal value)
+        {
+            Value = value;
+        }
+
+        public decimal Value { get; }
+
+        public override string ToString()
+        {
+            return "DecimalValue{{value={0}}}".ToFormat(Value);
+        }
+
+        protected bool Equals(DecimalValue other)
+        {
+            return Value == other.Value;
+        }
+
+        public override bool IsEqualTo(INode obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((DecimalValue)obj);
+        }
+    }
+
     public class FloatValue : AbstractNode, IValue
     {
         public FloatValue(double value)

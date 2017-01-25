@@ -41,6 +41,15 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void converts_decimal_to_decimal_value()
+        {
+            decimal val = 1234.56789m;
+            var result = val.AstFromValue(null, new DecimalGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<DecimalValue>();
+        }
+
+        [Fact]
         public void converts_int_to_int_value()
         {
             int val = 123;
