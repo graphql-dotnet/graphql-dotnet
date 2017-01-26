@@ -46,6 +46,11 @@ namespace GraphQL.Types
                 return ParseValue(((FloatValue)value).Value);
             }
 
+            if (value is DecimalValue)
+            {
+                return ParseValue(((DecimalValue)value).Value);
+            }
+
             return null;
         }
     }
