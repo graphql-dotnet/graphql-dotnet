@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+﻿using GraphQL.Language.AST;
+using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
@@ -29,7 +30,13 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_numeric_string_to_decimal()
         {
-            type.ParseValue("12345").ShouldBe((decimal)12345);
+            type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
+        }
+
+        [Fact]
+        public void converts_DecimalValue_to_decimal()
+        {
+            type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe((decimal)12345.6579);
         }
     }
 }
