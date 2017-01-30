@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Bugs
     public class BugDateTimeInStringGraphTypeTests : QueryTestBase<VariablesSchema>
     {
         /// <summary>
-        /// This is based the 'UsingVariablesTests => executes_with_complex_input' from VariablesTests.cs
+        /// This is based off the 'UsingVariablesTests => executes_with_complex_input' from VariablesTests.cs
         /// </summary>
         /// 
         [Fact]
