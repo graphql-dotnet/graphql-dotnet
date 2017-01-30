@@ -36,7 +36,7 @@ namespace GraphQL
             var namedType = type.GetNamedType();
             return namedType is ScalarGraphType ||
                    namedType is EnumerationGraphType ||
-                   namedType is InputObjectGraphType;
+                   namedType is IInputObjectGraphType;
         }
 
         public static IGraphType GetNamedType(this IGraphType type)
@@ -149,14 +149,14 @@ namespace GraphQL
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
 
-            if (type is InputObjectGraphType)
+            if (type is IInputObjectGraphType)
             {
                 if (!(valueAst is ObjectValue))
                 {
                     return new[] {$"Expected \"{type.Name}\", found not an object."};
                 }
 
-                var inputType = (InputObjectGraphType) type;
+                var inputType = (IInputObjectGraphType) type;
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
@@ -330,14 +330,14 @@ namespace GraphQL
 
             // Populate the fields of the input object by creating ASTs from each value
             // in the dictionary according to the fields in the input type.
-            if (type is InputObjectGraphType)
+            if (type is IInputObjectGraphType)
             {
                 if (!(value is Dictionary<string, object>))
                 {
                     return null;
                 }
 
-                var input = (InputObjectGraphType) type;
+                var input = (IInputObjectGraphType) type;
                 var dict = (Dictionary<string, object>)value;
 
                 var fields = dict
