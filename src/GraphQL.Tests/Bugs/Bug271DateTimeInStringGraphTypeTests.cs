@@ -3,7 +3,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class BugDateTimeInStringGraphTypeTests : QueryTestBase<VariablesSchema>
+    public class Bug271DateTimeInStringGraphTypeTests : QueryTestBase<VariablesSchema>
     {
         /// <summary>
         /// This is based the 'UsingVariablesTests => executes_with_complex_input' from VariablesTests.cs

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Conversion;
@@ -123,7 +124,17 @@ namespace GraphQL
         public static object ConvertValue(object value, Type fieldType)
         {
             if (value == null) return null;
-            if (fieldType == typeof(DateTime) && value is DateTime) return value;
+
+            if (fieldType == typeof(DateTime))
+            {
+                if (value is DateTime) return value;
+
+                DateTime dateTimeValue;
+                if (DateTime.TryParse($"{value}", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeValue))
+                {
+                    return dateTimeValue;
+                }
+            } 
 
             var text = value.ToString();
             return _conversions.Value.Convert(fieldType, text);
