@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Conversion;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -25,7 +26,8 @@ namespace GraphQL.Tests.Utilities
 
             var schema = new Schema
             {
-                Query = root
+                Query = root,
+                // FieldNameConverter = new PascalCaseFieldNameConverter()
             };
 
             var result = print(schema);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Conversion;
 
 namespace GraphQL.Types
 {
@@ -10,6 +11,8 @@ namespace GraphQL.Types
         bool Initialized { get; }
 
         void Initialize();
+
+        IFieldNameConverter FieldNameConverter { get; set;}
 
         IObjectGraphType Query { get; set; }
 
@@ -57,11 +60,13 @@ namespace GraphQL.Types
             };
         }
 
+        public IFieldNameConverter FieldNameConverter { get; set;} = new CamelCaseFieldNameConverter();
+
         public bool Initialized => _lookup.IsValueCreated;
 
         public void Initialize()
         {
-            FindType("abcd");
+            FindType("__abcd__");
         }
 
         public IObjectGraphType Query { get; set; }
@@ -168,7 +173,7 @@ namespace GraphQL.Types
                 .Where(x => x != null)
                 .ToList();
 
-            return GraphTypesLookup.Create(types, _directives, ResolveType);
+            return GraphTypesLookup.Create(types, _directives, ResolveType, FieldNameConverter);
         }
     }
 }

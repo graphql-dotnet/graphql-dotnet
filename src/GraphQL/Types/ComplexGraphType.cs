@@ -40,13 +40,13 @@ namespace GraphQL.Types
         {
             if (HasField(fieldType.Name))
             {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Name), 
+                throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
                     $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
             }
 
             if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
             {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Type), 
+                throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
                     $"The declared Field type: {fieldType.Type.Name} should derive from GraphType, but doesn't.");
             }
 
@@ -166,7 +166,7 @@ namespace GraphQL.Types
         {
             string name;
             try {
-                name = expression.NameOf().ToCamelCase();
+                name = expression.NameOf();
             }
             catch {
                 throw new ArgumentException(
@@ -175,7 +175,6 @@ namespace GraphQL.Types
             }
             return Field(name, expression, nullable, type);
         }
-
 
         public ConnectionBuilder<TNodeType, TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
