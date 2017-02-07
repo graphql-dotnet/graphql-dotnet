@@ -233,11 +233,11 @@ public static class GraphQLExtensions
 ```
 
 # Protection Against Malicious Queries
-GraphQL allows the client to bundle and nest many queries into a single request. While this is quite convenenit it also makes GraphQL endpoints suseptible to Denial of Service attacks.
+GraphQL allows the client to bundle and nest many queries into a single request. While this is quite convenient it also makes GraphQL endpoints susceptible to Denial of Service attacks.
 
-To mitigate this graphql-dotnet provides a few options that can be tweaked to set the upper bound of nesting and complexity of incoming queries so that the endpoint would only try to resolve queries that meet the set criteria and discard any overly complex and possibly malicious query that you don't expect your clients to make thus protecting your server resources agaisnt depletion by a denial of service attacks.
+To mitigate this graphql-dotnet provides a few options that can be tweaked to set the upper bound of nesting and complexity of incoming queries so that the endpoint would only try to resolve queries that meet the set criteria and discard any overly complex and possibly malicious query that you don't expect your clients to make thus protecting your server resources against depletion by a denial of service attacks.
 
-These options are passed to the ``` DocumentExecutor.ExecuteAsync(...)``` via an instance of ```GraphQL.Validation.Complexity.ComplexityConfiguration``` <sub><sup>[*(click here for an example)*](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.GraphiQL/Controllers/GraphQLController.cs#L62)</sup></sub>. You can leave any of options null to go with the default value and disable that specific test. The available options are the following:
+These options are passed to the ``` DocumentExecutor.ExecuteAsync(...)``` via an instance of ```GraphQL.Validation.Complexity.ComplexityConfiguration``` <sub><sup>[*(click here for an example)*](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.GraphiQL/Controllers/GraphQLController.cs#L62)</sup></sub>. You can leave any of the options null to go with the default value and disable that specific test. The available options are the following:
 ```csharp
 public int? MaxDepth { get; set; }
 public int? MaxComplexity { get; set; }
@@ -262,9 +262,9 @@ fragment X on Product { # This fragment has a depth of only 1.
   }
 }
 ```
-The query depth setting is a good estimation of complexity for most use cases and it loosely translates to the number of unique queries sent to the datastore (however it does not look at how many times each query might get executed). Keep in mind that the calculation of complexity needs to be FAST otherwise it can impose a sigificant overhead.
+The query depth setting is a good estimation of complexity for most use cases and it loosely translates to the number of unique queries sent to the datastore (however it does not look at how many times each query might get executed). Keep in mind that the calculation of complexity needs to be FAST otherwise it can impose a significant overhead.
 
-One step further would be specifying ```MaxComplexity``` and ```FieldImpact``` to look at the estimated number of entities (or cells in a databse) that are expected to be returned by each query. Obviously this depends on the size of your database (i.e. number of records per entity) so you will need to find the average number of records per database entity and input that into ```FieldImpact```. For example if I have 3 tables with 100, 120 and 98 rows and I know I will be querying the first table twice as much then a good estimation for ```avgImpact``` would be 105.
+One step further would be specifying ```MaxComplexity``` and ```FieldImpact``` to look at the estimated number of entities (or cells in a database) that are expected to be returned by each query. Obviously this depends on the size of your database (i.e. number of records per entity) so you will need to find the average number of records per database entity and input that into ```FieldImpact```. For example if I have 3 tables with 100, 120 and 98 rows and I know I will be querying the first table twice as much then a good estimation for ```avgImpact``` would be 105.
 
 Note: I highly recommend setting a higher bound on the number of returned entities by each resolve function in your code. if you use this approach already in your code then you can input that upper bound (which would be the maximum possible items returned per entity) as your avgImpact.
 It is also possilbe to use a theorical value for this (for example 2.0) to asses the query's impact on a theorical database hence decoupling this calculation from your actual database.
@@ -277,13 +277,13 @@ Imagine if we had a simple test database for the query in the previous example a
 
 Or simply put on average we will have **2x Products** each will have 1 Title for a total of **2x Titles** plus per each Product entry we will have 3 locations overriden by ```first``` argument (we follow relay's spec for ```first```,```last``` and ```id``` arguments) and each of these 3 locations have a lat and a long totalling **6x Locations** having **6x lat**s and **6x longs**.
 
-Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (or higher) the query will execute correctly. If we change the MaxComplexity to something like 20 the DocumentExecutor will fail right after parsing the AST tree and will not attempt to resolve any of the fields (or talk to the database).
+Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (or higher) the query will execute correctly. If we change the ```MaxComplexity``` to something like 20 the DocumentExecutor will fail right after parsing the AST tree and will not attempt to resolve any of the fields (or talk to the database).
 
 # Query Batching
 
 Query batching allows you to make a single request to your data store instead of multiple requests.  This can also often be referred to as the ["N+1"](http://stackoverflow.com/questions/97197/what-is-the-n1-selects-issue) problem.  One technique of accomplishing this is to have all of your resolvers return a `Task`, then resolve those tasks when the batch is complete.  Some projects provide features like [Marten Batched Queries](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) that support this pattern.
 
-The trick is knowing when to execute the batched query.  GraphQL .NET provides the ability to add listeners in the execution pipline.  Combined with a custom `UserContext` this makes executing the batch trivial.
+The trick is knowing when to execute the batched query.  GraphQL .NET provides the ability to add listeners in the execution pipeline.  Combined with a custom `UserContext` this makes executing the batch trivial.
 
 ```csharp
 public class GraphQLUserContext
