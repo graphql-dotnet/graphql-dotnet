@@ -3,8 +3,6 @@ using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
@@ -19,7 +17,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        internal class TestObject 
+        internal class TestObject
         {
             public int? someInt { get; set; }
             public KeyValuePair<int, string> valuePair { get; set; }
@@ -31,10 +29,9 @@ namespace GraphQL.Tests.Types
             var type = new ComplexType<Droid>();
             var field = type.Field(d => d.Name);
 
-            type.Fields.Last().Name.ShouldBe("name");
+            type.Fields.Last().Name.ShouldBe("Name");
             type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
         }
-
 
         [Fact]
         public void allows_custom_name()

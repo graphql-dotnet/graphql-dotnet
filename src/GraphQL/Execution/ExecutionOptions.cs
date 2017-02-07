@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -24,5 +25,7 @@ namespace GraphQL
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
 
         public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
+
+        public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
     }
 }
