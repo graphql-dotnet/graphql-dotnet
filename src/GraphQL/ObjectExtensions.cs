@@ -125,15 +125,6 @@ namespace GraphQL
         {
             if (value == null) return null;
 
-            if (fieldType == typeof(DateTime))
-            {
-                DateTime dateTimeValue;
-                if (DateTime.TryParse($"{value}", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTimeValue))
-                {
-                    return dateTimeValue;
-                }
-            } 
-
             var text = value.ToString();
             return _conversions.Value.Convert(fieldType, text);
         }
