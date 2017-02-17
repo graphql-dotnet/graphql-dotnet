@@ -21,6 +21,10 @@ namespace GraphQL
 
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
+        public string Code { get; set; }
+
+        public List<string> Path { get; private set; } = new List<string>();
+
         public void AddLocation(int line, int column)
         {
             if (_errorLocations == null)
