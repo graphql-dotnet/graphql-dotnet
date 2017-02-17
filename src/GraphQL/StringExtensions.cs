@@ -62,7 +62,8 @@ namespace GraphQL
             var values = JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings
                 {
-                    DateFormatHandling = DateFormatHandling.IsoDateFormat
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                    DateParseHandling = DateParseHandling.None
                 });
             return GetValue(values) as Dictionary<string, object>;
         }

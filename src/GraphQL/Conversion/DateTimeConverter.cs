@@ -37,7 +37,7 @@ namespace GraphQL.Conversion
             {
                 //Thank you jon skeet : http://stackoverflow.com/questions/10029099/datetime-parse2012-09-30t230000-0000000z-always-converts-to-datetimekind-l
                 DateTime result;
-                var success = DateTime.TryParseExact(trimmedString, "yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out result);
+                var success = DateTime.TryParse(trimmedString, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out result);
 
                 if (success) return result;
             }
