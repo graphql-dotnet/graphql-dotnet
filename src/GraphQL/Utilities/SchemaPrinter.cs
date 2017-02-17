@@ -271,7 +271,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = ".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue));
             }
 
             return desc;
