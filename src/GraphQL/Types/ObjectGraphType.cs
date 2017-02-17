@@ -1,4 +1,3 @@
-using GraphQL.Builders;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ namespace GraphQL.Types
         Func<object, bool> IsTypeOf { get; set; }
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
-
 
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
