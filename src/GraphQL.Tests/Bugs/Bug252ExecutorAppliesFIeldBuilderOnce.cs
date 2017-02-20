@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug252ExecutorAppliesBuilderOnceTests
     {
         [Fact]
-        public void apply_to_called_once_after_execution()
+        public void apply_to_not_called_without_execute()
         {
             var docExec = new DocumentExecuter();
             var execOptions = new ExecutionOptions();
