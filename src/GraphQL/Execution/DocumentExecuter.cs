@@ -86,7 +86,6 @@ namespace GraphQL
             var metrics = new Metrics();
             metrics.Start(config.OperationName);
 
-            config.FieldMiddleware.ApplyTo(config.Schema);
 
             var result = new ExecutionResult { Query = config.Query };
             try
@@ -95,6 +94,7 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
+                        config.FieldMiddleware.ApplyTo(config.Schema);
                         config.Schema.Initialize();
                     }
                 }
