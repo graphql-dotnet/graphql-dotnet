@@ -57,7 +57,7 @@ namespace GraphQL
                 : new Inputs(dictionary);
         }
 
-        private static Dictionary<string, object> ToDictionary(this string json)
+        public static Dictionary<string, object> ToDictionary(this string json)
         {
             var values = JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings
@@ -78,7 +78,7 @@ namespace GraphQL
             return $"{char.ToLowerInvariant(s[0])}{s.Substring(1)}";
         }
 
-        private static object GetValue(object value)
+        public static object GetValue(object value)
         {
             var objectValue = value as JObject;
             if (objectValue != null)
