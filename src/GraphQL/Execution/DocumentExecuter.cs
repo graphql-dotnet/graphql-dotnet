@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +86,7 @@ namespace GraphQL
             var metrics = new Metrics();
             metrics.Start(config.OperationName);
 
+            config.Schema.FieldNameConverter = config.FieldNameConverter;
 
             var result = new ExecutionResult { Query = config.Query };
             try
@@ -539,7 +540,7 @@ namespace GraphQL
 
             try
             {
-                AssertValidValue(schema, type, input, variable.Name); 
+                AssertValidValue(schema, type, input, variable.Name);
             }
             catch (InvalidValueException error)
             {

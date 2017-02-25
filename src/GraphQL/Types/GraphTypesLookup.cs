@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Conversion;
 using GraphQL.Introspection;
 
 namespace GraphQL.Types
@@ -33,9 +34,11 @@ namespace GraphQL.Types
         public static GraphTypesLookup Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
-            Func<Type, IGraphType> resolveType)
+            Func<Type, IGraphType> resolveType,
+            IFieldNameConverter fieldNameConverter)
         {
             var lookup = new GraphTypesLookup();
+            lookup.FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter();
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
@@ -50,9 +53,11 @@ namespace GraphQL.Types
                 lookup.AddType(type, ctx);
             });
 
-            lookup.HandleField(SchemaIntrospection.SchemaMeta, ctx);
-            lookup.HandleField(SchemaIntrospection.TypeMeta, ctx);
-            lookup.HandleField(SchemaIntrospection.TypeNameMeta, ctx);
+            var introspectionType = typeof(SchemaIntrospection);
+
+            lookup.HandleField(introspectionType, SchemaIntrospection.SchemaMeta, ctx);
+            lookup.HandleField(introspectionType, SchemaIntrospection.TypeMeta, ctx);
+            lookup.HandleField(introspectionType, SchemaIntrospection.TypeNameMeta, ctx);
 
             directives.Apply(directive =>
             {
@@ -69,6 +74,8 @@ namespace GraphQL.Types
 
             return lookup;
         }
+
+        public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
         public void Clear()
         {
@@ -191,7 +198,7 @@ namespace GraphQL.Types
                 var complexType = type as IComplexGraphType;
                 complexType.Fields.Apply(field =>
                 {
-                    HandleField(field, context);
+                    HandleField(type.GetType(), field, context);
                 });
             }
 
@@ -263,8 +270,10 @@ namespace GraphQL.Types
             }
         }
 
-        private void HandleField(FieldType field, TypeCollectionContext context)
+        private void HandleField(Type parentType, FieldType field, TypeCollectionContext context)
         {
+            field.Name = FieldNameConverter.NameFor(field.Name, parentType);
+
             if (field.ResolvedType == null)
             {
                 AddTypeIfNotRegistered(field.Type, context);
