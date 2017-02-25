@@ -93,7 +93,7 @@ namespace GraphQL.Introspection
                 });
             Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
             {
-                var type = context.Source as InputObjectGraphType;
+                var type = context.Source as IInputObjectGraphType;
                 return type?.Fields;
             });
             Field<__Type>("ofType", resolve: context =>
@@ -136,7 +136,7 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.UNION;
             }
-            if (type is InputObjectGraphType)
+            if (type is IInputObjectGraphType)
             {
                 return TypeKind.INPUT_OBJECT;
             }
@@ -174,7 +174,7 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.UNION;
             }
-            if (typeof (InputObjectGraphType).IsAssignableFrom(type))
+            if (typeof (IInputObjectGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.INPUT_OBJECT;
             }
