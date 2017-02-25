@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.StarWars.IoC;
@@ -76,7 +77,17 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default(CancellationToken),
             int expectedErrorCount = 0)
         {
-            var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, userContext, cancellationToken).Result;
+            var runResult = Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = query;
+                _.Root = root;
+                _.Inputs = inputs;
+                _.UserContext = userContext;
+                _.CancellationToken = cancellationToken;
+            }).Result;
+
+            // var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, userContext, cancellationToken).Result;
 
             var writtenResult = Writer.Write(new ExecutionResult { Data = runResult.Data });
             var expectedResult = Writer.Write(expectedExecutionResult);
@@ -103,16 +114,28 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var runResult = Executer.ExecuteAsync(
-                Schema,
-                root,
-                query,
-                null,
-                inputs,
-                userContext,
-                cancellationToken,
-                rules
-                ).Result;
+            var runResult = Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = query;
+                _.Root = root;
+                _.Inputs = inputs;
+                _.UserContext = userContext;
+                _.CancellationToken = cancellationToken;
+                _.ValidationRules = rules;
+                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+            }).Result;
+
+            // var runResult = Executer.ExecuteAsync(
+            //     Schema,
+            //     root,
+            //     query,
+            //     null,
+            //     inputs,
+            //     userContext,
+            //     cancellationToken,
+            //     rules
+            //     ).Result;
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);

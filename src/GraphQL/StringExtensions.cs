@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -76,6 +76,16 @@ namespace GraphQL
             }
 
             return $"{char.ToLowerInvariant(s[0])}{s.Substring(1)}";
+        }
+
+        public static string ToPascalCase(this string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return string.Empty;
+            }
+
+            return $"{char.ToUpperInvariant(s[0])}{s.Substring(1)}";
         }
 
         public static object GetValue(object value)

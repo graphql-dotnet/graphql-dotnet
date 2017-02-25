@@ -82,7 +82,7 @@ namespace GraphQL.Tests.Execution
             ";
 
             var expected = @"{
-                named: {
+                Named: {
                   kind: 'INTERFACE',
                   name: 'Named',
                   fields: [
@@ -97,7 +97,7 @@ namespace GraphQL.Tests.Execution
                   enumValues: null,
                   inputFields: null
                 },
-                pet: {
+                Pet: {
                   kind: 'UNION',
                   name: 'Pet',
                   fields: null,
