@@ -256,17 +256,17 @@ namespace GraphQL
                 new Dictionary<string, Fields>(),
                 new List<string>());
 
-            return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
+            return ExecuteFieldsAsync(context, rootType, context.RootValue, fields, new[] { context.Operation.Name });
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields, IEnumerable<string> path)
         {
             return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
-                pair => ResolveFieldAsync(context, rootType, source, pair.Value));
+                pair => ResolveFieldAsync(context, rootType, source, pair.Value, path.Concat(new[] { pair.Key })));
         }
 
-        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Fields fields, IEnumerable<string> path)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -318,7 +318,7 @@ namespace GraphQL
                         var exception = aggregateException.InnerExceptions.Count == 1
                             ? aggregateException.InnerException
                             : aggregateException;
-                        return GenerateError(resolveResult, field, context, exception);
+                        return GenerateError(resolveResult, field, context, exception, path);
                     }
                     await task.ConfigureAwait(false);
 
@@ -326,25 +326,26 @@ namespace GraphQL
                 }
 
                 resolveResult.Value =
-                    await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
+                    await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result, path).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
             {
-                return GenerateError(resolveResult, field, context, exc);
+                return GenerateError(resolveResult, field, context, exc, path);
             }
         }
 
-        private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc)
+        private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc, IEnumerable<string> path)
         {
             var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
             error.AddLocation(field, context.Document);
+            error.Path.AddRange(path);
             context.Errors.Add(error);
             resolveResult.Skip = false;
             return resolveResult;
         }
 
-        public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result, IEnumerable<string> path)
         {
             var field = fields != null ? fields.FirstOrDefault() : null;
             var fieldName = field != null ? field.Name : null;
@@ -353,7 +354,7 @@ namespace GraphQL
             if (nonNullType != null)
             {
                 var type = nonNullType.ResolvedType;
-                var completed = await CompleteValueAsync(context, type, fields, result).ConfigureAwait(false);
+                var completed = await CompleteValueAsync(context, type, fields, result, path).ConfigureAwait(false);
                 if (completed == null)
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
@@ -391,7 +392,10 @@ namespace GraphQL
                 var listType = fieldType as ListGraphType;
                 var itemType = listType.ResolvedType;
 
-                var results = await list.MapAsync(async item => await CompleteValueAsync(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await list
+                    .MapAsync(async (index, item) =>
+                        await CompleteValueAsync(context, itemType, fields, item, path.Concat(new[] { $"{index}" })).ConfigureAwait(false))
+                    .ConfigureAwait(false);
 
                 return results;
             }
@@ -435,7 +439,7 @@ namespace GraphQL
                 subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
             });
 
-            return await ExecuteFieldsAsync(context, objectType, result, subFields).ConfigureAwait(false);
+            return await ExecuteFieldsAsync(context, objectType, result, subFields, path).ConfigureAwait(false);
         }
 
         public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
@@ -908,6 +912,22 @@ namespace GraphQL
             }
 
             return false;
+        }
+    }
+
+    static class DocumentExecutorExtensions
+    {
+        public static async Task<object[]> MapAsync(this IEnumerable enumerable, Func<int, object, Task<object>> mapFunction)
+        {
+            return await enumerable
+                .Cast<object>()
+                .Select((item, index) => Tuple.Create(index, item))
+                .MapAsync(async tuple =>
+                {
+                    var data = (Tuple<int, object>)tuple;
+                    return await mapFunction(data.Item1, data.Item2).ConfigureAwait(false);
+                })
+                .ConfigureAwait(false);
         }
     }
 }
