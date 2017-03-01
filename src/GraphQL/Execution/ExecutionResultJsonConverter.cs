@@ -29,11 +29,6 @@ namespace GraphQL
                 return;
             }
 
-            if (result.Errors?.Count > 0)
-            {
-                data = null;
-            }
-
             writer.WritePropertyName("data");
             serializer.Serialize(writer, data);
         }
@@ -60,6 +55,18 @@ namespace GraphQL
                 {
                     writer.WritePropertyName("locations");
                     serializer.Serialize(writer, error.Locations);
+                }
+
+                if (error.Path != null && error.Path.Count > 0)
+                {
+                    writer.WritePropertyName("path");
+                    serializer.Serialize(writer, error.Path);
+                }
+
+                if (!string.IsNullOrWhiteSpace(error.Code))
+                {
+                    writer.WritePropertyName("code");
+                    serializer.Serialize(writer, error.Code);
                 }
 
                 writer.WriteEndObject();

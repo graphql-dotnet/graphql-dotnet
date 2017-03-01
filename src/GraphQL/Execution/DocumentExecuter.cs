@@ -256,7 +256,7 @@ namespace GraphQL
                 new Dictionary<string, Fields>(),
                 new List<string>());
 
-            return ExecuteFieldsAsync(context, rootType, context.RootValue, fields, new[] { context.Operation.Name });
+            return ExecuteFieldsAsync(context, rootType, context.RootValue, fields, new string[0]);
         }
 
         public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields, IEnumerable<string> path)
