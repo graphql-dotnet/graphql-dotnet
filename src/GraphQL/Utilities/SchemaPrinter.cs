@@ -324,12 +324,23 @@ namespace GraphQL.Utilities
                 return value.ToString().ToLower();
             }
 
-            if (value is Enum)
+            if (IsEnumType(graphType))
             {
                 return "{0}".ToFormat(SerializeEnumValue(graphType, value));
             }
 
             return "{0}".ToFormat(value);
+        }
+
+        private static bool IsEnumType(IGraphType type)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nullable = (NonNullGraphType)type;
+                type = nullable.ResolvedType;
+            }
+
+            return type is EnumerationGraphType;
         }
 
         private static object SerializeEnumValue(IGraphType type, object value)
