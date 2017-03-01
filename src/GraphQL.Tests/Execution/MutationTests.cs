@@ -12,14 +12,21 @@ namespace GraphQL.Tests.Execution
         public int TheNumber { get; set; }
     }
 
+    public class DateTimeHolder
+    {
+        public DateTime TheDateTime { get; set; }
+    }
+
     public class Root
     {
-        public Root(int number)
+        public Root(int number, DateTime dateTime)
         {
             NumberHolder = new NumberHolder {TheNumber = number};
+            DateTimeHolder = new DateTimeHolder { TheDateTime = dateTime };
         }
 
         public NumberHolder NumberHolder { get; private set; }
+        public DateTimeHolder DateTimeHolder { get; private set; }
 
         public NumberHolder ImmediatelyChangeTheNumber(int number)
         {
@@ -43,6 +50,29 @@ namespace GraphQL.Tests.Execution
             await Task.Delay(100).ConfigureAwait(false);
             throw new InvalidOperationException("Cannot change the number");
         }
+
+        public DateTimeHolder ImmediatelyChangeTheDateTime(DateTime dateTime)
+        {
+            DateTimeHolder.TheDateTime = dateTime;
+            return DateTimeHolder;
+        }
+
+        public Task<DateTimeHolder> PromiseToChangeTheDateTimeAsync(DateTime dateTime)
+        {
+            DateTimeHolder.TheDateTime = dateTime;
+            return Task.FromResult(DateTimeHolder);
+        }
+
+        public DateTimeHolder FailToChangeTheDateTime(DateTime dateTime)
+        {
+            throw new InvalidOperationException("Cannot change the datetime");
+        }
+
+        public async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
+        {
+            await Task.Delay(100).ConfigureAwait(false);
+            throw new InvalidOperationException("Cannot change the datetime");
+        }
     }
 
     public class MutationSchema : Schema
@@ -63,12 +93,22 @@ namespace GraphQL.Tests.Execution
         }
     }
 
+    public class DateTimeHolderType : ObjectGraphType
+    {
+        public DateTimeHolderType()
+        {
+            Name = "DateTimeHolder";
+            Field<DateGraphType>("theDateTime");
+        }
+    }
+
     public class MutationQuery : ObjectGraphType
     {
         public MutationQuery()
         {
             Name = "Query";
             Field<NumberHolderType>("numberHolder");
+            Field<DateTimeHolderType>("dateTimeHolder");
         }
     }
 
@@ -145,6 +185,70 @@ namespace GraphQL.Tests.Execution
                     return root.PromiseAndFailToChangeTheNumberAsync(change);
                 }
             );
+
+            Field<DateTimeHolderType>(
+                "immediatelyChangeTheDateTime",
+                arguments: new QueryArguments(
+                    new QueryArgument<DateGraphType>
+                    {
+                        Name = "newDateTime"
+                    }
+                ),
+                resolve: context =>
+                {
+                    var root = context.Source as Root;
+                    var change = context.GetArgument<DateTime>("newDateTime");
+                    return root.ImmediatelyChangeTheDateTime(change);
+                }
+            );
+
+            Field<DateTimeHolderType>(
+                "promiseToChangeTheDateTime",
+                arguments: new QueryArguments(
+                    new QueryArgument<DateGraphType>
+                    {
+                        Name = "newDateTime"
+                    }
+                ),
+                resolve: context =>
+                {
+                    var root = context.Source as Root;
+                    var change = context.GetArgument<DateTime>("newDateTime");
+                    return root.PromiseToChangeTheDateTimeAsync(change);
+                }
+            );
+
+            Field<DateTimeHolderType>(
+                "failToChangeTheDateTime",
+                arguments: new QueryArguments(
+                    new QueryArgument<DateGraphType>
+                    {
+                        Name = "newDateTime"
+                    }
+                ),
+                resolve: context =>
+                {
+                    var root = context.Source as Root;
+                    var change = context.GetArgument<DateTime>("newDateTime");
+                    return root.FailToChangeTheDateTime(change);
+                }
+            );
+
+            Field<DateTimeHolderType>(
+                "promiseAndFailToChangeTheDateTime",
+                arguments: new QueryArguments(
+                    new QueryArgument<DateGraphType>
+                    {
+                        Name = "newDateTime"
+                    }
+                ),
+                resolve: context =>
+                {
+                    var root = context.Source as Root;
+                    var change = context.GetArgument<DateTime>("newDateTime");
+                    return root.PromiseAndFailToChangeTheDateTimeAsync(change);
+                }
+            );
         }
     }
 
@@ -192,7 +296,7 @@ namespace GraphQL.Tests.Execution
                   }
                 }";
 
-            AssertQuerySuccess(query, expected, root: new Root(6));
+            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
         }
 
         [Fact]
@@ -239,10 +343,105 @@ namespace GraphQL.Tests.Execution
                   'sixth': null
                 }";
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6), expectedErrorCount: 2);
+            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
             result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number");
             var last = result.Errors.Last();
             last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number");
+        }
+
+        [Fact]
+        public void evaluates_datetime_mutations_serially()
+        {
+            var query = @"
+                mutation M {
+                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  second: immediatelyChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  third: immediatelyChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  fourth: immediatelyChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
+                    theDateTime
+                  }
+                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
+                    theDateTime
+                  }
+                }
+            ";
+
+            var expected = @"
+                {
+                  'first': {
+                    'theDateTime': ""2017-01-27T15:19:53.123Z""
+                  },
+                  'second': {
+                    'theDateTime': ""2017-02-27T15:19:53.123Z""
+                  },
+                  'third': {
+                    'theDateTime': ""2017-03-27T15:19:53.123Z""
+                  },
+                  'fourth': {
+                    'theDateTime': ""2017-04-27T20:19:53.123Z""
+                  },
+                  'fifth': {
+                    'theDateTime': ""2017-05-27T13:19:53.123Z""
+                  }
+                }";
+
+            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
+        }
+
+        [Fact]
+        public void evaluates_datetime_mutations_correctly_in_the_presense_of_a_failed_mutation()
+        {
+            var query = @"
+                mutation M {
+                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  second: promiseToChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  third: failToChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                  fourth: promiseToChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
+                    theDateTime
+                  }
+                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
+                    theDateTime
+                  }
+                  sixth: promiseAndFailToChangeTheDateTime(newDateTime: ""2017-06-27T15:19:53.123Z"") {
+                    theDateTime
+                  }
+                }
+            ";
+
+            var expected = @"
+                {
+                  'first': {
+                    'theDateTime': ""2017-01-27T15:19:53.123Z""
+                  },
+                  'second': {
+                    'theDateTime': ""2017-02-27T15:19:53.123Z""
+                  },
+                  'third': null,
+                  'fourth': {
+                    'theDateTime': ""2017-04-27T20:19:53.123""
+                  },
+                  'fifth': {
+                    'theDateTime': ""2017-05-27T13:19:53.123""
+                  },
+                  'sixth': null
+                }";
+
+            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
+            result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
+            var last = result.Errors.Last();
+            last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
         }
     }
 }
