@@ -124,6 +124,11 @@ namespace GraphQL
         {
             if (value == null) return null;
 
+            if (fieldType == typeof(DateTime) && value is DateTime)
+            {
+                return value;
+            }
+
             var text = value.ToString();
             return _conversions.Value.Convert(fieldType, text);
         }
