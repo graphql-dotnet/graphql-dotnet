@@ -222,6 +222,11 @@ namespace GraphQL.Language
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = source as GraphQLObjectValue;
+                    var scalar = source as GraphQLScalarValue;
+                    if (scalar != null && scalar.Value == null)
+                    {
+                        return null;
+                    }
                     var fields = obj.Fields.Select(ObjectField);
                     return new ObjectValue(fields).WithLocation(obj, _body);
                 }
@@ -306,3 +311,4 @@ namespace GraphQL.Language
         }
     }
 }
+ 
