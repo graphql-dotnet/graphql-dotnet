@@ -54,7 +54,16 @@ namespace GraphQL
                 if (error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
-                    serializer.Serialize(writer, error.Locations);
+                    writer.WriteStartArray();
+                    error.Locations.Apply(location => {
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("line");
+                        serializer.Serialize(writer, location.Line);
+                        writer.WritePropertyName("column");
+                        serializer.Serialize(writer, location.Column);
+                        writer.WriteEndObject();
+                    });
+                    writer.WriteEndArray();
                 }
 
                 if (error.Path != null && error.Path.Count > 0)
