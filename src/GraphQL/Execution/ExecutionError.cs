@@ -49,6 +49,10 @@ namespace GraphQL
             {
                 code = code.Substring(0, code.Length - nameof(Exception).Length);
             }
+            if (code.StartsWith("GraphQL"))
+            {
+                code = code.Substring("GraphQL".Length);
+            }
             return GetAllCapsRepresentation(code);
         }
 
