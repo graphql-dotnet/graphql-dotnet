@@ -8,6 +8,6 @@ namespace GraphQL.Validation.Complexity
         /// <exception cref="InvalidOperationException">
         /// Thrown if complexity is not within the defiend range in parameters.
         /// </exception>
-        void Validate(Document document, ComplexityConfiguration parameters);
+        void Validate(Document document, IComplexityConfiguration parameters);
     }
 }

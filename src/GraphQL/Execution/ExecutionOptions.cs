@@ -22,7 +22,7 @@ namespace GraphQL
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public object UserContext { get; set; }
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
-        public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
+        public IComplexityConfiguration ComplexityConfiguration { get; set; } = null;
 
         public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
 

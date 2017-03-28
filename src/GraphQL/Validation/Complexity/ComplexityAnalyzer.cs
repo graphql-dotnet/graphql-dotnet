@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace GraphQL.Validation.Complexity
             _maxRecursionCount = maxRecursionCount;
         }
 
-        public void Validate(Document document, ComplexityConfiguration complexityParameters)
+        public void Validate(Document document, IComplexityConfiguration complexityParameters)
         {
             if (complexityParameters == null) return;
             var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f);
