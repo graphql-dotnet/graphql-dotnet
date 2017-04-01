@@ -115,7 +115,7 @@
                 {
                     getComplexity =
                         (requestContext, arguments, childrenComplexity) =>
-                            1d + (childrenComplexity * requestContext.Configuration.DefaultCollectionChildrenCount);
+                            1d + ((childrenComplexity == 0 ? 1: childrenComplexity) * requestContext.Configuration.DefaultCollectionChildrenCount);
                 }
 
                 resolvedType = ((ListGraphType)resolvedType).ResolvedType;
