@@ -14,7 +14,7 @@ namespace GraphQL.Types
         string Description { get; set; }
         string DeprecationReason { get; set; }
         QueryArguments Arguments { get; set; }
-        Func<PreciseComplexityContext, Arguments, double, double> GetComplexity { get; set; }
+        PreciseComplexityAnalyser.GetComplexity GetComplexity { get; set; }
     }
 
     public class FieldType : IFieldType
@@ -29,7 +29,7 @@ namespace GraphQL.Types
         public IFieldResolver Resolver { get; set; }
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public Func<PreciseComplexityContext, Arguments, double, double> GetComplexity { get; set; }
+        public PreciseComplexityAnalyser.GetComplexity GetComplexity { get; set; }
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
         {
@@ -50,6 +50,12 @@ namespace GraphQL.Types
         public bool HasMetadata(string key)
         {
             return Metadata?.ContainsKey(key) ?? false;
+        }
+
+        public FieldType SetComplexity(PreciseComplexityAnalyser.GetComplexity complexity)
+        {
+            this.GetComplexity = complexity;
+            return this;
         }
     }
 }

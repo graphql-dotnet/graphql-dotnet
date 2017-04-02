@@ -8,9 +8,20 @@ namespace GraphQL.Tests.PreciseComplexity
 
     public abstract class PreciseComplexityTestBase
     {
-        protected PreciseComplexityAnalyser.Result Analyze(string query, string variables = null)
+        protected PreciseComplexityAnalyser.Result Analyze(
+            string query,
+            string variables = null,
+            int defaultCollectionChildrenCount = 10,
+            int? maxComplexity = null,
+            int? maxDepth = null)
         {
-            var configuration = new PreciseComplexityConfiguration { DefaultCollectionChildrenCount = 10 };
+            var configuration = new PreciseComplexityConfiguration
+                                    {
+                                        DefaultCollectionChildrenCount =
+                                            defaultCollectionChildrenCount,
+                                        MaxComplexity = maxComplexity,
+                                        MaxDepth = maxDepth
+            };
             var schema = new PreciseComplexitySchema();
             schema.Initialize();
             var documentBuilder = new GraphQLDocumentBuilder();

@@ -17,6 +17,8 @@ using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
+    using GraphQL.Validation.PreciseComplexity;
+
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
@@ -119,6 +121,30 @@ namespace GraphQL
                 {
                     using (metrics.Subject("document", "Analyzing complexity"))
                         _complexityAnalyzer.Validate(document, config.ComplexityConfiguration);
+                }
+
+                if (config.PreciseComplexityConfiguration != null)
+                {
+                    using (metrics.Subject("document", "Analyzing complexity precisely"))
+                    {
+                        var context = new PreciseComplexityContext
+                                          {
+                                              Configuration = config.PreciseComplexityConfiguration,
+                                              Document = document,
+                                              Fragments = document.Fragments,
+                                              Metrics = metrics,
+                                              Operation = operation,
+                                              Schema = config.Schema,
+                                              // todo: extract the usage of this method to avoid duplicate call
+                                              Variables = GetVariableValues(document, config.Schema, operation.Variables, config.Inputs)
+                        };
+
+                        new PreciseComplexityAnalyser().Analyze(
+                            this,
+                            context,
+                            GetOperationRootType(document, config.Schema, operation),
+                            operation.SelectionSet);
+                    }
                 }
 
                 IValidationResult validationResult;
@@ -458,7 +484,7 @@ namespace GraphQL
             });
         }
 
-        public FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        public FieldType GetFieldDefinition(ISchema schema, IComplexGraphType parentType, Field field)
         {
             if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
             {

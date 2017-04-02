@@ -8,10 +8,12 @@
 
     public class PreciseComplexityAnalyser
     {
+        public delegate double GetComplexity(PreciseComplexityContext context, Func<string, object> getArgumentValue,  double childComplexity);
+
         public Result Analyze(
             DocumentExecuter executer,
             PreciseComplexityContext context,
-            IObjectGraphType graphType,
+            IComplexGraphType graphType,
             SelectionSet selectionSet)
         {
             var result = new Result(0d, 0);
@@ -58,7 +60,7 @@
                             {
                                 fragmentType =
                                     context.Schema.AllTypes.FirstOrDefault(t => t.Name == inline.Type.Name) as
-                                        IObjectGraphType;
+                                        IComplexGraphType;
                                 if (fragmentType == null)
                                 {
                                     throw new Exception(
@@ -82,8 +84,8 @@
                             throw new Exception("The request is too complex");
                         }
 
-                        if (context.Configuration.MaxDeapth.HasValue
-                            && result.MaxDepth > context.Configuration.MaxDeapth.Value)
+                        if (context.Configuration.MaxDepth.HasValue
+                            && result.MaxDepth > context.Configuration.MaxDepth.Value)
                         {
                             // todo: display exect failure place and message
                             throw new Exception("The request is too complex");
@@ -96,7 +98,7 @@
         private Result CalculateFieldComplexity(
             DocumentExecuter executer,
             PreciseComplexityContext context,
-            IObjectGraphType graphType,
+            IComplexGraphType graphType,
             Field field)
         {
             var fieldType = executer.GetFieldDefinition(context.Schema, graphType, field);
@@ -115,7 +117,7 @@
                 {
                     getComplexity =
                         (requestContext, arguments, childrenComplexity) =>
-                            1d + ((childrenComplexity == 0 ? 1: childrenComplexity) * requestContext.Configuration.DefaultCollectionChildrenCount);
+                            1d + (childrenComplexity * requestContext.Configuration.DefaultCollectionChildrenCount);
                 }
 
                 resolvedType = ((ListGraphType)resolvedType).ResolvedType;
@@ -125,12 +127,12 @@
             {
                 fieldChildrenComplexity = new Result(0d, 0);
             }
-            else if (resolvedType is IObjectGraphType)
+            else if (resolvedType is IComplexGraphType)
             {
                 fieldChildrenComplexity = this.Analyze(
                     executer,
                     context,
-                    (IObjectGraphType)resolvedType,
+                    (IComplexGraphType)resolvedType,
                     field.SelectionSet);
             }
             else
@@ -145,11 +147,40 @@
                 getComplexity = (complexityContext, arguments, childrenComplexity) => 1d + childrenComplexity;
             }
 
-            var fieldComplexity = new Result(
-                getComplexity(context, field.Arguments, fieldChildrenComplexity.Complexity),
-                fieldChildrenComplexity.MaxDepth + 1);
+            var fieldComplexity =
+                new Result(
+                    getComplexity(
+                        context,
+                        argumentName => this.GetArgumentValue(argumentName, executer, context, fieldType, field),
+                        fieldChildrenComplexity.Complexity),
+                    fieldChildrenComplexity.MaxDepth + 1);
 
             return fieldComplexity;
+        }
+
+        private object GetArgumentValue(
+            string argumentName,
+            DocumentExecuter executer,
+            PreciseComplexityContext context,
+            FieldType fieldType,
+            Field field)
+        {
+            if (fieldType.Arguments == null || !fieldType.Arguments.Any())
+            {
+                return null;
+            }
+
+            var arg = fieldType.Arguments.FirstOrDefault(a => a.Name == argumentName);
+            if (arg == null)
+            {
+                return null;
+            }
+
+            var value = field.Arguments.ValueFor(argumentName);
+            var type = arg.ResolvedType;
+
+            var coercedValue = executer.CoerceValue(context.Schema, type, value, context.Variables);
+            return coercedValue ?? arg.DefaultValue;
         }
 
         public class Result
