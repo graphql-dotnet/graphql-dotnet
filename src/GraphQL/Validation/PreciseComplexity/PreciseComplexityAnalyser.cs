@@ -1,98 +1,117 @@
-﻿namespace GraphQL.Validation.PreciseComplexity
-{
-    using System;
-    using System.Linq;
+﻿using System;
+using System.Linq;
 
-    using GraphQL.Language.AST;
-    using GraphQL.Types;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+
+namespace GraphQL.Validation.PreciseComplexity
+{
+    using System.Collections.Generic;
 
     public class PreciseComplexityAnalyser
     {
-        public delegate double GetComplexity(PreciseComplexityContext context, Func<string, object> getArgumentValue,  double childComplexity);
+        private DocumentExecuter executer;
 
-        public Result Analyze(
-            DocumentExecuter executer,
-            PreciseComplexityContext context,
-            IComplexGraphType graphType,
-            SelectionSet selectionSet)
+        private PreciseComplexityContext context;
+
+        private readonly Dictionary<string, Result> NamedFragmentComplexity = new Dictionary<string, Result>();
+
+        public PreciseComplexityAnalyser(DocumentExecuter executer, PreciseComplexityContext context)
         {
-            var result = new Result(0d, 0);
-            selectionSet.Selections.Apply(
-                selection =>
+            this.executer = executer;
+            this.context = context;
+        }
+
+        public delegate double GetComplexity(
+            PreciseComplexityContext context,
+            Func<string, object> getArgumentValue,
+            double childComplexity);
+
+        public Result Analyze(IComplexGraphType graphType, SelectionSet selectionSet)
+        {
+            return selectionSet.Selections.Aggregate(
+                new Result(0d, 0),
+                (previousResult, selection) =>
                     {
+                        Result complexity;
                         if (selection is Field)
                         {
                             var field = (Field)selection;
-                            var fieldComplexity = this.CalculateFieldComplexity(executer, context, graphType, field);
-                            result.Complexity += fieldComplexity.Complexity;
-                            result.MaxDepth = Math.Max(result.MaxDepth, fieldComplexity.MaxDepth);
+                            complexity = this.CalculateFieldComplexity(this.executer, this.context, graphType, field);
                         }
                         else if (selection is FragmentSpread)
                         {
                             var spread = (FragmentSpread)selection;
-                            var fragment = context.Fragments.FindDefinition(spread.Name);
-                            if (fragment == null)
-                            {
-                                throw new Exception($"Uknown fragment named {spread.Name}");
-                            }
 
-                            var fragmentType =
-                                context.Schema.AllTypes.FirstOrDefault(t => t.Name == fragment.Type.Name) as
-                                    IObjectGraphType;
-                            if (fragmentType == null)
+                            if (!this.NamedFragmentComplexity.TryGetValue(spread.Name, out complexity))
                             {
-                                throw new Exception($"Could not find object type for fragment named {spread.Name}");
-                            }
+                                var fragment = context.Fragments.FindDefinition(spread.Name);
+                                if (fragment == null)
+                                {
+                                    throw new InvalidOperationException($"Uknown fragment named {spread.Name}");
+                                }
 
-                            var fragmentComplexity = this.Analyze(
-                                executer,
-                                context,
-                                fragmentType,
-                                fragment.SelectionSet);
-                            result.Complexity += fragmentComplexity.Complexity;
-                            result.MaxDepth = Math.Max(result.MaxDepth, fragmentComplexity.MaxDepth);
+                                var fragmentType =
+                                    context.Schema.AllTypes.FirstOrDefault(t => t.Name == fragment.Type.Name) as
+                                        IObjectGraphType;
+                                if (fragmentType == null)
+                                {
+                                    throw new InvalidOperationException($"Could not find object type for fragment named {spread.Name}");
+                                }
+
+                                complexity = this.Analyze(fragmentType, fragment.SelectionSet);
+                                this.NamedFragmentComplexity[spread.Name] = complexity;
+                            }
                         }
                         else if (selection is InlineFragment)
                         {
                             var inline = (InlineFragment)selection;
                             var fragmentType = graphType;
-                            if (inline.Type != null)
+                            var inlineType = inline.Type;
+                            if (inlineType != null)
                             {
                                 fragmentType =
-                                    context.Schema.AllTypes.FirstOrDefault(t => t.Name == inline.Type.Name) as
+                                    context.Schema.AllTypes.FirstOrDefault(t => t.Name == inlineType.Name) as
                                         IComplexGraphType;
+
                                 if (fragmentType == null)
                                 {
-                                    throw new Exception(
-                                        $"Could not find object type for inline fragment named {inline.Type.Name}");
+                                    throw new InvalidOperationException(
+                                        $"Could not find object type for inline fragment named {inlineType.Name}");
                                 }
-
-                                var fragmentComplexity = this.Analyze(
-                                    executer,
-                                    context,
-                                    fragmentType,
-                                    inline.SelectionSet);
-                                result.Complexity += fragmentComplexity.Complexity;
-                                result.MaxDepth = Math.Max(result.MaxDepth, fragmentComplexity.MaxDepth);
                             }
+                            else
+                            {
+                                fragmentType = graphType;
+                            }
+
+                            complexity = this.Analyze(fragmentType, inline.SelectionSet);
                         }
+                        else
+                        {
+                            throw new InvalidOperationException($"Unknown selection type {selection.GetType().Name}");
+                        }
+
+                        var result = new Result(
+                            previousResult.Complexity + complexity.Complexity,
+                            Math.Max(previousResult.MaxDepth, complexity.MaxDepth));
 
                         if (context.Configuration.MaxComplexity.HasValue
                             && result.Complexity > context.Configuration.MaxComplexity.Value)
                         {
                             // todo: display exect failure place and message
-                            throw new Exception("The request is too complex");
+                            throw new InvalidOperationException("Query is too complex to execute.");
                         }
 
                         if (context.Configuration.MaxDepth.HasValue
                             && result.MaxDepth > context.Configuration.MaxDepth.Value)
                         {
                             // todo: display exect failure place and message
-                            throw new Exception("The request is too complex");
+                            throw new InvalidOperationException("Query is too nested to execute.");
                         }
-                    });
 
-            return result;
+                        return result;
+                    });
         }
 
         private Result CalculateFieldComplexity(
@@ -104,7 +123,7 @@
             var fieldType = executer.GetFieldDefinition(context.Schema, graphType, field);
             if (fieldType == null)
             {
-                throw new Exception($"Uknown field {field.Name} of type {graphType.Name}");
+                throw new InvalidOperationException($"Uknown field {field.Name} of type {graphType.Name}");
             }
 
             var getComplexity = fieldType.GetComplexity;
@@ -116,7 +135,7 @@
                 if (getComplexity == null)
                 {
                     getComplexity =
-                        (requestContext, arguments, childrenComplexity) =>
+                        (requestContext, getArgumentValue, childrenComplexity) =>
                             1d + (childrenComplexity * requestContext.Configuration.DefaultCollectionChildrenCount);
                 }
 
@@ -129,33 +148,27 @@
             }
             else if (resolvedType is IComplexGraphType)
             {
-                fieldChildrenComplexity = this.Analyze(
-                    executer,
-                    context,
-                    (IComplexGraphType)resolvedType,
-                    field.SelectionSet);
+                fieldChildrenComplexity = this.Analyze((IComplexGraphType)resolvedType, field.SelectionSet);
             }
             else
             {
-                throw new Exception(
+                throw new InvalidOperationException(
                     $"Uknown field type {resolvedType?.GetType().Name} "
                     + $"for field {field.Name} of type {graphType.Name}");
             }
 
             if (getComplexity == null)
             {
-                getComplexity = (complexityContext, arguments, childrenComplexity) => 1d + childrenComplexity;
+                getComplexity = (complexityContext, getArgumentValue, childrenComplexity) => 1d + childrenComplexity;
             }
 
-            var fieldComplexity =
+            return
                 new Result(
                     getComplexity(
                         context,
                         argumentName => this.GetArgumentValue(argumentName, executer, context, fieldType, field),
                         fieldChildrenComplexity.Complexity),
                     fieldChildrenComplexity.MaxDepth + 1);
-
-            return fieldComplexity;
         }
 
         private object GetArgumentValue(

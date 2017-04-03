@@ -12,13 +12,12 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.PreciseComplexity;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
-    using GraphQL.Validation.PreciseComplexity;
-
     public interface IDocumentExecuter
     {
         Task<ExecutionResult> ExecuteAsync(
@@ -127,21 +126,26 @@ namespace GraphQL
                 {
                     using (metrics.Subject("document", "Analyzing complexity precisely"))
                     {
+                        // todo: extract the usage of this method to avoid duplicate call
+                        var variableValues = this.GetVariableValues(
+                            document,
+                            config.Schema,
+                            operation.Variables,
+                            config.Inputs);
+
                         var context = new PreciseComplexityContext
                                           {
-                                              Configuration = config.PreciseComplexityConfiguration,
+                                              Configuration =
+                                                  config.PreciseComplexityConfiguration,
                                               Document = document,
                                               Fragments = document.Fragments,
                                               Metrics = metrics,
                                               Operation = operation,
                                               Schema = config.Schema,
-                                              // todo: extract the usage of this method to avoid duplicate call
-                                              Variables = GetVariableValues(document, config.Schema, operation.Variables, config.Inputs)
-                        };
+                                              Variables = variableValues
+                                          };
 
-                        new PreciseComplexityAnalyser().Analyze(
-                            this,
-                            context,
+                        new PreciseComplexityAnalyser(this, context).Analyze(
                             GetOperationRootType(document, config.Schema, operation),
                             operation.SelectionSet);
                     }

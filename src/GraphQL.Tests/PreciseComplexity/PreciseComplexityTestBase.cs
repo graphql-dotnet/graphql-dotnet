@@ -1,18 +1,16 @@
 ﻿using GraphQL.Validation.PreciseComplexity;
+using GraphQL.Execution;
+using System.Linq;
 
 namespace GraphQL.Tests.PreciseComplexity
 {
-    using GraphQL.Execution;
-    using GraphQL.Language.AST;
-    using System.Linq;
-
     public abstract class PreciseComplexityTestBase
     {
         protected PreciseComplexityAnalyser.Result Analyze(
             string query,
             string variables = null,
             int defaultCollectionChildrenCount = 10,
-            int? maxComplexity = null,
+            double? maxComplexity = null,
             int? maxDepth = null)
         {
             var configuration = new PreciseComplexityConfiguration
@@ -26,8 +24,6 @@ namespace GraphQL.Tests.PreciseComplexity
             schema.Initialize();
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
-
-            var analyzer = new PreciseComplexityAnalyser();
 
             var executer = new DocumentExecuter();
 
@@ -50,9 +46,8 @@ namespace GraphQL.Tests.PreciseComplexity
                     variables.ToInputs());
             }
 
+            var analyzer = new PreciseComplexityAnalyser(executer, context);
             return analyzer.Analyze(
-                executer,
-                context,
                 executer.GetOperationRootType(document, schema, operation),
                 operation.SelectionSet);
         }

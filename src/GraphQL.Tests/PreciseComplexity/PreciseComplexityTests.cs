@@ -93,7 +93,7 @@ namespace GraphQL.Tests.PreciseComplexity
         {
             var query = "{this {...on RootQuery{ string }, ...on RootQuery { string }}}";
             var result = this.Analyze(query);
-            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer don't tries to optimize query
+            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer doesn't try to optimize query
             result.MaxDepth.ShouldBe(2);
         }
 
@@ -111,7 +111,7 @@ namespace GraphQL.Tests.PreciseComplexity
         {
             var query = "{this {...F1, ...F2}} fragment F1 on RootQuery { string } fragment F2 on RootQuery { string }";
             var result = this.Analyze(query);
-            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer don't tries to optimize query
+            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer doesn't try to optimize query
             result.MaxDepth.ShouldBe(2);
         }
 
@@ -129,7 +129,7 @@ namespace GraphQL.Tests.PreciseComplexity
         {
             var query = "{this {...on NonRootInterface{ this { int } }}}";
             var result = this.Analyze(query);
-            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer don't check interface compatibility and will caclulate as all fragments will run
+            result.Complexity.ShouldBe(1d + 1d + 1d); // complexity analyzer doesn't check interface or type compatibility and will caclulate assuming that all fragments will run
             result.MaxDepth.ShouldBe(3);
         }
 
@@ -137,8 +137,8 @@ namespace GraphQL.Tests.PreciseComplexity
         public void complexity_fail()
         {
             var query = "{this { this { this { string } } } }";
-            this.Analyze(query, maxComplexity: 4);
-            Assert.Throws(typeof(Exception), () => this.Analyze(query, maxComplexity: 3));
+            this.Analyze(query, maxComplexity: 4d);
+            Assert.Throws(typeof(InvalidOperationException), () => this.Analyze(query, maxComplexity: 3));
         }
 
         [Fact]
@@ -146,7 +146,7 @@ namespace GraphQL.Tests.PreciseComplexity
         {
             var query = "{this { this { this { string } } } }";
             this.Analyze(query, maxDepth: 4);
-            Assert.Throws(typeof(Exception), () => this.Analyze(query, maxDepth: 3));
+            Assert.Throws(typeof(InvalidOperationException), () => this.Analyze(query, maxDepth: 3));
         }
     }
 }

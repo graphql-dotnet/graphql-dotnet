@@ -1,7 +1,7 @@
-﻿namespace GraphQL.Tests.PreciseComplexity
-{
-    using GraphQL.Types;
+﻿using GraphQL.Types;
 
+namespace GraphQL.Tests.PreciseComplexity
+{
     public class RootInterface : InterfaceGraphType
     {
         public RootInterface()

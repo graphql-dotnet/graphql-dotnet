@@ -2,7 +2,7 @@
 {
     public class PreciseComplexityConfiguration
     {
-        public int? MaxComplexity { get; set; }
+        public double? MaxComplexity { get; set; }
 
         public int? MaxDepth { get; set; }
 
