@@ -5,6 +5,8 @@ namespace GraphQL
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
+        public bool EnableCompatibilityMode { get; set; } // Temporarily output error messages with label "error"
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value is ExecutionResult)
@@ -47,6 +49,12 @@ namespace GraphQL
             errors.Apply(error =>
             {
                 writer.WriteStartObject();
+
+                if (EnableCompatibilityMode)
+                {
+                    writer.WritePropertyName("error");
+                    serializer.Serialize(writer, error.Message);
+                }
 
                 writer.WritePropertyName("message");
                 serializer.Serialize(writer, error.Message);
