@@ -5,7 +5,7 @@ namespace GraphQL
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
-        public bool EnableCompatibilityMode { get; set; } // Temporarily output error messages with label "error"
+        public static bool EnableCompatibilityMode { get; set; } // Temporarily output error messages with label "error"
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
