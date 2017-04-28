@@ -1,16 +1,16 @@
-import { exec, rm } from 'shelljs';
+import { exec, pushd, popd } from 'shelljs';
 import Deferred from './Deferred';
 import settings from './settings';
 
 export default function compile() {
   const deferred = new Deferred();
-  rm('-rf', `src/GraphQL.Tests/obj`);
-  rm('-rf', `src/GraphQL.Tests/bin`);
 
   const platform = process.platform === 'darwin'
-    ? '-f netcoreapp1.0'
+    ? '-f netcoreapp1.1'
     : '';
-  const build = `dotnet build src/GraphQL.Tests ${platform} -c ${settings.target}`;
+  const build = `dotnet build ${platform} -c ${settings.target}`;
+
+  pushd('src/GraphQL.Tests');
   console.log(build);
 
   exec(build, (code, stdout, stderr)=> {
@@ -20,5 +20,8 @@ export default function compile() {
       deferred.reject(stderr);
     }
   });
+
+  popd();
+
   return deferred.promise;
 }

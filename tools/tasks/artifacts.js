@@ -5,12 +5,29 @@ import { exec } from 'child-process-promise';
 import Deferred from './Deferred';
 import settings from './settings';
 
+function walkSync(currentDirPath, callback) {
+    fs.readdirSync(currentDirPath).forEach(function (name) {
+        var filePath = path.join(currentDirPath, name);
+        var stat = fs.statSync(filePath);
+        if (stat.isFile()) {
+            callback(filePath, stat);
+        } else if (stat.isDirectory()) {
+            walkSync(filePath, callback);
+        }
+    });
+}
+
 export default function nugetRestore() {
   const deferred = new Deferred();
 
-  const nuget = path.resolve(`./nuget/GraphQL.${settings.nugetVersion}.nupkg`);
-  const command = `appveyor PushArtifact ${nuget}`;
-  console.log(command);
+  const files = [];
+
+  walkSync('./artifacts', file => files.push(file));
+
+  files.forEach(f => {
+    const command = `appveyor PushArtifact ${f}`;
+    console.log(command);
+  });
 
   if(!settings.CI) {
     console.log(chalk.yellow('Not on CI, skipping artifact upload.'));

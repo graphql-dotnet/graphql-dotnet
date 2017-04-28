@@ -1,6 +1,6 @@
 import artifacts from './artifacts';
 import compile from './compile';
-import fixie from './test.fixie';
+import clean from './clean';
 import dotnetPack from './dotnetPack';
 import dotnetTest from './test.dotnet';
 import nuget from './nuget';
@@ -9,17 +9,15 @@ import restore from './restore';
 import settings from './settings';
 import setVersion from './setVersion';
 import version from './version';
-import projectVersion from './projectVersion';
 
 export default {
   artifacts,
   compile,
-  fixie,
+  clean,
   dotnetPack,
   dotnetTest,
   nuget: () => nuget({ version: settings.version, target: settings.target }),
   nuspec,
-  projectVersion,
   restore,
   settings,
   setVersion,
