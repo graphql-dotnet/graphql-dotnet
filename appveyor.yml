@@ -1,22 +1,31 @@
-version: 0.15.1.{build}
+version: 0.16.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
 environment:
   CI: true
-  nodejs_version: "6.9.1"
+
 nuget:
   account_feed: true
   project_feed: true
   disable_publish_on_pr: true
+
+install:
+  - npm install -g npm
+  - npm --version
+  - ps: Install-Product node LTS
+  - node --version
+  - dotnet --version
+
 build_script:
 - cmd: >-
-    npm install -g npm
+    yarn build-ci
 
-    node --version
-
-    yarn run build-ci
 test: off
+
+artifacts:
+  - path: 'artifacts\*.nupkg'
+
 deploy:
 - provider: NuGet
   server: https://www.myget.org/F/graphql-dotnet/api/v2/package

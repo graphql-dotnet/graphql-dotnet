@@ -13,8 +13,8 @@ export default function setVersion(version) {
     data => data.replace(/version: (.*)\./, `version: ${version}.`)
   )).then(updateFile(
     version,
-    'Updating GraphQL.project.json version',
-    './src/GraphQL/project.json',
-    data => data.replace(/"version": "(.*)"/, `"version": "${version}"`)
+    'Updating GraphQL.csproj version',
+    './src/GraphQL/GraphQL.csproj',
+    data => data.replace(/<VersionPrefix>(.*)<\/VersionPrefix>/, `<VersionPrefix>${version}<\/VersionPrefix>`)
   ));
 }

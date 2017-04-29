@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>GraphQL for .NET</Description>
+    <VersionPrefix>0.16.0</VersionPrefix>
+    <Authors>Joe McBride</Authors>
+    <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
+    <PackageTargetFallback>dnxcore50</PackageTargetFallback>
+    <AssemblyName>GraphQL</AssemblyName>
+    <PackageId>GraphQL</PackageId>
+    <PackageTags>GraphQL;json;api</PackageTags>
+    <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netstandard1.1' ">1.0.4</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL-Parser" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.1'">
+    <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

@@ -23,7 +23,7 @@ export default function version() {
     const options = {
       description: 'GraphQL for .NET',
       productName: 'GraphQL',
-      copyright: 'Copyright 2015-2016 Joseph T. McBride et al.  All rights reserved.',
+      copyright: 'Copyright 2015-2017 Joseph T. McBride et al.  All rights reserved.',
       trademark: commit,
       version: settings.version,
       fileVersion: settings.version,

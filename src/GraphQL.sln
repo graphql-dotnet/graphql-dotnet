@@ -1,23 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
+	ProjectSection(SolutionItems) = preProject
+		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.GraphiQL", "GraphQL.GraphiQL\GraphQL.GraphiQL.csproj", "{EE557888-1CD2-4E87-BD87-06834C988B23}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1DD5E10B-2361-467A-82AC-36EFB8C61A1D} = {1DD5E10B-2361-467A-82AC-36EFB8C61A1D}
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GraphQL", "GraphQL\GraphQL.xproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GraphQL.StarWars", "GraphQL.StarWars\GraphQL.StarWars.xproj", "{AE243087-3A7F-4BB3-9CE7-D95B2379C397}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.StarWars", "GraphQL.StarWars\GraphQL.StarWars.csproj", "{AE243087-3A7F-4BB3-9CE7-D95B2379C397}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.xproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
-	ProjectSection(SolutionItems) = preProject
-		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
