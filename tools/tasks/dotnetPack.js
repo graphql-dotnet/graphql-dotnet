@@ -4,7 +4,17 @@ import settings from './settings';
 
 export default function compile() {
   const deferred = new Deferred();
-  exec(`dotnet pack src/GraphQL -o nuget -c ${settings.target} --version-suffix ${settings.revision}`, (code, stdout, stderr)=> {
+
+  let versionSuffix = ''
+
+  if(settings.versionSuffix.length > 0) {
+    versionSuffix = `--version-suffix ${settings.versionSuffix}${settings.revision}`;
+  }
+
+  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} ${versionSuffix}`
+  console.log(cmd);
+
+  exec(cmd, (code, stdout, stderr)=> {
     if(code === 0) {
       deferred.resolve();
     } else {
