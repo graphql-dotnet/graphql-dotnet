@@ -25,6 +25,7 @@ namespace GraphQL.Http
                     // ContractResolver = new CamelCasePropertyNamesContractResolver(),
                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                     DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'",
+                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize
                 })
         {
         }
