@@ -23,7 +23,7 @@ namespace GraphQL.Utilities
                 "ID",
                 // added types
                 "Date",
-                "Decimal"
+                "Decimal",
             });
 
         public SchemaPrinter(ISchema schema, IEnumerable<string> customScalars = null)
@@ -248,10 +248,12 @@ namespace GraphQL.Utilities
                 {
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
-                    Args = PrintArgs(x)
+                    Args = PrintArgs(x),
+                    Description = PrintDescription(type.Description, "  "),
+                    Deprecation = PrintDeprecation(type.DeprecationReason),
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
+            return string.Join(Environment.NewLine, fields?.Select(f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)
@@ -403,6 +405,15 @@ namespace GraphQL.Utilities
             });
 
             return desc;
+        }
+
+        public string PrintDeprecation(string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return string.Empty;
+            }
+            return $" @deprecated(reason: \"{reason.Replace("\"", "\\\"")}\")";
         }
 
         public string[] BreakLine(string line, int len)
