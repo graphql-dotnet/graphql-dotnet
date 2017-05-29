@@ -12,6 +12,9 @@ npm-debug.log
 yarn-error.log
 bundle.js
 fixie-results.xml
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
 
 TestResults/
 [Oo]bj/
