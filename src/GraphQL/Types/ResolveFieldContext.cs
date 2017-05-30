@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -40,6 +40,8 @@ namespace GraphQL.Types
 
         public Metrics Metrics { get; set; }
 
+        public ExecutionErrors Errors { get; set; }
+
         public ResolveFieldContext() { }
 
         public ResolveFieldContext(ResolveFieldContext context)
@@ -60,6 +62,7 @@ namespace GraphQL.Types
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
             Metrics = context.Metrics;
+            Errors = context.Errors;
         }
 
         public TType GetArgument<TType>(string name, TType defaultValue = default(TType))
