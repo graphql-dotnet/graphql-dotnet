@@ -337,7 +337,7 @@ namespace GraphQL
 
         private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc)
         {
-            var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
+            var error = exc is ExternalExecutionError ? new ExecutionError(exc.Message) : new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
             error.AddLocation(field, context.Document);
             context.Errors.Add(error);
             resolveResult.Skip = false;
