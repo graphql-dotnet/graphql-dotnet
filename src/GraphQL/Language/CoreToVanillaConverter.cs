@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQLParser;
@@ -202,7 +203,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.FloatValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return new FloatValue(double.Parse(str.Value)).WithLocation(str, _body);
+                    return new FloatValue(double.Parse(str.Value, NumberStyles.Float, CultureInfo.InvariantCulture)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
