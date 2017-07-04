@@ -1,3 +1,5 @@
+﻿using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -17,7 +19,10 @@ namespace GraphQL.Types
         public override object ParseValue(object value)
         {
             decimal result;
-            if (decimal.TryParse(value?.ToString() ?? string.Empty, out result))
+            char separatorChar = Convert.ToChar(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            var decimalAsStr = value?.ToString() ?? string.Empty;
+            var invariantDecimalStr =decimalAsStr.Replace(separatorChar, Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator));
+            if (decimal.TryParse(invariantDecimalStr, NumberStyles.Float, CultureInfo.InvariantCulture, out result))
             {
                 return result;
             }
@@ -30,20 +35,20 @@ namespace GraphQL.Types
             {
                 return ParseValue(((StringValue)value).Value);
             }
-
-            if (value is IntValue)
-            {
-                return ParseValue(((IntValue)value).Value);
-            }
-
+  
             if (value is LongValue)
             {
-                return ParseValue(((LongValue)value).Value);
+                return Convert.ToDecimal(((LongValue)value).Value);
             }
 
             if (value is FloatValue)
             {
-                return ParseValue(((FloatValue)value).Value);
+                return Convert.ToDecimal(((FloatValue)value).Value);
+            }
+
+            if (value is DecimalValue)
+            {
+                return ((DecimalValue) value).Value;
             }
 
             if (value is DecimalValue)
