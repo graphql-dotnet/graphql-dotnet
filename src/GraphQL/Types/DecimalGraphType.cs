@@ -19,8 +19,10 @@ namespace GraphQL.Types
         public override object ParseValue(object value)
         {
             decimal result;
-
-            if (decimal.TryParse(value?.ToString() ?? string.Empty, NumberStyles.Float, CultureInfo.InvariantCulture, out result))
+            char separatorChar = Convert.ToChar(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            var decimalAsStr = value?.ToString() ?? string.Empty;
+            var invariantDecimalStr =decimalAsStr.Replace(separatorChar, Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator));
+            if (decimal.TryParse(invariantDecimalStr, NumberStyles.Float, CultureInfo.InvariantCulture, out result))
             {
                 return result;
             }
