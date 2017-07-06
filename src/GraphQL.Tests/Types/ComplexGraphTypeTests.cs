@@ -21,6 +21,7 @@ namespace GraphQL.Tests.Types
         {
             public int? someInt { get; set; }
             public KeyValuePair<int, string> valuePair { get; set; }
+            public List<int> someList { get; set; }
         }
 
         [Fact]
@@ -61,6 +62,16 @@ namespace GraphQL.Tests.Types
             type.Field(d => d.someInt, nullable: true);
 
             type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
+        }
+
+        [Fact]
+        public void infers_from_list_types()
+        {
+            var type = new ComplexType<TestObject>();
+
+            type.Field(d => d.someList, nullable: true);
+
+            type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
         }
 
         [Fact]
