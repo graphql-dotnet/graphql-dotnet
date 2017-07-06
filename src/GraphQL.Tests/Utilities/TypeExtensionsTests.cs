@@ -1,5 +1,6 @@
 ﻿using GraphQL.Types;
 using Shouldly;
+using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
@@ -16,6 +17,12 @@ namespace GraphQL.Tests.Utilities
         public void supports_float_type()
         {
             typeof(float).GetGraphTypeFromType(true).ShouldBe(typeof(FloatGraphType));
+        }
+
+        [Fact]
+        public void supports_list_type()
+        {
+            typeof(List<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
         }
     }
 }

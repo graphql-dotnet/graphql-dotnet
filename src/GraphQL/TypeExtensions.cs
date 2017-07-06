@@ -123,6 +123,13 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
+            if(type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
+                var listType = typeof(ListGraphType<>);
+                graphType = listType.MakeGenericType(elementType);
+            }
+
             if (graphType == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), 
