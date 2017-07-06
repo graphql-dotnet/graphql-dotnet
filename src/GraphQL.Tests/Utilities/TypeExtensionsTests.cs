@@ -17,5 +17,17 @@ namespace GraphQL.Tests.Utilities
         {
             typeof(float).GetGraphTypeFromType(true).ShouldBe(typeof(FloatGraphType));
         }
+
+        [Fact]
+        public void supports_array_of_float_type()
+        {
+            typeof(float[]).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<FloatGraphType>));
+        }
+
+        [Fact]
+        public void support_list_of_float_type()
+        {
+            typeof(float[]).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<FloatGraphType>));
+        }
     }
 }

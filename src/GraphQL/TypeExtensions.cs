@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Types;
@@ -65,10 +66,49 @@ namespace GraphQL
                 : typeName;
         }
 
+        private static Type GetScalarGraphTypeFromType(this Type type)
+        {
+            if (type == typeof(int))
+            {
+                return typeof(IntGraphType);
+            }
+
+            if (type == typeof(long))
+            {
+                return typeof(IntGraphType);
+            }
+
+            if (type == typeof(double) || type == typeof(float))
+            {
+                return typeof(FloatGraphType);
+            }
+
+            if (type == typeof(decimal))
+            {
+               return typeof(DecimalGraphType);
+            }
+
+            if (type == typeof(string))
+            {
+                return typeof(StringGraphType);
+            }
+
+            if (type == typeof(bool))
+            {
+                return typeof(BooleanGraphType);
+            }
+
+            if (type == typeof(DateTime))
+            {
+                return typeof(DateGraphType);
+            }
+
+            return null;
+        }
+
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
-            TypeInfo info = type.GetTypeInfo();
-            Type graphType = null;
+            var info = type.GetTypeInfo();
 
             if (info.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -80,48 +120,22 @@ namespace GraphQL
                 }
             }
 
-  
-            if (type == typeof(int))
+            var enumerableType = type.GetInterfaces().FirstOrDefault(x => x.GenericTypeArguments.Any() && x.GetGenericTypeDefinition() == typeof(IList<>));
+            if (enumerableType != null)
             {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(long))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(double) || type == typeof(float))
-            {
-                graphType = typeof(FloatGraphType);
-            }
-
-            if (type == typeof(decimal))
-            {
-                graphType = typeof(DecimalGraphType);
-            }
-
-            if (type == typeof(string))
-            {
-                graphType = typeof(StringGraphType);
-            }
-
-            if (type == typeof(bool))
-            {
-                graphType = typeof(BooleanGraphType);
-            }
-
-            if (type == typeof(DateTime))
-            {
-                graphType = typeof(DateGraphType);
+                var genericType = GetGraphTypeFromType(enumerableType.GenericTypeArguments[0], isNullable);
+                var listType = typeof(ListGraphType<>);
+                return listType.MakeGenericType(genericType);
             }
 
             if (type.IsArray)
             {
                 var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
                 var listType = typeof(ListGraphType<>);
-                graphType = listType.MakeGenericType(elementType);
+                return listType.MakeGenericType(elementType);
             }
+
+            var graphType = type.GetScalarGraphTypeFromType();
 
             if (graphType == null)
             {

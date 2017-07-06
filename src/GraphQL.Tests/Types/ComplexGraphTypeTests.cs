@@ -10,7 +10,8 @@ namespace GraphQL.Tests.Types
 {
     public class ComplexGraphTypeTests
     {
-        internal class ComplexType<T> : ComplexGraphType<T> {
+        internal class ComplexType<T> : ComplexGraphType<T>
+        {
             public ComplexType()
             {
                 Name = typeof(T).Name;
@@ -104,11 +105,34 @@ namespace GraphQL.Tests.Types
         public void create_field_with_func_resolver()
         {
             var type = new ComplexType<Droid>();
-            var field = type.Field<StringGraphType>("name",
+            type.Field<StringGraphType>("name",
                 resolve: context => context.Source.Name
             );
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
         }
+
+        public class ListAndArray
+        {
+            public List<string> ListItems { get; set; }
+            public string[] ArrayItems { get; set; }
+        }
+
+        [Fact]
+        public void create_field_with_array()
+        {
+            var type = new ComplexType<ListAndArray>();
+            type.Field(x => x.ArrayItems);
+            type.Fields.First().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<StringGraphType>>));
+        }
+
+        [Fact]
+        public void create_field_with_list()
+        {
+            var type = new ComplexType<ListAndArray>();
+            type.Field(x => x.ListItems);
+            type.Fields.First().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<StringGraphType>>));
+        }
+
     }
 }
