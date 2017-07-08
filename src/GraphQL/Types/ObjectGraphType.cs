@@ -1,4 +1,3 @@
-using GraphQL.Builders;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,7 +11,6 @@ namespace GraphQL.Types
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 
-  
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();
@@ -28,7 +26,10 @@ namespace GraphQL.Types
 
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
-            _resolvedInterfaces.Add(graphType);
+            if (!_resolvedInterfaces.Contains(graphType))
+            {
+                _resolvedInterfaces.Add(graphType);
+            }
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces

@@ -23,7 +23,7 @@ namespace GraphQL.Utilities
                 "ID",
                 // added types
                 "Date",
-                "Decimal"
+                "Decimal",
             });
 
         public SchemaPrinter(ISchema schema, IEnumerable<string> customScalars = null)
@@ -248,10 +248,12 @@ namespace GraphQL.Utilities
                 {
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
-                    Args = PrintArgs(x)
+                    Args = PrintArgs(x),
+                    Description = PrintDescription(type.Description, "  "),
+                    Deprecation = PrintDeprecation(type.DeprecationReason),
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
+            return string.Join(Environment.NewLine, fields?.Select(f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)
@@ -271,7 +273,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = ".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue, argumentType));
             }
 
             return desc;
@@ -284,7 +286,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue, argumentType));
             }
 
             return desc;
@@ -312,7 +314,7 @@ namespace GraphQL.Utilities
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
         }
 
-        public string FormatDefaultValue(object value)
+        public string FormatDefaultValue(object value, IGraphType graphType)
         {
             if (value is string)
             {
@@ -324,7 +326,34 @@ namespace GraphQL.Utilities
                 return value.ToString().ToLower();
             }
 
+            if (IsEnumType(graphType))
+            {
+                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
+            }
+
             return "{0}".ToFormat(value);
+        }
+
+        private static bool IsEnumType(IGraphType type)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nullable = (NonNullGraphType)type;
+                type = nullable.ResolvedType;
+            }
+
+            return type is EnumerationGraphType;
+        }
+
+        private static object SerializeEnumValue(IGraphType type, object value)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nullable = (NonNullGraphType)type;
+                type = nullable.ResolvedType;
+            }
+
+            return ((EnumerationGraphType)type).Serialize(value);
         }
 
         public static string ResolveName(IGraphType type)
@@ -376,6 +405,15 @@ namespace GraphQL.Utilities
             });
 
             return desc;
+        }
+
+        public string PrintDeprecation(string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return string.Empty;
+            }
+            return $" @deprecated(reason: \"{reason.Replace("\"", "\\\"")}\")";
         }
 
         public string[] BreakLine(string line, int len)
