@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -12,11 +12,32 @@ namespace GraphQL.Execution
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        private readonly LightweightCache<string, IDictionary<string, IFieldResolver>> _resolvers;
+
+        public SchemaBuilder()
+        {
+            _resolvers = new LightweightCache<string, IDictionary<string, IFieldResolver>>(type => new Dictionary<string, IFieldResolver>());
+        }
+
+        public void Resolver<TSourceType, TReturnType>(string type, string field, Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        {
+            Resolver(type, field, new FuncFieldResolver<TSourceType, TReturnType>(resolver));
+        }
+
+        public void Resolver<TReturnType>(string type, string field, Func<ResolveFieldContext, TReturnType> resolver)
+        {
+            Resolver(type, field, new FuncFieldResolver<TReturnType>(resolver));
+        }
+
+        public void Resolver(string type, string field, IFieldResolver resolver)
+        {
+            _resolvers[type][field] = resolver;
+        }
 
         public ISchema Build(string typeDefs)
         {
             var document = Parse(typeDefs);
-            return BuildAstSchema(document);
+            return BuildSchemaFrom(document);
         }
 
         private static GraphQLDocument Parse(string document)
@@ -27,7 +48,7 @@ namespace GraphQL.Execution
             return ast;
         }
 
-        public ISchema BuildAstSchema(GraphQLDocument document)
+        public ISchema BuildSchemaFrom(GraphQLDocument document)
         {
             var schema = new Schema();
 
@@ -102,11 +123,18 @@ namespace GraphQL.Execution
 
         public IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
         {
+            var handlers = _resolvers[astType.Name.Value];
+
             var type = new ObjectGraphType();
             type.Name = astType.Name.Value;
 
             var fields = astType.Fields.Select(ToFieldType);
-            fields.Apply(f => type.AddField(f));
+            fields.Apply(f =>
+            {
+                handlers.TryGetValue(f.Name, out IFieldResolver resolver);
+                f.Resolver = resolver;
+                type.AddField(f);
+            });
             return type;
         }
 
@@ -128,7 +156,7 @@ namespace GraphQL.Execution
 
             var arg = new QueryArgument(type);
             arg.Name = inputDef.Name.Value;
-            arg.DefaultValue = ToDefaultValue(inputDef.DefaultValue);
+            arg.DefaultValue = ToValue(inputDef.DefaultValue);
 
             return arg;
         }
@@ -160,15 +188,70 @@ namespace GraphQL.Execution
             throw new ArgumentOutOfRangeException($"Unknown GraphQL type {astType.Kind}");
         }
 
-        public object ToDefaultValue(GraphQLValue astValue)
+        public object ToValue(GraphQLValue source)
         {
-            if (astValue.Kind == ASTNodeKind.IntValue)
+            switch (source.Kind)
             {
-                return ((GraphQLScalarValue) astValue).Value;
+                case ASTNodeKind.StringValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return str.Value;
+                }
+                case ASTNodeKind.IntValue:
+                {
+                    var str = source as GraphQLScalarValue;
+
+                    int intResult;
+                    if (int.TryParse(str.Value, out intResult))
+                    {
+                        return intResult;
+                    }
+
+                    // If the value doesn't fit in an integer, revert to using long...
+                    long longResult;
+                    if (long.TryParse(str.Value, out longResult))
+                    {
+                        return longResult;
+                    }
+
+                    throw new ExecutionError($"Invalid number {str.Value}");
+                }
+                case ASTNodeKind.FloatValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return double.Parse(str.Value);
+                }
+                case ASTNodeKind.BooleanValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return bool.Parse(str.Value);
+                }
+                case ASTNodeKind.EnumValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return str.Value;
+                }
+                case ASTNodeKind.ObjectValue:
+                {
+                    var obj = source as GraphQLObjectValue;
+                    var values = new Dictionary<string, object>();
+
+                    obj.Fields.Apply(f =>
+                    {
+                        values[f.Name.Value] = ToValue(f.Value);
+                    });
+
+                    return values;
+                }
+                case ASTNodeKind.ListValue:
+                {
+                    var list = source as GraphQLListValue;
+                    var values = list.Values.Select(ToValue).ToArray();
+                    return values;
+                }
             }
 
-            return null;
+            throw new ExecutionError($"Unsupported value type {source.Kind}");
         }
     }
 }
-

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -409,6 +409,60 @@ namespace GraphQL
             }
 
             throw new ExecutionError($"Cannot convert value to AST: {serialized}");
+        }
+
+        public static object ValueFromAst(this IValue value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is StringValue)
+            {
+                var str = (StringValue)value;
+                return str.Value;
+            }
+
+            if (value is IntValue)
+            {
+                var num = (IntValue)value;
+                return num.Value;
+            }
+
+            if (value is LongValue)
+            {
+                var num = (LongValue)value;
+                return num.Value;
+            }
+
+            if (value is FloatValue)
+            {
+                var num = (FloatValue)value;
+                return num.Value;
+            }
+
+            if (value is EnumValue)
+            {
+                var @enum = (EnumValue)value;
+                return @enum.Name;
+            }
+
+            if (value is ObjectValue)
+            {
+                var objVal = (ObjectValue)value;
+                var obj = new Dictionary<string, object>();
+                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
+                return obj;
+            }
+
+            if (value is ListValue)
+            {
+                var list = (ListValue)value;
+                return list.Values.Select(ValueFromAst).ToList();
+            }
+
+            return null;
         }
     }
 }

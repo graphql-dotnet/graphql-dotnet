@@ -11,6 +11,10 @@ namespace GraphQL.Tests.Execution
 {
     public class RegisteredInstanceTests : BasicQueryTestBase
     {
+        private class Post
+        {
+        }
+
         [Fact]
         public void something()
         {
@@ -32,6 +36,17 @@ schema {
 ";
 
             var builder = new SchemaBuilder();
+            builder.Resolver("Query", "posts", context =>
+            {
+                return Enumerable.Empty<Post>();
+            });
+
+            builder.Resolver("Query", "post", context =>
+            {
+                var id = context.GetArgument<int>("id");
+                return new Post();
+            });
+
             var schema = builder.Build(definitions);
             schema.Initialize();
 
@@ -39,7 +54,7 @@ schema {
 
             query.ShouldNotBeNull();
             query.Name.ShouldBe("Query");
-            query.Fields.Count().ShouldBe(1);
+            query.Fields.Count().ShouldBe(2);
 
             var post = schema.FindType("Post") as IObjectGraphType;
             post.ShouldNotBeNull();

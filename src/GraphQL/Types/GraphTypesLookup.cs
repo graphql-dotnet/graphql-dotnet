@@ -342,10 +342,9 @@ namespace GraphQL.Types
 
             if (type is UnionGraphType)
             {
+                // TODO
                 var union = (UnionGraphType)type;
-                union.PossibleTypes.Apply(unionedType =>
-                {
-                });
+//                union.PossibleTypes = union.PossibleTypes.Select(t => ConvertType(t) as IObjectGraphType);
             }
         }
 

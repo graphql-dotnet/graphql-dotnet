@@ -553,67 +553,12 @@ namespace GraphQL
             {
                 if (variable.DefaultValue != null)
                 {
-                    return ValueFromAst(variable.DefaultValue);
+                    return variable.DefaultValue.ValueFromAst();
                 }
             }
             var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
             return coercedValue;
         }
-
-        private object ValueFromAst(IValue value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (value is StringValue)
-            {
-                var str = (StringValue)value;
-                return str.Value;
-            }
-
-            if (value is IntValue)
-            {
-                var num = (IntValue)value;
-                return num.Value;
-            }
-
-            if (value is LongValue)
-            {
-                var num = (LongValue)value;
-                return num.Value;
-            }
-
-            if (value is FloatValue)
-            {
-                var num = (FloatValue)value;
-                return num.Value;
-            }
-
-            if (value is EnumValue)
-            {
-                var @enum = (EnumValue)value;
-                return @enum.Name;
-            }
-
-            if (value is ObjectValue)
-            {
-                var objVal = (ObjectValue)value;
-                var obj = new Dictionary<string, object>();
-                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
-                return obj;
-            }
-
-            if (value is ListValue)
-            {
-                var list = (ListValue)value;
-                return list.Values.Select(ValueFromAst).ToList();
-            }
-
-            return null;
-        }
-
 
         public void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
         {
