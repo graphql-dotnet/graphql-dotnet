@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace GraphQL.Types
@@ -14,6 +14,11 @@ namespace GraphQL.Types
 
     public class QueryArgument : IHaveDefaultValue
     {
+        public QueryArgument(IGraphType type)
+        {
+            ResolvedType = type ?? throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required");
+        }
+
         public QueryArgument(Type type)
         {
             if (type == null || !typeof(GraphType).IsAssignableFrom(type))
@@ -31,6 +36,7 @@ namespace GraphQL.Types
         public object DefaultValue { get; set; }
 
         public IGraphType ResolvedType { get; set; }
+
         public Type Type { get; private set; }
     }
 }
