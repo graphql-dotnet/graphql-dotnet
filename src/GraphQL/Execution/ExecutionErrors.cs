@@ -7,6 +7,11 @@ namespace GraphQL
     {
         private readonly List<ExecutionError> _errors = new List<ExecutionError>();
 
+        public ExecutionErrors(IEnumerable<ExecutionError> errors = null)
+        {
+            AddRange(errors);
+        }
+
         public void Add(ExecutionError error)
         {
             _errors.Add(error);
@@ -14,7 +19,10 @@ namespace GraphQL
 
         public void AddRange(IEnumerable<ExecutionError> errors)
         {
-            _errors.AddRange(errors);
+            if (errors != null)
+            {
+                _errors.AddRange(errors);
+            }
         }
 
         public int Count

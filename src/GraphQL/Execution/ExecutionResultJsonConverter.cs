@@ -5,6 +5,8 @@ namespace GraphQL
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
+        public static bool EnableCompatibilityMode { get; set; } // Temporarily output error messages with label "error"
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value is ExecutionResult)
@@ -29,11 +31,6 @@ namespace GraphQL
                 return;
             }
 
-            if (result.Errors?.Count > 0)
-            {
-                data = null;
-            }
-
             writer.WritePropertyName("data");
             serializer.Serialize(writer, data);
         }
@@ -53,13 +50,40 @@ namespace GraphQL
             {
                 writer.WriteStartObject();
 
+                if (EnableCompatibilityMode)
+                {
+                    writer.WritePropertyName("error");
+                    serializer.Serialize(writer, error.Message);
+                }
+
                 writer.WritePropertyName("message");
                 serializer.Serialize(writer, error.Message);
 
                 if (error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
-                    serializer.Serialize(writer, error.Locations);
+                    writer.WriteStartArray();
+                    error.Locations.Apply(location => {
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("line");
+                        serializer.Serialize(writer, location.Line);
+                        writer.WritePropertyName("column");
+                        serializer.Serialize(writer, location.Column);
+                        writer.WriteEndObject();
+                    });
+                    writer.WriteEndArray();
+                }
+
+                if (error.Path != null && error.Path.Count > 0)
+                {
+                    writer.WritePropertyName("path");
+                    serializer.Serialize(writer, error.Path);
+                }
+
+                if (!string.IsNullOrWhiteSpace(error.Code))
+                {
+                    writer.WritePropertyName("code");
+                    serializer.Serialize(writer, error.Code);
                 }
 
                 writer.WriteEndObject();
