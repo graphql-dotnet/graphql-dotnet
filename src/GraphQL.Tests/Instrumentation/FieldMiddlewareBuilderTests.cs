@@ -24,6 +24,7 @@ namespace GraphQL.Tests.Instrumentation
             {
                 Name = "Quinn"
             };
+            _context.Errors = new ExecutionErrors();
 
             _context.Metrics = new Metrics();
         }
@@ -94,6 +95,23 @@ namespace GraphQL.Tests.Instrumentation
             var record = _context.Metrics.AllRecords.Single();
             record.Category.ShouldBe("class");
             record.Subject.ShouldBe("from class");
+        }
+
+        [Fact]
+        public void can_report_errors()
+        {
+            _builder.Use(next =>
+            {
+                return context =>
+                {
+                    context.Errors.Add(new ExecutionError("Custom error"));
+                    return Task.FromResult((object)null);
+                };
+            });
+
+            var result = _builder.Build().Invoke(_context).Result;
+            result.ShouldBeNull();
+            _context.Errors.ShouldContain(x => x.Message == "Custom error");
         }
 
         public class Person
