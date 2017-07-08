@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -27,6 +27,10 @@ namespace GraphQL.Types
         IGraphType FindType(string name);
 
         IEnumerable<Type> AdditionalTypes { get; }
+
+        void RegisterType(IGraphType type);
+
+        void RegisterTypes(params IGraphType[] types);
 
         void RegisterTypes(params Type[] types);
 
@@ -102,6 +106,11 @@ namespace GraphQL.Types
                 .ToList();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+
+        public void RegisterType(IGraphType type)
+        {
+            _additionalInstances.Add(type);
+        }
 
         public void RegisterTypes(params IGraphType[] types)
         {

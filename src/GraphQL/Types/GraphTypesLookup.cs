@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
@@ -71,6 +71,8 @@ namespace GraphQL.Types
                     arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
                 });
             });
+
+            lookup.ApplyTypeReferences();
 
             return lookup;
         }
@@ -177,7 +179,7 @@ namespace GraphQL.Types
 
         public void AddType(IGraphType type, TypeCollectionContext context)
         {
-            if (type == null)
+            if (type == null || type is GraphQLTypeReference)
             {
                 return;
             }
@@ -315,6 +317,56 @@ namespace GraphQL.Types
             {
                 AddType(namedType, context);
             }
+        }
+
+        public void ApplyTypeReferences()
+        {
+            var types = _types.Select(x => x.Value).ToList();
+            types.Apply(ApplyTypeReference);
+        }
+
+        public void ApplyTypeReference(IGraphType type)
+        {
+            if (type is IComplexGraphType)
+            {
+                var complexType = (IComplexGraphType)type;
+                complexType.Fields.Apply(field =>
+                {
+                    field.ResolvedType = ConvertType(field.ResolvedType);
+                    field.Arguments?.Apply(arg =>
+                    {
+                        arg.ResolvedType = ConvertType(arg.ResolvedType);
+                    });
+                });
+            }
+
+            if (type is UnionGraphType)
+            {
+                var union = (UnionGraphType)type;
+                union.PossibleTypes.Apply(unionedType =>
+                {
+                });
+            }
+        }
+
+        private IGraphType ConvertType(IGraphType type)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nonNull = (NonNullGraphType)type;
+                nonNull.ResolvedType = ConvertType(nonNull.ResolvedType);
+                return nonNull;
+            }
+
+            if (type is ListGraphType)
+            {
+                var list = (ListGraphType)type;
+                list.ResolvedType = ConvertType(list.ResolvedType);
+                return list;
+            }
+
+            var reference = type as GraphQLTypeReference;
+            return reference == null ? type : this[reference.TypeName];
         }
     }
 }
