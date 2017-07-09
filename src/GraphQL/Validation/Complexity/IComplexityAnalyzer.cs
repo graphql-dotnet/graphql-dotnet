@@ -1,5 +1,4 @@
-﻿using System;
-using GraphQL.Language.AST;
+﻿using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Complexity
 {
