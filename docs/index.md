@@ -3,5 +3,5 @@ title: GraphQL .NET
 permalink: /
 ---
 
-[Getting Started](/getting-started)
-[Advanced Topics](/learn)
+[Getting Started](getting-started)
+[Advanced Topics](learn)
