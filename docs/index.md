@@ -1,5 +1,5 @@
 ---
-title: GraphQL .NET
+title: GraphQL for .NET
 permalink: /
 ---
 

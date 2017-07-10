@@ -1,5 +1,5 @@
 ---
-title: Learn More About GraphQL .NET
+title: GraphQL .NET Advanced Topics
 permalink: /learn
 ---
 
