@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using GraphQL.Introspection;
 
@@ -11,7 +11,7 @@ namespace GraphQL.Conversion
 
     public class DefaultFieldNameConverter : IFieldNameConverter
     {
-        private static Type[] IntrospectionTypes = new[] { typeof(SchemaIntrospection) };
+        private static readonly Type[] IntrospectionTypes = new[] { typeof(SchemaIntrospection) };
 
         public string NameFor(string field, Type parentType)
         {
@@ -39,7 +39,7 @@ namespace GraphQL.Conversion
 
     public class PascalCaseFieldNameConverter : IFieldNameConverter
     {
-        private static Type[] IntrospectionTypes = new[] { typeof(SchemaIntrospection) };
+        private static readonly Type[] IntrospectionTypes = new[] { typeof(SchemaIntrospection) };
 
         public string NameFor(string field, Type parentType)
         {

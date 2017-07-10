@@ -135,6 +135,13 @@ namespace GraphQL.Execution
                 f.Resolver = resolver;
                 type.AddField(f);
             });
+
+            var interfaces = astType
+                .Interfaces
+                .Select(i => new GraphQLTypeReference(i.Name.Value))
+                .ToList();
+            interfaces.Apply(type.AddResolvedInterface);
+
             return type;
         }
 
@@ -148,6 +155,12 @@ namespace GraphQL.Execution
             field.Arguments = new QueryArguments(args);
 
             return field;
+        }
+
+        public InterfaceGraphType ToInterfaceType()
+        {
+            var type = new InterfaceGraphType();
+            return type;
         }
 
         public QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)

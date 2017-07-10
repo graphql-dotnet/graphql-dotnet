@@ -332,35 +332,48 @@ namespace GraphQL.Types
                 var complexType = (IComplexGraphType)type;
                 complexType.Fields.Apply(field =>
                 {
-                    field.ResolvedType = ConvertType(field.ResolvedType);
+                    field.ResolvedType = ConvertTypeReference(field.ResolvedType);
                     field.Arguments?.Apply(arg =>
                     {
-                        arg.ResolvedType = ConvertType(arg.ResolvedType);
+                        arg.ResolvedType = ConvertTypeReference(arg.ResolvedType);
                     });
                 });
             }
 
+            if (type is IObjectGraphType)
+            {
+                var objectType = (IObjectGraphType) type;
+                var types = objectType
+                    .ResolvedInterfaces
+                    .Select(i => ConvertTypeReference(i) as IInterfaceGraphType)
+                    .ToList();
+                objectType.ResolvedInterfaces = types;
+            }
+
             if (type is UnionGraphType)
             {
-                // TODO
                 var union = (UnionGraphType)type;
-//                union.PossibleTypes = union.PossibleTypes.Select(t => ConvertType(t) as IObjectGraphType);
+                var types = union
+                    .PossibleTypes
+                    .Select(t => ConvertTypeReference(t) as IObjectGraphType)
+                    .ToList();
+                union.PossibleTypes = types;
             }
         }
 
-        private IGraphType ConvertType(IGraphType type)
+        private IGraphType ConvertTypeReference(IGraphType type)
         {
             if (type is NonNullGraphType)
             {
                 var nonNull = (NonNullGraphType)type;
-                nonNull.ResolvedType = ConvertType(nonNull.ResolvedType);
+                nonNull.ResolvedType = ConvertTypeReference(nonNull.ResolvedType);
                 return nonNull;
             }
 
             if (type is ListGraphType)
             {
                 var list = (ListGraphType)type;
-                list.ResolvedType = ConvertType(list.ResolvedType);
+                list.ResolvedType = ConvertTypeReference(list.ResolvedType);
                 return list;
             }
 

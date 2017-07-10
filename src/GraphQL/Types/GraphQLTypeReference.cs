@@ -1,6 +1,6 @@
 ﻿namespace GraphQL.Types
 {
-    public class GraphQLTypeReference : GraphType
+    public class GraphQLTypeReference : InterfaceGraphType
     {
         public GraphQLTypeReference(string typeName)
         {
