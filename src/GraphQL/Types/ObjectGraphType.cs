@@ -1,7 +1,6 @@
-using GraphQL.Builders;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace GraphQL.Types
@@ -28,7 +27,7 @@ namespace GraphQL.Types
 
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
-            _resolvedInterfaces.Add(graphType);
+            _resolvedInterfaces.Fill(graphType);
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces

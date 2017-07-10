@@ -131,6 +131,7 @@ namespace GraphQL.Utilities
          *   schema {
          *     query: Query
          *     mutation: Mutation
+         *     subscription: Subscription
          *   }
          *
          * When using this naming convention, the schema description can be omitted.
@@ -251,7 +252,8 @@ namespace GraphQL.Utilities
                     Args = PrintArgs(x)
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
+            return string.Join(Environment.NewLine, fields?.Select(
+                f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
         }
 
         public string PrintArgs(FieldType field)
@@ -271,7 +273,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = ".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue));
             }
 
             return desc;
@@ -376,6 +378,15 @@ namespace GraphQL.Utilities
             });
 
             return desc;
+        }
+
+        public string PrintDeprecation(string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return string.Empty;
+            }
+            return $" @deprecated(reason: \"{reason.Replace("\"", "\\\"")}\")";
         }
 
         public string[] BreakLine(string line, int len)

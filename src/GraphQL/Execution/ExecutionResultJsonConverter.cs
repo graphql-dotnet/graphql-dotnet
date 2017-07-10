@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace GraphQL
@@ -24,14 +25,9 @@ namespace GraphQL
         {
             var data = result.Data;
 
-            if (result.Errors?.Count > 0 && data == null)
+            if (result.Errors?.Any() == true && data == null)
             {
                 return;
-            }
-
-            if (result.Errors?.Count > 0)
-            {
-                data = null;
             }
 
             writer.WritePropertyName("data");
@@ -40,7 +36,7 @@ namespace GraphQL
 
         private void writeErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer)
         {
-            if (errors == null || errors.Count == 0)
+            if (errors == null || !errors.Any())
             {
                 return;
             }
@@ -59,6 +55,17 @@ namespace GraphQL
                 if (error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
+                    writer.WriteStartArray();
+                    error.Locations.Apply(location =>
+                    {
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("line");
+                        serializer.Serialize(writer, location.Line);
+                        writer.WritePropertyName("column");
+                        serializer.Serialize(writer, location.Column);
+                        writer.WriteEndObject();
+                    });
+                    writer.WriteEndArray();
                     serializer.Serialize(writer, error.Locations);
                 }
 
