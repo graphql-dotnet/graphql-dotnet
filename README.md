@@ -193,8 +193,7 @@ Hello GraphQL!
 ### Deployment Process
 
 ```
-yarn run setVersion 0.12.0
-write release notes in release-notes.md
+yarn run setVersion 0.17.0
 git commit/push
 download nuget from AppVeyor
 upload nuget package to github
