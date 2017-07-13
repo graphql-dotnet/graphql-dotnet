@@ -1,4 +1,4 @@
-using System.Web.Http.Dependencies;
+﻿using System.Web.Http.Dependencies;
 using GraphQL.Http;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
@@ -24,7 +24,9 @@ namespace GraphQL.GraphiQL
 
             container.Singleton(new StarWarsData());
             container.Register<StarWarsQuery>();
+            container.Register<StarWarsMutation>();
             container.Register<HumanType>();
+            container.Register<HumanInputType>();
             container.Register<DroidType>();
             container.Register<CharacterInterface>();
             container.Singleton(new StarWarsSchema(type => (GraphType) container.Get(type)));

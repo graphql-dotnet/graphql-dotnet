@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.StarWars", "GraphQL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.GraphiQLCore", "GraphQL.GraphiQLCore\GraphQL.GraphiQLCore.csproj", "{487A7A85-31E1-4B1E-BAAA-F8E723AFEE89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.GraphiQLCore", "GraphQL.GraphiQLCore\GraphQL.GraphiQLCore.csproj", "{487A7A85-31E1-4B1E-BAAA-F8E723AFEE89}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{F515FCA3-BD5F-485A-8BDE-E3E5E1FE33B6}"
 EndProject

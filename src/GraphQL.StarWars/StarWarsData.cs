@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,6 +67,13 @@ namespace GraphQL.StarWars
         public Task<Droid> GetDroidByIdAsync(string id)
         {
             return Task.FromResult(_droids.FirstOrDefault(h => h.Id == id));
+        }
+
+        public Human AddHuman(Human human)
+        {
+            human.Id = Guid.NewGuid().ToString();
+            _humans.Add(human);
+            return human;
         }
     }
 }

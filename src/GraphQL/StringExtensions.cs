@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -57,6 +57,13 @@ namespace GraphQL
                 : new Inputs(dictionary);
         }
 
+        public static Inputs ToInputs(this JObject obj)
+        {
+            var variables = obj?.GetValue() as Dictionary<string, object>
+                            ?? new Dictionary<string, object>();
+            return new Inputs(variables);
+        }
+
         public static Dictionary<string, object> ToDictionary(this string json)
         {
             var values = JsonConvert.DeserializeObject(json,
@@ -88,7 +95,7 @@ namespace GraphQL
             return $"{char.ToUpperInvariant(s[0])}{s.Substring(1)}";
         }
 
-        public static object GetValue(object value)
+        public static object GetValue(this object value)
         {
             var objectValue = value as JObject;
             if (objectValue != null)

@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.StarWars
@@ -195,6 +196,30 @@ namespace GraphQL.Tests.StarWars
             }";
 
             AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void can_add_new_human()
+        {
+            var mutation = @"mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
+
+            var expected = @"{
+              'createHuman': {
+                'name': 'Boba Fett',
+                'homePlanet': 'Kamino'
+              }
+            }";
+
+            var data = new Dictionary<string, object>();
+            data.Add("human", new Dictionary<string, object>
+            {
+                {"name", "Boba Fett"},
+                {"homePlanet", "Kamino"}
+            });
+
+            var variables = new Inputs(data);
+
+            AssertQuerySuccess(mutation, expected, variables);
         }
     }
 }
