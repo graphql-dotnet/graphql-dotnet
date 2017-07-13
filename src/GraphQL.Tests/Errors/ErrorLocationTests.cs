@@ -13,14 +13,13 @@ namespace GraphQL.Tests.Errors
         [InlineData("{\n    test\n}", 2, 5)]
         [InlineData("{  test\n}", 1, 4)]
         [InlineData("{\n    test\n  cat\n}", 3, 3)]
-        public async Task should_show_location_when_exception_thrown(string body, int line, int column)
+        public async Task should_show_location_when_exception_thrown(string query, int line, int column)
         {
-            var result = await Executer.ExecuteAsync(
-                Schema,
-                null,
-                body,
-                null
-                );
+            var result = await Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = query;
+            });
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
@@ -28,6 +27,43 @@ namespace GraphQL.Tests.Errors
             var location = error.Locations.First();
             location.Line.ShouldBe(line);
             location.Column.ShouldBe(column);
+        }
+
+        [Theory]
+        [InlineData("{\n    testasync\n}", 2, 5)]
+        [InlineData("{  testasync\n}", 1, 4)]
+        [InlineData("{\n    testasync\n  cat\n}", 3, 3)]
+        public async Task should_show_location_when_exception_thrown_with_async_field(string query, int line, int column)
+        {
+            var result = await Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = query;
+            });
+
+            result.Errors.Count.ShouldBe(1);
+            var error = result.Errors.First();
+            error.Locations.Count().ShouldBe(1);
+            var location = error.Locations.First();
+            location.Line.ShouldBe(line);
+            location.Column.ShouldBe(column);
+        }
+
+        [Fact]
+        public void async_field_with_errors()
+        {
+            var error = new ExecutionError("Error trying to resolve testasync.");
+            error.AddLocation(1, 3);
+
+            var errors = new ExecutionErrors {error};
+
+            AssertQueryIgnoreErrors(
+                "{ testasync }",
+                CreateQueryResult(@"{
+   ""testasync"": null
+}", errors),
+                expectedErrorCount: 1,
+                renderErrors: true);
         }
 
         public class TestQuery : ObjectGraphType
@@ -38,7 +74,11 @@ namespace GraphQL.Tests.Errors
 
                 Field<StringGraphType>()
                     .Name("test")
-                    .Resolve(_ => { throw new Exception("wat"); });
+                    .Resolve(_ => throw new Exception("wat"));
+
+                FieldAsync<StringGraphType>(
+                    "testasync",
+                    resolve: async _ => throw new Exception("wat"));
             }
         }
 
