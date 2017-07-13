@@ -66,7 +66,6 @@ namespace GraphQL
                         writer.WriteEndObject();
                     });
                     writer.WriteEndArray();
-                    serializer.Serialize(writer, error.Locations);
                 }
 
                 writer.WriteEndObject();

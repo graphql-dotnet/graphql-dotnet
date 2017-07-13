@@ -62,20 +62,30 @@ namespace GraphQL.Tests
             object root = null,
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
-            int expectedErrorCount = 0)
+            int expectedErrorCount = 0,
+            bool renderErrors = false)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQueryIgnoreErrors(query, queryResult, inputs, root, userContext, cancellationToken, expectedErrorCount);
+            return AssertQueryIgnoreErrors(
+                query,
+                queryResult,
+                inputs,
+                root,
+                userContext,
+                cancellationToken,
+                expectedErrorCount,
+                renderErrors);
         }
 
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs,
-            object root,
+            Inputs inputs= null,
+            object root = null,
             object userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
-            int expectedErrorCount = 0)
+            int expectedErrorCount = 0,
+            bool renderErrors = false)
         {
             var runResult = Executer.ExecuteAsync(_ =>
             {
@@ -85,11 +95,11 @@ namespace GraphQL.Tests
                 _.Inputs = inputs;
                 _.UserContext = userContext;
                 _.CancellationToken = cancellationToken;
-            }).Result;
+            }).GetAwaiter().GetResult();
 
-            // var runResult = Executer.ExecuteAsync(Schema, root, query, null, inputs, userContext, cancellationToken).Result;
+            var renderResult = renderErrors ? runResult : new ExecutionResult {Data = runResult.Data};
 
-            var writtenResult = Writer.Write(new ExecutionResult { Data = runResult.Data });
+            var writtenResult = Writer.Write(renderResult);
             var expectedResult = Writer.Write(expectedExecutionResult);
 
 // #if DEBUG
@@ -124,18 +134,7 @@ namespace GraphQL.Tests
                 _.CancellationToken = cancellationToken;
                 _.ValidationRules = rules;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
-            }).Result;
-
-            // var runResult = Executer.ExecuteAsync(
-            //     Schema,
-            //     root,
-            //     query,
-            //     null,
-            //     inputs,
-            //     userContext,
-            //     cancellationToken,
-            //     rules
-            //     ).Result;
+            }).GetAwaiter().GetResult();
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);
@@ -158,14 +157,15 @@ namespace GraphQL.Tests
             return runResult;
         }
 
-        public ExecutionResult CreateQueryResult(string result)
+        public ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
         {
-            object expected = null;
+            object data = null;
             if (!string.IsNullOrWhiteSpace(result))
             {
-                expected = JObject.Parse(result);
+                data = JObject.Parse(result);
             }
-            return new ExecutionResult { Data = expected };
+
+            return new ExecutionResult { Data = data, Errors = errors};
         }
     }
 }
