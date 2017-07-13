@@ -9,6 +9,7 @@ namespace GraphQL.StarWars
             : base(resolveType)
         {
             Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
+            Mutation = (StarWarsMutation) resolveType(typeof(StarWarsMutation));
         }
     }
 }

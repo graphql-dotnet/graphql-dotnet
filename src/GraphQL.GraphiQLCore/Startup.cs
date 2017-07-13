@@ -18,7 +18,9 @@ namespace GraphQL.GraphiQLCore
 
             services.AddSingleton<StarWarsData>();
             services.AddSingleton<StarWarsQuery>();
+            services.AddSingleton<StarWarsMutation>();
             services.AddSingleton<HumanType>();
+            services.AddSingleton<HumanInputType>();
             services.AddSingleton<DroidType>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<ISchema>(s => new StarWarsSchema(type => (GraphType) s.GetService(type)));

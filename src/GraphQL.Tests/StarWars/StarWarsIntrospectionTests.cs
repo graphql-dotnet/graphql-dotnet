@@ -274,13 +274,23 @@ namespace GraphQL.Tests.StarWars
                 {
                   'name': 'Droid',
                   'kind': 'OBJECT'
+                },
+                {
+                  'name': 'Mutation',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': 'HumanInput',
+                  'kind': 'INPUT_OBJECT'
                 }
               ],
               'queryType': {
                 'name': 'Query',
                 'kind': 'OBJECT'
               },
-              'mutationType': null,
+              'mutationType': {
+                'name': 'Mutation'
+              },
               'directives': [
                 {
                   'name': 'include',

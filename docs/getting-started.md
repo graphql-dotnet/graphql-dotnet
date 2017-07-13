@@ -182,38 +182,69 @@ public class StarWarsQuery : ObjectGraphType
 
 To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
 
+See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
+See the [offical GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations);
+
 ```csharp
-public class Mutation : ObjectGraphType
+public class StarWarsSchema : Schema
 {
-  public Mutation(IDocumentSession session)
-  {
-    Field<DinnerType>(
-      "createDinner",
-      arguments: new QueryArguments(new QueryArgument<DinnerInputType> { Name = "dinner" }),
-      resolve: context =>
-      {
-        var userContext = context.UserContext.As<GraphQLUserContext>();
-        var dinner = context.GetArgument<Dinner>("dinner");
-
-        dinner.HostedById = userContext.User.UserName;
-        dinner.HostedBy = string.IsNullOrWhiteSpace(dinner.HostedBy)
-          ? userContext.User.FriendlyName
-          : dinner.HostedBy;
-
-        session.Store(dinner);
-        session.SaveChanges();
-
-        return dinner;
-      });
-  }
+    public StarWarsSchema(Func<Type, GraphType> resolveType)
+        : base(resolveType)
+    {
+        Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
+        Mutation = (StarWarsMutation)resolveType(typeof (StarWarsMutation));
+    }
 }
 
-public class NerdDinnerSchema : Schema
+/// <example>
+/// This is an example JSON request for a mutation
+/// {
+///   "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
+///   "variables": {
+///     "human": {
+///       "name": "Boba Fett"
+///     }
+///   }
+/// }
+/// </example>
+public class StarWarsMutation : ObjectGraphType<object>
 {
-  public NerdDinnerSchema()
-  {
-    Mutation = new Mutation();
-  }
+    public StarWarsMutation(StarWarsData data)
+    {
+        Field<HumanType>(
+            "createHuman",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<HumanInputType>> {Name = "human"}
+            ),
+            resolve: context =>
+            {
+                var human = context.GetArgument<Human>("human");
+                return data.AddHuman(human);
+            });
+    }
+}
+
+public class HumanInputType : InputObjectGraphType
+{
+    public HumanInputType()
+    {
+        Name = "HumanInput";
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Field<StringGraphType>("homePlanet");
+    }
+}
+
+// in-memory data store
+public class StarWarsData
+{
+    ...
+
+    public Human AddHuman(Human human)
+    {
+        human.Id = Guid.NewGuid().ToString();
+        _humans.Add(human);
+        return human;
+    }
 }
 ```
 
