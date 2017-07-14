@@ -178,12 +178,51 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
+# Variables
+
+You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
+
+* See the (offical GraphQL documentation on variables)[http://graphql.org/learn/queries/#variables]
+
+Here is what a query looks like with a variable:
+
+```graphql
+query DroidQuery($droidId: String) {
+  droid(id: $droidId) {
+    id
+    name
+  }
+}
+```
+
+Here is what this query would look like as a JSON request:
+
+```json
+{
+ "query": "query DroidQuery($droidId: String) { droid(id: $droidId) { id name } }",
+ "variables": {
+   "droidId": "1"
+ }
+}
+```
+
+```csharp
+var variablesJson = // get from request
+// `ToInputs` converts the json to the `Inputs` class
+var inputs = variablesJson.ToInputs();
+
+var result = await executer.ExecuteAsync(_ =>
+{
+    _.Inputs = inputs;
+});
+```
+
 # Mutations
 
 To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
 
-See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
-See the [offical GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations);
+* See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
+* See the [offical GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
 
 ```csharp
 public class StarWarsSchema : Schema
@@ -394,19 +433,6 @@ public class CatOrDog : UnionGraphType
     Type<Dog>();
   }
 }
-```
-
-# Variables
-
-You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
-
-```csharp
-var inputs = variablesJson.ToInputs();
-
-var result = await executer.ExecuteAsync(_ =>
-{
-    _.Inputs = inputs;
-});
 ```
 
 # Query Validation
