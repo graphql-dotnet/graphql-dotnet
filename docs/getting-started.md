@@ -182,7 +182,7 @@ public class StarWarsQuery : ObjectGraphType
 
 You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
 
-* See the (offical GraphQL documentation on variables)[http://graphql.org/learn/queries/#variables]
+* See the [offical GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
 
 Here is what a query looks like with a variable:
 
