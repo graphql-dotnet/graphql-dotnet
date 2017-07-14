@@ -182,7 +182,7 @@ public class StarWarsQuery : ObjectGraphType
 
 You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
 
-* See the [offical GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
+* See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
 
 Here is what a query looks like with a variable:
 
@@ -222,7 +222,7 @@ var result = await executer.ExecuteAsync(_ =>
 To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
 
 * See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
-* See the [offical GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
+* See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
 
 ```csharp
 public class StarWarsSchema : Schema
