@@ -1,37 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
 using OperationType = GraphQLParser.AST.OperationType;
 
-namespace GraphQL.Execution
+namespace GraphQL.Tools
 {
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
-        private readonly LightweightCache<string, IDictionary<string, IFieldResolver>> _resolvers;
+        private readonly LightweightCache<string, TypeConfig> _resolvers;
 
         public SchemaBuilder()
         {
-            _resolvers = new LightweightCache<string, IDictionary<string, IFieldResolver>>(type => new Dictionary<string, IFieldResolver>());
+            _resolvers = new LightweightCache<string, TypeConfig>(s => new TypeConfig(s));
         }
 
-        public void Resolver<TSourceType, TReturnType>(string type, string field, Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        private IGraphType GetType(string name)
         {
-            Resolver(type, field, new FuncFieldResolver<TSourceType, TReturnType>(resolver));
+            _types.TryGetValue(name, out IGraphType type);
+            return type;
         }
 
-        public void Resolver<TReturnType>(string type, string field, Func<ResolveFieldContext, TReturnType> resolver)
+        public void Config(string typeName, Action<TypeConfig> configure)
         {
-            Resolver(type, field, new FuncFieldResolver<TReturnType>(resolver));
-        }
-
-        public void Resolver(string type, string field, IFieldResolver resolver)
-        {
-            _resolvers[type][field] = resolver;
+            var config = _resolvers[typeName];
+            configure(config);
         }
 
         public ISchema Build(string typeDefs)
@@ -68,6 +64,20 @@ namespace GraphQL.Execution
                         _types[type.Name] = type;
                         break;
                     }
+
+                    case ASTNodeKind.InterfaceTypeDefinition:
+                    {
+                        var type = ToInterfaceType(def as GraphQLInterfaceTypeDefinition);
+                        _types[type.Name] = type;
+                        break;
+                    }
+
+                    case ASTNodeKind.EnumTypeDefinition:
+                    {
+                        var type = ToEnumerationType(def as GraphQLEnumTypeDefinition);
+                        _types[type.Name] = type;
+                        break;
+                    }
                 }
             }
 
@@ -76,7 +86,7 @@ namespace GraphQL.Execution
                 foreach (var op in schemaDef.OperationTypes)
                 {
                     var typeName = op.Type.Name.Value;
-                    var type = _types[typeName] as IObjectGraphType;
+                    var type = GetType(typeName) as IObjectGraphType;
 
                     switch (op.Operation)
                     {
@@ -99,20 +109,9 @@ namespace GraphQL.Execution
             }
             else
             {
-                if (_types.ContainsKey("Query"))
-                {
-                    schema.Query = _types["Query"] as IObjectGraphType;
-                }
-
-                if (_types.ContainsKey("Mutation"))
-                {
-                    schema.Mutation = _types["Mutation"] as IObjectGraphType;
-                }
-
-                if (_types.ContainsKey("Subscription"))
-                {
-                    schema.Subscription = _types["Subscription"] as IObjectGraphType;
-                }
+                schema.Query = GetType("Query") as IObjectGraphType;
+                schema.Mutation = GetType("Mutation") as IObjectGraphType;
+                schema.Subscription = GetType("Subscription") as IObjectGraphType;
             }
 
             var typeList = _types.Values.ToArray();
@@ -123,16 +122,16 @@ namespace GraphQL.Execution
 
         public IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
         {
-            var handlers = _resolvers[astType.Name.Value];
+            var typeConfig = _resolvers[astType.Name.Value];
 
             var type = new ObjectGraphType();
             type.Name = astType.Name.Value;
+            type.IsTypeOf = typeConfig.IsTypeOf;
 
             var fields = astType.Fields.Select(ToFieldType);
             fields.Apply(f =>
             {
-                handlers.TryGetValue(f.Name, out IFieldResolver resolver);
-                f.Resolver = resolver;
+                f.Resolver = typeConfig.ResolverFor(f.Name);
                 type.AddField(f);
             });
 
@@ -157,10 +156,32 @@ namespace GraphQL.Execution
             return field;
         }
 
-        public InterfaceGraphType ToInterfaceType()
+        public InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
             var type = new InterfaceGraphType();
+            type.Name = interfaceDef.Name.Value;
+
+            var fields = interfaceDef.Fields.Select(ToFieldType);
+            fields.Apply(f => type.AddField(f));
+
             return type;
+        }
+
+        public EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
+        {
+            var type = new EnumerationGraphType();
+            type.Name = enumDef.Name.Value;
+            var values = enumDef.Values.Select(ToEnumValue);
+            values.Apply(type.AddValue);
+            return type;
+        }
+
+        public EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
+        {
+            var val = new EnumValueDefinition();
+            val.Value = valDef.Name.Value;
+            val.Name = valDef.Name.Value;
+            return val;
         }
 
         public QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)
@@ -170,6 +191,7 @@ namespace GraphQL.Execution
             var arg = new QueryArgument(type);
             arg.Name = inputDef.Name.Value;
             arg.DefaultValue = ToValue(inputDef.DefaultValue);
+            arg.ResolvedType = ToGraphType(inputDef.Type);
 
             return arg;
         }
@@ -193,7 +215,7 @@ namespace GraphQL.Execution
                 case ASTNodeKind.NamedType:
                 {
                     var namedType = (GraphQLNamedType)astType;
-                    _types.TryGetValue(namedType.Name.Value, out IGraphType type);
+                    var type = GetType(namedType.Name.Value);
                     return type ?? new GraphQLTypeReference(namedType.Name.Value);
                 }
             }

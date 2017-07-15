@@ -223,7 +223,7 @@ namespace GraphQL.Types
                                 "Interface type {0} does not provide a \"resolveType\" function " +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                                 "There is no way to resolve this possible type during execution.")
-                                .ToFormat(interfaceInstance, obj));
+                                .ToFormat(interfaceInstance.Name, obj.Name));
                         }
                     }
                 });
@@ -248,7 +248,7 @@ namespace GraphQL.Types
                             "Union type {0} does not provide a \"resolveType\" function" +
                             "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                             "There is no way to resolve this possible type during execution.")
-                            .ToFormat(union, unionedType));
+                            .ToFormat(union.Name, unionedType.Name));
                     }
                 });
 
@@ -264,7 +264,7 @@ namespace GraphQL.Types
                             "Union type {0} does not provide a \"resolveType\" function" +
                             "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                             "There is no way to resolve this possible type during execution.")
-                            .ToFormat(union, objType));
+                            .ToFormat(union.Name, objType.Name));
                     }
 
                     union.AddPossibleType(objType);
@@ -345,7 +345,23 @@ namespace GraphQL.Types
                 var objectType = (IObjectGraphType) type;
                 var types = objectType
                     .ResolvedInterfaces
-                    .Select(i => ConvertTypeReference(i) as IInterfaceGraphType)
+                    .Select(i =>
+                    {
+                        var interfaceType = ConvertTypeReference(i) as IInterfaceGraphType;
+
+                        if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
+                        {
+                            throw new ExecutionError((
+                                    "Interface type {0} does not provide a \"resolveType\" function " +
+                                    "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                    "There is no way to resolve this possible type during execution.")
+                                .ToFormat(interfaceType.Name, objectType.Name));
+                        }
+
+                        interfaceType.AddPossibleType(objectType);
+
+                        return interfaceType;
+                    })
                     .ToList();
                 objectType.ResolvedInterfaces = types;
             }
@@ -355,7 +371,21 @@ namespace GraphQL.Types
                 var union = (UnionGraphType)type;
                 var types = union
                     .PossibleTypes
-                    .Select(t => ConvertTypeReference(t) as IObjectGraphType)
+                    .Select(t =>
+                    {
+                        var unionType = ConvertTypeReference(t) as IObjectGraphType;
+
+                        if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
+                        {
+                            throw new ExecutionError((
+                                "Union type {0} does not provide a \"resolveType\" function" +
+                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                "There is no way to resolve this possible type during execution.")
+                                .ToFormat(union.Name, unionType.Name));
+                        }
+
+                        return unionType;
+                    })
                     .ToList();
                 union.PossibleTypes = types;
             }

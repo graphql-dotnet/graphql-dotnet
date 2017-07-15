@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -11,56 +9,6 @@ namespace GraphQL.Tests.Execution
 {
     public class RegisteredInstanceTests : BasicQueryTestBase
     {
-        private class Post
-        {
-        }
-
-        [Fact]
-        public void something()
-        {
-            var definitions = @"
-type Post {
-  id: ID!
-  title: String
-  votes: Int
-}
-
-type Query {
-  posts: [Post]
-  post(id: ID = 1): Post
-}
-
-schema {
-  query: Query
-}
-";
-
-            var builder = new SchemaBuilder();
-            builder.Resolver("Query", "posts", context =>
-            {
-                return Enumerable.Empty<Post>();
-            });
-
-            builder.Resolver("Query", "post", context =>
-            {
-                var id = context.GetArgument<int>("id");
-                return new Post();
-            });
-
-            var schema = builder.Build(definitions);
-            schema.Initialize();
-
-            var query = schema.Query;
-
-            query.ShouldNotBeNull();
-            query.Name.ShouldBe("Query");
-            query.Fields.Count().ShouldBe(2);
-
-            var post = schema.FindType("Post") as IObjectGraphType;
-            post.ShouldNotBeNull();
-            post.Fields.Count().ShouldBe(3);
-        }
-
         [Fact]
         public void build_dynamic_schema()
         {
