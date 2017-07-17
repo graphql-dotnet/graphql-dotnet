@@ -369,7 +369,7 @@ namespace GraphQL.Tests.StarWars
                             'kind': 'SCALAR'
                           }
                         },
-                        'defaultValue': null
+                        'defaultValue': 'null'
                       }
                     ]
                   },
@@ -387,7 +387,7 @@ namespace GraphQL.Tests.StarWars
                             'kind': 'SCALAR'
                           }
                         },
-                        'defaultValue': null
+                        'defaultValue': 'null'
                       }
                     ]
                   }
