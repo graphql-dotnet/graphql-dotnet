@@ -54,6 +54,7 @@ namespace GraphQL.Tests.Bugs
             var docExec = new DocumentExecuter();
             var execOptions = new ExecutionOptions();
             execOptions.Schema = new Schema();
+            execOptions.Query = "{ abcd }";
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
             execOptions.FieldMiddleware = mockMiddleware;
 
@@ -67,6 +68,7 @@ namespace GraphQL.Tests.Bugs
             var docExec = new DocumentExecuter();
             var execOptions = new ExecutionOptions();
             execOptions.Schema = new Schema();
+            execOptions.Query = "{ abcd }";
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
             execOptions.FieldMiddleware = mockMiddleware;
 

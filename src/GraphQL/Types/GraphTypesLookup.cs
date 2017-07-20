@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
@@ -8,7 +9,7 @@ namespace GraphQL.Types
 {
     public class GraphTypesLookup
     {
-        private readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        private readonly IDictionary<string, IGraphType> _types = new ConcurrentDictionary<string, IGraphType>();
 
         private readonly object _lock = new object();
 
@@ -332,10 +333,10 @@ namespace GraphQL.Types
                 var complexType = (IComplexGraphType)type;
                 complexType.Fields.Apply(field =>
                 {
-                    field.ResolvedType = ConvertTypeReference(field.ResolvedType);
+                    field.ResolvedType = ConvertTypeReference(type, field.ResolvedType);
                     field.Arguments?.Apply(arg =>
                     {
-                        arg.ResolvedType = ConvertTypeReference(arg.ResolvedType);
+                        arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
                     });
                 });
             }
@@ -347,7 +348,7 @@ namespace GraphQL.Types
                     .ResolvedInterfaces
                     .Select(i =>
                     {
-                        var interfaceType = ConvertTypeReference(i) as IInterfaceGraphType;
+                        var interfaceType = ConvertTypeReference(objectType, i) as IInterfaceGraphType;
 
                         if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                         {
@@ -373,7 +374,7 @@ namespace GraphQL.Types
                     .PossibleTypes
                     .Select(t =>
                     {
-                        var unionType = ConvertTypeReference(t) as IObjectGraphType;
+                        var unionType = ConvertTypeReference(union, t) as IObjectGraphType;
 
                         if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                         {
@@ -391,24 +392,31 @@ namespace GraphQL.Types
             }
         }
 
-        private IGraphType ConvertTypeReference(IGraphType type)
+        private IGraphType ConvertTypeReference(IGraphType parentType, IGraphType type)
         {
             if (type is NonNullGraphType)
             {
                 var nonNull = (NonNullGraphType)type;
-                nonNull.ResolvedType = ConvertTypeReference(nonNull.ResolvedType);
+                nonNull.ResolvedType = ConvertTypeReference(parentType, nonNull.ResolvedType);
                 return nonNull;
             }
 
             if (type is ListGraphType)
             {
                 var list = (ListGraphType)type;
-                list.ResolvedType = ConvertTypeReference(list.ResolvedType);
+                list.ResolvedType = ConvertTypeReference(parentType, list.ResolvedType);
                 return list;
             }
 
             var reference = type as GraphQLTypeReference;
-            return reference == null ? type : this[reference.TypeName];
+            var result = reference == null ? type : this[reference.TypeName];
+
+            if (reference != null && result == null)
+            {
+                throw new ExecutionError($"Unable to resolve reference to type '{reference.TypeName}' on '{parentType.Name}'");
+            }
+
+            return result;
         }
     }
 }
