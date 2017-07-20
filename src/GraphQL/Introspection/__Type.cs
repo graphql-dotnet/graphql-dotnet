@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
@@ -25,10 +25,6 @@ namespace GraphQL.Introspection
                 {
                     return KindForInstance((GraphType)context.Source);
                 }
-//                if (context.Source is Type)
-//                {
-//                    return KindForType((Type)context.Source);
-//                }
 
                 throw new ExecutionError("Unkown kind of type: {0}".ToFormat(context.Source));
             });

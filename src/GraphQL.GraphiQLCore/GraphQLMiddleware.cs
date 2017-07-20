@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GraphQL.Http;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
@@ -29,15 +29,15 @@ namespace GraphQL.GraphiQLCore
             _writer = writer;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ISchema schema)
         {
             if (!IsGraphQLRequest(context))
             {
-                await _next(context).ConfigureAwait(false);
+                await _next(context);
                 return;
             }
 
-            await ExecuteAsync(context);
+            await ExecuteAsync(context, schema);
         }
 
         private bool IsGraphQLRequest(HttpContext context)
@@ -46,7 +46,7 @@ namespace GraphQL.GraphiQLCore
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
-        private async Task ExecuteAsync(HttpContext context)
+        private async Task ExecuteAsync(HttpContext context, ISchema schema)
         {
             string body;
             using (var streamReader = new StreamReader(context.Request.Body))
@@ -58,10 +58,11 @@ namespace GraphQL.GraphiQLCore
 
             var result = await _executer.ExecuteAsync(_ =>
             {
-                _.Schema = _settings.Schema;
+                _.Schema = schema;
                 _.Query = request.Query;
                 _.OperationName = request.OperationName;
                 _.Inputs = request.Variables.ToInputs();
+                _.UserContext = _settings?.BuildUserContext(context);
             });
 
             await WriteResponseAsync(context, result);

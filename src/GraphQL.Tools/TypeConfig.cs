@@ -1,42 +1,91 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Tools
 {
-    public class TypeConfig
+    public class MetadataProvider : IProvideMetadata
     {
-        private readonly LightweightCache<string, IFieldResolver> _resolvers;
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
+        {
+            if (!HasMetadata(key))
+            {
+                return defaultValue;
+            }
+
+            object item;
+            if (Metadata.TryGetValue(key, out item))
+            {
+                return (TType) item;
+            }
+
+            return defaultValue;
+        }
+
+        public bool HasMetadata(string key)
+        {
+            return Metadata.ContainsKey(key);
+        }
+    }
+
+    public class FieldConfig : MetadataProvider
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public IFieldResolver ResolverValue { get; set; }
+
+        public void Resolver<TSourceType, TReturnType>(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        {
+            ResolverValue = new FuncFieldResolver<TSourceType, TReturnType>(resolver);
+        }
+
+        public void Resolver<TReturnType>(Func<ResolveFieldContext, TReturnType> resolver)
+        {
+            ResolverValue = new FuncFieldResolver<TReturnType>(resolver);
+        }
+    }
+
+    public class TypeConfig : MetadataProvider
+    {
+        private readonly LightweightCache<string, FieldConfig> _resolvers;
 
         public TypeConfig(string name)
         {
-            _resolvers = new LightweightCache<string, IFieldResolver>(s => null);
+            _resolvers = new LightweightCache<string, FieldConfig>(s => new FieldConfig {Name = s});
 
             Name = name;
         }
 
         public string Name { get; }
-
+        public string Description { get; set; }
         public Func<object, bool> IsTypeOf { get; set; }
+        public Func<object, IObjectGraphType> ResolveType { get; set; }
 
         public IFieldResolver ResolverFor(string field)
         {
-            return _resolvers[field];
+            return _resolvers[field].ResolverValue;
         }
 
-        public void Resolver<TSourceType, TReturnType>(string field, Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public void Field(string name, Action<FieldConfig> configure)
         {
-            Resolver(field, new FuncFieldResolver<TSourceType, TReturnType>(resolver));
+            var config = _resolvers[name];
+            configure(config);
         }
 
-        public void Resolver<TReturnType>(string field, Func<ResolveFieldContext, TReturnType> resolver)
+        public void Field<TSourceType, TReturnType>(string name, Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
-            Resolver(field, new FuncFieldResolver<TReturnType>(resolver));
+            var r = new FuncFieldResolver<TSourceType, TReturnType>(resolver);
+            _resolvers[name].ResolverValue = r;
         }
 
-        public void Resolver(string field, IFieldResolver resolver)
+        public void Field<TReturnType>(string name, Func<ResolveFieldContext, TReturnType> resolver)
         {
-            _resolvers[field] = resolver;
+            var r = new FuncFieldResolver<TReturnType>(resolver);
+            _resolvers[name].ResolverValue = r;
         }
     }
 }

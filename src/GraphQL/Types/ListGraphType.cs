@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace GraphQL.Types
 {
@@ -24,6 +24,7 @@ namespace GraphQL.Types
         }
 
         public Type Type { get; private set; }
+
         public IGraphType ResolvedType { get; set; }
 
         public override string CollectTypes(TypeCollectionContext context)

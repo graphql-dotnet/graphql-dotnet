@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.Http;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tools.Tests
@@ -57,9 +62,9 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            Builder.Config("Query", _ =>
+            Builder.Types.Configure("Query", _ =>
             {
-                _.Resolver("post", context =>
+                _.Field("post", context =>
                 {
                     var id = context.GetArgument<string>("id");
                     return _posts.FirstOrDefault(x => x.Id == id);
@@ -105,19 +110,19 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            Builder.Config("Dog", _ =>
+            Builder.Types.Configure("Dog", _ =>
             {
                 _.IsTypeOf = obj => obj is Dog;
             });
 
-            Builder.Config("Cat", _ =>
+            Builder.Types.Configure("Cat", _ =>
             {
                 _.IsTypeOf = obj => obj is Cat;
             });
 
-            Builder.Config("Query", _ =>
+            Builder.Types.Configure("Query", _ =>
             {
-                _.Resolver<Pet>("pet", context =>
+                _.Field<Pet>("pet", context =>
                 {
                     var type = context.GetArgument<PetKind>("type");
                     if (type == PetKind.Dog)
@@ -138,6 +143,49 @@ namespace GraphQL.Tools.Tests
                 _.Definitions = defs;
                 _.ExpectedResult = expected;
             });
+        }
+
+        [Fact]
+        public void minimal()
+        {
+            var schema = GraphQLSchema.For(@"
+                type Query {
+                  hello: String
+                }
+            ");
+
+            var root = new { Hello = "Hello World!" };
+            var result = schema.Execute(_ =>
+            {
+                _.Query = "{ hello }";
+                _.Root = root;
+            });
+            Console.WriteLine(result);
+        }
+    }
+
+    public static class SchemaExtensions
+    {
+        public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
+        {
+            var executor = new DocumentExecuter();
+            var result = executor.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                configure(_);
+            }).GetAwaiter().GetResult();
+            return new DocumentWriter(indent: true).Write(result);
+        }
+
+        public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
+        {
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                configure(_);
+            });
+            return new DocumentWriter(indent: true).Write(result);
         }
     }
 }

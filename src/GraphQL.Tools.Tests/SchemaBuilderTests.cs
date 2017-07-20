@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -18,8 +18,8 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
+            schema.Initialize();
 
             var query = schema.Query;
             query.ShouldNotBeNull();
@@ -38,8 +38,8 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
+            schema.Initialize();
 
             var mutation = schema.Mutation;
             mutation.ShouldNotBeNull();
@@ -58,8 +58,8 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
+            schema.Initialize();
 
             var subscription = schema.Subscription;
             subscription.ShouldNotBeNull();
@@ -92,8 +92,8 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
+            schema.Initialize();
 
             var query = schema.Query;
             query.ShouldNotBeNull();
@@ -117,8 +117,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -144,8 +143,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
             schema.Initialize();
 
             var type = schema.FindType("Pet") as InterfaceGraphType;
@@ -167,14 +165,43 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
             schema.Initialize();
 
             var type = schema.FindType("PetKind") as EnumerationGraphType;
             type.ShouldNotBeNull();
 
             type.Values.Select(x => x.Value.ToString()).ShouldBe(new [] {"CAT", "DOG"});
+        }
+
+        [Fact]
+        public void builds_scalars()
+        {
+            var definitions = @"
+                scalar CustomScalar
+
+                type Query {
+                    search: CustomScalar
+                }
+            ";
+
+            var customScalar = new CustomScalarType();
+
+            var schema = GraphQLSchema.For(definitions, _ =>
+            {
+                _.RegisterType(customScalar);
+            });
+
+            schema.Initialize();
+
+            var type = schema.FindType("CustomScalar") as ScalarGraphType;
+            type.ShouldNotBeNull();
+
+            var query = schema.Query;
+            query.ShouldNotBeNull();
+
+            var field = query.Fields.First();
+            field.ResolvedType.ShouldBeOfType<CustomScalarType>();
         }
 
         [Fact]
@@ -193,9 +220,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var builder = new SchemaBuilder();
-
-            var schema = builder.Build(definitions);
+            var schema = GraphQLSchema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -212,6 +237,60 @@ namespace GraphQL.Tools.Tests
             var post = schema.FindType("Post") as IObjectGraphType;
             post.ShouldNotBeNull();
             post.Fields.Count().ShouldBe(3);
+        }
+
+        [Fact]
+        public void builds_unions()
+        {
+            var definitions = @"
+                type Human {
+                    name: String
+                }
+
+                type Droid {
+                    name: String
+                }
+
+                union SearchResult = Human | Droid";
+
+            var schema = GraphQLSchema.For(definitions, _ =>
+            {
+                _.Types.Configure("SearchResult", t =>
+                {
+                    t.ResolveType = obj =>
+                    {
+                        return null;
+                    };
+                });
+            });
+
+            schema.Initialize();
+
+            var searchResult = schema.FindType("SearchResult") as UnionGraphType;
+            searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] {"Human", "Droid"});
+        }
+
+        class CustomScalarType : ScalarGraphType
+        {
+            public CustomScalarType()
+            {
+                Name = "CustomScalar";
+            }
+
+            public override object Serialize(object value)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public override object ParseValue(object value)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public override object ParseLiteral(IValue value)
+            {
+                throw new System.NotImplementedException();
+            }
         }
     }
 }

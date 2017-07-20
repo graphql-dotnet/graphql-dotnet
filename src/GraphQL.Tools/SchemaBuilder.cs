@@ -8,15 +8,49 @@ using OperationType = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Tools
 {
+    public class GraphQLSchema
+    {
+        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var defs = string.Join("\n", typeDefinitions);
+            return For(defs, configure);
+        }
+
+        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var builder = new SchemaBuilder();
+            configure?.Invoke(builder);
+            return builder.Build(typeDefinitions);
+        }
+    }
+
+    public class TypeSettings
+    {
+        private readonly LightweightCache<string, TypeConfig> _typeConfigurations;
+
+        public TypeSettings()
+        {
+            _typeConfigurations = new LightweightCache<string, TypeConfig>(s => new TypeConfig(s));
+        }
+
+        public void Configure(string typeName, Action<TypeConfig> configure)
+        {
+            var config = _typeConfigurations[typeName];
+            configure(config);
+        }
+
+        public TypeConfig ConfigFor(string typeName)
+        {
+            return _typeConfigurations[typeName];
+        }
+    }
+
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
-        private readonly LightweightCache<string, TypeConfig> _resolvers;
 
-        public SchemaBuilder()
-        {
-            _resolvers = new LightweightCache<string, TypeConfig>(s => new TypeConfig(s));
-        }
+        public AuthorizationSettings Authorization { get; } = new AuthorizationSettings();
+        public TypeSettings Types { get; } = new TypeSettings();
 
         private IGraphType GetType(string name)
         {
@@ -24,15 +58,24 @@ namespace GraphQL.Tools
             return type;
         }
 
-        public void Config(string typeName, Action<TypeConfig> configure)
+        public void RegisterType(IGraphType type)
         {
-            var config = _resolvers[typeName];
-            configure(config);
+            _types[type.Name] = type;
         }
 
-        public ISchema Build(string typeDefs)
+        public void RegisterTypes(IEnumerable<IGraphType> types)
         {
-            var document = Parse(typeDefs);
+            types.Apply(t => _types[t.Name] = t);
+        }
+
+        public ISchema Build(string[] typeDefinitions)
+        {
+            return Build(string.Join(Environment.NewLine, typeDefinitions));
+        }
+
+        public ISchema Build(string typeDefinitions)
+        {
+            var document = Parse(typeDefinitions);
             return BuildSchemaFrom(document);
         }
 
@@ -44,7 +87,7 @@ namespace GraphQL.Tools
             return ast;
         }
 
-        public ISchema BuildSchemaFrom(GraphQLDocument document)
+        private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
             var schema = new Schema();
 
@@ -75,6 +118,13 @@ namespace GraphQL.Tools
                     case ASTNodeKind.EnumTypeDefinition:
                     {
                         var type = ToEnumerationType(def as GraphQLEnumTypeDefinition);
+                        _types[type.Name] = type;
+                        break;
+                    }
+
+                    case ASTNodeKind.UnionTypeDefinition:
+                    {
+                        var type = ToUnionType(def as GraphQLUnionTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
@@ -120,13 +170,16 @@ namespace GraphQL.Tools
             return schema;
         }
 
-        public IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
+        private IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
         {
-            var typeConfig = _resolvers[astType.Name.Value];
+            var typeConfig = Types.ConfigFor(astType.Name.Value);
 
             var type = new ObjectGraphType();
             type.Name = astType.Name.Value;
+            type.Description = typeConfig.Description;
             type.IsTypeOf = typeConfig.IsTypeOf;
+
+            CopyMetadata(type, typeConfig);
 
             var fields = astType.Fields.Select(ToFieldType);
             fields.Apply(f =>
@@ -144,7 +197,7 @@ namespace GraphQL.Tools
             return type;
         }
 
-        public FieldType ToFieldType(GraphQLFieldDefinition fieldDef)
+        private FieldType ToFieldType(GraphQLFieldDefinition fieldDef)
         {
             var field = new FieldType();
             field.Name = fieldDef.Name.Value;
@@ -156,10 +209,16 @@ namespace GraphQL.Tools
             return field;
         }
 
-        public InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
+        private InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
+            var typeConfig = Types.ConfigFor(interfaceDef.Name.Value);
+
             var type = new InterfaceGraphType();
             type.Name = interfaceDef.Name.Value;
+            type.Description = typeConfig.Description;
+            type.ResolveType = typeConfig.ResolveType;
+
+            CopyMetadata(type, typeConfig);
 
             var fields = interfaceDef.Fields.Select(ToFieldType);
             fields.Apply(f => type.AddField(f));
@@ -167,7 +226,23 @@ namespace GraphQL.Tools
             return type;
         }
 
-        public EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
+        private UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
+        {
+            var typeConfig = Types.ConfigFor(unionDef.Name.Value);
+
+            var type = new UnionGraphType();
+            type.Name = unionDef.Name.Value;
+            type.Description = typeConfig.Description;
+            type.ResolveType = typeConfig.ResolveType;
+
+            CopyMetadata(type, typeConfig);
+
+            var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value));
+            possibleTypes.Apply(x => type.AddPossibleType(x as IObjectGraphType));
+            return type;
+        }
+
+        private EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
             var type = new EnumerationGraphType();
             type.Name = enumDef.Name.Value;
@@ -176,7 +251,7 @@ namespace GraphQL.Tools
             return type;
         }
 
-        public EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
+        private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
         {
             var val = new EnumValueDefinition();
             val.Value = valDef.Name.Value;
@@ -184,7 +259,7 @@ namespace GraphQL.Tools
             return val;
         }
 
-        public QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)
+        private QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)
         {
             var type = ToGraphType(inputDef.Type);
 
@@ -196,7 +271,7 @@ namespace GraphQL.Tools
             return arg;
         }
 
-        public IGraphType ToGraphType(GraphQLType astType)
+        private IGraphType ToGraphType(GraphQLType astType)
         {
             switch (astType.Kind)
             {
@@ -223,7 +298,7 @@ namespace GraphQL.Tools
             throw new ArgumentOutOfRangeException($"Unknown GraphQL type {astType.Kind}");
         }
 
-        public object ToValue(GraphQLValue source)
+        private object ToValue(GraphQLValue source)
         {
             switch (source.Kind)
             {
@@ -287,6 +362,14 @@ namespace GraphQL.Tools
             }
 
             throw new ExecutionError($"Unsupported value type {source.Kind}");
+        }
+
+        private void CopyMetadata(IGraphType type, TypeConfig config)
+        {
+            config.Metadata.Apply(kv =>
+            {
+                type.Metadata[kv.Key] = kv.Value;
+            });
         }
     }
 }
