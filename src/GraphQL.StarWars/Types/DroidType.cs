@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using GraphQL.Types;
 
 namespace GraphQL.StarWars.Types
@@ -18,6 +19,18 @@ namespace GraphQL.StarWars.Types
             );
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
             Field(d => d.PrimaryFunction, nullable: true).Description("The primary function of the droid.");
+
+            Field<StringGraphType>("testing",
+                arguments: new QueryArguments(
+                    new QueryArgument<ListGraphType<StringGraphType>>
+                    {
+                        Name = "ids"
+                    }),
+                resolve: context =>
+                {
+                    var ids = context.GetArgument<List<string>>("ids");
+                    return string.Join(", ", ids);
+                });
 
             Interface<CharacterInterface>();
         }
