@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace GraphQL.Tools
+namespace GraphQL.Authorization
 {
     public interface IAuthorizationEvaluator
     {

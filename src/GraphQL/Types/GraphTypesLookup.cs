@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
@@ -9,7 +8,7 @@ namespace GraphQL.Types
 {
     public class GraphTypesLookup
     {
-        private readonly IDictionary<string, IGraphType> _types = new ConcurrentDictionary<string, IGraphType>();
+        private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
         private readonly object _lock = new object();
 

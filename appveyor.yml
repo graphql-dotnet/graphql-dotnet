@@ -36,3 +36,4 @@ deploy:
     branch:
       - master
       - dev
+      - instance

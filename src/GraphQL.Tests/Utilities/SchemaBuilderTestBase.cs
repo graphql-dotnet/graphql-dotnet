@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
 using GraphQL.Http;
+using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 
-namespace GraphQL.Tools.Tests
+namespace GraphQL.Tests.Utilities
 {
-    public class TestBase
+    public class SchemaBuilderTestBase
     {
-        public TestBase()
+        public SchemaBuilderTestBase()
         {
             Builder = new SchemaBuilder();
         }

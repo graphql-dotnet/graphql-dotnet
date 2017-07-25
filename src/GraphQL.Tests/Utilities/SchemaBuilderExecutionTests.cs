@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Http;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tools.Tests
+namespace GraphQL.Tests.Utilities
 {
-    public class ExecutionTests : TestBase
+    public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         class Post
         {
@@ -19,7 +17,7 @@ namespace GraphQL.Tools.Tests
 
         private readonly List<Post> _posts;
 
-        public ExecutionTests()
+        public SchemaBuilderExecutionTests()
         {
             _posts = new List<Post>
             {
@@ -146,9 +144,9 @@ namespace GraphQL.Tools.Tests
         }
 
         [Fact]
-        public void minimal()
+        public void minimal_schema()
         {
-            var schema = GraphQLSchema.For(@"
+            var schema = Schema.For(@"
                 type Query {
                   hello: String
                 }
@@ -160,8 +158,11 @@ namespace GraphQL.Tools.Tests
                 _.Query = "{ hello }";
                 _.Root = root;
             });
-            Console.WriteLine(result);
+
+            var expectedResult = CreateQueryResult("{ 'hello': 'Hello World!' }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
         }
     }
-
 }

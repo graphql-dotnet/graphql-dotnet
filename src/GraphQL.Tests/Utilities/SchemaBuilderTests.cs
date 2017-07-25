@@ -5,7 +5,7 @@ using GraphQL.Utilities;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tools.Tests
+namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderTests
     {
@@ -18,7 +18,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -38,7 +38,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var mutation = schema.Mutation;
@@ -58,7 +58,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var subscription = schema.Subscription;
@@ -92,7 +92,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -117,7 +117,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -143,7 +143,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var type = schema.FindType("Pet") as InterfaceGraphType;
@@ -165,7 +165,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var type = schema.FindType("PetKind") as EnumerationGraphType;
@@ -187,7 +187,7 @@ namespace GraphQL.Tools.Tests
 
             var customScalar = new CustomScalarType();
 
-            var schema = GraphQLSchema.For(definitions, _ =>
+            var schema = Schema.For(definitions, _ =>
             {
                 _.RegisterType(customScalar);
             });
@@ -220,7 +220,7 @@ namespace GraphQL.Tools.Tests
                 }
             ";
 
-            var schema = GraphQLSchema.For(definitions);
+            var schema = Schema.For(definitions);
             schema.Initialize();
 
             var query = schema.Query;
@@ -253,7 +253,7 @@ namespace GraphQL.Tools.Tests
 
                 union SearchResult = Human | Droid";
 
-            var schema = GraphQLSchema.For(definitions, _ =>
+            var schema = Schema.For(definitions, _ =>
             {
                 _.Types.Configure("SearchResult", t =>
                 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Conversion;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -62,6 +63,19 @@ namespace GraphQL.Types
                 DirectiveGraphType.Skip,
                 DirectiveGraphType.Deprecated
             };
+        }
+
+        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var defs = string.Join("\n", typeDefinitions);
+            return For(defs, configure);
+        }
+
+        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var builder = new SchemaBuilder();
+            configure?.Invoke(builder);
+            return builder.Build(typeDefinitions);
         }
 
         public IFieldNameConverter FieldNameConverter { get; set;} = new CamelCaseFieldNameConverter();

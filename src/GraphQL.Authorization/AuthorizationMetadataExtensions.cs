@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Types;
 
-namespace GraphQL.Tools
+namespace GraphQL.Authorization
 {
-    public static class MetadataExtensions
+    public static class AuthorizationMetadataExtensions
     {
         public static readonly string PolicyKey = "Policies";
 

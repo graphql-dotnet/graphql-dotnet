@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace GraphQL.Tools
+namespace GraphQL.Authorization
 {
     public interface IProvideClaimsPrincipal
     {

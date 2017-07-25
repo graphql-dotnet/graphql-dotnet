@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace GraphQL.Tools
+namespace GraphQL.Authorization
 {
     public interface IAuthorizationRequirement
     {

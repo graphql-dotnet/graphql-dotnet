@@ -6,57 +6,13 @@ using GraphQLParser;
 using GraphQLParser.AST;
 using OperationType = GraphQLParser.AST.OperationType;
 
-namespace GraphQL.Tools
+namespace GraphQL.Utilities
 {
-    public class GraphQLSchema
-    {
-        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
-        {
-            var defs = string.Join("\n", typeDefinitions);
-            return For(defs, configure);
-        }
-
-        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
-        {
-            var builder = new SchemaBuilder();
-            configure?.Invoke(builder);
-            return builder.Build(typeDefinitions);
-        }
-    }
-
-    public class TypeSettings
-    {
-        private readonly LightweightCache<string, TypeConfig> _typeConfigurations;
-
-        public TypeSettings()
-        {
-            _typeConfigurations = new LightweightCache<string, TypeConfig>(s => new TypeConfig(s));
-        }
-
-        public void Configure(string typeName, Action<TypeConfig> configure)
-        {
-            var config = _typeConfigurations[typeName];
-            configure(config);
-        }
-
-        public TypeConfig ConfigFor(string typeName)
-        {
-            return _typeConfigurations[typeName];
-        }
-    }
-
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
-        public AuthorizationSettings Authorization { get; } = new AuthorizationSettings();
         public TypeSettings Types { get; } = new TypeSettings();
-
-        private IGraphType GetType(string name)
-        {
-            _types.TryGetValue(name, out IGraphType type);
-            return type;
-        }
 
         public void RegisterType(IGraphType type)
         {
@@ -170,7 +126,13 @@ namespace GraphQL.Tools
             return schema;
         }
 
-        private IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
+        protected virtual IGraphType GetType(string name)
+        {
+            _types.TryGetValue(name, out IGraphType type);
+            return type;
+        }
+
+        protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
         {
             var typeConfig = Types.ConfigFor(astType.Name.Value);
 
@@ -197,7 +159,7 @@ namespace GraphQL.Tools
             return type;
         }
 
-        private FieldType ToFieldType(GraphQLFieldDefinition fieldDef)
+        protected virtual FieldType ToFieldType(GraphQLFieldDefinition fieldDef)
         {
             var field = new FieldType();
             field.Name = fieldDef.Name.Value;
@@ -209,7 +171,7 @@ namespace GraphQL.Tools
             return field;
         }
 
-        private InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
+        protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
             var typeConfig = Types.ConfigFor(interfaceDef.Name.Value);
 
@@ -226,7 +188,7 @@ namespace GraphQL.Tools
             return type;
         }
 
-        private UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
+        protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
             var typeConfig = Types.ConfigFor(unionDef.Name.Value);
 
@@ -242,7 +204,7 @@ namespace GraphQL.Tools
             return type;
         }
 
-        private EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
+        protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
             var type = new EnumerationGraphType();
             type.Name = enumDef.Name.Value;
@@ -259,7 +221,7 @@ namespace GraphQL.Tools
             return val;
         }
 
-        private QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)
+        protected virtual QueryArgument ToArguments(GraphQLInputValueDefinition inputDef)
         {
             var type = ToGraphType(inputDef.Type);
 
@@ -364,7 +326,7 @@ namespace GraphQL.Tools
             throw new ExecutionError($"Unsupported value type {source.Kind}");
         }
 
-        private void CopyMetadata(IGraphType type, TypeConfig config)
+        protected virtual void CopyMetadata(IGraphType type, TypeConfig config)
         {
             config.Metadata.Apply(kv =>
             {

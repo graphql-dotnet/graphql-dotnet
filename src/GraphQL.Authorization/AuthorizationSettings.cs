@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GraphQL.Tools
+namespace GraphQL.Authorization
 {
     public class AuthorizationSettings
     {
