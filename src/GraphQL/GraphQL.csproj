@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>GraphQL for .NET</Description>
-    <VersionPrefix>0.17.3</VersionPrefix>
+    <VersionPrefix>0.18.0</VersionPrefix>
     <Authors>Joe McBride</Authors>
     <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
     <PackageTargetFallback>dnxcore50</PackageTargetFallback>
