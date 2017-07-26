@@ -270,6 +270,24 @@ namespace GraphQL.Tests.Utilities
             searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] {"Human", "Droid"});
         }
 
+        [Fact]
+        public void builds_input_types()
+        {
+            var definitions = @"
+                input ReviewInput {
+                  stars: Int!
+                  commentary: String
+                }
+                ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+
+            var input = schema.FindType("ReviewInput") as InputObjectGraphType;
+            input.ShouldNotBeNull();
+            input.Fields.Count().ShouldBe(2);
+        }
+
         class CustomScalarType : ScalarGraphType
         {
             public CustomScalarType()

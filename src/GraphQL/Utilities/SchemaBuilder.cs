@@ -84,6 +84,13 @@ namespace GraphQL.Utilities
                         _types[type.Name] = type;
                         break;
                     }
+
+                    case ASTNodeKind.InputObjectTypeDefinition:
+                    {
+                        var type = ToInputObjectType(def as GraphQLInputObjectTypeDefinition);
+                        _types[type.Name] = type;
+                        break;
+                    }
                 }
             }
 
@@ -171,6 +178,16 @@ namespace GraphQL.Utilities
             return field;
         }
 
+        protected virtual FieldType ToFieldType(GraphQLInputValueDefinition inputDef)
+        {
+            var field = new FieldType();
+            field.Name = inputDef.Name.Value;
+            field.ResolvedType = ToGraphType(inputDef.Type);
+            field.DefaultValue = ToValue(inputDef.DefaultValue);
+
+            return field;
+        }
+
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
             var typeConfig = Types.ConfigFor(interfaceDef.Name.Value);
@@ -201,6 +218,17 @@ namespace GraphQL.Utilities
 
             var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value));
             possibleTypes.Apply(x => type.AddPossibleType(x as IObjectGraphType));
+            return type;
+        }
+
+        protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
+        {
+            var type = new InputObjectGraphType();
+            type.Name = inputDef.Name.Value;
+            var fields = inputDef.Fields.Select(ToFieldType);
+
+            fields.Apply(f => type.AddField(f));
+
             return type;
         }
 
@@ -262,6 +290,11 @@ namespace GraphQL.Utilities
 
         private object ToValue(GraphQLValue source)
         {
+            if (source == null)
+            {
+                return null;
+            }
+
             switch (source.Kind)
             {
                 case ASTNodeKind.StringValue:

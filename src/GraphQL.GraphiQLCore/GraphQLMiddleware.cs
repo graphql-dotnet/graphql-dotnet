@@ -62,7 +62,7 @@ namespace GraphQL.GraphiQLCore
                 _.Query = request.Query;
                 _.OperationName = request.OperationName;
                 _.Inputs = request.Variables.ToInputs();
-                _.UserContext = _settings?.BuildUserContext(context);
+                _.UserContext = _settings.BuildUserContext?.Invoke(context);
             });
 
             await WriteResponseAsync(context, result);
