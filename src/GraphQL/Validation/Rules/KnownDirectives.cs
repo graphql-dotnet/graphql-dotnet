@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
             {
                 _.Match<Directive>(node =>
                 {
-                    var directiveDef = context.Schema.Directives.SingleOrDefault(x => x.Name == node.Name);
+                    var directiveDef = context.Schema.FindDirective(node.Name);
                     if (directiveDef == null)
                     {
                         context.ReportError(new ValidationError(context.OriginalQuery, "5.6.1", UnknownDirectiveMessage(node.Name), node));

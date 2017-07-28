@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -46,6 +47,7 @@ namespace GraphQL.Utilities
         private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
             var schema = new Schema();
+            var directives = new List<DirectiveGraphType>();
 
             GraphQLSchemaDefinition schemaDef = null;
 
@@ -91,6 +93,13 @@ namespace GraphQL.Utilities
                         _types[type.Name] = type;
                         break;
                     }
+
+                    case ASTNodeKind.DirectiveDefinition:
+                    {
+                        var directive = ToDirective(def as GraphQLDirectiveDefinition);
+                        directives.Add(directive);
+                        break;
+                    }
                 }
             }
 
@@ -129,6 +138,7 @@ namespace GraphQL.Utilities
 
             var typeList = _types.Values.ToArray();
             typeList.Apply(schema.RegisterType);
+            schema.RegisterDirectives(directives.ToArray());
 
             return schema;
         }
@@ -239,6 +249,29 @@ namespace GraphQL.Utilities
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
             return type;
+        }
+
+        protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
+        {
+            var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
+            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations);
+
+            var arguments = directiveDef.Arguments.Select(ToArguments);
+            directive.Arguments = new QueryArguments(arguments);
+
+            return directive;
+        }
+
+        private DirectiveLocation ToDirectiveLocation(string name)
+        {
+            var enums = new __DirectiveLocation();
+            var result = enums.ParseValue(name);
+            if (result != null)
+            {
+                return (DirectiveLocation) result;
+            }
+
+            throw new ExecutionError($"{name} is an unknown directive location");
         }
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)

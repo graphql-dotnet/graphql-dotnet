@@ -278,7 +278,7 @@ namespace GraphQL.Tests.Utilities
                   stars: Int!
                   commentary: String
                 }
-                ";
+            ";
 
             var schema = Schema.For(definitions);
             schema.Initialize();
@@ -286,6 +286,33 @@ namespace GraphQL.Tests.Utilities
             var input = schema.FindType("ReviewInput") as InputObjectGraphType;
             input.ShouldNotBeNull();
             input.Fields.Count().ShouldBe(2);
+        }
+
+        [Fact]
+        public void builds_directives()
+        {
+            var definitions = @"
+                directive @myDirective(
+                  if: Boolean!
+                ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+            ";
+
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+
+            var directive = schema.FindDirective("myDirective");
+            directive.ShouldNotBeNull();
+
+            directive.Arguments.Count().ShouldBe(1);
+            var argument = directive.Arguments.Find("if");
+            SchemaPrinter.ResolveName(argument.ResolvedType).ShouldBe("Boolean!");
+
+            directive.Locations.ShouldBe(new[]
+            {
+                DirectiveLocation.Field,
+                DirectiveLocation.FragmentSpread,
+                DirectiveLocation.InlineFragment
+            });
         }
 
         class CustomScalarType : ScalarGraphType

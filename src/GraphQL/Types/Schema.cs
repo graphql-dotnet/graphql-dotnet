@@ -27,6 +27,8 @@ namespace GraphQL.Types
 
         IGraphType FindType(string name);
 
+        DirectiveGraphType FindDirective(string name);
+
         IEnumerable<Type> AdditionalTypes { get; }
 
         void RegisterType(IGraphType type);
@@ -36,6 +38,10 @@ namespace GraphQL.Types
         void RegisterTypes(params Type[] types);
 
         void RegisterType<T>() where T : IGraphType;
+
+        void RegisterDirective(DirectiveGraphType directive);
+
+        void RegisterDirectives(params DirectiveGraphType[] directives);
     }
 
     public class Schema : ISchema
@@ -144,6 +150,21 @@ namespace GraphQL.Types
         public void RegisterType<T>() where T : IGraphType
         {
             RegisterType(typeof(T));
+        }
+
+        public void RegisterDirective(DirectiveGraphType directive)
+        {
+            _directives.Add(directive);
+        }
+
+        public void RegisterDirectives(params DirectiveGraphType[] directives)
+        {
+            directives.Apply(RegisterDirective);
+        }
+
+        public DirectiveGraphType FindDirective(string name)
+        {
+            return _directives.FirstOrDefault(x => x.Name == name);
         }
 
         public IGraphType FindType(string name)

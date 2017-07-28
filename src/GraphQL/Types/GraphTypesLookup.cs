@@ -65,6 +65,7 @@ namespace GraphQL.Types
                 {
                     if (arg.ResolvedType != null)
                     {
+                        arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
                         return;
                     }
 
@@ -391,7 +392,7 @@ namespace GraphQL.Types
             }
         }
 
-        private IGraphType ConvertTypeReference(IGraphType parentType, IGraphType type)
+        private IGraphType ConvertTypeReference(INamedType parentType, IGraphType type)
         {
             if (type is NonNullGraphType)
             {
