@@ -1,4 +1,5 @@
-﻿using GraphQL.StarWars.Types;
+﻿using System;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
 namespace GraphQL.StarWars
@@ -17,12 +18,15 @@ namespace GraphQL.StarWars
                 ),
                 resolve: context => data.GetHumanByIdAsync(context.GetArgument<string>("id"))
             );
-            Field<DroidType>(
+
+            Func<ResolveFieldContext<object>, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
+
+            FieldDelegate<DroidType>(
                 "droid",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
                 ),
-                resolve: context => data.GetDroidByIdAsync(context.GetArgument<string>("id"))
+                resolve: func
             );
         }
     }
