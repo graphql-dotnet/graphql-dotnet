@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -6,11 +6,11 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class FuncFieldModelBinderResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
+    public class DelegateFieldModelBinderResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
     {
         private readonly Delegate _resolver;
 
-        public FuncFieldModelBinderResolver(Delegate resolver)
+        public DelegateFieldModelBinderResolver(Delegate resolver)
         {
             if (resolver == null)
             {
