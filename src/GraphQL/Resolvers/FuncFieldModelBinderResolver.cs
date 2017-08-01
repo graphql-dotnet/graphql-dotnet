@@ -21,21 +21,25 @@ namespace GraphQL.Resolvers
 
         public async Task<TReturnType> Resolve(ResolveFieldContext context)
         {
-            var parameters = RuntimeReflectionExtensions.GetMethodInfo(_resolver).GetParameters();
+            var parameters = _resolver.GetMethodInfo().GetParameters();
 
             int index = 0;
-            var arguments = new object[parameters.Length];
+            object[] arguments = null;
 
-            if (context.As<TSourceType>().GetType() == parameters[0].ParameterType)
+            if (parameters.Any())
             {
-                arguments[index] = context.As<TSourceType>();
-                index++;
-            }
+                arguments = new object[parameters.Length];
+                if (context.As<TSourceType>().GetType() == parameters[0].ParameterType)
+                {
+                    arguments[index] = context.As<TSourceType>();
+                    index++;
+                }
 
-            foreach (var parameter in parameters.Skip(index))
-            {
-                arguments[index] = context.GetArgument<object>(parameter.Name);
-                index++;
+                foreach (var parameter in parameters.Skip(index))
+                {
+                    arguments[index] = context.GetArgument<object>(parameter.Name);
+                    index++;
+                } 
             }
 
             var result = _resolver.DynamicInvoke(arguments);
