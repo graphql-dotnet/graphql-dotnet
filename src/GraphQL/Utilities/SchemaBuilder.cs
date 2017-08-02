@@ -12,12 +12,27 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        private readonly WrappedDependencyResolver _dependencyResolver;
+
+        public SchemaBuilder()
+        {
+            _dependencyResolver = new WrappedDependencyResolver(new DefaultDependencyResolver());
+        }
+
+        protected IDependencyResolver DependencyResolver => _dependencyResolver;
 
         public TypeSettings Types { get; } = new TypeSettings();
 
-        public void RegisterType(IGraphType type)
+        public SchemaBuilder SetDependencyResolver(IDependencyResolver resolver)
+        {
+            _dependencyResolver.InnerResolver = resolver;
+            return this;
+        }
+
+        public SchemaBuilder RegisterType(IGraphType type)
         {
             _types[type.Name] = type;
+            return this;
         }
 
         public void RegisterTypes(IEnumerable<IGraphType> types)
@@ -46,7 +61,8 @@ namespace GraphQL.Utilities
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema();
+            var schema = new Schema(_dependencyResolver);
+
             var directives = new List<DirectiveGraphType>();
 
             GraphQLSchemaDefinition schemaDef = null;
@@ -151,19 +167,18 @@ namespace GraphQL.Utilities
 
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
         {
-            var typeConfig = Types.ConfigFor(astType.Name.Value);
+            var typeConfig = Types.For(astType.Name.Value);
 
             var type = new ObjectGraphType();
             type.Name = astType.Name.Value;
             type.Description = typeConfig.Description;
-            type.IsTypeOf = typeConfig.IsTypeOf;
+            type.IsTypeOf = typeConfig.IsTypeOfFunc;
 
             CopyMetadata(type, typeConfig);
 
-            var fields = astType.Fields.Select(ToFieldType);
+            var fields = astType.Fields.Select(f => ToFieldType(type.Name, f));
             fields.Apply(f =>
             {
-                f.Resolver = typeConfig.ResolverFor(f.Name);
                 type.AddField(f);
             });
 
@@ -176,11 +191,14 @@ namespace GraphQL.Utilities
             return type;
         }
 
-        protected virtual FieldType ToFieldType(GraphQLFieldDefinition fieldDef)
+        protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
+            var typeConfig = Types.For(parentTypeName);
+
             var field = new FieldType();
             field.Name = fieldDef.Name.Value;
             field.ResolvedType = ToGraphType(fieldDef.Type);
+            field.Resolver = typeConfig.ResolverFor(field.Name, _dependencyResolver);
 
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
@@ -200,7 +218,7 @@ namespace GraphQL.Utilities
 
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
-            var typeConfig = Types.ConfigFor(interfaceDef.Name.Value);
+            var typeConfig = Types.For(interfaceDef.Name.Value);
 
             var type = new InterfaceGraphType();
             type.Name = interfaceDef.Name.Value;
@@ -209,7 +227,7 @@ namespace GraphQL.Utilities
 
             CopyMetadata(type, typeConfig);
 
-            var fields = interfaceDef.Fields.Select(ToFieldType);
+            var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
             fields.Apply(f => type.AddField(f));
 
             return type;
@@ -217,7 +235,7 @@ namespace GraphQL.Utilities
 
         protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
-            var typeConfig = Types.ConfigFor(unionDef.Name.Value);
+            var typeConfig = Types.For(unionDef.Name.Value);
 
             var type = new UnionGraphType();
             type.Name = unionDef.Name.Value;

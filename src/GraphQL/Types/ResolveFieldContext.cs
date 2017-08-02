@@ -2,6 +2,7 @@
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using Newtonsoft.Json.Linq;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Types
@@ -91,6 +92,28 @@ namespace GraphQL.Types
             }
 
             return arg.GetPropertyValue(argumentType);
+        }
+
+        public object GetArgument(string name, System.Type type)
+        {
+            if (!HasArgument(name))
+            {
+                return null;
+            }
+
+            var arg = Arguments[name];
+            var inputObject = arg as Dictionary<string, object>;
+            if (inputObject != null)
+            {
+                if (type.Namespace?.StartsWith("System") == true)
+                {
+                    return arg;
+                }
+
+                return inputObject.ToObject(type);
+            }
+
+            return arg.GetPropertyValue(type);
         }
 
         public bool HasArgument(string argumentName)

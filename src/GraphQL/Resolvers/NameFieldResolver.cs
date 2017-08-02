@@ -6,7 +6,7 @@ namespace GraphQL.Resolvers
 {
     internal class NameFieldResolver : IFieldResolver
     {
-        private BindingFlags _flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
+        private readonly BindingFlags _flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
 
         public object Resolve(ResolveFieldContext context)
         {

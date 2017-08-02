@@ -56,6 +56,11 @@ namespace GraphQL.Types
         {
         }
 
+        public Schema(IDependencyResolver dependencyResolver)
+            : this(type => dependencyResolver.Resolve(type) as IGraphType)
+        {
+        }
+
         public Schema(Func<Type, IGraphType> resolveType)
         {
             ResolveType = resolveType;

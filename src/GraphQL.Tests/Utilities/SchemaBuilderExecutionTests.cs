@@ -9,43 +9,6 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
-        class Post
-        {
-            public string Id { get; set; }
-            public string Title { get; set; }
-        }
-
-        private readonly List<Post> _posts;
-
-        public SchemaBuilderExecutionTests()
-        {
-            _posts = new List<Post>
-            {
-                new Post {Id = "1", Title = "Post One"}
-            };
-        }
-
-        abstract class Pet
-        {
-            public string Name { get; set; }
-        }
-
-        class Dog : Pet
-        {
-            public bool Barks { get; set; }
-        }
-
-        class Cat : Pet
-        {
-            public bool Meows { get; set; }
-        }
-
-        enum PetKind
-        {
-            Cat,
-            Dog
-        }
-
         [Fact]
         public void can_execute_resolver()
         {
@@ -56,26 +19,50 @@ namespace GraphQL.Tests.Utilities
                 }
 
                 type Query {
-                    post(id: ID = 1): Post
+                    post(id: ID!): Post
                 }
             ";
 
-            Builder.Types.Configure("Query", _ =>
-            {
-                _.Field("post", context =>
-                {
-                    var id = context.GetArgument<string>("id");
-                    return _posts.FirstOrDefault(x => x.Id == id);
-                });
-            });
+            Builder.Types.Include<PostQueryType>();
 
-            var query = @"{ post { id title } }";
+            var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
             var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
+            var variables = "{ 'id': '1' }";
 
             AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
+                _.Variables = variables;
+                _.ExpectedResult = expected;
+            });
+        }
+
+        [Fact]
+        public void can_execute_renamed_field()
+        {
+            var defs = @"
+                type Post {
+                    id: ID!
+                    title: String!
+                }
+
+                type Query {
+                    post(id: ID!): Post
+                }
+            ";
+
+            Builder.Types.Include<PostQueryRenamedType>();
+
+            var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
+            var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
+            var variables = "{ 'id': '1' }";
+
+            AssertQuery(_ =>
+            {
+                _.Query = query;
+                _.Definitions = defs;
+                _.Variables = variables;
                 _.ExpectedResult = expected;
             });
         }
@@ -108,29 +95,9 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            Builder.Types.Configure("Dog", _ =>
-            {
-                _.IsTypeOf = obj => obj is Dog;
-            });
-
-            Builder.Types.Configure("Cat", _ =>
-            {
-                _.IsTypeOf = obj => obj is Cat;
-            });
-
-            Builder.Types.Configure("Query", _ =>
-            {
-                _.Field<Pet>("pet", context =>
-                {
-                    var type = context.GetArgument<PetKind>("type");
-                    if (type == PetKind.Dog)
-                    {
-                        return new Dog {Name = "Eli", Barks = true};
-                    }
-
-                    return new Cat {Name = "Biscuit", Meows = true};
-                });
-            });
+            Builder.Types.For("Dog").IsTypeOf<Dog>();
+            Builder.Types.For("Cat").IsTypeOf<Cat>();
+            Builder.Types.Include<PetQueryType>();
 
             var query = @"{ pet { name } }";
             var expected = @"{ 'pet': { 'name' : 'Eli' } }";
@@ -163,6 +130,74 @@ namespace GraphQL.Tests.Utilities
             var serializedExpectedResult = Writer.Write(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
+        }
+    }
+
+    public class PostData
+    {
+        public static List<Post> Posts = new List<Post>
+        {
+            new Post {Id = "1", Title = "Post One"}
+        };
+    }
+
+    public class Post
+    {
+        public string Id { get; set; }
+        public string Title { get; set; }
+    }
+
+    [GraphQLName("Query")]
+    public class PostQueryType
+    {
+        public Post Post(string id)
+        {
+            return PostData.Posts.FirstOrDefault(x => x.Id == id);
+        }
+    }
+
+    [GraphQLName("Query")]
+    public class PostQueryRenamedType
+    {
+        [GraphQLName("post")]
+        public Post GetPostById(string id)
+        {
+            return PostData.Posts.FirstOrDefault(x => x.Id == id);
+        }
+    }
+
+    abstract class Pet
+    {
+        public string Name { get; set; }
+    }
+
+    class Dog : Pet
+    {
+        public bool Barks { get; set; }
+    }
+
+    class Cat : Pet
+    {
+        public bool Meows { get; set; }
+    }
+
+    enum PetKind
+    {
+        Cat,
+        Dog
+    }
+
+    [GraphQLName("Query")]
+    class PetQueryType
+    {
+        public Pet Pet(PetKind type)
+        {
+            if (type == PetKind.Dog)
+            {
+                return new Dog {Name = "Eli", Barks = true};
+            }
+
+            return new Cat {Name = "Biscuit", Meows = true};
         }
     }
 }

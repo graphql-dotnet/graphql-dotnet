@@ -8,7 +8,8 @@ namespace GraphQL.Utilities
 
         public TypeSettings()
         {
-            _typeConfigurations = new LightweightCache<string, TypeConfig>(s => new TypeConfig(s));
+            _typeConfigurations =
+                new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
         }
 
         public void Configure(string typeName, Action<TypeConfig> configure)
@@ -17,9 +18,21 @@ namespace GraphQL.Utilities
             configure(config);
         }
 
-        public TypeConfig ConfigFor(string typeName)
+        public TypeConfig For(string typeName)
         {
             return _typeConfigurations[typeName];
+        }
+
+        public void Include<T>()
+        {
+            var type = typeof(T);
+            var name = type.GraphQLName();
+            Include(name, type);
+        }
+
+        public void Include(string name, Type type)
+        {
+            _typeConfigurations[name].Type = type;
         }
     }
 }
