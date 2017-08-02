@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -18,7 +17,7 @@ namespace GraphQL.Tests.Execution
             Services.Register<PetType>();
             Services.Register<PersonType>();
 
-            Services.Singleton(() => new UnionSchema(type => (GraphType) Services.Get(type)));
+            Services.Singleton(new UnionSchema(new FuncDependencyResolver(type => Services.Get(type))));
 
             var garfield = new Cat
             {
@@ -364,10 +363,10 @@ namespace GraphQL.Tests.Execution
 
     public class UnionSchema : Schema
     {
-        public UnionSchema(Func<Type, GraphType> resolveType)
-            : base(resolveType)
+        public UnionSchema(IDependencyResolver resolver)
+            : base(resolver)
         {
-            Query = (PersonType)resolveType(typeof(PersonType));
+            Query = resolver.Resolve<PersonType>();
         }
     }
 }

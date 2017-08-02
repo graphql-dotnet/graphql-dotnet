@@ -12,18 +12,8 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
-        private readonly WrappedDependencyResolver _dependencyResolver;
 
-        public SchemaBuilder()
-        {
-            _dependencyResolver = new WrappedDependencyResolver(new DefaultDependencyResolver());
-        }
-
-        public IDependencyResolver DependencyResolver
-        {
-            get => _dependencyResolver;
-            set => _dependencyResolver.InnerResolver = value;
-        }
+        public IDependencyResolver DependencyResolver { get; set; } = new DefaultDependencyResolver();
 
         public TypeSettings Types { get; } = new TypeSettings();
 
@@ -59,7 +49,7 @@ namespace GraphQL.Utilities
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema(_dependencyResolver);
+            var schema = new Schema(DependencyResolver);
 
             var directives = new List<DirectiveGraphType>();
 
@@ -196,7 +186,7 @@ namespace GraphQL.Utilities
             var field = new FieldType();
             field.Name = fieldDef.Name.Value;
             field.ResolvedType = ToGraphType(fieldDef.Type);
-            field.Resolver = typeConfig.ResolverFor(field.Name, _dependencyResolver);
+            field.Resolver = typeConfig.ResolverFor(field.Name, DependencyResolver);
 
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);

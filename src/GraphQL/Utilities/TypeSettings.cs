@@ -12,20 +12,26 @@ namespace GraphQL.Utilities
                 new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
         }
 
-        public void Configure(string typeName, Action<TypeConfig> configure)
-        {
-            var config = _typeConfigurations[typeName];
-            configure(config);
-        }
-
         public TypeConfig For(string typeName)
         {
             return _typeConfigurations[typeName];
         }
 
+        public TypeSettings For(string typeName, Action<TypeConfig> configure)
+        {
+            var config = For(typeName);
+            configure?.Invoke(config);
+            return this;
+        }
+
         public void Include<T>()
         {
             var type = typeof(T);
+            Include(type);
+        }
+
+        public void Include(Type type)
+        {
             var name = type.GraphQLName();
             Include(name, type);
         }

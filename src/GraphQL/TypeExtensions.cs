@@ -158,15 +158,14 @@ namespace GraphQL
 
             var method = methods.FirstOrDefault(m =>
             {
-                var name = m.Name;
                 var attr = m.GetCustomAttribute<GraphQLNameAttribute>();
-                name = attr?.Name ?? name;
+                var name = attr?.Name ?? m.Name;
                 return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
             });
 
             if (method == null)
             {
-                throw new InvalidOperationException($"Expected to find method {field} on {type.Name} but it does not exist.");
+                throw new InvalidOperationException($"Expected to find method {field} on {type.Name} but could not.");
             }
 
             return method;

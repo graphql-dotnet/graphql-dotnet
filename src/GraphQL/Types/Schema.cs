@@ -52,18 +52,23 @@ namespace GraphQL.Types
         private readonly List<DirectiveGraphType> _directives;
 
         public Schema()
-            : this(type => (GraphType) Activator.CreateInstance(type))
+            : this(new DefaultDependencyResolver())
+        {
+        }
+
+        [Obsolete(
+            "The Func<Type, IGraphType> constructor has been deprecated in favor of using IDependencyResolver.  " +
+            "Use FuncDependencyResolver to continue using a Func.  " +
+            "This constructor will be removed in a future version.")]
+        public Schema(Func<Type, IGraphType> resolveType)
+            : this(new FuncDependencyResolver(resolveType))
         {
         }
 
         public Schema(IDependencyResolver dependencyResolver)
-            : this(type => dependencyResolver.Resolve(type) as IGraphType)
         {
-        }
-
-        public Schema(Func<Type, IGraphType> resolveType)
-        {
-            ResolveType = resolveType;
+            DependencyResolver = dependencyResolver;
+            ResolveType = type => dependencyResolver.Resolve(type) as IGraphType;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -95,7 +100,7 @@ namespace GraphQL.Types
 
         public void Initialize()
         {
-            FindType("__abcd__");
+            FindType("____");
         }
 
         public IObjectGraphType Query { get; set; }
@@ -104,7 +109,12 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
+        [Obsolete(
+            "The ResolveType property has been deprecated in favor of using the DependencyResolver property.  " +
+            "This property will be removed in a future version.")]
         public Func<Type, IGraphType> ResolveType { get; set; }
+
+        public IDependencyResolver DependencyResolver { get; set; }
 
         public IEnumerable<DirectiveGraphType> Directives
         {
@@ -185,6 +195,7 @@ namespace GraphQL.Types
         public void Dispose()
         {
             ResolveType = null;
+            DependencyResolver = null;
             Query = null;
             Mutation = null;
             Subscription = null;
@@ -209,7 +220,9 @@ namespace GraphQL.Types
 
         private GraphTypesLookup CreateTypesLookup()
         {
-            var resolvedTypes = _additionalTypes.Select(t => ResolveType(t.GetNamedType())).ToList();
+            var resolvedTypes = _additionalTypes
+                .Select(t => DependencyResolver.Resolve(t.GetNamedType()) as IGraphType)
+                .ToList();
 
             var types = _additionalInstances.Concat(
                     new IGraphType[]
@@ -222,7 +235,11 @@ namespace GraphQL.Types
                 .Where(x => x != null)
                 .ToList();
 
-            return GraphTypesLookup.Create(types, _directives, ResolveType, FieldNameConverter);
+            return GraphTypesLookup.Create(
+                types,
+                _directives,
+                type => DependencyResolver.Resolve(type) as IGraphType,
+                FieldNameConverter);
         }
     }
 }

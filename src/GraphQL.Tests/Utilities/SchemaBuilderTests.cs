@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using GraphQL.Language.AST;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -255,13 +256,8 @@ namespace GraphQL.Tests.Utilities
 
             var schema = Schema.For(definitions, _ =>
             {
-                _.Types.Configure("SearchResult", t =>
-                {
-                    t.ResolveType = obj =>
-                    {
-                        return null;
-                    };
-                });
+                _.Types.For("Human").IsTypeOf<Human>();
+                _.Types.For("Droid").IsTypeOf<Droid>();
             });
 
             schema.Initialize();

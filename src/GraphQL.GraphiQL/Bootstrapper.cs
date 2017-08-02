@@ -1,15 +1,13 @@
-﻿using System.Web.Http.Dependencies;
-using GraphQL.Http;
+﻿using GraphQL.Http;
 using GraphQL.StarWars;
 using GraphQL.StarWars.IoC;
 using GraphQL.StarWars.Types;
-using GraphQL.Types;
 
 namespace GraphQL.GraphiQL
 {
     public class Bootstrapper
     {
-        public IDependencyResolver Resolver()
+        public System.Web.Http.Dependencies.IDependencyResolver Resolver()
         {
             var container = BuildContainer();
             var resolver = new SimpleContainerDependencyResolver(container);
@@ -29,7 +27,7 @@ namespace GraphQL.GraphiQL
             container.Register<HumanInputType>();
             container.Register<DroidType>();
             container.Register<CharacterInterface>();
-            container.Singleton(new StarWarsSchema(type => (GraphType) container.Get(type)));
+            container.Singleton(new StarWarsSchema(new FuncDependencyResolver(type => container.Get(type))));
 
             return container;
         }

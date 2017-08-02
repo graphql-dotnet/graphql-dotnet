@@ -69,8 +69,7 @@ namespace GraphQL.Tests.Utilities
     [GraphQLName("Query")]
     public class PostWithExtraAttributesType
     {
-        [GraphQLName("post")]
-        [MyAuthorize(Policy = "SomePolicy")]
+        [GraphQLName("post"), MyAuthorize(Policy = "SomePolicy")]
         public Post GetPostById(string id)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
