@@ -19,15 +19,13 @@ namespace GraphQL.Utilities
             _dependencyResolver = new WrappedDependencyResolver(new DefaultDependencyResolver());
         }
 
-        protected IDependencyResolver DependencyResolver => _dependencyResolver;
+        public IDependencyResolver DependencyResolver
+        {
+            get => _dependencyResolver;
+            set => _dependencyResolver.InnerResolver = value;
+        }
 
         public TypeSettings Types { get; } = new TypeSettings();
-
-        public SchemaBuilder SetDependencyResolver(IDependencyResolver resolver)
-        {
-            _dependencyResolver.InnerResolver = resolver;
-            return this;
-        }
 
         public SchemaBuilder RegisterType(IGraphType type)
         {

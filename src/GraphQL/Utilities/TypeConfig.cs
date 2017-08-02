@@ -120,6 +120,12 @@ namespace GraphQL.Utilities
             }
 
             var target = _dependencyResolver.Resolve(_type);
+
+            if (target == null)
+            {
+                throw new InvalidOperationException($"Could not resolve an instance of {_type.Name} to execute {context.FieldName}");
+            }
+
             return _methodInfo.Invoke(target, arguments);
         }
     }
