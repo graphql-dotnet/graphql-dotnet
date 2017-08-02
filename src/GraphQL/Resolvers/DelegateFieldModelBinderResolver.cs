@@ -6,20 +6,16 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class DelegateFieldModelBinderResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
+    public class DelegateFieldModelBinderResolver : IFieldResolver
     {
         private readonly Delegate _resolver;
 
         public DelegateFieldModelBinderResolver(Delegate resolver)
         {
-            if (resolver == null)
-            {
-                throw new ArgumentNullException("A resolver function must be specified");
-            }
-            _resolver = resolver;
+            _resolver = resolver ?? throw new ArgumentNullException("A resolver function must be specified");
         }
 
-        public async Task<TReturnType> Resolve(ResolveFieldContext context)
+        public object Resolve(ResolveFieldContext context)
         {
             var parameters = _resolver.GetMethodInfo().GetParameters();
 
@@ -29,9 +25,16 @@ namespace GraphQL.Resolvers
             if (parameters.Any())
             {
                 arguments = new object[parameters.Length];
-                if (context.As<TSourceType>().GetType() == parameters[0].ParameterType)
+
+                if (typeof(ResolveFieldContext) == parameters[index].ParameterType)
                 {
-                    arguments[index] = context.As<TSourceType>();
+                    arguments[index] = context;
+                    index++;
+                }
+
+                if (context.Source?.GetType() == parameters[index].ParameterType)
+                {
+                    arguments[index] = context.Source;
                     index++;
                 }
 
@@ -42,20 +45,7 @@ namespace GraphQL.Resolvers
                 }
             }
 
-            var result = _resolver.DynamicInvoke(arguments);
-
-            if (result is Task)
-            {
-                var task = result as Task;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                await task.ConfigureAwait(false);
-                result = task.GetProperyValue("Result");
-            }
-
-            return (TReturnType)result;
+            return _resolver.DynamicInvoke(arguments);
         }
 
         object IFieldResolver.Resolve(ResolveFieldContext context)

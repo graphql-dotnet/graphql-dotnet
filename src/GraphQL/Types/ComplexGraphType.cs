@@ -113,7 +113,7 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new DelegateFieldModelBinderResolver<TSourceType, object>(resolve)
+                    ? new DelegateFieldModelBinderResolver(resolve)
                     : null,
             });
         }
