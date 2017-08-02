@@ -37,9 +37,9 @@ namespace GraphQL.Resolvers
 
                 foreach (var parameter in parameters.Skip(index))
                 {
-                    arguments[index] = context.GetArgument<object>(parameter.Name);
+                    arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name, null);
                     index++;
-                } 
+                }
             }
 
             var result = _resolver.DynamicInvoke(arguments);

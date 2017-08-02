@@ -67,6 +67,11 @@ namespace GraphQL.Types
 
         public TType GetArgument<TType>(string name, TType defaultValue = default(TType))
         {
+            return (TType) GetArgument(typeof(TType), name, defaultValue);
+        }
+
+        public object GetArgument(System.Type argumentType, string name, object defaultValue)
+        {
             if (!HasArgument(name))
             {
                 return defaultValue;
@@ -76,16 +81,16 @@ namespace GraphQL.Types
             var inputObject = arg as Dictionary<string, object>;
             if (inputObject != null)
             {
-                var type = typeof(TType);
+                var type = argumentType;
                 if (type.Namespace?.StartsWith("System") == true)
                 {
-                    return (TType)arg;
+                    return arg;
                 }
 
-                return (TType)inputObject.ToObject(type);
+                return inputObject.ToObject(type);
             }
 
-            return arg.GetPropertyValue<TType>();
+            return ObjectExtensions.GetPropertyValue(arg, argumentType);
         }
 
         public bool HasArgument(string argumentName)
