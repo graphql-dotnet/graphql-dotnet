@@ -97,6 +97,27 @@ namespace GraphQL.Types
             });
         }
 
+        public FieldType FieldDelegate<TGraphType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Delegate resolve = null,
+            string deprecationReason = null)
+            where TGraphType : IGraphType
+        {
+            return AddField(new FieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = typeof(TGraphType),
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new DelegateFieldModelBinderResolver(resolve)
+                    : null,
+            });
+        }
+
         public FieldType FieldAsync<TGraphType>(
             string name,
             string description = null,
