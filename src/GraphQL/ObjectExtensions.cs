@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +35,7 @@ namespace GraphQL
             return obj;
         }
 
-        public static object GetPropertyValue(object propertyValue, Type fieldType)
+        public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
             if (fieldType.FullName == "System.Object")
             {

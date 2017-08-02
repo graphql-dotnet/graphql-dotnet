@@ -90,7 +90,7 @@ namespace GraphQL.Types
                 return inputObject.ToObject(type);
             }
 
-            return ObjectExtensions.GetPropertyValue(arg, argumentType);
+            return arg.GetPropertyValue(argumentType);
         }
 
         public bool HasArgument(string argumentName)

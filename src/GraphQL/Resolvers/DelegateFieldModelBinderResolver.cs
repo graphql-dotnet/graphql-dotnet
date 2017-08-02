@@ -47,10 +47,5 @@ namespace GraphQL.Resolvers
 
             return _resolver.DynamicInvoke(arguments);
         }
-
-        object IFieldResolver.Resolve(ResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
     }
 }
