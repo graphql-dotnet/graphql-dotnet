@@ -7,16 +7,16 @@ namespace GraphQL.Resolvers
 {
     public class MethodModelBinderResolver<T> : IFieldResolver
     {
-        private readonly IDependencyResolver _dependencyResolver;
-        private readonly MethodInfo _methodInfo;
-        private readonly ParameterInfo[] _parameters;
         private readonly Type _type;
+        private readonly MethodInfo _methodInfo;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly ParameterInfo[] _parameters;
 
         public MethodModelBinderResolver(MethodInfo methodInfo, IDependencyResolver dependencyResolver)
         {
-            _dependencyResolver = dependencyResolver;
             _type = typeof(T);
             _methodInfo = methodInfo;
+            _dependencyResolver = dependencyResolver;
             _parameters = _methodInfo.GetParameters();
         }
 
@@ -43,7 +43,7 @@ namespace GraphQL.Resolvers
 
                 foreach (var parameter in _parameters.Skip(index))
                 {
-                    arguments[index] = context.GetArgument(parameter.Name, parameter.ParameterType);
+                    arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
                     index++;
                 }
             }

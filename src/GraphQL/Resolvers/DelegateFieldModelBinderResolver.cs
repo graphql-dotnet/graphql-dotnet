@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
@@ -9,38 +8,38 @@ namespace GraphQL.Resolvers
     public class DelegateFieldModelBinderResolver : IFieldResolver
     {
         private readonly Delegate _resolver;
+        private readonly ParameterInfo[] _parameters;
 
         public DelegateFieldModelBinderResolver(Delegate resolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException("A resolver function must be specified");
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+            _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
         public object Resolve(ResolveFieldContext context)
         {
-            var parameters = _resolver.GetMethodInfo().GetParameters();
-
-            int index = 0;
             object[] arguments = null;
 
-            if (parameters.Any())
+            if (_parameters.Any())
             {
-                arguments = new object[parameters.Length];
+                var index = 0;
+                arguments = new object[_parameters.Length];
 
-                if (typeof(ResolveFieldContext) == parameters[index].ParameterType)
+                if (typeof(ResolveFieldContext) == _parameters[index].ParameterType)
                 {
                     arguments[index] = context;
                     index++;
                 }
 
-                if (context.Source?.GetType() == parameters[index].ParameterType)
+                if (context.Source?.GetType() == _parameters[index].ParameterType)
                 {
                     arguments[index] = context.Source;
                     index++;
                 }
 
-                foreach (var parameter in parameters.Skip(index))
+                foreach (var parameter in _parameters.Skip(index))
                 {
-                    arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name, null);
+                    arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
                     index++;
                 }
             }
