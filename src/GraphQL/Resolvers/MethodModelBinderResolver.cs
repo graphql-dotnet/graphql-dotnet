@@ -22,32 +22,38 @@ namespace GraphQL.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
-            var index = 0;
-            var arguments = new object[_parameters.Length];
+            object[] arguments = null;
 
-            if (_parameters.Any() && typeof(ResolveFieldContext) == _parameters[index].ParameterType)
+            if (_parameters.Any())
             {
-                arguments[index] = context;
-                index++;
-            }
+                arguments = new object[_parameters.Length];
 
-            if (_parameters.Any() && context.Source?.GetType() == _parameters[index].ParameterType)
-            {
-                arguments[index] = context.Source;
-                index++;
-            }
+                var index = 0;
+                if (typeof(ResolveFieldContext) == _parameters[index].ParameterType)
+                {
+                    arguments[index] = context;
+                    index++;
+                }
 
-            foreach (var parameter in _parameters.Skip(index))
-            {
-                arguments[index] = context.GetArgument(parameter.Name, parameter.ParameterType);
-                index++;
+                if (context.Source?.GetType() == _parameters[index].ParameterType)
+                {
+                    arguments[index] = context.Source;
+                    index++;
+                }
+
+                foreach (var parameter in _parameters.Skip(index))
+                {
+                    arguments[index] = context.GetArgument(parameter.Name, parameter.ParameterType);
+                    index++;
+                }
             }
 
             var target = _dependencyResolver.Resolve(_type);
 
             if (target == null)
             {
-                throw new InvalidOperationException($"Could not resolve an instance of {_type.Name} to execute {context.FieldName}");
+                var parentType = context.ParentType != null ? $"{context.ParentType.Name}." : null;
+                throw new InvalidOperationException($"Could not resolve an instance of {_type.Name} to execute {parentType}{context.FieldName}");
             }
 
             return _methodInfo.Invoke(target, arguments);
