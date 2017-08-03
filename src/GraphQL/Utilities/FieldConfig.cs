@@ -1,23 +1,19 @@
-﻿using System;
+﻿using System.Reflection;
 using GraphQL.Resolvers;
-using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
     public class FieldConfig : MetadataProvider
     {
-        public string Name { get; set; }
+        public FieldConfig(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
         public string Description { get; set; }
-        public IFieldResolver ResolverValue { get; set; }
-
-        public void Resolver<TSourceType, TReturnType>(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
-        {
-            ResolverValue = new FuncFieldResolver<TSourceType, TReturnType>(resolver);
-        }
-
-        public void Resolver<TReturnType>(Func<ResolveFieldContext, TReturnType> resolver)
-        {
-            ResolverValue = new FuncFieldResolver<TReturnType>(resolver);
-        }
+        public string DeprecationReason { get; set; }
+        public IFieldResolver Resolver { get; set; }
+        public MethodInfo MethodInfo { get; set; }
     }
 }

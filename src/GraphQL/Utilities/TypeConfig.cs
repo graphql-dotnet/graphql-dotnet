@@ -7,15 +7,29 @@ namespace GraphQL.Utilities
 {
     public class TypeConfig : MetadataProvider
     {
+        private readonly LightweightCache<string, FieldConfig> _fields =
+            new LightweightCache<string, FieldConfig>(f => new FieldConfig(f));
+
+        private Type _type;
+
         public TypeConfig(string name)
         {
             Name = name;
         }
 
-        public Type Type { get; set; }
+        public Type Type
+        {
+            get => _type;
+            set
+            {
+                _type = value;
+                ApplyMetadata(value);
+            }
+        }
 
         public string Name { get; }
         public string Description { get; set; }
+        public string DeprecationReason { get; set; }
         public Func<object, IObjectGraphType> ResolveType { get; set; }
         public Func<object, bool> IsTypeOfFunc { get; set; }
 
@@ -24,19 +38,26 @@ namespace GraphQL.Utilities
             IsTypeOfFunc = obj => obj?.GetType() == typeof(T);
         }
 
-        public MethodInfo MethodForField(string field)
+        public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
         {
-            return Type?.MethodForField(field);
+            var config = _fields[field];
+            config.Resolver = ResolverFor(field, dependencyResolver);
+            config.MethodInfo = Type?.MethodForField(field);
+
+            var attributes = config.MethodInfo?.GetCustomAttributes<GraphQLAttribute>();
+            attributes?.Apply(a => a.Modify(config));
+
+            return config;
         }
 
-        public IFieldResolver ResolverFor(string field, IDependencyResolver dependencyResolver)
+        private IFieldResolver ResolverFor(string field, IDependencyResolver dependencyResolver)
         {
             if (Type == null)
             {
                 return null;
             }
 
-            var method = MethodForField(field);
+            var method = Type.MethodForField(field);
 
             var resolverType = typeof(MethodModelBinderResolver<>).MakeGenericType(Type);
 
@@ -44,6 +65,12 @@ namespace GraphQL.Utilities
             var resolver = (IFieldResolver) Activator.CreateInstance(resolverType, args);
 
             return resolver;
+        }
+
+        private void ApplyMetadata(Type type)
+        {
+            var attributes = type?.GetTypeInfo().GetCustomAttributes<GraphQLAttribute>();
+            attributes?.Apply(a => a.Modify(this));
         }
     }
 }

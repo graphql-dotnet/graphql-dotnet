@@ -1,21 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser.AST;
 using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
-    public class CustomSchemaBuilderTests : SchemaBuilderTestBase
+    public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     {
-        public CustomSchemaBuilderTests()
-        {
-            Builder = new MyCustomSchemaBuilder();
-        }
-
         [Fact]
         public void can_set_metadata_from_custom_attribute()
         {
@@ -41,35 +33,25 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    public class MyAuthorizeAttribute : Attribute
+    public class MyAuthorizeAttribute : GraphQLAttribute
     {
         public string Policy { get; set; }
-    }
 
-    public class MyCustomSchemaBuilder : SchemaBuilder
-    {
-        protected override FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
+        public override void Modify(TypeConfig type)
         {
-            var typeConfig = Types.For(parentTypeName);
+            type.Metadata["Authorize"] = Policy;
+        }
 
-            var fieldType = base.ToFieldType(parentTypeName, fieldDef);
-
-            var methodInfo = typeConfig.MethodForField(fieldType.Name);
-
-            var attr = methodInfo?.GetCustomAttribute<MyAuthorizeAttribute>();
-            if (attr != null)
-            {
-                fieldType.Metadata["Authorize"] = attr.Policy;
-            }
-
-            return fieldType;
+        public override void Modify(FieldConfig field)
+        {
+            field.Metadata["Authorize"] = Policy;
         }
     }
 
-    [GraphQLName("Query")]
+    [GraphQLMetadata("Query")]
     public class PostWithExtraAttributesType
     {
-        [GraphQLName("post"), MyAuthorize(Policy = "SomePolicy")]
+        [GraphQLMetadata("post"), MyAuthorize(Policy = "SomePolicy")]
         public Post GetPostById(string id)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);

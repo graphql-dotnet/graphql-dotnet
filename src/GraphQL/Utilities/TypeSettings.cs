@@ -17,13 +17,6 @@ namespace GraphQL.Utilities
             return _typeConfigurations[typeName];
         }
 
-        public TypeSettings For(string typeName, Action<TypeConfig> configure)
-        {
-            var config = For(typeName);
-            configure?.Invoke(config);
-            return this;
-        }
-
         public void Include<T>()
         {
             var type = typeof(T);

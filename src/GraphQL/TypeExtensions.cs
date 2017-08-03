@@ -51,7 +51,7 @@ namespace GraphQL
 
 		public static string GraphQLName(this Type type)
         {
-            var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLNameAttribute>();
+            var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
 
             if (attr != null)
             {
@@ -158,7 +158,7 @@ namespace GraphQL
 
             var method = methods.FirstOrDefault(m =>
             {
-                var attr = m.GetCustomAttribute<GraphQLNameAttribute>();
+                var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
                 var name = attr?.Name ?? m.Name;
                 return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
             });

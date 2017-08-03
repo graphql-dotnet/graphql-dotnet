@@ -160,6 +160,7 @@ namespace GraphQL.Utilities
             var type = new ObjectGraphType();
             type.Name = astType.Name.Value;
             type.Description = typeConfig.Description;
+            type.DeprecationReason = typeConfig.DeprecationReason;
             type.IsTypeOf = typeConfig.IsTypeOfFunc;
 
             CopyMetadata(type, typeConfig);
@@ -182,11 +183,16 @@ namespace GraphQL.Utilities
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
+            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, DependencyResolver);
 
             var field = new FieldType();
             field.Name = fieldDef.Name.Value;
+            field.Description = fieldConfig.Description;
+            field.DeprecationReason = fieldConfig.DeprecationReason;
             field.ResolvedType = ToGraphType(fieldDef.Type);
-            field.Resolver = typeConfig.ResolverFor(field.Name, DependencyResolver);
+            field.Resolver = fieldConfig.Resolver;
+
+            CopyMetadata(field, fieldConfig);
 
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
@@ -398,11 +404,11 @@ namespace GraphQL.Utilities
             throw new ExecutionError($"Unsupported value type {source.Kind}");
         }
 
-        protected virtual void CopyMetadata(IGraphType type, TypeConfig config)
+        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
         {
-            config.Metadata.Apply(kv =>
+            source.Metadata.Apply(kv =>
             {
-                type.Metadata[kv.Key] = kv.Value;
+                target.Metadata[kv.Key] = kv.Value;
             });
         }
     }

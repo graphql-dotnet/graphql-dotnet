@@ -38,6 +38,27 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void can_provide_field_description()
+        {
+            var defs = @"
+                type Post {
+                    id: ID!
+                    title: String!
+                }
+
+                type Query {
+                    post(id: ID!): Post
+                }
+            ";
+
+            Builder.Types.Include<PostQueryRenamedType>();
+            var schema = Builder.Build(defs);
+
+            var field = schema.Query.Fields.Single();
+            field.Description.ShouldBe("A description");
+        }
+
+        [Fact]
         public void can_execute_renamed_field()
         {
             var defs = @"
@@ -146,7 +167,7 @@ namespace GraphQL.Tests.Utilities
         public string Title { get; set; }
     }
 
-    [GraphQLName("Query")]
+    [GraphQLMetadata("Query")]
     public class PostQueryType
     {
         public Post Post(string id)
@@ -155,10 +176,10 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    [GraphQLName("Query")]
+    [GraphQLMetadata("Query")]
     public class PostQueryRenamedType
     {
-        [GraphQLName("post")]
+        [GraphQLMetadata("post", Description = "A description")]
         public Post GetPostById(string id)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
@@ -186,7 +207,7 @@ namespace GraphQL.Tests.Utilities
         Dog
     }
 
-    [GraphQLName("Query")]
+    [GraphQLMetadata("Query")]
     class PetQueryType
     {
         public Pet Pet(PetKind type)
