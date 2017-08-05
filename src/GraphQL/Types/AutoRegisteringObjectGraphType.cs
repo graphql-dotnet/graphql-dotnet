@@ -20,7 +20,7 @@ namespace GraphQL.Types
         {
             return typeof(TSourceType)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => IntrospectionExtensions.GetTypeInfo(p.PropertyType).IsValueType || p.PropertyType == typeof(string));
+                .Where(p => p.PropertyType.GetTypeInfo().IsValueType || p.PropertyType == typeof(string));
         }
     }
 }
