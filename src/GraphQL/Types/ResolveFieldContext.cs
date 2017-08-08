@@ -2,7 +2,6 @@
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
-using Newtonsoft.Json.Linq;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Types
@@ -43,6 +42,12 @@ namespace GraphQL.Types
 
         public ExecutionErrors Errors { get; set; }
 
+        /// <summary>
+        /// Queried sub fields.  Note that this does not include sub fields for
+        /// abstract types (interfaces or unions).
+        /// </summary>
+        public IDictionary<string, Field> SubFields { get; set; }
+
         public ResolveFieldContext() { }
 
         public ResolveFieldContext(ResolveFieldContext context)
@@ -64,6 +69,7 @@ namespace GraphQL.Types
             CancellationToken = context.CancellationToken;
             Metrics = context.Metrics;
             Errors = context.Errors;
+            SubFields = context.SubFields;
         }
 
         public TType GetArgument<TType>(string name, TType defaultValue = default(TType))

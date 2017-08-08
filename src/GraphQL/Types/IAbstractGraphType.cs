@@ -13,7 +13,6 @@ namespace GraphQL.Types
         void AddPossibleType(IObjectGraphType type);
     }
 
-
     public static class AbstractGraphTypeExtensions {
 
         public static bool IsPossibleType(this IAbstractGraphType abstractType, IGraphType type)

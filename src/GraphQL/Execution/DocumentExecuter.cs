@@ -19,6 +19,7 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
+        [Obsolete("This method will be removed in a future version.")]
         Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,
@@ -294,20 +295,20 @@ namespace GraphQL
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(),
+                new Dictionary<string, Field>(),
                 new List<string>());
 
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields)
         {
-            return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
+            return fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveFieldAsync(context, rootType, source, pair.Value));
         }
 
-        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Field field)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -316,9 +317,7 @@ namespace GraphQL
                 Skip = false
             };
 
-            var field = fields.First();
-
-            var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
+            var fieldDefinition = GetFieldDefinition(context.Document, context.Schema, parentType, field);
             if (fieldDefinition == null)
             {
                 resolveResult.Skip = true;
@@ -348,6 +347,9 @@ namespace GraphQL
                 resolveContext.Metrics = context.Metrics;
                 resolveContext.Errors = context.Errors;
 
+                var subFields = SubFieldsFor(context, fieldDefinition.ResolvedType, field);
+                resolveContext.SubFields = subFields;
+
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
@@ -368,13 +370,26 @@ namespace GraphQL
                 }
 
                 resolveResult.Value =
-                    await CompleteValueAsync(context, parentType, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
+                    await CompleteValueAsync(context, parentType, fieldDefinition.ResolvedType, field, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
             {
                 return GenerateError(resolveResult, field, context, exc);
             }
+        }
+
+        private IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
+        {
+            if (!(fieldType is IObjectGraphType) || !field.SelectionSet.Selections.Any())
+            {
+                return null;
+            }
+
+            var subFields = new Dictionary<string, Field>();
+            var visitedFragments = new List<string>();
+            var fields = CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
+            return fields;
         }
 
         private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc)
@@ -386,16 +401,15 @@ namespace GraphQL
             return resolveResult;
         }
 
-        public async Task<object> CompleteValueAsync(ExecutionContext context, IObjectGraphType parentType, IGraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValueAsync(ExecutionContext context, IObjectGraphType parentType, IGraphType fieldType, Field field, object result)
         {
-            var field = fields?.FirstOrDefault();
             var fieldName = field?.Name;
 
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
                 var type = nonNullType.ResolvedType;
-                var completed = await CompleteValueAsync(context, parentType, type, fields, result).ConfigureAwait(false);
+                var completed = await CompleteValueAsync(context, parentType, type, field, result).ConfigureAwait(false);
                 if (completed == null)
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
@@ -433,7 +447,7 @@ namespace GraphQL
                 var listType = fieldType as ListGraphType;
                 var itemType = listType.ResolvedType;
 
-                var results = await list.MapAsync(async item => await CompleteValueAsync(context, parentType, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await list.MapAsync(async item => await CompleteValueAsync(context, parentType, itemType, field, item).ConfigureAwait(false)).ConfigureAwait(false);
 
                 return results;
             }
@@ -479,13 +493,10 @@ namespace GraphQL
                 throw error;
             }
 
-            var subFields = new Dictionary<string, Fields>();
+            var subFields = new Dictionary<string, Field>();
             var visitedFragments = new List<string>();
 
-            fields.Apply(f =>
-            {
-                subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
-            });
+            subFields = CollectFields(context, objectType, field?.SelectionSet, subFields, visitedFragments);
 
             return await ExecuteFieldsAsync(context, objectType, result, subFields).ConfigureAwait(false);
         }
@@ -510,7 +521,7 @@ namespace GraphQL
             });
         }
 
-        public FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        public FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
             {
@@ -523,6 +534,13 @@ namespace GraphQL
             if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
             {
                 return SchemaIntrospection.TypeNameMeta;
+            }
+
+            if (parentType == null)
+            {
+                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
+                error.AddLocation(field, document);
+                throw error;
             }
 
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
@@ -719,9 +737,7 @@ namespace GraphQL
             var variable = input as VariableReference;
             if (variable != null)
             {
-                return variables != null
-                    ? variables.ValueFor(variable.Name)
-                    : null;
+                return variables?.ValueFor(variable.Name);
             }
 
             if (type is ListGraphType)
@@ -769,19 +785,19 @@ namespace GraphQL
             return null;
         }
 
-        public Dictionary<string, Fields> CollectFields(
+        public Dictionary<string, Field> CollectFields(
             ExecutionContext context,
             IGraphType specificType,
             SelectionSet selectionSet,
-            Dictionary<string, Fields> fields,
+            Dictionary<string, Field> fields,
             List<string> visitedFragmentNames)
         {
             if (fields == null)
             {
-                fields = new Dictionary<string, Fields>();
+                fields = new Dictionary<string, Field>();
             }
 
-            selectionSet.Selections.Apply(selection =>
+            selectionSet?.Selections.Apply(selection =>
             {
                 if (selection is Field)
                 {
@@ -792,11 +808,7 @@ namespace GraphQL
                     }
 
                     var name = field.Alias ?? field.Name;
-                    if (!fields.ContainsKey(name))
-                    {
-                        fields[name] = new Fields();
-                    }
-                    fields[name].Add(field);
+                    fields[name] = field;
                 }
                 else if (selection is FragmentSpread)
                 {
