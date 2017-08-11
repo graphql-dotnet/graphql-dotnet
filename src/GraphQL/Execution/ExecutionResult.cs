@@ -1,4 +1,4 @@
-using GraphQL.Instrumentation;
+﻿using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using Newtonsoft.Json;
 
@@ -18,5 +18,7 @@ namespace GraphQL
         public Operation Operation { get; set; }
 
         public PerfRecord[] Perf { get; set; }
+
+        public bool ExposeExceptions { get; set; }
     }
 }
