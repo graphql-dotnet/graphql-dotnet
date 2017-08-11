@@ -88,7 +88,7 @@ namespace GraphQL
 
             config.Schema.FieldNameConverter = config.FieldNameConverter;
 
-            var result = new ExecutionResult { Query = config.Query };
+            var result = new ExecutionResult { Query = config.Query, ExposeExceptions = config.ExposeExceptions };
             try
             {
                 if (!config.Schema.Initialized)

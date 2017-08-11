@@ -15,7 +15,7 @@ namespace GraphQL
                 writer.WriteStartObject();
 
                 writeData(result, writer, serializer);
-                writeErrors(result.Errors, writer, serializer);
+                writeErrors(result.Errors, writer, serializer, result.ExposeExceptions);
 
                 writer.WriteEndObject();
             }
@@ -34,7 +34,7 @@ namespace GraphQL
             serializer.Serialize(writer, data);
         }
 
-        private void writeErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer)
+        private void writeErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
         {
             if (errors == null || !errors.Any())
             {
@@ -50,7 +50,14 @@ namespace GraphQL
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
-                serializer.Serialize(writer, error.Message);
+                if (exposeExceptions)
+                {
+                    serializer.Serialize(writer, error.ToString()); // return StackTrace (including all inner exceptions)
+                }
+                else
+                {
+                    serializer.Serialize(writer, error.Message);
+                }
 
                 if (error.Locations != null)
                 {
