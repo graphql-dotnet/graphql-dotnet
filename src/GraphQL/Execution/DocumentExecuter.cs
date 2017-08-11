@@ -183,7 +183,18 @@ namespace GraphQL
 
                     if (context.Errors.Any())
                     {
-                        result.Errors = context.Errors;
+                        if (config.ExposeExceptions)
+                        {
+                            result.Errors = new ExecutionErrors();
+                            foreach (ExecutionError err in context.Errors)
+                            {
+                                result.Errors.Add(new ExecutionError(err.ToString()));
+                            }
+                        }
+                        else
+                        {
+                            result.Errors = context.Errors;
+                        }
                     }
                 }
                 else
