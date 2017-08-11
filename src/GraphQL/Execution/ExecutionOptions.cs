@@ -28,6 +28,6 @@ namespace GraphQL
 
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
-        public bool ExposeExceptions = false;
+        public bool ExposeExceptions { get; set; } = false;
     }
 }
