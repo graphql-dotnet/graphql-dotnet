@@ -18,8 +18,9 @@ module.exports = [
 
     module: {
       loaders: [
-        { test: /\.js/, loader: 'babel', exclude: /node_modules/ },
-        { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') }
+        { test: /\.js/, loader: 'babel-loader', exclude: /node_modules/ },
+        { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') },
+        { test: /\.flow/, loader: 'ignore-loader' }
       ]
     },
 
@@ -43,8 +44,9 @@ module.exports = [
 
     module: {
       loaders: [
-        { test: /\.js/, loader: 'babel', exclude: /node_modules/ },
-        { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') }
+        { test: /\.js/, loader: 'babel-loader', exclude: /node_modules/ },
+        { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader') },
+        { test: /\.flow/, loader: 'ignore-loader' }
       ]
     },
 
