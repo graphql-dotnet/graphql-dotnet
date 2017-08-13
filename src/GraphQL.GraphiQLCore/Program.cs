@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace GraphQL.GraphiQLCore
 {
@@ -10,6 +11,7 @@ namespace GraphQL.GraphiQLCore
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseWebRoot("public")
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

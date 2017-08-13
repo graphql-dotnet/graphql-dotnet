@@ -5,7 +5,7 @@ namespace GraphQL.GraphiQLCore
 {
     public class GraphQLSettings
     {
-        public PathString Path { get; set; } = "/graphql";
+        public PathString Path { get; set; } = "/api/graphql";
         public ISchema Schema { get; set; }
     }
 }

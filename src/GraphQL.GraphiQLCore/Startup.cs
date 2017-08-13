@@ -1,4 +1,4 @@
-﻿using GraphQL.Http;
+using GraphQL.Http;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
@@ -23,6 +23,7 @@ namespace GraphQL.GraphiQLCore
             services.AddSingleton<HumanInputType>();
             services.AddSingleton<DroidType>();
             services.AddSingleton<CharacterInterface>();
+            services.AddSingleton<EpisodeEnum>();
             services.AddSingleton<ISchema>(s => new StarWarsSchema(type => (GraphType) s.GetService(type)));
         }
 
@@ -34,11 +35,13 @@ namespace GraphQL.GraphiQLCore
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseMiddleware<GraphQLMiddleware>(new GraphQLSettings
             {
                 Schema = app.ApplicationServices.GetService<ISchema>()
             });
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
     }
 }

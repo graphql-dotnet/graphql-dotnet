@@ -28,11 +28,12 @@
   },
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
-    "graphiql": "^0.7.8",
-    "graphql": "^0.7.0",
-    "isomorphic-fetch": "^2.1.1",
-    "react": "^15.3.1",
-    "react-dom": "^15.3.1"
+    "axios": "^0.16.2",
+    "graphiql": "^0.11.2",
+    "graphql": "^0.10.5",
+    "ignore-loader": "^0.1.2",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
   },
   "devDependencies": {
     "babel": "^5.6.14",
