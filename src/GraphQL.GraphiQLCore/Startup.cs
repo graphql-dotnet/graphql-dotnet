@@ -39,6 +39,7 @@ namespace GraphQL.GraphiQLCore
             {
                 Schema = app.ApplicationServices.GetService<ISchema>()
             });
+            app.UseDefaultFiles();
             app.UseStaticFiles();
         }
     }
