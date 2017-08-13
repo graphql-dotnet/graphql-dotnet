@@ -22,6 +22,7 @@ namespace GraphQL.GraphiQLCore
             services.AddSingleton<HumanType>();
             services.AddSingleton<HumanInputType>();
             services.AddSingleton<DroidType>();
+            services.AddSingleton<EpisodeEnum>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<ISchema>(s => new StarWarsSchema(type => (GraphType) s.GetService(type)));
         }
