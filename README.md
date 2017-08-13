@@ -202,12 +202,12 @@ publish nuget from MyGet
 
 
 ### Running on .NET Core
-The GraphQL.GraphiQLCore project runs on .NET Core 1.1. You can run from Visual Studio Code or from the command line using `dotnet run`. When you run the project, you will see the GraphiQL editor open.
+The GraphQL.GraphiQLCore project runs on `.NET Core 1.1`. You can run from Visual Studio Code or from the command line using `dotnet run`. When you run the project, you will see the GraphiQL editor open.
 
 When using Visual Studio Code, open to the `./src/GraphQL.GraphiQLCore` folder. You will get a warning "Required assets to build and debug are missing from 'GraphQL.GraphiQLCore'. Add Them?". Choose `Yes`. This will add the necessary launch.json and tasks.json files. 
 
-### Running on OSX on Mono
-To run this project on OSX on Mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
+### Running on OSX with mono
+To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
 
 ```bash
 export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/
