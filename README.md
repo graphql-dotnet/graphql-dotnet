@@ -19,7 +19,7 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
-## GraphiQL
+## GraphiQL sample
 There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
 
 > Note: Before running the GraphiQL project: make sure you Build the entire solution so that all the project references get built. (GraphQL, GraphQL-Parser, etc) to avoid missing reference/assembly errors.
@@ -200,9 +200,14 @@ upload nuget package to github
 publish nuget from MyGet
 ```
 
-### Running on macOS
 
-To run this project on macOS you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
+### Running on .NET Core
+The GraphQL.GraphiQLCore project runs on `.NET Core 1.1`. You can run from Visual Studio Code or from the command line using `dotnet run`. When you run the project, you will see the GraphiQL editor open.
+
+When using Visual Studio Code, open to the `./src/GraphQL.GraphiQLCore` folder. You will get a warning "Required assets to build and debug are missing from 'GraphQL.GraphiQLCore'. Add Them?". Choose `Yes`. This will add the necessary launch.json and tasks.json files. 
+
+### Running on OSX with mono
+To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
 
 ```bash
 export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/
@@ -212,3 +217,4 @@ See the following for more details:
 
 * [Building VS 2017 MSBuild csproj Projects with Mono on Linux](https://stackoverflow.com/questions/42747722/building-vs-2017-msbuild-csproj-projects-with-mono-on-linux)
 * [using .NET Framework as targets framework, the osx/unix build fails](https://github.com/dotnet/netcorecli-fsc/wiki/.NET-Core-SDK-rc4#using-net-framework-as-targets-framework-the-osxunix-build-fails)
+
