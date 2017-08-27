@@ -5,7 +5,7 @@ import settings from './settings';
 export default function testDotnet() {
   const deferred = new Deferred();
 
-  const platform = process.platform === 'darwin'
+  const platform = process.platform === ('darwin' || 'win32')
     ? '-f netcoreapp2.0'
     : '';
   const test = `dotnet test ${platform} -c ${settings.target}`;

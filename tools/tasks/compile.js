@@ -5,7 +5,7 @@ import settings from './settings';
 export default function compile() {
   const deferred = new Deferred();
 
-  const platform = process.platform === 'darwin'
+  const platform = process.platform === ('darwin' || 'win32')
     ? '-f netcoreapp2.0'
     : '';
   const build = `dotnet build ${platform} -c ${settings.target}`;
