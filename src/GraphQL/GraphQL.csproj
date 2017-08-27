@@ -4,7 +4,7 @@
     <Description>GraphQL for .NET</Description>
     <VersionPrefix>0.17.2</VersionPrefix>
     <Authors>Joe McBride</Authors>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <AssetTargetFallback>dnxcore50</AssetTargetFallback>
     <AssemblyName>GraphQL</AssemblyName>
     <PackageId>GraphQL</PackageId>

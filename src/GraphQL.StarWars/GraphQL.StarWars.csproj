@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <AssetTargetFallback>dnxcore50</AssetTargetFallback>
     <AssemblyName>GraphQL.StarWars</AssemblyName>
     <PackageId>GraphQL.StarWars</PackageId>
