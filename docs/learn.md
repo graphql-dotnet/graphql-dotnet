@@ -73,7 +73,7 @@ public class NerdDinnerSchema : GraphQL.Types.Schema
 
 # Object/Field Metadata
 
-`GraphType` and `FieldType` implement the `IProvideMetadata` interface.  This allows you to add arbitrary information to a field or graph type.  This can be useful in combination with a validation rule or filed middleware.
+`GraphType` and `FieldType` implement the `IProvideMetadata` interface.  This allows you to add arbitrary information to a field or graph type.  This can be useful in combination with a validation rule or field middleware.
 
 ```csharp
 public interface IProvideMetadata
