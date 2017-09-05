@@ -231,6 +231,11 @@ namespace GraphQL.Language
                     var values = list.Values.Select(Value);
                     return new ListValue(values).WithLocation(list, _body);
                 }
+                case ASTNodeKind.NullValue:
+                {
+                    var str = source as GraphQLScalarValue;
+                    return new NullValue().WithLocation(str, _body);
+                }
             }
 
             throw new ExecutionError($"Unmapped value type {source.Kind}");
