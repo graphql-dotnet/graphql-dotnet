@@ -37,10 +37,10 @@ namespace ConsoleApplication
     {
         public static void Main(string[] args)
         {
-          Run();
+          Run().Wait();
         }
 
-        private static async void Run()
+        private static async Task Run()
         {
           Console.WriteLine("Hello GraphQL!");
 
