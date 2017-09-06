@@ -81,13 +81,6 @@ namespace GraphQL.Types
             };
         }
 
-        public static ISchema For(IEnumerable<Type> types, Action<TypedSchemaBuilder> configure = null)
-        {
-            var builder = new TypedSchemaBuilder();
-            configure?.Invoke(builder);
-            return builder.Build(types);
-        }
-
         public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
         {
             var defs = string.Join("\n", typeDefinitions);
@@ -125,10 +118,7 @@ namespace GraphQL.Types
 
         public IEnumerable<DirectiveGraphType> Directives
         {
-            get
-            {
-                return _directives;
-            }
+            get => _directives;
             set
             {
                 if (value == null)

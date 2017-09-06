@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -16,7 +15,11 @@ namespace GraphQL.Tests.Bugs
 
         ExecutionResult ExecuteQuery(ISchema schema, string query)
         {
-            return _executer.ExecuteAsync(schema, null, query, null, null, CancellationToken.None).Result;
+            return _executer.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                _.Query = query;
+            }).GetAwaiter().GetResult();
         }
 
         [Fact]

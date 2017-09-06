@@ -11,6 +11,11 @@ namespace GraphQL.Builders
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
+
+        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(IGraphType type)
+        {
+            return FieldBuilder<TSourceType, TReturnType>.Create(type);
+        }
     }
 
     public class FieldBuilder<TSourceType, TReturnType>
@@ -22,6 +27,16 @@ namespace GraphQL.Builders
         private FieldBuilder(EventStreamFieldType fieldType)
         {
             _fieldType = fieldType;
+        }
+
+        public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type)
+        {
+            var fieldType = new FieldType
+            {
+                ResolvedType = type,
+                Arguments = new QueryArguments(),
+            };
+            return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
 
         public static FieldBuilder<TSourceType, TReturnType> Create(Type type = null)
