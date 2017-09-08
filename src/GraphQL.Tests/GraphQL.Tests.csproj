@@ -22,7 +22,6 @@
     <PackageReference Include="xunit" Version="2.3.0-beta1-build3642" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta1-build1309" />
     <PackageReference Include="xunit.runner.reporters" Version="2.3.0-beta1-build3642" />
-    <PackageReference Include="GraphQL-Parser" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="Shouldly" Version="2.8.2" />
   </ItemGroup>

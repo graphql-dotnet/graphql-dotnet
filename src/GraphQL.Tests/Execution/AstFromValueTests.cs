@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Execution
         {
             object value = null;
             var result = value.AstFromValue(null, null);
-            result.ShouldBeNull();
+            result.ShouldBeOfType<NullValue>();
         }
 
         [Fact]
