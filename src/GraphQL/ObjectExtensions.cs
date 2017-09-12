@@ -102,7 +102,9 @@ namespace GraphQL
                 value = Enum.Parse(fieldType, str, true);
             }
 
-            return ConvertValue(value, fieldType);
+            if (_conversions.Value.Has(fieldType))
+                return ConvertValue(value, fieldType);
+            return value;
         }
 
         public static object GetProperyValue(this object obj, string propertyName)
