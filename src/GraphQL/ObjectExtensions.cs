@@ -37,6 +37,12 @@ namespace GraphQL
 
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
+            // Short-circuit conversion if the property value already 
+            if (fieldType.IsInstanceOfType(propertyValue))
+            {
+                return propertyValue;
+            }
+
             if (fieldType.FullName == "System.Object")
             {
                 return propertyValue;
@@ -102,9 +108,7 @@ namespace GraphQL
                 value = Enum.Parse(fieldType, str, true);
             }
 
-            if (_conversions.Value.Has(fieldType))
-                return ConvertValue(value, fieldType);
-            return value;
+            return ConvertValue(value, fieldType);
         }
 
         public static object GetProperyValue(this object obj, string propertyName)
