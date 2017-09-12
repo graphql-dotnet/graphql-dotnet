@@ -574,10 +574,8 @@ namespace GraphQL.Tests.Execution
                 ["arrayProperty"] = new JArray {"cat", "dog", "bird"}
             }.ToString();
 
-            var inputs = new Inputs(new Dictionary<string, object>
-            {
-                ["input"] = jsonString
-            });
+            var inputs = $"{{ 'input': '{jsonString}' }}".ToInputs();
+            
             AssertQuerySuccess(query, expected, inputs);
         }
     }
