@@ -1,8 +1,10 @@
-﻿using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
 
@@ -47,6 +49,44 @@ namespace GraphQL.Tests.Execution
 
             return null;
         }
+    }
+
+    public class TestJsonScalarReturningObject : ScalarGraphType
+    {
+        public TestJsonScalarReturningObject()
+        {
+            Name = "JsonScalarReturningObject";
+        }
+
+        public override object Serialize(object value)
+        {
+            return value;
+        }
+
+        public override object ParseValue(object value)
+        {
+            var stringValue = value as string;
+            if (stringValue == null)
+                return null;
+            return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue);
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            var stringValue = value as StringValue;
+            if (stringValue == null)
+                return null;
+            return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue.Value);
+        }
+    }
+
+    public class TestJsonScalarObject
+    {
+        [JsonProperty("stringProperty")]
+        public string StringProperty { get; set; }
+
+        [JsonProperty("arrayProperty")]
+        public string[] ArrayProperty { get; set; }
     }
 
     public class TestInputObject : InputObjectGraphType
@@ -110,6 +150,19 @@ namespace GraphQL.Tests.Execution
                 {
                     var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
                     return result;
+                });
+
+            Field<StringGraphType>(
+                "fieldWithCustomScalarInput",
+                arguments: new QueryArguments(
+                    new QueryArgument<TestJsonScalarReturningObject> { Name = "input" }
+                ),
+                resolve: context =>
+                {
+                    var val = context.GetArgument<TestJsonScalarObject>("input");
+                    var stringProperty = val.StringProperty;
+                    var arrayProperty = string.Join(", ", val.ArrayProperty);
+                    return $"{stringProperty}-{arrayProperty}";
                 });
         }
     }
@@ -498,6 +551,32 @@ namespace GraphQL.Tests.Execution
             ";
 
             AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void allows_custom_scalar_that_resolves_to_an_object()
+        {
+            var query = @"
+            query SetsCustomScalarInput($input: JsonScalarReturningObject) {
+              fieldWithCustomScalarInput(input: $input)
+            }
+            ";
+
+            var expected = @"
+            {
+              'fieldWithCustomScalarInput': ""bear-cat, dog, bird""
+            }
+            ";
+
+            var jsonString = new JObject
+            {
+                ["stringProperty"] = "bear",
+                ["arrayProperty"] = new JArray {"cat", "dog", "bird"}
+            }.ToString();
+
+            var inputs = $"{{ 'input': '{jsonString}' }}".ToInputs();
+            
+            AssertQuerySuccess(query, expected, inputs);
         }
     }
 

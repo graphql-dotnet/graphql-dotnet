@@ -37,6 +37,12 @@ namespace GraphQL
 
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
+            // Short-circuit conversion if the property value already 
+            if (fieldType.IsInstanceOfType(propertyValue))
+            {
+                return propertyValue;
+            }
+
             if (fieldType.FullName == "System.Object")
             {
                 return propertyValue;
