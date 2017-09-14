@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,7 +237,7 @@ namespace GraphQL
             return context;
         }
 
-        private Operation GetOperation(string operationName, Document document)
+        protected Operation GetOperation(string operationName, Document document)
         {
             var operation = !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)

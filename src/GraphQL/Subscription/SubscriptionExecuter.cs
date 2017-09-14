@@ -35,16 +35,6 @@ namespace GraphQL.Subscription
             _complexityAnalyzer = complexityAnalyzer;
         }
 
-        //todo: this is currently private in the DocumentExecuter
-        protected Operation GetOperation(string operationName, Document document)
-        {
-            var operation = !string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.WithName(operationName)
-                : document.Operations.FirstOrDefault();
-
-            return operation;
-        }
-
         public async Task<SubscriptionExecutionResult> SubscribeAsync(ExecutionOptions config)
         {
             var metrics = new Metrics();
