@@ -45,6 +45,7 @@ namespace GraphQL.Tests.Subscription
             message.ShouldNotBeNull();
             message.ShouldBeOfType<ExecutionResult>();
             message.Data.ShouldNotBeNull();
+            message.Data.ShouldNotBeAssignableTo<Task>();
         }
 
         [Fact]

@@ -243,22 +243,22 @@ namespace GraphQL.Subscription
                 var result = fieldDefinition.Subscriber.Subscribe(resolveContext);
 
                 var valueTransformer = result
-                    .Select(value =>
+                    .SelectMany(async value =>
                     {
-                        var r = ResolveFieldAsync(context, parentType, value, fields).GetAwaiter().GetResult();
-
+                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, fields);
                         return new ExecutionResult()
                         {
-                            Data = r.Value
+                            Data = fieldResolveResult.Value
                         };
                     })
-                    .Catch<ExecutionResult, Exception>(exception => Observable.Return(
+                    .Catch<ExecutionResult, Exception>(exception =>
+                        Observable.Return(
                             new ExecutionResult
                             {
                                 Errors = new ExecutionErrors
                                 {
                                     new ExecutionError(
-                                        $"Error in subscription '{resolveContext.Document.OriginalQuery}'",
+                                        $"Could not subscribe to field '{field.Name}' in query '{context.Document.OriginalQuery}'",
                                         exception)
                                 }
                             }));
