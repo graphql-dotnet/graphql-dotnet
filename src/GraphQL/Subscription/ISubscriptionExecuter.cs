@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
-using GraphQL.Execution;
 
 namespace GraphQL.Subscription
 {
-    public interface ISubscriptionExecuter : IDocumentExecuter
+    public interface ISubscriptionExecuter
     {
         Task<SubscriptionExecutionResult> SubscribeAsync(ExecutionOptions config);
     }
