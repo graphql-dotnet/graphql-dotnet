@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
-using Newtonsoft.Json.Linq;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Subscription
@@ -41,8 +41,10 @@ namespace GraphQL.Tests.Subscription
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
             var message = await stream.FirstOrDefaultAsync();
-            Assert.NotNull(message);
-            Assert.IsType<ExecutionResult>(message);
+
+            message.ShouldNotBeNull();
+            message.ShouldBeOfType<ExecutionResult>();
+            message.Data.ShouldNotBeNull();
         }
 
         [Fact]
@@ -79,8 +81,10 @@ namespace GraphQL.Tests.Subscription
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
             var message = await stream.FirstOrDefaultAsync();
-            Assert.NotNull(message);
-            Assert.IsType<ExecutionResult>(message);
+
+            message.ShouldNotBeNull();
+            message.ShouldBeOfType<ExecutionResult>();
+            message.Data.ShouldNotBeNull();
         }
 
         [Fact]
@@ -103,10 +107,11 @@ namespace GraphQL.Tests.Subscription
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
             var message = await stream.FirstOrDefaultAsync();
-            Assert.NotNull(message);
-            Assert.IsType<ExecutionResult>(message);
-            Assert.Null(message.Data);
-            Assert.Contains("test", message.Errors.Select(e => e.InnerException.Message));
+
+            message.ShouldNotBeNull();
+            message.ShouldBeOfType<ExecutionResult>();
+            message.Data.ShouldBeNull();
+            message.Errors.ShouldContain(error => error.InnerException.Message == "test");
         }
     }
 }
