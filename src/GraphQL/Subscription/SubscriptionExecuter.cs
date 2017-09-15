@@ -90,7 +90,7 @@ namespace GraphQL.Subscription
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(),
+                new Dictionary<string, Field>(),
                 new List<string>());
 
             return ExecuteSubscriptionFields(context, rootType, context.RootValue, fields);
@@ -100,7 +100,7 @@ namespace GraphQL.Subscription
            ExecutionContext context,
            IObjectGraphType rootType,
            object source,
-           Dictionary<string, Fields> fields)
+           Dictionary<string, Field> fields)
         {
             var result = new ConcurrentDictionary<string, IObservable<ExecutionResult>>();
 
@@ -120,7 +120,7 @@ namespace GraphQL.Subscription
         }
 
         private ResolveEventStreamResult ResolveEventStream(ExecutionContext context,
-            IObjectGraphType parentType, object source, Fields fields)
+            IObjectGraphType parentType, object source, Field field)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -129,9 +129,7 @@ namespace GraphQL.Subscription
                 Skip = false
             };
 
-            var field = fields.First();
-
-            if (!(GetFieldDefinition(context.Schema, parentType, field) is EventStreamFieldType fieldDefinition))
+            if (!(GetFieldDefinition(context.Document, context.Schema, parentType, field) is EventStreamFieldType fieldDefinition))
             {
                 resolveResult.Skip = true;
                 return resolveResult;
@@ -173,7 +171,7 @@ namespace GraphQL.Subscription
                 var valueTransformer = result
                     .SelectMany(async value =>
                     {
-                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, fields);
+                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, field);
                         return new ExecutionResult
                         {
                             Data = fieldResolveResult.Value

@@ -31,7 +31,7 @@ namespace GraphQL.Builders
 
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type)
         {
-            var fieldType = new FieldType
+            var fieldType = new EventStreamFieldType
             {
                 ResolvedType = type,
                 Arguments = new QueryArguments(),
