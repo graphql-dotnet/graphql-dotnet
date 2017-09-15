@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reactive.Linq;
@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Subscription
         }
     }
 
-    public class ChatSubscriptions : ObjectGraphType<object>
+    public class ChatSubscriptions : ObjectGraphType
     {
         private readonly IChat _chat;
 

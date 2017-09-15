@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Execution;
+﻿using System;
 using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
