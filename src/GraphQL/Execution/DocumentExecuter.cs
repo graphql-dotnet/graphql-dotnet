@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,6 +81,41 @@ namespace GraphQL
             return ExecuteAsync(options);
         }
 
+        protected virtual ExecutionResult InitializeResult(ExecutionOptions config)
+        {
+            var result = new ExecutionResult { Query = config.Query, ExposeExceptions = config.ExposeExceptions };
+            return result;
+        }
+
+        protected virtual async Task OnExecution(ExecutionOptions config, ExecutionContext context, ExecutionResult result)
+        {
+            var task = ExecuteOperationAsync(context).ConfigureAwait(false);
+
+            foreach (var listener in config.Listeners)
+            {
+                await listener.BeforeExecutionAwaitedAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
+            }
+
+            result.Data = await task;
+        }
+
+        protected virtual void OnValidationError(IValidationResult validationResult, ExecutionResult result)
+        {
+            result.Data = null;
+            result.Errors = validationResult.Errors;
+        }
+
+        protected virtual void OnError(Exception exception, ExecutionResult result)
+        {
+            if (result.Errors == null)
+            {
+                result.Errors = new ExecutionErrors();
+            }
+
+            result.Data = null;
+            result.Errors.Add(new ExecutionError(exception.Message, exception));
+        }
+
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
             var metrics = new Metrics();
@@ -88,7 +123,7 @@ namespace GraphQL
 
             config.Schema.FieldNameConverter = config.FieldNameConverter;
 
-            var result = new ExecutionResult { Query = config.Query, ExposeExceptions = config.ExposeExceptions };
+            var result = InitializeResult(config);
             try
             {
                 if (!config.Schema.Initialized)
@@ -166,14 +201,7 @@ namespace GraphQL
                             await listener.BeforeExecutionAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
                         }
 
-                        var task = ExecuteOperationAsync(context).ConfigureAwait(false);
-
-                        foreach (var listener in config.Listeners)
-                        {
-                            await listener.BeforeExecutionAwaitedAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
-                        }
-
-                        result.Data = await task;
+                        await OnExecution(config, context, result);
 
                         foreach (var listener in config.Listeners)
                         {
@@ -188,21 +216,14 @@ namespace GraphQL
                 }
                 else
                 {
-                    result.Data = null;
-                    result.Errors = validationResult.Errors;
+                    OnValidationError(validationResult, result);
                 }
 
                 return result;
             }
             catch (Exception exc)
             {
-                if (result.Errors == null)
-                {
-                    result.Errors = new ExecutionErrors();
-                }
-
-                result.Data = null;
-                result.Errors.Add(new ExecutionError(exc.Message, exc));
+                OnError(exc, result);
                 return result;
             }
             finally
@@ -237,7 +258,7 @@ namespace GraphQL
             return context;
         }
 
-        protected Operation GetOperation(string operationName, Document document)
+        protected virtual Operation GetOperation(string operationName, Document document)
         {
             var operation = !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)

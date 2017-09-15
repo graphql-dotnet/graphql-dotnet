@@ -1,6 +1,7 @@
 ﻿using System;
 using GraphQL.Types;
 using GraphQL.Resolvers;
+using GraphQL.Subscription;
 
 namespace GraphQL.Builders
 {
@@ -14,18 +15,18 @@ namespace GraphQL.Builders
 
     public class FieldBuilder<TSourceType, TReturnType>
     {
-        private readonly FieldType _fieldType;
+        private readonly EventStreamFieldType _fieldType;
 
-        public FieldType FieldType => _fieldType;
+        public EventStreamFieldType FieldType => _fieldType;
 
-        private FieldBuilder(FieldType fieldType)
+        private FieldBuilder(EventStreamFieldType fieldType)
         {
             _fieldType = fieldType;
         }
 
         public static FieldBuilder<TSourceType, TReturnType> Create(Type type = null)
         {
-            var fieldType = new FieldType
+            var fieldType = new EventStreamFieldType
             {
                 Type = type,
                 Arguments = new QueryArguments(),
@@ -104,6 +105,12 @@ namespace GraphQL.Builders
         public FieldBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
         {
             configure(FieldType);
+            return this;
+        }
+
+        public FieldBuilder<TSourceType, TReturnType> Subscribe(Func<ResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> subscribe)
+        {
+            FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
             return this;
         }
     }

@@ -1,10 +1,11 @@
-using GraphQL.Builders;
+﻿using GraphQL.Builders;
 using GraphQL.Resolvers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GraphQL.Subscription;
 
 namespace GraphQL.Types
 {
@@ -135,7 +136,32 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, Task<object>>(resolve)
+                    : null
+            });
+        }
+
+        public FieldType FieldSubscribe<TGraphType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<ResolveEventStreamContext, IObservable<object>> subscribe = null,
+            string deprecationReason = null)
+            where TGraphType : IGraphType
+        {
+            return AddField(new EventStreamFieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = typeof(TGraphType),
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new FuncFieldResolver<TSourceType, object>(resolve)
                     : null,
+                Subscriber = subscribe != null
+                    ? new EventStreamResolver<object>(subscribe)
+                    : null
             });
         }
 
