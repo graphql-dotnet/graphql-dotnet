@@ -5,12 +5,16 @@ using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
+    using GraphQL.Validation.PreciseComplexity;
+    using Language.AST;
+
     public interface IFieldType : IHaveDefaultValue, IProvideMetadata
     {
         string Name { get; set; }
         string Description { get; set; }
         string DeprecationReason { get; set; }
         QueryArguments Arguments { get; set; }
+        PreciseComplexityAnalyser.GetComplexity GetComplexity { get; set; }
     }
 
     public class FieldType : IFieldType
@@ -24,6 +28,8 @@ namespace GraphQL.Types
         public QueryArguments Arguments { get; set; }
         public IFieldResolver Resolver { get; set; }
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        public PreciseComplexityAnalyser.GetComplexity GetComplexity { get; set; }
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
         {
@@ -44,6 +50,12 @@ namespace GraphQL.Types
         public bool HasMetadata(string key)
         {
             return Metadata?.ContainsKey(key) ?? false;
+        }
+
+        public FieldType SetComplexity(PreciseComplexityAnalyser.GetComplexity complexity)
+        {
+            this.GetComplexity = complexity;
+            return this;
         }
     }
 }

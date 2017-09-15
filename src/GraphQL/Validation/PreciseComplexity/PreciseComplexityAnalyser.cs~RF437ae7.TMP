@@ -1,0 +1,27 @@
+﻿namespace GraphQL.Validation.PreciseComplexity
+{
+    using GraphQL.Language.AST;
+    using GraphQL.Types;
+
+    public class PreciseComplexityAnalyser
+    {
+        public Result Analyze(PreciseComplexityContext context, SelectionSet)
+        {
+            return new Result(0d, 0);
+        }
+
+        public class Result
+        {
+            /// <inheritdoc />
+            public Result(double complexity, int maxDeapth)
+            {
+                this.Complexity = complexity;
+                this.MaxDeapth = maxDeapth;
+            }
+
+            public double Complexity { get; }
+
+            public double MaxDeapth { get; }
+        }
+    }
+}

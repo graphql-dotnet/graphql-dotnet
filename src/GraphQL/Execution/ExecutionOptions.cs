@@ -10,6 +10,8 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
+    using GraphQL.Validation.PreciseComplexity;
+
     public class ExecutionOptions
     {
         public ISchema Schema { get; set; }
@@ -23,6 +25,7 @@ namespace GraphQL
         public object UserContext { get; set; }
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
+        public PreciseComplexityConfiguration PreciseComplexityConfiguration { get; set; } = null;
 
         public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
 
