@@ -62,17 +62,17 @@ Console.WriteLine(result);
 ```csharp
 public class Droid
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+  public string Id { get; set; }
+  public string Name { get; set; }
 }
 
 public class Query
 {
-    [GraphQLMetadata("hero")]
-    public Droid GetHero()
-    {
-        return new Droid { Id = "123", Name = "R2-D2" };
-    }
+  [GraphQLMetadata("hero")]
+  public Droid GetHero()
+  {
+    return new Droid { Id = "123", Name = "R2-D2" };
+  }
 }
 
 var schema = Schema.For(@"
@@ -90,7 +90,7 @@ var schema = Schema.For(@"
 
 var result = schema.Execute(_ =>
 {
-    _.Query = "{ hero { id name } }";
+  _.Query = "{ hero { id name } }";
 });
 ```
 
@@ -99,15 +99,15 @@ var result = schema.Execute(_ =>
 ```csharp
 public class Droid
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+  public string Id { get; set; }
+  public string Name { get; set; }
 }
 
 public class Query
 {
   private List<Droid> _droids = new List<Droid>
   {
-    new Droid { Id = id, Name = "R2-D2" };
+    new Droid { Id = "123", Name = "R2-D2" }
   };
 
   [GraphQLMetadata("hero")]
@@ -133,7 +133,7 @@ var schema = Schema.For(@"
 string id = "123";
 var result = schema.Execute(_ =>
 {
-    _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
+  _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
 });
 ```
 
