@@ -1,4 +1,4 @@
-version: 0.18.0.{build}
+version: 2.0.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
