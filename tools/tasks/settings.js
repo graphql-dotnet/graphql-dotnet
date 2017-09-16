@@ -15,7 +15,7 @@ const CI = process.env.CI && process.env.CI.toString().toLowerCase() === 'true';
 
 const artifacts = path.resolve('./artifacts');
 
-const versionSuffix = ''
+const versionSuffix = 'alpha-'
 
 export default {
   appVeyorJobId,

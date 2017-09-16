@@ -5,15 +5,19 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class DelegateFieldModelBinderResolver : IFieldResolver
+    public class MethodModelBinderResolver<T> : IFieldResolver
     {
-        private readonly Delegate _resolver;
+        private readonly Type _type;
+        private readonly MethodInfo _methodInfo;
+        private readonly IDependencyResolver _dependencyResolver;
         private readonly ParameterInfo[] _parameters;
 
-        public DelegateFieldModelBinderResolver(Delegate resolver)
+        public MethodModelBinderResolver(MethodInfo methodInfo, IDependencyResolver dependencyResolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
-            _parameters = _resolver.GetMethodInfo().GetParameters();
+            _type = typeof(T);
+            _methodInfo = methodInfo;
+            _dependencyResolver = dependencyResolver;
+            _parameters = _methodInfo.GetParameters();
         }
 
         public object Resolve(ResolveFieldContext context)
@@ -22,9 +26,9 @@ namespace GraphQL.Resolvers
 
             if (_parameters.Any())
             {
-                var index = 0;
                 arguments = new object[_parameters.Length];
 
+                var index = 0;
                 if (typeof(ResolveFieldContext) == _parameters[index].ParameterType)
                 {
                     arguments[index] = context;
@@ -44,7 +48,15 @@ namespace GraphQL.Resolvers
                 }
             }
 
-            return _resolver.DynamicInvoke(arguments);
+            var target = _dependencyResolver.Resolve(_type);
+
+            if (target == null)
+            {
+                var parentType = context.ParentType != null ? $"{context.ParentType.Name}." : null;
+                throw new InvalidOperationException($"Could not resolve an instance of {_type.Name} to execute {parentType}{context.FieldName}");
+            }
+
+            return _methodInfo.Invoke(target, arguments);
         }
     }
 }

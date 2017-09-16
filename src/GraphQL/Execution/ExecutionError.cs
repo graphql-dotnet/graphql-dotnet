@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQLParser;
@@ -42,18 +42,16 @@ namespace GraphQL
     {
         public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
         {
+            if (abstractNode == null) return;
 
-            if (abstractNode != null)
+            if (document != null)
             {
-                if (document != null)
-                {
-                    var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
-                    error.AddLocation(location.Line, location.Column);
-                }
-                else if (abstractNode.SourceLocation.Line > 0 && abstractNode.SourceLocation.Column > 0)
-                {
-                    error.AddLocation(abstractNode.SourceLocation.Line, abstractNode.SourceLocation.Column);
-                }
+                var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
+                error.AddLocation(location.Line, location.Column);
+            }
+            else if (abstractNode.SourceLocation.Line > 0 && abstractNode.SourceLocation.Column > 0)
+            {
+                error.AddLocation(abstractNode.SourceLocation.Line, abstractNode.SourceLocation.Column);
             }
         }
     }

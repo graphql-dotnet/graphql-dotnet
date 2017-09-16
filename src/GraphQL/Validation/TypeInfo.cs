@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
@@ -81,7 +81,7 @@ namespace GraphQL.Validation
             if (node is Directive)
             {
                 var directive = (Directive) node;
-                _directive = _schema.Directives.SingleOrDefault(x => x.Name == directive.Name);
+                _directive = _schema.FindDirective(directive.Name);
             }
 
             if (node is Operation)

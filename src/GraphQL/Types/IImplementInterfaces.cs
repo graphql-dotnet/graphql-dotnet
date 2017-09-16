@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
     public interface IImplementInterfaces
     {
-        IEnumerable<Type> Interfaces { get; }
-        IEnumerable<IInterfaceGraphType> ResolvedInterfaces { get; }
+        IEnumerable<Type> Interfaces { get; set; }
+        IEnumerable<IInterfaceGraphType> ResolvedInterfaces { get; set; }
     }
 }

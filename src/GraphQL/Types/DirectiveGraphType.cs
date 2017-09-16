@@ -30,7 +30,7 @@ namespace GraphQL.Types
     /// Directives are used by the GraphQL runtime as a way of modifying execution
     /// behavior.Type system creators will usually not create these directly.
     /// </summary>
-    public class DirectiveGraphType
+    public class DirectiveGraphType : INamedType
     {
         public static IncludeDirective Include = new IncludeDirective();
         public static SkipDirective Skip = new SkipDirective();

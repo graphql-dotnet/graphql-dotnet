@@ -4,6 +4,7 @@ using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +25,10 @@ namespace GraphQL.GraphiQLCore
             services.AddSingleton<DroidType>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<EpisodeEnum>();
-            services.AddSingleton<ISchema>(s => new StarWarsSchema(type => (GraphType) s.GetService(type)));
+            services.AddSingleton<ISchema>(
+                s => new StarWarsSchema(new FuncDependencyResolver(type => (GraphType) s.GetService(type))));
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -38,7 +42,10 @@ namespace GraphQL.GraphiQLCore
 
             app.UseMiddleware<GraphQLMiddleware>(new GraphQLSettings
             {
-                Schema = app.ApplicationServices.GetService<ISchema>()
+                BuildUserContext = ctx => new GraphQLUserContext
+                {
+                    User = ctx.User
+                }
             });
             app.UseDefaultFiles();
             app.UseStaticFiles();

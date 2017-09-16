@@ -10,7 +10,15 @@ namespace GraphQL.Types
         private readonly List<Type> _types;
         private readonly List<IObjectGraphType> _possibleTypes;
 
-        public IEnumerable<IObjectGraphType> PossibleTypes => _possibleTypes;
+        public IEnumerable<IObjectGraphType> PossibleTypes
+        {
+            get { return _possibleTypes; }
+            set
+            {
+                _possibleTypes.Clear();
+                _possibleTypes.AddRange(value);
+            }
+        }
 
         public Func<object, IObjectGraphType> ResolveType { get; set; }
 

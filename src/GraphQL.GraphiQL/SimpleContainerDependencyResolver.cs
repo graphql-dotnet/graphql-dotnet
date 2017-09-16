@@ -6,7 +6,7 @@ using GraphQL.StarWars.IoC;
 
 namespace GraphQL.GraphiQL
 {
-    public class SimpleContainerDependencyResolver : IDependencyResolver
+    public class SimpleContainerDependencyResolver : System.Web.Http.Dependencies.IDependencyResolver
     {
         private readonly ISimpleContainer _container;
 

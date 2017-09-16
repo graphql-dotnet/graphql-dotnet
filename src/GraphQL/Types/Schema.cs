@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Conversion;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -26,11 +27,21 @@ namespace GraphQL.Types
 
         IGraphType FindType(string name);
 
+        DirectiveGraphType FindDirective(string name);
+
         IEnumerable<Type> AdditionalTypes { get; }
+
+        void RegisterType(IGraphType type);
+
+        void RegisterTypes(params IGraphType[] types);
 
         void RegisterTypes(params Type[] types);
 
         void RegisterType<T>() where T : IGraphType;
+
+        void RegisterDirective(DirectiveGraphType directive);
+
+        void RegisterDirectives(params DirectiveGraphType[] directives);
     }
 
     public class Schema : ISchema
@@ -41,13 +52,23 @@ namespace GraphQL.Types
         private readonly List<DirectiveGraphType> _directives;
 
         public Schema()
-            : this(type => (GraphType) Activator.CreateInstance(type))
+            : this(new DefaultDependencyResolver())
         {
         }
 
+        [Obsolete(
+            "The Func<Type, IGraphType> constructor has been deprecated in favor of using IDependencyResolver.  " +
+            "Use FuncDependencyResolver to continue using a Func.  " +
+            "This constructor will be removed in a future version.")]
         public Schema(Func<Type, IGraphType> resolveType)
+            : this(new FuncDependencyResolver(resolveType))
         {
-            ResolveType = resolveType;
+        }
+
+        public Schema(IDependencyResolver dependencyResolver)
+        {
+            DependencyResolver = dependencyResolver;
+            ResolveType = type => dependencyResolver.Resolve(type) as IGraphType;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -60,13 +81,26 @@ namespace GraphQL.Types
             };
         }
 
+        public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var defs = string.Join("\n", typeDefinitions);
+            return For(defs, configure);
+        }
+
+        public static ISchema For(string typeDefinitions, Action<SchemaBuilder> configure = null)
+        {
+            var builder = new SchemaBuilder();
+            configure?.Invoke(builder);
+            return builder.Build(typeDefinitions);
+        }
+
         public IFieldNameConverter FieldNameConverter { get; set;} = new CamelCaseFieldNameConverter();
 
         public bool Initialized => _lookup.IsValueCreated;
 
         public void Initialize()
         {
-            FindType("__abcd__");
+            FindType("____");
         }
 
         public IObjectGraphType Query { get; set; }
@@ -75,14 +109,16 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
+        [Obsolete(
+            "The ResolveType property has been deprecated in favor of using the DependencyResolver property.  " +
+            "This property will be removed in a future version.")]
         public Func<Type, IGraphType> ResolveType { get; set; }
+
+        public IDependencyResolver DependencyResolver { get; set; }
 
         public IEnumerable<DirectiveGraphType> Directives
         {
-            get
-            {
-                return _directives;
-            }
+            get => _directives;
             set
             {
                 if (value == null)
@@ -102,6 +138,11 @@ namespace GraphQL.Types
                 .ToList();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+
+        public void RegisterType(IGraphType type)
+        {
+            _additionalInstances.Add(type);
+        }
 
         public void RegisterTypes(params IGraphType[] types)
         {
@@ -123,6 +164,21 @@ namespace GraphQL.Types
             RegisterType(typeof(T));
         }
 
+        public void RegisterDirective(DirectiveGraphType directive)
+        {
+            _directives.Add(directive);
+        }
+
+        public void RegisterDirectives(params DirectiveGraphType[] directives)
+        {
+            directives.Apply(RegisterDirective);
+        }
+
+        public DirectiveGraphType FindDirective(string name)
+        {
+            return _directives.FirstOrDefault(x => x.Name == name);
+        }
+
         public IGraphType FindType(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -136,6 +192,7 @@ namespace GraphQL.Types
         public void Dispose()
         {
             ResolveType = null;
+            DependencyResolver = null;
             Query = null;
             Mutation = null;
             Subscription = null;
@@ -160,7 +217,9 @@ namespace GraphQL.Types
 
         private GraphTypesLookup CreateTypesLookup()
         {
-            var resolvedTypes = _additionalTypes.Select(t => ResolveType(t.GetNamedType())).ToList();
+            var resolvedTypes = _additionalTypes
+                .Select(t => DependencyResolver.Resolve(t.GetNamedType()) as IGraphType)
+                .ToList();
 
             var types = _additionalInstances.Concat(
                     new IGraphType[]
@@ -173,7 +232,11 @@ namespace GraphQL.Types
                 .Where(x => x != null)
                 .ToList();
 
-            return GraphTypesLookup.Create(types, _directives, ResolveType, FieldNameConverter);
+            return GraphTypesLookup.Create(
+                types,
+                _directives,
+                type => DependencyResolver.Resolve(type) as IGraphType,
+                FieldNameConverter);
         }
     }
 }

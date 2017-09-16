@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace GraphQL.Types
 {
-    public interface IAbstractGraphType
+    public interface IAbstractGraphType : IGraphType
     {
         Func<object, IObjectGraphType> ResolveType { get; set; }
 
@@ -12,7 +12,6 @@ namespace GraphQL.Types
 
         void AddPossibleType(IObjectGraphType type);
     }
-
 
     public static class AbstractGraphTypeExtensions {
 

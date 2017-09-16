@@ -19,6 +19,7 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
+        [Obsolete("This method will be removed in a future version.")]
         Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,
@@ -116,6 +117,19 @@ namespace GraphQL
             result.Errors.Add(new ExecutionError(exception.Message, exception));
         }
 
+        private void ValidateOptions(ExecutionOptions options)
+        {
+            if (options.Schema == null)
+            {
+                throw new ExecutionError("A schema is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(options.Query))
+            {
+                throw new ExecutionError("A query is required.");
+            }
+        }
+
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
             var metrics = new Metrics();
@@ -126,6 +140,8 @@ namespace GraphQL
             var result = InitializeResult(config);
             try
             {
+                ValidateOptions(config);
+
                 if (!config.Schema.Initialized)
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
@@ -149,6 +165,11 @@ namespace GraphQL
                 var operation = GetOperation(config.OperationName, document);
                 result.Operation = operation;
                 metrics.SetOperationName(operation?.Name);
+
+                if (operation == null)
+                {
+                    throw new ExecutionError("Unable to determine operation from query.");
+                }
 
                 if (config.ComplexityConfiguration != null)
                 {
@@ -249,7 +270,7 @@ namespace GraphQL
             context.UserContext = userContext;
 
             context.Operation = operation;
-            context.Variables = GetVariableValues(document, schema, operation.Variables, inputs);
+            context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
 
@@ -274,20 +295,20 @@ namespace GraphQL
                 context,
                 rootType,
                 context.Operation.SelectionSet,
-                new Dictionary<string, Fields>(),
+                new Dictionary<string, Field>(),
                 new List<string>());
 
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Fields> fields)
+        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields)
         {
-            return fields.ToDictionaryAsync<KeyValuePair<string, Fields>, string, ResolveFieldResult<object>, object>(
+            return fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
                 pair => pair.Key,
                 pair => ResolveFieldAsync(context, rootType, source, pair.Value));
         }
 
-        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Fields fields)
+        public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Field field)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -296,9 +317,7 @@ namespace GraphQL
                 Skip = false
             };
 
-            var field = fields.First();
-
-            var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
+            var fieldDefinition = GetFieldDefinition(context.Document, context.Schema, parentType, field);
             if (fieldDefinition == null)
             {
                 resolveResult.Skip = true;
@@ -328,6 +347,9 @@ namespace GraphQL
                 resolveContext.Metrics = context.Metrics;
                 resolveContext.Errors = context.Errors;
 
+                var subFields = SubFieldsFor(context, fieldDefinition.ResolvedType, field);
+                resolveContext.SubFields = subFields;
+
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
@@ -348,13 +370,26 @@ namespace GraphQL
                 }
 
                 resolveResult.Value =
-                    await CompleteValueAsync(context, fieldDefinition.ResolvedType, fields, result).ConfigureAwait(false);
+                    await CompleteValueAsync(context, parentType, fieldDefinition.ResolvedType, field, result).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
             {
                 return GenerateError(resolveResult, field, context, exc);
             }
+        }
+
+        private IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
+        {
+            if (!(fieldType is IObjectGraphType) || !field.SelectionSet.Selections.Any())
+            {
+                return null;
+            }
+
+            var subFields = new Dictionary<string, Field>();
+            var visitedFragments = new List<string>();
+            var fields = CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
+            return fields;
         }
 
         private ResolveFieldResult<object> GenerateError(ResolveFieldResult<object> resolveResult, Field field, ExecutionContext context, Exception exc)
@@ -366,16 +401,15 @@ namespace GraphQL
             return resolveResult;
         }
 
-        public async Task<object> CompleteValueAsync(ExecutionContext context, IGraphType fieldType, Fields fields, object result)
+        public async Task<object> CompleteValueAsync(ExecutionContext context, IObjectGraphType parentType, IGraphType fieldType, Field field, object result)
         {
-            var field = fields != null ? fields.FirstOrDefault() : null;
-            var fieldName = field != null ? field.Name : null;
+            var fieldName = field?.Name;
 
             var nonNullType = fieldType as NonNullGraphType;
             if (nonNullType != null)
             {
                 var type = nonNullType.ResolvedType;
-                var completed = await CompleteValueAsync(context, type, fields, result).ConfigureAwait(false);
+                var completed = await CompleteValueAsync(context, parentType, type, field, result).ConfigureAwait(false);
                 if (completed == null)
                 {
                     var error = new ExecutionError("Cannot return null for non-null type. Field: {0}, Type: {1}!."
@@ -413,7 +447,7 @@ namespace GraphQL
                 var listType = fieldType as ListGraphType;
                 var itemType = listType.ResolvedType;
 
-                var results = await list.MapAsync(async item => await CompleteValueAsync(context, itemType, fields, item).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await list.MapAsync(async item => await CompleteValueAsync(context, parentType, itemType, field, item).ConfigureAwait(false)).ConfigureAwait(false);
 
                 return results;
             }
@@ -425,7 +459,17 @@ namespace GraphQL
                 var abstractType = fieldType as IAbstractGraphType;
                 objectType = abstractType.GetObjectType(result);
 
-                if (objectType != null && !abstractType.IsPossibleType(objectType))
+                if (objectType == null)
+                {
+                    var error = new ExecutionError(
+                        $"Abstract type {abstractType.Name} must resolve to an Object type at " +
+                        $"runtime for field {parentType.Name}.{fieldName} " +
+                        $"with value {result}, received 'null'.");
+                    error.AddLocation(field, context.Document);
+                    throw error;
+                }
+
+                if (!abstractType.IsPossibleType(objectType))
                 {
                     var error = new ExecutionError(
                         "Runtime Object type \"{0}\" is not a possible type for \"{1}\""
@@ -449,13 +493,10 @@ namespace GraphQL
                 throw error;
             }
 
-            var subFields = new Dictionary<string, Fields>();
+            var subFields = new Dictionary<string, Field>();
             var visitedFragments = new List<string>();
 
-            fields.Apply(f =>
-            {
-                subFields = CollectFields(context, objectType, f.SelectionSet, subFields, visitedFragments);
-            });
+            subFields = CollectFields(context, objectType, field?.SelectionSet, subFields, visitedFragments);
 
             return await ExecuteFieldsAsync(context, objectType, result, subFields).ConfigureAwait(false);
         }
@@ -480,7 +521,7 @@ namespace GraphQL
             });
         }
 
-        public FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
+        public FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
             {
@@ -493,6 +534,13 @@ namespace GraphQL
             if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
             {
                 return SchemaIntrospection.TypeNameMeta;
+            }
+
+            if (parentType == null)
+            {
+                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
+                error.AddLocation(field, document);
+                throw error;
             }
 
             return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
@@ -542,7 +590,7 @@ namespace GraphQL
         public Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
-            variableDefinitions.Apply(v =>
+            variableDefinitions?.Apply(v =>
             {
                 var variable = new Variable();
                 variable.Name = v.Name;
@@ -574,67 +622,12 @@ namespace GraphQL
             {
                 if (variable.DefaultValue != null)
                 {
-                    return ValueFromAst(variable.DefaultValue);
+                    return variable.DefaultValue.ValueFromAst();
                 }
             }
             var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
             return coercedValue;
         }
-
-        private object ValueFromAst(IValue value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (value is StringValue)
-            {
-                var str = (StringValue)value;
-                return str.Value;
-            }
-
-            if (value is IntValue)
-            {
-                var num = (IntValue)value;
-                return num.Value;
-            }
-
-            if (value is LongValue)
-            {
-                var num = (LongValue)value;
-                return num.Value;
-            }
-
-            if (value is FloatValue)
-            {
-                var num = (FloatValue)value;
-                return num.Value;
-            }
-
-            if (value is EnumValue)
-            {
-                var @enum = (EnumValue)value;
-                return @enum.Name;
-            }
-
-            if (value is ObjectValue)
-            {
-                var objVal = (ObjectValue)value;
-                var obj = new Dictionary<string, object>();
-                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
-                return obj;
-            }
-
-            if (value is ListValue)
-            {
-                var list = (ListValue)value;
-                return list.Values.Select(ValueFromAst).ToList();
-            }
-
-            return null;
-        }
-
 
         public void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
         {
@@ -744,9 +737,7 @@ namespace GraphQL
             var variable = input as VariableReference;
             if (variable != null)
             {
-                return variables != null
-                    ? variables.ValueFor(variable.Name)
-                    : null;
+                return variables?.ValueFor(variable.Name);
             }
 
             if (type is ListGraphType)
@@ -794,19 +785,19 @@ namespace GraphQL
             return null;
         }
 
-        public Dictionary<string, Fields> CollectFields(
+        public Dictionary<string, Field> CollectFields(
             ExecutionContext context,
             IGraphType specificType,
             SelectionSet selectionSet,
-            Dictionary<string, Fields> fields,
+            Dictionary<string, Field> fields,
             List<string> visitedFragmentNames)
         {
             if (fields == null)
             {
-                fields = new Dictionary<string, Fields>();
+                fields = new Dictionary<string, Field>();
             }
 
-            selectionSet.Selections.Apply(selection =>
+            selectionSet?.Selections.Apply(selection =>
             {
                 if (selection is Field)
                 {
@@ -817,11 +808,7 @@ namespace GraphQL
                     }
 
                     var name = field.Alias ?? field.Name;
-                    if (!fields.ContainsKey(name))
-                    {
-                        fields[name] = new Fields();
-                    }
-                    fields[name].Add(field);
+                    fields[name] = field;
                 }
                 else if (selection is FragmentSpread)
                 {

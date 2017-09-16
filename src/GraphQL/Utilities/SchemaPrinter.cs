@@ -343,7 +343,7 @@ namespace GraphQL.Utilities
                 return "[{0}]".ToFormat(ResolveName(list.ResolvedType));
             }
 
-            return type.Name;
+            return type?.Name;
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)

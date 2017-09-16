@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
-using System.Linq;
 
 namespace GraphQL
 {
@@ -51,7 +51,14 @@ namespace GraphQL
 
 		public static string GraphQLName(this Type type)
         {
-            string typeName = type.Name;
+            var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
+
+            if (attr != null)
+            {
+                return attr.Name;
+            }
+
+            var typeName = type.Name;
 
             if (type.GetTypeInfo().IsGenericType)
             {
@@ -143,6 +150,25 @@ namespace GraphQL
             }
 
             return graphType;
+        }
+
+        public static MethodInfo MethodForField(this Type type, string field)
+        {
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+
+            var method = methods.FirstOrDefault(m =>
+            {
+                var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
+                var name = attr?.Name ?? m.Name;
+                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
+            });
+
+            if (method == null)
+            {
+                throw new InvalidOperationException($"Expected to find method {field} on {type.Name} but could not.");
+            }
+
+            return method;
         }
     }
 }

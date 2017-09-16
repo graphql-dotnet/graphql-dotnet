@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace GraphQL
 {
+    /// <remarks>https://github.com/JasperFx/baseline/blob/master/src/Baseline/LightweightCache.cs</remarks>
     public class LightweightCache<TKey, TValue> : IEnumerable<TValue>
     {
         private readonly IDictionary<TKey, TValue> _values;

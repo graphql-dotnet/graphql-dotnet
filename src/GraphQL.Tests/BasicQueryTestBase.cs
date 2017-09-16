@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -71,16 +71,16 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var runResult = Executer.ExecuteAsync(
-                schema,
-                root,
-                query,
-                null,
-                inputs,
-                userContext,
-                cancellationToken,
-                rules
-                ).Result;
+            var runResult = Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                _.Query = query;
+                _.Root = root;
+                _.Inputs = inputs;
+                _.UserContext = userContext;
+                _.CancellationToken = cancellationToken;
+                _.ValidationRules = rules;
+            }).GetAwaiter().GetResult();
 
             var writtenResult = Writer.Write(runResult);
             var expectedResult = Writer.Write(expectedExecutionResult);
