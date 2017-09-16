@@ -38,86 +38,103 @@ Define your schema with a top level query object then execute that query.
 
 A more full-featured example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
 
+### Hello World
+
 ```csharp
-namespace ConsoleApplication
+var schema = Schema.For(@"
+  type Query {
+    hello: String
+  }
+");
+
+var root = new { Hello = "Hello World!" };
+var result = schema.Execute(_ =>
 {
-    using System;
-    using System.Threading.Tasks;
-    using GraphQL;
-    using GraphQL.Http;
-    using GraphQL.Types;
+  _.Query = "{ hello }";
+  _.Root = root;
+});
 
-    public class Program
+Console.WriteLine(result);
+```
+
+### Handler/Endpoints
+
+```csharp
+public class Droid
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class Query
+{
+    [GraphQLMetadata("hero")]
+    public Droid GetHero()
     {
-        public static void Main(string[] args)
-        {
-          Run();
-        }
-
-        private static async void Run()
-        {
-          Console.WriteLine("Hello GraphQL!");
-
-          var schema = new Schema { Query = new StarWarsQuery() };
-
-          var result = await new DocumentExecuter().ExecuteAsync( _ =>
-          {
-            _.Schema = schema;
-            _.Query = @"
-                query {
-                  hero {
-                    id
-                    name
-                  }
-                }
-              ";
-          }).ConfigureAwait(false);
-
-          var json = new DocumentWriter(indent: true).Write(result);
-
-          Console.WriteLine(json);
-        }
-    }
-
-    public class Droid
-    {
-      public string Id { get; set; }
-      public string Name { get; set; }
-    }
-
-    public class DroidType : ObjectGraphType<Droid>
-    {
-      public DroidType()
-      {
-        Field(x => x.Id).Description("The Id of the Droid.");
-        Field(x => x.Name, nullable: true).Description("The name of the Droid.");
-      }
-    }
-
-    public class StarWarsQuery : ObjectGraphType
-    {
-      public StarWarsQuery()
-      {
-        Field<DroidType>(
-          "hero",
-          resolve: context => new Droid { Id = "1", Name = "R2-D2" }
-        );
-      }
+        return new Droid { Id = "123", Name = "R2-D2" };
     }
 }
+
+var schema = Schema.For(@"
+  type Droid {
+    id: String
+    name: String
+  }
+
+  type Query {
+    hero: Droid
+  }
+", _ => {
+    _.Types.Include<Query>();
+});
+
+var result = schema.Execute(_ =>
+{
+    _.Query = "{ hero { id name } }";
+});
 ```
 
-Output
-```
-Hello GraphQL!
+### Parameters
+
+```csharp
+public class Droid
 {
-  "data": {
-    "hero": {
-      "id": "1",
-      "name": "R2-D2"
-    }
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class Query
+{
+  private List<Droid> _droids = new List<Droid>
+  {
+    new Droid { Id = id, Name = "R2-D2" };
+  };
+
+  [GraphQLMetadata("hero")]
+  public Droid GetHero(string id)
+  {
+    return _droids.FirstOrDefault(x => x.Id == id);
   }
 }
+
+var schema = Schema.For(@"
+  type Droid {
+    id: String
+    name: String
+  }
+
+  type Query {
+    hero(id: String): Droid
+  }
+", _ => {
+    _.Types.Include<Query>();
+});
+
+string id = "123";
+var result = schema.Execute(_ =>
+{
+    _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
+});
 ```
 
 ## Roadmap
@@ -204,7 +221,7 @@ publish nuget from MyGet
 ### Running on .NET Core
 The GraphQL.GraphiQLCore project runs on `.NET Core 1.1`. You can run from Visual Studio Code or from the command line using `dotnet run`. When you run the project, you will see the GraphiQL editor open.
 
-When using Visual Studio Code, open to the `./src/GraphQL.GraphiQLCore` folder. You will get a warning "Required assets to build and debug are missing from 'GraphQL.GraphiQLCore'. Add Them?". Choose `Yes`. This will add the necessary launch.json and tasks.json files. 
+When using Visual Studio Code, open to the `./src/GraphQL.GraphiQLCore` folder. You will get a warning "Required assets to build and debug are missing from 'GraphQL.GraphiQLCore'. Add Them?". Choose `Yes`. This will add the necessary launch.json and tasks.json files.
 
 ### Running on OSX with mono
 To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
@@ -217,4 +234,3 @@ See the following for more details:
 
 * [Building VS 2017 MSBuild csproj Projects with Mono on Linux](https://stackoverflow.com/questions/42747722/building-vs-2017-msbuild-csproj-projects-with-mono-on-linux)
 * [using .NET Framework as targets framework, the osx/unix build fails](https://github.com/dotnet/netcorecli-fsc/wiki/.NET-Core-SDK-rc4#using-net-framework-as-targets-framework-the-osxunix-build-fails)
-
