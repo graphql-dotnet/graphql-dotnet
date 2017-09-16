@@ -12,7 +12,12 @@ namespace GraphQL.Tests.Introspection
         public void validate_core_schema()
         {
             var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(new Schema(), null, SchemaIntrospection.IntrospectionQuery, null).Result;
+            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema();
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+            }).GetAwaiter().GetResult();
+
             var json = new DocumentWriter(true).Write(executionResult.Data);
 
             ShouldBe(json, IntrospectionResult.Data);
@@ -22,7 +27,12 @@ namespace GraphQL.Tests.Introspection
         public void validate_non_null_schema()
         {
             var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(new TestSchema(), null, InputObjectBugQuery, null).Result;
+            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new TestSchema();
+                _.Query = InputObjectBugQuery;
+            }).GetAwaiter().GetResult();
+
             var json = new DocumentWriter(true).Write(executionResult.Data);
             executionResult.Errors.ShouldBeNull();
 

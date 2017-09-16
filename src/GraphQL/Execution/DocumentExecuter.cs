@@ -19,7 +19,7 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        [Obsolete("This method will be removed in a future version.")]
+        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
         Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,
@@ -52,6 +52,7 @@ namespace GraphQL
             _complexityAnalyzer = complexityAnalyzer;
         }
 
+        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
         public Task<ExecutionResult> ExecuteAsync(
             ISchema schema,
             object root,

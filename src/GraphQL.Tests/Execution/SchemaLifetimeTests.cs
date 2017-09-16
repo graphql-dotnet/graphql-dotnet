@@ -21,7 +21,11 @@ namespace GraphQL.Tests.Execution
             var executer = new DocumentExecuter();
             var schema = new Schema();
 
-            await executer.ExecuteAsync(schema, null, "{noop}", null).ConfigureAwait(false);
+            await executer.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                _.Query = "{noop}";
+            }).ConfigureAwait(false);
 
             Should.NotThrow(() => schema.Dispose());
         }
