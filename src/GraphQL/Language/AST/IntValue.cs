@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace GraphQL.Language.AST
@@ -99,7 +100,8 @@ namespace GraphQL.Language.AST
 
         public override string ToString()
         {
-            return "FloatValue{{value={0}}}".ToFormat(Value);
+            var valueStr = Value.ToString("G", NumberFormatInfo.InvariantInfo);
+            return "FloatValue{{value={0}}}".ToFormat(valueStr);
         }
 
         protected bool Equals(FloatValue other)

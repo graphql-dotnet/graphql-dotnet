@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -13,7 +14,8 @@ namespace GraphQL.Utilities
         public static string Print(INode node)
         {
             var printer = new AstPrintVisitor();
-            return printer.Visit(node)?.ToString() ?? "";
+
+            return printer.Visit(node)?.ToString();
         }
     }
 

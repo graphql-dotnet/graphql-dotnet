@@ -1,3 +1,6 @@
+using System;
+using System.Globalization;
+using GraphQL.Conversion;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -16,12 +19,20 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            decimal result;
-            if (decimal.TryParse(value?.ToString() ?? string.Empty, out result))
+            if (value == null)
+                return null;
+
+            try
             {
+                var result = Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo);
+
                 return result;
             }
-            return null;
+            catch (FormatException e)
+            {
+                //todo: should log or something?
+                return null;
+            }
         }
 
         public override object ParseLiteral(IValue value)
