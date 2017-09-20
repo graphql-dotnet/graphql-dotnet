@@ -15,7 +15,7 @@ namespace GraphQL.Utilities
         {
             var printer = new AstPrintVisitor();
 
-            return printer.Visit(node)?.ToString();
+            return printer.Visit(node)?.ToString() ?? string.Empty;
         }
     }
 
