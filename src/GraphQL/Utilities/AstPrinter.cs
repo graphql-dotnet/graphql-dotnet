@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -15,7 +16,8 @@ namespace GraphQL.Utilities
         {
             var printer = new AstPrintVisitor();
 
-            return printer.Visit(node)?.ToString() ?? string.Empty;
+            var result = printer.Visit(node);
+            return result?.ToString() ?? string.Empty;
         }
     }
 
@@ -280,7 +282,11 @@ namespace GraphQL.Utilities
             Config<FloatValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => $"{f.Arg(x => x.Value), 0:0.0##}");
+                c.Print(f =>
+                {
+                    var val = (double)f.Arg(x => x.Value);
+                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                });
             });
             Config<StringValue>(c =>
             {
@@ -406,7 +412,6 @@ namespace GraphQL.Utilities
                     };
 
                     var result = f.Resolver.Resolve(ctx);
-
                     if (result is INode)
                     {
                         result = ApplyConfig(result as INode);

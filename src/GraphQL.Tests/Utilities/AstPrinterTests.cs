@@ -1,4 +1,5 @@
-﻿using GraphQL.Execution;
+using System.Globalization;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using Shouldly;
@@ -71,7 +72,7 @@ var query = @"mutation createUser($userInput: UserInput!) {
 
             var val = new FloatValue(value);
             var result = _printer.Visit(val);
-            result.ShouldBe($"{value, 0:0.0##}");
+            result.ShouldBe(value.ToString("0.0##", NumberFormatInfo.InvariantInfo));
         }
 
         private static string MonetizeLineBreaks(string input)
