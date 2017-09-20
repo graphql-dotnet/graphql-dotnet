@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -154,14 +154,14 @@ namespace GraphQL
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
 
-            if (type is InputObjectGraphType)
+            if (type is IComplexGraphType)
             {
                 if (!(valueAst is ObjectValue))
                 {
                     return new[] {$"Expected \"{type.Name}\", found not an object."};
                 }
 
-                var inputType = (InputObjectGraphType) type;
+                var inputType = (IComplexGraphType) type;
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
