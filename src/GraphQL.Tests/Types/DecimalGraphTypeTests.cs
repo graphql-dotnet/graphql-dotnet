@@ -1,4 +1,5 @@
-﻿using GraphQL.Language.AST;
+using System.Globalization;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -27,15 +28,21 @@ namespace GraphQL.Tests.Types
             type.ParseValue("abcd").ShouldBe(null);
         }
 
-        [Fact]
-        public void coerces_numeric_string_to_decimal()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void coerces_numeric_string_to_decimal(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
             type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
         }
 
-        [Fact]
-        public void converts_DecimalValue_to_decimal()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void converts_DecimalValue_to_decimal(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
             type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe((decimal)12345.6579);
         }
     }

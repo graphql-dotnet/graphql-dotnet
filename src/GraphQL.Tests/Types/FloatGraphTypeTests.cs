@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+using System.Globalization;
+using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
@@ -20,9 +21,12 @@ namespace GraphQL.Tests.Types
             type.ParseValue("abcd").ShouldBe(null);
         }
 
-        [Fact]
-        public void coerces_double_to_value()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void coerces_double_to_value(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
             type.ParseValue(1.79769313486231e308).ShouldBe((double)1.79769313486231e308);
         }
     }

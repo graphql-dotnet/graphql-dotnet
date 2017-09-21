@@ -49,14 +49,14 @@ namespace GraphQL.Conversion
             });
         }
 
-        public static float ParseFloat(string arg)
+        public static float ParseFloat(string value)
         {
-            return System.Convert.ToSingle(arg, NumberFormatInfo.InvariantInfo);
+            return System.Convert.ToSingle(value, NumberFormatInfo.InvariantInfo);
         }
 
-        public static double ParseDouble(string arg)
+        public static double ParseDouble(string value)
         {
-            return System.Convert.ToDouble(arg, NumberFormatInfo.InvariantInfo);
+            return System.Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
         }
 
         public static decimal ParseDecimal(string value)
