@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Globalization;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -122,9 +123,13 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        [Fact]
-        public void float_into_string()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void float_into_string(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             var query = @"{
               complicatedArgs {
                 stringArgField(stringArg: 1.0)
@@ -426,9 +431,13 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        [Fact]
-        public void float_into_enum()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void float_into_enum(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+
             var query = @"{
               dog {
                 doesKnowCommand(dogCommand: 1.0)

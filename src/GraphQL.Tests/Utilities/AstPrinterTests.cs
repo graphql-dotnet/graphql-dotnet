@@ -1,4 +1,5 @@
-﻿using GraphQL.Execution;
+using System.Globalization;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using Shouldly;
@@ -64,14 +65,18 @@ var query = @"mutation createUser($userInput: UserInput!) {
             result.ShouldBe(value);
         }
 
-        [Fact]
-        public void prints_float_value()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void prints_float_value(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             double value = 3.33;
 
             var val = new FloatValue(value);
             var result = _printer.Visit(val);
-            result.ShouldBe($"{value, 0:0.0##}");
+            result.ShouldBe(value.ToString("0.0##", NumberFormatInfo.InvariantInfo));
         }
 
         private static string MonetizeLineBreaks(string input)
