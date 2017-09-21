@@ -319,8 +319,7 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
+        [Fact]
         public void float_into_boolean()
         {
             var query = @"{
