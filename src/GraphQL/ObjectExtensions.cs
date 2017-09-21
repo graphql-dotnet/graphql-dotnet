@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Conversion;
@@ -135,7 +136,16 @@ namespace GraphQL
                 return value;
             }
 
-            var text = value.ToString();
+            string text;
+            if (value is float)
+                text = ((float)value).ToString(CultureInfo.InvariantCulture);
+            else if (value is double)
+                text = ((double)value).ToString(CultureInfo.InvariantCulture);
+            else if (value is decimal)
+                text = ((decimal)value).ToString(CultureInfo.InvariantCulture);
+            else
+                text = value.ToString();
+
             return _conversions.Value.Convert(fieldType, text);
         }
 
