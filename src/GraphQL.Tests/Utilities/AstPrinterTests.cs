@@ -65,9 +65,13 @@ var query = @"mutation createUser($userInput: UserInput!) {
             result.ShouldBe(value);
         }
 
-        [Fact]
-        public void prints_float_value()
+        [Theory]
+        [ClassData(typeof(CultureList))]
+        public void prints_float_value(CultureInfo cultureInfo)
         {
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             double value = 3.33;
 
             var val = new FloatValue(value);
