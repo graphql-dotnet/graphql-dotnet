@@ -154,14 +154,14 @@ namespace GraphQL
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
 
-            if (type is IComplexGraphType)
+            if (type is InputObjectGraphType)
             {
                 if (!(valueAst is ObjectValue))
                 {
                     return new[] {$"Expected \"{type.Name}\", found not an object."};
                 }
 
-                var inputType = (IComplexGraphType) type;
+                var inputType = (InputObjectGraphType) type;
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
