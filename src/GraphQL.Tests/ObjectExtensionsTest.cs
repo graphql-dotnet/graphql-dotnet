@@ -10,13 +10,15 @@ namespace GraphQL.Tests
 {
     public class ObjectExtensionsTests
     {
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void convert_double(CultureInfo cultureInfo)
+        [Fact]
+        public void convert_double_using_cultures() 
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(convert_double);
+        } 
 
+        [Fact]
+        public void convert_double()
+        {
             /* Given */
             double value = 123.123d;
             Type floatType = typeof(double);
@@ -29,13 +31,15 @@ namespace GraphQL.Tests
             actual.ShouldBe(value);
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void convert_decimal(CultureInfo cultureInfo)
+        [Fact]
+        public void convert_decimal_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(convert_decimal);
+        }
 
+        [Fact]
+        public void convert_decimal()
+        {
             /* Given */
             decimal value = 123.123m;
             Type floatType = typeof(decimal);
@@ -48,12 +52,15 @@ namespace GraphQL.Tests
             actual.ShouldBe(value);
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void convert_single(CultureInfo cultureInfo)
+        [Fact]
+        public void convert_single_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(convert_single);
+        }
+
+        [Fact]
+        public void convert_single()
+        { 
 
             /* Given */
             float value = 123.123f;

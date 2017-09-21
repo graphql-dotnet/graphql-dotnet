@@ -21,12 +21,15 @@ namespace GraphQL.Tests.Types
             type.ParseValue("abcd").ShouldBe(null);
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void coerces_double_to_value(CultureInfo cultureInfo)
+        [Fact]
+        public void coerces_double_to_value_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(coerces_double_to_value);
+        }
+
+        [Fact]
+        public void coerces_double_to_value()
+        {
             type.ParseValue(1.79769313486231e308).ShouldBe((double)1.79769313486231e308);
         }
     }

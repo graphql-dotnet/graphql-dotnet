@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_integer_to_decimal()
         {
-            type.ParseValue(0).ShouldBe((decimal)0);
+            type.ParseValue(0).ShouldBe((decimal) 0);
         }
 
         [Fact]
@@ -28,21 +28,27 @@ namespace GraphQL.Tests.Types
             type.ParseValue("abcd").ShouldBe(null);
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void coerces_numeric_string_to_decimal(CultureInfo cultureInfo)
+        [Fact]
+        public void coerces_numeric_string_to_decimal_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(coerces_numeric_string_to_decimal);
+        }
+
+        [Fact]
+        public void coerces_numeric_string_to_decimal()
+        {
             type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void converts_DecimalValue_to_decimal(CultureInfo cultureInfo)
+        [Fact]
+        public void converts_DecimalValue_to_decimal_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(converts_DecimalValue_to_decimal);
+        }
+
+        [Fact]
+        public void converts_DecimalValue_to_decimal()
+        {
             type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe((decimal)12345.6579);
         }
     }

@@ -123,13 +123,15 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void float_into_string(CultureInfo cultureInfo)
+        [Fact]
+        public void float_into_string_using_cultures()
         {
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            CultureTestHelper.UseCultures(float_into_string);
+        }
 
+        [Fact]
+        public void float_into_string()
+        {
             var query = @"{
               complicatedArgs {
                 stringArgField(stringArg: 1.0)
@@ -431,13 +433,15 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        [Theory]
-        [ClassData(typeof(CultureList))]
-        public void float_into_enum(CultureInfo cultureInfo)
+        [Fact]
+        public void float_into_enum_with_cultures()
         {
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureTestHelper.UseCultures(float_into_enum);
+        }
 
+        [Fact]
+        public void float_into_enum()
+        {
             var query = @"{
               dog {
                 doesKnowCommand(dogCommand: 1.0)
