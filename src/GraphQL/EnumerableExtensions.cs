@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +26,19 @@ namespace GraphQL
                 .Cast<object>()
                 .Select(map);
             return Task.WhenAll(tasks);
+        }
+
+        public static async Task<object[]> MapAsync(this IEnumerable enumerable, Func<int, object, Task<object>> mapFunction)
+        {
+            return await enumerable
+                .Cast<object>()
+                .Select((item, index) => Tuple.Create(index, item))
+                .MapAsync(async tuple =>
+                {
+                    var data = (Tuple<int, object>)tuple;
+                    return await mapFunction(data.Item1, data.Item2).ConfigureAwait(false);
+                })
+                .ConfigureAwait(false);
         }
 
         public static void Apply<T>(this IEnumerable<T> items, Action<T> action)
