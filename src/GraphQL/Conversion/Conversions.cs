@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace GraphQL.Conversion
@@ -28,9 +29,9 @@ namespace GraphQL.Conversion
                 char.TryParse(x, out c);
                 return c;
             });
-            RegisterConversion(decimal.Parse);
-            RegisterConversion(double.Parse);
-            RegisterConversion(float.Parse);
+            RegisterConversion(ParseDecimal);
+            RegisterConversion(ParseDouble);
+            RegisterConversion(ParseFloat);
             RegisterConversion(short.Parse);
             RegisterConversion(int.Parse);
             RegisterConversion(long.Parse);
@@ -46,6 +47,21 @@ namespace GraphQL.Conversion
 
                 return x;
             });
+        }
+
+        public static float ParseFloat(string value)
+        {
+            return System.Convert.ToSingle(value, NumberFormatInfo.InvariantInfo);
+        }
+
+        public static double ParseDouble(string value)
+        {
+            return System.Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
+        }
+
+        public static decimal ParseDecimal(string value)
+        {
+            return System.Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo);
         }
 
         private IEnumerable<IConversionProvider> providers()

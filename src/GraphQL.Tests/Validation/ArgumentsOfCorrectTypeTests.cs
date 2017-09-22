@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Globalization;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -120,6 +121,12 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 Rule.badValue(_, "stringArg", "String", "1", 3, 32);
             });
+        }
+
+        [Fact]
+        public void float_into_string_using_cultures()
+        {
+            CultureTestHelper.UseCultures(float_into_string);
         }
 
         [Fact]
@@ -424,6 +431,12 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 Rule.badValue(_, "dogCommand", "DogCommand", "2", 3, 33);
             });
+        }
+
+        [Fact]
+        public void float_into_enum_with_cultures()
+        {
+            CultureTestHelper.UseCultures(float_into_enum);
         }
 
         [Fact]

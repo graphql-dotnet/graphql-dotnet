@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -16,12 +18,19 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            double result;
-            if (double.TryParse(value?.ToString() ?? string.Empty, out result))
+            if (value == null)
+                return null;
+
+            try
             {
+                var result = Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
                 return result;
             }
-            return null;
+            catch (FormatException e)
+            {
+                //todo: should log or something?
+                return null;
+            }
         }
 
         public override object ParseLiteral(IValue value)

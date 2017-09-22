@@ -1,4 +1,5 @@
-﻿using GraphQL.Language.AST;
+using System.Globalization;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -18,7 +19,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_integer_to_decimal()
         {
-            type.ParseValue(0).ShouldBe((decimal)0);
+            type.ParseValue(0).ShouldBe((decimal) 0);
         }
 
         [Fact]
@@ -28,9 +29,21 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void coerces_numeric_string_to_decimal_using_cultures()
+        {
+            CultureTestHelper.UseCultures(coerces_numeric_string_to_decimal);
+        }
+
+        [Fact]
         public void coerces_numeric_string_to_decimal()
         {
             type.ParseValue("12345.6579").ShouldBe((decimal)12345.6579);
+        }
+
+        [Fact]
+        public void converts_DecimalValue_to_decimal_using_cultures()
+        {
+            CultureTestHelper.UseCultures(converts_DecimalValue_to_decimal);
         }
 
         [Fact]
