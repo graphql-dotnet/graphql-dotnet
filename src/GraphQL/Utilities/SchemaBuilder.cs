@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
@@ -369,7 +370,7 @@ namespace GraphQL.Utilities
                 case ASTNodeKind.FloatValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return double.Parse(str.Value);
+                    return Conversions.ParseDouble(str.Value);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
