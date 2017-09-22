@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -188,12 +188,12 @@ namespace GraphQL.Utilities
                 return PrintDirective((DirectiveGraphType)type);
             }
 
-            if (!(type is InputObjectGraphType))
+            if (!(type is IInputObjectGraphType))
             {
                 throw new InvalidOperationException("Unknown GraphType {0}".ToFormat(type.GetType().Name));
             }
 
-            return PrintInputObject((InputObjectGraphType)type);
+            return PrintInputObject((IInputObjectGraphType)type);
         }
 
         public string PrintScalar(ScalarGraphType type)
@@ -234,7 +234,7 @@ namespace GraphQL.Utilities
             return description + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
-        public string PrintInputObject(InputObjectGraphType type)
+        public string PrintInputObject(IInputObjectGraphType type)
         {
             var description = PrintDescription(type.Description);
             var fields = type.Fields.Select(x => "  " + PrintInputValue(x));

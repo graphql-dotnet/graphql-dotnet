@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -678,7 +678,7 @@ namespace GraphQL
                 return;
             }
 
-            if (type is IObjectGraphType || type is InputObjectGraphType)
+            if (type is IObjectGraphType || type is IInputObjectGraphType)
             {
                 var dict = input as Dictionary<string, object>;
                 var complexType = (IComplexGraphType)type;
@@ -690,7 +690,7 @@ namespace GraphQL
                 }
 
                 // ensure every provided field is defined
-                var unknownFields = type is InputObjectGraphType
+                var unknownFields = type is IInputObjectGraphType
                     ? dict.Keys.Where(key => complexType.Fields.All(field => field.Name != key)).ToArray()
                     : null;
 
@@ -751,7 +751,7 @@ namespace GraphQL
                     : new[] { CoerceValue(schema, listItemType, input, variables) };
             }
 
-            if (type is IObjectGraphType || type is InputObjectGraphType)
+            if (type is IObjectGraphType || type is IInputObjectGraphType)
             {
                 var complexType = type as IComplexGraphType;
                 var obj = new Dictionary<string, object>();

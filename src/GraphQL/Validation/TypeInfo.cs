@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
@@ -157,7 +157,7 @@ namespace GraphQL.Validation
                 var objectType = GetInputType().GetNamedType();
                 IGraphType fieldType = null;
 
-                if (objectType is InputObjectGraphType)
+                if (objectType is IInputObjectGraphType)
                 {
                     var complexType = objectType as IComplexGraphType;
                     var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
