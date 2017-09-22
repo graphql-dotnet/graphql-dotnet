@@ -79,6 +79,13 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
 type NestedObjType {
   intField: Int
 }
@@ -96,6 +103,13 @@ type root {
   query: root
 }
 
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
 type NestedObjType {
   intField: Int
 }
@@ -112,6 +126,13 @@ type root {
             build_schema("none").ShouldBeCrossPlat(@"schema {
   query: root
 }
+
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
 
 type NestedObjType {
   intField: Int

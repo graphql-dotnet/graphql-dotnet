@@ -15,15 +15,11 @@ namespace GraphQL.Utilities
         private readonly List<string> _scalars = new List<string>(
             new[]
             {
-                // core types
                 "String",
                 "Boolean",
                 "Int",
                 "Float",
-                "ID",
-                // added types
-                "Date",
-                "Decimal"
+                "ID"
             });
 
         public SchemaPrinter(ISchema schema, IEnumerable<string> customScalars = null)
