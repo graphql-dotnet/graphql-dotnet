@@ -12,12 +12,4 @@
 
         string CollectTypes(TypeCollectionContext context);
     }
-
-    public interface IOutputGraphType : IGraphType
-    {
-    }
-
-    public interface IInputGraphType : IGraphType
-    {
-    }
 }

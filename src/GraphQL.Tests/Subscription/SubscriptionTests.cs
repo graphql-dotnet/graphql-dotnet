@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -112,7 +112,9 @@ namespace GraphQL.Tests.Subscription
             message.ShouldNotBeNull();
             message.ShouldBeOfType<ExecutionResult>();
             message.Data.ShouldBeNull();
-            message.Errors.ShouldContain(error => error.InnerException.Message == "test");
+            var error = message.Errors.Single();
+            error.InnerException.Message.ShouldBe("test");
+            error.Path.ShouldBe(new[] {"messageAdded"});
         }
     }
 }

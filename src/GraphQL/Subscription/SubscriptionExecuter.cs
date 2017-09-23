@@ -93,22 +93,25 @@ namespace GraphQL.Subscription
                 new Dictionary<string, Field>(),
                 new List<string>());
 
-            return ExecuteSubscriptionFields(context, rootType, context.RootValue, fields);
+            return ExecuteSubscriptionFields(context, rootType, context.RootValue, fields, new string[0]);
         }
 
         private IDictionary<string, IObservable<ExecutionResult>> ExecuteSubscriptionFields(
            ExecutionContext context,
            IObjectGraphType rootType,
            object source,
-           Dictionary<string, Field> fields)
+           Dictionary<string, Field> fields,
+           IEnumerable<string> path)
         {
             var result = new ConcurrentDictionary<string, IObservable<ExecutionResult>>();
+
+            var parentPath = path.ToList();
 
             foreach (var field in fields)
             {
                 var key = field.Key;
 
-                var fieldResult = ResolveEventStream(context, rootType, source, field.Value);
+                var fieldResult = ResolveEventStream(context, rootType, source, field.Value, parentPath.Concat(new[] {key}));
 
                 if (fieldResult.Skip)
                     continue;
@@ -119,10 +122,16 @@ namespace GraphQL.Subscription
             return result;
         }
 
-        private ResolveEventStreamResult ResolveEventStream(ExecutionContext context,
-            IObjectGraphType parentType, object source, Field field)
+        private ResolveEventStreamResult ResolveEventStream(
+            ExecutionContext context,
+            IObjectGraphType parentType,
+            object source,
+            Field field,
+            IEnumerable<string> path)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
+
+            var fieldPath = path?.ToList() ?? new List<string>();
 
             var resolveResult = new ResolveEventStreamResult
             {
@@ -161,17 +170,19 @@ namespace GraphQL.Subscription
                 resolveContext.CancellationToken = context.CancellationToken;
                 resolveContext.Metrics = context.Metrics;
                 resolveContext.Errors = context.Errors;
+                resolveContext.Path = fieldPath;
 
                 if (fieldDefinition.Subscriber == null)
                     return GenerateError(resolveResult, field, context,
-                        new InvalidOperationException($"Subscriber not set for field {field.Name}"));
+                        new InvalidOperationException($"Subscriber not set for field {field.Name}"),
+                        fieldPath);
 
                 var result = fieldDefinition.Subscriber.Subscribe(resolveContext);
 
                 var valueTransformer = result
                     .SelectMany(async value =>
                     {
-                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, field);
+                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, field, fieldPath);
                         return new ExecutionResult
                         {
                             Data = fieldResolveResult.Value
@@ -186,6 +197,9 @@ namespace GraphQL.Subscription
                                     new ExecutionError(
                                         $"Could not subscribe to field '{field.Name}' in query '{context.Document.OriginalQuery}'",
                                         exception)
+                                    {
+                                        Path = path
+                                    }
                                 }
                             }));
 
@@ -194,7 +208,7 @@ namespace GraphQL.Subscription
             }
             catch (Exception exc)
             {
-                return GenerateError(resolveResult, field, context, exc);
+                return GenerateError(resolveResult, field, context, exc, path);
             }
         }
 
@@ -202,10 +216,12 @@ namespace GraphQL.Subscription
             ResolveEventStreamResult resolveResult,
             Field field,
             ExecutionContext context,
-            Exception exc)
+            Exception exc,
+            IEnumerable<string> path)
         {
             var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
             error.AddLocation(field, context.Document);
+            error.Path = path;
             context.Errors.Add(error);
             resolveResult.Skip = false;
             return resolveResult;

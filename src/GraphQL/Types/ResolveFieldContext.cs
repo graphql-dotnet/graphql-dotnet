@@ -42,6 +42,8 @@ namespace GraphQL.Types
 
         public ExecutionErrors Errors { get; set; }
 
+        public IEnumerable<string> Path { get; set; }
+
         /// <summary>
         /// Queried sub fields.  Note that this does not include sub fields for
         /// abstract types (interfaces or unions).

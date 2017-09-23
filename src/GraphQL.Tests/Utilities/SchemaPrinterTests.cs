@@ -12,6 +12,15 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaPrinterTests
     {
+        private const string built_in_scalars = @"
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+";
+
         private string printSingleFieldSchema<T>(
             IEnumerable<QueryArgument> arguments = null)
             where T : GraphType
@@ -26,13 +35,12 @@ namespace GraphQL.Tests.Utilities
 
             var schema = new Schema
             {
-                Query = root,
-                // FieldNameConverter = new PascalCaseFieldNameConverter()
+                Query = root
             };
 
             var result = print(schema);
 
-            // ensure schema isn't disposed
+            // ensure schema isn't disposed before test finishes
             if (schema.Query.Name == "")
             {
             }
@@ -46,9 +54,10 @@ namespace GraphQL.Tests.Utilities
             return Environment.NewLine + printer.Print();
         }
 
-        private void AssertEqual(string result, string expected)
+        private void AssertEqual(string result, string expected, bool excludeScalars = false)
         {
-            result.Replace("\r", "").ShouldBe(expected.Replace("\r", ""));
+            var exp = excludeScalars ? expected : built_in_scalars + expected;
+            result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
         }
 
         [Fact]
@@ -64,7 +73,7 @@ directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(result, expected);
+            AssertEqual(result, expected, excludeScalars: true);
         }
 
         [Fact]
@@ -289,6 +298,13 @@ type Bar implements Foo {
   str: String
 }
 
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
 interface Foo {
   str: String
 }
@@ -296,7 +312,7 @@ interface Foo {
 type Root {
   bar: Bar
 }
-");
+", excludeScalars: true);
         }
 
         [Fact]
@@ -316,6 +332,13 @@ type Bar implements Foo, Baaz {
   str: String
 }
 
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
 interface Foo {
   str: String
 }
@@ -323,7 +346,7 @@ interface Foo {
 type Query {
   bar: Bar
 }
-");
+", excludeScalars: true);
         }
 
         [Fact]
@@ -340,6 +363,13 @@ type Bar implements Foo {
   str: String
 }
 
+# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+scalar Decimal
+
 interface Foo {
   str: String
 }
@@ -352,7 +382,7 @@ type Query {
 }
 
 union SingleUnion = Foo
-");
+", excludeScalars: true);
         }
 
         [Fact]
@@ -561,7 +591,7 @@ enum __TypeKind {
 }
 ";
 
-            AssertEqual(result, expected);
+            AssertEqual(result, expected, excludeScalars: true);
         }
 
         public class FooType : ObjectGraphType

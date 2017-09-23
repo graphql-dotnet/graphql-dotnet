@@ -8,17 +8,16 @@ namespace GraphQL
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is ExecutionResult)
-            {
-                var result = (ExecutionResult) value;
+            if (!(value is ExecutionResult)) return;
 
-                writer.WriteStartObject();
+            var result = (ExecutionResult) value;
 
-                writeData(result, writer, serializer);
-                writeErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+            writer.WriteStartObject();
 
-                writer.WriteEndObject();
-            }
+            writeData(result, writer, serializer);
+            writeErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+
+            writer.WriteEndObject();
         }
 
         private void writeData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
@@ -50,14 +49,9 @@ namespace GraphQL
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
-                if (exposeExceptions)
-                {
-                    serializer.Serialize(writer, error.ToString()); // return StackTrace (including all inner exceptions)
-                }
-                else
-                {
-                    serializer.Serialize(writer, error.Message);
-                }
+
+                // check if return StackTrace, including all inner exceptions
+                serializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
 
                 if (error.Locations != null)
                 {
@@ -73,6 +67,12 @@ namespace GraphQL
                         writer.WriteEndObject();
                     });
                     writer.WriteEndArray();
+                }
+
+                if (error.Path != null && error.Path.Any())
+                {
+                    writer.WritePropertyName("path");
+                    serializer.Serialize(writer, error.Path);
                 }
 
                 writer.WriteEndObject();

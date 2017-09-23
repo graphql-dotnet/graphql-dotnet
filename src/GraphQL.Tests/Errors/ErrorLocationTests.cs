@@ -50,10 +50,39 @@ namespace GraphQL.Tests.Errors
         }
 
         [Fact]
+        public async Task should_include_path()
+        {
+            var result = await Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = @"{ testSub { one two } }";
+            });
+
+            result.Errors.Count.ShouldBe(1);
+            var error = result.Errors.First();
+            error.Path.ShouldBe(new[] {"testSub", "two"});
+        }
+
+        [Fact]
+        public async Task should_include_path_with_list_index()
+        {
+            var result = await Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = @"{ testSubList { one two } }";
+            });
+
+            result.Errors.Count.ShouldBe(1);
+            var error = result.Errors.First();
+            error.Path.ShouldBe(new[] {"testSubList", "0", "two"});
+        }
+
+        [Fact]
         public void async_field_with_errors()
         {
             var error = new ExecutionError("Error trying to resolve testasync.");
             error.AddLocation(1, 3);
+            error.Path = new[] {"testasync"};
 
             var errors = new ExecutionErrors {error};
 
@@ -79,6 +108,34 @@ namespace GraphQL.Tests.Errors
                 FieldAsync<StringGraphType>(
                     "testasync",
                     resolve: async _ => throw new Exception("wat"));
+
+                Field<TestSubObject>()
+                    .Name("testSub")
+                    .Resolve(_ => new {One = "One", Two = "Two"});
+
+                Field<ListGraphType<TestSubObject>>()
+                    .Name("testSubList")
+                    .Resolve(_ => new[] {new Thing {One = "One", Two = "Two"}});
+            }
+        }
+
+        public class Thing
+        {
+            public string One { get; set; }
+            public string Two { get; set; }
+        }
+
+        public class TestSubObject : ObjectGraphType
+        {
+            public TestSubObject()
+            {
+                Name = "Sub";
+                Field<StringGraphType>()
+                    .Name("one");
+
+                Field<StringGraphType>()
+                    .Name("two")
+                    .Resolve(_ => throw new Exception("wat"));
             }
         }
 

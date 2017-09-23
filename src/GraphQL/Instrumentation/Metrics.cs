@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace GraphQL.Instrumentation
     public class Metrics : IDisposable
     {
         private readonly Stopwatch _stopwatch = new Stopwatch();
-        private readonly IList<PerfRecord> _records = new List<PerfRecord>();
+        private readonly ConcurrentBag<PerfRecord> _records = new ConcurrentBag<PerfRecord>();
         private PerfRecord _main;
 
         public void Start(string operationName)
@@ -30,7 +31,7 @@ namespace GraphQL.Instrumentation
             return new Marker(record, _stopwatch);
         }
 
-        public IEnumerable<PerfRecord> AllRecords => _records.OrderBy(x => x.Start).ToArray();
+        public IEnumerable<PerfRecord> AllRecords => _records.Where(x => x != null).OrderBy(x => x.Start).ToArray();
 
         public IEnumerable<PerfRecord> Finish()
         {
