@@ -4,8 +4,7 @@
     <Description>GraphQL for .NET</Description>
     <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>Joe McBride</Authors>
-    <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
-    <PackageTargetFallback>dnxcore50</PackageTargetFallback>
+    <TargetFrameworks>netstandard2.0;netstandard1.1;net45</TargetFrameworks>
     <AssemblyName>GraphQL</AssemblyName>
     <PackageId>GraphQL</PackageId>
     <PackageTags>GraphQL;json;api</PackageTags>
@@ -18,7 +17,11 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netstandard1.1' ">1.0.4</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.1'">
+    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <PackageTargetFallback>dnxcore50</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +39,11 @@
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.0.0" />
   </ItemGroup>
-
+   
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+  </ItemGroup>
+        
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
