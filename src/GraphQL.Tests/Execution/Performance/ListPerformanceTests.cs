@@ -63,7 +63,7 @@ namespace GraphQL.Tests.Execution.Performance
 
         private readonly ITestOutputHelper _output;
 
-        private const int PerformanceIterations = 100000;
+        private const int PerformanceIterations = 2;
         private readonly List<Person> _people;
 
         private dynamic PeopleList => new
@@ -79,24 +79,7 @@ namespace GraphQL.Tests.Execution.Performance
                     people{
                         name
                         name1:name
-                        name2:name
-                        name3:name
-                        name4:name
-                        name5:name
-                        name6:name
-                        name7:name
-                        name8:name
-                        name9:name
-                        name10:name
-                        name11:name
-                        name12:name
-                        name13:name
-                        name14:name
-                        name15:name
-                        name16:name
-                        name17:name
-                        name18:name
-                        name19:name
+                       
                     }
                 }
             ";

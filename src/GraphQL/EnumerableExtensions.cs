@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,17 +29,29 @@ namespace GraphQL
             return Task.WhenAll(tasks);
         }
 
-        public static async Task<object[]> MapAsync(this IEnumerable enumerable, Func<int, object, Task<object>> mapFunction)
+        public static async Task<IEnumerable<object>> MapAsync(this IEnumerable enumerable, Func<int, object, Task<object>> mapFunction)
         {
-            return await enumerable
-                .Cast<object>()
-                .Select((item, index) => Tuple.Create(index, item))
-                .MapAsync(async tuple =>
-                {
-                    var data = (Tuple<int, object>)tuple;
-                    return await mapFunction(data.Item1, data.Item2).ConfigureAwait(false);
-                })
-                .ConfigureAwait(false);
+            var index = 0;
+            var results = new List<object>();
+
+            foreach (var item in enumerable)
+            {
+                var result = await mapFunction(index++, item);
+
+                results.Add(result);
+            }
+
+            return results;
+
+            //return await enumerable
+            //    .Cast<object>()
+            //    .Select((item, index) => Tuple.Create(index, item))
+            //    .MapAsync(async tuple =>
+            //    {
+            //        var data = (Tuple<int, object>)tuple;
+            //        return await mapFunction(data.Item1, data.Item2).ConfigureAwait(false);
+            //    })
+            //    .ConfigureAwait(false);
         }
 
         public static void Apply<T>(this IEnumerable<T> items, Action<T> action)
@@ -69,7 +82,7 @@ namespace GraphQL
             }
         }
 
-        public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
+        public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryThreaded<TSource, TKey, TValue, TValueVal>(
             this IEnumerable<TSource> items,
             Func<TSource, TKey> keyFunc,
             Func<TSource, Task<TValue>> valueFunc) where TValue : ResolveFieldResult<TValueVal>
@@ -85,6 +98,26 @@ namespace GraphQL
             keyValuePairs = keyValuePairs.Where(x => !x.Result.Skip).ToArray();
 
             return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);
+        }
+
+        public static async Task<IDictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
+            this IEnumerable<TSource> items,
+            Func<TSource, TKey> keyFunc,
+            Func<TSource, Task<TValue>> valueFunc) where TValue : ResolveFieldResult<TValueVal>
+        {
+            var data = new ConcurrentDictionary<TKey, TValueVal>();
+
+            foreach (var item in items)
+            {
+                var serialResults = await valueFunc(item).ConfigureAwait(false);
+
+                if (serialResults.Skip)
+                    continue;
+
+                data.TryAdd(keyFunc(item), serialResults.Value);
+            }
+
+            return data;
         }
 
         public static bool All(this IEnumerable items, Func<object, bool> check)

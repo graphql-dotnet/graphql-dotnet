@@ -148,7 +148,7 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        config.FieldMiddleware.ApplyTo(config.Schema);
+                        //config.FieldMiddleware.ApplyTo(config.Schema);
                         config.Schema.Initialize();
                     }
                 }
@@ -305,22 +305,11 @@ namespace GraphQL
 
         public async Task<IDictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
         {
-            var data = new ConcurrentDictionary<string, object>();
-
             //if (context.Operation.OperationType == OperationType.Mutation)
             {
-                foreach (var field in fields)
-                {
-                    var serialResults = await ResolveFieldAsync(context, rootType, source, field.Value,
-                        path.Concat(new[] {field.Key}));
-
-                    if (serialResults.Skip)
-                        continue;
-
-                    data.TryAdd(field.Key, serialResults.Value);
-                }
-
-                return data;
+                return await fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
+                    pair => pair.Key,
+                    pair => ResolveFieldAsync(context, rootType, source, pair.Value, path.Concat(new[] { pair.Key })));
             }
             //else
             //{
