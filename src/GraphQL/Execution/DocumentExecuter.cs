@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -289,7 +290,7 @@ namespace GraphQL
             return operation;
         }
 
-        public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
+        public Task<IDictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var fields = CollectFields(
@@ -302,11 +303,32 @@ namespace GraphQL
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields, new string[0]);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
+        public async Task<IDictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
         {
-            return fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
-                pair => pair.Key,
-                pair => ResolveFieldAsync(context, rootType, source, pair.Value, path.Concat(new[]{pair.Key})));
+            var data = new ConcurrentDictionary<string, object>();
+
+            //if (context.Operation.OperationType == OperationType.Mutation)
+            {
+                foreach (var field in fields)
+                {
+                    var serialResults = await ResolveFieldAsync(context, rootType, source, field.Value,
+                        path.Concat(new[] {field.Key}));
+
+                    if (serialResults.Skip)
+                        continue;
+
+                    data.TryAdd(field.Key, serialResults.Value);
+                }
+
+                return data;
+            }
+            //else
+            //{
+                
+            //}
+            //return fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
+            //    pair => pair.Key,
+            //    pair => ResolveFieldAsync(context, rootType, source, pair.Value, path.Concat(new[]{pair.Key})));
         }
 
         public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Field field, IEnumerable<string> path)
