@@ -63,7 +63,7 @@ namespace GraphQL.Tests.Execution.Performance
 
         private readonly ITestOutputHelper _output;
 
-        private const int PerformanceIterations = 10000;
+        private const int PerformanceIterations = 100000;
         private readonly List<Person> _people;
 
         private dynamic PeopleList => new
