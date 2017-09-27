@@ -28,9 +28,8 @@ namespace GraphQL.Types
 
                 return result;
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
-                //todo: should log or something?
                 return null;
             }
         }

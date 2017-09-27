@@ -26,9 +26,8 @@ namespace GraphQL.Types
                 var result = Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
                 return result;
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
-                //todo: should log or something?
                 return null;
             }
         }
