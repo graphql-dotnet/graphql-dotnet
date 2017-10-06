@@ -122,7 +122,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
             Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 398 * 2); //machine specific data with a buffer
+            Assert.True(smallListTimer.ElapsedMilliseconds < 6000 * 2); //machine specific data with a buffer
         }
 
         [Fact]
@@ -157,7 +157,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
             Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 393 * 2); //machine specific data with a buffer
+            Assert.True(smallListTimer.ElapsedMilliseconds < 700 * 2); //machine specific data with a buffer
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
             Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 415 * 2); //machine specific data with a buffer
+            Assert.True(smallListTimer.ElapsedMilliseconds < 5600 * 2); //machine specific data with a buffer
         }
     }
 
