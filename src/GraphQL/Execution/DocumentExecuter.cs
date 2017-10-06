@@ -582,22 +582,7 @@ namespace GraphQL
 
             if (fieldType is ListGraphType)
             {
-                var list = result as IEnumerable;
-
-                if (list == null)
-                {
-                    var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                    error.AddLocation(field, context.Document);
-                    throw error;
-                }
-
-                var listType = fieldType as ListGraphType;
-                var itemType = listType.ResolvedType;
-
-                var results = await list
-                    .MapAsync(async (index, item) =>
-                        await CompleteValueAsync(context, parentType, itemType, field,item, path.Concat(new[] {$"{index}"})).ConfigureAwait(false))
-                    .ConfigureAwait(false);
+                var results = await ResolveListFromData(context, result, parentType, fieldType, field, path);
 
                 return results;
             }
@@ -649,6 +634,48 @@ namespace GraphQL
             subFields = CollectFields(context, objectType, field?.SelectionSet, subFields, visitedFragments);
 
             return await ExecuteFieldsAsync(context, objectType, result, subFields, path).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Resolve lists in a performant manor
+        /// </summary>
+        private async Task<List<object>> ResolveListFromData(ExecutionContext context, object source, IObjectGraphType parentType,
+            IGraphType graphType, Field field, IEnumerable<string> path)
+        {
+            var result = new List<object>();
+            var listInfo = graphType as ListGraphType;
+            var subType = listInfo?.ResolvedType as IObjectGraphType;
+            var data = source as IEnumerable;
+            var visitedFragments = new List<string>();
+            var subFields = CollectFields(context, subType, field.SelectionSet, null, visitedFragments);
+
+            if (data == null)
+            {
+                var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                error.AddLocation(field, context.Document);
+                throw error;
+            }
+
+            if (subType != null)
+            {
+                foreach (var node in data)
+                {
+                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, path);
+
+                    result.Add(nodeResult);
+                }
+            }
+            else
+            {
+                foreach (var node in data)
+                {
+                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, path).ConfigureAwait(false);
+
+                    result.Add(nodeResult);
+                }
+            }
+
+            return result;
         }
 
         public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
