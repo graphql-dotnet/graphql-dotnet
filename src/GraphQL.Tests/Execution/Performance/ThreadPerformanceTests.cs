@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Mutation";
 
-                Field<StringGraphType>("setFive", resolve: c => Set("5"));
+                FieldAsync<StringGraphType>("setFive", resolve: c => Set("5"));
                 FieldAsync<StringGraphType>("setOne", resolve: async c => Set("1"));
             }
 
@@ -81,6 +81,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             runResult2 = Executer.ExecuteAsync(_ =>
             {
+                _.EnableLogging = false;
+                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = null;

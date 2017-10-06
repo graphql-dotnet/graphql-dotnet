@@ -322,16 +322,18 @@ namespace GraphQL
 
             foreach (var fieldCollection in fields)
             {
+                var currentPath = path.Concat(new[] { fieldCollection.Key });
+
                 var field = fieldCollection.Value;
                 var fieldType = GetFieldDefinition(context.Document, context.Schema, rootType, field);
 
                 if (fieldType?.Resolver == null || !fieldType.Resolver.RunThreaded() || context.Operation.OperationType == OperationType.Mutation)
                 {
-                    await ExtractFieldAsync(context, rootType, source, field, fieldType, data, path);
+                    await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath);
                 }
                 else
                 {
-                    var task = Task.Run(() => ExtractFieldAsync(context, rootType, source, field, fieldType, data, path));
+                    var task = Task.Run(() => ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath));
 
                     externalTasks.Add(task);
                 }
@@ -439,16 +441,21 @@ namespace GraphQL
                 }
                 else
                 {
-                    var value = NameFieldResolver.Resolve(source, field.Name);
+                    result = NameFieldResolver.Resolve(source, field.Name);
+                }
+
+                if (result != null)
+                {
                     var scalarType = fieldType.ResolvedType as ScalarGraphType;
 
-                    result = scalarType?.Serialize(value);
+                    result = scalarType?.Serialize(result);
                 }
             }
             catch (Exception exc)
             {
                 var error = new ExecutionError($"Error trying to resolve {field.Name}.", exc);
                 error.AddLocation(field, context.Document);
+                error.Path = path.ToList();
                 context.Errors.Add(error);
             }
 
@@ -667,20 +674,20 @@ namespace GraphQL
                 throw error;
             }
 
-            if (subType != null)
+            var index = 0;
+            foreach (var node in data)
             {
-                foreach (var node in data)
+                var currentPath = path.Concat(new[] {$"{index++}"});
+
+                if (subType != null)
                 {
-                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, path);
+                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, currentPath);
 
                     result.Add(nodeResult);
                 }
-            }
-            else
-            {
-                foreach (var node in data)
+                else
                 {
-                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, path).ConfigureAwait(false);
+                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, currentPath).ConfigureAwait(false);
 
                     result.Add(nodeResult);
                 }
