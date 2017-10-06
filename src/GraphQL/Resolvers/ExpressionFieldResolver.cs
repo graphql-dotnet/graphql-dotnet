@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using GraphQL.Types;
 
@@ -11,6 +11,11 @@ namespace GraphQL.Resolvers
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)
         {
             _property = property.Compile();
+        }
+
+        public bool RunThreaded()
+        {
+            return false;
         }
 
         public TProperty Resolve(ResolveFieldContext context)

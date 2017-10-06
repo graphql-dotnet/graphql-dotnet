@@ -3,11 +3,16 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
+    /// <summary>
+    ///     Different from async in that we want to run this in a seperate thread to allow
+    ///     the entire query to return faster. Note this does not apply to mutations since they
+    ///     must run sequentially
+    /// </summary>
+    public class SlowFuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
     {
         private readonly Func<ResolveFieldContext, TReturnType> _resolver;
 
-        public FuncFieldResolver(Func<ResolveFieldContext, TReturnType> resolver)
+        public SlowFuncFieldResolver(Func<ResolveFieldContext, TReturnType> resolver)
         {
             _resolver = resolver;
         }
@@ -19,7 +24,7 @@ namespace GraphQL.Resolvers
 
         public bool RunThreaded()
         {
-            return false;
+            return true;
         }
 
         object IFieldResolver.Resolve(ResolveFieldContext context)
@@ -28,11 +33,11 @@ namespace GraphQL.Resolvers
         }
     }
 
-    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
+    public class SlowFuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
     {
         private readonly Func<ResolveFieldContext<TSourceType>, TReturnType> _resolver;
 
-        public FuncFieldResolver(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public SlowFuncFieldResolver(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
             if (resolver == null)
             {
@@ -43,7 +48,7 @@ namespace GraphQL.Resolvers
 
         public bool RunThreaded()
         {
-            return false;
+            return true;
         }
 
         public TReturnType Resolve(ResolveFieldContext context)

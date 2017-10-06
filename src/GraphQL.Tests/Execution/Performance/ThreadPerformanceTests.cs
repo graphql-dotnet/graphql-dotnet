@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Query";
 
-                FieldAsync<StringGraphType>("halfSecond", resolve: async c => Get(500, "Half"));
+                FieldAsync<StringGraphType>("halfSecond", resolve: c => Get(500, "Half"));
                 FieldAsync<StringGraphType>("quarterSecond", resolve: async c => Get(500, "Quarter"));
             }
 
