@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Execution.Performance
             people = _people
         };
 
-        [Fact]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
         public void Executes_MultipleProperties_Are_Performant()
         {
             var query = @"
@@ -125,7 +125,7 @@ namespace GraphQL.Tests.Execution.Performance
             Assert.True(smallListTimer.ElapsedMilliseconds < 6000 * 2); //machine specific data with a buffer
         }
 
-        [Fact]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
         public void Executes_SimpleLists_Are_Performant()
         {
             var query = @"
@@ -160,7 +160,7 @@ namespace GraphQL.Tests.Execution.Performance
             Assert.True(smallListTimer.ElapsedMilliseconds < 700 * 2); //machine specific data with a buffer
         }
 
-        [Fact]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
         public void Executes_UnionLists_Are_Performant()
         {
             var query = @"
