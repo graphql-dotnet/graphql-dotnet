@@ -40,6 +40,7 @@ namespace GraphQL
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
+        private static readonly ValidationResult validResult = new ValidationResult();
 
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
@@ -134,7 +135,7 @@ namespace GraphQL
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
-            var metrics = new Metrics();
+            var metrics = new Metrics(config.EnableLogging);
             metrics.Start(config.OperationName);
 
             config.Schema.FieldNameConverter = config.FieldNameConverter;
@@ -148,7 +149,10 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        //config.FieldMiddleware.ApplyTo(config.Schema);
+                        if (config.EnableLogging)
+                        {
+                            config.FieldMiddleware.ApplyTo(config.Schema);
+                        }
                         config.Schema.Initialize();
                     }
                 }
@@ -182,12 +186,19 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    validationResult = _documentValidator.Validate(
-                        config.Query,
-                        config.Schema,
-                        document,
-                        config.ValidationRules,
-                        config.UserContext);
+                    if (config.EnableDocumentValidation)
+                    {
+                        validationResult = _documentValidator.Validate(
+                            config.Query,
+                            config.Schema,
+                            document,
+                            config.ValidationRules,
+                            config.UserContext);
+                    }
+                    else
+                    {
+                        validationResult = validResult;
+                    }
                 }
 
                 foreach (var listener in config.Listeners)
@@ -251,7 +262,7 @@ namespace GraphQL
             }
             finally
             {
-                result.Perf = metrics.Finish().ToArray();
+                result.Perf = metrics.Finish()?.ToArray();
             }
         }
 

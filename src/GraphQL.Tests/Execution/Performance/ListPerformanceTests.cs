@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Execution.Performance
             people = _people
         };
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact/*(Skip = "Benchmarks only, these numbers are machine dependant.")*/]
         public void Executes_MultipleProperties_Are_Performant()
         {
             var query = @"
@@ -107,6 +107,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
+                _.EnableLogging = false;
+                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -142,6 +144,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
+                _.EnableLogging = false;
+                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -189,6 +193,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
+                _.EnableLogging = false;
+                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;

@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output = output;
         }
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact/*(Skip = "Benchmarks only, these numbers are machine dependant.")*/]
         public void Executes_StarWarsBasicQuery_Performant()
         {
 
@@ -45,6 +45,8 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 runResult2 = Executer.ExecuteAsync(_ =>
                 {
+                    _.EnableLogging = false;
+                    _.EnableDocumentValidation = false;
                     _.Schema = Schema;
                     _.Query = query;
                     _.Root = null;

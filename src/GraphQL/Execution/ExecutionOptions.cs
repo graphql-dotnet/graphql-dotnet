@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
@@ -29,5 +29,11 @@ namespace GraphQL
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
         public bool ExposeExceptions { get; set; } = false;
+
+        //Note disabling will increase performance
+        public bool EnableLogging { get; set; } = true;
+
+        //Note disabling will increase performance
+        public bool EnableDocumentValidation { get; set; } = true;
     }
 }
