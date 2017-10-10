@@ -31,7 +31,10 @@ namespace GraphQL
         public bool ExposeExceptions { get; set; } = false;
 
         //Note disabling will increase performance
-        public bool EnableLogging { get; set; } = true;
+        public bool EnableMetrics { get; set; } = true;
+
+        //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
+        public bool SetFieldMiddleware { get; set; } = true;
 
         //Note disabling will increase performance
         public bool EnableDocumentValidation { get; set; } = true;

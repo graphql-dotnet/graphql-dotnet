@@ -135,7 +135,7 @@ namespace GraphQL
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
-            var metrics = new Metrics(config.EnableLogging);
+            var metrics = new Metrics(config.EnableMetrics);
             metrics.Start(config.OperationName);
 
             config.Schema.FieldNameConverter = config.FieldNameConverter;
@@ -149,7 +149,7 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        if (config.EnableLogging)
+                        if (config.SetFieldMiddleware)
                         {
                             config.FieldMiddleware.ApplyTo(config.Schema);
                         }
@@ -339,7 +339,7 @@ namespace GraphQL
                 }
             }
 
-            if (externalTasks.Any())
+            if (externalTasks.Count > 0)
             {
                 Task.WaitAll(externalTasks.ToArray());
             }

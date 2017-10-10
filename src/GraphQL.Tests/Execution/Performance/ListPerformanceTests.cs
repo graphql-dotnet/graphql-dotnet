@@ -107,7 +107,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
-                _.EnableLogging = false;
+                _.EnableMetrics = false;
+                _.SetFieldMiddleware = false;
                 _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
@@ -144,7 +145,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
-                _.EnableLogging = false;
+                _.SetFieldMiddleware = false;
+                _.EnableMetrics = false;
                 _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
@@ -193,7 +195,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
-                _.EnableLogging = false;
+                _.SetFieldMiddleware = false;
+                _.EnableMetrics = false;
                 _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
