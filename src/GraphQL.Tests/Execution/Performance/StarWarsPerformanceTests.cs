@@ -41,13 +41,13 @@ namespace GraphQL.Tests.Execution.Performance
             ExecutionResult runResult2 = null;
             smallListTimer.Start();
 
+            //Note: Implementing a custom IDocumentValidator would increase speeds 600%
             for (var x = 0; x < 10000; x++)
             {
                 runResult2 = Executer.ExecuteAsync(_ =>
                 {
                     _.SetFieldMiddleware = false;
                     _.EnableMetrics = false;
-                    _.EnableDocumentValidation = false;
                     _.Schema = Schema;
                     _.Query = query;
                     _.Root = null;

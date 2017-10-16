@@ -83,7 +83,6 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
-                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = null;

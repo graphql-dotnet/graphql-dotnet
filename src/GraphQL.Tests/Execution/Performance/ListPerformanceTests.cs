@@ -109,7 +109,6 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
-                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -147,7 +146,6 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
-                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -197,7 +195,6 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
-                _.EnableDocumentValidation = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;

@@ -40,7 +40,6 @@ namespace GraphQL
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
-        private static readonly ValidationResult validResult = new ValidationResult();
 
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
@@ -186,19 +185,12 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    if (config.EnableDocumentValidation)
-                    {
-                        validationResult = _documentValidator.Validate(
-                            config.Query,
-                            config.Schema,
-                            document,
-                            config.ValidationRules,
-                            config.UserContext);
-                    }
-                    else
-                    {
-                        validationResult = validResult;
-                    }
+                    validationResult = _documentValidator.Validate(
+                        config.Query,
+                        config.Schema,
+                        document,
+                        config.ValidationRules,
+                        config.UserContext);
                 }
 
                 foreach (var listener in config.Listeners)
