@@ -413,6 +413,12 @@ namespace GraphQL
                 return new StringValue(serialized.ToString());
             }
 
+            var converter = schema.FindValueConverter(serialized);
+            if (converter != null)
+            {
+                return converter.Convert(serialized);
+            }
+
             throw new ExecutionError($"Cannot convert value to AST: {serialized}");
         }
 
@@ -421,36 +427,6 @@ namespace GraphQL
             if (value == null)
             {
                 return null;
-            }
-
-            if (value is StringValue)
-            {
-                var str = (StringValue)value;
-                return str.Value;
-            }
-
-            if (value is IntValue)
-            {
-                var num = (IntValue)value;
-                return num.Value;
-            }
-
-            if (value is LongValue)
-            {
-                var num = (LongValue)value;
-                return num.Value;
-            }
-
-            if (value is FloatValue)
-            {
-                var num = (FloatValue)value;
-                return num.Value;
-            }
-
-            if (value is EnumValue)
-            {
-                var @enum = (EnumValue)value;
-                return @enum.Name;
             }
 
             if (value is ObjectValue)
@@ -467,7 +443,7 @@ namespace GraphQL
                 return list.Values.Select(ValueFromAst).ToList();
             }
 
-            return null;
+            return value.GetValue();
         }
     }
 }
