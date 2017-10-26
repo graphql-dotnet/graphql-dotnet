@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -133,7 +134,7 @@ namespace GraphQL
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions config)
         {
-            var metrics = new Metrics();
+            var metrics = new Metrics(config.EnableMetrics);
             metrics.Start(config.OperationName);
 
             config.Schema.FieldNameConverter = config.FieldNameConverter;
@@ -147,7 +148,10 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        config.FieldMiddleware.ApplyTo(config.Schema);
+                        if (config.SetFieldMiddleware)
+                        {
+                            config.FieldMiddleware.ApplyTo(config.Schema);
+                        }
                         config.Schema.Initialize();
                     }
                 }
@@ -250,7 +254,7 @@ namespace GraphQL
             }
             finally
             {
-                result.Perf = metrics.Finish().ToArray();
+                result.Perf = metrics.Finish()?.ToArray();
             }
         }
 
@@ -289,7 +293,7 @@ namespace GraphQL
             return operation;
         }
 
-        public Task<Dictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
+        public Task<IDictionary<string, object>> ExecuteOperationAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var fields = CollectFields(
@@ -302,11 +306,152 @@ namespace GraphQL
             return ExecuteFieldsAsync(context, rootType, context.RootValue, fields, new string[0]);
         }
 
-        public Task<Dictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
+        public async Task<IDictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
         {
-            return fields.ToDictionaryAsync<KeyValuePair<string, Field>, string, ResolveFieldResult<object>, object>(
-                pair => pair.Key,
-                pair => ResolveFieldAsync(context, rootType, source, pair.Value, path.Concat(new[]{pair.Key})));
+
+            var data = new ConcurrentDictionary<string, object>();
+            var externalTasks = new List<Task>();
+
+            foreach (var fieldCollection in fields)
+            {
+                var currentPath = path.Concat(new[] { fieldCollection.Key });
+
+                var field = fieldCollection.Value;
+                var fieldType = GetFieldDefinition(context.Document, context.Schema, rootType, field);
+
+                if (fieldType?.Resolver == null || !fieldType.Resolver.RunThreaded() || context.Operation.OperationType == OperationType.Mutation)
+                {
+                    await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath);
+                }
+                else
+                {
+                    var task = Task.Run(() => ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath));
+
+                    externalTasks.Add(task);
+                }
+            }
+
+            if (externalTasks.Count > 0)
+            {
+                Task.WaitAll(externalTasks.ToArray());
+            }
+
+            var ordered = new Dictionary<string, object>();
+
+            foreach (var fieldCollection in fields)
+            {
+                var name = fieldCollection.Key; 
+
+                if (!data.ContainsKey(name))
+                {
+                    continue;
+                }
+
+                ordered.Add(name, data[name]);
+            }
+
+            return ordered;
+        }
+
+        private async Task ExtractFieldAsync(ExecutionContext context, IObjectGraphType rootType, object source,
+            Field field, FieldType fieldType, ConcurrentDictionary<string, object> data, IEnumerable<string> path)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var name = field.Alias ?? field.Name;
+
+            if (data.ContainsKey(name))
+            {
+                return;
+            }
+
+            if (!ShouldIncludeNode(context, field.Directives))
+            {
+                return;
+            }
+
+            if (CanResolveFromData(field, fieldType))
+            {
+                var result = ResolveFieldFromData(context, rootType, source, fieldType, field, path);
+
+                data.TryAdd(name, result);
+            }
+            else
+            {
+                var result = await ResolveFieldAsync(context, rootType, source, field, path);
+
+                if (result.Skip)
+                {
+                    return;
+                }
+
+                data.TryAdd(name, result.Value);
+            }
+        }
+
+        private bool CanResolveFromData(Field field, FieldType type)
+        {
+            if (field == null || type == null)
+            {
+                return false;
+            }
+
+            if (type.Arguments != null &&
+                type.Arguments.Any())
+            {
+                return false;
+            }
+
+            if (!(type.ResolvedType is ScalarGraphType))
+            {
+                return false;
+            }
+
+            if (type.ResolvedType is NonNullGraphType)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Resolve simple fields in a performant manor
+        /// </summary>
+        private static object ResolveFieldFromData(ExecutionContext context, IObjectGraphType rootType, object source,
+            FieldType fieldType, Field field, IEnumerable<string> path)
+        {
+            object result = null;
+
+            try
+            {
+                if (fieldType.Resolver != null)
+                {
+                    var rfc = new ResolveFieldContext(context, field, fieldType, source, rootType, null, path);
+
+                    result = fieldType.Resolver.Resolve(rfc);
+                }
+                else
+                {
+                    result = NameFieldResolver.Resolve(source, field.Name);
+                }
+
+                if (result != null)
+                {
+                    var scalarType = fieldType.ResolvedType as ScalarGraphType;
+
+                    result = scalarType?.Serialize(result);
+                }
+            }
+            catch (Exception exc)
+            {
+                var error = new ExecutionError($"Error trying to resolve {field.Name}.", exc);
+                error.AddLocation(field, context.Document);
+                error.Path = path.ToList();
+                context.Errors.Add(error);
+            }
+
+            return result;
         }
 
         public async Task<ResolveFieldResult<object>> ResolveFieldAsync(ExecutionContext context, IObjectGraphType parentType, object source, Field field, IEnumerable<string> path)
@@ -331,25 +476,27 @@ namespace GraphQL
 
             try
             {
-                var resolveContext = new ResolveFieldContext();
-                resolveContext.FieldName = field.Name;
-                resolveContext.FieldAst = field;
-                resolveContext.FieldDefinition = fieldDefinition;
-                resolveContext.ReturnType = fieldDefinition.ResolvedType;
-                resolveContext.ParentType = parentType;
-                resolveContext.Arguments = arguments;
-                resolveContext.Source = source;
-                resolveContext.Schema = context.Schema;
-                resolveContext.Document = context.Document;
-                resolveContext.Fragments = context.Fragments;
-                resolveContext.RootValue = context.RootValue;
-                resolveContext.UserContext = context.UserContext;
-                resolveContext.Operation = context.Operation;
-                resolveContext.Variables = context.Variables;
-                resolveContext.CancellationToken = context.CancellationToken;
-                resolveContext.Metrics = context.Metrics;
-                resolveContext.Errors = context.Errors;
-                resolveContext.Path = fieldPath;
+                var resolveContext = new ResolveFieldContext
+                {
+                    FieldName = field.Name,
+                    FieldAst = field,
+                    FieldDefinition = fieldDefinition,
+                    ReturnType = fieldDefinition.ResolvedType,
+                    ParentType = parentType,
+                    Arguments = arguments,
+                    Source = source,
+                    Schema = context.Schema,
+                    Document = context.Document,
+                    Fragments = context.Fragments,
+                    RootValue = context.RootValue,
+                    UserContext = context.UserContext,
+                    Operation = context.Operation,
+                    Variables = context.Variables,
+                    CancellationToken = context.CancellationToken,
+                    Metrics = context.Metrics,
+                    Errors = context.Errors,
+                    Path = fieldPath
+                };
 
                 var subFields = SubFieldsFor(context, fieldDefinition.ResolvedType, field);
                 resolveContext.SubFields = subFields;
@@ -445,22 +592,7 @@ namespace GraphQL
 
             if (fieldType is ListGraphType)
             {
-                var list = result as IEnumerable;
-
-                if (list == null)
-                {
-                    var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                    error.AddLocation(field, context.Document);
-                    throw error;
-                }
-
-                var listType = fieldType as ListGraphType;
-                var itemType = listType.ResolvedType;
-
-                var results = await list
-                    .MapAsync(async (index, item) =>
-                        await CompleteValueAsync(context, parentType, itemType, field,item, path.Concat(new[] {$"{index}"})).ConfigureAwait(false))
-                    .ConfigureAwait(false);
+                var results = await ResolveListFromData(context, result, parentType, fieldType, field, path);
 
                 return results;
             }
@@ -512,6 +644,48 @@ namespace GraphQL
             subFields = CollectFields(context, objectType, field?.SelectionSet, subFields, visitedFragments);
 
             return await ExecuteFieldsAsync(context, objectType, result, subFields, path).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Resolve lists in a performant manor
+        /// </summary>
+        private async Task<List<object>> ResolveListFromData(ExecutionContext context, object source, IObjectGraphType parentType,
+            IGraphType graphType, Field field, IEnumerable<string> path)
+        {
+            var result = new List<object>();
+            var listInfo = graphType as ListGraphType;
+            var subType = listInfo?.ResolvedType as IObjectGraphType;
+            var data = source as IEnumerable;
+            var visitedFragments = new List<string>();
+            var subFields = CollectFields(context, subType, field.SelectionSet, null, visitedFragments);
+
+            if (data == null)
+            {
+                var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
+                error.AddLocation(field, context.Document);
+                throw error;
+            }
+
+            var index = 0;
+            foreach (var node in data)
+            {
+                var currentPath = path.Concat(new[] {$"{index++}"});
+
+                if (subType != null)
+                {
+                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, currentPath);
+
+                    result.Add(nodeResult);
+                }
+                else
+                {
+                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, currentPath).ConfigureAwait(false);
+
+                    result.Add(nodeResult);
+                }
+            }
+
+            return result;
         }
 
         public Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
@@ -14,6 +14,11 @@ namespace GraphQL.Resolvers
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
             _parameters = _resolver.GetMethodInfo().GetParameters();
+        }
+
+        public bool RunThreaded()
+        {
+            return false;
         }
 
         public object Resolve(ResolveFieldContext context)

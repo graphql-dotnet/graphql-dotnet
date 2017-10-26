@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +48,19 @@ namespace GraphQL.Instrumentation
                     FieldMiddlewareDelegate app = context => resolver.Resolve(context);
                     app = Build(app);
 
-                    field.Resolver = new FuncFieldResolver<Task<object>>(context => app.Invoke(context));
+                    field.Resolver = new FuncFieldResolver<object>(context =>
+                    {
+                        try
+                        {
+                            var result = app.Invoke(context);
+                            result.ConfigureAwait(false);
+                            return result.Result;
+                        }
+                        catch (AggregateException ex)
+                        {
+                            throw ex.InnerException;
+                        }
+                    });
                 });
             });
         }

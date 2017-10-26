@@ -1,3 +1,10 @@
+#Forked as of 10/17/2017
+
+## Reasons the SchemaGenerator is using this fork instead of the Graph Ql .Net nuget packages
+
+- Early adoption of performance enhancements. These are trying to get pulled into the main branch. https://github.com/graphql-dotnet/graphql-dotnet/pull/452
+- Roll back of issue that breaks graph iql: https://github.com/graphql-dotnet/graphql-dotnet/pull/374
+
 # GraphQL for .NET
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/graphql-dotnet/graphql-dotnet?branch=master&svg=true)](https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet)

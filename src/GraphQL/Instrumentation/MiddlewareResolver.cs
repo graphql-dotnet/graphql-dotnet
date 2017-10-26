@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -17,6 +17,17 @@ namespace GraphQL.Instrumentation
         {
             var result = _next.Resolve(context);
 
+            //more performant if available
+            if (result is Task<object>)
+            {
+                var task = result as Task<object>;
+                if (task.IsFaulted)
+                {
+                    throw task.Exception;
+                }
+                result = task.Result;
+            }
+
             if (result is Task)
             {
                 var task = result as Task;
@@ -25,10 +36,16 @@ namespace GraphQL.Instrumentation
                     throw task.Exception;
                 }
                 await task.ConfigureAwait(false);
+
                 result = task.GetProperyValue("Result");
             }
 
             return result;
+        }
+
+        public bool RunThreaded()
+        {
+            return _next.RunThreaded();
         }
 
         object IFieldResolver.Resolve(ResolveFieldContext context)

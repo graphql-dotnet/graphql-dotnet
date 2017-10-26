@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
@@ -18,6 +18,11 @@ namespace GraphQL.Resolvers
             _methodInfo = methodInfo;
             _dependencyResolver = dependencyResolver;
             _parameters = _methodInfo.GetParameters();
+        }
+
+        public bool RunThreaded()
+        {
+            return true;
         }
 
         public object Resolve(ResolveFieldContext context)

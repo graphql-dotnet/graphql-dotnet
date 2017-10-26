@@ -1,10 +1,12 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
     public interface IFieldResolver
     {
         object Resolve(ResolveFieldContext context);
+
+        bool RunThreaded();
     }
 
     public interface IFieldResolver<out T> : IFieldResolver

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,12 +8,23 @@ namespace GraphQL.Instrumentation
 {
     public class Metrics : IDisposable
     {
+        private readonly bool _enabled;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private readonly ConcurrentBag<PerfRecord> _records = new ConcurrentBag<PerfRecord>();
         private PerfRecord _main;
 
+        public Metrics(bool enabled = true)
+        {
+            _enabled = enabled;
+        }
+
         public void Start(string operationName)
         {
+            if (!_enabled)
+            {
+                return;
+            }
+
             _main = new PerfRecord("operation", operationName, 0);
             _records.Add(_main);
             _stopwatch.Start();
@@ -21,11 +32,21 @@ namespace GraphQL.Instrumentation
 
         public void SetOperationName(string name)
         {
+            if (!_enabled)
+            {
+                return;
+            }
+
             _main.Subject = name;
         }
 
         public IDisposable Subject(string category, string subject, Dictionary<string, object> metadata = null)
         {
+            if (!_enabled)
+            {
+                return null;
+            }
+
             var record = new PerfRecord(category, subject, _stopwatch.ElapsedMilliseconds, metadata);
             _records.Add(record);
             return new Marker(record, _stopwatch);
@@ -35,6 +56,11 @@ namespace GraphQL.Instrumentation
 
         public IEnumerable<PerfRecord> Finish()
         {
+            if (!_enabled)
+            {
+                return null;
+            }
+
             _main?.MarkEnd(_stopwatch.ElapsedMilliseconds);
             _stopwatch.Stop();
             return AllRecords;
