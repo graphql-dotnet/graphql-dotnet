@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -42,6 +42,10 @@ namespace GraphQL.Types
         void RegisterDirective(DirectiveGraphType directive);
 
         void RegisterDirectives(params DirectiveGraphType[] directives);
+
+        void RegisterValueConverter(IAstFromValueConverter converter);
+
+        IAstFromValueConverter FindValueConverter(object value);
     }
 
     public class Schema : ISchema
@@ -50,6 +54,7 @@ namespace GraphQL.Types
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
         private readonly List<DirectiveGraphType> _directives;
+        private readonly List<IAstFromValueConverter> _converters;
 
         public Schema()
             : this(new DefaultDependencyResolver())
@@ -79,6 +84,7 @@ namespace GraphQL.Types
                 DirectiveGraphType.Skip,
                 DirectiveGraphType.Deprecated
             };
+            _converters = new List<IAstFromValueConverter>();
         }
 
         public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
@@ -177,6 +183,16 @@ namespace GraphQL.Types
         public DirectiveGraphType FindDirective(string name)
         {
             return _directives.FirstOrDefault(x => x.Name == name);
+        }
+
+        public void RegisterValueConverter(IAstFromValueConverter converter)
+        {
+            _converters.Add(converter);
+        }
+
+        public IAstFromValueConverter FindValueConverter(object value)
+        {
+            return _converters.FirstOrDefault(x => x.Matches(value));
         }
 
         public IGraphType FindType(string name)

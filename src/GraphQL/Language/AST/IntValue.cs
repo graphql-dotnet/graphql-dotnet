@@ -12,6 +12,11 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
+        public object GetValue()
+        {
+            return Value;
+        }
+
         public int Value { get; }
 
         public override string ToString()
@@ -38,6 +43,11 @@ namespace GraphQL.Language.AST
         public LongValue(long value)
         {
             Value = value;
+        }
+
+        public object GetValue()
+        {
+            return Value;
         }
 
         public long Value { get; }
@@ -68,6 +78,11 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
+        public object GetValue()
+        {
+            return Value;
+        }
+
         public decimal Value { get; }
 
         public override string ToString()
@@ -94,6 +109,11 @@ namespace GraphQL.Language.AST
         public FloatValue(double value)
         {
             Value = value;
+        }
+
+        public object GetValue()
+        {
+            return Value;
         }
 
         public double Value { get; }
@@ -126,6 +146,11 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
+        public object GetValue()
+        {
+            return Value;
+        }
+
         public string Value { get; }
 
         public override string ToString()
@@ -152,6 +177,11 @@ namespace GraphQL.Language.AST
         public BooleanValue(bool value)
         {
             Value = value;
+        }
+
+        public object GetValue()
+        {
+            return Value;
         }
 
         public bool Value { get; }
@@ -183,6 +213,11 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
+        public object GetValue()
+        {
+            return Value;
+        }
+
         public DateTime Value { get; }
 
         public override string ToString()
@@ -211,6 +246,11 @@ namespace GraphQL.Language.AST
         {
             Name = name.Name;
             NameNode = name;
+        }
+
+        public object GetValue()
+        {
+            return Name;
         }
 
         public EnumValue(string name)
@@ -248,6 +288,11 @@ namespace GraphQL.Language.AST
             Values = values;
         }
 
+        public object GetValue()
+        {
+            return Values;
+        }
+
         public IEnumerable<IValue> Values { get; }
 
         public override IEnumerable<INode> Children => Values;
@@ -272,6 +317,11 @@ namespace GraphQL.Language.AST
         public ObjectValue(IEnumerable<ObjectField> fields)
         {
             ObjectFields = fields;
+        }
+
+        public object GetValue()
+        {
+            return ObjectFields;
         }
 
         public IEnumerable<ObjectField> ObjectFields { get; }

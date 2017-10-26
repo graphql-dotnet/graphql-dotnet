@@ -1,4 +1,5 @@
-﻿using GraphQL.Language.AST;
+using System;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -65,6 +66,103 @@ namespace GraphQL.Tests.Execution
             var result = val.AstFromValue(null, new FloatGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeOfType<FloatValue>();
+        }
+
+        [Fact]
+        public void registers_ast_from_value_converters()
+        {
+            var schema = new Schema();
+            schema.RegisterValueConverter(new ByteValueConverter());
+
+            byte value = 12;
+            var result = schema.FindValueConverter(value);
+            result.ShouldNotBeNull("AST from value converter should be registered");
+            result.ShouldBeOfType<ByteValueConverter>();
+        }
+
+        [Fact]
+        public void converts_byte_to_byte_value()
+        {
+            var schema = new Schema();
+            schema.RegisterValueConverter(new ByteValueConverter());
+
+            byte value = 12;
+            var result = value.AstFromValue(schema, new ByteGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<ByteValue>();
+        }
+    }
+
+    internal class ByteValueConverter : IAstFromValueConverter
+    {
+        public bool Matches(object value)
+        {
+            return value is byte;
+        }
+
+        public IValue Convert(object value)
+        {
+            return new ByteValue((byte)value);
+        }
+    }
+
+    internal class ByteValue : AbstractNode, IValue
+    {
+        public ByteValue(byte value)
+        {
+            Value = value;
+        }
+
+        public byte Value { get; }
+
+        public object GetValue()
+        {
+            return Value;
+        }
+
+        public override bool IsEqualTo(INode obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ByteValue)obj);
+        }
+    }
+
+    internal class ByteGraphType : ScalarGraphType
+    {
+        public ByteGraphType()
+        {
+            Name = "Byte";
+        }
+
+        public override object Serialize(object value)
+        {
+            return ParseValue(value);
+        }
+
+        public override object ParseValue(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                var result = Convert.ToByte(value);
+                return result;
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            var byteValue = value as ByteValue;
+            return byteValue?.Value;
         }
     }
 }

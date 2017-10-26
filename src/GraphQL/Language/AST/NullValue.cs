@@ -1,10 +1,15 @@
-﻿namespace GraphQL.Language.AST
+namespace GraphQL.Language.AST
 {
     public class NullValue : AbstractNode, IValue
     {
         public override string ToString()
         {
             return "null";
+        }
+
+        public object GetValue()
+        {
+            return null;
         }
 
         public override bool IsEqualTo(INode obj)
