@@ -176,12 +176,6 @@ namespace GraphQL
                     throw new ExecutionError("Unable to determine operation from query.");
                 }
 
-                if (config.ComplexityConfiguration != null)
-                {
-                    using (metrics.Subject("document", "Analyzing complexity"))
-                        _complexityAnalyzer.Validate(document, config.ComplexityConfiguration);
-                }
-
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
@@ -191,6 +185,12 @@ namespace GraphQL
                         document,
                         config.ValidationRules,
                         config.UserContext);
+                }
+
+                if (config.ComplexityConfiguration != null && validationResult.IsValid)
+                {
+                    using (metrics.Subject("document", "Analyzing complexity"))
+                        _complexityAnalyzer.Validate(document, config.ComplexityConfiguration);
                 }
 
                 foreach (var listener in config.Listeners)

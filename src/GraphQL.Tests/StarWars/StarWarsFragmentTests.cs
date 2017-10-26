@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace GraphQL.Tests.StarWars
 {
@@ -76,6 +76,25 @@ namespace GraphQL.Tests.StarWars
             }";
 
             AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void use_undefined_fragment()
+        {
+            var query = @"
+                query someDroids {
+                    r2d2: droid(id: ""3"") {
+                        ...unknown_fragment
+                        name
+                    }
+               }
+            ";
+            var errors = new ExecutionErrors();
+            var error = new ExecutionError(@"Unknown fragment ""unknown_fragment"".");
+            error.AddLocation(4, 25);
+            errors.Add(error);
+
+            AssertQuery(query, CreateQueryResult(null, errors), null, null);
         }
     }
 }
