@@ -17,10 +17,7 @@
     "restore": "babel-node tools/build.js restore",
     "setVersion": "babel-node tools/build.js setVersion"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/graphql-dotnet/graphql-dotnet.git"
-  },
+  "repository": "https://github.com/graphql-dotnet/graphql-dotnet.git",
   "author": "Joe McBride",
   "license": "MIT",
   "bugs": {

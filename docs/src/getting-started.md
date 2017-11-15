@@ -1,7 +1,5 @@
----
-title: Getting Started
-permalink: /getting-started
----
+<!--Title:Getting Started-->
+<!--Url:getting-started-->
 
 # Basics
 

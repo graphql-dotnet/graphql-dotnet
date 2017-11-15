@@ -1,15 +1,10 @@
----
-title: GraphQL .NET Advanced Topics
-permalink: /learn
----
-
-# Error Handling
+## Error Handling
 
 The `ExecutionResult` provides an `Errors` property which includes any errors encountered during exectution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
 
 You can provide additional error handling or logging for fields by adding Field Middleware.
 
-# User Context
+## User Context
 
 You can provide a `UserContext` to provide access to your specific data.  The `UserContext` is accessible in field resolvers and validation rules.
 
@@ -254,9 +249,9 @@ public double? FieldImpact { get; set; }
   Product {  # This query has a depth of 2 which loosely translates to two distinct queries
   			 # to the datasource, first one to return the list of products and second
              # one (which will be executed once for each returned product) to grab
-             # the product's first 3 locations.     
+             # the product's first 3 locations.
     Title
-    ...X  # The depth of this fragment is calculated first and added to the total.             
+    ...X  # The depth of this fragment is calculated first and added to the total.
   }
 }
 
@@ -324,7 +319,7 @@ Field<ListGraphType<DinnerType>>(
     });
 ```
 
-## Projects attempting to solve N+1:
+## Projects attempting to solve N+1
 
 * [Marten](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) - by Jeremy Miller, PostgreSQL
 * [GraphQL .NET DataLoader](https://github.com/dlukez/graphql-dotnet-dataloader) by [Daniel Zimmermann](https://github.com/dlukez)

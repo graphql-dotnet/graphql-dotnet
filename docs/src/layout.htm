@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>GraphQL - <[title]></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/prismjs@1.8.1/themes/prism.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <h3>GraphQL <[version]></h3>
+          <div id="sidebar"></div>
+          <[linkto:{next};<a href="{href}">Next - {title}</a>]>
+          <[linkto:{previous};<a href="{href}">Previous - {title}</a>]>
+        </div>
+        <div class="col-md-9">
+          <h1><[title]></h1>
+          <div id="main-pane">
+            <[inner]>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/domready@1.0.8/ready.min.js"></script>
+    <script src="https://unpkg.com/axios@0.16.2/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/prismjs@1.8.1/prism.js"></script>
+    <[script:content/load.js]>
+  </body>
+</html>
