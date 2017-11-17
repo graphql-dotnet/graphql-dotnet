@@ -45,7 +45,7 @@ namespace GraphQL.Types
 
         void RegisterValueConverter(IAstFromValueConverter converter);
 
-        IAstFromValueConverter FindValueConverter(object value);
+        IAstFromValueConverter FindValueConverter(object value, IGraphType type);
     }
 
     public class Schema : ISchema
@@ -190,9 +190,9 @@ namespace GraphQL.Types
             _converters.Add(converter);
         }
 
-        public IAstFromValueConverter FindValueConverter(object value)
+        public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
-            return _converters.FirstOrDefault(x => x.Matches(value));
+            return _converters.FirstOrDefault(x => x.Matches(value, type));
         }
 
         public IGraphType FindType(string name)

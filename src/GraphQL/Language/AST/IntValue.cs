@@ -5,238 +5,116 @@ using System.Linq;
 
 namespace GraphQL.Language.AST
 {
-    public class IntValue : AbstractNode, IValue
+    public abstract class ValueNode<T> : AbstractNode, IValue<T>
+    {
+        public T Value { get; protected set; }
+
+        object IValue.Value => Value;
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}{{value={Value}}}";
+        }
+
+        public override bool IsEqualTo(INode obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((T) obj);
+        }
+
+        protected abstract bool Equals(ValueNode<T> node);
+    }
+
+    public class IntValue : ValueNode<int>
     {
         public IntValue(int value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public int Value { get; }
-
-        public override string ToString()
-        {
-            return "IntValue{{value={0}}}".ToFormat(Value);
-        }
-
-        protected bool Equals(IntValue other)
+        protected override bool Equals(ValueNode<int> other)
         {
             return Value == other.Value;
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((IntValue) obj);
-        }
     }
 
-    public class LongValue : AbstractNode, IValue
+    public class LongValue : ValueNode<long>
     {
         public LongValue(long value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public long Value { get; }
-
-        public override string ToString()
-        {
-            return "LongValue{{value={0}}}".ToFormat(Value);
-        }
-
-        protected bool Equals(LongValue other)
+        protected override bool Equals(ValueNode<long> other)
         {
             return Value == other.Value;
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((LongValue)obj);
-        }
     }
 
-    public class DecimalValue : AbstractNode, IValue
+    public class DecimalValue : ValueNode<decimal>
     {
         public DecimalValue(decimal value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public decimal Value { get; }
-
-        public override string ToString()
-        {
-            return "DecimalValue{{value={0}}}".ToFormat(Value);
-        }
-
-        protected bool Equals(DecimalValue other)
+        protected override bool Equals(ValueNode<decimal> other)
         {
             return Value == other.Value;
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((DecimalValue)obj);
-        }
     }
 
-    public class FloatValue : AbstractNode, IValue
+    public class FloatValue : ValueNode<double>
     {
         public FloatValue(double value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public double Value { get; }
-
-        public override string ToString()
-        {
-            var valueStr = Value.ToString("G", NumberFormatInfo.InvariantInfo);
-            return "FloatValue{{value={0}}}".ToFormat(valueStr);
-        }
-
-        protected bool Equals(FloatValue other)
+        protected override bool Equals(ValueNode<double> other)
         {
             return Value == other.Value;
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-
-            return Equals((FloatValue)obj);
-        }
     }
 
-    public class StringValue : AbstractNode, IValue
+    public class StringValue : ValueNode<string>
     {
         public StringValue(string value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public string Value { get; }
-
-        public override string ToString()
-        {
-            return "StringValue{{value={0}}}".ToFormat(Value);
-        }
-
-        protected bool Equals(StringValue other)
+        protected override bool Equals(ValueNode<string> other)
         {
             return string.Equals(Value, other.Value);
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((StringValue)obj);
-        }
     }
 
-    public class BooleanValue : AbstractNode, IValue
+    public class BooleanValue : ValueNode<bool>
     {
         public BooleanValue(bool value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public bool Value { get; }
-
-        public override string ToString()
-        {
-            return "BooleanValue{{value={0}}}".ToFormat(Value);
-        }
-
-        protected bool Equals(BooleanValue other)
+        protected override bool Equals(ValueNode<bool> other)
         {
             return Value == other.Value;
         }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-
-            return Equals((BooleanValue)obj);
-        }
     }
 
-    public class DateTimeValue : AbstractNode, IValue
+    public class DateTimeValue : ValueNode<DateTime>
     {
         public DateTimeValue(DateTime value)
         {
             Value = value;
         }
 
-        public object GetValue()
-        {
-            return Value;
-        }
-
-        public DateTime Value { get; }
-
-        public override string ToString()
-        {
-            return "DateTimeValue{{value={0}}}".ToFormat(Value.ToString("o"));
-        }
-
-        protected bool Equals(DateTimeValue other)
+        protected override bool Equals(ValueNode<DateTime> other)
         {
             return DateTime.Equals(Value, other.Value);
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-
-            return Equals((DateTimeValue)obj);
         }
     }
 
@@ -248,16 +126,12 @@ namespace GraphQL.Language.AST
             NameNode = name;
         }
 
-        public object GetValue()
-        {
-            return Name;
-        }
-
         public EnumValue(string name)
         {
             Name = name;
         }
 
+        object IValue.Value => Name;
         public string Name { get; }
         public NameNode NameNode { get; }
 
@@ -288,9 +162,12 @@ namespace GraphQL.Language.AST
             Values = values;
         }
 
-        public object GetValue()
+        public object Value
         {
-            return Values;
+            get
+            {
+                return Values.Select(x => x.Value).ToList();
+            }
         }
 
         public IEnumerable<IValue> Values { get; }
@@ -319,9 +196,14 @@ namespace GraphQL.Language.AST
             ObjectFields = fields;
         }
 
-        public object GetValue()
+        public object Value
         {
-            return ObjectFields;
+            get
+            {
+                var obj = new Dictionary<string, object>();
+                FieldNames.Apply(name => obj.Add(name, Field(name).Value.Value));
+                return obj;
+            }
         }
 
         public IEnumerable<ObjectField> ObjectFields { get; }

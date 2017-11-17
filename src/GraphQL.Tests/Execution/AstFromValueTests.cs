@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Execution
             schema.RegisterValueConverter(new ByteValueConverter());
 
             byte value = 12;
-            var result = schema.FindValueConverter(value);
+            var result = schema.FindValueConverter(value, null);
             result.ShouldNotBeNull("AST from value converter should be registered");
             result.ShouldBeOfType<ByteValueConverter>();
         }
@@ -95,37 +95,27 @@ namespace GraphQL.Tests.Execution
 
     internal class ByteValueConverter : IAstFromValueConverter
     {
-        public bool Matches(object value)
+        public bool Matches(object value, IGraphType type)
         {
             return value is byte;
         }
 
-        public IValue Convert(object value)
+        public IValue Convert(object value, IGraphType type)
         {
             return new ByteValue((byte)value);
         }
     }
 
-    internal class ByteValue : AbstractNode, IValue
+    internal class ByteValue : ValueNode<byte>
     {
         public ByteValue(byte value)
         {
             Value = value;
         }
 
-        public byte Value { get; }
-
-        public object GetValue()
+        protected override bool Equals(ValueNode<byte> node)
         {
-            return Value;
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ByteValue)obj);
+            return Value == node.Value;
         }
     }
 

@@ -340,7 +340,7 @@ namespace GraphQL
 
             foreach (var fieldCollection in fields)
             {
-                var name = fieldCollection.Key; 
+                var name = fieldCollection.Key;
 
                 if (!data.ContainsKey(name))
                 {
@@ -809,7 +809,7 @@ namespace GraphQL
             {
                 if (variable.DefaultValue != null)
                 {
-                    return variable.DefaultValue.ValueFromAst();
+                    return variable.DefaultValue.Value;
                 }
             }
             var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
