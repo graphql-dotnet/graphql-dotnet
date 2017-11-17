@@ -413,37 +413,13 @@ namespace GraphQL
                 return new StringValue(serialized.ToString());
             }
 
-            var converter = schema.FindValueConverter(serialized);
+            var converter = schema.FindValueConverter(serialized, type);
             if (converter != null)
             {
-                return converter.Convert(serialized);
+                return converter.Convert(serialized, type);
             }
 
             throw new ExecutionError($"Cannot convert value to AST: {serialized}");
-        }
-
-        public static object ValueFromAst(this IValue value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (value is ObjectValue)
-            {
-                var objVal = (ObjectValue)value;
-                var obj = new Dictionary<string, object>();
-                objVal.FieldNames.Apply(name => obj.Add(name, ValueFromAst(objVal.Field(name).Value)));
-                return obj;
-            }
-
-            if (value is ListValue)
-            {
-                var list = (ListValue)value;
-                return list.Values.Select(ValueFromAst).ToList();
-            }
-
-            return value.GetValue();
         }
     }
 }

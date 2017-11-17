@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution.Performance
@@ -15,7 +17,7 @@ namespace GraphQL.Tests.Execution.Performance
         {
             Services.Register<PerfQuery>();
 
-            Services.Singleton(() => new ThreadPerformanceSchema(type => (GraphType) Services.Get(type)));
+            Services.Singleton(() => new ThreadPerformanceSchema(new FuncDependencyResolver(type => (GraphType) Services.Get(type))));
         }
 
         public class PerfQuery : ObjectGraphType<object>
@@ -25,13 +27,12 @@ namespace GraphQL.Tests.Execution.Performance
                 Name = "Query";
 
                 FieldAsync<StringGraphType>("halfSecond", resolve: c => Get(500, "Half"));
-                FieldAsync<StringGraphType>("quarterSecond", resolve: async c => Get(500, "Quarter"));
+                FieldAsync<StringGraphType>("quarterSecond", resolve: c => Get(500, "Quarter"));
             }
 
-            private string Get(int milliseconds, string result)
+            private async Task<string> Get(int milliseconds, string result)
             {
-                Thread.Sleep(milliseconds);
-
+                await Task.Delay(milliseconds);
                 return result;
             }
         }
@@ -45,27 +46,29 @@ namespace GraphQL.Tests.Execution.Performance
                 Name = "Mutation";
 
                 FieldAsync<StringGraphType>("setFive", resolve: c => Set("5"));
-                FieldAsync<StringGraphType>("setOne", resolve: async c => Set("1"));
+                FieldAsync<StringGraphType>("setOne", resolve: c => Set("1"));
             }
 
-            private string Set(string result)
+            private Task<string> Set(string result)
             {
                 Calls.Add(result);
-                return string.Join(",", Calls.ToList());
+                var list = string.Join(",", Calls.ToList());
+                return Task.FromResult(list);
             }
         }
 
         public class ThreadPerformanceSchema : Schema
         {
-            public ThreadPerformanceSchema(Func<Type, GraphType> resolveType)
-                : base(resolveType)
+            public ThreadPerformanceSchema(IDependencyResolver resolver)
+                : base(resolver)
             {
-                Query = (PerfQuery) resolveType(typeof(PerfQuery));
-                Mutation = (PerfMutation) resolveType(typeof(PerfMutation));
+                Query = resolver.Resolve<PerfQuery>();
+                Mutation = resolver.Resolve<PerfMutation>();
             }
         }
 
-        [Fact(Skip = "May fail one a single processor machine.")]
+        // [Fact(Skip = "May fail one a single processor machine.")]
+        [Fact]
         public void Executes_IsQuickerThanTotalTaskTime()
         {
             var query = @"
@@ -76,28 +79,20 @@ namespace GraphQL.Tests.Execution.Performance
             ";
 
             var smallListTimer = new Stopwatch();
-            ExecutionResult runResult2 = null;
             smallListTimer.Start();
 
-            runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
                 _.Schema = Schema;
                 _.Query = query;
-                _.Root = null;
-                _.Inputs = null;
-                _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
-                _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
             }).GetAwaiter().GetResult();
 
             smallListTimer.Stop();
 
-            Assert.Null(runResult2.Errors);
-
-            Assert.True(smallListTimer.ElapsedMilliseconds < 900);
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(900);
         }
 
         [Fact]
@@ -125,23 +120,15 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            ExecutionResult runResult2 = null;
-
-            runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
-                _.Root = null;
-                _.Inputs = null;
-                _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
-                _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
             }).GetAwaiter().GetResult();
 
             var result = runResult2.Data as dynamic;
-            Assert.Null(runResult2.Errors);
-            Assert.Equal("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5", result["m17"]);
+            runResult2.Errors.ShouldBeNull();
+            ((string)result["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
         }
     }
 }

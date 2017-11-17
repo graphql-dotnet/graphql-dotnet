@@ -67,11 +67,7 @@ namespace GraphQL.Language.AST
             NameNode = name;
         }
 
-        public object GetValue()
-        {
-            return NameNode;
-        }
-
+        object IValue.Value => Name;
         public string Name { get; }
         public NameNode NameNode { get; }
 
