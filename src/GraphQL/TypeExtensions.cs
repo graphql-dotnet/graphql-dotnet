@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -88,12 +88,7 @@ namespace GraphQL
             }
 
   
-            if (type == typeof(int))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(long))
+            if (type == typeof(int) || type == typeof(long) || type == typeof(uint))
             {
                 graphType = typeof(IntGraphType);
             }
