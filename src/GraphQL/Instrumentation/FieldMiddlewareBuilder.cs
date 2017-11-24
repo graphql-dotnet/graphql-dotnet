@@ -58,7 +58,7 @@ namespace GraphQL.Instrumentation
                         }
                         catch (AggregateException ex)
                         {
-                            throw new Exception($"GraphQL - Error resolving field {context.FieldName}", ex.InnerException);
+                            throw new Exception(String.Format("GraphQL - error resolving field {0}", context.FieldName), ex.InnerException);
                         }
                     });
                 });
