@@ -7,10 +7,16 @@ namespace GraphQL.Types
     {
         public static IGraphType GraphTypeFromType(this IType type, ISchema schema)
         {
+            if (type == null) return null;
+
             if (type is NonNullType)
             {
                 var nonnull = (NonNullType)type;
                 var ofType = GraphTypeFromType(nonnull.Type, schema);
+                if(ofType == null)
+                {
+                    return null;
+                }
                 var nonnullGraphType = typeof(NonNullGraphType<>).MakeGenericType(ofType.GetType());
                 var instance = (NonNullGraphType)Activator.CreateInstance(nonnullGraphType);
                 instance.ResolvedType = ofType;
@@ -21,6 +27,10 @@ namespace GraphQL.Types
             {
                 var list = (ListType)type;
                 var ofType = GraphTypeFromType(list.Type, schema);
+                if(ofType == null)
+                {
+                    return null;
+                }
                 var listGraphType = typeof(ListGraphType<>).MakeGenericType(ofType.GetType());
                 var instance = (ListGraphType)Activator.CreateInstance(listGraphType);
                 instance.ResolvedType = ofType;
