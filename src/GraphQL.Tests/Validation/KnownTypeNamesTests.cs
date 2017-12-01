@@ -24,6 +24,28 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
+        public void unknown_nonnull_type_name_is_invalid()
+        {
+            ShouldFailRule(_ =>{
+                _.Query = @"
+                    query Foo($var: Abcd!) {
+                        user(id: 4) {
+                            pets {
+                                ... on Pet { name },
+                                ...PetFields
+                            }
+                        }
+                    }
+                    fragment PetFields on Pet {
+                        name
+                    }
+                    ";
+
+                _.Error(Rule.UnknownTypeMessage("Abcd", null), 2, 37);
+            });
+        }
+
+        [Fact]
         public void unknown_type_names_are_invalid()
         {
             ShouldFailRule(_ =>
