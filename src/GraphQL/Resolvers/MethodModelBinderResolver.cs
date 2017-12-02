@@ -40,9 +40,20 @@ namespace GraphQL.Resolvers
                     index++;
                 }
 
-                if (context.Source?.GetType() == _parameters[index].ParameterType)
+                if (_parameters.Length > index
+                    && context.Source != null
+                    && (context.Source?.GetType() == _parameters[index].ParameterType
+                        || string.Equals(_parameters[index].Name, "source", StringComparison.OrdinalIgnoreCase)))
                 {
                     arguments[index] = context.Source;
+                    index++;
+                }
+
+                if (_parameters.Length > index
+                    && context.UserContext != null
+                    && context.UserContext?.GetType() == _parameters[index].ParameterType)
+                {
+                    arguments[index] = context.UserContext;
                     index++;
                 }
 
