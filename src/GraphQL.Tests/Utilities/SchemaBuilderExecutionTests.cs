@@ -151,6 +151,175 @@ namespace GraphQL.Tests.Utilities
 
             result.ShouldBe(serializedExpectedResult);
         }
+
+        [Fact]
+        public void can_use_source_without_params()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  source: Boolean
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = "{ source }";
+                _.Root = new { Hello =  "World" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'source': true }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_resolvefieldcontext_without_params()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  resolve: String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = "{ resolve }";
+                _.ExposeExceptions = true;
+            });
+
+            var expectedResult = CreateQueryResult("{ 'resolve': 'Resolved' }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_resolvefieldcontext_with_params()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  resolveWithParam(id: String): String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = @"{ resolveWithParam(id: ""abcd"") }";
+            });
+
+            var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContext: String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = @"{ userContext }";
+                _.UserContext = new MyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_usercontext_with_params()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContextWithParam(id: String): String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = @"{ userContextWithParam(id: ""abcd"") }";
+                _.UserContext = new MyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'userContextWithParam': 'Quinn abcd' }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_context_source_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  three: Boolean
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = @"{ three }";
+                _.Root = new { Hello = "World" };
+                _.UserContext = new MyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'three': true }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_context_source_usercontext_with_params()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  four(id: Int): Boolean
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = @"{ four(id: 123) }";
+                _.Root = new { Hello = "World" };
+                _.UserContext = new MyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'four': true }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
     }
 
     public class PostData
@@ -219,5 +388,49 @@ namespace GraphQL.Tests.Utilities
 
             return new Cat {Name = "Biscuit", Meows = true};
         }
+    }
+
+    [GraphQLMetadata("Query")]
+    class ParametersType
+    {
+        public bool Source(object source)
+        {
+            return source != null;
+        }
+
+        public string Resolve(ResolveFieldContext context)
+        {
+            return "Resolved";
+        }
+
+        public string ResolveWithParam(ResolveFieldContext context, string id)
+        {
+            return $"Resolved {id}";
+        }
+
+        public string UserContext(MyUserContext context)
+        {
+            return context.Name;
+        }
+
+        public string UserContextWithParam(MyUserContext context, string id)
+        {
+            return $"{context.Name} {id}";
+        }
+
+        public bool Three(ResolveFieldContext resolveContext, object source, MyUserContext context)
+        {
+            return resolveContext != null && context != null && source != null;
+        }
+
+        public bool Four(ResolveFieldContext resolveContext, object source, MyUserContext context, int id)
+        {
+            return resolveContext != null && context != null && source != null && id != 0;
+        }
+    }
+
+    class MyUserContext
+    {
+        public string Name { get; set; }
     }
 }
