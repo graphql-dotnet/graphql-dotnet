@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -185,7 +185,10 @@ namespace GraphQL.Subscription
                         var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, field, fieldPath);
                         return new ExecutionResult
                         {
-                            Data = fieldResolveResult.Value
+                            Data = new Dictionary<string, object>()
+                            {
+                                { field.Name,fieldResolveResult.Value }
+                            }
                         };
                     })
                     .Catch<ExecutionResult, Exception>(exception =>
