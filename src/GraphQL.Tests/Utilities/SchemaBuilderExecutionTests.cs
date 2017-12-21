@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -300,6 +301,7 @@ namespace GraphQL.Tests.Utilities
         public void can_use_context_source_usercontext_with_params()
         {
             var schema = Schema.For(@"
+                input
                 type Query {
                   four(id: Int): Boolean
                 }
@@ -316,6 +318,33 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'four': true }");
+            var serializedExpectedResult = Writer.Write(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public void can_use_DateTimeOffset_type(){
+            var schema = Schema.For(@"
+                input DateTimeOffsetInput{
+                    value: Date
+                }
+                type Query {
+                  five(model: DateTimeOffsetInput): Date
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var utcNow = DateTimeOffset.UtcNow;
+
+            var result = schema.Execute(_ =>
+            {
+                _.Query = $"{{ five(model:{{ value:\"{utcNow}\"}}) }}";
+            });
+
+            var expectedResult = CreateQueryResult($"{{ 'five': \"{utcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ")}\" }}");
             var serializedExpectedResult = Writer.Write(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -427,10 +456,20 @@ namespace GraphQL.Tests.Utilities
         {
             return resolveContext != null && context != null && source != null && id != 0;
         }
+
+        public DateTimeOffset Five(DateTimeOffsetInput model)
+        {
+            return model.Value.AddDays(1);
+        }
     }
 
     class MyUserContext
     {
         public string Name { get; set; }
+    }
+
+    class DateTimeOffsetInput
+    {
+        public DateTimeOffset Value { get; set; }
     }
 }
