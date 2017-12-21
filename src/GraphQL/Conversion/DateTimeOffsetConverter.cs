@@ -1,7 +1,3 @@
-// <copyright file="DateTimeOffsetConverter.cs" company="wut">
-//   Copyright © wut
-// </copyright>
-
 using System;
 using System.Globalization;
 using System.Linq;
