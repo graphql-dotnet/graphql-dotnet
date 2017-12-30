@@ -111,12 +111,10 @@ namespace GraphQL.Types
 
         public async Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
         {
-            Task<object> result = null;
-
             try
             {
-                result = (Task<object>) await resolve(this);
-                return result;
+                var result = await resolve(this);
+                return Task.FromResult(result);
             }
             catch (Exception ex)
             {

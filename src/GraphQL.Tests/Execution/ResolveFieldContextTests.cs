@@ -4,7 +4,7 @@ using System.Linq;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
-
+using System.Threading.Tasks;
 
 namespace GraphQL.Tests.Execution
 {
@@ -119,6 +119,15 @@ namespace GraphQL.Tests.Execution
                 }
             );
             _context.Errors.First().Message.ShouldBe("Test Error");
+        }
+
+        [Fact]
+        public async void try_resolve_async_properly_resolves_result()
+        {
+            Task<object> result = (Task<object>) await _context.TryAsyncResolve(
+                c => Task.FromResult<object>("Test Result")
+            );
+            result.Result.ShouldBe("Test Result");
         }
 
         enum SomeEnum
