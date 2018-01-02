@@ -9,7 +9,7 @@ namespace GraphQL.Types
             Name = "Boolean";
         }
 
-        public override bool? Serialize(object value)
+        public override object Serialize(object value)
         {
             if (value is bool)
             {
@@ -19,7 +19,7 @@ namespace GraphQL.Types
             return false;
         }
 
-        public override object ParseValue(object value)
+        public override bool? ParseValue(object value)
         {
             if (value != null)
             {
