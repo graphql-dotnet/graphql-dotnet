@@ -8,7 +8,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public class EnumerationGraphType : ScalarGraphType
+    public class EnumerationGraphType : ScalarGraphType<object>
     {
         public EnumerationGraphType()
         {
