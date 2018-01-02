@@ -8,7 +8,7 @@ namespace GraphQL.Types {
     /// The `Date` scalar type represents a timestamp provided in UTC.
     /// `Date` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
     /// </summary>
-    public class DateGraphType : ScalarGraphType<DateTime>
+    public class DateGraphType : ScalarGraphType<DateTime?>
     {
         public DateGraphType()
         {
@@ -23,7 +23,7 @@ namespace GraphQL.Types {
             return ParseValue(value);
         }
 
-        public override DateTime ParseValue(object value)
+        public override DateTime? ParseValue(object value)
         {
             if (value is DateTime)
             {
