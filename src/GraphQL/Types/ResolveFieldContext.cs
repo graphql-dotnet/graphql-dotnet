@@ -113,8 +113,7 @@ namespace GraphQL.Types
         {
             try
             {
-                var result = await resolve(this);
-                return Task.FromResult(result);
+                return await resolve(this);
             }
             catch (Exception ex)
             {

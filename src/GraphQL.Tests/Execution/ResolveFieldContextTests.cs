@@ -124,10 +124,10 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public async void try_resolve_async_properly_resolves_result()
         {
-            Task<object> result = (Task<object>) await _context.TryAsyncResolve(
+            var result = await _context.TryAsyncResolve(
                 c => Task.FromResult<object>("Test Result")
             );
-            result.Result.ShouldBe("Test Result");
+            result.ShouldBe("Test Result");
         }
 
         enum SomeEnum
