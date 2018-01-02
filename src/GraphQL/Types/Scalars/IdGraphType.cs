@@ -2,7 +2,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class IdGraphType : ScalarGraphType
+    public class IdGraphType : ScalarGraphType<string>
     {
         public IdGraphType()
         {
@@ -19,7 +19,7 @@ namespace GraphQL.Types
             return value?.ToString();
         }
 
-        public override object ParseValue(object value)
+        public override string ParseValue(object value)
         {
             return value?.ToString().Trim(' ', '"');
         }

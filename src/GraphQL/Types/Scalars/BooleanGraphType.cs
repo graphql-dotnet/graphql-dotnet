@@ -2,14 +2,14 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class BooleanGraphType : ScalarGraphType
+    public class BooleanGraphType : ScalarGraphType<bool?>
     {
         public BooleanGraphType()
         {
             Name = "Boolean";
         }
 
-        public override object Serialize(object value)
+        public override bool? Serialize(object value)
         {
             if (value is bool)
             {

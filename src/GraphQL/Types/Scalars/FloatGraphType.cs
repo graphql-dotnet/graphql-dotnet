@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class FloatGraphType : ScalarGraphType
+    public class FloatGraphType : ScalarGraphType<double?>
     {
         public FloatGraphType()
         {
@@ -16,7 +16,7 @@ namespace GraphQL.Types
             return ParseValue(value);
         }
 
-        public override object ParseValue(object value)
+        public override double? ParseValue(object value)
         {
             if (value == null)
                 return null;
