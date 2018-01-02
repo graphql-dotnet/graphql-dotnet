@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -17,6 +18,7 @@ namespace GraphQL.Types
         public abstract object ParseLiteral(IValue value);
     }
 
+    [Obsolete("Deprecated in favour of ScalarGraphType<Type>")]
     public abstract class ScalarGraphType : GraphType
     {
         public abstract object Serialize(object value);
