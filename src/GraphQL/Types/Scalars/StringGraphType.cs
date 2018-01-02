@@ -2,7 +2,11 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class StringGraphType : ScalarGraphType
+
+    /// <summary>
+    /// The String scalar type represents textual data, represented as UTF‐8 character sequences.
+    /// </summary>
+    public class StringGraphType : ScalarGraphType<string>
     {
         public StringGraphType()
         {
@@ -14,7 +18,7 @@ namespace GraphQL.Types
             return value;
         }
 
-        public override object ParseValue(object value)
+        public override string ParseValue(object value)
         {
             return value?.ToString();
         }
