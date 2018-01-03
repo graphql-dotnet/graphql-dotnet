@@ -117,7 +117,6 @@ namespace GraphQL.Tests.Execution
             _context.Errors.First().InnerException.ShouldBe(exception);
         }
 
-
         [Fact]
         public async void try_resolve_async_invokes_error_handler()
         {
