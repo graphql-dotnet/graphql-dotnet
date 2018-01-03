@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace GraphQL.Tests.Execution
 {
@@ -13,6 +16,7 @@ namespace GraphQL.Tests.Execution
         {
             _context = new ResolveFieldContext();
             _context.Arguments = new Dictionary<string, object>();
+            _context.Errors = new ExecutionErrors();
         }
 
         [Fact]
@@ -95,6 +99,44 @@ namespace GraphQL.Tests.Execution
             result.Count.ShouldBe(2);
             result[0].ShouldBe("one");
             result[1].ShouldBe("two");
+        }
+
+        [Fact]
+        public async void try_resolve_async_adds_exception_message()
+        {
+            var result = await _context.TryAsyncResolve(c => throw new InvalidOperationException("Test Error"));
+            _context.Errors.First().Message.ShouldBe("Test Error");
+        }
+
+        [Fact]
+        public async void try_resolve_sets_inner_exception()
+        {
+            var exception = new Exception("Test");
+            var result = await _context.TryAsyncResolve(
+                c => throw exception);
+            _context.Errors.First().InnerException.ShouldBe(exception);
+        }
+
+        [Fact]
+        public async void try_resolve_async_invokes_error_handler()
+        {
+            var result = await _context.TryAsyncResolve(
+                c => throw new InvalidOperationException(),
+                e => {
+                    e.Add(new ExecutionError("Test Error"));
+                    return null;
+                }
+            );
+            _context.Errors.First().Message.ShouldBe("Test Error");
+        }
+
+        [Fact]
+        public async void try_resolve_async_properly_resolves_result()
+        {
+            var result = await _context.TryAsyncResolve(
+                c => Task.FromResult<object>("Test Result")
+            );
+            result.ShouldBe("Test Result");
         }
 
         enum SomeEnum

@@ -3,6 +3,8 @@ using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using Field = GraphQL.Language.AST.Field;
+using System.Threading.Tasks;
+using System;
 
 namespace GraphQL.Types
 {
@@ -105,6 +107,26 @@ namespace GraphQL.Types
         public bool HasArgument(string argumentName)
         {
             return Arguments?.ContainsKey(argumentName) ?? false;
+        }
+
+        public async Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+        {
+            try
+            {
+                return await resolve(this);
+            }
+            catch (Exception ex)
+            {
+                if (error == null)
+                {
+                    Errors.Add(new ExecutionError(ex.Message, ex));
+                    return null;
+                }
+                else
+                {
+                    return error(Errors);
+                }
+            }
         }
     }
 
