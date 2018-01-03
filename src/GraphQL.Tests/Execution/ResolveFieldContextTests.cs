@@ -109,6 +109,16 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public async void try_resolve_sets_inner_exception()
+        {
+            var exception = new Exception("Test");
+            var result = await _context.TryAsyncResolve(
+                c => throw exception);
+            _context.Errors.First().InnerException.ShouldBe(exception);
+        }
+
+
+        [Fact]
         public async void try_resolve_async_invokes_error_handler()
         {
             var result = await _context.TryAsyncResolve(

@@ -119,7 +119,7 @@ namespace GraphQL.Types
             {
                 if (error == null)
                 {
-                    Errors.Add(new ExecutionError(ex.Message));
+                    Errors.Add(new ExecutionError(ex.Message, ex));
                     return null;
                 }
                 else
