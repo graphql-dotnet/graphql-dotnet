@@ -66,6 +66,7 @@ public class Droid
   public string Name { get; set; }
 }
 
+[GraphQLMetadata("Query")]
 public class Query
 {
   [GraphQLMetadata("hero")]
@@ -103,6 +104,7 @@ public class Droid
   public string Name { get; set; }
 }
 
+[GraphQLMetadata("Query")]
 public class Query
 {
   private List<Droid> _droids = new List<Droid>
