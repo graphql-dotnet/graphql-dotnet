@@ -320,6 +320,39 @@ namespace GraphQL.Tests.Utilities
 
             result.ShouldBe(serializedExpectedResult);
         }
+
+        [Fact]
+        public void can_execute_complex_schema()
+        {
+            var defs = @"
+                type Post {
+                    id: ID!
+                    title: String!
+                }
+                type Blog {
+                    title: String!
+                    post(id: ID!): Post
+                }
+                type Query {
+                    blog(id: ID!): Blog
+                }
+            ";
+
+            Builder.Types.Include<BlogQueryType>();
+            Builder.Types.Include<Blog>();
+
+            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ post(id: $postId) { id title } } }";
+            var expected = @"{ 'blog': { 'post': { 'id' : '1', 'title': 'Post One' } } }";
+            var variables = "{ 'blogId': '1', 'postId': '1' }";
+
+            AssertQuery(_ =>
+            {
+                _.Query = query;
+                _.Definitions = defs;
+                _.ExpectedResult = expected;
+                _.Variables = variables;
+            });
+        }
     }
 
     public class PostData
@@ -334,6 +367,28 @@ namespace GraphQL.Tests.Utilities
     {
         public string Id { get; set; }
         public string Title { get; set; }
+    }
+
+    [GraphQLMetadata("Blog")]
+    public class Blog
+    {
+        public string Title { get; set; }
+        public Post Post(string id)
+        {
+            return PostData.Posts.FirstOrDefault(x => x.Id == id);
+        }
+    }
+
+    [GraphQLMetadata("Query")]
+    public class BlogQueryType
+    {
+        public Blog Blog(string id)
+        {
+            return new Blog
+            {
+                Title = "New blog"
+            };
+        }
     }
 
     [GraphQLMetadata("Query")]
