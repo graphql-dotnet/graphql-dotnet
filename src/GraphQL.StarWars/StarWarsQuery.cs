@@ -19,7 +19,7 @@ namespace GraphQL.StarWars
                 resolve: context => data.GetHumanByIdAsync(context.GetArgument<string>("id"))
             );
 
-            Func<ResolveFieldContext<object>, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
+            Func<ResolveFieldContext, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
 
             FieldDelegate<DroidType>(
                 "droid",

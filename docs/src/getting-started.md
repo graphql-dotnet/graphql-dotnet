@@ -1,9 +1,7 @@
----
-title: Getting Started
-permalink: /getting-started
----
+<!--Title:Getting Started-->
+<!--Url:getting-started-->
 
-# Basics
+## Basics
 
 [GraphQL.org](http://graphql.org/learn) is the best place to get started learning GraphQL.  Here is an excerpt from the introduction:
 
@@ -106,13 +104,13 @@ Hello GraphQL!
 }
 ```
 
-# GraphiQL
+## GraphiQL
 
 [GraphiQL](https://github.com/graphql/graphiql) is an interactive in-browser GraphQL IDE.  This is a fantastic developer tool to help you form queries and explore your Schema.  The [sample project](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.GraphiQL) gives an example of hosting the GraphiQL IDE.
 
 ![](http://i.imgur.com/2uGdVAj.png)
 
-# Queries
+## Queries
 
 To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.
 
@@ -146,7 +144,7 @@ public class StarWarsSchema : Schema
 }
 ```
 
-# Arguments
+## Arguments
 
 You can provide arguments to a field.  You can use `GetArgument` on `ResolveFieldContext` to retrieve argument values.  `GetArgument` will attempt to coerce the argument values to the generic type it is given, including primitive values, objects, and enumerations.  You can gain access to the value directly through the `Arguments` dictionary on `ResolveFieldContext`.
 
@@ -178,7 +176,7 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
-# Variables
+## Variables
 
 You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
 
@@ -217,7 +215,7 @@ var result = await executer.ExecuteAsync(_ =>
 });
 ```
 
-# Mutations
+## Mutations
 
 To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
 
@@ -287,7 +285,7 @@ public class StarWarsData
 }
 ```
 
-# Interfaces
+## Interfaces
 
 A GraphQL Interface is an abstract type that includes a certain set of fields that a type must include to implement the interface.
 
@@ -361,7 +359,7 @@ public class StarWarsSchema : Schema
 }
 ```
 
-# IsTypeOf
+## IsTypeOf
 
 `IsTypeOf` is a function which helps resolve the implementing GraphQL type during execution.  For example, when you have a field that returns a GraphQL Interface the engine needs to know which concrete Graph Type to use.  So if you have a `Character` interface that is implemented by both `Human` and `Droid` types, the engine needs to know which graph type to choose.  The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
 
@@ -385,7 +383,7 @@ public class DroidType : ObjectGraphType
 
 An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface or Union.  See the `ResolveType` section for more details.
 
-# ResolveType
+## ResolveType
 
 An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhastive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
 
@@ -420,7 +418,7 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 }
 ```
 
-# Unions
+## Unions
 
 Unions are a composition of two different types.
 
@@ -435,7 +433,7 @@ public class CatOrDog : UnionGraphType
 }
 ```
 
-# Query Validation
+## Query Validation
 
 There [are a number of query validation rules](http://facebook.github.io/graphql/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by accessing the `ValidationRules` property.
 
@@ -446,7 +444,7 @@ var result = await executer.ExecuteAsync(_ =>
 });
 ```
 
-# Subscriptions
+## Subscriptions
 
 The Schema class supports a Subscription graph type and the parser supports the `subscription` keyword.  Subscriptions are an experimental feature of the GraphQL specification.
 
@@ -462,7 +460,7 @@ subscription comments($repoName: String!) {
 }
 ```
 
-# Schema Generation
+## Schema Generation
 
 There is currently nothing in the core project to do GraphQL Schema generation based off of existing C# classes.  Here are a few community projects built with GraphQL .NET which do so.
 
@@ -470,7 +468,7 @@ There is currently nothing in the core project to do GraphQL Schema generation b
 * [GraphQL Annotations](https://github.com/dlukez/graphql-dotnet-annotations) by [Daniel Zimmermann](https://github.com/dlukez)
 * [GraphQL Schema Generator](https://github.com/holm0563/graphql-schemaGenerator) by [Derek Holmes](https://github.com/holm0563)
 
-# How do I use XYZ ORM/database with GraphQL.NET?
+## How do I use XYZ ORM/database with GraphQL.NET?
 
 * [Entity Framework](https://github.com/JacekKosciesza/StarWars) by [Jacek Kościesza](https://github.com/JacekKosciesza)
 * [Marten + Nancy](https://github.com/joemcbride/marten/blob/graphql2/src/DinnerParty/Modules/GraphQLModule.cs) by [Joe McBride](https://github.com/joemcbride)
