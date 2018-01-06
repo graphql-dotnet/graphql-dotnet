@@ -1,3 +1,6 @@
+<!--Title:Advanced Topics-->
+<!--Url:learn-->
+
 ## Error Handling
 
 The `ExecutionResult` provides an `Errors` property which includes any errors encountered during exectution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
@@ -26,7 +29,7 @@ Field<ListGraphType<DinnerType>>(
     });
 ```
 
-# Dependency Injection
+## Dependency Injection
 
 GraphQL .NET supports dependency injection through a simple resolve function on the Schema class.  Internally when trying to resolve a type the library will call this resolve function.
 
@@ -66,7 +69,7 @@ public class NerdDinnerSchema : GraphQL.Types.Schema
 }
 ```
 
-# Object/Field Metadata
+## Object/Field Metadata
 
 `GraphType` and `FieldType` implement the `IProvideMetadata` interface.  This allows you to add arbitrary information to a field or graph type.  This can be useful in combination with a validation rule or field middleware.
 
@@ -79,7 +82,7 @@ public interface IProvideMetadata
 }
 ```
 
-# Field Middleware
+## Field Middleware
 
 You can write middleware for fields to provide additional behaviors during field resolution.  The following example is how Metrics are captured.  You register Field Middleware in the `ExecutionOptions`.
 
@@ -133,7 +136,7 @@ _.FieldMiddleware.Use(next =>
 });
 ```
 
-# Authentication / Authorization
+## Authentication / Authorization
 
 You can write validation rules that will run before the query is executed.  You can use this pattern to check that the user is authenticated or has permissions for a specific field.  This example uses the `Metadata` dictionary available on Fields to set permissons per field.
 
@@ -181,7 +184,7 @@ public class RequiresAuthValidationRule : IValidationRule
 }
 ```
 
-## Permission Extension Methods
+### Permission Extension Methods
 
 ```csharp
 Field(x => x.Name).AddPermission("Some permission");
@@ -232,7 +235,7 @@ public static class GraphQLExtensions
 }
 ```
 
-# Protection Against Malicious Queries
+## Protection Against Malicious Queries
 GraphQL allows the client to bundle and nest many queries into a single request. While this is quite convenient it also makes GraphQL endpoints susceptible to Denial of Service attacks.
 
 To mitigate this graphql-dotnet provides a few options that can be tweaked to set the upper bound of nesting and complexity of incoming queries so that the endpoint would only try to resolve queries that meet the set criteria and discard any overly complex and possibly malicious query that you don't expect your clients to make thus protecting your server resources against depletion by a denial of service attacks.
@@ -279,7 +282,7 @@ Or simply put on average we will have **2x Products** each will have 1 Title for
 
 Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (or higher) the query will execute correctly. If we change the ```MaxComplexity``` to something like 20 the DocumentExecutor will fail right after parsing the AST tree and will not attempt to resolve any of the fields (or talk to the database).
 
-# Query Batching
+## Query Batching
 
 Query batching allows you to make a single request to your data store instead of multiple requests.  This can also often be referred to as the ["N+1"](http://stackoverflow.com/questions/97197/what-is-the-n1-selects-issue) problem.  One technique of accomplishing this is to have all of your resolvers return a `Task`, then resolve those tasks when the batch is complete.  Some projects provide features like [Marten Batched Queries](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) that support this pattern.
 
@@ -324,7 +327,7 @@ Field<ListGraphType<DinnerType>>(
 * [Marten](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) - by Jeremy Miller, PostgreSQL
 * [GraphQL .NET DataLoader](https://github.com/dlukez/graphql-dotnet-dataloader) by [Daniel Zimmermann](https://github.com/dlukez)
 
-# Metrics
+## Metrics
 
 Metrics are captured during execution.  This can help you determine performance issues within a resolver or validation.  Field metrics are captured using Field Middleware and the results are returned as a `PerfRecord` array on the `ExecutionResult`.  You can then generate a report from those records using `StatsReport`.
 
@@ -338,7 +341,7 @@ var result = await _executer.ExecuteAsync( _ =>
 var report = StatsReport.From(schema, result.Operation, result.Perf, start);
 ```
 
-# Relay
+## Relay
 
 The core project provides a few classes to help with Relay.  You can find more types and helpers [here](https://github.com/graphql-dotnet/relay).
 

@@ -207,7 +207,8 @@ var result = schema.Execute(_ =>
   - [x] subscriptionType
   - [x] directives
 
-### Deployment Process
+
+### Publishing Nugets
 
 ```
 yarn run setVersion 0.17.0
@@ -215,6 +216,15 @@ git commit/push
 download nuget from AppVeyor
 upload nuget package to github
 publish nuget from MyGet
+```
+
+### Publishing Documentation
+
+Publishing documentation requires access to https://github.com/graphql-dotnet/graphql-dotnet.github.io
+
+```
+cd docs
+./publish_docs.sh 2.0.0
 ```
 
 

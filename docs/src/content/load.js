@@ -5,7 +5,7 @@ function appendScript(url) {
 }
 
 domready(function() {
-  axios.get('content/manifest.json')
+  axios.get('/content/manifest.json')
     .then(function(response) {
       Object.keys(response.data).forEach(key =>
         appendScript(response.data[key])

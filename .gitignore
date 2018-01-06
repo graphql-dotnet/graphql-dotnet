@@ -20,3 +20,5 @@ packages/
 node_modules/
 nuget/lib
 artifacts
+*.tgz
+doc-target

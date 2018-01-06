@@ -1,2 +1,4 @@
+<!--Title:GraphQL-->
+
 * [Getting Started](getting-started)
-* [Advanced Topics](learn)
+* [Learn Advanced Topics](learn)

@@ -6,28 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>GraphQL - <[title]></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/prismjs@1.8.1/themes/prism.css">
+    <[css:content/prism.css]>
+    <[css:content/theme.css]>
   </head>
   <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="banner">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="<[RootUrl]>" class="navbar-brand">GraphQL</a>
+        </div>
+        <nav class="collapse navbar-collapse" role="navigation">
+          <ul class="nav navbar-nav pull-right">
+            <li>
+              <[linkto:getting-started]>
+            </li>
+            <li>
+              <[linkto:learn]>
+            </li>
+            <[linkto:{previous};<li><a href="{href}" title="{title}">Previous</a></li>]>
+            <[linkto:{next};<li><a href="{href}" title="{title}">Next</a></li>]>
+          </ul>
+        </nav>
+      </div>
+    </nav>
+    <div class="container">
+      <nav class="navbar-inverse">
+        <[Breadcrumbs]>
+      </nav>
+    </div>
     <div class="container">
       <div class="row">
         <div class="col-md-3">
-          <h3>GraphQL <[version]></h3>
           <div id="sidebar"></div>
-          <[linkto:{next};<a href="{href}">Next - {title}</a>]>
-          <[linkto:{previous};<a href="{href}">Previous - {title}</a>]>
         </div>
         <div class="col-md-9">
           <h1><[title]></h1>
           <div id="main-pane">
             <[inner]>
           </div>
+          <div>
+            <[linkto:{previous};<a href="{href}">Previous - {title}</a>]>
+            <[linkto:{next};<a href="{href}">Next - {title}</a>]>
+          </div>
         </div>
       </div>
     </div>
     <script src="https://unpkg.com/domready@1.0.8/ready.min.js"></script>
     <script src="https://unpkg.com/axios@0.16.2/dist/axios.min.js"></script>
-    <script src="https://unpkg.com/prismjs@1.8.1/prism.js"></script>
-    <[script:content/load.js]>
+    <[script:content/prism.js]>
+    <[script:content/bundle.js]>
   </body>
 </html>
