@@ -2,7 +2,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class IntGraphType : ScalarGraphType
+    public class IntGraphType : ScalarGraphType<long?>
     {
         public IntGraphType()
         {
@@ -14,7 +14,7 @@ namespace GraphQL.Types
             return ParseValue(value);
         }
 
-        public override object ParseValue(object value)
+        public override long? ParseValue(object value)
         {
             if (value == null)
             {

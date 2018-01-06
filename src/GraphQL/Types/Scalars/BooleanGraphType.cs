@@ -2,7 +2,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class BooleanGraphType : ScalarGraphType
+    public class BooleanGraphType : ScalarGraphType<bool?>
     {
         public BooleanGraphType()
         {
@@ -19,7 +19,7 @@ namespace GraphQL.Types
             return false;
         }
 
-        public override object ParseValue(object value)
+        public override bool? ParseValue(object value)
         {
             if (value != null)
             {

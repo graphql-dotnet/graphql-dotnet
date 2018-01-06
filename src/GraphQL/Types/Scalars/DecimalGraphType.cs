@@ -5,7 +5,7 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class DecimalGraphType : ScalarGraphType
+    public class DecimalGraphType : ScalarGraphType<decimal?>
     {
         public DecimalGraphType()
         {
@@ -17,7 +17,7 @@ namespace GraphQL.Types
             return ParseValue(value);
         }
 
-        public override object ParseValue(object value)
+        public override decimal? ParseValue(object value)
         {
             if (value == null)
                 return null;
