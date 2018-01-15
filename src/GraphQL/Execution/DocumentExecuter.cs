@@ -319,13 +319,13 @@ namespace GraphQL
                 var field = fieldCollection.Value;
                 var fieldType = GetFieldDefinition(context.Document, context.Schema, rootType, field);
 
-                if (fieldType?.Resolver == null || !fieldType.Resolver.RunThreaded() || context.Operation.OperationType == OperationType.Mutation)
+                if (fieldType?.Resolver == null || !fieldType.Resolver.RunThreaded() || context.Operation.OperationType == OperationType.Mutation || fields.Count == 1)
                 {
                     await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath);
                 }
                 else
                 {
-                    var task = Task.Run(() => ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath));
+                    var task = Task.Run(() => ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath), context.CancellationToken);
 
                     externalTasks.Add(task);
                 }
@@ -333,7 +333,7 @@ namespace GraphQL
 
             if (externalTasks.Count > 0)
             {
-                Task.WaitAll(externalTasks.ToArray());
+                await Task.WhenAll(externalTasks.ToArray());
             }
 
             var ordered = new Dictionary<string, object>();
