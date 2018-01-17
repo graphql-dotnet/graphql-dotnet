@@ -333,7 +333,7 @@ namespace GraphQL
 
             if (externalTasks.Count > 0)
             {
-                await Task.WhenAll(externalTasks.ToArray());
+                await Task.WhenAll(externalTasks);
             }
 
             var ordered = new Dictionary<string, object>();
