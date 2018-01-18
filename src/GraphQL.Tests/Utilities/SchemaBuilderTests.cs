@@ -403,6 +403,33 @@ namespace GraphQL.Tests.Utilities
             type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
         }
 
+        [Fact]
+        public void deprecated_prefers_metadata_values()
+        {
+            var definitions = @"
+                type Movie {
+                  movies: Int @deprecated
+                }
+            ";
+
+            var schema = Schema.For(definitions, _ => _.Types.Include<Movie>());
+            schema.Initialize();
+
+            var type = schema.FindType("Movie") as IObjectGraphType;
+            type.ShouldNotBeNull();
+            type.Fields.Count().ShouldBe(1);
+            type.Fields.Single().DeprecationReason.ShouldBe("my reason");
+        }
+
+        class Movie
+        {
+            [GraphQLMetadata("movies", DeprecationReason = "my reason")]
+            public int Movies()
+            {
+                return 0;
+            }
+        }
+
         class CustomScalarType : ScalarGraphType
         {
             public CustomScalarType()

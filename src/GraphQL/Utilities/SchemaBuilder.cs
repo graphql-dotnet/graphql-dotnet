@@ -163,7 +163,7 @@ namespace GraphQL.Utilities
             type.Description = typeConfig.Description;
             type.IsTypeOf = typeConfig.IsTypeOfFunc;
 
-            ApplyDeprecatedDirective(type.Name, astType.Directives, reason =>
+            ApplyDeprecatedDirective(astType.Directives, reason =>
             {
                 type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
             });
@@ -201,7 +201,7 @@ namespace GraphQL.Utilities
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
 
-            ApplyDeprecatedDirective($"{parentTypeName}.{field.Name}", fieldDef.Directives, reason =>
+            ApplyDeprecatedDirective(fieldDef.Directives, reason =>
             {
                 field.DeprecationReason = fieldConfig.DeprecationReason ?? reason;
             });
@@ -210,19 +210,23 @@ namespace GraphQL.Utilities
         }
 
         private static string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
-        private void ApplyDeprecatedDirective(string name, IEnumerable<GraphQLDirective> directives, Action<string> apply)
+        private void ApplyDeprecatedDirective(IEnumerable<GraphQLDirective> directives, Action<string> apply)
         {
-            var deprecated = directives?.Directive("deprecated");
+            var deprecated = directives.Directive("deprecated");
 
             if(deprecated != null)
             {
                 var arg = deprecated.Arguments.Argument("reason");
-                var value = DeprecatedDefaultValue;
+                var value = "";
 
                 if(arg != null)
                 {
                     value = ToValue(arg.Value).ToString();
-                    // throw new ExecutionError($"Expected to find a 'reason' argument with the 'deprecated' directive on {name}.");
+                }
+
+                if(string.IsNullOrWhiteSpace(value))
+                {
+                    value = DeprecatedDefaultValue;
                 }
 
                 apply(value);
@@ -236,7 +240,7 @@ namespace GraphQL.Utilities
             field.ResolvedType = ToGraphType(inputDef.Type);
             field.DefaultValue = ToValue(inputDef.DefaultValue);
 
-            ApplyDeprecatedDirective($"{parentTypeName}.{field.Name}", inputDef.Directives, reason =>
+            ApplyDeprecatedDirective(inputDef.Directives, reason =>
             {
                 field.DeprecationReason = reason;
             });
@@ -253,7 +257,7 @@ namespace GraphQL.Utilities
             type.Description = typeConfig.Description;
             type.ResolveType = typeConfig.ResolveType;
 
-            ApplyDeprecatedDirective(type.Name, interfaceDef.Directives, reason =>
+            ApplyDeprecatedDirective(interfaceDef.Directives, reason =>
             {
                 type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
             });
@@ -275,7 +279,7 @@ namespace GraphQL.Utilities
             type.Description = typeConfig.Description;
             type.ResolveType = typeConfig.ResolveType;
 
-            ApplyDeprecatedDirective(type.Name, unionDef.Directives, reason =>
+            ApplyDeprecatedDirective(unionDef.Directives, reason =>
             {
                 type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
             });
@@ -292,7 +296,7 @@ namespace GraphQL.Utilities
             var type = new InputObjectGraphType();
             type.Name = inputDef.Name.Value;
 
-            ApplyDeprecatedDirective(type.Name, inputDef.Directives, reason =>
+            ApplyDeprecatedDirective(inputDef.Directives, reason =>
             {
                 type.DeprecationReason = reason;
             });
@@ -308,7 +312,7 @@ namespace GraphQL.Utilities
             var type = new EnumerationGraphType();
             type.Name = enumDef.Name.Value;
 
-            ApplyDeprecatedDirective(type.Name, enumDef.Directives, reason =>
+            ApplyDeprecatedDirective(enumDef.Directives, reason =>
             {
                 type.DeprecationReason = reason;
             });
@@ -347,7 +351,7 @@ namespace GraphQL.Utilities
             val.Value = valDef.Name.Value;
             val.Name = valDef.Name.Value;
 
-            ApplyDeprecatedDirective(val.Name, valDef.Directives, reason =>
+            ApplyDeprecatedDirective(valDef.Directives, reason =>
             {
                 val.DeprecationReason = reason;
             });
