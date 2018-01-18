@@ -132,14 +132,13 @@ namespace GraphQL
             if (value == null) return null;
 
             // exact type match
-            if ((fieldType == typeof(DateTime) && value is DateTime) ||
-                (fieldType == typeof(DateTimeOffset) && value is DateTimeOffset))
+            if (fieldType.IsInstanceOfType(value))
             {
                 return value;
             }
 
             // DateTime -> DateTimeOffset convertion
-            if(fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
+            if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
             {
                 return (DateTimeOffset)dateTimeValue;
             }
