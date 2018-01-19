@@ -38,7 +38,7 @@ namespace GraphQL
 
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
-            // Short-circuit conversion if the property value already 
+            // Short-circuit conversion if the property value already
             if (fieldType.IsInstanceOfType(propertyValue))
             {
                 return propertyValue;
@@ -131,9 +131,22 @@ namespace GraphQL
         {
             if (value == null) return null;
 
-            if (fieldType == typeof(DateTime) && value is DateTime)
+            // exact type match
+            if (fieldType.IsInstanceOfType(value))
             {
                 return value;
+            }
+
+            // DateTime -> DateTimeOffset convertion
+            if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
+            {
+                return (DateTimeOffset)dateTimeValue;
+            }
+
+            // DateTimeOffset -> DateTime convertion
+            if(fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
+            {
+                return dateTimeOffsetValue.DateTime;
             }
 
             string text;

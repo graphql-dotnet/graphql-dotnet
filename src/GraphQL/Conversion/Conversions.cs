@@ -39,6 +39,7 @@ namespace GraphQL.Conversion
             RegisterConversion(uint.Parse);
             RegisterConversion(ulong.Parse);
             RegisterConversion(DateTimeConverter.GetDateTime);
+            RegisterConversion(DateTimeOffsetConverter.GetDateTimeOffset);
             RegisterConversion(Guid.Parse);
 
             RegisterConversion(x =>
