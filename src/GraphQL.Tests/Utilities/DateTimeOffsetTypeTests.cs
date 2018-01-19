@@ -1,7 +1,3 @@
-// <copyright file="DateTimeOffsetTypeTests.cs" company="eVote">
-//   Copyright © eVote
-// </copyright>
-
 using System;
 using GraphQL.Types;
 using Shouldly;
