@@ -4,8 +4,6 @@ using Newtonsoft.Json;
 
 namespace GraphQL
 {
-    using System.Collections.Generic;
-
     public class ExecutionResultJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -18,7 +16,7 @@ namespace GraphQL
 
             WriteData(result, writer, serializer);
             WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
-            WriteExtensions(result.Extensions, writer, serializer);
+            WriteExtensions(result, writer, serializer);
 
             writer.WriteEndObject();
         }
@@ -84,15 +82,15 @@ namespace GraphQL
             writer.WriteEndArray();
         }
 
-        private void WriteExtensions(Dictionary<string, object> extensions, JsonWriter writer, JsonSerializer serializer)
+        private void WriteExtensions(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            if (extensions == null || !extensions.Any())
+            if (result.Data == null || result.Extensions == null || !result.Extensions.Any())
             {
                 return;
             }
 
             writer.WritePropertyName("extensions");
-            serializer.Serialize(writer, extensions);
+            serializer.Serialize(writer, result.Extensions);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
