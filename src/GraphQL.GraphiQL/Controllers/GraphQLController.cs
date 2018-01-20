@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -38,7 +38,7 @@ namespace GraphQL.GraphiQL.Controllers
         [HttpGet]
         public Task<HttpResponseMessage> GetAsync(HttpRequestMessage request)
         {
-            return PostAsync(request, new GraphQLQuery { Query = "query foo { hero }", Variables = "" });
+            return PostAsync(request, new GraphQLQuery { Query = "query foo { hero }", Variables = null });
         }
 
         [HttpPost]
@@ -82,6 +82,6 @@ namespace GraphQL.GraphiQL.Controllers
         public string OperationName { get; set; }
         public string NamedQuery { get; set; }
         public string Query { get; set; }
-        public string Variables { get; set; }
+        public Newtonsoft.Json.Linq.JObject Variables { get; set; }
     }
 }
