@@ -1,9 +1,11 @@
-﻿using GraphQL.Instrumentation;
+using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using Newtonsoft.Json;
 
 namespace GraphQL
 {
+    using System.Collections.Generic;
+
     [JsonConverter(typeof(ExecutionResultJsonConverter))]
     public class ExecutionResult
     {
@@ -20,5 +22,7 @@ namespace GraphQL
         public PerfRecord[] Perf { get; set; }
 
         public bool ExposeExceptions { get; set; }
+
+        public Dictionary<string, object> Extensions { get; set; }
     }
 }

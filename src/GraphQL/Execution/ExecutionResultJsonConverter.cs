@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 
 namespace GraphQL
 {
+    using System.Collections.Generic;
+
     public class ExecutionResultJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -14,13 +16,14 @@ namespace GraphQL
 
             writer.WriteStartObject();
 
-            writeData(result, writer, serializer);
-            writeErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+            WriteData(result, writer, serializer);
+            WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+            WriteExtensions(result.Extensions, writer, serializer);
 
             writer.WriteEndObject();
         }
 
-        private void writeData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
+        private void WriteData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
             var data = result.Data;
 
@@ -33,7 +36,7 @@ namespace GraphQL
             serializer.Serialize(writer, data);
         }
 
-        private void writeErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
+        private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
         {
             if (errors == null || !errors.Any())
             {
@@ -79,6 +82,17 @@ namespace GraphQL
             });
 
             writer.WriteEndArray();
+        }
+
+        private void WriteExtensions(Dictionary<string, object> extensions, JsonWriter writer, JsonSerializer serializer)
+        {
+            if (extensions == null || !extensions.Any())
+            {
+                return;
+            }
+
+            writer.WritePropertyName("extensions");
+            serializer.Serialize(writer, extensions);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
