@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
@@ -330,6 +331,30 @@ namespace GraphQL.Tests.Builders
                 FieldDefinition = field
             });
         }
+
+        [Fact]
+        public void can_get_collection_argument()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
+                .Resolve(context =>
+                {
+                    context.GetArgument<Collection<string>>("episodes").ShouldBe(new Collection<string> { "JEDI", "EMPIRE" });
+                    return null;
+                });
+
+            var field = objectType.Fields.First();
+            field.Resolver.Resolve(new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>
+                {
+                    {"episodes", new object[] {"JEDI", "EMPIRE" } }
+                },
+                FieldDefinition = field
+            });
+        }
+
 
         [Fact]
         public void getting_specified_argument_in_resolver_overrides_default_value()
