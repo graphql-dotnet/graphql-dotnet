@@ -47,7 +47,7 @@ namespace GraphQL.Instrumentation
                 return null;
             }
 
-            var record = new PerfRecord(category, subject, _stopwatch.ElapsedMilliseconds, metadata);
+            var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
             _records.Add(record);
             return new Marker(record, _stopwatch);
         }
@@ -61,7 +61,7 @@ namespace GraphQL.Instrumentation
                 return null;
             }
 
-            _main?.MarkEnd(_stopwatch.ElapsedMilliseconds);
+            _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             _stopwatch.Stop();
             return AllRecords;
         }
@@ -79,7 +79,7 @@ namespace GraphQL.Instrumentation
 
             public void Dispose()
             {
-                _record.MarkEnd(_stopwatch.ElapsedMilliseconds);
+                _record.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             }
         }
 
