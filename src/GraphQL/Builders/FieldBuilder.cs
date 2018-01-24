@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using GraphQL.Types;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
+using System.Threading.Tasks;
 
 namespace GraphQL.Builders
 {
@@ -88,6 +89,11 @@ namespace GraphQL.Builders
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<ResolveFieldContext<TSourceType>, TReturnType> resolve)
         {
             return Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
+        }
+
+        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
+        {
+            return Resolve(new FuncFieldResolver<TSourceType, Task<TReturnType>>(resolve));
         }
 
         public FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()

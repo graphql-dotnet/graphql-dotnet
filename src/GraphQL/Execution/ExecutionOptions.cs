@@ -24,7 +24,7 @@ namespace GraphQL
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
 
-        public readonly IList<IDocumentExecutionListener> Listeners = new List<IDocumentExecutionListener>();
+        public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 

@@ -1,4 +1,6 @@
-﻿using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -32,5 +34,7 @@ namespace GraphQL.Execution
         public CancellationToken CancellationToken { get; set; }
 
         public Metrics Metrics { get; set; }
+
+        public IEnumerable<IDocumentExecutionListener> Listeners { get; set; } = Enumerable.Empty<IDocumentExecutionListener>();
     }
 }

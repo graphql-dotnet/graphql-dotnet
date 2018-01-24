@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
@@ -6,6 +7,7 @@ namespace GraphQL.Resolvers
     {
         object Resolve(ResolveFieldContext context);
 
+        [Obsolete]
         bool RunThreaded();
     }
 
