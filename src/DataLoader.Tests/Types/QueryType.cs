@@ -37,12 +37,12 @@ namespace DataLoader.Tests.Types
                 });
 
             Field<ListGraphType<OrderType>>()
-                .Name("Order")
+                .Name("Orders")
                 .Description("Get all Orders")
                 .Returns<IEnumerable<Order>>()
                 .ResolveAsync(ctx =>
                 {
-                    var loader = accessor.Context.GetOrAddLoader("GetOrders",
+                    var loader = accessor.Context.GetOrAddLoader("GetAllOrders",
                         orders.GetAllOrdersAsync);
 
                     return loader.LoadAsync();
