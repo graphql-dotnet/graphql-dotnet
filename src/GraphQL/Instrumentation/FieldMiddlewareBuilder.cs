@@ -45,22 +45,9 @@ namespace GraphQL.Instrumentation
                 {
                     var resolver = new MiddlewareResolver(field.Resolver);
 
-                    FieldMiddlewareDelegate app = context => resolver.Resolve(context);
-                    app = Build(app);
+                    FieldMiddlewareDelegate app = Build(resolver.Resolve);
 
-                    field.Resolver = new FuncFieldResolver<object>(context =>
-                    {
-                        try
-                        {
-                            var result = app.Invoke(context);
-                            result.ConfigureAwait(false);
-                            return result.Result;
-                        }
-                        catch (AggregateException ex)
-                        {
-                            throw new Exception(ex.InnerException.Message, ex.InnerException);
-                        }
-                    });
+                    field.Resolver = new FuncFieldResolver<object>(app.Invoke);
                 });
             });
         }

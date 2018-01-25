@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace GraphQL.Instrumentation
         {
         }
 
-        public PerfRecord(string category, string subject, long start, Dictionary<string, object> metadata = null)
+        public PerfRecord(string category, string subject, double start, Dictionary<string, object> metadata = null)
         {
             Category = category;
             Subject = subject;
@@ -25,7 +25,7 @@ namespace GraphQL.Instrumentation
             Metadata = metadata;
         }
 
-        public void MarkEnd(long end)
+        public void MarkEnd(double end)
         {
             End = end;
         }
@@ -36,11 +36,11 @@ namespace GraphQL.Instrumentation
 
         public Dictionary<string, object> Metadata { get; set; }
 
-        public long Start { get; set; }
+        public double Start { get; set; }
 
-        public long End { get; set; }
+        public double End { get; set; }
 
-        public long Duration => End - Start;
+        public double Duration => End - Start;
 
         public T MetaField<T>(string key)
         {
@@ -61,9 +61,9 @@ namespace GraphQL.Instrumentation
         public string ReturnType { get; set; }
 
         // TODO: switch this to a histogram
-        public long Latency { get; set; }
+        public double Latency { get; set; }
 
-        public void AddLatency(long duration)
+        public void AddLatency(double duration)
         {
             Latency += duration;
         }
@@ -119,7 +119,7 @@ namespace GraphQL.Instrumentation
 
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public long Duration { get; set; }
+        public double Duration { get; set; }
 
         public Dictionary<string, StatsPerSignature> PerSignature { get; set; }
         public Type[] Types { get; set; }

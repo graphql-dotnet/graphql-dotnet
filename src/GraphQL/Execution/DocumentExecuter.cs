@@ -227,7 +227,7 @@ namespace GraphQL
                             await listener.BeforeExecutionAsync(config.UserContext, config.CancellationToken).ConfigureAwait(false);
                         }
 
-                        await OnExecution(config, context, result);
+                        await OnExecution(config, context, result).ConfigureAwait(false);
 
                         foreach (var listener in config.Listeners)
                         {
@@ -308,7 +308,6 @@ namespace GraphQL
 
         public async Task<IDictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
         {
-
             var data = new ConcurrentDictionary<string, object>();
             var externalTasks = new List<Task>();
 
@@ -321,7 +320,8 @@ namespace GraphQL
 
                 if (fieldType?.Resolver == null || !fieldType.Resolver.RunThreaded() || context.Operation.OperationType == OperationType.Mutation || fields.Count == 1)
                 {
-                    await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath);
+                    await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
@@ -333,7 +333,8 @@ namespace GraphQL
 
             if (externalTasks.Count > 0)
             {
-                await Task.WhenAll(externalTasks);
+                await Task.WhenAll(externalTasks)
+                    .ConfigureAwait(false);
             }
 
             var ordered = new Dictionary<string, object>();
@@ -372,13 +373,15 @@ namespace GraphQL
 
             if (CanResolveFromData(field, fieldType))
             {
-                var result = ResolveFieldFromData(context, rootType, source, fieldType, field, path);
+                var result = await ResolveFieldFromDataAsync(context, rootType, source, fieldType, field, path)
+                    .ConfigureAwait(false);
 
                 data.TryAdd(name, result);
             }
             else
             {
-                var result = await ResolveFieldAsync(context, rootType, source, field, path);
+                var result = await ResolveFieldAsync(context, rootType, source, field, path)
+                    .ConfigureAwait(false);
 
                 if (result.Skip)
                 {
@@ -418,7 +421,7 @@ namespace GraphQL
         /// <summary>
         ///     Resolve simple fields in a performant manor
         /// </summary>
-        private static object ResolveFieldFromData(ExecutionContext context, IObjectGraphType rootType, object source,
+        private static async Task<object> ResolveFieldFromDataAsync(ExecutionContext context, IObjectGraphType rootType, object source,
             FieldType fieldType, Field field, IEnumerable<string> path)
         {
             object result = null;
@@ -430,6 +433,9 @@ namespace GraphQL
                     var rfc = new ResolveFieldContext(context, field, fieldType, source, rootType, null, path);
 
                     result = fieldType.Resolver.Resolve(rfc);
+
+                    result = await UnwrapResultAsync(result)
+                        .ConfigureAwait(false);
                 }
                 else
                 {
@@ -449,6 +455,9 @@ namespace GraphQL
                 error.AddLocation(field, context.Document);
                 error.Path = path.ToList();
                 context.Errors.Add(error);
+
+                // If there was an exception, the value of result cannot be trusted
+                result = null;
             }
 
             return result;
@@ -504,30 +513,43 @@ namespace GraphQL
                 var resolver = fieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
-                if (result is Task)
-                {
-                    var task = result as Task;
-                    if (task.IsFaulted)
-                    {
-                        var aggregateException = task.Exception;
-                        var exception = aggregateException.InnerExceptions.Count == 1
-                            ? aggregateException.InnerException
-                            : aggregateException;
-                        return GenerateError(resolveResult, field, context, exception, fieldPath);
-                    }
-                    await task.ConfigureAwait(false);
+                result = await UnwrapResultAsync(result)
+                    .ConfigureAwait(false);
 
-                    result = task.GetProperyValue("Result");
-                }
+                resolveResult.Value = await CompleteValueAsync(context, parentType, fieldDefinition.ResolvedType, field, result, fieldPath)
+                    .ConfigureAwait(false);
 
-                resolveResult.Value =
-                    await CompleteValueAsync(context, parentType, fieldDefinition.ResolvedType, field, result, fieldPath).ConfigureAwait(false);
                 return resolveResult;
             }
             catch (Exception exc)
             {
                 return GenerateError(resolveResult, field, context, exc, path);
             }
+        }
+
+        /// <summary>
+        /// Unwrap nested Tasks to get the result
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private static async Task<object> UnwrapResultAsync(object result)
+        {
+            while (result is Task task)
+            {
+                await task.ConfigureAwait(false);
+
+                // Most performant if available
+                if (task is Task<object> t)
+                {
+                    result = t.Result;
+                }
+                else
+                {
+                    result = ((dynamic)task).Result;
+                }
+            }
+
+            return result;
         }
 
         private IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
@@ -592,9 +614,8 @@ namespace GraphQL
 
             if (fieldType is ListGraphType)
             {
-                var results = await ResolveListFromData(context, result, parentType, fieldType, field, path);
-
-                return results;
+                return await ResolveListFromData(context, result, parentType, fieldType, field, path)
+                    .ConfigureAwait(false);
             }
 
             var objectType = fieldType as IObjectGraphType;
@@ -673,13 +694,15 @@ namespace GraphQL
 
                 if (subType != null)
                 {
-                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, currentPath);
+                    var nodeResult = await ExecuteFieldsAsync(context, subType, node, subFields, currentPath)
+                        .ConfigureAwait(false);
 
                     result.Add(nodeResult);
                 }
                 else
                 {
-                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, currentPath).ConfigureAwait(false);
+                    var nodeResult = await CompleteValueAsync(context, parentType, listInfo?.ResolvedType, field, node, currentPath)
+                        .ConfigureAwait(false);
 
                     result.Add(nodeResult);
                 }

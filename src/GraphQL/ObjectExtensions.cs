@@ -38,7 +38,7 @@ namespace GraphQL
 
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
-            // Short-circuit conversion if the property value already 
+            // Short-circuit conversion if the property value already
             if (fieldType.IsInstanceOfType(propertyValue))
             {
                 return propertyValue;
@@ -56,10 +56,20 @@ namespace GraphQL
             if (fieldType.Name != "String"
                 && enumerableInterface != null)
             {
+                IList newArray;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
-                var genericListType = typeof(List<>).MakeGenericType(elementType);
-                var newArray = (IList) Activator.CreateInstance(genericListType);
+                var implementsIList = fieldType.GetInterface("IList") != null;
+
+                if (implementsIList)
+                {
+                    newArray = (IList)Activator.CreateInstance(fieldType);
+                }
+                else
+                {
+                    var genericListType = typeof(List<>).MakeGenericType(elementType);
+                    newArray = (IList)Activator.CreateInstance(genericListType);
+                }
 
                 var valueList = propertyValue as IEnumerable;
                 if (valueList == null) return newArray;
@@ -131,9 +141,22 @@ namespace GraphQL
         {
             if (value == null) return null;
 
-            if (fieldType == typeof(DateTime) && value is DateTime)
+            // exact type match
+            if (fieldType.IsInstanceOfType(value))
             {
                 return value;
+            }
+
+            // DateTime -> DateTimeOffset convertion
+            if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
+            {
+                return (DateTimeOffset)dateTimeValue;
+            }
+
+            // DateTimeOffset -> DateTime convertion
+            if(fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
+            {
+                return dateTimeOffsetValue.DateTime;
             }
 
             string text;
