@@ -11,7 +11,7 @@ namespace DataLoader.Tests.Types
         {
             Name = "Query";
 
-            Field<ListGraphType<UserType>>()
+            Field<ListGraphType<UserType>, IEnumerable<User>>()
                 .Name("Users")
                 .Description("Get all Users")
                 .Returns<IEnumerable<User>>()
@@ -23,11 +23,10 @@ namespace DataLoader.Tests.Types
                     return loader.LoadAsync();
                 });
 
-            Field<OrderType>()
+            Field<OrderType, Order>()
                 .Name("Order")
                 .Description("Get Order by ID")
                 .Argument<NonNullGraphType<IntGraphType>>("orderId", "")
-                .Returns<Order>()
                 .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddBatchLoader<int, Order>("GetOrderById",
@@ -36,10 +35,9 @@ namespace DataLoader.Tests.Types
                     return loader.LoadAsync(ctx.GetArgument<int>("orderId"));
                 });
 
-            Field<ListGraphType<OrderType>>()
+            Field<ListGraphType<OrderType>, IEnumerable<Order>>()
                 .Name("Orders")
                 .Description("Get all Orders")
-                .Returns<IEnumerable<Order>>()
                 .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddLoader("GetAllOrders",

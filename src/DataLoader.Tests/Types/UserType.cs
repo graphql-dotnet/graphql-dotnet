@@ -16,9 +16,8 @@ namespace DataLoader.Tests.Types
             Field(x => x.LastName);
             Field(x => x.Email);
 
-            Field<ListGraphType<OrderType>>()
+            Field<ListGraphType<OrderType>, IEnumerable<Order>>()
                 .Name("Orders")
-                .Returns<IEnumerable<Order>>()
                 .ResolveAsync(ctx =>
                 {
                     var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",

@@ -14,9 +14,8 @@ namespace DataLoader.Tests.Types
             Field(x => x.OrderedOn);
             Field(x => x.Total);
 
-            Field<UserType>()
+            Field<UserType, User>()
                 .Name("User")
-                .Returns<User>()
                 .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersById",
