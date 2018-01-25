@@ -13,11 +13,6 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public bool RunThreaded()
-        {
-            return false;
-        }
-
         public TProperty Resolve(ResolveFieldContext context)
         {
             return _property(context.As<TSourceType>().Source);

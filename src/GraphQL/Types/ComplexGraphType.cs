@@ -124,7 +124,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<ResolveFieldContext<TSourceType>, Task<object>> resolve = null,
             string deprecationReason = null)
         {
             return AddField(new FieldType
@@ -135,28 +135,7 @@ namespace GraphQL.Types
                 Type = type,
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new SlowFuncFieldResolver<TSourceType, object>(resolve)
-                    : null,
-            });
-        }
-
-        public FieldType FieldAsync<TGraphType>(
-            string name,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            string deprecationReason = null)
-            where TGraphType : IGraphType
-        {
-            return AddField(new FieldType
-            {
-                Name = name,
-                Description = description,
-                DeprecationReason = deprecationReason,
-                Type = typeof(TGraphType),
-                Arguments = arguments,
-                Resolver = resolve != null
-                    ? new SlowFuncFieldResolver<TSourceType, object>(resolve)
+                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
                     : null,
             });
         }
@@ -177,7 +156,28 @@ namespace GraphQL.Types
                 Type = typeof(TGraphType),
                 Arguments = arguments,
                 Resolver = resolve != null
-                    ? new SlowFuncFieldResolver<TSourceType, Task<object>>(resolve)
+                    ? new AsyncFieldResolver<TSourceType, object>(resolve)
+                    : null
+            });
+        }
+
+        public FieldType FieldAsync<TGraphType, TReturnType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
+            string deprecationReason = null)
+            where TGraphType : IGraphType
+        {
+            return AddField(new FieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = typeof(TGraphType),
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new AsyncFieldResolver<TSourceType, TReturnType>(resolve)
                     : null
             });
         }

@@ -25,11 +25,6 @@ namespace GraphQL.Instrumentation
             return Task.FromResult(result);
         }
 
-        public bool RunThreaded()
-        {
-            return _next.RunThreaded();
-        }
-
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);

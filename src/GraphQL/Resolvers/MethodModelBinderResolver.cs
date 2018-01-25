@@ -20,11 +20,6 @@ namespace GraphQL.Resolvers
             _parameters = _methodInfo.GetParameters();
         }
 
-        public bool RunThreaded()
-        {
-            return true;
-        }
-
         public object Resolve(ResolveFieldContext context)
         {
             object[] arguments = null;
