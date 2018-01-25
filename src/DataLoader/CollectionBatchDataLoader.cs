@@ -8,8 +8,6 @@ namespace DataLoader
 {
     public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<ILookup<TKey, T>>, IDataLoader<TKey, IEnumerable<T>>
     {
-        private static readonly ILookup<TKey, T> EmptyResult = Enumerable.Empty<T>().ToLookup(_ => default(TKey));
-
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
         private readonly Dictionary<TKey, IEnumerable<T>> _cache;
         private readonly List<TKey> _pendingKeys = new List<TKey>();
@@ -55,10 +53,18 @@ namespace DataLoader
 
                 // Otherwise add to pending keys
                 _pendingKeys.Add(key);
+            }
 
-                // Return task which will complete when this loader is dispatched
-                return DataLoaded.ContinueWith(task => task.Result[key],
-                    TaskContinuationOptions.OnlyOnRanToCompletion);
+            // Return task which will complete when this loader is dispatched
+            return DataLoaded.ContinueWith(task => task.Result[key],
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
+        protected override bool IsFetchNeeded()
+        {
+            lock (_cache)
+            {
+                return _pendingKeys.Count > 0;
             }
         }
 
@@ -68,10 +74,6 @@ namespace DataLoader
 
             lock (_cache)
             {
-                // If there's nothing to load, return an empty dictionary
-                if (_pendingKeys.Count == 0)
-                    return EmptyResult;
-
                 // Get pending keys and clear pending list
                 keys = _pendingKeys.ToArray();
                 _pendingKeys.Clear();

@@ -28,15 +28,21 @@ namespace DataLoader
             }
         }
 
+        protected override bool IsFetchNeeded()
+        {
+            lock (_lock)
+            {
+                // No need to re-fetch if we have a cached task
+                return _cachedTask == null;
+            }
+        }
+
         protected override Task<T> FetchAsync(CancellationToken cancellationToken)
         {
             lock (_lock)
             {
-                if (_cachedTask == null)
-                {
-                    // Cache the task
-                    _cachedTask = _loader(cancellationToken);
-                }
+                // Cache the task
+                _cachedTask = _loader(cancellationToken);
             }
 
             return _cachedTask;

@@ -7,11 +7,6 @@ using System.Threading;
 
 namespace DataLoader
 {
-    public interface IDataLoaderContextAccessor
-    {
-        DataLoaderContext Context { get; set; }
-    }
-
     public class DataLoaderContextAccessor : IDataLoaderContextAccessor
     {
 #if NET45
