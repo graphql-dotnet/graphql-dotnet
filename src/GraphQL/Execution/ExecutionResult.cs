@@ -12,11 +12,11 @@ namespace GraphQL
 
         public ExecutionErrors Errors { get; set; }
 
-        public string Query { get; set; }
+        //public string Query { get; set; }
 
-        public Document Document { get; set; }
+        //public Document Document { get; set; }
 
-        public Operation Operation { get; set; }
+        //public Operation Operation { get; set; }
 
         public PerfRecord[] Perf { get; set; }
 
