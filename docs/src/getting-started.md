@@ -185,7 +185,7 @@ You can pass variables recieved from the client to the execution engine by using
 Here is what a query looks like with a variable:
 
 ```graphql
-query DroidQuery($droidId: String) {
+query DroidQuery($droidId: String!) {
   droid(id: $droidId) {
     id
     name
