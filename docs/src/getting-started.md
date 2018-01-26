@@ -197,7 +197,7 @@ Here is what this query would look like as a JSON request:
 
 ```json
 {
- "query": "query DroidQuery($droidId: String) { droid(id: $droidId) { id name } }",
+ "query": "query DroidQuery($droidId: String!) { droid(id: $droidId) { id name } }",
  "variables": {
    "droidId": "1"
  }
