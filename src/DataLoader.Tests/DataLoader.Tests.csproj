@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="22.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0-pre-05" />
     <PackageReference Include="Shouldly" Version="2.8.3" />
@@ -19,8 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataLoader\DataLoader.csproj" />
-    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
-    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 
 </Project>

@@ -21,22 +21,29 @@ namespace DataLoader.Tests.Stores
         private int _getAllUsersCalled;
         public int GetAllUsersCalledCount => _getAllUsersCalled;
 
-        public async Task<Dictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds)
+        public async Task<Dictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             Interlocked.Increment(ref _getUsersByIdCalled);
 
             await Task.Delay(1);
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             return _users
                 .Join(userIds, u => u.UserId, x => x, (u, _) => u)
                 .ToDictionary(u => u.UserId);
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<User>> GetAllUsersAsync(
+            CancellationToken cancellationToken = default(CancellationToken),
+            int delayMs = 1)
         {
             Interlocked.Increment(ref _getAllUsersCalled);
 
-            await Task.Delay(1);
+            await Task.Delay(delayMs);
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             return _users.AsReadOnly();
         }

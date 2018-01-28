@@ -1,10 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading;
+using DataLoader;
 using DataLoader.Tests.Stores;
-using DataLoader.Tests.Types;
-using GraphQL;
-using GraphQL.DataLoader;
+using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -14,7 +13,7 @@ using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public abstract class QueryTestBase
     {

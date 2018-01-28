@@ -1,7 +1,7 @@
 using System;
 using GraphQL;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public class DependencyResolver : IDependencyResolver
     {

@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
-    public class DataLoaderTests : QueryTestBase
+    public class DataLoaderQueryTests : QueryTestBase
     {
         [Fact]
         public void SingleQueryRoot_Works()
@@ -93,7 +93,7 @@ namespace DataLoader.Tests
             users.GetUsersByIdCalledCount.ShouldBe(1);
         }
 
-        [Fact]
+        [Fact(Skip = "ParallelExecutionStrategy not yet optimized")]
         public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
             var orders = Services.GetRequiredService<OrdersStore>();

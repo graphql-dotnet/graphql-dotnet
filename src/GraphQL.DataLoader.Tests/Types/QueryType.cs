@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using DataLoader;
 using DataLoader.Tests.Models;
 using DataLoader.Tests.Stores;
 using GraphQL.Types;
 
-namespace DataLoader.Tests.Types
+namespace GraphQL.DataLoader.Tests.Types
 {
     public class QueryType : ObjectGraphType
     {
@@ -18,7 +19,7 @@ namespace DataLoader.Tests.Types
                 .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
-                        users.GetAllUsersAsync);
+                        () => users.GetAllUsersAsync());
 
                     return loader.LoadAsync();
                 });

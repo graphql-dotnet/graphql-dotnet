@@ -13,7 +13,7 @@ namespace DataLoader
 
         protected abstract bool IsFetchNeeded();
 
-        public void Dispatch(CancellationToken cancellationToken)
+        public void Dispatch(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!IsFetchNeeded())
             {
@@ -21,6 +21,14 @@ namespace DataLoader
             }
 
             var cts = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<T>());
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                // If cancellation has been requested already,
+                // set the task to cancelled without calling FetchAsync()
+                cts.TrySetCanceled();
+                return;
+            }
 
             FetchAsync(cancellationToken).ContinueWith(task =>
             {

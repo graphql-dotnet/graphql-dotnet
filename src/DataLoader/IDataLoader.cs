@@ -5,7 +5,7 @@ namespace DataLoader
 {
     public interface IDataLoader
     {
-        void Dispatch(CancellationToken cancellationToken);
+        void Dispatch(CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public interface IDataLoader<T>

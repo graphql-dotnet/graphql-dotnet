@@ -45,7 +45,7 @@ namespace DataLoader
         /// Dispatch all queued data loaders
         /// </summary>
         /// <param name="cancellationToken"></param>
-        public void DispatchAll(CancellationToken cancellationToken)
+        public void DispatchAll(CancellationToken cancellationToken = default(CancellationToken))
         {
             lock (_loaders)
             {

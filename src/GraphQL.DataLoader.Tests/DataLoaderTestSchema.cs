@@ -1,8 +1,8 @@
 using System;
-using DataLoader.Tests.Types;
+using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Types;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public class DataLoaderTestSchema : Schema
     {

@@ -1,8 +1,9 @@
+using DataLoader;
 using DataLoader.Tests.Models;
 using DataLoader.Tests.Stores;
 using GraphQL.Types;
 
-namespace DataLoader.Tests.Types
+namespace GraphQL.DataLoader.Tests.Types
 {
     public class OrderType : ObjectGraphType<Order>
     {
