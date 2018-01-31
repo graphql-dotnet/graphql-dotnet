@@ -7,6 +7,6 @@ namespace GraphQL.Execution
 {
     public interface IExecutionStrategy
     {
-        Task<ExecutionResult> ExecuteAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields);
+        Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
     }
 }

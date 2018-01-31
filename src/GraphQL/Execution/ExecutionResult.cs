@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -12,16 +13,27 @@ namespace GraphQL
 
         public ExecutionErrors Errors { get; set; }
 
-        //public string Query { get; set; }
-
-        //public Document Document { get; set; }
-
-        //public Operation Operation { get; set; }
-
         public PerfRecord[] Perf { get; set; }
 
         public bool ExposeExceptions { get; set; }
 
         public Dictionary<string, object> Extensions { get; set; }
+
+        public ExecutionResult()
+        {
+
+        }
+
+        protected ExecutionResult(ExecutionResult result)
+        {
+            if (result == null)
+                throw new ArgumentNullException(nameof(result));
+
+            Data = result.Data;
+            Errors = result.Errors;
+            Perf = result.Perf;
+            ExposeExceptions = result.ExposeExceptions;
+            Extensions = result.Extensions;
+        }
     }
 }

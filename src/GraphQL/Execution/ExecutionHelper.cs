@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -9,13 +11,81 @@ namespace GraphQL.Execution
 {
     public static class ExecutionHelper
     {
+        public static IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
+        {
+            IObjectGraphType type;
+
+            ExecutionError error;
+
+            switch (operation.OperationType)
+            {
+                case OperationType.Query:
+                    type = schema.Query;
+                    break;
+
+                case OperationType.Mutation:
+                    type = schema.Mutation;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for mutations");
+                        error.AddLocation(operation, document);
+                        throw error;
+                    }
+                    break;
+
+                case OperationType.Subscription:
+                    type = schema.Subscription;
+                    if (type == null)
+                    {
+                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error.AddLocation(operation, document);
+                        throw error;
+                    }
+                    break;
+
+                default:
+                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
+                    error.AddLocation(operation, document);
+                    throw error;
+            }
+
+            return type;
+        }
+
+        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        {
+            if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
+            {
+                return SchemaIntrospection.SchemaMeta;
+            }
+            if (field.Name == SchemaIntrospection.TypeMeta.Name && schema.Query == parentType)
+            {
+                return SchemaIntrospection.TypeMeta;
+            }
+            if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
+            {
+                return SchemaIntrospection.TypeNameMeta;
+            }
+
+            if (parentType == null)
+            {
+                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
+                error.AddLocation(field, document);
+                throw error;
+            }
+
+            return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
+        }
+
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
             variableDefinitions?.Apply(v =>
             {
-                var variable = new Variable();
-                variable.Name = v.Name;
+                var variable = new Variable
+                {
+                    Name = v.Name
+                };
 
                 object variableValue = null;
                 inputs?.TryGetValue(v.Name, out variableValue);
@@ -40,15 +110,12 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null)
+            if (input == null && variable.DefaultValue != null)
             {
-                if (variable.DefaultValue != null)
-                {
-                    return variable.DefaultValue.Value;
-                }
+                return variable.DefaultValue.Value;
             }
-            var coercedValue = CoerceValue(schema, type, input.AstFromValue(schema, type));
-            return coercedValue;
+
+            return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
         public static void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
@@ -71,22 +138,19 @@ namespace GraphQL.Execution
                 return;
             }
 
-            if (type is ScalarGraphType)
+            if (type is ScalarGraphType scalar)
             {
-                var scalar = (ScalarGraphType)type;
                 if (ValueFromScalar(scalar, input) == null)
                     throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
 
                 return;
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType listType)
             {
-                var listType = (ListGraphType)type;
                 var listItemType = listType.ResolvedType;
 
-                var list = input as IEnumerable;
-                if (list != null && !(input is string))
+                if (input is IEnumerable list && !(input is string))
                 {
                     var index = -1;
                     foreach (var item in list)
@@ -115,7 +179,7 @@ namespace GraphQL.Execution
                     ? dict.Keys.Where(key => complexType.Fields.All(field => field.Name != key)).ToArray()
                     : null;
 
-                if (unknownFields != null && unknownFields.Any())
+                if (unknownFields?.Any() == true)
                 {
                     throw new InvalidValueException(fieldName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
@@ -123,8 +187,7 @@ namespace GraphQL.Execution
 
                 foreach (var field in complexType.Fields)
                 {
-                    object fieldValue;
-                    dict.TryGetValue(field.Name, out fieldValue);
+                    dict.TryGetValue(field.Name, out object fieldValue);
                     AssertValidValue(schema, field.ResolvedType, fieldValue, $"{fieldName}.{field.Name}");
                 }
                 return;
@@ -176,17 +239,16 @@ namespace GraphQL.Execution
                 return null;
             }
 
-            var variable = input as VariableReference;
-            if (variable != null)
+            if (input is VariableReference variable)
             {
                 return variables?.ValueFor(variable.Name);
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType listType)
             {
-                var listType = type as ListGraphType;
                 var listItemType = listType.ResolvedType;
                 var list = input as ListValue;
+
                 return list != null
                     ? list.Values.Map(item => CoerceValue(schema, listItemType, item, variables)).ToArray()
                     : new[] { CoerceValue(schema, listItemType, input, variables) };
@@ -241,9 +303,8 @@ namespace GraphQL.Execution
 
             selectionSet?.Selections.Apply(selection =>
             {
-                if (selection is Field)
+                if (selection is Field field)
                 {
-                    var field = (Field)selection;
                     if (!ShouldIncludeNode(context, field.Directives))
                     {
                         return;
@@ -252,10 +313,8 @@ namespace GraphQL.Execution
                     var name = field.Alias ?? field.Name;
                     fields[name] = field;
                 }
-                else if (selection is FragmentSpread)
+                else if (selection is FragmentSpread spread)
                 {
-                    var spread = (FragmentSpread)selection;
-
                     if (visitedFragmentNames.Contains(spread.Name)
                         || !ShouldIncludeNode(context, spread.Directives))
                     {
@@ -274,10 +333,8 @@ namespace GraphQL.Execution
 
                     CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
                 }
-                else if (selection is InlineFragment)
+                else if (selection is InlineFragment inline)
                 {
-                    var inline = (InlineFragment)selection;
-
                     var name = inline.Type != null ? inline.Type.Name : specificType.Name;
 
                     if (!ShouldIncludeNode(context, inline.Directives)
@@ -306,11 +363,9 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    object ifObj;
-                    values.TryGetValue("if", out ifObj);
+                    values.TryGetValue("if", out object ifObj);
 
-                    bool ifVal;
-                    return !(bool.TryParse(ifObj?.ToString() ?? string.Empty, out ifVal) && ifVal);
+                    return !(bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal);
                 }
 
                 directive = directives.Find(DirectiveGraphType.Include.Name);
@@ -322,11 +377,8 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    object ifObj;
-                    values.TryGetValue("if", out ifObj);
-
-                    bool ifVal;
-                    return bool.TryParse(ifObj?.ToString() ?? string.Empty, out ifVal) && ifVal;
+                    values.TryGetValue("if", out object ifObj);
+                    return bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
                 }
             }
 
@@ -352,9 +404,8 @@ namespace GraphQL.Execution
                 return true;
             }
 
-            if (conditionalType is IAbstractGraphType)
+            if (conditionalType is IAbstractGraphType abstractType)
             {
-                var abstractType = (IAbstractGraphType)conditionalType;
                 return abstractType.IsPossibleType(type);
             }
 
@@ -395,10 +446,21 @@ namespace GraphQL.Execution
 
             var subFields = new Dictionary<string, Field>();
             var visitedFragments = new List<string>();
-            var fields = CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
-            return fields;
+            return CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
         }
 
+        public static string[] AppendPath(string[] path, string pathSegment)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
 
+            var newPath = new string[path.Length + 1];
+
+            path.CopyTo(newPath, 0);
+
+            newPath[path.Length] = pathSegment;
+
+            return newPath;
+        }
     }
 }

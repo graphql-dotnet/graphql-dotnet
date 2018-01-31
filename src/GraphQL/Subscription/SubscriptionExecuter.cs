@@ -23,7 +23,16 @@ namespace GraphQL.Subscription
 
         public async Task<SubscriptionExecutionResult> SubscribeAsync(ExecutionOptions config)
         {
-            return await ExecuteAsync(config).ConfigureAwait(false) as SubscriptionExecutionResult;
+            var result = await ExecuteAsync(config).ConfigureAwait(false);
+
+            if (result is SubscriptionExecutionResult subscriptionResult)
+            {
+                return subscriptionResult;
+            }
+            else
+            {
+                return new SubscriptionExecutionResult(result);
+            }
         }
     }
 }
