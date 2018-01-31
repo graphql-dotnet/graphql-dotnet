@@ -1,6 +1,6 @@
-using DataLoader.Tests.Stores;
+using GraphQL.DataLoader.Tests.Stores;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public abstract class DataLoaderTestBase
     {

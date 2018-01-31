@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Models;
 
-namespace DataLoader.Tests.Stores
+namespace GraphQL.DataLoader.Tests.Stores
 {
     public class OrdersStore
     {

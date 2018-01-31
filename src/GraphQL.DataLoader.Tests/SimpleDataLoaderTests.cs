@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Models;
 using Shouldly;
 using Xunit;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public class SimpleDataLoaderTests : DataLoaderTestBase
     {

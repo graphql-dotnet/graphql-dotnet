@@ -1,5 +1,5 @@
-using DataLoader.Tests.Models;
-using DataLoader.Tests.Stores;
+using GraphQL.DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

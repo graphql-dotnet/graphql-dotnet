@@ -17,9 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataLoader.Tests\DataLoader.Tests.csproj" />
-    <ProjectReference Include="..\DataLoader\DataLoader.csproj" />
-    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 

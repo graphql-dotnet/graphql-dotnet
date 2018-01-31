@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DataLoader
+namespace GraphQL.DataLoader
 {
     public class SimpleDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
     {

@@ -11,11 +11,6 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.1'">
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
-    <PackageTargetFallback>dnxcore50</PackageTargetFallback>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />

@@ -1,4 +1,4 @@
-namespace DataLoader
+namespace GraphQL.DataLoader
 {
     public interface IDataLoaderContextAccessor
     {

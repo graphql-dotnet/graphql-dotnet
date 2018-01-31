@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DataLoader
+namespace GraphQL.DataLoader
 {
     public interface IDataLoader
     {

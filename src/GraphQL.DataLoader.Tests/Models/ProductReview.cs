@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataLoader.Tests.Models
+namespace GraphQL.DataLoader.Tests.Models
 {
     public class ProductReview
     {

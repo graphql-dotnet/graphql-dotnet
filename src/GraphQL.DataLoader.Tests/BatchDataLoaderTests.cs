@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Models;
 using Nito.AsyncEx;
 using Shouldly;
 using Xunit;
 
-namespace DataLoader.Tests
+namespace GraphQL.DataLoader.Tests
 {
     public class BatchDataLoaderTests : DataLoaderTestBase
     {

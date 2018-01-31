@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DataLoader.Tests.Models
+namespace GraphQL.DataLoader.Tests.Models
 {
     public class Order
     {

@@ -5,7 +5,7 @@ using System.Runtime.Remoting;
 using System.Threading;
 #endif
 
-namespace DataLoader
+namespace GraphQL.DataLoader
 {
     public class DataLoaderContextAccessor : IDataLoaderContextAccessor
     {
