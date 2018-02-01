@@ -1,27 +1,17 @@
-import { exec, pushd, popd } from 'shelljs';
+import exec from './exec'
 import Deferred from './Deferred';
 import settings from './settings';
 
-export default function testDotnet() {
-  const deferred = new Deferred();
-
+function test(project) {
   const platform = process.platform === 'darwin'
     ? '-f netcoreapp2.0'
     : '';
-  const test = `dotnet test ${platform} -c ${settings.target}`;
+  const cmd = `dotnet test ${platform} "${project}" -c ${settings.target}`
+  return exec(cmd)
+}
 
-  pushd('src/GraphQL.Tests')
-  console.log(test);
-
-  exec(test, {async:true}, (code, stdout, stderr)=> {
-    if(code === 0) {
-      deferred.resolve();
-    } else {
-      deferred.reject(stderr);
-    }
-  });
-
-  popd();
-
-  return deferred.promise;
+export default function testDotnet() {
+  return Promise.all([
+    test('./src/GraphQL.Tests')
+  ])
 }
