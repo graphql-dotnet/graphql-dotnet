@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -11,6 +11,17 @@ namespace GraphQL.Tests.Subscription
 {
     public class SubscriptionTests
     {
+        protected async Task<SubscriptionExecutionResult> SubscribeAsync(ExecutionOptions options)
+        {
+            var executer = new DocumentExecuter();
+
+            var result = await executer.ExecuteAsync(options);
+
+            result.ShouldBeOfType<SubscriptionExecutionResult>();
+
+            return (SubscriptionExecutionResult)result;
+        }
+
         [Fact]
         public async Task Subscribe()
         {
@@ -27,10 +38,9 @@ namespace GraphQL.Tests.Subscription
             };
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await SubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
                 Schema = schema
@@ -64,10 +74,9 @@ namespace GraphQL.Tests.Subscription
             };
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await SubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
@@ -94,10 +103,9 @@ namespace GraphQL.Tests.Subscription
             /* Given */
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await SubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
                 Schema = schema

@@ -18,11 +18,6 @@ namespace GraphQL.Resolvers
             return _resolver(context);
         }
 
-        public bool RunThreaded()
-        {
-            return false;
-        }
-
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
@@ -40,11 +35,6 @@ namespace GraphQL.Resolvers
                 throw new ArgumentNullException("A resolver function must be specified");
             }
             _resolver = resolver;
-        }
-
-        public bool RunThreaded()
-        {
-            return false;
         }
 
         public TReturnType Resolve(ResolveFieldContext context)

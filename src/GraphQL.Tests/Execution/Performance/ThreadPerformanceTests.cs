@@ -26,8 +26,8 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Query";
 
-                FieldAsync<StringGraphType>("halfSecond", resolve: c => Get(500, "Half"));
-                FieldAsync<StringGraphType>("quarterSecond", resolve: c => Get(500, "Quarter"));
+                FieldAsync<StringGraphType, string>("halfSecond", resolve: c => Get(500, "Half"));
+                FieldAsync<StringGraphType, string>("quarterSecond", resolve: c => Get(500, "Quarter"));
             }
 
             private async Task<string> Get(int milliseconds, string result)
@@ -45,8 +45,8 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Mutation";
 
-                FieldAsync<StringGraphType>("setFive", resolve: c => Set("5"));
-                FieldAsync<StringGraphType>("setOne", resolve: c => Set("1"));
+                FieldAsync<StringGraphType, string>("setFive", resolve: c => Set("5"));
+                FieldAsync<StringGraphType, string>("setOne", resolve: c => Set("1"));
             }
 
             private Task<string> Set(string result)

@@ -1,16 +1,15 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace GraphQL
 {
     public static class TaskExtensions
     {
-        public static Task CompletedTask
-        {
-            get
-            {
-                object result = null;
-                return Task.FromResult(result);
-            }
-        }
+
+#if NETSTANDARD2_0
+        public static Task CompletedTask => Task.CompletedTask;
+#else
+        public static Task CompletedTask { get; } = Task.FromResult(0);
+#endif
+
     }
 }
