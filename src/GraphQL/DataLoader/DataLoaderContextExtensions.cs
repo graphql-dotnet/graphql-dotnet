@@ -35,7 +35,7 @@ namespace GraphQL.DataLoader
         }
 
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<Dictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null)
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -43,11 +43,11 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer, defaultValue));
         }
 
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<Dictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null)
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -55,11 +55,11 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, defaultValue));
         }
 
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -70,11 +70,11 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, defaultValue));
         }
 
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -85,7 +85,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, defaultValue));
         }
 
         public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchFunc,

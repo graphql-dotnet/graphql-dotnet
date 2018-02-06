@@ -11,17 +11,23 @@ namespace GraphQL.DataLoader
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<Dictionary<TKey, T>>> _loader;
         private readonly List<TKey> _pendingKeys = new List<TKey>();
         private readonly Dictionary<TKey, T> _cache;
+        private readonly T _defaultValue;
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<Dictionary<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null)
+        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<Dictionary<TKey, T>>> loader,
+            IEqualityComparer<TKey> keyComparer = null,
+            T defaultValue = default(T))
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             _cache = new Dictionary<TKey, T>(keyComparer);
+            _defaultValue = defaultValue;
         }
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader, Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null)
+        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
+            Func<T, TKey> keySelector,
+            IEqualityComparer<TKey> keyComparer = null,
+            T defaultValue = default(T))
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
@@ -39,6 +45,7 @@ namespace GraphQL.DataLoader
 
             _loader = LoadAndMapToDictionary;
             _cache = new Dictionary<TKey, T>(keyComparer);
+            _defaultValue = defaultValue;
         }
 
         public Task<T> LoadAsync(TKey key)
@@ -46,7 +53,7 @@ namespace GraphQL.DataLoader
             lock (_cache)
             {
                 // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out var value))
+                if (_cache.TryGetValue(key, out T value))
                 {
                     return Task.FromResult(value);
                 }
@@ -56,8 +63,17 @@ namespace GraphQL.DataLoader
             }
 
             // Return task which will complete when this loader is dispatched
-            return DataLoaded.ContinueWith(task => task.Result[key],
-                TaskContinuationOptions.OnlyOnRanToCompletion);
+            return DataLoaded.ContinueWith(task =>
+            {
+                if (task.Result.TryGetValue(key, out T value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return _defaultValue;
+                }
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         protected override bool IsFetchNeeded()
@@ -84,9 +100,16 @@ namespace GraphQL.DataLoader
             // Populate cache
             lock (_cache)
             {
-                foreach (var kvp in dictionary)
+                foreach (TKey key in keys)
                 {
-                    _cache[kvp.Key] = kvp.Value;
+                    if (dictionary.TryGetValue(key, out T value))
+                    {
+                        _cache[key] = value;
+                    }
+                    else
+                    {
+                        _cache[key] = _defaultValue;
+                    }
                 }
             }
 
