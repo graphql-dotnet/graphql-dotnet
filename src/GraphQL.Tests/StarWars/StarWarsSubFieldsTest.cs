@@ -17,9 +17,9 @@ namespace GraphQL.Tests.StarWars
         public StarWarsQuery RootQuery;
 
         [Fact]
-        public void subfields_is_not_null_for_ListGraphType()
+        public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
         {
-            RootQuery.FieldAsync<ListGraphType<HumanType>>("listOfHumans", resolve: async (ctx) =>
+            RootQuery.Field<ListGraphType<HumanType>>("listOfHumans", resolve: (ctx) =>
             {
                 ctx.SubFields.ShouldNotBeNull();
                 ctx.SubFields.Keys.ShouldContain("id");
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.StarWars
         }
 
         [Fact]
-        public void subfields_is_not_null_for_custom_graph_type()
+        public void subfields_is_not_null_for_single_ObjectGraphType()
         {
             RootQuery.Field<HumanType>("singleHuman", resolve: (ctx) =>
             {
@@ -73,6 +73,65 @@ namespace GraphQL.Tests.StarWars
             ";
             AssertQuerySuccess(query, expected);
         }
+
+        [Fact]
+        public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
+        {
+            RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters", resolve: (ctx) =>
+            {
+                ctx.SubFields.ShouldNotBeNull();
+                ctx.SubFields.Keys.ShouldContain("id");
+                ctx.SubFields.Keys.ShouldContain("friends");
+                return new List<Human>();
+            });
+            var query = @"
+                {
+                    listOfCharacters {
+                        id
+                        friends {
+                            name
+                        }
+                    }
+                }
+            ";
+
+            var expected = @"
+                {
+                    listOfCharacters: []
+                }
+            ";
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void subfields_is_not_null_for_single_InterfaceGraphType()
+        {
+            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: (ctx) =>
+           {
+               ctx.SubFields.ShouldNotBeNull();
+               ctx.SubFields.Keys.ShouldContain("id");
+               ctx.SubFields.Keys.ShouldContain("friends");
+               return null;
+           });
+            var query = @"
+                {
+                    singleCharacter {
+                        id
+                        friends {
+                            name
+                        }
+                    }
+                }
+            ";
+
+            var expected = @"
+                {
+                    singleCharacter: null
+                }
+            ";
+            AssertQuerySuccess(query, expected);
+        }
+
 
         [Fact]
         public void subfields_does_not_throw_for_primative()
