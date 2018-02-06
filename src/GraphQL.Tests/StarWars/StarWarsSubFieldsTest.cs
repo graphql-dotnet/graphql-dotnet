@@ -21,7 +21,6 @@ namespace GraphQL.Tests.StarWars
         {
             RootQuery.FieldAsync<ListGraphType<HumanType>>("listOfHumans", resolve: async (ctx) =>
             {
-                //this test fails
                 ctx.SubFields.ShouldNotBeNull();
                 ctx.SubFields.Keys.ShouldContain("id");
                 ctx.SubFields.Keys.ShouldContain("friends");
