@@ -84,9 +84,9 @@ namespace GraphQL.DataLoader
             // Populate cache
             lock (_cache)
             {
-                foreach (var group in lookup)
+                foreach (TKey key in keys)
                 {
-                    _cache[group.Key] = group;
+                    _cache[key] = lookup[key].ToArray();
                 }
             }
 
