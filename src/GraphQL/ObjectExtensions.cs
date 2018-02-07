@@ -145,7 +145,7 @@ namespace GraphQL
         /// <param name="obj">The object to be read.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>System.Object.</returns>
-        public static object GetProperyValue(this object obj, string propertyName)
+        public static object GetPropertyValue(this object obj, string propertyName)
         {
             var val = obj.GetType()
                 .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)

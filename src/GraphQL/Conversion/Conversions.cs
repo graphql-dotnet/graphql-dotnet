@@ -73,7 +73,7 @@ namespace GraphQL.Conversion
             }
 
             yield return new EnumerationConversion();
-            yield return new NullableConvertor(this);
+            yield return new NullableConverter(this);
             yield return new ArrayConversion(this);
             yield return new StringConverterProvider();
         }

@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 
 namespace GraphQL.Conversion
 {
     // https://github.com/JasperFx/baseline/tree/master/src/Baseline/Conversion
-    public class NullableConvertor : IConversionProvider
+    public class NullableConverter : IConversionProvider
     {
         private readonly Conversions _conversions;
 
-        public NullableConvertor(Conversions conversions)
+        public NullableConverter(Conversions conversions)
         {
             _conversions = conversions;
         }

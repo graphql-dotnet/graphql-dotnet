@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -11,9 +11,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoUnusedFragments : IValidationRule
   {
-    public string UnusedFragMessage(string fragName)
+    public string UnusedFragmentMessage(string fragmentName)
     {
-      return $"Fragment \"{fragName}\" is never used.";
+      return $"Fragment \"{fragmentName}\" is never used.";
     }
 
     public INodeVisitor Validate(ValidationContext context)
@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Rules
               var fragName = fragmentDef.Name;
               if (!fragmentNameUsed.Contains(fragName))
               {
-                var error = new ValidationError(context.OriginalQuery, "5.4.1.4", UnusedFragMessage(fragName), fragmentDef);
+                var error = new ValidationError(context.OriginalQuery, "5.4.1.4", UnusedFragmentMessage(fragName), fragmentDef);
                 context.ReportError(error);
               }
             });
