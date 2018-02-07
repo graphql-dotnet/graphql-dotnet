@@ -1,19 +1,32 @@
-﻿using System;
+using GraphQL.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Types;
 
 namespace GraphQL
 {
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Conditionally casts the item into the indicated type using an "as" cast.
+        /// </summary>
+        /// <typeparam name="T">The desired type</typeparam>
+        /// <param name="item">The item.</param>
+        /// <returns><c>null</c> if the cast failed, otherwise item as T</returns>
         public static T As<T>(this object item)
             where T : class
         {
             return item as T;
         }
 
+        /// <summary>
+        /// Determines whether this instance is a concrete type.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified type is neither abstract nor an interface; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsConcrete(this Type type)
         {
             if (type == null) return false;
@@ -23,6 +36,13 @@ namespace GraphQL
             return !typeInfo.IsAbstract && !typeInfo.IsInterface;
         }
 
+        /// <summary>
+        /// Determines whether this instance is a subclass of Nullable&lt;T&gt;.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsNullable(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
@@ -32,6 +52,7 @@ namespace GraphQL
         /// <summary>
         /// Returns the first non-null value from executing the func against the enumerable
         /// </summary>
+        /// <returns><c>null</c> is all values were null.</returns>
         public static TReturn FirstValue<TItem, TReturn>(this IEnumerable<TItem> enumerable, Func<TItem, TReturn> func)
             where TReturn : class
         {
@@ -44,12 +65,24 @@ namespace GraphQL
             return null;
         }
 
+        /// <summary>
+        /// Determines whether the indicated type implements IGraphType.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>
+        ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
+        /// </returns>
         public static bool IsGraphType(this Type type)
         {
             return type.GetInterfaces().Contains(typeof(IGraphType));
         }
 
-		public static string GraphQLName(this Type type)
+        /// <summary>
+        /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
+        /// </summary>
+        /// <param name="type">The indicated type.</param>
+        /// <returns>A string containing a GraphQL compatible type name.</returns>
+        public static string GraphQLName(this Type type)
         {
             var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
 
@@ -72,6 +105,15 @@ namespace GraphQL
                 : typeName;
         }
 
+
+
+        /// <summary>
+        /// Gets the graph type for the indicated type.
+        /// </summary>
+        /// <param name="type">The type for which a graph type is desired.</param>
+        /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
+        /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
+        /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             TypeInfo info = type.GetTypeInfo();
@@ -87,7 +129,7 @@ namespace GraphQL
                 }
             }
 
-  
+
             if (type == typeof(int))
             {
                 graphType = typeof(IntGraphType);
@@ -130,7 +172,7 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
-            if(type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
                 var listType = typeof(ListGraphType<>);
@@ -139,7 +181,7 @@ namespace GraphQL
 
             if (graphType == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(type), 
+                throw new ArgumentOutOfRangeException(nameof(type),
                     $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
             }
 
@@ -152,6 +194,11 @@ namespace GraphQL
             return graphType;
         }
 
+        /// <summary>
+        /// Returns the method associated with the indicated field
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="field">The desired field.</param>
         public static MethodInfo MethodForField(this Type type, string field)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
