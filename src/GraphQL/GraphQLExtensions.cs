@@ -309,8 +309,8 @@ namespace GraphQL
         {
             if (type is NonNullGraphType)
             {
-                var nonnull = (NonNullGraphType)type;
-                return AstFromValue(value, schema, nonnull.ResolvedType);
+                var nonNull = (NonNullGraphType)type;
+                return AstFromValue(value, schema, nonNull.ResolvedType);
             }
 
             if (value == null || type == null)

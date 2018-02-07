@@ -1,10 +1,10 @@
+using GraphQL.Conversion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Conversion;
 
 namespace GraphQL
 {
@@ -15,7 +15,7 @@ namespace GraphQL
         public static T ToObject<T>(this IDictionary<string, object> source)
             where T : class, new()
         {
-            return (T) ToObject(source, typeof(T));
+            return (T)ToObject(source, typeof(T));
         }
 
         public static object ToObject(this IDictionary<string, object> source, Type type)
@@ -87,12 +87,12 @@ namespace GraphQL
             var nullableFieldType = Nullable.GetUnderlyingType(fieldType);
 
             // if this is a nullable type and the value is null, return null
-            if(nullableFieldType != null && value == null)
+            if (nullableFieldType != null && value == null)
             {
                 return null;
             }
 
-            if(nullableFieldType != null)
+            if (nullableFieldType != null)
             {
                 fieldType = nullableFieldType;
             }
@@ -147,14 +147,14 @@ namespace GraphQL
                 return value;
             }
 
-            // DateTime -> DateTimeOffset convertion
+            // DateTime -> DateTimeOffset conversion
             if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
             {
                 return (DateTimeOffset)dateTimeValue;
             }
 
-            // DateTimeOffset -> DateTime convertion
-            if(fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
+            // DateTimeOffset -> DateTime conversion
+            if (fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
             {
                 return dateTimeOffsetValue.DateTime;
             }

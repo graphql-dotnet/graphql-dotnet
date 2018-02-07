@@ -55,11 +55,11 @@ namespace GraphQL.Language
 
         public FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
-            var frag = new FragmentDefinition(Name(source.Name)).WithLocation(source, _body);
-            frag.Type = NamedType(source.TypeCondition);
-            frag.SelectionSet = SelectionSet(source.SelectionSet);
-            frag.Directives = Directives(source.Directives);
-            return frag;
+            var fragment = new FragmentDefinition(Name(source.Name)).WithLocation(source, _body);
+            fragment.Type = NamedType(source.TypeCondition);
+            fragment.SelectionSet = SelectionSet(source.SelectionSet);
+            fragment.Directives = Directives(source.Directives);
+            return fragment;
         }
 
         public FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
@@ -72,11 +72,11 @@ namespace GraphQL.Language
 
         public InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
-            var frag = new InlineFragment().WithLocation(source, _body);
-            frag.Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null;
-            frag.Directives = Directives(source.Directives);
-            frag.SelectionSet = SelectionSet(source.SelectionSet);
-            return frag;
+            var fragment = new InlineFragment().WithLocation(source, _body);
+            fragment.Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null;
+            fragment.Directives = Directives(source.Directives);
+            fragment.SelectionSet = SelectionSet(source.SelectionSet);
+            return fragment;
         }
 
         public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
