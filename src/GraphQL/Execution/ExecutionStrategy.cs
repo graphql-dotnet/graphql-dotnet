@@ -15,7 +15,7 @@ namespace GraphQL.Execution
     {
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields)
         {
-            var data = await ExecuteFieldsAsync(context, rootType, source, fields, new string[0])
+            var data = await ExecuteFieldsAsync(context, rootType, source, fields, Enumerable.Empty<string>())
                 .ConfigureAwait(false);
 
             return new ExecutionResult

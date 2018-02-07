@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -88,7 +88,7 @@ namespace GraphQL.Utilities
         {
             if (options == null)
             {
-                return new string[0];
+                return Enumerable.Empty<string>().ToArray(); //should be Array.Empty, but that's not in .NET 4.5
             }
 
             var optionsByDistance = new Dictionary<string, int>();

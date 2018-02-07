@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -56,7 +56,7 @@ namespace GraphQL.Validation.Rules
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Any()
-                                ? new string[] {}
+                                ? Enumerable.Empty<string>()
                                 : getSuggestedFieldNames(type, fieldName);
 
                             // Retport an error, including helpful suggestions.
