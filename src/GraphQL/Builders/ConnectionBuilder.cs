@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -46,7 +47,7 @@ namespace GraphQL.Builders
             var fieldType = new FieldType
             {
                 Type = typeof(ConnectionType<TGraphType>),
-                Arguments = new QueryArguments(new QueryArgument[0]),
+                Arguments = new QueryArguments(Enumerable.Empty<QueryArgument>()),
             };
             return new ConnectionBuilder<TGraphType, TSourceType>(fieldType, null, false, false, null)
                 .Unidirectional();

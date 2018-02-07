@@ -120,20 +120,20 @@ namespace GraphQL
             }
             else if (valueAst is NullValue)
             {
-                return new string[] { };
+                return Enumerable.Empty<string>();
             }
 
 
             if (valueAst == null)
             {
-                return new string[] {};
+                return Enumerable.Empty<string>();
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return new string[] {};
+                return Enumerable.Empty<string>();
             }
 
             if (type is ListGraphType)
@@ -144,7 +144,7 @@ namespace GraphQL
                 if (valueAst is ListValue)
                 {
                     var index = 0;
-                    return ((ListValue) valueAst).Values.Aggregate(new string[] {}, (acc, value) =>
+                    return ((ListValue) valueAst).Values.Aggregate(Enumerable.Empty<string>(), (acc, value) =>
                     {
                         var errors = IsValidLiteralValue(ofType, value, schema);
                         var result = acc.Concat(errors.Map(err => $"In element #{index}: {err}")).ToArray();
@@ -201,7 +201,7 @@ namespace GraphQL
                 return new [] {$"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}."};
             }
 
-            return new string[] {};
+            return Enumerable.Empty<string>();
         }
 
         public static string NameOf<T, P>(this Expression<Func<T, P>> expression)

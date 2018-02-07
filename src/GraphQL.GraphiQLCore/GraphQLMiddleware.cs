@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace GraphQL.GraphiQLCore
 {
@@ -33,11 +33,11 @@ namespace GraphQL.GraphiQLCore
         {
             if (!IsGraphQLRequest(context))
             {
-                await _next(context);
+                await _next(context).ConfigureAwait(false);
                 return;
             }
 
-            await ExecuteAsync(context, schema);
+            await ExecuteAsync(context, schema).ConfigureAwait(false);
         }
 
         private bool IsGraphQLRequest(HttpContext context)
@@ -63,9 +63,9 @@ namespace GraphQL.GraphiQLCore
                 _.OperationName = request.OperationName;
                 _.Inputs = request.Variables.ToInputs();
                 _.UserContext = _settings.BuildUserContext?.Invoke(context);
-            });
+            }).ConfigureAwait(false);
 
-            await WriteResponseAsync(context, result);
+            await WriteResponseAsync(context, result).ConfigureAwait(false);
         }
 
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result)
@@ -75,7 +75,7 @@ namespace GraphQL.GraphiQLCore
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
 
-            await context.Response.WriteAsync(json);
+            await context.Response.WriteAsync(json).ConfigureAwait(false);
         }
     }
 }

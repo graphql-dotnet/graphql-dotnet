@@ -1,12 +1,11 @@
-﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.StaticFiles;
+using System.IO;
 
 namespace GraphQL.GraphiQLCore
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             var host = new WebHostBuilder()
                 .UseKestrel()

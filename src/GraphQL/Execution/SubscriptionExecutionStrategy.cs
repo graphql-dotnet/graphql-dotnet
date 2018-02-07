@@ -15,7 +15,7 @@ namespace GraphQL.Execution
     {
         public override Task<ExecutionResult> ExecuteAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields)
         {
-            var streams = ExecuteSubscriptionFields(context, rootType, context.RootValue, fields, new string[0]);
+            var streams = ExecuteSubscriptionFields(context, rootType, context.RootValue, fields, Enumerable.Empty<string>());
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
