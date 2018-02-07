@@ -12,12 +12,23 @@ namespace GraphQL
     {
         private static readonly Lazy<Conversions> _conversions = new Lazy<Conversions>(() => new Conversions());
 
+        /// <summary>
+        /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// </summary>
+        /// <typeparam name="T">The type to create.</typeparam>
+        /// <param name="source">The source of values.</param>
+        /// <returns>T.</returns>
         public static T ToObject<T>(this IDictionary<string, object> source)
             where T : class, new()
         {
             return (T)ToObject(source, typeof(T));
         }
 
+        /// <summary>
+        /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// </summary>
+        /// <param name="source">The source of values.</param>
+        /// <param name="type">The type to create.</param>
         public static object ToObject(this IDictionary<string, object> source, Type type)
         {
             var obj = Activator.CreateInstance(type);
@@ -36,6 +47,12 @@ namespace GraphQL
             return obj;
         }
 
+        /// <summary>
+        /// Converts the indicated value into a type that is compatible with fieldType.
+        /// </summary>
+        /// <param name="propertyValue">The value to be converted.</param>
+        /// <param name="fieldType">The desired type.</param>
+        /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
             // Short-circuit conversion if the property value already
@@ -99,7 +116,7 @@ namespace GraphQL
 
             if (propertyValue is Dictionary<string, object>)
             {
-                return ToObject(propertyValue as Dictionary<string, object>, fieldType);
+                return ToObject((Dictionary<string, object>)propertyValue, fieldType);
             }
 
             if (fieldType.GetTypeInfo().IsEnum)
@@ -122,6 +139,12 @@ namespace GraphQL
             return ConvertValue(value, fieldType);
         }
 
+        /// <summary>
+        /// Gets the value of the named property.
+        /// </summary>
+        /// <param name="obj">The object to be read.</param>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns>System.Object.</returns>
         public static object GetProperyValue(this object obj, string propertyName)
         {
             var val = obj.GetType()
@@ -132,6 +155,13 @@ namespace GraphQL
         }
 
 
+        /// <summary>
+        /// Returns an interface implemented by the indicated type whose name matches the desired name.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="name">The name of the desired interface. This is case sensitive.</param>
+        /// <returns>The interface, or <c>null</c> if no matches were found.</returns>
+        /// <remarks>If more than one interface matches, the returned interface is non-deterministic.</remarks>
         public static Type GetInterface(this Type type, string name)
         {
             return type.GetInterfaces().FirstOrDefault(x => x.Name == name);
@@ -177,6 +207,11 @@ namespace GraphQL
             return (T)GetPropertyValue(value, typeof(T));
         }
 
+        /// <summary>
+        /// Returns true is the value is null, value.ToString equals an empty string, or the value can be converted into a named enum value.
+        /// </summary>
+        /// <param name="type">An enum type.</param>
+        /// <param name="value">The value being tested.</param>
         public static bool IsDefinedEnumValue(Type type, object value)
         {
             var names = Enum.GetNames(type);
@@ -202,6 +237,11 @@ namespace GraphQL
             return false;
         }
 
+        /// <summary>
+        /// Converts an object into a dictionary.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="flags">The binding flags used to control which properties are read.</param>
         public static IDictionary<string, object> AsDictionary(
             this object source,
             BindingFlags flags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
