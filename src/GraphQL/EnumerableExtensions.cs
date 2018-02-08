@@ -109,50 +109,6 @@ namespace GraphQL
             }
         }
 
-        public static async Task<Dictionary<TKey, TValueVal>> ToDictionaryThreaded<TSource, TKey, TValue, TValueVal>(
-            this IEnumerable<TSource> items,
-            Func<TSource, TKey> keyFunc,
-            Func<TSource, Task<TValue>> valueFunc) where TValue : ResolveFieldResult<TValueVal>
-        {
-            var tasks = items
-                .Select(async item => new
-                {
-                    Key = keyFunc(item),
-                    Result = await valueFunc(item).ConfigureAwait(false)
-                })
-                .ToArray();
-
-            var keyValuePairs = await Task.WhenAll(tasks).ConfigureAwait(false);
-            keyValuePairs = keyValuePairs.Where(x => !x.Result.Skip).ToArray();
-
-            return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Result.Value);
-        }
-
-        public static async Task<IDictionary<TKey, TValueVal>> ToDictionaryAsync<TSource, TKey, TValue, TValueVal>(
-            this IEnumerable<TSource> items,
-            Func<TSource, TKey> keyFunc,
-            Func<TSource, Task<TValue>> valueFunc) where TValue : ResolveFieldResult<TValueVal>
-        {
-            var data = new ConcurrentDictionary<TKey, TValueVal>();
-
-            foreach (var item in items)
-            {
-                var serialResults = await valueFunc(item).ConfigureAwait(false);
-
-                if (serialResults.Skip)
-                    continue;
-
-                data.TryAdd(keyFunc(item), serialResults.Value);
-            }
-
-            return data;
-        }
-
-        /// <summary>
-        /// Equivalent to Cast&lt;object&gt;().All(...)
-        /// </summary>
-        /// <param name="items">The items.</param>
-        /// <param name="check">The check.</param>
         public static bool All(this IEnumerable items, Func<object, bool> check)
         {
             foreach (var item in items)

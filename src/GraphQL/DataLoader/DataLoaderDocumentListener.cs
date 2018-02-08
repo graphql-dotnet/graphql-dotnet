@@ -37,7 +37,7 @@ namespace GraphQL.DataLoader
             return TaskExtensions.CompletedTask;
         }
 
-        public Task BeforeResolveLevelAwaitedAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
         {
             var context = _accessor.Context;
             context.DispatchAll(token);

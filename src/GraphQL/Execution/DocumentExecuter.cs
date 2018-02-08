@@ -11,7 +11,6 @@ using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using static GraphQL.Execution.ExecutionHelper;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
-using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
 {
@@ -208,15 +207,7 @@ namespace GraphQL
                     if (executionStrategy == null)
                         throw new InvalidOperationException("Invalid ExecutionStrategy!");
 
-                    var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
-                    var fields = CollectFields(
-                        context,
-                        rootType,
-                        context.Operation.SelectionSet,
-                        new Dictionary<string, Field>(),
-                        new List<string>());
-
-                    var task = executionStrategy.ExecuteAsync(context, rootType, context.RootValue, fields)
+                    var task = executionStrategy.ExecuteAsync(context)
                         .ConfigureAwait(false);
 
                     foreach (var listener in context.Listeners)
@@ -289,52 +280,9 @@ namespace GraphQL
 
         protected virtual Operation GetOperation(string operationName, Document document)
         {
-            var operation = !string.IsNullOrWhiteSpace(operationName)
+            return !string.IsNullOrWhiteSpace(operationName)
                 ? document.Operations.WithName(operationName)
                 : document.Operations.FirstOrDefault();
-
-            return operation;
-        }
-
-        public IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
-        {
-            IObjectGraphType type;
-
-            ExecutionError error;
-
-            switch (operation.OperationType)
-            {
-                case OperationType.Query:
-                    type = schema.Query;
-                    break;
-
-                case OperationType.Mutation:
-                    type = schema.Mutation;
-                    if (type == null)
-                    {
-                        error = new ExecutionError("Schema is not configured for mutations");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
-                    break;
-
-                case OperationType.Subscription:
-                    type = schema.Subscription;
-                    if (type == null)
-                    {
-                        error = new ExecutionError("Schema is not configured for subscriptions");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
-                    break;
-
-                default:
-                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation, document);
-                    throw error;
-            }
-
-            return type;
         }
 
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)

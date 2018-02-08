@@ -93,7 +93,7 @@ namespace GraphQL.DataLoader.Tests
             users.GetUsersByIdCalledCount.ShouldBe(1);
         }
 
-        [Fact(Skip = "ParallelExecutionStrategy not yet optimized")]
+        [Fact]
         public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
             var orders = Services.GetRequiredService<OrdersStore>();

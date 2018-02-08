@@ -1,36 +1,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Language.AST;
-using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
     public class SerialExecutionStrategy : ExecutionStrategy
     {
-        protected override async Task<IDictionary<string, object>> ExecuteFieldsAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields, IEnumerable<string> path)
+        protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
-            var data = new Dictionary<string, object>();
+            // Use a stack to track all nodes in the tree that need to be executed
+            var nodes = new Stack<ExecutionNode>();
+            nodes.Push(rootNode);
 
-            foreach (var fieldCollection in fields)
+            // Process each node on the stack one by one
+            while (nodes.Count > 0)
             {
-                var currentPath = path.Concat(new[] { fieldCollection.Key });
+                var node = nodes.Pop();
+                var task = ExecuteNodeAsync(context, node);
 
-                var field = fieldCollection.Value;
-                var fieldType = GetFieldDefinition(context.Document, context.Schema, rootType, field);
-
-                // Process each field serially
-                await ExtractFieldAsync(context, rootType, source, field, fieldType, data, currentPath)
+                await OnBeforeExecutionStepAwaitedAsync(context)
                     .ConfigureAwait(false);
-            }
 
-            foreach (var listener in context.Listeners)
-            {
-                await listener.BeforeResolveLevelAwaitedAsync(context.UserContext, context.CancellationToken)
-                    .ConfigureAwait(false);
-            }
+                await task.ConfigureAwait(false);
 
-            return data;
+                // Push any child nodes on top of the stack
+                if (node is IParentExecutionNode parentNode)
+                {
+                    // Add in reverse order so fields are executed in the correct order
+                    foreach (var child in parentNode.GetChildNodes().Reverse())
+                    {
+                        nodes.Push(child);
+                    }
+                }
+            }
         }
     }
 }

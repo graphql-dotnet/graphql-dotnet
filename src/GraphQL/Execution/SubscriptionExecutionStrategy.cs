@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -13,9 +12,12 @@ namespace GraphQL.Execution
 {
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {
-        public override Task<ExecutionResult> ExecuteAsync(ExecutionContext context, IObjectGraphType rootType, object source, Dictionary<string, Field> fields)
+        public override Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var streams = ExecuteSubscriptionFields(context, rootType, context.RootValue, fields, new string[0]);
+            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootNode = BuildExecutionRootNode(context, rootType);
+
+            var streams = ExecuteSubscriptionNodes(context, rootNode.SubFields);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -25,101 +27,91 @@ namespace GraphQL.Execution
             return Task.FromResult(result);
         }
 
-        private IDictionary<string, IObservable<ExecutionResult>> ExecuteSubscriptionFields(
-           ExecutionContext context,
-           IObjectGraphType rootType,
-           object source,
-           Dictionary<string, Field> fields,
-           IEnumerable<string> path)
+        private IDictionary<string, IObservable<ExecutionResult>> ExecuteSubscriptionNodes(ExecutionContext context, IDictionary<string, ExecutionNode> nodes)
         {
-            var result = new ConcurrentDictionary<string, IObservable<ExecutionResult>>();
+            var streams = new Dictionary<string, IObservable<ExecutionResult>>();
 
-            var parentPath = path.ToList();
-
-            foreach (var field in fields)
+            foreach (var kvp in nodes)
             {
-                var key = field.Key;
+                var name = kvp.Key;
+                var node = kvp.Value;
 
-                var fieldResult = ResolveEventStream(context, rootType, source, field.Value, parentPath.Concat(new[] { key }));
-
-                if (fieldResult.Skip)
+                if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
                     continue;
 
-                result[key] = fieldResult.Value;
+                streams[name] = ResolveEventStream(context, node);
             }
 
-            return result;
+            return streams;
         }
 
-        private ResolveEventStreamResult ResolveEventStream(
-            ExecutionContext context,
-            IObjectGraphType parentType,
-            object source,
-            Field field,
-            IEnumerable<string> path)
+        protected virtual IObservable<ExecutionResult> ResolveEventStream(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var fieldPath = path?.ToList() ?? new List<string>();
-
-            var resolveResult = new ResolveEventStreamResult
-            {
-                Skip = false
-            };
-
-            if (!(GetFieldDefinition(context.Document, context.Schema, parentType, field) is EventStreamFieldType fieldDefinition))
-            {
-                resolveResult.Skip = true;
-                return resolveResult;
-            }
-
             var arguments = GetArgumentValues(
                 context.Schema,
-                fieldDefinition.Arguments,
-                field.Arguments,
+                node.FieldDefinition.Arguments,
+                node.Field.Arguments,
                 context.Variables);
+
+            object source = (node.Parent != null)
+                ? node.Parent.Result
+                : context.RootValue;
 
             try
             {
-                var resolveContext = new ResolveEventStreamContext();
-                resolveContext.FieldName = field.Name;
-                resolveContext.FieldAst = field;
-                resolveContext.FieldDefinition = fieldDefinition;
-                resolveContext.ReturnType = fieldDefinition.ResolvedType;
-                resolveContext.ParentType = parentType;
-                resolveContext.Arguments = arguments;
-                resolveContext.Source = source;
-                resolveContext.Schema = context.Schema;
-                resolveContext.Document = context.Document;
-                resolveContext.Fragments = context.Fragments;
-                resolveContext.RootValue = context.RootValue;
-                resolveContext.UserContext = context.UserContext;
-                resolveContext.Operation = context.Operation;
-                resolveContext.Variables = context.Variables;
-                resolveContext.CancellationToken = context.CancellationToken;
-                resolveContext.Metrics = context.Metrics;
-                resolveContext.Errors = context.Errors;
-                resolveContext.Path = fieldPath;
-
-                if (fieldDefinition.Subscriber == null)
+                var resolveContext = new ResolveEventStreamContext
                 {
-                    return GenerateError(resolveResult, field, context,
-                       new InvalidOperationException($"Subscriber not set for field {field.Name}"),
-                       fieldPath);
+                    FieldName = node.Field.Name,
+                    FieldAst = node.Field,
+                    FieldDefinition = node.FieldDefinition,
+                    ReturnType = node.FieldDefinition.ResolvedType,
+                    ParentType = node.GraphType as IObjectGraphType,
+                    Arguments = arguments,
+                    Source = source,
+                    Schema = context.Schema,
+                    Document = context.Document,
+                    Fragments = context.Fragments,
+                    RootValue = context.RootValue,
+                    UserContext = context.UserContext,
+                    Operation = context.Operation,
+                    Variables = context.Variables,
+                    CancellationToken = context.CancellationToken,
+                    Metrics = context.Metrics,
+                    Errors = context.Errors,
+                    Path = node.Path
+                };
+
+                var eventStreamField = node.FieldDefinition as EventStreamFieldType;
+
+                if (eventStreamField?.Subscriber == null)
+                {
+                    throw new InvalidOperationException($"Subscriber not set for field {node.Field.Name}");
                 }
 
-                var result = fieldDefinition.Subscriber.Subscribe(resolveContext);
+                var subscription = eventStreamField.Subscriber.Subscribe(resolveContext);
 
-                resolveResult.Value = result
-                    .SelectMany(async value =>
+                return subscription
+                    .Select(value =>
                     {
-                        var fieldResolveResult = await ResolveFieldAsync(context, parentType, value, field, fieldPath)
+                        // Create new execution node
+                        return new ObjectExecutionNode(null, node.GraphType, node.Field, node.FieldDefinition, node.Path)
+                        {
+                            Source = value
+                        };
+                    })
+                    .SelectMany(async objectNode =>
+                    {
+                        // Execute the whole execution tree and return the result
+                        await ExecuteNodeTreeAsync(context, objectNode)
                             .ConfigureAwait(false);
+
                         return new ExecutionResult
                         {
-                            Data = new Dictionary<string, object>()
+                            Data = new Dictionary<string, object>
                             {
-                                { field.Name,fieldResolveResult.Value }
+                                { objectNode.Name, objectNode.ToValue() }
                             }
                         };
                     })
@@ -130,35 +122,32 @@ namespace GraphQL.Execution
                                 Errors = new ExecutionErrors
                                 {
                                     new ExecutionError(
-                                        $"Could not subscribe to field '{field.Name}' in query '{context.Document.OriginalQuery}'",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'",
                                         exception)
                                     {
-                                        Path = path
+                                        Path = node.Path
                                     }
                                 }
                             }));
-
-                return resolveResult;
             }
-            catch (Exception exc)
+            catch (Exception ex)
             {
-                return GenerateError(resolveResult, field, context, exc, path);
+                GenerateError(context, node.Field, ex, node.Path);
+                return null;
             }
         }
 
-        private ResolveEventStreamResult GenerateError(
-            ResolveEventStreamResult resolveResult,
-            Field field,
+        private void GenerateError(
             ExecutionContext context,
-            Exception exc,
+            Field field,
+            Exception ex,
             IEnumerable<string> path)
         {
-            var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), exc);
+            var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), ex);
             error.AddLocation(field, context.Document);
             error.Path = path;
+
             context.Errors.Add(error);
-            resolveResult.Skip = false;
-            return resolveResult;
         }
     }
 }
