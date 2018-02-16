@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -57,14 +57,20 @@ namespace GraphQL.Utilities
                 return null;
             }
 
-            var method = Type.MethodForField(field);
+            var method = Type.MethodForField(field)
+                ?? Type.PropertyForField(field)?.GetMethod;
 
-            var resolverType = typeof(MethodModelBinderResolver<>).MakeGenericType(Type);
+            if (method != null)
+            {
+                var resolverType = typeof(MethodModelBinderResolver<>).MakeGenericType(Type);
 
-            var args = new object[] { method, dependencyResolver };
-            var resolver = (IFieldResolver) Activator.CreateInstance(resolverType, args);
+                var args = new object[] { method, dependencyResolver };
+                var resolver = (IFieldResolver)Activator.CreateInstance(resolverType, args);
 
-            return resolver;
+                return resolver;
+            }
+
+            throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
         }
 
         private void ApplyMetadata(Type type)

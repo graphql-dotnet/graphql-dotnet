@@ -210,12 +210,21 @@ namespace GraphQL
                 return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
             });
 
-            if (method == null)
-            {
-                throw new InvalidOperationException($"Expected to find method {field} on {type.Name} but could not.");
-            }
-
             return method;
+        }
+
+        public static PropertyInfo PropertyForField(this Type type, string field)
+        {
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            var property = properties.FirstOrDefault(m =>
+            {
+                var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
+                var name = attr?.Name ?? m.Name;
+                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
+            });
+
+            return property;
         }
     }
 }
