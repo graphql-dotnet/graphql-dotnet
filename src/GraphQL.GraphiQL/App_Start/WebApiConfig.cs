@@ -1,4 +1,4 @@
-﻿using System.Web.Http;
+using System.Web.Http;
 
 namespace GraphQL.GraphiQL
 {
@@ -11,6 +11,8 @@ namespace GraphQL.GraphiQL
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+            //enable cors
+            config.EnableCors();
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

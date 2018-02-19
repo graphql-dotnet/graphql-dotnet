@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace GraphQL.GraphiQLCore
@@ -33,9 +34,16 @@ namespace GraphQL.GraphiQLCore
         {
             if (!IsGraphQLRequest(context))
             {
-                await _next(context);
+                if (IsOptionsRequest(context))
+                {
+                    SendOptionsRequest(context);
+                }
+                else
+                {
+                    await _next(context);
+                }
                 return;
-            }
+            };
 
             await ExecuteAsync(context, schema);
         }
@@ -44,6 +52,24 @@ namespace GraphQL.GraphiQLCore
         {
             return context.Request.Path.StartsWithSegments(_settings.Path)
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsOptionsRequest(HttpContext context)
+        {
+            return (string.Equals(context.Request.Method, "OPTIONS", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(context.Request.Headers.FirstOrDefault(s => s.Key == "Access-Control-Request-Method").Value,
+                        "POST", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void SendOptionsRequest(HttpContext context)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.OK;
+            context.Response.Headers.Add("Cache-Control", "no-cache");
+            context.Response.Headers.Add("Content-Length", "0");
+            context.Response.Headers.Add("Expires", "-1");
+            context.Response.Headers.Add("Pragma", "no-cache");
+            context.Response.Headers.Add("Access-Control-Allow-Headers", "access-control-allow-origin,content-type");
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
         }
 
         private async Task ExecuteAsync(HttpContext context, ISchema schema)
@@ -74,7 +100,7 @@ namespace GraphQL.GraphiQLCore
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
-
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await context.Response.WriteAsync(json);
         }
     }

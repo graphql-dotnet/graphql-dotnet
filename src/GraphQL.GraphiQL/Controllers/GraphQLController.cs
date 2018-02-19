@@ -9,9 +9,11 @@ using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.Types;
 using GraphQL.Validation.Complexity;
+using System.Web.Http.Cors;
 
 namespace GraphQL.GraphiQL.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class GraphQLController : ApiController
     {
         private readonly ISchema _schema;
@@ -72,7 +74,7 @@ namespace GraphQL.GraphiQL.Controllers
 
             var response = request.CreateResponse(httpResult);
             response.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            //response.Headers.Add("Access-Control-Allow-Origin", "*");
             return response;
         }
     }
