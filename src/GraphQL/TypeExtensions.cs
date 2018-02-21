@@ -193,29 +193,5 @@ namespace GraphQL
 
             return graphType;
         }
-
-        /// <summary>
-        /// Returns the method associated with the indicated field
-        /// </summary>
-        /// <param name="type">The type to check.</param>
-        /// <param name="field">The desired field.</param>
-        public static MethodInfo MethodForField(this Type type, string field)
-        {
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-
-            var method = methods.FirstOrDefault(m =>
-            {
-                var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
-                var name = attr?.Name ?? m.Name;
-                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
-            });
-
-            if (method == null)
-            {
-                throw new InvalidOperationException($"Expected to find method {field} on {type.Name} but could not.");
-            }
-
-            return method;
-        }
     }
 }

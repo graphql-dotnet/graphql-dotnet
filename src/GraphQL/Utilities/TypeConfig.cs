@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Reflection;
+using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -41,30 +42,20 @@ namespace GraphQL.Utilities
         public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
         {
             var config = _fields[field];
-            config.Resolver = ResolverFor(field, dependencyResolver);
-            config.MethodInfo = Type?.MethodForField(field);
+            config.Accessor = Type.ToAccessor(field);
 
-            var attributes = config.MethodInfo?.GetCustomAttributes<GraphQLAttribute>();
-            attributes?.Apply(a => a.Modify(config));
-
-            return config;
-        }
-
-        private IFieldResolver ResolverFor(string field, IDependencyResolver dependencyResolver)
-        {
-            if (Type == null)
+            if(Type != null)
             {
-                return null;
+                if(config.Accessor == null)
+                {
+                    throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
+                }
+
+                config.Resolver = new AccessorFieldResolver(config.Accessor, dependencyResolver);
+                config.Accessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
             }
 
-            var method = Type.MethodForField(field);
-
-            var resolverType = typeof(MethodModelBinderResolver<>).MakeGenericType(Type);
-
-            var args = new object[] { method, dependencyResolver };
-            var resolver = (IFieldResolver) Activator.CreateInstance(resolverType, args);
-
-            return resolver;
+            return config;
         }
 
         private void ApplyMetadata(Type type)
