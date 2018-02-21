@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -12,22 +11,22 @@ namespace GraphQL.Execution
 {
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {
-        public override Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
+        public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = ExecuteSubscriptionNodes(context, rootNode.SubFields);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
                 Streams = streams
             };
 
-            return Task.FromResult(result);
+            return result;
         }
 
-        private IDictionary<string, IObservable<ExecutionResult>> ExecuteSubscriptionNodes(ExecutionContext context, IDictionary<string, ExecutionNode> nodes)
+        private async Task<IDictionary<string, IObservable<ExecutionResult>>> ExecuteSubscriptionNodesAsync(ExecutionContext context, IDictionary<string, ExecutionNode> nodes)
         {
             var streams = new Dictionary<string, IObservable<ExecutionResult>>();
 
@@ -39,13 +38,13 @@ namespace GraphQL.Execution
                 if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
                     continue;
 
-                streams[name] = ResolveEventStream(context, node);
+                streams[name] = await ResolveEventStreamAsync(context, node);
             }
 
             return streams;
         }
 
-        protected virtual IObservable<ExecutionResult> ResolveEventStream(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task<IObservable<ExecutionResult>> ResolveEventStreamAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -85,21 +84,26 @@ namespace GraphQL.Execution
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
 
-                if (eventStreamField?.Subscriber == null)
+
+                IObservable<object> subscription;
+
+                if (eventStreamField?.Subscriber != null)
+                {
+                    subscription = eventStreamField.Subscriber.Subscribe(resolveContext);
+                }
+                else if (eventStreamField?.AsyncSubscriber != null)
+                {
+                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext);
+                }
+                else
                 {
                     throw new InvalidOperationException($"Subscriber not set for field {node.Field.Name}");
                 }
 
-                var subscription = eventStreamField.Subscriber.Subscribe(resolveContext);
-
                 return subscription
-                    .Select(value =>
+                    .Select(value => new ObjectExecutionNode(null, node.GraphType, node.Field, node.FieldDefinition, node.Path)
                     {
-                        // Create new execution node
-                        return new ObjectExecutionNode(null, node.GraphType, node.Field, node.FieldDefinition, node.Path)
-                        {
-                            Source = value
-                        };
+                        Source = value
                     })
                     .SelectMany(async objectNode =>
                     {
