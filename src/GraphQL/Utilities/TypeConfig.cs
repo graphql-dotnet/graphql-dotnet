@@ -51,7 +51,7 @@ namespace GraphQL.Utilities
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                config.Resolver = new AccessorResolver(config.Accessor, dependencyResolver);
+                config.Resolver = new AccessorFieldResolver(config.Accessor, dependencyResolver);
                 config.Accessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
             }
 
