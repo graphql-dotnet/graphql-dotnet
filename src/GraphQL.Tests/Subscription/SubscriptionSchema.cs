@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
@@ -44,6 +45,25 @@ namespace GraphQL.Tests.Subscription
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
                 Subscriber = new EventStreamResolver<Message>(SubscribeById)
             });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "messageAddedAsync",
+                Type = typeof(MessageType),
+                Resolver = new FuncFieldResolver<Message>(ResolveMessage),
+                AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeAsync)
+            });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "messageAddedByUserAsync",
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
+                ),
+                Type = typeof(MessageType),
+                Resolver = new FuncFieldResolver<Message>(ResolveMessage),
+                AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
+            });
         }
 
         private IObservable<Message> SubscribeById(ResolveEventStreamContext context)
@@ -52,6 +72,14 @@ namespace GraphQL.Tests.Subscription
 
             var messages = _chat.Messages();
 
+            return messages.Where(message => message.From.Id == id);
+        }
+
+        private async Task<IObservable<Message>> SubscribeByIdAsync(ResolveEventStreamContext context)
+        {
+            var id = context.GetArgument<string>("id");
+
+            var messages = await _chat.MessagesAsync();
             return messages.Where(message => message.From.Id == id);
         }
 
@@ -65,6 +93,11 @@ namespace GraphQL.Tests.Subscription
         private IObservable<Message> Subscribe(ResolveEventStreamContext context)
         {
             return _chat.Messages();
+        }
+
+        private Task<IObservable<Message>> SubscribeAsync(ResolveEventStreamContext context)
+        {
+            return _chat.MessagesAsync();
         }
     }
 
@@ -162,6 +195,8 @@ namespace GraphQL.Tests.Subscription
         IObservable<Message> Messages();
 
         Message AddMessage(ReceivedMessage message);
+
+        Task<IObservable<Message>> MessagesAsync();
     }
 
     public class Chat : IChat
@@ -200,6 +235,13 @@ namespace GraphQL.Tests.Subscription
                     Id = message.FromId
                 }
             });
+        }
+
+        public async Task<IObservable<Message>> MessagesAsync()
+        {
+            //pretend we are doing something async here
+            await Task.Delay(100);
+            return Messages();
         }
 
         public Message AddMessage(Message message)

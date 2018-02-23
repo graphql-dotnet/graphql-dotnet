@@ -134,5 +134,11 @@ namespace GraphQL.Builders
             FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
             return this;
         }
+
+        public FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<ResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType>>> subscribeAsync)
+        {
+            FieldType.AsyncSubscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
+            return this;
+        }
     }
 }

@@ -207,6 +207,31 @@ namespace GraphQL.Types
             });
         }
 
+        public FieldType FieldSubscribeAsync<TGraphType>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<ResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
+            string deprecationReason = null)
+            where TGraphType : IGraphType
+        {
+            return AddField(new EventStreamFieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = typeof(TGraphType),
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new FuncFieldResolver<TSourceType, object>(resolve)
+                    : null,
+                AsyncSubscriber = subscribeAsync != null
+                    ? new AsyncEventStreamResolver<object>(subscribeAsync)
+                    : null
+            });
+        }
+
         public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
         {
             var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType));
