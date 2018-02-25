@@ -21,7 +21,7 @@ namespace GraphQL.Execution
             ExecutionResult result = new SubscriptionExecutionResult
             {
                 Streams = streams
-            };
+            }.With(context);
 
             return result;
         }
@@ -117,7 +117,7 @@ namespace GraphQL.Execution
                             {
                                 { objectNode.Name, objectNode.ToValue() }
                             }
-                        };
+                        }.With(context);
                     })
                     .Catch<ExecutionResult, Exception>(exception =>
                         Observable.Return(
@@ -125,33 +125,46 @@ namespace GraphQL.Execution
                             {
                                 Errors = new ExecutionErrors
                                 {
-                                    new ExecutionError(
+                                    GenerateError(
+                                        context,
                                         $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'",
+                                        node.Field,
+                                        node.Path,
                                         exception)
-                                    {
-                                        Path = node.Path
-                                    }
                                 }
-                            }));
+                            }.With(context)));
             }
             catch (Exception ex)
             {
-                GenerateError(context, node.Field, ex, node.Path);
+                var message = $"Error trying to resolve {node.Field.Name}.";
+                var error = GenerateError(context, message, node.Field, node.Path, ex);
+                context.Errors.Add(error);
                 return null;
             }
         }
 
-        private void GenerateError(
+        private ExecutionError GenerateError(
             ExecutionContext context,
+            string message,
             Field field,
-            Exception ex,
-            IEnumerable<string> path)
+            IEnumerable<string> path,
+            Exception ex = null)
         {
-            var error = new ExecutionError("Error trying to resolve {0}.".ToFormat(field.Name), ex);
+            var error = new ExecutionError(message, ex);
             error.AddLocation(field, context.Document);
             error.Path = path;
+            return error;
+        }
+    }
 
-            context.Errors.Add(error);
+    internal static class ExecutionContextExtensions
+    {
+        public static ExecutionResult With(this ExecutionResult result, ExecutionContext context)
+        {
+            result.Query = context.Document.OriginalQuery;
+            result.Document = context.Document;
+            result.Operation = context.Operation;
+            return result;
         }
     }
 }

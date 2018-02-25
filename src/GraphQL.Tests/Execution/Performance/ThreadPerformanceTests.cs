@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Execution.Performance
             }
         }
 
-        [Fact(Skip = "May fail one a single processor machine.")]
+        [Fact(Skip = "May fail on a single processor machine.")]
         // [Fact]
         public void Executes_IsQuickerThanTotalTaskTime()
         {
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact]
-        public void Mutations_RunSyncronously()
+        public async Task Mutations_RunSyncronously()
         {
             var query = @"
                 mutation Multiple {
@@ -120,11 +120,11 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
-            }).GetAwaiter().GetResult();
+            });
 
             var result = runResult2.Data as dynamic;
             runResult2.Errors.ShouldBeNull();

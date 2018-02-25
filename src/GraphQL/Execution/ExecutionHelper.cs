@@ -440,7 +440,6 @@ namespace GraphQL.Execution
         public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
         {
             var selections = field?.SelectionSet?.Selections;
-            //if the field has no subfields
             if (selections == null || selections.Any() == false)
             {
                 return null;

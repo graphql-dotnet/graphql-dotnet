@@ -5,7 +5,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class DelegateFieldModelBinderResolver : IFieldResolver
+    public class DelegateFieldModelBinderResolver : FieldResolverBase
     {
         private readonly Delegate _resolver;
         private readonly ParameterInfo[] _parameters;
@@ -16,39 +16,9 @@ namespace GraphQL.Resolvers
             _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
-        public bool RunThreaded()
+        public override object Resolve(ResolveFieldContext context)
         {
-            return false;
-        }
-
-        public object Resolve(ResolveFieldContext context)
-        {
-            object[] arguments = null;
-
-            if (_parameters.Any())
-            {
-                var index = 0;
-                arguments = new object[_parameters.Length];
-
-                if (typeof(ResolveFieldContext) == _parameters[index].ParameterType)
-                {
-                    arguments[index] = context;
-                    index++;
-                }
-
-                if (context.Source?.GetType() == _parameters[index].ParameterType)
-                {
-                    arguments[index] = context.Source;
-                    index++;
-                }
-
-                foreach (var parameter in _parameters.Skip(index))
-                {
-                    arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
-                    index++;
-                }
-            }
-
+            var arguments = BuildArguments(_parameters, context);
             return _resolver.DynamicInvoke(arguments);
         }
     }

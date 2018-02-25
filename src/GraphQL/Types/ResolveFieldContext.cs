@@ -47,8 +47,7 @@ namespace GraphQL.Types
         public IEnumerable<string> Path { get; set; }
 
         /// <summary>
-        /// Queried sub fields.  Note that this does not include sub fields for
-        /// abstract types (interfaces or unions).
+        /// Queried sub fields
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
@@ -119,7 +118,10 @@ namespace GraphQL.Types
             {
                 if (error == null)
                 {
-                    Errors.Add(new ExecutionError(ex.Message, ex));
+                    var er = new ExecutionError(ex.Message, ex);
+                    er.AddLocation(FieldAst, Document);
+                    er.Path = Path;
+                    Errors.Add(er);
                     return null;
                 }
                 else
