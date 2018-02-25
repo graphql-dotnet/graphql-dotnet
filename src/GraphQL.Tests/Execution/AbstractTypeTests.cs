@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Execution
         {
             var result = AssertQueryWithErrors("{ pets { name } }", "{ 'pets': null }", expectedErrorCount: 1);
             var error = result.Errors.First();
-            error.InnerException.Message.ShouldBe("Abstract type Pet must resolve to an Object type at runtime for field Query.pets with value { name = Eli }, received 'null'.");
+            error.Message.ShouldBe("Abstract type Pet must resolve to an Object type at runtime for field Query.pets with value { name = Eli }, received 'null'.");
         }
     }
 
