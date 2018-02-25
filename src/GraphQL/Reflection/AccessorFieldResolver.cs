@@ -6,7 +6,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
-    internal class AccessorFieldResolver : IFieldResolver
+    internal class AccessorFieldResolver : FieldResolverBase
     {
         private readonly IAccessor _accessor;
         private readonly IDependencyResolver _dependencyResolver;
@@ -17,7 +17,7 @@ namespace GraphQL.Reflection
             _dependencyResolver = dependencyResolver;
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public override object Resolve(ResolveFieldContext context)
         {
             var arguments = BuildArguments(_accessor.Parameters, context);
 
@@ -30,45 +30,6 @@ namespace GraphQL.Reflection
             }
 
             return _accessor.GetValue(target, arguments);
-        }
-
-        private object[] BuildArguments(ParameterInfo[] parameters, ResolveFieldContext context)
-        {
-            if(parameters == null || !parameters.Any()) return null;
-
-            object[] arguments = new object[parameters.Length];
-
-            var index = 0;
-            if (typeof(ResolveFieldContext) == parameters[index].ParameterType)
-            {
-                arguments[index] = context;
-                index++;
-            }
-
-            if (parameters.Length > index
-                && context.Source != null
-                && (context.Source?.GetType() == parameters[index].ParameterType
-                    || string.Equals(parameters[index].Name, "source", StringComparison.OrdinalIgnoreCase)))
-            {
-                arguments[index] = context.Source;
-                index++;
-            }
-
-            if (parameters.Length > index
-                && context.UserContext != null
-                && context.UserContext?.GetType() == parameters[index].ParameterType)
-            {
-                arguments[index] = context.UserContext;
-                index++;
-            }
-
-            foreach (var parameter in parameters.Skip(index))
-            {
-                arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
-                index++;
-            }
-
-            return arguments;
         }
     }
 }

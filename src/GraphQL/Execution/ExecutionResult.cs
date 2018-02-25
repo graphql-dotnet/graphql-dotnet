@@ -13,6 +13,12 @@ namespace GraphQL
 
         public ExecutionErrors Errors { get; set; }
 
+        public string Query { get; set; }
+
+        public Document Document { get; set; }
+
+        public Operation Operation { get; set; }
+
         public PerfRecord[] Perf { get; set; }
 
         public bool ExposeExceptions { get; set; }
@@ -21,7 +27,6 @@ namespace GraphQL
 
         public ExecutionResult()
         {
-
         }
 
         protected ExecutionResult(ExecutionResult result)
@@ -31,6 +36,9 @@ namespace GraphQL
 
             Data = result.Data;
             Errors = result.Errors;
+            Query = result.Query;
+            Operation = result.Operation;
+            Document = result.Document;
             Perf = result.Perf;
             ExposeExceptions = result.ExposeExceptions;
             Extensions = result.Extensions;

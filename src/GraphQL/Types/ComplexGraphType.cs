@@ -73,7 +73,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
-                    : null,
+                    : null
             });
         }
 
@@ -94,7 +94,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new FuncFieldResolver<TSourceType, object>(resolve)
-                    : null,
+                    : null
             });
         }
 
@@ -115,7 +115,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new DelegateFieldModelBinderResolver(resolve)
-                    : null,
+                    : null
             });
         }
 
@@ -136,7 +136,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 Resolver = resolve != null
                     ? new AsyncFieldResolver<TSourceType, object>(resolve)
-                    : null,
+                    : null
             });
         }
 
