@@ -343,7 +343,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<Blog>();
 
             var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
-            var expected = @"{ 'blog': { 'title': 'New Blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
+            var expected = @"{ 'blog': { 'title': 'New blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
             var variables = "{ 'blogId': '1', 'postId': '1' }";
 
             AssertQuery(_ =>
