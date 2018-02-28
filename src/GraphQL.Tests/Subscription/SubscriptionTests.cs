@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -11,6 +11,17 @@ namespace GraphQL.Tests.Subscription
 {
     public class SubscriptionTests
     {
+        protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
+        {
+            var executer = new DocumentExecuter();
+
+            var result = await executer.ExecuteAsync(options);
+
+            result.ShouldBeOfType<SubscriptionExecutionResult>();
+
+            return (SubscriptionExecutionResult)result;
+        }
+
         [Fact]
         public async Task Subscribe()
         {
@@ -27,12 +38,47 @@ namespace GraphQL.Tests.Subscription
             };
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
+                Schema = schema
+            });
+
+            chat.AddMessage(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            message.ShouldBeOfType<ExecutionResult>();
+            message.Data.ShouldNotBeNull();
+            message.Data.ShouldNotBeAssignableTo<Task>();
+        }
+
+        [Fact]
+        public async Task SubscribeAsync()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom()
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now
+            };
+            var chat = new Chat();
+            var schema = new ChatSchema(chat);
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
                 Schema = schema
             });
 
@@ -64,12 +110,50 @@ namespace GraphQL.Tests.Subscription
             };
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
+                Schema = schema,
+                Inputs = new Inputs(new Dictionary<string, object>()
+                {
+                    ["id"] = "1"
+                })
+            });
+
+            chat.AddMessage(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            message.ShouldBeOfType<ExecutionResult>();
+            message.Data.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async Task SubscribeWithArgumentAsync()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom()
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now
+            };
+            var chat = new Chat();
+            var schema = new ChatSchema(chat);
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
                 Inputs = new Inputs(new Dictionary<string, object>()
                 {
@@ -94,10 +178,9 @@ namespace GraphQL.Tests.Subscription
             /* Given */
             var chat = new Chat();
             var schema = new ChatSchema(chat);
-            var sut = new SubscriptionExecuter();
 
             /* When */
-            var result = await sut.SubscribeAsync(new ExecutionOptions
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
             {
                 Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
                 Schema = schema

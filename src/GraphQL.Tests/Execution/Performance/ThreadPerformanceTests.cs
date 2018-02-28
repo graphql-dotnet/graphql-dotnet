@@ -26,8 +26,8 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Query";
 
-                FieldAsync<StringGraphType>("halfSecond", resolve: c => Get(500, "Half"));
-                FieldAsync<StringGraphType>("quarterSecond", resolve: c => Get(500, "Quarter"));
+                FieldAsync<StringGraphType, string>("halfSecond", resolve: c => Get(500, "Half"));
+                FieldAsync<StringGraphType, string>("quarterSecond", resolve: c => Get(500, "Quarter"));
             }
 
             private async Task<string> Get(int milliseconds, string result)
@@ -45,8 +45,8 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 Name = "Mutation";
 
-                FieldAsync<StringGraphType>("setFive", resolve: c => Set("5"));
-                FieldAsync<StringGraphType>("setOne", resolve: c => Set("1"));
+                FieldAsync<StringGraphType, string>("setFive", resolve: c => Set("5"));
+                FieldAsync<StringGraphType, string>("setOne", resolve: c => Set("1"));
             }
 
             private Task<string> Set(string result)
@@ -67,8 +67,8 @@ namespace GraphQL.Tests.Execution.Performance
             }
         }
 
-        // [Fact(Skip = "May fail one a single processor machine.")]
-        [Fact]
+        [Fact(Skip = "May fail on a single processor machine.")]
+        // [Fact]
         public void Executes_IsQuickerThanTotalTaskTime()
         {
             var query = @"
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact]
-        public void Mutations_RunSyncronously()
+        public async Task Mutations_RunSyncronously()
         {
             var query = @"
                 mutation Multiple {
@@ -120,11 +120,11 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
-            }).GetAwaiter().GetResult();
+            });
 
             var result = runResult2.Data as dynamic;
             runResult2.Errors.ShouldBeNull();

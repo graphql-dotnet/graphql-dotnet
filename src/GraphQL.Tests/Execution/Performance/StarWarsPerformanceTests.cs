@@ -20,9 +20,9 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        // [Fact]
         public void Executes_StarWarsBasicQuery_Performant()
         {
-
             var query = @"
                 query HeroNameAndFriendsQuery {
                   hero {

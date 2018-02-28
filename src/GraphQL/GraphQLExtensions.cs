@@ -82,7 +82,9 @@ namespace GraphQL
                 }
             }
 
-            return resolve(type);
+            return resolve(type) ??
+                   throw new InvalidOperationException(
+                       $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
         }
 
         public static Type GetNamedType(this Type type)

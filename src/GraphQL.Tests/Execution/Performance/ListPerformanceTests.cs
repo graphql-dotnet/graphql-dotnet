@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Types;
 using Xunit;
@@ -72,7 +73,7 @@ namespace GraphQL.Tests.Execution.Performance
         };
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        public void Executes_MultipleProperties_Are_Performant()
+        public async Task Executes_MultipleProperties_Are_Performant()
         {
             var query = @"
                 query AQuery {
@@ -105,7 +106,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
@@ -117,7 +118,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.CancellationToken = default(CancellationToken);
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
-            }).GetAwaiter().GetResult();
+            });
 
             smallListTimer.Stop();
 
@@ -128,7 +129,8 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        public void Executes_SimpleLists_Are_Performant()
+        // [Fact]
+        public async Task Executes_SimpleLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
@@ -142,7 +144,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
@@ -154,7 +156,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.CancellationToken = default(CancellationToken);
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
-            }).GetAwaiter().GetResult();
+            });
 
             smallListTimer.Stop();
 
@@ -165,7 +167,8 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        public void Executes_UnionLists_Are_Performant()
+        // [Fact]
+        public async Task Executes_UnionLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
@@ -191,7 +194,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
@@ -203,7 +206,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.CancellationToken = default(CancellationToken);
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
-            }).GetAwaiter().GetResult();
+            });
 
             smallListTimer.Stop();
 

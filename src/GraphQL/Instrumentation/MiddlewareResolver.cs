@@ -13,39 +13,16 @@ namespace GraphQL.Instrumentation
             _next = next ?? new NameFieldResolver();
         }
 
-        public async Task<object> Resolve(ResolveFieldContext context)
+        public Task<object> Resolve(ResolveFieldContext context)
         {
-            var result = _next.Resolve(context);
+            object result = _next.Resolve(context);
 
-            //more performant if available
-            if (result is Task<object>)
+            if (result is Task<object> task)
             {
-                var task = result as Task<object>;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                result = task.Result;
+                return task;
             }
 
-            if (result is Task)
-            {
-                var task = result as Task;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                await task.ConfigureAwait(false);
-
-                result = task.GetProperyValue("Result");
-            }
-
-            return result;
-        }
-
-        public bool RunThreaded()
-        {
-            return _next.RunThreaded();
+            return Task.FromResult(result);
         }
 
         object IFieldResolver.Resolve(ResolveFieldContext context)

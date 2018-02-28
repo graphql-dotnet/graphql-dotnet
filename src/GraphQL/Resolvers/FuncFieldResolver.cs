@@ -18,11 +18,6 @@ namespace GraphQL.Resolvers
             return _resolver(context);
         }
 
-        public bool RunThreaded()
-        {
-            return false;
-        }
-
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
@@ -42,48 +37,9 @@ namespace GraphQL.Resolvers
             _resolver = resolver;
         }
 
-        public bool RunThreaded()
-        {
-            return false;
-        }
-
         public TReturnType Resolve(ResolveFieldContext context)
         {
-            var result = _resolver(context.As<TSourceType>());
-
-            //most performant if available
-            if (result is Task<TReturnType>)
-            {
-                var task = result as Task<TReturnType>;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                result = task.Result;
-            }
-
-            if (result is Task<object>)
-            {
-                var task = result as Task<object>;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                result = (TReturnType)task.Result;
-            }
-
-            if (result is Task)
-            {
-                var task = result as Task;
-                if (task.IsFaulted)
-                {
-                    throw task.Exception;
-                }
-                task.ConfigureAwait(false);
-                result = (TReturnType)task.GetProperyValue("Result");
-            }
-
-            return result;
+            return _resolver(context.As<TSourceType>());
         }
 
         object IFieldResolver.Resolve(ResolveFieldContext context)

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using GraphQL.Reflection;
 using GraphQL.Resolvers;
 
 namespace GraphQL.Utilities
@@ -14,6 +15,6 @@ namespace GraphQL.Utilities
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public IFieldResolver Resolver { get; set; }
-        public MethodInfo MethodInfo { get; set; }
+        public IAccessor Accessor { get; set; }
     }
 }
