@@ -5,49 +5,35 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
-	public static class GraphTypeRegistry
-	{
-		static Stack<RegistryEntry> _entries;
+    public static class GraphTypeRegistry
+    {
+        static Dictionary<Type, Type> _entries;
 
-		static GraphTypeRegistry()
-		{
-			_entries.Push(new RegistryEntry(typeof(int), typeof(IntGraphType)));
-			_entries.Push(new RegistryEntry(typeof(long), typeof(IntGraphType)));
-			_entries.Push(new RegistryEntry(typeof(double), typeof(FloatGraphType)));
-			_entries.Push(new RegistryEntry(typeof(float), typeof(FloatGraphType)));
-			_entries.Push(new RegistryEntry(typeof(decimal), typeof(DecimalGraphType)));
-			_entries.Push(new RegistryEntry(typeof(string), typeof(StringGraphType)));
-			_entries.Push(new RegistryEntry(typeof(bool), typeof(BooleanGraphType)));
-			_entries.Push(new RegistryEntry(typeof(DateTime), typeof(DateGraphType)));
-		}
+        static GraphTypeRegistry()
+        {
+            _entries[typeof(int)] = typeof(IntGraphType);
+            _entries[typeof(long)] = typeof(IntGraphType);
+            _entries[typeof(double)] = typeof(FloatGraphType);
+            _entries[typeof(float)] = typeof(FloatGraphType);
+            _entries[typeof(decimal)] = typeof(DecimalGraphType);
+            _entries[typeof(string)] = typeof(StringGraphType);
+            _entries[typeof(bool)] = typeof(BooleanGraphType);
+            _entries[typeof(DateTime)] = typeof(DateGraphType);
+        }
 
-		public static void Register(Type clrType, Type graphType)
-		{
-			_entries.Push(new RegistryEntry(clrType, graphType));
-		}
+        public static void Register(Type clrType, Type graphType)
+        {
+            _entries[clrType] = graphType;
+        }
 
-		public static Type Get(Type clrType)
-		{
-			foreach (var entry in _entries)
-			{
-				if (entry.CLRType == clrType)
-				{
-					return entry.GraphType;
-				}
-			}
-			return null;
-		}
-	}
+        public static Type Get(Type clrType)
+        {
+            if (_entries.TryGetValue(clrType, out var graphType))
+            {
+                return graphType;
+            }
 
-	public class RegistryEntry
-	{
-		public Type CLRType { get; }
-		public Type GraphType { get; }
-
-		public RegistryEntry(Type clrType, Type graphType)
-		{
-			CLRType = clrType;
-			GraphType = graphType;
-		}
-	}
+            return null;
+        }
+    }
 }
