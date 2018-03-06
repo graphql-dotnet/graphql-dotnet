@@ -11,6 +11,8 @@ namespace GraphQL
 
         static GraphTypeRegistry()
         {
+            _entries = new Dictionary<Type, Type>();
+
             _entries[typeof(int)] = typeof(IntGraphType);
             _entries[typeof(long)] = typeof(IntGraphType);
             _entries[typeof(double)] = typeof(FloatGraphType);
