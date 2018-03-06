@@ -129,6 +129,9 @@ namespace GraphQL
                 }
             }
 
+            graphType = GraphQL.GraphTypeRegistry.Get(type);
+
+
             if (type.IsArray)
             {
                 var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
@@ -142,8 +145,6 @@ namespace GraphQL
                 var listType = typeof(ListGraphType<>);
                 graphType = listType.MakeGenericType(elementType);
             }
-
-            graphType = GraphQL.GraphTypeRegistry.Get(type);
 
             if (graphType == null)
             {
