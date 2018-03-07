@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -59,7 +59,7 @@ namespace GraphQL.Validation.Rules
                                 ? new string[] {}
                                 : getSuggestedFieldNames(type, fieldName);
 
-                            // Retport an error, including helpful suggestions.
+                            // Report an error, including helpful suggestions.
                             context.ReportError(new ValidationError(
                                 context.OriginalQuery,
                                 "5.2.1",

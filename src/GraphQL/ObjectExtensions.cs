@@ -177,13 +177,13 @@ namespace GraphQL
                 return value;
             }
 
-            // DateTime -> DateTimeOffset convertion
+            // DateTime -> DateTimeOffset conversion
             if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
             {
                 return (DateTimeOffset)dateTimeValue;
             }
 
-            // DateTimeOffset -> DateTime convertion
+            // DateTimeOffset -> DateTime conversion
             if (fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
             {
                 return dateTimeOffsetValue.DateTime;
