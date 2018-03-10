@@ -8,12 +8,12 @@ namespace GraphQL.Conversion
     // https://github.com/JasperFx/baseline/tree/master/src/Baseline/Conversion
     public class Conversions
     {
-        private readonly LightweightCache<Type, Func<string, object>> _convertors;
+        private readonly LightweightCache<Type, Func<string, object>> _converters;
         private readonly IList<IConversionProvider> _providers = new List<IConversionProvider>();
 
         public Conversions()
         {
-            _convertors =
+            _converters =
                 new LightweightCache<Type, Func<string, object>>(
                     type =>
                     {
@@ -73,7 +73,7 @@ namespace GraphQL.Conversion
             }
 
             yield return new EnumerationConversion();
-            yield return new NullableConvertor(this);
+            yield return new NullableConverter(this);
             yield return new ArrayConversion(this);
             yield return new StringConverterProvider();
         }
@@ -83,24 +83,24 @@ namespace GraphQL.Conversion
             _providers.Add(new T());
         }
 
-        public void RegisterConversion<T>(Func<string, T> convertor)
+        public void RegisterConversion<T>(Func<string, T> converter)
         {
-            _convertors[typeof(T)] = x => convertor(x);
+            _converters[typeof(T)] = x => converter(x);
         }
 
         public Func<string, object> FindConverter(Type type)
         {
-            return _convertors[type];
+            return _converters[type];
         }
 
         public object Convert(Type type, string raw)
         {
-            return _convertors[type](raw);
+            return _converters[type](raw);
         }
 
         public bool Has(Type type)
         {
-            return _convertors.Has(type) || providers().Any(x => x.ConverterFor(type) != null);
+            return _converters.Has(type) || providers().Any(x => x.ConverterFor(type) != null);
         }
     }
 }

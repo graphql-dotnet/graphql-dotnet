@@ -363,10 +363,10 @@ namespace GraphQL.Utilities
                 }
                 else
                 {
-                    // For > 120 character long lines, cut at space boundaries into sublines
+                    // For > 120 character long lines, cut at space boundaries into sub-lines
                     // of ~80 chars.
-                    var sublines = BreakLine(line, 120 - indentation.Length);
-                    sublines.Apply(sub =>
+                    var subLines = BreakLine(line, 120 - indentation.Length);
+                    subLines.Apply(sub =>
                     {
                         desc += $"{indentation}# {sub}{Environment.NewLine}";
                     });
@@ -396,15 +396,15 @@ namespace GraphQL.Utilities
             {
                 return new[] {line};
             }
-            var sublines = new List<string>
+            var subLines = new List<string>
             {
                 parts[0] + parts[1] + parts[2]
             };
             for (var i = 3; i < parts.Length; i += 2)
             {
-                sublines.Add(parts[i].Substring(1) + parts[i + 1]);
+                subLines.Add(parts[i].Substring(1) + parts[i + 1]);
             }
-            return sublines.ToArray();
+            return subLines.ToArray();
         }
 
         public void Dispose()

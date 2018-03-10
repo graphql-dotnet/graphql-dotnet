@@ -25,7 +25,7 @@ namespace GraphQL.DataLoader
             if (cancellationToken.IsCancellationRequested)
             {
                 // If cancellation has been requested already,
-                // set the task to cancelled without calling FetchAsync()
+                // set the task to canceled without calling FetchAsync()
                 cts.TrySetCanceled();
                 return;
             }

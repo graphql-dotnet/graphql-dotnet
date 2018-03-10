@@ -1,4 +1,4 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -61,8 +61,8 @@ namespace GraphQL.Validation.Rules
 
         private IGraphType getFragmentType(ValidationContext context, string name)
         {
-            var frag = context.GetFragment(name);
-            return frag?.Type?.GraphTypeFromType(context.Schema);
+            var fragment = context.GetFragment(name);
+            return fragment?.Type?.GraphTypeFromType(context.Schema);
         }
     }
 }

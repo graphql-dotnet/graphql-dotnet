@@ -1,6 +1,6 @@
-﻿using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using System;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,8 +12,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class VariablesAreInputTypes : IValidationRule
     {
-        public Func<string, string, string> UndefinedVarMessage = (variableName, typeName) =>
-            $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
+
+        public Func<string, string, string> UndefinedVarMessage { get; } = (variableName, typeName) =>
+                 $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
 
         public INodeVisitor Validate(ValidationContext context)
         {

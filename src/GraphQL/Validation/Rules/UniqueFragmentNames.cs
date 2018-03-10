@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -10,9 +10,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueFragmentNames : IValidationRule
     {
-        public string DuplicateFragmentNameMessage(string fragName)
+        public string DuplicateFragmentNameMessage(string fragmentName)
         {
-            return $"There can only be one fragment named \"{fragName}\"";
+            return $"There can only be one fragment named \"{fragmentName}\"";
         }
 
         public INodeVisitor Validate(ValidationContext context)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -68,7 +68,7 @@ namespace GraphQL.Validation.Rules
         }
 
         /// <summary>
-        /// if a variable defintion has a default value, it is effectively non-null.
+        /// if a variable definition has a default value, it is effectively non-null.
         /// </summary>
         private GraphType effectiveType(IGraphType varType, VariableDefinition varDef)
         {
