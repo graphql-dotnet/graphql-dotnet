@@ -18,6 +18,9 @@ namespace GraphQL.DataLoader.Tests.Stores
         private int _getOrdersByUserIdCalled;
         public int GetOrdersByUserIdCalledCount => _getOrdersByUserIdCalled;
 
+        private IEnumerable<int> _getOrdersByUserId_UserIds;
+        public IEnumerable<int> GetOrdersByUserId_UserIds => _getOrdersByUserId_UserIds;
+
         private int _getOrderByIdCalled;
         public int GetOrderByIdCalledCount => _getOrderByIdCalled;
 
@@ -27,8 +30,9 @@ namespace GraphQL.DataLoader.Tests.Stores
         public async Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds)
         {
             Interlocked.Increment(ref _getOrdersByUserIdCalled);
+            Interlocked.Exchange(ref _getOrdersByUserId_UserIds, userIds);
 
-            await Task.Delay(1);
+            await Task.Yield();
 
             return _orders
                 .Join(userIds, o => o.UserId, x => x, (o, _) => o)

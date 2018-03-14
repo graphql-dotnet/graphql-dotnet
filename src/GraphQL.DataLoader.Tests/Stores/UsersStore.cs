@@ -19,6 +19,9 @@ namespace GraphQL.DataLoader.Tests.Stores
         private int _getUsersByIdCalled;
         public int GetUsersByIdCalledCount => _getUsersByIdCalled;
 
+        private IEnumerable<int> _getUsersById_UserIds;
+        public IEnumerable<int> GetUsersById_UserIds => _getUsersById_UserIds;
+
         private int _getAllUsersCalled;
         public int GetAllUsersCalledCount => _getAllUsersCalled;
 
@@ -26,8 +29,9 @@ namespace GraphQL.DataLoader.Tests.Stores
             CancellationToken cancellationToken = default(CancellationToken))
         {
             Interlocked.Increment(ref _getUsersByIdCalled);
+            Interlocked.Exchange(ref _getUsersById_UserIds, userIds);
 
-            await Task.Delay(1);
+            await Task.Yield();
 
             cancellationToken.ThrowIfCancellationRequested();
 

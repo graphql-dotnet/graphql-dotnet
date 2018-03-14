@@ -9,7 +9,7 @@ namespace GraphQL.DataLoader
     public class BatchDataLoader<TKey, T> : DataLoaderBase<Dictionary<TKey, T>>, IDataLoader<TKey, T>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<Dictionary<TKey, T>>> _loader;
-        private readonly List<TKey> _pendingKeys = new List<TKey>();
+        private readonly HashSet<TKey> _pendingKeys;
         private readonly Dictionary<TKey, T> _cache;
         private readonly T _defaultValue;
 
@@ -20,6 +20,8 @@ namespace GraphQL.DataLoader
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
+
+            _pendingKeys = new HashSet<TKey>(keyComparer);
             _cache = new Dictionary<TKey, T>(keyComparer);
             _defaultValue = defaultValue;
         }
@@ -44,6 +46,7 @@ namespace GraphQL.DataLoader
             }
 
             _loader = LoadAndMapToDictionary;
+            _pendingKeys = new HashSet<TKey>(keyComparer);
             _cache = new Dictionary<TKey, T>(keyComparer);
             _defaultValue = defaultValue;
         }
@@ -59,7 +62,10 @@ namespace GraphQL.DataLoader
                 }
 
                 // Otherwise add to pending keys
-                _pendingKeys.Add(key);
+                if (!_pendingKeys.Contains(key))
+                {
+                    _pendingKeys.Add(key);
+                }
             }
 
             var result = await DataLoaded;
