@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,6 +47,30 @@ namespace GraphQL.DataLoader.Tests.Stores
             cancellationToken.ThrowIfCancellationRequested();
 
             return _users.AsReadOnly();
+        }
+
+        public async Task<IEnumerable<User>> GetDuplicateUsersAsync(IEnumerable<int> userIds, CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Return 2 users for each key
+            return userIds.SelectMany(x =>
+                Enumerable.Repeat(_users.Find(u => u.UserId == x), 2)
+            ).ToList();
+        }
+
+        public Task<IEnumerable<User>> ThrowExceptionImmediatelyAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new Exception("Immediate");
+        }
+
+        public async Task<IEnumerable<User>> ThrowExceptionDeferredAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await Task.Yield();
+
+            throw new Exception("Deferred");
         }
     }
 }

@@ -41,23 +41,23 @@ namespace GraphQL.DataLoader
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
         }
 
-        public Task<IEnumerable<T>> LoadAsync(TKey key)
+        public async Task<IEnumerable<T>> LoadAsync(TKey key)
         {
             lock (_cache)
             {
                 // Get value from the cache if it's there
                 if (_cache.TryGetValue(key, out var value))
                 {
-                    return Task.FromResult(value);
+                    return value;
                 }
 
                 // Otherwise add to pending keys
                 _pendingKeys.Add(key);
             }
 
-            // Return task which will complete when this loader is dispatched
-            return DataLoaded.ContinueWith(task => task.Result[key],
-                TaskContinuationOptions.OnlyOnRanToCompletion);
+            var result = await DataLoaded;
+
+            return result[key];
         }
 
         protected override bool IsFetchNeeded()

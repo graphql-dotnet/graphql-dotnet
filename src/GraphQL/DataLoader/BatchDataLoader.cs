@@ -48,32 +48,30 @@ namespace GraphQL.DataLoader
             _defaultValue = defaultValue;
         }
 
-        public Task<T> LoadAsync(TKey key)
+        public async Task<T> LoadAsync(TKey key)
         {
             lock (_cache)
             {
                 // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out T value))
+                if (_cache.TryGetValue(key, out T cacheValue))
                 {
-                    return Task.FromResult(value);
+                    return cacheValue;
                 }
 
                 // Otherwise add to pending keys
                 _pendingKeys.Add(key);
             }
 
-            // Return task which will complete when this loader is dispatched
-            return DataLoaded.ContinueWith(task =>
+            var result = await DataLoaded;
+
+            if (result.TryGetValue(key, out T value))
             {
-                if (task.Result.TryGetValue(key, out T value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return _defaultValue;
-                }
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                return value;
+            }
+            else
+            {
+                return _defaultValue;
+            }
         }
 
         protected override bool IsFetchNeeded()
