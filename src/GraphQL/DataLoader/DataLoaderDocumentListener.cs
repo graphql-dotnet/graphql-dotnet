@@ -5,6 +5,10 @@ using GraphQL.Validation;
 
 namespace GraphQL.DataLoader
 {
+    /// <summary>
+    /// Used to manage the <seealso cref="DataLoaderContext"/>
+    /// and automatically dispatch data loader operations at each execution step.
+    /// </summary>
     public class DataLoaderDocumentListener : IDocumentExecutionListener
     {
         private readonly IDataLoaderContextAccessor _accessor;
@@ -34,6 +38,8 @@ namespace GraphQL.DataLoader
 
         public Task AfterExecutionAsync(object userContext, CancellationToken token)
         {
+            _accessor.Context = null;
+
             return TaskExtensions.CompletedTask;
         }
 
