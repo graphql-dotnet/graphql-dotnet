@@ -115,5 +115,25 @@ namespace GraphQL.DataLoader.Tests
             // This should have been called only once to load in a single batch
             Orders.GetOrdersByUserIdCalledCount.ShouldBe(2, "Operations should be batched");
         }
+
+        [Fact]
+        public async Task Keys_Are_DeDuped()
+        {
+            var loader = new CollectionBatchDataLoader<int, Order>((ids, ct) => Orders.GetOrdersByUserIdAsync(ids));
+
+            // Start async tasks to load duplicate keys
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(1);
+
+            // Dispatch loading
+            loader.Dispatch();
+
+            // Now await tasks
+            var user1Orders = await task1;
+            var user1bOrders = await task2;
+
+            Orders.GetOrdersByUserIdCalledCount.ShouldBe(1);
+            Orders.GetOrdersByUserId_UserIds.Count().ShouldBe(1, "The keys passed to the fetch delegate should be de-duplicated");
+        }
     }
 }
