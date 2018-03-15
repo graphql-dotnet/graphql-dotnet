@@ -220,7 +220,10 @@ namespace GraphQL.Execution
 
                 var coercedValue = CoerceValue(schema, type, value, variables);
                 coercedValue = coercedValue ?? arg.DefaultValue;
-                acc[arg.Name] = coercedValue;
+                if (coercedValue != null)
+                {
+                    acc[arg.Name] = coercedValue;
+                }
 
                 return acc;
             });
