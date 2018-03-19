@@ -78,24 +78,39 @@ namespace GraphQL
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var implementsIList = fieldType.GetInterface("IList") != null;
 
-                if (implementsIList)
+                if (fieldType.IsArray)
                 {
-                    newArray = (IList)Activator.CreateInstance(fieldType);
+                    if (!(propertyValue is IList values))
+                    {
+                        return null;
+                    }
+
+                    var tempArray = Array.CreateInstance(elementType, values.Count);
+                    values.CopyTo(tempArray, 0);
+                    newArray = tempArray;
+                    return newArray;
                 }
                 else
                 {
-                    var genericListType = typeof(List<>).MakeGenericType(elementType);
-                    newArray = (IList)Activator.CreateInstance(genericListType);
+                    if (implementsIList)
+                    {
+                        newArray = (IList)Activator.CreateInstance(fieldType);
+                    }
+                    else
+                    {
+                        var genericListType = typeof(List<>).MakeGenericType(elementType);
+                        newArray = (IList)Activator.CreateInstance(genericListType);
+                    }
+
+                    var valueList = propertyValue as IEnumerable;
+                    if (valueList == null) return newArray;
+
+                    foreach (var listItem in valueList)
+                    {
+                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    }
                 }
-
-                var valueList = propertyValue as IEnumerable;
-                if (valueList == null) return newArray;
-
-                foreach (var listItem in valueList)
-                {
-                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
-                }
-
+                
                 return newArray;
             }
 
