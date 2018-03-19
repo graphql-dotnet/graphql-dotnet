@@ -90,25 +90,23 @@ namespace GraphQL
                     newArray = tempArray;
                     return newArray;
                 }
+
+                if (implementsIList)
+                {
+                    newArray = (IList)Activator.CreateInstance(fieldType);
+                }
                 else
                 {
-                    if (implementsIList)
-                    {
-                        newArray = (IList)Activator.CreateInstance(fieldType);
-                    }
-                    else
-                    {
-                        var genericListType = typeof(List<>).MakeGenericType(elementType);
-                        newArray = (IList)Activator.CreateInstance(genericListType);
-                    }
+                    var genericListType = typeof(List<>).MakeGenericType(elementType);
+                    newArray = (IList)Activator.CreateInstance(genericListType);
+                }
 
-                    var valueList = propertyValue as IEnumerable;
-                    if (valueList == null) return newArray;
+                var valueList = propertyValue as IEnumerable;
+                if (valueList == null) return newArray;
 
-                    foreach (var listItem in valueList)
-                    {
-                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
-                    }
+                foreach (var listItem in valueList)
+                {
+                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
                 }
                 
                 return newArray;
