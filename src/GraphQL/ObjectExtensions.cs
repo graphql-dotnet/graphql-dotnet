@@ -80,7 +80,7 @@ namespace GraphQL
 
                 if (fieldType.IsArray)
                 {
-                    if (!(propertyValue is IList values))
+                    if (!(propertyValue is ICollection values))
                     {
                         return null;
                     }
