@@ -78,17 +78,29 @@ namespace GraphQL
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var implementsIList = fieldType.GetInterface("IList") != null;
 
-                if (fieldType.IsArray)
+                if (fieldType.IsArray | fieldType.IsAssignableFrom(elementType))
                 {
-                    if (!(propertyValue is ICollection values))
+                    if (!(propertyValue is IEnumerable values))
                     {
                         return null;
                     }
 
-                    var tempArray = Array.CreateInstance(elementType, values.Count);
-                    values.CopyTo(tempArray, 0);
-                    newArray = tempArray;
-                    return newArray;
+                    int length = 0;
+                    foreach (var line in values)
+                        length++;
+
+                    var tempArray = Array.CreateInstance(elementType, length);
+
+                    var valuesEnumerator = values.GetEnumerator();
+                    int idx = 0;
+                    while (valuesEnumerator.MoveNext())
+                    {
+                        var listValue = valuesEnumerator.Current;
+                        tempArray.SetValue(listValue == null ? null : GetPropertyValue(listValue, elementType), idx);
+                        idx++;
+                    }
+
+                    return tempArray;
                 }
 
                 if (implementsIList)
@@ -108,7 +120,7 @@ namespace GraphQL
                 {
                     newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
                 }
-                
+
                 return newArray;
             }
 
