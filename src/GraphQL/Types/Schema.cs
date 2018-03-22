@@ -73,7 +73,9 @@ namespace GraphQL.Types
         public Schema(IDependencyResolver dependencyResolver)
         {
             DependencyResolver = dependencyResolver;
+            #pragma warning disable 0618
             ResolveType = type => dependencyResolver.Resolve(type) as IGraphType;
+            #pragma warning restore 0618
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -207,11 +209,6 @@ namespace GraphQL.Types
 
         public void Dispose()
         {
-            ResolveType = null;
-            DependencyResolver = null;
-            Query = null;
-            Mutation = null;
-            Subscription = null;
             _additionalInstances.Clear();
             _additionalTypes.Clear();
 
