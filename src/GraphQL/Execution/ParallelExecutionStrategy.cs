@@ -20,6 +20,7 @@ namespace GraphQL.Execution
                 // Start executing all pending nodes
                 for (int i = 0; i < pendingNodes.Count; i++)
                 {
+                    context.CancellationToken.ThrowIfCancellationRequested();
                     currentTasks[i] = ExecuteNodeAsync(context, pendingNodes[i]);
                 }
 
