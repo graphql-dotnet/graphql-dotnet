@@ -137,6 +137,8 @@ _.FieldMiddleware.Use(next =>
 
 ## Authentication / Authorization
 
+See the [Authorization](https://github.com/graphql-dotnet/authorization) project for an implemenation of the following.
+
 You can write validation rules that will run before the query is executed.  You can use this pattern to check that the user is authenticated or has permissions for a specific field.  This example uses the `Metadata` dictionary available on Fields to set permissons per field.
 
 ```csharp
@@ -283,7 +285,7 @@ Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (
 
 ## DataLoader
 
-GraphQL .NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader). 
+GraphQL .NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader).
 
 Documentation is here: <[linkto:dataloader]>
 
