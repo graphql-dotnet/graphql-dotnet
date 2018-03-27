@@ -32,6 +32,7 @@ deploy:
   api_key:
     secure: +l1vfBMajn1WfmXkQ2LdILKxK4fQ5AHSnnU1kf11Bn1xRGUOTCdPhLwHx232piEn
   skip_symbols: false
+  symbol_server: https://www.myget.org/F/graphql-dotnet/symbols/api/v2/package
   on:
     branch:
       - master
