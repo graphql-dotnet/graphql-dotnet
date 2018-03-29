@@ -130,6 +130,18 @@ namespace GraphQL.Tests.Execution
                     return result;
                 });
 
+            Field<IntGraphType>(
+                "fieldWithNullableIntInput",
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> { Name = "input" }
+                ),
+                resolve: context =>
+                {
+                    var val = context.GetArgument<int>("input");
+                    var result = JsonConvert.SerializeObject(val);
+                    return result;
+                });
+
             Field<StringGraphType>(
                 "fieldWithNonNullableStringInput",
                 arguments: new QueryArguments(
@@ -360,6 +372,24 @@ namespace GraphQL.Tests.Execution
 
     public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     {
+        [Fact]
+        public void allows_nullable_int_input_to_be_ommited()
+        {
+            var query = @"
+{
+  fieldWithNullableIntInput
+}
+";
+
+            var expected = @"
+{
+  'fieldWithNullableIntInput': 0
+}
+";
+
+            AssertQuerySuccess(query, expected);
+        }
+
         [Fact]
         public void allows_nullable_inputs_to_be_ommited()
         {

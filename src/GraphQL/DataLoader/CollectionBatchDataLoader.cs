@@ -10,7 +10,7 @@ namespace GraphQL.DataLoader
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
         private readonly Dictionary<TKey, IEnumerable<T>> _cache;
-        private readonly List<TKey> _pendingKeys = new List<TKey>();
+        private readonly HashSet<TKey> _pendingKeys;
 
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null)
         {
@@ -18,6 +18,7 @@ namespace GraphQL.DataLoader
 
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
+            _pendingKeys = new HashSet<TKey>(keyComparer);
         }
 
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader, Func<T, TKey> keySelector,
@@ -39,25 +40,29 @@ namespace GraphQL.DataLoader
 
             _loader = LoadAndMapToLookup;
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
+            _pendingKeys = new HashSet<TKey>(keyComparer);
         }
 
-        public Task<IEnumerable<T>> LoadAsync(TKey key)
+        public async Task<IEnumerable<T>> LoadAsync(TKey key)
         {
             lock (_cache)
             {
                 // Get value from the cache if it's there
                 if (_cache.TryGetValue(key, out var value))
                 {
-                    return Task.FromResult(value);
+                    return value;
                 }
 
                 // Otherwise add to pending keys
-                _pendingKeys.Add(key);
+                if (!_pendingKeys.Contains(key))
+                {
+                    _pendingKeys.Add(key);
+                }
             }
 
-            // Return task which will complete when this loader is dispatched
-            return DataLoaded.ContinueWith(task => task.Result[key],
-                TaskContinuationOptions.OnlyOnRanToCompletion);
+            var result = await DataLoaded;
+
+            return result[key];
         }
 
         protected override bool IsFetchNeeded()

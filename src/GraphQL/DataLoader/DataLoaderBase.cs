@@ -20,17 +20,29 @@ namespace GraphQL.DataLoader
                 return;
             }
 
-            var cts = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<T>());
+            var tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<T>());
 
             if (cancellationToken.IsCancellationRequested)
             {
                 // If cancellation has been requested already,
                 // set the task to cancelled without calling FetchAsync()
-                cts.TrySetCanceled();
+                tcs.TrySetCanceled();
                 return;
             }
 
-            FetchAsync(cancellationToken).ContinueWith(task =>
+            Task<T> fetchTask = null;
+
+            try
+            {
+                fetchTask = FetchAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                tcs.SetException(ex);
+                return;
+            }
+
+            fetchTask.ContinueWith(task =>
             {
                 if (task.IsFaulted)
                 {
@@ -41,15 +53,15 @@ namespace GraphQL.DataLoader
                         ex = ex.InnerException;
                     }
 
-                    cts.SetException(ex);
+                    tcs.SetException(ex);
                 }
                 else if (task.IsCanceled)
                 {
-                    cts.SetCanceled();
+                    tcs.SetCanceled();
                 }
                 else
                 {
-                    cts.SetResult(task.Result);
+                    tcs.SetResult(task.Result);
                 }
             });
         }

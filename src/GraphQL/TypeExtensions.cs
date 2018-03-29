@@ -129,41 +129,8 @@ namespace GraphQL
                 }
             }
 
+            graphType = GraphQL.GraphTypeRegistry.Get(type);
 
-            if (type == typeof(int))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(long))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(double) || type == typeof(float))
-            {
-                graphType = typeof(FloatGraphType);
-            }
-
-            if (type == typeof(decimal))
-            {
-                graphType = typeof(DecimalGraphType);
-            }
-
-            if (type == typeof(string))
-            {
-                graphType = typeof(StringGraphType);
-            }
-
-            if (type == typeof(bool))
-            {
-                graphType = typeof(BooleanGraphType);
-            }
-
-            if (type == typeof(DateTime))
-            {
-                graphType = typeof(DateGraphType);
-            }
 
             if (type.IsArray)
             {

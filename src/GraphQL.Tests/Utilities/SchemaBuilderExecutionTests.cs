@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -341,8 +342,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<BlogQueryType>();
             Builder.Types.Include<Blog>();
 
-            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ post(id: $postId) { id title } } }";
-            var expected = @"{ 'blog': { 'post': { 'id' : '1', 'title': 'Post One' } } }";
+            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
+            var expected = @"{ 'blog': { 'title': 'New blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
             var variables = "{ 'blogId': '1', 'postId': '1' }";
 
             AssertQuery(_ =>
