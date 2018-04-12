@@ -139,7 +139,9 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
-            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (type.GetTypeInfo().IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>)
+                                                    || type.GetGenericTypeDefinition() == typeof(ICollection<>) 
+                                                    || type.GetGenericTypeDefinition() == typeof(IList<>)))
             {
                 var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
                 var listType = typeof(ListGraphType<>);
