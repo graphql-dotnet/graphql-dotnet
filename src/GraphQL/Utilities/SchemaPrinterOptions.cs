@@ -1,9 +1,13 @@
+using System.Collections.Generic;
+
 namespace GraphQL.Utilities
 {
     public class SchemaPrinterOptions
     {
-        public bool IncludeDescriptions { get; set; }
+        public List<string> CustomScalars { get; set; } = new List<string>();
 
-        public bool IncludeDeprecationReasons { get; set; }
+        public bool IncludeDescriptions { get; set; } = false;
+
+        public bool IncludeDeprecationReasons { get; set; } = false;
     }
 }

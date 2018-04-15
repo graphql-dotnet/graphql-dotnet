@@ -26,17 +26,15 @@ namespace GraphQL.Utilities
 
         public SchemaPrinter(
             ISchema schema,
-            IEnumerable<string> customScalars = null,
             SchemaPrinterOptions options = null)
         {
             _schema = schema;
-
-            if (customScalars != null)
-            {
-                _scalars.Fill(customScalars);
-            }
-
             _options = options ?? new SchemaPrinterOptions();
+
+            if (_options.CustomScalars?.Count > 0)
+            {
+                _scalars.Fill(_options.CustomScalars);
+            }
         }
 
         private ISchema Schema => _schema;
