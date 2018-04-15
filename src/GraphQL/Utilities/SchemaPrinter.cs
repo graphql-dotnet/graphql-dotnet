@@ -12,9 +12,7 @@ namespace GraphQL.Utilities
     {
         private ISchema _schema;
 
-        private readonly bool _fieldDescriptions;
-
-        private readonly bool _fieldDeprecationReasons;
+        private readonly SchemaPrinterOptions _options;
 
         private readonly List<string> _scalars = new List<string>(
             new[]
@@ -29,8 +27,7 @@ namespace GraphQL.Utilities
         public SchemaPrinter(
             ISchema schema,
             IEnumerable<string> customScalars = null,
-            bool fieldDescriptions = false,
-            bool fieldDeprecationReasons = false)
+            SchemaPrinterOptions options = null)
         {
             _schema = schema;
 
@@ -39,8 +36,7 @@ namespace GraphQL.Utilities
                 _scalars.Fill(customScalars);
             }
 
-            _fieldDescriptions = fieldDescriptions;
-            _fieldDeprecationReasons = fieldDeprecationReasons;
+            _options = options ?? new SchemaPrinterOptions();
         }
 
         private ISchema Schema => _schema;
@@ -257,8 +253,8 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = _fieldDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
-                    Deprecation = _fieldDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
+                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
+                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(
