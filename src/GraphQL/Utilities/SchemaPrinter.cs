@@ -12,6 +12,8 @@ namespace GraphQL.Utilities
     {
         private ISchema _schema;
 
+        private readonly SchemaPrinterOptions _options;
+
         private readonly List<string> _scalars = new List<string>(
             new[]
             {
@@ -22,13 +24,16 @@ namespace GraphQL.Utilities
                 "ID"
             });
 
-        public SchemaPrinter(ISchema schema, IEnumerable<string> customScalars = null)
+        public SchemaPrinter(
+            ISchema schema,
+            SchemaPrinterOptions options = null)
         {
             _schema = schema;
+            _options = options ?? new SchemaPrinterOptions();
 
-            if (customScalars != null)
+            if (_options.CustomScalars?.Count > 0)
             {
-                _scalars.Fill(customScalars);
+                _scalars.Fill(_options.CustomScalars);
             }
         }
 
@@ -245,11 +250,13 @@ namespace GraphQL.Utilities
                 {
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
-                    Args = PrintArgs(x)
+                    Args = PrintArgs(x),
+                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
+                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(
-                f => "  {0}{1}: {2}".ToFormat(f.Name, f.Args, f.Type)));
+                f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)
@@ -269,7 +276,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue, argumentType));
             }
 
             return desc;
@@ -282,7 +289,7 @@ namespace GraphQL.Utilities
 
             if (argument.DefaultValue != null)
             {
-                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue));
+                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue, argumentType));
             }
 
             return desc;
@@ -310,7 +317,7 @@ namespace GraphQL.Utilities
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
         }
 
-        public string FormatDefaultValue(object value)
+        public string FormatDefaultValue(object value, IGraphType graphType)
         {
             if (value is string)
             {
@@ -322,7 +329,28 @@ namespace GraphQL.Utilities
                 return value.ToString().ToLower();
             }
 
+            if (IsEnumType(graphType))
+            {
+                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
+            }
+
             return "{0}".ToFormat(value);
+        }
+
+        private static bool IsEnumType(IGraphType type)
+        {
+            return type.GetNamedType() is EnumerationGraphType;
+        }
+
+        private static object SerializeEnumValue(IGraphType type, object value)
+        {
+            if (type is NonNullGraphType)
+            {
+                var nullable = (NonNullGraphType)type;
+                type = nullable.ResolvedType;
+            }
+
+            return ((EnumerationGraphType)type).Serialize(value);
         }
 
         public static string ResolveName(IGraphType type)
