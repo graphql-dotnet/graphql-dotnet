@@ -339,13 +339,7 @@ namespace GraphQL.Utilities
 
         private static bool IsEnumType(IGraphType type)
         {
-            if (type is NonNullGraphType)
-            {
-                var nullable = (NonNullGraphType)type;
-                type = nullable.ResolvedType;
-            }
-
-            return type is EnumerationGraphType;
+            return type.GetNamedType() is EnumerationGraphType;
         }
 
         private static object SerializeEnumValue(IGraphType type, object value)
