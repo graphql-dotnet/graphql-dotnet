@@ -120,13 +120,15 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public async void try_resolve_async_invokes_error_handler()
         {
+            var obj = new object();
             var result = await _context.TryAsyncResolve<object>(
                 c => throw new InvalidOperationException(),
                 e => {
                     e.Add(new ExecutionError("Test Error"));
-                    return null;
+                    return Task.FromResult(obj);
                 }
             );
+            result.ShouldBe(obj);
             _context.Errors.First().Message.ShouldBe("Test Error");
         }
 

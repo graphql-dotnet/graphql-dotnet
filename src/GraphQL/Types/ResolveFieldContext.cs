@@ -108,11 +108,11 @@ namespace GraphQL.Types
             return Arguments?.ContainsKey(argumentName) ?? false;
         }
 
-        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
+        public Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
         {
             try
             {
-                return await resolve(this);
+                return resolve(this);
             }
             catch (Exception ex)
             {
@@ -122,11 +122,11 @@ namespace GraphQL.Types
                     er.AddLocation(FieldAst, Document);
                     er.Path = Path;
                     Errors.Add(er);
-                    return default(TResult);
+                    return Task.FromResult(default(TResult));
                 }
                 else
                 {
-                    return await error(Errors);
+                    return error(Errors);
                 }
             }
         }
