@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
@@ -419,6 +419,40 @@ namespace GraphQL.Tests.Utilities
             type.ShouldNotBeNull();
             type.Fields.Count().ShouldBe(1);
             type.Fields.Single().DeprecationReason.ShouldBe("my reason");
+        }
+
+        [Fact]
+        public void build_extension_type()
+        {
+            var definitions1 = @"
+                type Query {
+                    author(id: Int): String
+                }
+
+                extend type Query {
+                    book(id: Int): String
+                }
+            ";
+
+            var schema1 = Schema.For(definitions1);
+            schema1.Initialize();
+            var type1 = schema1.FindType("Query") as IObjectGraphType;
+            type1.Fields.Count().ShouldBe(2);
+
+            var definitions2 = @"
+                extend type Query {
+                    author(id: Int): String
+                }
+
+                type Query {
+                    book(id: Int): String
+                }
+            ";
+
+            var schema2 = Schema.For(definitions2);
+            schema2.Initialize();
+            var type2 = schema2.FindType("Query") as IObjectGraphType;
+            type2.Fields.Count().ShouldBe(2);
         }
 
         class Movie
