@@ -108,6 +108,12 @@ namespace GraphQL.Types
             return Arguments?.ContainsKey(argumentName) ?? false;
         }
 
+
+        public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+        {
+            return TryAsyncResolve<object>(resolve, error);
+        }
+
         public Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
         {
             try
