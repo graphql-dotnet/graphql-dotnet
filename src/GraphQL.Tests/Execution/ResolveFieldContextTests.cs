@@ -102,23 +102,46 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public async void try_resolve_async_adds_exception_message()
+        public async Task try_resolve_async_handles_null()
         {
-            var result = await _context.TryAsyncResolve<object>(c => throw new InvalidOperationException("Test Error"));
+            var result = await _context.TryAsyncResolve(c => null);
+            result.ShouldBe(null);
+        }
+
+        [Fact]
+        public async Task try_resolve_async_handles_exception()
+        {
+            var result = await _context.TryAsyncResolve(c => throw new InvalidOperationException("Test Error"));
+            result.ShouldBeNull();
             _context.Errors.First().Message.ShouldBe("Test Error");
         }
 
         [Fact]
-        public async void try_resolve_sets_inner_exception()
+        public async Task try_resolve_sets_inner_exception()
         {
             var exception = new Exception("Test");
             var result = await _context.TryAsyncResolve(
                 c => throw exception);
+            result.ShouldBeNull();
             _context.Errors.First().InnerException.ShouldBe(exception);
         }
 
         [Fact]
-        public async void try_resolve_async_invokes_error_handler()
+        public async Task try_resolve_async_invokes_error_handler()
+        {
+            var result = await _context.TryAsyncResolve(
+                c => throw new InvalidOperationException(),
+                e => {
+                    e.Add(new ExecutionError("Test Error"));
+                    return null;
+                }
+            );
+            result.ShouldBeNull();
+            _context.Errors.First().Message.ShouldBe("Test Error");
+        }
+
+        [Fact]
+        public async Task try_resolve_async_not_null_invokes_error_handler()
         {
             var obj = new object();
             var result = await _context.TryAsyncResolve(
@@ -133,7 +156,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public async void try_resolve_generic_sets_inner_exception()
+        public async Task try_resolve_generic_sets_inner_exception()
         {
             var exception = new Exception("Test");
             var result = await _context.TryAsyncResolve<int>(
@@ -144,7 +167,7 @@ namespace GraphQL.Tests.Execution
 
         [Theory]
         [InlineData(123)]
-        public async void try_resolve_generic_async_invokes_error_handler(int value)
+        public async Task try_resolve_generic_async_invokes_error_handler(int value)
         {
             var result = await _context.TryAsyncResolve<int>(
                 c => throw new InvalidOperationException(),
@@ -158,7 +181,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public async void try_resolve_async_properly_resolves_result()
+        public async Task try_resolve_async_properly_resolves_result()
         {
             var result = await _context.TryAsyncResolve(
                 c => Task.FromResult<object>("Test Result")
