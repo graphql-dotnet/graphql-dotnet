@@ -3,6 +3,7 @@ using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ namespace GraphQL.GraphiQLCore
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
@@ -29,6 +31,11 @@ namespace GraphQL.GraphiQLCore
                 s => new StarWarsSchema(new FuncDependencyResolver(type => (GraphType) s.GetService(type))));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddCors();
+            services.Configure<CorsOptions>(options => options.AddPolicy("AllResolved", builder =>
+            {
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+            }));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -49,6 +56,7 @@ namespace GraphQL.GraphiQLCore
             });
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseCors("AllResolved");
         }
     }
 }

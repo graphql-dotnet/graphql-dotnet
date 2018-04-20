@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
-    <PackageTargetFallback>dnxcore50</PackageTargetFallback>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
+    <AssetTargetFallback>dnxcore50</AssetTargetFallback>
     <AssemblyName>GraphQL.StarWars</AssemblyName>
     <PackageId>GraphQL.StarWars</PackageId>
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="2.0.0-alpha-820" />
+    <PackageReference Include="GraphQL" Version="2.0.0-alpha-851" />
   </ItemGroup>
 
 </Project>

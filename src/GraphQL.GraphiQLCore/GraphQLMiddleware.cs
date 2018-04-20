@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace GraphQL.GraphiQLCore
@@ -35,7 +37,7 @@ namespace GraphQL.GraphiQLCore
             {
                 await _next(context);
                 return;
-            }
+            };
 
             await ExecuteAsync(context, schema);
         }
@@ -74,7 +76,7 @@ namespace GraphQL.GraphiQLCore
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
-
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await context.Response.WriteAsync(json);
         }
     }
