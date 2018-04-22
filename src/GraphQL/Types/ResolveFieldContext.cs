@@ -136,7 +136,7 @@ namespace GraphQL.Types
                     if (result == null)
                         return default(TResult);
 
-                    return await error(Errors);
+                    return await result;
                 }
             }
         }
