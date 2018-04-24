@@ -133,10 +133,7 @@ namespace GraphQL.Types
                 else
                 {
                     var result = error(Errors);
-                    if (result == null)
-                        return default(TResult);
-
-                    return await result;
+                    return result == null ? default(TResult) : await result;
                 }
             }
         }
