@@ -424,7 +424,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void build_extension_type()
         {
-            var definitions1 = @"
+            var definitions = @"
                 type Query {
                     author(id: Int): String
                 }
@@ -434,12 +434,16 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema1 = Schema.For(definitions1);
-            schema1.Initialize();
-            var type1 = schema1.FindType("Query") as IObjectGraphType;
-            type1.Fields.Count().ShouldBe(2);
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+            var type = schema.FindType("Query") as IObjectGraphType;
+            type.Fields.Count().ShouldBe(2);
+        }
 
-            var definitions2 = @"
+        [Fact]
+        public void build_extension_type_out_of_order()
+        {
+            var definitions = @"
                 extend type Query {
                     author(id: Int): String
                 }
@@ -449,10 +453,10 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema2 = Schema.For(definitions2);
-            schema2.Initialize();
-            var type2 = schema2.FindType("Query") as IObjectGraphType;
-            type2.Fields.Count().ShouldBe(2);
+            var schema = Schema.For(definitions);
+            schema.Initialize();
+            var type = schema.FindType("Query") as IObjectGraphType;
+            type.Fields.Count().ShouldBe(2);
         }
 
         class Movie
