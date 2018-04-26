@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="2.0.0-alpha-820" />
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 
 </Project>
