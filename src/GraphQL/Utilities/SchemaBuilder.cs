@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -213,6 +214,32 @@ namespace GraphQL.Utilities
             field.Description = fieldConfig.Description;
             field.ResolvedType = ToGraphType(fieldDef.Type);
             field.Resolver = fieldConfig.Resolver;
+
+            CopyMetadata(field, fieldConfig);
+
+            var args = fieldDef.Arguments.Select(ToArguments);
+            field.Arguments = new QueryArguments(args);
+
+            ApplyDeprecatedDirective(fieldDef.Directives, reason =>
+            {
+                field.DeprecationReason = fieldConfig.DeprecationReason ?? reason;
+            });
+
+            return field;
+        }
+
+        protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
+        {
+            var typeConfig = Types.For(parentTypeName);
+            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, DependencyResolver);
+
+            var field = new EventStreamFieldType();
+            field.Name = fieldDef.Name.Value;
+            field.Description = fieldConfig.Description;
+            //field.ResolvedType = ToGraphType(fieldDef.Type);
+            field.Resolver = fieldConfig.Resolver;
+            field.AsyncSubscriber = fieldConfig.AsyncSubscriber;
+            field.Subscriber = fieldConfig.Subscriber;
 
             CopyMetadata(field, fieldConfig);
 

@@ -42,17 +42,24 @@ namespace GraphQL.Utilities
         public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
         {
             var config = _fields[field];
-            config.Accessor = Type.ToAccessor(field);
+            config.ResolverAccessor = Type.ToAccessor(field, false);
+            config.SubscriberAccessor = Type.ToAccessor(field, true);
 
             if(Type != null)
             {
-                if(config.Accessor == null)
+                if(config.ResolverAccessor == null)
                 {
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                config.Resolver = new AccessorFieldResolver(config.Accessor, dependencyResolver);
-                config.Accessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+
+                if (config.SubscriberAccessor != null)
+                {
+                    config.AsyncSubscriber = new AccessorFieldResolver(config.SubscriberAccessor, dependencyResolver);
+
+                }
             }
 
             return config;

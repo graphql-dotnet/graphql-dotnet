@@ -11,11 +11,12 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        public static IAccessor ToAccessor(this Type type, string field)
+        /// <param name="isSubscriber">Indicateds if it is a subscriber field</param>
+        public static IAccessor ToAccessor(this Type type, string field, bool isSubscriber)
         {
             if(type == null) return null;
 
-            var methodInfo = type.MethodForField(field);
+            var methodInfo = type.MethodForField(field, isSubscriber);
             if(methodInfo != null)
             {
                 return new SingleMethodAccessor(methodInfo);
@@ -35,7 +36,7 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        public static MethodInfo MethodForField(this Type type, string field)
+        public static MethodInfo MethodForField(this Type type, string field, bool isSubcriber)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -43,7 +44,7 @@ namespace GraphQL.Reflection
             {
                 var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
                 var name = attr?.Name ?? m.Name;
-                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase);
+                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase) && isSubcriber == attr?.Subscriber;
             });
 
             return method;
