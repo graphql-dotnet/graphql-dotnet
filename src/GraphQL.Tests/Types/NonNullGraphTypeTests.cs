@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Types
         {
             var result = AssertQueryWithErrors(
                 "{ nonNullable { a b c } }",
-                "{ nonNullable: { a: null, b: null, c: null } }",
+                "{ nonNullable: null }",
                 root: new ExampleContext(null, null, null),
                 expectedErrorCount: 3);
 
