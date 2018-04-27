@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,7 @@ using GraphQLParser;
 
 namespace GraphQL
 {
+    [Serializable]
     public class ExecutionError : Exception
     {
         private List<ErrorLocation> _errorLocations;

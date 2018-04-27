@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQLParser;
 
 namespace GraphQL.Validation
 {
+    [Serializable]
     public class ValidationError : ExecutionError
     {
         private readonly List<INode> _nodes = new List<INode>();
