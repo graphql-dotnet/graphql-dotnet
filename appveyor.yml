@@ -11,10 +11,10 @@ nuget:
   disable_publish_on_pr: true
 
 install:
-  - npm install -g npm
-  - npm --version
   - ps: Install-Product node LTS
   - node --version
+  - npm install -g npm
+  - npm --version
   - dotnet --version
 
 build_script:
