@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace GraphQL.Execution
 {
+    [Serializable]
     public class InvalidValueException : ExecutionError
     {
         public InvalidValueException(string fieldName, string message) : 

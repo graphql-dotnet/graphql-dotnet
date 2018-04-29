@@ -5,6 +5,7 @@ using GraphQLParser;
 
 namespace GraphQL.Validation
 {
+    [Serializable]
     public class ValidationError : ExecutionError
     {
         private readonly List<INode> _nodes = new List<INode>();
