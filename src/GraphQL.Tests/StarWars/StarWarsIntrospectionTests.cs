@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace GraphQL.Tests.StarWars
 {
@@ -111,6 +111,20 @@ namespace GraphQL.Tests.StarWars
                   name: 'Droid',
                   fields: [
                     {
+                      name: 'appearsIn',
+                      type: {
+                        name: null,
+                        kind: 'LIST'
+                      }
+                    },
+                    {
+                      name: 'friends',
+                      type: {
+                        name: null,
+                        kind: 'LIST'
+                      }
+                    },
+                    {
                       name: 'id',
                       type: {
                         name: null,
@@ -122,20 +136,6 @@ namespace GraphQL.Tests.StarWars
                       type: {
                         name: 'String',
                         kind: 'SCALAR'
-                      }
-                    },
-                    {
-                      name: 'friends',
-                      type: {
-                        name: null,
-                        kind: 'LIST'
-                      }
-                    },
-                    {
-                      name: 'appearsIn',
-                      type: {
-                        name: null,
-                        kind: 'LIST'
                       }
                     },
                     {
@@ -352,15 +352,11 @@ namespace GraphQL.Tests.StarWars
               'queryType': {
                 'fields': [
                   {
-                    'name': 'hero',
-                    'args': []
-                  },
-                  {
-                    'name': 'human',
+                    'name': 'droid',
                     'args': [
                       {
                         'name': 'id',
-                        'description': 'id of the human',
+                        'description': 'id of the droid',
                         'type': {
                           'name': null,
                           'kind': 'NON_NULL',
@@ -374,11 +370,15 @@ namespace GraphQL.Tests.StarWars
                     ]
                   },
                   {
-                    'name': 'droid',
+                    'name': 'hero',
+                    'args': []
+                  },
+                  {
+                    'name': 'human',
                     'args': [
                       {
                         'name': 'id',
-                        'description': 'id of the droid',
+                        'description': 'id of the human',
                         'type': {
                           'name': null,
                           'kind': 'NON_NULL',

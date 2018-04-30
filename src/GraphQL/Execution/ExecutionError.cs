@@ -8,6 +8,7 @@ using GraphQLParser;
 
 namespace GraphQL
 {
+    [Serializable]
     public class ExecutionError : Exception
     {
         private List<ErrorLocation> _errorLocations;

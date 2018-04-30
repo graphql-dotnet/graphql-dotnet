@@ -25,3 +25,6 @@ nuget/lib
 artifacts
 *.tgz
 doc-target
+_NCrunch_*/
+*.ncrunchproject
+*.ncrunchsolution
