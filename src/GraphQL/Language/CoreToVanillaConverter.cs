@@ -205,18 +205,13 @@ namespace GraphQL.Language
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    if (double.TryParse(str.Value, NumberStyles.Float, NumberFormatInfo.InvariantInfo, out var value))
-                    {
-                        return new FloatValue(value).WithLocation(str, _body);
-                    }
-
-                    throw new ExecutionError($"Invalid float {str.Value}");
+                    return new FloatValue(ValueConverter.ConvertTo<double>(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
+                    return new BooleanValue(ValueConverter.ConvertTo<bool>(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {

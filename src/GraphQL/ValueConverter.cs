@@ -27,8 +27,23 @@ namespace GraphQL
 
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(long), IntToLong);
+            Register(typeof(int), typeof(decimal), IntToDecimal);
 
             Register(typeof(long), typeof(int), LongToInt);
+
+            Register(typeof(double), typeof(decimal), DoubleToDecimal);
+        }
+
+        private static object IntToDecimal(object value)
+        {
+            var intValue = (int) value;
+            return Convert.ToDecimal(intValue, NumberFormatInfo.InvariantInfo);
+        }
+
+        private static object DoubleToDecimal(object value)
+        {
+            var doubleValue = (double) value;
+            return Convert.ToDecimal(doubleValue, NumberFormatInfo.InvariantInfo);
         }
 
         private static object LongToInt(object value)
@@ -95,17 +110,28 @@ namespace GraphQL
 
         private static object ParseDouble(object value)
         {
-            return Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
+            var v =  double.Parse(
+                (string)value,
+                NumberStyles.Float,
+                NumberFormatInfo.InvariantInfo);
+
+            return v;
         }
 
         private static object ParseDecimal(object value)
         {
-            return Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo);
+            return decimal.Parse(
+                (string)value,
+                NumberStyles.Float,
+                NumberFormatInfo.InvariantInfo);
         }
 
         private static object ParseFloat(object value)
         {
-            return Convert.ToSingle(value, NumberFormatInfo.InvariantInfo);
+            return float.Parse(
+                (string)value,
+                NumberStyles.Float,
+                NumberFormatInfo.InvariantInfo);
         }
 
         private static object ParseInt(object value)
@@ -123,6 +149,16 @@ namespace GraphQL
             var valueType = value.GetType();
             var conversion = GetConversion(valueType, targetType);
             return conversion(value);
+        }
+
+        public static T ConvertTo<T>(object value)
+        {
+            var v = ConvertTo(value, typeof(T));
+
+            if (v == null)
+                return default(T);
+
+            return (T) v;
         }
 
         private static Func<object, object> GetConversion(Type valueType, Type targetType)
