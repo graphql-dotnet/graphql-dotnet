@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -43,8 +44,6 @@ namespace GraphQL.Utilities
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
-            config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
-            config.AsyncSubscriberAccessor = Type.ToAccessor(field, ResolverType.AsyncSubscriber);
             
             if(Type != null)
             {
@@ -55,15 +54,39 @@ namespace GraphQL.Utilities
 
                 config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
                 config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+            }
 
-                if (config.SubscriberAccessor != null)
+            return config;
+        }
+
+        public FieldConfig SubscriptionFieldFor(string field, IDependencyResolver dependencyResolver)
+        {
+            var config = _fields[field];
+            config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
+            config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
+
+            if (Type != null)
+            {
+                if (config.ResolverAccessor == null)
                 {
-                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                    throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                if (config.AsyncSubscriberAccessor != null)
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+
+                if (config.SubscriberAccessor == null)
                 {
-                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.AsyncSubscriberAccessor, dependencyResolver);
+                    throw new InvalidOperationException($"Expected to find Subscribe method {field} on {Type.Name} but could not.");
+                }
+
+                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                }
+                else
+                {
+                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, dependencyResolver);
                 }
             }
 

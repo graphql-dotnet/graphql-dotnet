@@ -18,6 +18,5 @@ namespace GraphQL.Utilities
         public IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public IAccessor ResolverAccessor { get; set; }
         public IAccessor SubscriberAccessor { get; set; }
-        public IAccessor AsyncSubscriberAccessor { get; set; }
     }
 }

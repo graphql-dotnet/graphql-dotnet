@@ -240,7 +240,7 @@ namespace GraphQL.Utilities
         protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, DependencyResolver);
+            var fieldConfig = typeConfig.SubscriptionFieldFor(fieldDef.Name.Value, DependencyResolver);
 
             var field = new EventStreamFieldType();
             field.Name = fieldDef.Name.Value;
