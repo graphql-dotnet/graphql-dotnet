@@ -88,8 +88,7 @@ namespace GraphQL.Types
             }
 
             var arg = Arguments[name];
-            var inputObject = arg as Dictionary<string, object>;
-            if (inputObject != null)
+            if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;
                 if (type.Namespace?.StartsWith("System") == true)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
@@ -434,7 +435,8 @@ namespace GraphQL.Utilities
                 case ASTNodeKind.FloatValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return Conversions.ParseDouble(str.Value);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    return ValueConverter.ConvertTo(str.Value, typeof(double));
                 }
                 case ASTNodeKind.BooleanValue:
                 {
