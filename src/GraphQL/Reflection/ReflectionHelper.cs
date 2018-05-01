@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        /// <param name="isSubscriber">Indicateds if it is a subscriber field</param>
+        /// <param name="resolverType">defaults to Resolver</param>
         public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
         {
             if(type == null) return null;
@@ -72,6 +73,45 @@ namespace GraphQL.Reflection
             });
 
             return property;
+        }
+
+        public static object[] BuildArguments<T>(ParameterInfo[] parameters,  T context) where T : ResolveFieldContext<object>
+        {
+            if (parameters == null || !parameters.Any()) return null;
+
+            object[] arguments = new object[parameters.Length];
+
+            var index = 0;
+            if (typeof(T) == parameters[index].ParameterType)
+            {
+                arguments[index] = context;
+                index++;
+            }
+
+            if (parameters.Length > index
+                && context.Source != null
+                && (context.Source?.GetType() == parameters[index].ParameterType
+                    || string.Equals(parameters[index].Name, "source", StringComparison.OrdinalIgnoreCase)))
+            {
+                arguments[index] = context.Source;
+                index++;
+            }
+
+            if (parameters.Length > index
+                && context.UserContext != null
+                && context.UserContext?.GetType() == parameters[index].ParameterType)
+            {
+                arguments[index] = context.UserContext;
+                index++;
+            }
+
+            foreach (var parameter in parameters.Skip(index))
+            {
+                arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
+                index++;
+            }
+
+            return arguments;
         }
     }
 }

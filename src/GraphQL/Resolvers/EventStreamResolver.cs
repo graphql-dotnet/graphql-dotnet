@@ -62,7 +62,7 @@ namespace GraphQL.Resolvers
         public IObservable<object> Subscribe(ResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;
-            var arguments = ResolverHelper.BuildArguments(parameters, context);
+            var arguments = ReflectionHelper.BuildArguments(parameters, context);
             return (IObservable<object>)_accessor.GetValue(_target, arguments);
         }
 
