@@ -12,14 +12,19 @@ namespace GraphQL.Reflection
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
         /// <param name="isSubscriber">Indicateds if it is a subscriber field</param>
-        public static IAccessor ToAccessor(this Type type, string field, bool isSubscriber)
+        public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
         {
             if(type == null) return null;
 
-            var methodInfo = type.MethodForField(field, isSubscriber);
+            var methodInfo = type.MethodForField(field, resolverType);
             if(methodInfo != null)
             {
                 return new SingleMethodAccessor(methodInfo);
+            }
+
+            if (resolverType != ResolverType.Resolver)
+            {
+                return null;
             }
 
             var propertyInfo = type.PropertyForField(field);
@@ -36,7 +41,7 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        public static MethodInfo MethodForField(this Type type, string field, bool isSubcriber)
+        public static MethodInfo MethodForField(this Type type, string field, ResolverType resolverType)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -44,7 +49,7 @@ namespace GraphQL.Reflection
             {
                 var attr = m.GetCustomAttribute<GraphQLMetadataAttribute>();
                 var name = attr?.Name ?? m.Name;
-                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase) && isSubcriber == attr?.Subscriber;
+                return string.Equals(field, name, StringComparison.OrdinalIgnoreCase) && resolverType == (attr?.Type ?? ResolverType.Resolver);
             });
 
             return method;

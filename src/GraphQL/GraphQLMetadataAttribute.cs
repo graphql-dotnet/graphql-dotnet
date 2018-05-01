@@ -30,7 +30,7 @@ namespace GraphQL
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
-        public bool Subscriber { get; set; }
+        public ResolverType Type { get; set; }
 
         public override void Modify(TypeConfig type)
         {
@@ -43,5 +43,11 @@ namespace GraphQL
             field.Description = Description;
             field.DeprecationReason = DeprecationReason;
         }
+    }
+
+    public enum ResolverType
+    {
+        Resolver,
+        Subscriber
     }
 }
