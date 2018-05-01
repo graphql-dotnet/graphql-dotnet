@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -249,6 +248,7 @@ namespace GraphQL.Utilities
             field.ResolvedType = ToGraphType(fieldDef.Type);
             field.Resolver = fieldConfig.Resolver;
             field.Subscriber = fieldConfig.Subscriber;
+            field.AsyncSubscriber = fieldConfig.AsyncSubscriber;
 
             CopyMetadata(field, fieldConfig);
 

@@ -61,18 +61,21 @@ namespace GraphQL.Resolvers
             _dependencyResolver = dependencyResolver;
             _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
         }
-
-        public Task<IObservable<object>> SubscribeAsync(ResolveEventStreamContext context)
+        
+        async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;
             var arguments = ResolverHelper.BuildArguments(parameters, context);
-            return (Task<IObservable<object>>)_accessor.MethodInfo.Invoke(_target, arguments);
-        }
+            var result = _accessor.GetValue(_target, arguments);
 
-        async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
-        {
-            var result = await SubscribeAsync(context);
-            return (IObservable<object>)result;
+            if (!(result is Task task))
+            {
+                throw new ArgumentException($"Return type of {_accessor.FieldName} should be Task<IObservable<T>>, instead of {_accessor.ReturnType}");
+            }
+
+            await task;
+
+            return ((dynamic)task).Result;
         }
     }
 

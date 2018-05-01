@@ -1,9 +1,7 @@
 using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -46,7 +44,8 @@ namespace GraphQL.Utilities
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
             config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
-
+            config.AsyncSubscriberAccessor = Type.ToAccessor(field, ResolverType.AsyncSubscriber);
+            
             if(Type != null)
             {
                 if(config.ResolverAccessor == null)
@@ -60,6 +59,11 @@ namespace GraphQL.Utilities
                 if (config.SubscriberAccessor != null)
                 {
                     config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                }
+
+                if (config.AsyncSubscriberAccessor != null)
+                {
+                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.AsyncSubscriberAccessor, dependencyResolver);
                 }
             }
 

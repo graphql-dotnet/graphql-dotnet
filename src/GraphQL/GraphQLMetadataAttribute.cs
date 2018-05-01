@@ -48,6 +48,7 @@ namespace GraphQL
     public enum ResolverType
     {
         Resolver,
-        Subscriber
+        Subscriber,
+        AsyncSubscriber
     }
 }
