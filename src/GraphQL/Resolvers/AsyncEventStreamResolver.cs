@@ -64,7 +64,9 @@ namespace GraphQL.Resolvers
 
         public Task<IObservable<object>> SubscribeAsync(ResolveEventStreamContext context)
         {
-            return (Task<IObservable<object>>)_accessor.MethodInfo.Invoke(_target, new object[] { context });
+            var parameters = _accessor.Parameters;
+            var arguments = ResolverHelper.BuildArguments(parameters, context);
+            return (Task<IObservable<object>>)_accessor.MethodInfo.Invoke(_target, arguments);
         }
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)

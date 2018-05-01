@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using GraphQL.Reflection;
 using GraphQL.Subscription;
 
@@ -61,7 +63,9 @@ namespace GraphQL.Resolvers
 
         public IObservable<object> Subscribe(ResolveEventStreamContext context)
         {
-            return (IObservable<object>)_accessor.MethodInfo.Invoke(_target, new object[] { context });
+            var parameters = _accessor.Parameters;
+            var arguments = ResolverHelper.BuildArguments(parameters, context);
+            return (IObservable<object>)_accessor.MethodInfo.Invoke(_target, arguments);
         }
 
         IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
