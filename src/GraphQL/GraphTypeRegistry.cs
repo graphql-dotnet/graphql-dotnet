@@ -7,20 +7,23 @@ namespace GraphQL
 {
     public static class GraphTypeRegistry
     {
-        static Dictionary<Type, Type> _entries;
+        static readonly Dictionary<Type, Type> _entries;
 
         static GraphTypeRegistry()
         {
-            _entries = new Dictionary<Type, Type>();
+            _entries = new Dictionary<Type, Type>
+            {
+                [typeof(int)] = typeof(IntGraphType),
+                [typeof(long)] = typeof(IntGraphType),
+                [typeof(double)] = typeof(FloatGraphType),
+                [typeof(float)] = typeof(FloatGraphType),
+                [typeof(decimal)] = typeof(DecimalGraphType),
+                [typeof(string)] = typeof(StringGraphType),
+                [typeof(bool)] = typeof(BooleanGraphType),
+                [typeof(DateTime)] = typeof(DateGraphType),
+                [typeof(DateTimeOffset)] = typeof(DateGraphType)
+            };
 
-            _entries[typeof(int)] = typeof(IntGraphType);
-            _entries[typeof(long)] = typeof(IntGraphType);
-            _entries[typeof(double)] = typeof(FloatGraphType);
-            _entries[typeof(float)] = typeof(FloatGraphType);
-            _entries[typeof(decimal)] = typeof(DecimalGraphType);
-            _entries[typeof(string)] = typeof(StringGraphType);
-            _entries[typeof(bool)] = typeof(BooleanGraphType);
-            _entries[typeof(DateTime)] = typeof(DateGraphType);
         }
 
         public static void Register(Type clrType, Type graphType)

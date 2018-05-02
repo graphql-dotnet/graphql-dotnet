@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using GraphQL.Conversion;
 using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -11,16 +12,18 @@ namespace GraphQL.Language
 {
     public class CoreToVanillaConverter
     {
-        private ISource _body;
+        private readonly ISource _body;
 
-        public Document Convert(string body, GraphQLDocument source)
+        private CoreToVanillaConverter(string body)
         {
             _body = new Source(body);
+        }
 
+        public static Document Convert(string body, GraphQLDocument source)
+        {
+            var converter = new CoreToVanillaConverter(body);
             var target = new Document();
-
-            AddDefinitions(source, target);
-
+            converter.AddDefinitions(source, target);
             return target;
         }
 
@@ -28,14 +31,12 @@ namespace GraphQL.Language
         {
             source.Definitions.Apply(def =>
             {
-                var op = def as GraphQLOperationDefinition;
-                if (op != null)
+                if (def is GraphQLOperationDefinition op)
                 {
                     target.AddDefinition(Operation(op));
                 }
 
-                var frag = def as GraphQLFragmentDefinition;
-                if (frag != null)
+                if (def is GraphQLFragmentDefinition frag)
                 {
                     target.AddDefinition(Fragment(frag));
                 }
@@ -91,8 +92,7 @@ namespace GraphQL.Language
         {
             var def = new VariableDefinition(Name(source.Variable.Name)).WithLocation(source, _body);
             def.Type = Type(source.Type);
-            var val = source.DefaultValue as GraphQLValue;
-            if (val != null)
+            if (source.DefaultValue is GraphQLValue val)
             {
                 def.DefaultValue = Value(val);
             }
@@ -177,22 +177,23 @@ namespace GraphQL.Language
                 case ASTNodeKind.StringValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return new StringValue($"{str.Value}").WithLocation(str, _body);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+
+                    return new StringValue(str.Value).WithLocation(str, _body);
                 }
                 case ASTNodeKind.IntValue:
                 {
                     var str = source as GraphQLScalarValue;
+                    Debug.Assert(str != null, nameof(str) + " != null");
 
-                    int intResult;
-                    if (int.TryParse(str.Value, out intResult))
+                    if (int.TryParse(str.Value, out var intResult))
                     {
                         var val = new IntValue(intResult).WithLocation(str, _body);
                         return val;
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    long longResult;
-                    if (long.TryParse(str.Value, out longResult))
+                    if (long.TryParse(str.Value, out var longResult))
                     {
                         var val = new LongValue(longResult).WithLocation(str, _body);
                         return val;
@@ -203,33 +204,38 @@ namespace GraphQL.Language
                 case ASTNodeKind.FloatValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    var value = Conversions.ParseDouble(str.Value);
-                    return new FloatValue(value).WithLocation(str, _body);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    return new FloatValue(ValueConverter.ConvertTo<double>(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    return new BooleanValue(ValueConverter.ConvertTo<bool>(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {
                     var str = source as GraphQLScalarValue;
+                    Debug.Assert(str != null, nameof(str) + " != null");
                     return new EnumValue(str.Value).WithLocation(str, _body);
                 }
                 case ASTNodeKind.Variable:
                 {
                     var vari = source as GraphQLVariable;
+                    Debug.Assert(vari != null, nameof(vari) + " != null");
                     return new VariableReference(Name(vari.Name)).WithLocation(vari, _body);
                 }
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = source as GraphQLObjectValue;
+                    Debug.Assert(obj != null, nameof(obj) + " != null");
                     var fields = obj.Fields.Select(ObjectField);
                     return new ObjectValue(fields).WithLocation(obj, _body);
                 }
                 case ASTNodeKind.ListValue:
                 {
                     var list = source as GraphQLListValue;
+                    Debug.Assert(list != null, nameof(list) + " != null");
                     var values = list.Values.Select(Value);
                     return new ListValue(values).WithLocation(list, _body);
                 }

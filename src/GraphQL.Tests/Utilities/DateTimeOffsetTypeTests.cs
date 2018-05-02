@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -10,29 +11,34 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_use_DateTimeOffset_type()
         {
-            var schema = Schema.For(@"
+            CultureTestHelper.UseCultures(() =>
+            {
+                var schema = Schema.For(@"
                 input DateTimeOffsetInput{
                     value: Date
                 }
                 type Query {
                   five(model: DateTimeOffsetInput): Date
                 }
-            ", _ =>
-            {
-                _.Types.Include<ParametersType>();
+                ", _ =>
+                {
+                    _.Types.Include<ParametersType>();
+                });
+
+                var utcNow = DateTimeOffset.UtcNow;
+                var value = utcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'", DateTimeFormatInfo.InvariantInfo);
+                var expectedValue = utcNow.AddDays(1).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'", DateTimeFormatInfo.InvariantInfo);
+
+                var result = schema.Execute(_ =>
+                {
+                    _.Query = $"{{ five(model:{{ value:\"{value}\"}}) }}";
+                });
+
+                var expectedResult = CreateQueryResult($"{{ 'five': \"{expectedValue}\" }}");
+                var serializedExpectedResult = Writer.Write(expectedResult);
+
+                result.ShouldBe(serializedExpectedResult);
             });
-
-            var utcNow = DateTimeOffset.UtcNow;
-
-            var result = schema.Execute(_ =>
-            {
-                _.Query = $"{{ five(model:{{ value:\"{utcNow}\"}}) }}";
-            });
-
-            var expectedResult = CreateQueryResult($"{{ 'five': \"{utcNow.AddDays(1):yyyy-MM-ddTHH:mm:ssZ}\" }}");
-            var serializedExpectedResult = Writer.Write(expectedResult);
-
-            result.ShouldBe(serializedExpectedResult);
         }
 
         [GraphQLMetadata("Query")]

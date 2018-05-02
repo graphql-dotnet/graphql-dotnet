@@ -21,21 +21,7 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            if (value != null)
-            {
-                var stringValue = value.ToString().ToLower();
-                switch (stringValue)
-                {
-                    case "false":
-                    case "0":
-                        return false;
-                    case "true":
-                    case "1":
-                        return true;
-                }
-            }
-
-            return null;
+            return ValueConverter.ConvertTo(value, typeof(bool));
         }
 
         public override object ParseLiteral(IValue value)
