@@ -18,18 +18,7 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            if (value == null)
-                return null;
-
-            try
-            {
-                var result = Convert.ToDouble(value, NumberFormatInfo.InvariantInfo);
-                return result;
-            }
-            catch (FormatException)
-            {
-                return null;
-            }
+            return ValueConverter.ConvertTo(value, typeof(double));
         }
 
         public override object ParseLiteral(IValue value)

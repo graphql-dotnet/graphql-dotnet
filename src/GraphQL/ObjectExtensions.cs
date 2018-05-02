@@ -10,8 +10,6 @@ namespace GraphQL
 {
     public static class ObjectExtensions
     {
-        private static readonly Lazy<Conversions> _conversions = new Lazy<Conversions>(() => new Conversions());
-
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// </summary>
@@ -114,9 +112,9 @@ namespace GraphQL
                 fieldType = nullableFieldType;
             }
 
-            if (propertyValue is Dictionary<string, object>)
+            if (propertyValue is Dictionary<string, object> objects)
             {
-                return ToObject((Dictionary<string, object>)propertyValue, fieldType);
+                return ToObject(objects, fieldType);
             }
 
             if (fieldType.GetTypeInfo().IsEnum)
@@ -139,6 +137,11 @@ namespace GraphQL
             return ConvertValue(value, fieldType);
         }
 
+        private static object ConvertValue(object value, Type targetType)
+        {
+            return ValueConverter.ConvertTo(value, targetType);
+        }
+
         /// <summary>
         /// Gets the value of the named property.
         /// </summary>
@@ -149,7 +152,7 @@ namespace GraphQL
         {
             var val = obj.GetType()
                 .GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)
-                .GetValue(obj, null);
+                ?.GetValue(obj, null);
 
             return val;
         }
@@ -165,41 +168,6 @@ namespace GraphQL
         public static Type GetInterface(this Type type, string name)
         {
             return type.GetInterfaces().FirstOrDefault(x => x.Name == name);
-        }
-
-        public static object ConvertValue(object value, Type fieldType)
-        {
-            if (value == null) return null;
-
-            // exact type match
-            if (fieldType.IsInstanceOfType(value))
-            {
-                return value;
-            }
-
-            // DateTime -> DateTimeOffset convertion
-            if (fieldType == typeof(DateTimeOffset) && value is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Utc)
-            {
-                return (DateTimeOffset)dateTimeValue;
-            }
-
-            // DateTimeOffset -> DateTime convertion
-            if (fieldType == typeof(DateTime) && value is DateTimeOffset dateTimeOffsetValue)
-            {
-                return dateTimeOffsetValue.DateTime;
-            }
-
-            string text;
-            if (value is float)
-                text = ((float)value).ToString(CultureInfo.InvariantCulture);
-            else if (value is double)
-                text = ((double)value).ToString(CultureInfo.InvariantCulture);
-            else if (value is decimal)
-                text = ((decimal)value).ToString(CultureInfo.InvariantCulture);
-            else
-                text = value.ToString();
-
-            return _conversions.Value.Convert(fieldType, text);
         }
 
         public static T GetPropertyValue<T>(this object value)
