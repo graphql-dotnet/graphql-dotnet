@@ -72,6 +72,13 @@ namespace GraphQL.Utilities
                         break;
                     }
 
+                    case ASTNodeKind.TypeExtensionDefinition:
+                    {
+                        var type = ToObjectGraphType((def as GraphQLTypeExtensionDefinition).Definition, true);
+                        _types[type.Name] = type;
+                        break;
+                    }
+
                     case ASTNodeKind.InterfaceTypeDefinition:
                     {
                         var type = ToInterfaceType(def as GraphQLInterfaceTypeDefinition);
@@ -155,19 +162,30 @@ namespace GraphQL.Utilities
             return type;
         }
 
-        protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType)
+        protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var typeConfig = Types.For(astType.Name.Value);
 
-            var type = new ObjectGraphType();
-            type.Name = astType.Name.Value;
-            type.Description = typeConfig.Description;
-            type.IsTypeOf = typeConfig.IsTypeOfFunc;
-
-            ApplyDeprecatedDirective(astType.Directives, reason =>
+            ObjectGraphType type;
+            if (!_types.ContainsKey(astType.Name.Value))
             {
-                type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
-            });
+                type = new ObjectGraphType {Name = astType.Name.Value};
+            }
+            else
+            {
+                type = _types[astType.Name.Value] as ObjectGraphType;
+            }
+
+            if (!isExtensionType)
+            {
+                type.Description = typeConfig.Description;
+                type.IsTypeOf = typeConfig.IsTypeOfFunc;
+
+                ApplyDeprecatedDirective(astType.Directives, reason =>
+                {
+                    type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
+                });
+            }
 
             CopyMetadata(type, typeConfig);
 
