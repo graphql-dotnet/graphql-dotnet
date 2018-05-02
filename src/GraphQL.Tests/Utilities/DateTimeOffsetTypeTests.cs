@@ -26,13 +26,15 @@ namespace GraphQL.Tests.Utilities
                 });
 
                 var utcNow = DateTimeOffset.UtcNow;
+                var value = utcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'", DateTimeFormatInfo.InvariantInfo);
+                var expectedValue = utcNow.AddDays(1).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'", DateTimeFormatInfo.InvariantInfo);
 
                 var result = schema.Execute(_ =>
                 {
-                    _.Query = $"{{ five(model:{{ value:\"{utcNow}\"}}) }}";
+                    _.Query = $"{{ five(model:{{ value:\"{value}\"}}) }}";
                 });
 
-                var expectedResult = CreateQueryResult($"{{ 'five': \"{utcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)}\" }}");
+                var expectedResult = CreateQueryResult($"{{ 'five': \"{expectedValue}\" }}");
                 var serializedExpectedResult = Writer.Write(expectedResult);
 
                 result.ShouldBe(serializedExpectedResult);

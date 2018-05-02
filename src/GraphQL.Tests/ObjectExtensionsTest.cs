@@ -25,7 +25,7 @@ namespace GraphQL.Tests
 
 
             /* When */
-            var actual = ObjectExtensions.ConvertValue(value, floatType);
+            var actual = ValueConverter.ConvertTo(value, floatType);
 
             /* Then */
             actual.ShouldBe(value);
@@ -46,7 +46,7 @@ namespace GraphQL.Tests
 
 
             /* When */
-            var actual = ObjectExtensions.ConvertValue(value, floatType);
+            var actual = ValueConverter.ConvertTo(value, floatType);
 
             /* Then */
             actual.ShouldBe(value);
@@ -68,7 +68,7 @@ namespace GraphQL.Tests
 
 
             /* When */
-            var actual = ObjectExtensions.ConvertValue(value, floatType);
+            var actual = ValueConverter.ConvertTo(value, floatType);
 
             /* Then */
             actual.ShouldBe(value);

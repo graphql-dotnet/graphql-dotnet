@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
@@ -428,21 +429,21 @@ namespace GraphQL.Utilities
                 case ASTNodeKind.StringValue:
                 {
                     var str = source as GraphQLScalarValue;
+                    Debug.Assert(str != null, nameof(str) + " != null");
                     return str.Value;
                 }
                 case ASTNodeKind.IntValue:
                 {
                     var str = source as GraphQLScalarValue;
 
-                    int intResult;
-                    if (int.TryParse(str.Value, out intResult))
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    if (int.TryParse(str.Value, out var intResult))
                     {
                         return intResult;
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    long longResult;
-                    if (long.TryParse(str.Value, out longResult))
+                    if (long.TryParse(str.Value, out var longResult))
                     {
                         return longResult;
                     }
@@ -452,16 +453,19 @@ namespace GraphQL.Utilities
                 case ASTNodeKind.FloatValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return Conversions.ParseDouble(str.Value);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    return ValueConverter.ConvertTo<double>(str.Value);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = source as GraphQLScalarValue;
-                    return bool.Parse(str.Value);
+                    Debug.Assert(str != null, nameof(str) + " != null");
+                    return ValueConverter.ConvertTo<bool>(str.Value);
                 }
                 case ASTNodeKind.EnumValue:
                 {
                     var str = source as GraphQLScalarValue;
+                    Debug.Assert(str != null, nameof(str) + " != null");
                     return str.Value;
                 }
                 case ASTNodeKind.ObjectValue:
@@ -469,6 +473,7 @@ namespace GraphQL.Utilities
                     var obj = source as GraphQLObjectValue;
                     var values = new Dictionary<string, object>();
 
+                    Debug.Assert(obj != null, nameof(obj) + " != null");
                     obj.Fields.Apply(f =>
                     {
                         values[f.Name.Value] = ToValue(f.Value);
@@ -479,6 +484,7 @@ namespace GraphQL.Utilities
                 case ASTNodeKind.ListValue:
                 {
                     var list = source as GraphQLListValue;
+                    Debug.Assert(list != null, nameof(list) + " != null");
                     var values = list.Values.Select(ToValue).ToArray();
                     return values;
                 }
