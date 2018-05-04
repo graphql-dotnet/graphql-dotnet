@@ -23,7 +23,7 @@ namespace GraphQL.Tests
         }
 
         [Fact]
-        public void StringConversionToDouble()
+        public void StringConversionToDecimal()
         {
             string source = "100.1";
             decimal expected = 100.1m;

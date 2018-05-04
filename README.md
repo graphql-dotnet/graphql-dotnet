@@ -19,24 +19,15 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
-## GraphiQL sample
-There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
+## Examples
 
-> Note: Before running the GraphiQL project: make sure you Build the entire solution so that all the project references get built. (GraphQL, GraphQL-Parser, etc) to avoid missing reference/assembly errors.
-
-
-```
-> npm install -g yarn
-> yarn install
-> yarn start
-```
-![](http://i.imgur.com/2uGdVAj.png)
+https://github.com/graphql-dotnet/examples
 
 ## Usage
 
 Define your schema with a top level query object then execute that query.
 
-A more full-featured example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
+A more full-featured example can be found [here](https://github.com/graphql-dotnet/examples).
 
 ### Hello World
 
