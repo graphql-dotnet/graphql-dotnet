@@ -5,15 +5,15 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public abstract class FieldResolverBase : IFieldResolver
+    public abstract class ReflectionFieldResolverBase : IFieldResolver
     {
         public abstract object Resolve(ResolveFieldContext context);
 
         protected object[] BuildArguments(ParameterInfo[] parameters, ResolveFieldContext context)
         {
-            if(parameters == null || !parameters.Any()) return null;
+            if (parameters == null || !parameters.Any()) return null;
 
-            object[] arguments = new object[parameters.Length];
+            var arguments = new object[parameters.Length];
 
             var index = 0;
             if (typeof(ResolveFieldContext) == parameters[index].ParameterType)

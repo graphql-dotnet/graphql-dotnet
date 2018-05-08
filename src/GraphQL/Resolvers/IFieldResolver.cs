@@ -8,8 +8,8 @@ namespace GraphQL.Resolvers
         object Resolve(ResolveFieldContext context);
     }
 
-    public interface IFieldResolver<out T> : IFieldResolver
+    public interface IAsyncFieldResolver
     {
-        new T Resolve(ResolveFieldContext context);
+        Task<object> Resolve(ResolveFieldContext context);
     }
 }

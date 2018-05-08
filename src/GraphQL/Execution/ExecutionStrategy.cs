@@ -196,8 +196,17 @@ namespace GraphQL.Execution
                     SubFields = subFields
                 };
 
-                var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
-                var result = resolver.Resolve(resolveContext);
+                object result;
+                if (node.FieldDefinition.AsyncResolver != null)
+                {
+                    var asyncResolver = node.FieldDefinition.AsyncResolver;
+                    result = asyncResolver.Resolve(resolveContext);
+                }
+                else
+                {
+                    var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
+                    result = resolver.Resolve(resolveContext);
+                }
 
                 result = await UnwrapResultAsync(result)
                     .ConfigureAwait(false);

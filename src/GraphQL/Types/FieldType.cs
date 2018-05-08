@@ -22,7 +22,11 @@ namespace GraphQL.Types
         public Type Type { get; set; }
         public IGraphType ResolvedType { get; set; }
         public QueryArguments Arguments { get; set; }
+
         public IFieldResolver Resolver { get; set; }
+
+        public IAsyncFieldResolver AsyncResolver { get; set; }
+
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))

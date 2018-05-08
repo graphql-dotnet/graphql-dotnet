@@ -6,7 +6,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
-    internal class AccessorFieldResolver : FieldResolverBase
+    internal class AccessorFieldResolver : ReflectionFieldResolverBase
     {
         private readonly IAccessor _accessor;
         private readonly IDependencyResolver _dependencyResolver;

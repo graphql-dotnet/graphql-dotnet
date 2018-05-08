@@ -86,6 +86,12 @@ namespace GraphQL.Builders
             return this;
         }
 
+        public FieldBuilder<TSourceType, TReturnType> Resolve(IAsyncFieldResolver resolver)
+        {
+            _fieldType.AsyncResolver = resolver;
+            return this;
+        }
+
         public FieldBuilder<TSourceType, TReturnType> Resolve(Func<ResolveFieldContext<TSourceType>, TReturnType> resolve)
         {
             return Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));

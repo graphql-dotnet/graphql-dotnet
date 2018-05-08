@@ -4,7 +4,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
-    public class MiddlewareResolver : IFieldResolver<Task<object>>
+    public class MiddlewareResolver : IAsyncFieldResolver
     {
         private readonly IFieldResolver _next;
 
@@ -23,11 +23,6 @@ namespace GraphQL.Instrumentation
             }
 
             return Task.FromResult(result);
-        }
-
-        object IFieldResolver.Resolve(ResolveFieldContext context)
-        {
-            return Resolve(context);
         }
     }
 }

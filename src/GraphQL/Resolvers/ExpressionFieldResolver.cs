@@ -4,7 +4,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver<TProperty>
+    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver
     {
         private readonly Func<TSourceType, TProperty> _property;
 
@@ -13,14 +13,9 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public TProperty Resolve(ResolveFieldContext context)
+        public object Resolve(ResolveFieldContext context)
         {
             return _property(context.As<TSourceType>().Source);
-        }
-
-        object IFieldResolver.Resolve(ResolveFieldContext context)
-        {
-            return Resolve(context);
         }
     }
 }

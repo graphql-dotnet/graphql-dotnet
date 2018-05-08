@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -111,7 +112,7 @@ namespace GraphQL.Tests.StarWars
                ctx.SubFields.ShouldNotBeNull();
                ctx.SubFields.Keys.ShouldContain("id");
                ctx.SubFields.Keys.ShouldContain("friends");
-               return null;
+               return Task.FromResult<object>(null);
            });
             var query = @"
                 {
