@@ -3,28 +3,23 @@ using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
 {
-    public class EventStreamResolver<T> : IEventStreamResolver<T>
+    public class EventStreamResolver<TReturnType> : IEventStreamResolver
     {
-        private readonly Func<ResolveEventStreamContext, IObservable<T>> _subscriber;
+        private readonly Func<ResolveEventStreamContext, IObservable<TReturnType>> _subscriber;
 
         public EventStreamResolver(
-            Func<ResolveEventStreamContext, IObservable<T>> subscriber)
+            Func<ResolveEventStreamContext, IObservable<TReturnType>> subscriber)
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<T> Subscribe(ResolveEventStreamContext context)
+        public IObservable<object> Subscribe(ResolveEventStreamContext context)
         {
-            return _subscriber(context);
-        }
-
-        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
+            return (IObservable<object>) _subscriber(context);
         }
     }
 
-    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
+    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver
     {
         private readonly Func<ResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> _subscriber;
 
@@ -34,14 +29,9 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<TReturnType> Subscribe(ResolveEventStreamContext context)
+        public IObservable<object> Subscribe(ResolveEventStreamContext context)
         {
-            return _subscriber(context.As<TSourceType>());
-        }
-
-        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
+            return (IObservable<object>) _subscriber(context.As<TSourceType>());
         }
     }
 }
