@@ -31,7 +31,7 @@ namespace GraphQL.Resolvers
 
         public IObservable<object> Subscribe(ResolveEventStreamContext context)
         {
-            return (IObservable<object>) _subscriber(context.As<TSourceType>());
+            return (IObservable<object>) _subscriber(new ResolveEventStreamContext<TSourceType>(context));
         }
     }
 }

@@ -15,7 +15,7 @@ namespace GraphQL.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
-            return _property(context.As<TSourceType>().Source);
+            return _property(new ResolveFieldContext<TSourceType>(context).Source);
         }
     }
 }

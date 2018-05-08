@@ -68,7 +68,7 @@ namespace GraphQL.Execution
                     ReturnType = node.FieldDefinition.ResolvedType,
                     ParentType = node.GraphType as IObjectGraphType,
                     Arguments = arguments,
-                    Source = source,
+                    SourceObject = source,
                     Schema = context.Schema,
                     Document = context.Document,
                     Fragments = context.Fragments,

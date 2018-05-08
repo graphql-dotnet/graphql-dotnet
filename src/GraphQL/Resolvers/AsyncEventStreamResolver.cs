@@ -33,7 +33,7 @@ namespace GraphQL.Resolvers
 
         public async Task<IObservable<object>> SubscribeAsync(ResolveEventStreamContext context)
         {
-            var result = await _subscriber(context.As<TSourceType>());
+            var result = await _subscriber(new ResolveEventStreamContext<TSourceType>(context));
             return (IObservable<object>) result;
         }
     }

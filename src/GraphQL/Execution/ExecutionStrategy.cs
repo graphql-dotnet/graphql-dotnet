@@ -181,7 +181,7 @@ namespace GraphQL.Execution
                     ReturnType = node.FieldDefinition.ResolvedType,
                     ParentType = node.GetParentType(),
                     Arguments = arguments,
-                    Source = node.Source,
+                    SourceObject = node.Source,
                     Schema = context.Schema,
                     Document = context.Document,
                     Fragments = context.Fragments,

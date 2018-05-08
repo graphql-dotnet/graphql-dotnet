@@ -394,7 +394,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Source = 12345
+                SourceObject = 12345
             });
         }
     }

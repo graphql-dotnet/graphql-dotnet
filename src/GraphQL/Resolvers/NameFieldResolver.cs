@@ -11,7 +11,7 @@ namespace GraphQL.Resolvers
 
         public object Resolve(ResolveFieldContext context)
         {
-            return Resolve(context?.Source, context?.FieldAst?.Name);
+            return Resolve(context?.SourceObject, context?.FieldAst?.Name);
         }
 
         public static object Resolve(object source, string name)

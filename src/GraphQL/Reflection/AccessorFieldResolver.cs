@@ -21,8 +21,8 @@ namespace GraphQL.Reflection
         {
             var arguments = BuildArguments(_accessor.Parameters, context);
 
-            var target = _accessor.DeclaringType.IsInstanceOfType(context.Source)
-                    ? context.Source
+            var target = _accessor.DeclaringType.IsInstanceOfType(context.SourceObject)
+                    ? context.SourceObject
                     : _dependencyResolver.Resolve(_accessor.DeclaringType);
 
             if (target == null)

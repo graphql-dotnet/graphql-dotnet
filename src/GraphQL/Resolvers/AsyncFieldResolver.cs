@@ -15,7 +15,7 @@ namespace GraphQL.Resolvers
 
         public async Task<object> Resolve(ResolveFieldContext context)
         {
-            var result = _resolver(context.As<TSourceType>());
+            var result = _resolver(new ResolveFieldContext<TSourceType>(context));
 
             if (result == null)
                 throw new InvalidOperationException(

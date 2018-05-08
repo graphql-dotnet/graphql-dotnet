@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Instrumentation
             _context = new ResolveFieldContext();
             _context.FieldName = "Name";
             _context.FieldAst = new Field(null, new NameNode("Name"));
-            _context.Source = new Person
+            _context.SourceObject = new Person
             {
                 Name = "Quinn"
             };

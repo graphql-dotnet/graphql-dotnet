@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Types;
@@ -23,11 +23,11 @@ namespace GraphQL.Resolvers
             }
 
             if (parameters.Length > index
-                && context.Source != null
-                && (context.Source?.GetType() == parameters[index].ParameterType
+                && context.SourceObject != null
+                && (context.SourceObject?.GetType() == parameters[index].ParameterType
                     || string.Equals(parameters[index].Name, "source", StringComparison.OrdinalIgnoreCase)))
             {
-                arguments[index] = context.Source;
+                arguments[index] = context.SourceObject;
                 index++;
             }
 
