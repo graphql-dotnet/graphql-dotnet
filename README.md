@@ -131,7 +131,7 @@ var result = schema.Execute(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the April 2016 specification.
+- Grammar and AST for the GraphQL language should be compatible with the October 2016 specification.
 
 ### Operation Execution
 - [x] Scalars
@@ -166,12 +166,12 @@ var result = schema.Execute(_ =>
 - [x] No undefined variables
 - [x] No unused fragments
 - [x] No unused variables
-- [ ] Overlapping fields can be merged
+- [ ] Overlapping fields can be merged ([help with this rule](https://github.com/graphql-dotnet/graphql-dotnet/issues/160))
 - [x] Possible fragment spreads
 - [x] Provide non-null arguments
 - [x] Scalar leafs
 - [x] Unique argument names
-- [ ] Unique directives per location
+- [x] Unique directives per location
 - [x] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names
