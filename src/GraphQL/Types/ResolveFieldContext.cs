@@ -1,15 +1,66 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 using Field = GraphQL.Language.AST.Field;
-using System.Threading.Tasks;
-using System;
+using Type = System.Type;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource>
+    public class ResolveFieldContext
     {
+        public ResolveFieldContext()
+        {
+        }
+
+        public ResolveFieldContext(ResolveFieldContext context)
+        {
+            SourceObject = context.SourceObject;
+            FieldName = context.FieldName;
+            FieldAst = context.FieldAst;
+            FieldDefinition = context.FieldDefinition;
+            ReturnType = context.ReturnType;
+            ParentType = context.ParentType;
+            Arguments = context.Arguments;
+            Schema = context.Schema;
+            Document = context.Document;
+            Fragments = context.Fragments;
+            RootValue = context.RootValue;
+            UserContext = context.UserContext;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+            Metrics = context.Metrics;
+            Errors = context.Errors;
+            SubFields = context.SubFields;
+        }
+
+        public ResolveFieldContext(ExecutionContext context, Field field, FieldType type, object source,
+            IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
+        {
+            SourceObject = source;
+            FieldName = field.Name;
+            FieldAst = field;
+            FieldDefinition = type;
+            ReturnType = type.ResolvedType;
+            ParentType = parentType;
+            Arguments = arguments;
+            Schema = context.Schema;
+            Document = context.Document;
+            Fragments = context.Fragments;
+            RootValue = context.RootValue;
+            UserContext = context.UserContext;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+            Metrics = context.Metrics;
+            Errors = context.Errors;
+            Path = path;
+        }
+
         public string FieldName { get; set; }
 
         public Field FieldAst { get; set; }
@@ -26,7 +77,7 @@ namespace GraphQL.Types
 
         public object UserContext { get; set; }
 
-        public TSource Source { get; set; }
+        public object SourceObject { get; set; }
 
         public ISchema Schema { get; set; }
 
@@ -47,54 +98,24 @@ namespace GraphQL.Types
         public IEnumerable<string> Path { get; set; }
 
         /// <summary>
-        /// Queried sub fields
+        ///     Queried sub fields
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
-
-        public ResolveFieldContext() { }
-
-        public ResolveFieldContext(ResolveFieldContext context)
-        {
-            Source = (TSource)context.Source;
-            FieldName = context.FieldName;
-            FieldAst = context.FieldAst;
-            FieldDefinition = context.FieldDefinition;
-            ReturnType = context.ReturnType;
-            ParentType = context.ParentType;
-            Arguments = context.Arguments;
-            Schema = context.Schema;
-            Document = context.Document;
-            Fragments = context.Fragments;
-            RootValue = context.RootValue;
-            UserContext = context.UserContext;
-            Operation = context.Operation;
-            Variables = context.Variables;
-            CancellationToken = context.CancellationToken;
-            Metrics = context.Metrics;
-            Errors = context.Errors;
-            SubFields = context.SubFields;
-        }
 
         public TType GetArgument<TType>(string name, TType defaultValue = default(TType))
         {
             return (TType) GetArgument(typeof(TType), name, defaultValue);
         }
 
-        public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
+        public object GetArgument(Type argumentType, string name, object defaultValue = null)
         {
-            if (!HasArgument(name))
-            {
-                return defaultValue;
-            }
+            if (!HasArgument(name)) return defaultValue;
 
             var arg = Arguments[name];
             if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;
-                if (type.Namespace?.StartsWith("System") == true)
-                {
-                    return arg;
-                }
+                if (type.Namespace?.StartsWith("System") == true) return arg;
 
                 return inputObject.ToObject(type);
             }
@@ -107,7 +128,7 @@ namespace GraphQL.Types
             return Arguments?.ContainsKey(argumentName) ?? false;
         }
 
-        public async Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+        public async Task<object> TryAsyncResolve(Func<ResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
         {
             try
             {
@@ -131,37 +152,12 @@ namespace GraphQL.Types
         }
     }
 
-    public class ResolveFieldContext : ResolveFieldContext<object>
+    public class ResolveFieldContext<TSource> : ResolveFieldContext
     {
-        internal ResolveFieldContext<TSourceType> As<TSourceType>()
-        {
-            return new ResolveFieldContext<TSourceType>(this);
-        }
-
-        public ResolveFieldContext()
+        public ResolveFieldContext(ResolveFieldContext context) : base(context)
         {
         }
 
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, object source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
-        {
-            Source = source;
-            FieldName = field.Name;
-            FieldAst = field;
-            FieldDefinition = type;
-            ReturnType = type.ResolvedType;
-            ParentType = parentType;
-            Arguments = arguments;
-            Schema = context.Schema;
-            Document = context.Document;
-            Fragments = context.Fragments;
-            RootValue = context.RootValue;
-            UserContext = context.UserContext;
-            Operation = context.Operation;
-            Variables = context.Variables;
-            CancellationToken = context.CancellationToken;
-            Metrics = context.Metrics;
-            Errors = context.Errors;
-            Path = path;
-        }
+        public TSource Source => (TSource) SourceObject;
     }
 }

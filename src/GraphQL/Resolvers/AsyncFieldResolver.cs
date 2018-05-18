@@ -4,43 +4,25 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class AsyncFieldResolver<TReturnType> : IFieldResolver<Task<TReturnType>>
-    {
-        private readonly Func<ResolveFieldContext, Task<TReturnType>> _resolver;
-
-        public AsyncFieldResolver(Func<ResolveFieldContext, Task<TReturnType>> resolver)
-        {
-            _resolver = resolver;
-        }
-
-        public Task<TReturnType> Resolve(ResolveFieldContext context)
-        {
-            return _resolver(context);
-        }
-
-        object IFieldResolver.Resolve(ResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
-    }
-
-    public class AsyncFieldResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
+    public class AsyncFieldResolver<TSourceType, TReturnType> : IAsyncFieldResolver
     {
         private readonly Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> _resolver;
 
         public AsyncFieldResolver(Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException("A resolver function must be specified");
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
 
-        public Task<TReturnType> Resolve(ResolveFieldContext context)
+        public async Task<object> Resolve(ResolveFieldContext context)
         {
-            return _resolver(context.As<TSourceType>());
-        }
+            var result = _resolver(new ResolveFieldContext<TSourceType>(context));
 
-        object IFieldResolver.Resolve(ResolveFieldContext context)
-        {
-            return Resolve(context);
+            if (result == null)
+                throw new InvalidOperationException(
+                    "Resolver result is null when Task<object> is expected. When using resolvers with " +
+                    "Task<object> and null results you must provide a valid return value Task<object>");
+
+            return await result;
         }
     }
 }

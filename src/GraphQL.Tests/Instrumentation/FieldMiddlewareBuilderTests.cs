@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -20,7 +20,7 @@ namespace GraphQL.Tests.Instrumentation
             _context = new ResolveFieldContext();
             _context.FieldName = "Name";
             _context.FieldAst = new Field(null, new NameNode("Name"));
-            _context.Source = new Person
+            _context.SourceObject = new Person
             {
                 Name = "Quinn"
             };
@@ -58,8 +58,8 @@ namespace GraphQL.Tests.Instrumentation
                 };
             });
 
-            var result = _builder.Build().Invoke(_context).Result;
-            result.ShouldBe("One Quinn");
+            var result = _builder.Build().Invoke(_context);
+            result.Result.ShouldBe("One Quinn");
         }
 
         [Fact]

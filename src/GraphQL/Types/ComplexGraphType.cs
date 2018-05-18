@@ -134,7 +134,7 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = type,
                 Arguments = arguments,
-                Resolver = resolve != null
+                AsyncResolver = resolve != null
                     ? new AsyncFieldResolver<TSourceType, object>(resolve)
                     : null
             });
@@ -155,7 +155,7 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = typeof(TGraphType),
                 Arguments = arguments,
-                Resolver = resolve != null
+                AsyncResolver = resolve != null
                     ? new AsyncFieldResolver<TSourceType, object>(resolve)
                     : null
             });
@@ -176,7 +176,7 @@ namespace GraphQL.Types
                 DeprecationReason = deprecationReason,
                 Type = typeof(TGraphType),
                 Arguments = arguments,
-                Resolver = resolve != null
+                AsyncResolver = resolve != null
                     ? new AsyncFieldResolver<TSourceType, TReturnType>(resolve)
                     : null
             });

@@ -181,7 +181,7 @@ namespace GraphQL.Execution
                     ReturnType = node.FieldDefinition.ResolvedType,
                     ParentType = node.GetParentType(),
                     Arguments = arguments,
-                    Source = node.Source,
+                    SourceObject = node.Source,
                     Schema = context.Schema,
                     Document = context.Document,
                     Fragments = context.Fragments,
@@ -196,8 +196,17 @@ namespace GraphQL.Execution
                     SubFields = subFields
                 };
 
-                var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
-                var result = resolver.Resolve(resolveContext);
+                object result;
+                if (node.FieldDefinition.AsyncResolver != null)
+                {
+                    var asyncResolver = node.FieldDefinition.AsyncResolver;
+                    result = asyncResolver.Resolve(resolveContext);
+                }
+                else
+                {
+                    var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
+                    result = resolver.Resolve(resolveContext);
+                }
 
                 result = await UnwrapResultAsync(result)
                     .ConfigureAwait(false);

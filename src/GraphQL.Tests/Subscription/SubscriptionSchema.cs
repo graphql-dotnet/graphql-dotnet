@@ -85,7 +85,7 @@ namespace GraphQL.Tests.Subscription
 
         private Message ResolveMessage(ResolveFieldContext context)
         {
-            var message = context.Source as Message;
+            var message = context.SourceObject as Message;
 
             return message;
         }

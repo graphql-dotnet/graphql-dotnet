@@ -4,7 +4,7 @@ using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
 {
-    public class AsyncEventStreamResolver<T> : IAsyncEventStreamResolver<T>
+    public class AsyncEventStreamResolver<T> : IAsyncEventStreamResolver
     {
         private readonly Func<ResolveEventStreamContext, Task<IObservable<T>>> _subscriber;
 
@@ -14,19 +14,14 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<T>> SubscribeAsync(ResolveEventStreamContext context)
+        public async Task<IObservable<object>> SubscribeAsync(ResolveEventStreamContext context)
         {
-            return _subscriber(context);
-        }
-
-        async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
-        {
-            var result = await SubscribeAsync(context);
-            return (IObservable<object>)result;
+            var result = await _subscriber(context);
+            return (IObservable<object>) result;
         }
     }
 
-    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IAsyncEventStreamResolver<TReturnType>
+    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IAsyncEventStreamResolver
     {
         private readonly Func<ResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType>>> _subscriber;
 
@@ -36,15 +31,10 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<TReturnType>> SubscribeAsync(ResolveEventStreamContext context)
+        public async Task<IObservable<object>> SubscribeAsync(ResolveEventStreamContext context)
         {
-            return _subscriber(context.As<TSourceType>());
-        }
-
-        async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
-        {
-            var result = await SubscribeAsync(context);
-            return (IObservable<object>)result;
+            var result = await _subscriber(new ResolveEventStreamContext<TSourceType>(context));
+            return (IObservable<object>) result;
         }
     }
 }
