@@ -19,6 +19,7 @@ namespace GraphQL
             Register(typeof(string), typeof(decimal), ParseDecimal);
             Register(typeof(string), typeof(DateTime), ParseDateTime);
             Register(typeof(string), typeof(DateTimeOffset), ParseDateTimeOffset);
+            Register(typeof(string), typeof(TimeSpan), ParseTimeSpan);
             Register(typeof(string), typeof(bool), ParseBool);
             Register(typeof(string), typeof(Guid), ParseGuid);
 
@@ -99,6 +100,14 @@ namespace GraphQL
         {
             var dateTime = (DateTime) value;
             return new DateTimeOffset(dateTime, TimeSpan.Zero);
+        }
+
+        private static object ParseTimeSpan(object value)
+        {
+            var stringValue = (string)value;
+            return TimeSpan.Parse(
+                stringValue,
+                DateTimeFormatInfo.InvariantInfo);
         }
 
         private static object ParseDateTimeOffset(object value)

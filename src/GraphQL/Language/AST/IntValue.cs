@@ -130,6 +130,32 @@ namespace GraphQL.Language.AST
         }
     }
 
+    public class DateTimeOffsetValue : ValueNode<DateTimeOffset>
+    {
+        public DateTimeOffsetValue(DateTimeOffset value)
+        {
+            Value = value;
+        }
+
+        protected override bool Equals(ValueNode<DateTimeOffset> other)
+        {
+            return DateTimeOffset.Equals(Value, other.Value);
+        }
+    }
+
+    public class TimeSpanValue : ValueNode<TimeSpan>
+    {
+        public TimeSpanValue(TimeSpan value)
+        {
+            Value = value;
+        }
+
+        protected override bool Equals(ValueNode<TimeSpan> other)
+        {
+            return TimeSpan.Equals(Value, other.Value);
+        }
+    }
+
     public class EnumValue : AbstractNode, IValue
     {
         public EnumValue(NameNode name)

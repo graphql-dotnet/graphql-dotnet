@@ -3,23 +3,19 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    public class DateGraphType : ScalarGraphType
+    public class DateTimeGraphType : ScalarGraphType
     {
-        public DateGraphType()
+        public DateTimeGraphType()
         {
-            Name = "Date";
-            Description = "The `Date` scalar type represents a year, month and day in accordance with the " +
-                "[ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
+            Name = "DateTime";
+            Description =
+                "The `DateTime` scalar type represents a date and time. `DateTime` expects timestamps " +
+                "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
         public override object Serialize(object value)
         {
-            if (value is DateTime dateTime)
-            {
-                return dateTime.ToString("yyyy-MM-dd");
-            }
-
-            return null;
+            return ParseValue(value);
         }
 
         public override object ParseValue(object value)

@@ -410,6 +410,16 @@ namespace GraphQL
                 return new UriValue(uri);
             }
 
+            if (serialized is DateTimeOffset)
+            {
+                return new DateTimeOffsetValue((DateTimeOffset)serialized);
+            }
+
+            if (serialized is TimeSpan)
+            {
+                return new TimeSpanValue((TimeSpan)serialized);
+            }
+
             if (serialized is string)
             {
                 if (type is EnumerationGraphType)

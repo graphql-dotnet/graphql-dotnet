@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
@@ -20,6 +20,8 @@ namespace GraphQL.Types
             AddType<IntGraphType>();
             AddType<IdGraphType>();
             AddType<DateGraphType>();
+            AddType<DateTimeGraphType>();
+            AddType<DateTimeOffsetGraphType>();
             AddType<DecimalGraphType>();
 
             AddType<__Schema>();

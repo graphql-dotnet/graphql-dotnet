@@ -6,9 +6,9 @@ using Xunit;
 
 namespace GraphQL.Tests.Types
 {
-    public class DateGraphTypeTests
+    public class DateTimeGraphTypeTests
     {
-        private readonly DateGraphType _type = new DateGraphType();
+        private readonly DateTimeGraphType _type = new DateTimeGraphType();
 
         [Fact]
         public void coerces_valid_date()
