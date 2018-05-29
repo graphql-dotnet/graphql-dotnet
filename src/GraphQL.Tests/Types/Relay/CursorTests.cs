@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Types.Relay;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types.Relay
@@ -14,8 +15,8 @@ namespace GraphQL.Tests.Types.Relay
 
             var (firstCursor, lastCursor) = Cursor.GetFirstAndLastCursor(items, x => x.Property);
 
-            Assert.Null(firstCursor);
-            Assert.Null(lastCursor);
+            firstCursor.ShouldBeNull();
+            lastCursor.ShouldBeNull();
         }
 
         [Fact]
@@ -25,8 +26,8 @@ namespace GraphQL.Tests.Types.Relay
 
             var (firstCursor, lastCursor) = Cursor.GetFirstAndLastCursor(items, x => x.Property);
 
-            Assert.Null(firstCursor);
-            Assert.Null(lastCursor);
+            firstCursor.ShouldBeNull();
+            lastCursor.ShouldBeNull();
         }
 
         [Fact]
@@ -34,7 +35,7 @@ namespace GraphQL.Tests.Types.Relay
         {
             List<Entity> items = new List<Entity>();
 
-            Assert.Throws<ArgumentNullException>(() => Cursor.GetFirstAndLastCursor<Entity, int>(items, null));
+            Should.Throw<ArgumentNullException>(() => Cursor.GetFirstAndLastCursor<Entity, int>(items, null));
         }
 
         [Fact]
@@ -49,8 +50,8 @@ namespace GraphQL.Tests.Types.Relay
 
             var (firstCursor, lastCursor) = Cursor.GetFirstAndLastCursor(items, x => x.Property);
 
-            Assert.Equal("YXJyYXljb25uZWN0aW9uOjE=", firstCursor);
-            Assert.Equal("YXJyYXljb25uZWN0aW9uOjM=", lastCursor);
+            firstCursor.ShouldBe("YXJyYXljb25uZWN0aW9uOjE=");
+            lastCursor.ShouldBe("YXJyYXljb25uZWN0aW9uOjM=");
         }
 
         [Fact]
@@ -60,7 +61,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromNullableCursor<int>(cursor);
 
-            Assert.Null(value);
+            value.ShouldBeNull();
         }
 
         [Fact]
@@ -70,7 +71,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromNullableCursor<int>(cursor);
 
-            Assert.Equal(5, value);
+            value.ShouldBe(5);
         }
 
         [Fact]
@@ -80,7 +81,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromNullableCursor<DateTime>(cursor);
 
-            Assert.Equal(new DateTime(2000, 1, 1), value);
+            value.ShouldBe(new DateTime(2000, 1, 1));
         }
 
         [Fact]
@@ -90,7 +91,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromCursor<string>(cursor);
 
-            Assert.Null(value);
+            value.ShouldBe(null);
         }
 
         [Fact]
@@ -100,7 +101,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromCursor<int>(cursor);
 
-            Assert.Equal(5, value);
+            value.ShouldBe(5);
         }
 
         [Fact]
@@ -110,7 +111,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromCursor<string>(cursor);
 
-            Assert.Equal("foo", value);
+            value.ShouldBe("foo");
         }
 
         [Fact]
@@ -120,7 +121,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var value = Cursor.FromCursor<DateTime>(cursor);
 
-            Assert.Equal(new DateTime(2000, 1, 1), value);
+            value.ShouldBe(new DateTime(2000, 1, 1));
         }
 
         [Fact]
@@ -128,7 +129,7 @@ namespace GraphQL.Tests.Types.Relay
         {
             var value = (string)null;
 
-            Assert.Throws<ArgumentNullException>(() => Cursor.ToCursor(value));
+            Should.Throw<ArgumentNullException>(() => Cursor.ToCursor(value));
         }
 
         [Fact]
@@ -138,7 +139,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var cursor = Cursor.ToCursor(value);
 
-            Assert.Equal("YXJyYXljb25uZWN0aW9uOjU=", cursor);
+            cursor.ShouldBe("YXJyYXljb25uZWN0aW9uOjU=");
         }
 
         [Fact]
@@ -148,7 +149,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var cursor = Cursor.ToCursor(value);
 
-            Assert.Equal("YXJyYXljb25uZWN0aW9uOmZvbw==", cursor);
+            cursor.ShouldBe("YXJyYXljb25uZWN0aW9uOmZvbw==");
         }
 
         [Fact]
@@ -158,7 +159,7 @@ namespace GraphQL.Tests.Types.Relay
 
             var cursor = Cursor.ToCursor(value);
 
-            Assert.Equal("YXJyYXljb25uZWN0aW9uOjAxLzAxLzIwMDAgMDA6MDA6MDA=", cursor);
+            cursor.ShouldBe("YXJyYXljb25uZWN0aW9uOjAxLzAxLzIwMDAgMDA6MDA6MDA=");
         }
 
         private class Entity

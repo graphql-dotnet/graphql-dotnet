@@ -2,6 +2,7 @@ namespace GraphQL.Types.Relay
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
 
@@ -38,7 +39,7 @@ namespace GraphQL.Types.Relay
             }
 
             var value = Base64Decode(cursor).Substring(Prefix.Length + 1);
-            return (T)Convert.ChangeType(value, typeof(T));
+            return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
 
         public static T FromCursor<T>(string cursor)
@@ -49,7 +50,7 @@ namespace GraphQL.Types.Relay
             }
 
             var value = Base64Decode(cursor).Substring(Prefix.Length + 1);
-            return (T)Convert.ChangeType(value, typeof(T));
+            return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
 
         public static string ToCursor<T>(T value)
@@ -59,7 +60,7 @@ namespace GraphQL.Types.Relay
                 throw new ArgumentNullException(nameof(value));
             }
 
-            return Base64Encode($"{Prefix}:{value}");
+            return Base64Encode(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", Prefix, value));
         }
 
         private static string Base64Decode(string value) => Encoding.UTF8.GetString(Convert.FromBase64String(value));
