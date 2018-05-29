@@ -26,7 +26,7 @@ namespace GraphQL.Builders
                     return _defaultPageSize;
                 }
                 
-                return first
+                return first;
             }
         }
         
