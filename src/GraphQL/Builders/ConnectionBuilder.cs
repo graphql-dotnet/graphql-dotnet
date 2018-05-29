@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -145,6 +146,16 @@ namespace GraphQL.Builders
         public void Resolve(Func<ResolveConnectionContext<TSourceType>, object> resolver)
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
+            {
+                var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
+                CheckForErrors(args);
+                return resolver(args);
+            });
+        }
+
+        public void ResolveAsync(Func<ResolveConnectionContext<TSourceType>, Task<object>> resolver)
+        {
+            FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
                 var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
