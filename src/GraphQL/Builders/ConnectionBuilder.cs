@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -154,25 +154,13 @@ namespace GraphQL.Builders
 
         private void CheckForErrors(ResolveConnectionContext<TSourceType> args)
         {
-            if (args.First.HasValue && args.Before != null)
-            {
-                throw new ArgumentException("Cannot specify both `first` and `before`.");
-            }
-            if (args.Last.HasValue && args.After != null)
-            {
-                throw new ArgumentException("Cannot specify both `last` and `after`.");
-            }
-            if (args.Before != null && args.After != null)
-            {
-                throw new ArgumentException("Cannot specify both `before` and `after`.");
-            }
             if (args.First.HasValue && args.Last.HasValue)
             {
                 throw new ArgumentException("Cannot specify both `first` and `last`.");
             }
-            if (args.IsUnidirectional && (args.Last.HasValue || args.Before != null))
+            if (args.IsUnidirectional && args.Last.HasValue)
             {
-                throw new ArgumentException("Cannot use `last` and `before` with unidirectional connections.");
+                throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
             if (args.IsPartial && args.NumberOfSkippedEntries.HasValue)
             {
