@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using GraphQL.Validation;
 using Newtonsoft.Json;
 
 namespace GraphQL
@@ -53,6 +54,14 @@ namespace GraphQL
 
                 // check if return StackTrace, including all inner exceptions
                 serializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
+
+                // Check if the current error is a validation error and an error code has been provided...
+                if (error is ValidationError validationError && !string.IsNullOrEmpty(validationError.ErrorCode))
+                {
+                    // ...it seems like so
+                    writer.WritePropertyName("code");
+                    serializer.Serialize(writer, validationError.ErrorCode);
+                }
 
                 if (error.Locations != null)
                 {
