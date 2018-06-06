@@ -27,11 +27,18 @@ namespace GraphQL
 
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(long), IntToLong);
+            Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
 
             Register(typeof(long), typeof(int), LongToInt);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
+        }
+
+        private static object IntToDouble(object value)
+        {
+            var intValue = (int)value;
+            return Convert.ToDouble(intValue, NumberFormatInfo.InvariantInfo);
         }
 
         private static object IntToDecimal(object value)
