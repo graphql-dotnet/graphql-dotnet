@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace GraphQL
 
         public IEnumerable<string> Path { get; set; }
 
-        public new Dictionary<string, object> Data { get; private set; } = null;
+        public new Dictionary<string, object> Data { get; private set; } = new Dictionary<string, object>();
 
         public void AddLocation(int line, int column)
         {
