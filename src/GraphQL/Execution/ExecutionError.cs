@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,9 @@ namespace GraphQL
 
         public IEnumerable<string> Path { get; set; }
 
-        public new Dictionary<string, object> Data { get; private set; } = null;
+        public Dictionary<string, object> DataAsDictionary { get; } = new Dictionary<string, object>();
+
+        public override IDictionary Data => DataAsDictionary;
 
         public void AddLocation(int line, int column)
         {
@@ -55,7 +57,6 @@ namespace GraphQL
             {
                 return;
             }
-            Data = new Dictionary<string, object>();
             foreach (DictionaryEntry entry in exception.Data)
             {
                 var key = entry.Key.ToString();
