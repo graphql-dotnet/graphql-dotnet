@@ -19,24 +19,15 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
-## GraphiQL sample
-There is a sample web api project hosting the GraphiQL interface.  `yarn install` and `yarn start` from the root of the repository, then run the web project from Visual Studio.
+## Examples
 
-> Note: Before running the GraphiQL project: make sure you Build the entire solution so that all the project references get built. (GraphQL, GraphQL-Parser, etc) to avoid missing reference/assembly errors.
-
-
-```
-> npm install -g yarn
-> yarn install
-> yarn start
-```
-![](http://i.imgur.com/2uGdVAj.png)
+https://github.com/graphql-dotnet/examples
 
 ## Usage
 
 Define your schema with a top level query object then execute that query.
 
-A more full-featured example including all classes required can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars).
+A more full-featured example can be found [here](https://github.com/graphql-dotnet/examples).
 
 ### Hello World
 
@@ -140,7 +131,7 @@ var result = schema.Execute(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the April 2016 specification.
+- Grammar and AST for the GraphQL language should be compatible with the October 2016 specification.
 
 ### Operation Execution
 - [x] Scalars
@@ -175,12 +166,12 @@ var result = schema.Execute(_ =>
 - [x] No undefined variables
 - [x] No unused fragments
 - [x] No unused variables
-- [ ] Overlapping fields can be merged
+- [ ] Overlapping fields can be merged ([help with this rule](https://github.com/graphql-dotnet/graphql-dotnet/issues/160))
 - [x] Possible fragment spreads
 - [x] Provide non-null arguments
 - [x] Scalar leafs
 - [x] Unique argument names
-- [ ] Unique directives per location
+- [x] Unique directives per location
 - [x] Unique fragment names
 - [x] Unique input field names
 - [x] Unique operation names
@@ -226,12 +217,6 @@ Publishing documentation requires access to https://github.com/graphql-dotnet/gr
 cd docs
 ./publish_docs.sh 2.0.0
 ```
-
-
-### Running on .NET Core
-The GraphQL.GraphiQLCore project runs on `.NET Core 1.1`. You can run from Visual Studio Code or from the command line using `dotnet run`. When you run the project, you will see the GraphiQL editor open.
-
-When using Visual Studio Code, open to the `./src/GraphQL.GraphiQLCore` folder. You will get a warning "Required assets to build and debug are missing from 'GraphQL.GraphiQLCore'. Add Them?". Choose `Yes`. This will add the necessary launch.json and tasks.json files.
 
 ### Running on OSX with mono
 To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:

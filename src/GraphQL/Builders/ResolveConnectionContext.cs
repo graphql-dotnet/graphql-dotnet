@@ -20,6 +20,20 @@ namespace GraphQL.Builders
         {
             get
             {
+                var first = FirstInternal;
+                if (!first.HasValue && !Last.HasValue)
+                {
+                    return _defaultPageSize;
+                }
+                
+                return first;
+            }
+        }
+        
+        private int? FirstInternal
+        {
+            get
+            {
                 var first = GetArgument<int?>("first");
                 return first.HasValue ? (int?)Math.Abs(first.Value) : null;
             }

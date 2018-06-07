@@ -82,11 +82,11 @@ namespace GraphQL
                     serializer.Serialize(writer, error.Code);
                 }
 
-                if (error.Data != null && error.Data.Count > 0)
+                if (error.Data.Count > 0)
                 {
                     writer.WritePropertyName("data");
                     writer.WriteStartObject();
-                    error.Data.Apply(entry =>
+                    error.DataAsDictionary.Apply(entry =>
                     {
                         writer.WritePropertyName(entry.Key);
                         serializer.Serialize(writer, entry.Value);

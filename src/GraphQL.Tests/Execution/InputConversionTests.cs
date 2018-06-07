@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
@@ -18,6 +18,7 @@ namespace GraphQL.Tests.Execution
             public List<int?> F { get; set; }
             public List<List<int?>> G { get; set; }
             public DateTime H { get; set; }
+            public Double I { get; set; }
         }
 
         public class EnumInput
@@ -166,6 +167,17 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
             myInput.D.ShouldBe(5);
+        }
+
+        [Fact]
+        public void can_convert_int_to_double()
+        {
+            var json = @"{'i': 1 }";
+            var inputs = json.ToInputs();
+            inputs.ShouldNotBeNull();
+            var myInput = inputs.ToObject<MyInput>();
+            myInput.ShouldNotBeNull();
+            myInput.I.ShouldBe(1.0);
         }
 
         [Fact]

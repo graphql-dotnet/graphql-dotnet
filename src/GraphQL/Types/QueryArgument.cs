@@ -4,7 +4,7 @@ using System.Reflection;
 namespace GraphQL.Types
 {
     public class QueryArgument<TType> : QueryArgument
-        where TType : GraphType
+        where TType : IGraphType
     {
         public QueryArgument()
             : base(typeof(TType))
@@ -21,9 +21,9 @@ namespace GraphQL.Types
 
         public QueryArgument(Type type)
         {
-            if (type == null || !typeof(GraphType).IsAssignableFrom(type))
+            if (type == null || !typeof(IGraphType).IsAssignableFrom(type))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required and must derive from GraphType.");
+                throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required and must derive from IGraphType.");
             }
 
             Type = type;

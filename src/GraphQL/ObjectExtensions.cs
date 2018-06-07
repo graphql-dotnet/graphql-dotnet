@@ -76,7 +76,7 @@ namespace GraphQL
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var implementsIList = fieldType.GetInterface("IList") != null;
 
-                if (implementsIList)
+                if (implementsIList && !fieldType.IsArray)
                 {
                     newArray = (IList)Activator.CreateInstance(fieldType);
                 }
@@ -92,6 +92,13 @@ namespace GraphQL
                 foreach (var listItem in valueList)
                 {
                     newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                }
+
+                if (fieldType.IsArray)
+                {
+                    var array = Array.CreateInstance(elementType, newArray.Count);
+                    newArray.CopyTo(array, 0);
+                    return array;
                 }
 
                 return newArray;
