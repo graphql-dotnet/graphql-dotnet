@@ -168,7 +168,7 @@ public class StarWarsQuery : ObjectGraphType
       resolve: context =>
       {
         var id = context.GetArgument<string>("id");
-        var objectId = contet.Arguments["id"];
+        var objectId = context.Arguments["id"];
         return data.GetDroidByIdAsync(id);
       }
     );
