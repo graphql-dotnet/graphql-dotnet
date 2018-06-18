@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace GraphQL
 {
+    using System.Collections;
+
     public static class TypeExtensions
     {
         /// <summary>
@@ -136,7 +138,7 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
-            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (IsAnIEnumerable(type))
             {
                 var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
                 var listType = typeof(ListGraphType<>);
@@ -157,5 +159,8 @@ namespace GraphQL
 
             return graphType;
         }
+
+        private static bool IsAnIEnumerable(Type type) =>
+            type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
     }
 }
