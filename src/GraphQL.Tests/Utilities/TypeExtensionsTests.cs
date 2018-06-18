@@ -24,6 +24,10 @@ namespace GraphQL.Tests.Utilities
             typeof(IList<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
 
         [Fact]
+        public void GetGraphTypeFromType_ForIReadOnlyCollection_EqualToListGraphType() =>
+            typeof(IReadOnlyCollection<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
+
+        [Fact]
         public void GetGraphTypeFromType_ForIEnumerable_EqualToListGraphType() =>
             typeof(IEnumerable<string>).GetGraphTypeFromType(true).ShouldBe(typeof(ListGraphType<StringGraphType>));
 
