@@ -1,4 +1,5 @@
 using GraphQL.Language.AST;
+using System;
 
 namespace GraphQL.Types
 {
@@ -11,10 +12,11 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            if (value is bool)
+            try
             {
-                return (bool) value;
+                return ParseValue(value);
             }
+            catch(Exception) { }
 
             return false;
         }
