@@ -73,6 +73,12 @@ namespace GraphQL
 
         private static object ParseBool(object value)
         {
+            string stringValue = (string)value;
+            if (string.CompareOrdinal(stringValue, "1") == 0)
+                return true;
+            else if (string.CompareOrdinal(stringValue, "0") == 0)
+                return false;
+
             return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo);
         }
 

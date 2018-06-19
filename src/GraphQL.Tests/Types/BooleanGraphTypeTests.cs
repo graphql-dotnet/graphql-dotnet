@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
@@ -42,6 +42,18 @@ namespace GraphQL.Tests.Types
         public void coerces_string_True()
         {
             type.ParseValue("True").ShouldBe(true);
+        }
+
+        [Fact]
+        public void coerces_string_1_to_true()
+        {
+            type.ParseValue("1").ShouldBe(true);
+        }
+
+        [Fact]
+        public void coerces_zero_string_to_false()
+        {
+            type.ParseValue("0").ShouldBe(false);
         }
     }
 }
