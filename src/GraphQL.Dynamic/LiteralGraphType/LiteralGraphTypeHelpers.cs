@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -11,11 +12,15 @@ namespace GraphQL.Dynamic.Types.LiteralGraphType
 
     internal static class LiteralGraphTypeHelpers
     {
+        private static readonly Regex SanitizeTypeNameRegex = new Regex(@"[:\/.]");
+
         private static ConcurrentDictionary<string, FieldTypeResolver> MemberFieldTypeResolverMappings { get; set; } = new ConcurrentDictionary<string, FieldTypeResolver>();
         private static ConcurrentDictionary<string, FieldType> MemberFieldTypeMappings { get; set; } = new ConcurrentDictionary<string, FieldType>();
 
         private static ConcurrentDictionary<LiteralGraphTypeMemberInfoType, Type> LiteralGraphTypeMemberInfoTypeMappings { get; set; } = new ConcurrentDictionary<LiteralGraphTypeMemberInfoType, Type>();
         private static ConcurrentDictionary<LiteralGraphTypeMemberInfoType, FieldTypeResolver> LiteralGraphTypeMemberInfoFieldTypeResolverMappings { get; set; } = new ConcurrentDictionary<LiteralGraphTypeMemberInfoType, FieldTypeResolver>();
+
+        private readonly static GraphTypesLookup _graphTypesLookup = new GraphTypesLookup();
 
         static LiteralGraphTypeHelpers()
         {
@@ -37,8 +42,13 @@ namespace GraphQL.Dynamic.Types.LiteralGraphType
             PopulateTypeMapping(LiteralGraphTypeMemberInfoType.Double, typeof(double), CreateFieldType<FloatGraphType>);
             PopulateTypeMapping(LiteralGraphTypeMemberInfoType.Boolean, typeof(bool), CreateFieldType<BooleanGraphType>);
             PopulateTypeMapping(LiteralGraphTypeMemberInfoType.Guid, typeof(Guid), CreateFieldType<IdGraphType>);
+            PopulateTypeMapping(LiteralGraphTypeMemberInfoType.DateTime, typeof(DateTimeOffset), CreateFieldType<DateGraphType>);
             PopulateTypeMapping(LiteralGraphTypeMemberInfoType.DateTimeOffset, typeof(DateTimeOffset), CreateFieldType<DateGraphType>);
         }
+
+        internal static Type GetPrimitiveGraphType(string name) => _graphTypesLookup[name]?.GetType();
+
+        internal static string GenerateRemoteTypeName(string remoteLocation, string name) => SanitizeTypeNameRegex.Replace($"{remoteLocation}.{name}", "_");
 
         internal static string MakeMemberFieldTypeResolverMapKey(LiteralGraphTypeMemberInfo member) => $"{member.DeclaringTypeName}.{member.Name}";
 
@@ -82,7 +92,7 @@ namespace GraphQL.Dynamic.Types.LiteralGraphType
 
         internal static LiteralGraphTypeMemberInfoType GetLiteralGraphTypeMemberInfoTypeForType(Type type)
         {
-            var memberInfoType = LiteralGraphTypeMemberInfoTypeMappings.Keys.FirstOrDefault(key => LiteralGraphTypeMemberInfoTypeMappings[key] == type);
+            var memberInfoType = LiteralGraphTypeMemberInfoTypeMappings.Keys.FirstOrDefault(key => GetTypeForLiteralGraphTypeMemberInfoType(key) == type);
             if (memberInfoType != LiteralGraphTypeMemberInfoType.Unknown)
             {
                 return memberInfoType;
@@ -91,6 +101,13 @@ namespace GraphQL.Dynamic.Types.LiteralGraphType
             return type.IsPrimitive
                 ? LiteralGraphTypeMemberInfoType.Unknown
                 : LiteralGraphTypeMemberInfoType.Complex;
+        }
+
+        internal static Type GetTypeForLiteralGraphTypeMemberInfoType(LiteralGraphTypeMemberInfoType memberInfoType)
+        {
+            LiteralGraphTypeMemberInfoTypeMappings.TryGetValue(memberInfoType, out var type);
+
+            return type;
         }
 
         internal static FieldTypeResolver GetFieldTypeResolverForMember(LiteralGraphTypeMemberInfo member, FieldTypeResolver complexFieldTypeResolver)

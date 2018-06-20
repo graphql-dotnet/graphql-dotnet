@@ -7,7 +7,6 @@ using GraphQL.Types;
 
 namespace GraphQL.Dynamic.Types.LiteralGraphType
 {
-
     public class LiteralGraphType<T> : ObjectGraphType<T>
     {
         private bool _hasAddedFields;
@@ -67,6 +66,7 @@ namespace GraphQL.Dynamic.Types.LiteralGraphType
                     return null;
                 }
 
+                // TODO: if maybeActualType is a primitive, we SHOULDN'T be wrapping it in a LiteralGraphType<>
                 var literalGraphType = typedMember.IsList
                     // IEnumerable<T> -> ListGraphType<LiteralGraphType<T>> 
                     ? typeof(ListGraphType<>).MakeGenericType(typeof(LiteralGraphType<>).MakeGenericType(GetListElementType(maybeActualType)))

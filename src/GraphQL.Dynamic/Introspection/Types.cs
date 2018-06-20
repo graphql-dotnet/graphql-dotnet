@@ -45,7 +45,7 @@ namespace GraphQL.Dynamic.Types.Introspection
         public string Description { get; set; }
 
         [JsonProperty("args")]
-        public DirectiveArg[] Args { get; set; }
+        public Field[] Args { get; set; }
 
         [JsonProperty("onOperation")]
         public bool OnOperation { get; set; }
@@ -55,21 +55,6 @@ namespace GraphQL.Dynamic.Types.Introspection
 
         [JsonProperty("onField")]
         public bool OnField { get; set; }
-    }
-
-    public partial class DirectiveArg
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("type")]
-        public TypeElementType Type { get; set; }
-
-        [JsonProperty("defaultValue")]
-        public object DefaultValue { get; set; }
     }
 
     public partial class TypeElementType
@@ -105,7 +90,7 @@ namespace GraphQL.Dynamic.Types.Introspection
         public Field[] Fields { get; set; }
 
         [JsonProperty("inputFields")]
-        public DirectiveArg[] InputFields { get; set; }
+        public InputValue[] InputFields { get; set; }
 
         [JsonProperty("interfaces")]
         public TypeElementType[] Interfaces { get; set; }
@@ -130,6 +115,21 @@ namespace GraphQL.Dynamic.Types.Introspection
 
         [JsonProperty("deprecationReason")]
         public object DeprecationReason { get; set; }
+    }
+
+    public partial class InputValue
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("type")]
+        public TypeElementType Type { get; set; }
+
+        [JsonProperty("defaultValue")]
+        public string DefaultValue { get; set; }
     }
 
     public partial class Field
@@ -172,7 +172,7 @@ namespace GraphQL.Dynamic.Types.Introspection
 
     public partial class Root
     {
-        public static Root FromJson(string json) => JsonConvert.DeserializeObject<Root>(json, GraphQL.Dynamic.Types.Introspection.Converter.Settings);
+        public static Root FromJson(string json) => JsonConvert.DeserializeObject<Root>(json, Converter.Settings);
     }
 
     static class InterfaceKindExtensions
@@ -219,7 +219,7 @@ namespace GraphQL.Dynamic.Types.Introspection
 
     public static class Serialize
     {
-        public static string ToJson(this Root self) => JsonConvert.SerializeObject(self, GraphQL.Dynamic.Types.Introspection.Converter.Settings);
+        public static string ToJson(this Root self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }
 
     internal class Converter : JsonConverter

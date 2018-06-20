@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using Xunit;
 
 namespace GraphQL.Dynamic.Tests
 {
-    [Trait("Category", "Dynamic - Basic")]
     public class BasicTests
     {
         private readonly Schema _schema;
@@ -73,6 +73,6 @@ namespace GraphQL.Dynamic.Tests
             Assert.NotNull(queryResult.SelectToken("githubDynamic.user.repos[1].name").Value<object>());
         }
 
-        private string GetFileContentsForTestFile(string relativePath) => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), relativePath));
+        private string GetFileContentsForTestFile(string relativePath) => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Uri.UnescapeDataString(new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath)), relativePath));
     }
 }
