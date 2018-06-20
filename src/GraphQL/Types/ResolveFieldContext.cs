@@ -88,8 +88,7 @@ namespace GraphQL.Types
             }
 
             var arg = Arguments[name];
-            var inputObject = arg as Dictionary<string, object>;
-            if (inputObject != null)
+            if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;
                 if (type.Namespace?.StartsWith("System") == true)
@@ -108,7 +107,13 @@ namespace GraphQL.Types
             return Arguments?.ContainsKey(argumentName) ?? false;
         }
 
-        public async Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+
+        public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+        {
+            return TryAsyncResolve<object>(resolve, error);
+        }
+
+        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
         {
             try
             {
@@ -122,11 +127,12 @@ namespace GraphQL.Types
                     er.AddLocation(FieldAst, Document);
                     er.Path = Path;
                     Errors.Add(er);
-                    return null;
+                    return default(TResult);
                 }
                 else
                 {
-                    return error(Errors);
+                    var result = error(Errors);
+                    return result == null ? default(TResult) : await result;
                 }
             }
         }

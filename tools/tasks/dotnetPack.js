@@ -24,11 +24,8 @@ export default function compile() {
     versionSuffix = `--version-suffix ${settings.versionSuffix}${settings.revision}`;
   }
 
-  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} ${versionSuffix}`
+  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} ${versionSuffix} --include-symbols --include-source`
   const one = run(cmd)
 
-  const cmd2 = `dotnet pack src/GraphQL.StarWars -o ${settings.artifacts} -c ${settings.target}`
-  const two = run(cmd2)
-
-  return Promise.all[one, two]
+  return Promise.all[one]
 }

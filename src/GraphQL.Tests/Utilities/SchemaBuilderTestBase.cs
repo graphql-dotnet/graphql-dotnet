@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using GraphQL.Http;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 
@@ -63,7 +64,15 @@ namespace GraphQL.Tests.Utilities
             object expected = null;
             if (!string.IsNullOrWhiteSpace(result))
             {
-                expected = JObject.Parse(result);
+                expected = JObject.Parse(result); /*/JsonConvert.SerializeObject(
+                    result,
+                    new JsonSerializerSettings
+                    {
+                        // ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                        Formatting = Formatting.Indented,
+                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                        DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'",
+                    });*/
             }
             return new ExecutionResult { Data = expected };
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,9 @@ namespace GraphQL.DataLoader.Tests.Stores
         private int _getUsersByIdCalled;
         public int GetUsersByIdCalledCount => _getUsersByIdCalled;
 
+        private IEnumerable<int> _getUsersById_UserIds;
+        public IEnumerable<int> GetUsersById_UserIds => _getUsersById_UserIds;
+
         private int _getAllUsersCalled;
         public int GetAllUsersCalledCount => _getAllUsersCalled;
 
@@ -25,8 +29,9 @@ namespace GraphQL.DataLoader.Tests.Stores
             CancellationToken cancellationToken = default(CancellationToken))
         {
             Interlocked.Increment(ref _getUsersByIdCalled);
+            Interlocked.Exchange(ref _getUsersById_UserIds, userIds);
 
-            await Task.Delay(1);
+            await Task.Yield();
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -46,6 +51,30 @@ namespace GraphQL.DataLoader.Tests.Stores
             cancellationToken.ThrowIfCancellationRequested();
 
             return _users.AsReadOnly();
+        }
+
+        public async Task<IEnumerable<User>> GetDuplicateUsersAsync(IEnumerable<int> userIds, CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Return 2 users for each key
+            return userIds.SelectMany(x =>
+                Enumerable.Repeat(_users.Find(u => u.UserId == x), 2)
+            ).ToList();
+        }
+
+        public Task<IEnumerable<User>> ThrowExceptionImmediatelyAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new Exception("Immediate");
+        }
+
+        public async Task<IEnumerable<User>> ThrowExceptionDeferredAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await Task.Yield();
+
+            throw new Exception("Deferred");
         }
     }
 }

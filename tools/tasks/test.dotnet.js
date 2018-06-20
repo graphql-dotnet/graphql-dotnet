@@ -13,6 +13,7 @@ function test(project) {
 export default function testDotnet() {
   return Promise.all([
     test('./src/GraphQL.Tests'),
-    test('./src/GraphQL.DataLoader.Tests')
+    test('./src/GraphQL.DataLoader.Tests'),
+    test('./src/GraphQL.Harness.Tests')
   ])
 }

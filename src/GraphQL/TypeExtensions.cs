@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace GraphQL
 {
+    using System.Collections;
+
     public static class TypeExtensions
     {
         /// <summary>
@@ -105,8 +107,6 @@ namespace GraphQL
                 : typeName;
         }
 
-
-
         /// <summary>
         /// Gets the graph type for the indicated type.
         /// </summary>
@@ -129,41 +129,7 @@ namespace GraphQL
                 }
             }
 
-
-            if (type == typeof(int))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(long))
-            {
-                graphType = typeof(IntGraphType);
-            }
-
-            if (type == typeof(double) || type == typeof(float))
-            {
-                graphType = typeof(FloatGraphType);
-            }
-
-            if (type == typeof(decimal))
-            {
-                graphType = typeof(DecimalGraphType);
-            }
-
-            if (type == typeof(string))
-            {
-                graphType = typeof(StringGraphType);
-            }
-
-            if (type == typeof(bool))
-            {
-                graphType = typeof(BooleanGraphType);
-            }
-
-            if (type == typeof(DateTime))
-            {
-                graphType = typeof(DateGraphType);
-            }
+            graphType = GraphQL.GraphTypeRegistry.Get(type);
 
             if (type.IsArray)
             {
@@ -172,7 +138,7 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
-            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (IsAnIEnumerable(type))
             {
                 var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
                 var listType = typeof(ListGraphType<>);
@@ -193,5 +159,8 @@ namespace GraphQL
 
             return graphType;
         }
+
+        private static bool IsAnIEnumerable(Type type) =>
+            type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
     }
 }

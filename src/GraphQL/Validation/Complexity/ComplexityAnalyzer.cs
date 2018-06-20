@@ -77,7 +77,10 @@ namespace GraphQL.Validation.Complexity
         private void FragmentIterator(INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
+            {
+                _loopCounter = 0;
                 throw new InvalidOperationException("Query is too complex to validate.");
+            }
 
             if (node.Children != null &&
                 node.Children.Any(
@@ -102,7 +105,10 @@ namespace GraphQL.Validation.Complexity
         private void TreeIterator(INode node, ComplexityResult result, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (_loopCounter++ > _maxRecursionCount)
+            {
+                _loopCounter = 0;
                 throw new InvalidOperationException("Query is too complex to validate.");
+            }
             if (node is FragmentDefinition) return;
 
             if (node.Children != null &&

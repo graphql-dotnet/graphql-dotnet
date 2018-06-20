@@ -106,7 +106,7 @@ Hello GraphQL!
 
 ## GraphiQL
 
-[GraphiQL](https://github.com/graphql/graphiql) is an interactive in-browser GraphQL IDE.  This is a fantastic developer tool to help you form queries and explore your Schema.  The [sample project](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.GraphiQL) gives an example of hosting the GraphiQL IDE.
+[GraphiQL](https://github.com/graphql/graphiql) is an interactive in-browser GraphQL IDE.  This is a fantastic developer tool to help you form queries and explore your Schema.  The [sample project](https://github.com/graphql-dotnet/examples/tree/master/src/AspNetCoreCustom) gives an example of hosting the GraphiQL IDE.
 
 ![](http://i.imgur.com/2uGdVAj.png)
 
@@ -168,7 +168,7 @@ public class StarWarsQuery : ObjectGraphType
       resolve: context =>
       {
         var id = context.GetArgument<string>("id");
-        var objectId = contet.Arguments["id"];
+        var objectId = context.Arguments["id"];
         return data.GetDroidByIdAsync(id);
       }
     );

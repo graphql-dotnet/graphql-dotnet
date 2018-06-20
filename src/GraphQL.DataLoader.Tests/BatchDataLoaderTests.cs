@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using Nito.AsyncEx;
@@ -172,6 +174,50 @@ namespace GraphQL.DataLoader.Tests
             user3.ShouldBeSameAs(nullObjectUser, "The DataLoader should use the supplied default value");
 
             Users.GetUsersByIdCalledCount.ShouldBe(1, "Results should have been cached from first batch");
+        }
+
+        [Fact]
+        public async Task ToDictionary_Exception()
+        {
+            var loader = new BatchDataLoader<int, User>(Users.GetDuplicateUsersAsync, x => x.UserId);
+
+            // Start async tasks to load by ID
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(2);
+
+            // Dispatch loading
+            loader.Dispatch();
+
+            try
+            {
+                // Now await tasks
+                var user1 = await task1;
+                var user2 = await task2;
+            }
+            catch (ArgumentException ex) when (ex.Message == "An item with the same key has already been added. Key: 1")
+            {
+                // This is the exception we should get
+            }
+        }
+
+        [Fact]
+        public async Task Keys_Are_DeDuped()
+        {
+            var loader = new BatchDataLoader<int, User>(Users.GetUsersByIdAsync);
+
+            // Start async tasks to load duplicate IDs
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(1);
+
+            // Dispatch loading
+            loader.Dispatch();
+
+            // Now await tasks
+            var user1 = await task1;
+            var user1b = await task2;
+
+            Users.GetUsersByIdCalledCount.ShouldBe(1);
+            Users.GetUsersById_UserIds.Count().ShouldBe(1, "The keys passed to the fetch delegate should be de-duplicated");
         }
     }
 }

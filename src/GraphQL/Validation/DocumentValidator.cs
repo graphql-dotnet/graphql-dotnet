@@ -13,7 +13,8 @@ namespace GraphQL.Validation
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null,
-            object userContext = null);
+            object userContext = null,
+            Inputs inputs = null);
     }
 
     public class DocumentValidator : IDocumentValidator
@@ -23,7 +24,8 @@ namespace GraphQL.Validation
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null,
-            object userContext = null)
+            object userContext = null,
+            Inputs inputs = null)
         {
             if (!schema.Initialized)
             {
@@ -36,7 +38,8 @@ namespace GraphQL.Validation
                 Schema = schema,
                 Document = document,
                 TypeInfo = new TypeInfo(schema),
-                UserContext = userContext
+                UserContext = userContext,
+                Inputs = inputs
             };
 
             if (rules == null)
@@ -80,6 +83,7 @@ namespace GraphQL.Validation
                 new NoUnusedVariables(),
                 new UniqueVariableNames(),
                 new KnownDirectives(),
+                new UniqueDirectivesPerLocation(),
                 new KnownArgumentNames(),
                 new UniqueArgumentNames(),
                 new ArgumentsOfCorrectType(),

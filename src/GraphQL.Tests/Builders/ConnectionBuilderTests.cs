@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
@@ -133,6 +134,59 @@ namespace GraphQL.Tests.Builders
             field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType>));
 
             var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
+
+            result.ShouldNotBeNull();
+            if (result != null)
+            {
+                result.TotalCount.ShouldBe(1);
+                result.PageInfo.HasNextPage.ShouldBe(true);
+                result.PageInfo.HasPreviousPage.ShouldBe(false);
+                result.PageInfo.StartCursor.ShouldBe("01");
+                result.PageInfo.EndCursor.ShouldBe("01");
+                result.Edges.Count.ShouldBe(1);
+                result.Edges.First().Cursor.ShouldBe("01");
+                result.Edges.First().Node.Field1.ShouldBe("abcd");
+                result.Items.Count.ShouldBe(1);
+                result.Items.First().Field1.ShouldBe("abcd");
+            }
+        }
+
+        [Fact]
+        public async Task can_define_simple_connection_with__async_resolver()
+        {
+            var type = new ObjectGraphType();
+            var connection = new Connection<Child>
+            {
+                TotalCount = 1,
+                PageInfo = new PageInfo
+                {
+                    HasNextPage = true,
+                    HasPreviousPage = false,
+                    StartCursor = "01",
+                    EndCursor = "01",
+                },
+                Edges = new List<Edge<Child>>
+                {
+                    new Edge<Child>
+                    {
+                        Cursor = "01",
+                        Node = new Child
+                        {
+                            Field1 = "abcd",
+                        },
+                    },
+                },
+            };
+            type.Connection<ObjectGraphType>()
+                .Name("testConnection")
+                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+
+            var field = type.Fields.Single();
+            field.Name.ShouldBe("testConnection");
+            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType>));
+
+            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var result = boxedResult as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)

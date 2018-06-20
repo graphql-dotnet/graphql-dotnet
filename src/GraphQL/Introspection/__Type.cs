@@ -46,9 +46,11 @@ namespace GraphQL.Introspection
                     {
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var type = context.Source as IComplexGraphType;
-                        return !includeDeprecated
+                        var fields = !includeDeprecated
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
+
+                        return fields.OrderBy(f => f.Name);
                     }
                     return null;
                 });

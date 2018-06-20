@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using GraphQL.Types;
 using Shouldly;
@@ -16,9 +17,9 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
-        public void coerces_invalid_string_to_null()
+        public void coerces_invalid_string_to_exception()
         {
-            type.ParseValue("abcd").ShouldBe(null);
+            Assert.Throws<FormatException>(()=>type.ParseValue("abcd"));
         }
 
         [Fact]

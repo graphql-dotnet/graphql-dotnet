@@ -107,5 +107,43 @@ namespace GraphQL.DataLoader.Tests
             wasCancelled.ShouldBe(true);
             Users.GetAllUsersCalledCount.ShouldBe(0, "Fetch delegate should not be called");
         }
+
+        [Fact]
+        public async Task Deferred_Exception_Is_Bubbled_Properly()
+        {
+            var loader = new SimpleDataLoader<IEnumerable<User>>(Users.ThrowExceptionDeferredAsync);
+
+            var task = loader.LoadAsync();
+
+            loader.Dispatch();
+
+            try
+            {
+                await task;
+            }
+            catch (Exception ex) when (ex.Message == "Deferred")
+            {
+                // This is what should happen
+            }
+        }
+
+        [Fact]
+        public async Task Immediate_Exception_Is_Bubbled_Properly()
+        {
+            var loader = new SimpleDataLoader<IEnumerable<User>>(Users.ThrowExceptionImmediatelyAsync);
+
+            var task = loader.LoadAsync();
+
+            loader.Dispatch();
+
+            try
+            {
+                await task;
+            }
+            catch (Exception ex) when (ex.Message == "Immediate")
+            {
+                // This is what should happen
+            }
+        }
     }
 }

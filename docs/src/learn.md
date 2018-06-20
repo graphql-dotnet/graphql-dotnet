@@ -34,7 +34,6 @@ Field<ListGraphType<DinnerType>>(
 GraphQL .NET supports dependency injection through a simple resolve function on the Schema class.  Internally when trying to resolve a type the library will call this resolve function.
 
 
-
 The default implementation uses `Activator.CreateInstance`.
 
 ```csharp
@@ -137,6 +136,8 @@ _.FieldMiddleware.Use(next =>
 ```
 
 ## Authentication / Authorization
+
+See the [Authorization](https://github.com/graphql-dotnet/authorization) project for an implemenation of the following.
 
 You can write validation rules that will run before the query is executed.  You can use this pattern to check that the user is authenticated or has permissions for a specific field.  This example uses the `Metadata` dictionary available on Fields to set permissons per field.
 
@@ -282,50 +283,11 @@ Or simply put on average we will have **2x Products** each will have 1 Title for
 
 Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (or higher) the query will execute correctly. If we change the ```MaxComplexity``` to something like 20 the DocumentExecutor will fail right after parsing the AST tree and will not attempt to resolve any of the fields (or talk to the database).
 
-## Query Batching
+## DataLoader
 
-Query batching allows you to make a single request to your data store instead of multiple requests.  This can also often be referred to as the ["N+1"](http://stackoverflow.com/questions/97197/what-is-the-n1-selects-issue) problem.  One technique of accomplishing this is to have all of your resolvers return a `Task`, then resolve those tasks when the batch is complete.  Some projects provide features like [Marten Batched Queries](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) that support this pattern.
+GraphQL .NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader).
 
-The trick is knowing when to execute the batched query.  GraphQL .NET provides the ability to add listeners in the execution pipeline.  Combined with a custom `UserContext` this makes executing the batch trivial.
-
-```csharp
-public class GraphQLUserContext
-{
-    // a Marten batched query
-    public IBatchedQuery Batch { get; set; }
-}
-
-var result = await executer.ExecuteAsync(_ =>
-{
-    ...
-    _.UserContext = userContext;
-    _.Listeners.Add(new ExecuteBatchListener());
-});
-
-public class ExecuteBatchListener : DocumentExecutionListenerBase<GraphQLUserContext>
-{
-    public override async Task BeforeExecutionAwaitedAsync(
-        GraphQLUserContext userContext,
-        CancellationToken token)
-    {
-        await userContext.Batch.Execute(token);
-    }
-}
-
-// using the Batched Query in the field resolver
-Field<ListGraphType<DinnerType>>(
-    "popularDinners",
-    resolve: context =>
-    {
-        var userContext = context.UserContext.As<GraphQLUserContext>();
-        return userContext.Batch.Query(new FindPopularDinners());
-    });
-```
-
-## Projects attempting to solve N+1
-
-* [Marten](http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/) - by Jeremy Miller, PostgreSQL
-* [GraphQL .NET DataLoader](https://github.com/dlukez/graphql-dotnet-dataloader) by [Daniel Zimmermann](https://github.com/dlukez)
+Documentation is here: <[linkto:dataloader]>
 
 ## Metrics
 
