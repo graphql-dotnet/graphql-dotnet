@@ -53,6 +53,38 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
+            Builder.Types.Include<ResolvingClassForABlog>();
+
+            var schema = Builder.Build(defs);
+            schema.Initialize();
+
+            var blog = schema.FindType("ABlog") as IObjectGraphType;
+
+            blog.IsTypeOf.ShouldNotBeNull();
+            blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
+        }
+
+        [Fact]
+        public void impl_type_sets_default_isTypeOfFunc()
+        {
+            var defs = @"
+                interface IUniqueElement
+                {
+                    id: ID!
+                }
+
+                type ABlog implements IUniqueElement
+                {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query
+                {
+                    blog(id: ID!): ABlog
+                }
+            ";
+
             Builder.Types.Include<ABlog>();
 
             var schema = Builder.Build(defs);
@@ -89,19 +121,30 @@ namespace GraphQL.Tests.Utilities
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }
 
-        public ABlog Blog(string id)
+        public ResolvingClassForABlog Blog(string id)
         {
-            return new ABlog();
+            return new ResolvingClassForABlog();
         }
     }
 
-    [GraphQLMetadata("IUniqueElement")]
     public abstract class UniqueElement
     {
         public abstract string Id { get; }
     }
 
-    [GraphQLMetadata(IsTypeOf = typeof(ABlog))]
+    [GraphQLMetadata(Name="ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
+    public class ResolvingClassForABlog : UniqueElement
+    {
+        public ResolvingClassForABlog()
+        {
+            Id = "Id-0";
+            Name = $"Blog Name {Id}";
+        }
+
+        public override string Id { get; }
+        public string Name { get; }
+    }
+
     public class ABlog : UniqueElement
     {
         public ABlog()
@@ -113,5 +156,4 @@ namespace GraphQL.Tests.Utilities
         public override string Id { get; }
         public string Name { get; }
     }
-
 }
