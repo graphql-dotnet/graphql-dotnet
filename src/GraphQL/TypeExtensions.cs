@@ -88,7 +88,7 @@ namespace GraphQL
         {
             var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
 
-            if (attr != null)
+            if (!string.IsNullOrEmpty(attr?.Name))
             {
                 return attr.Name;
             }
