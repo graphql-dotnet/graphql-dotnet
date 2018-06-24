@@ -24,5 +24,17 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void ParseValue_stringAsInvalidUri_ThrowsFormatException() =>
             Assert.Throws<UriFormatException>(() => uriGraphType.ParseValue("www.wp.pl"));
+
+        [Fact]
+        public void Serialize_uriIsAString_ReturnValidUriGraphType() =>
+            uriGraphType.Serialize("https://www.wp.pl").ShouldBe(new Uri("https://www.wp.pl"));
+
+        [Fact]
+        public void Serialize_uriIsAUri_ReturnValidUriGraphType() =>
+            uriGraphType.Serialize(new Uri("https://www.wp.pl")).ShouldBe(new Uri("https://www.wp.pl"));
+
+        [Fact]
+        public void Serialize_stringAsInvalidUri_ThrowsFormatException() =>
+            Assert.Throws<UriFormatException>(() => uriGraphType.Serialize("www.wp.pl"));
     }
 }
