@@ -63,7 +63,7 @@ namespace GraphQL.Tests.Types
         public void coerces_input_to_exception(string input)
         {
             FormatException formatException = Assert.Throws<FormatException>(() => type.ParseValue(input));
-            Assert.Equal("String was not recognized as a valid Boolean.", formatException.Message);
+            formatException.Message.ShouldBe("String was not recognized as a valid Boolean.");
         }
 
         [Theory]
