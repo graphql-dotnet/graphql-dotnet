@@ -12,13 +12,7 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            try
-            {
-                return ParseValue(value);
-            }
-            catch(Exception) { }
-
-            return false;
+            return ParseValue(value);
         }
 
         public override object ParseValue(object value)
