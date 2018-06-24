@@ -71,6 +71,7 @@ namespace GraphQL.Tests.Types
         [InlineData("0")]
         [InlineData("False")]
         [InlineData("false")]
+        [InlineData(false)]
         public void serialize_input_to_false(object input)
         {
             type.Serialize(input).ShouldBe(false);
@@ -81,6 +82,7 @@ namespace GraphQL.Tests.Types
         [InlineData("1")]
         [InlineData("True")]
         [InlineData("true")]
+        [InlineData(true)]
         public void serialize_input_to_true(object input)
         {
             type.Serialize(input).ShouldBe(true);
