@@ -192,6 +192,26 @@ namespace GraphQL.Utilities
                         : join(new[] {op, join(new[] {name, variables}, ""), directives, selectionSet}, " ");
                 });
             });
+            
+            Config<InlineFragment>(c =>
+            {
+                c.Field(x => x.Directives);
+                c.Field(x => x.SelectionSet);
+                c.Field(x => x.Type);
+                c.Print(p =>
+                {
+                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var selectionSet = p.Arg(x => x.SelectionSet);
+                    var typename = p.Arg(x => x.Type);
+                    var body = string.IsNullOrWhiteSpace(directives)
+                        ? selectionSet
+                        : join(new[] { directives, selectionSet }, " ");
+
+                    return $"... on {typename} {body}";
+
+
+                });
+            });
 
             Config<VariableDefinition>(c =>
             {
