@@ -63,12 +63,11 @@ namespace GraphQL.Validation.Complexity
             
             var context = new AnalysisContext();
 
-            doc.Children.Where(node => node is FragmentDefinition).Apply(node =>
+            doc.Children.OfType<FragmentDefinition>().Apply(node =>
             {
                 var fragResult = new FragmentComplexity();
-                FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);
-                var fragmentName = ((FragmentDefinition) node).Name;
-                context.FragmentMap[fragmentName] = fragResult;
+                FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);                
+                context.FragmentMap[node.Name] = fragResult;
             });
             
             TreeIterator(context, doc, avgImpact, avgImpact, 1d);
