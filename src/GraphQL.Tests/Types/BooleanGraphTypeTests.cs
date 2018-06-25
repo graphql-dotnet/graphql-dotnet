@@ -1,9 +1,11 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types
 {
+    using System;
+
     public class BooleanGraphTypeTests
     {
         private BooleanGraphType type = new BooleanGraphType();
@@ -43,5 +45,36 @@ namespace GraphQL.Tests.Types
         {
             type.ParseValue("True").ShouldBe(true);
         }
+
+        [Fact]
+        public void coerces_string_1() =>
+            type.ParseValue("1").ShouldBe(true);
+
+
+        [Fact]
+        public void coerces_string_0() =>
+            type.ParseValue("0").ShouldBe(false);
+
+        [Fact]
+        public void coerces_string_notRelevantToBooleanValue_ThrowsFormatException() =>
+            Assert.Throws<FormatException>(() => type.ParseValue("bdsjkfbdsk"));
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData("1")]
+        [InlineData(1)]
+        public void Serialize_valueIsWrittenAsAValidTrueValue_ReturnTrue(object input) =>
+            type.Serialize(input).ShouldBe(true);
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData("0")]
+        [InlineData(0)]
+        public void Serialize_valueIsWrittenAsAValidFalseValue_ReturnFalse(object input) =>
+            type.Serialize(input).ShouldBe(false);
+
+        [Fact]
+        public void Serialize_valueIsInvalid_ThrowsFormatException() =>
+            Assert.Throws<FormatException>(() => type.Serialize("fdsfsd"));
     }
 }

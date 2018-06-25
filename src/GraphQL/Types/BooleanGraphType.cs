@@ -9,20 +9,11 @@ namespace GraphQL.Types
             Name = "Boolean";
         }
 
-        public override object Serialize(object value)
-        {
-            if (value is bool)
-            {
-                return (bool) value;
-            }
+        public override object Serialize(object value) =>
+            this.ParseValue(value);
 
-            return false;
-        }
-
-        public override object ParseValue(object value)
-        {
-            return ValueConverter.ConvertTo(value, typeof(bool));
-        }
+        public override object ParseValue(object value) =>
+            ValueConverter.ConvertTo(value, typeof(bool));
 
         public override object ParseLiteral(IValue value)
         {

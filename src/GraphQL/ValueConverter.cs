@@ -73,6 +73,8 @@ namespace GraphQL
 
         private static object ParseBool(object value)
         {
+            if (int.TryParse(value as string, out var intValue))
+                return Convert.ToBoolean(intValue, NumberFormatInfo.InvariantInfo);
             return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo);
         }
 
