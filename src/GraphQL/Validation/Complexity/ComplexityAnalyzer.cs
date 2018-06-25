@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Complexity
             public double Complexity { get; set; }
         }
 
-        private class ComplexityAnalysisContext
+        private class AnalysisContext
         {
             public ComplexityResult Result { get; } = new ComplexityResult();
             public int LoopCounter { get; set; }
@@ -61,22 +61,22 @@ namespace GraphQL.Validation.Complexity
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
             
-            var context = new ComplexityAnalysisContext();
+            var context = new AnalysisContext();
 
             doc.Children.Where(node => node is FragmentDefinition).Apply(node =>
             {
                 var fragResult = new FragmentComplexity();
-                FragmentIterator(node, fragResult, avgImpact, avgImpact, 1d, context);
+                FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);
                 var fragmentName = ((FragmentDefinition) node).Name;
                 context.FragmentMap[fragmentName] = fragResult;
             });
             
-            TreeIterator(doc, context, avgImpact, avgImpact, 1d);
+            TreeIterator(context, doc, avgImpact, avgImpact, 1d);
 
             return context.Result;
         }
 
-        private void FragmentIterator(INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact, ComplexityAnalysisContext context)
+        private void FragmentIterator(AnalysisContext context, INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (context.LoopCounter++ > _maxRecursionCount)
             {
@@ -93,17 +93,17 @@ namespace GraphQL.Validation.Complexity
                     var impactFromArgs = GetImpactFromArgs(node);
                     qDepthComplexity.Complexity += currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact;
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact, context);
+                        FragmentIterator(context, nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        FragmentIterator(nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact, currentEndNodeImpact, context);
+                        FragmentIterator(context, nodeChild, qDepthComplexity, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
             }
             else if (node is Field)
                 qDepthComplexity.Complexity += currentEndNodeImpact;
         }
 
-        private void TreeIterator(INode node, ComplexityAnalysisContext context, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
+        private void TreeIterator(AnalysisContext context, INode node, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
             if (context.LoopCounter++ > _maxRecursionCount)
             {
@@ -119,20 +119,20 @@ namespace GraphQL.Validation.Complexity
                 {
                     context.Result.TotalQueryDepth++;
                     var impactFromArgs = GetImpactFromArgs(node);
-                    RecordFieldComplexity(node, context, currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact);
+                    RecordFieldComplexity(context, node, currentEndNodeImpact = impactFromArgs / avgImpact * currentSubSelectionImpact ?? currentSubSelectionImpact);
                     foreach (var nodeChild in node.Children.Where(n => n is SelectionSet))
-                        TreeIterator(nodeChild, context, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
+                        TreeIterator(context, nodeChild, avgImpact, currentSubSelectionImpact * (impactFromArgs ?? avgImpact), currentEndNodeImpact);
                 }
                 else
                     foreach (var nodeChild in node.Children)
-                        TreeIterator(nodeChild, context, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
+                        TreeIterator(context, nodeChild, avgImpact, currentSubSelectionImpact, currentEndNodeImpact);
             }
             else if (node is Field)
-                RecordFieldComplexity(node, context, currentEndNodeImpact);
+                RecordFieldComplexity(context, node, currentEndNodeImpact);
             else if (node is FragmentSpread)
             {
                 var fragmentComplexity = context.FragmentMap[((FragmentSpread)node).Name];
-                RecordFieldComplexity(node, context, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
+                RecordFieldComplexity(context, node, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
                 context.Result.TotalQueryDepth += fragmentComplexity.Depth;
             }
         }
@@ -157,7 +157,7 @@ namespace GraphQL.Validation.Complexity
             return newImpact;
         }
 
-        private static void RecordFieldComplexity(INode node, ComplexityAnalysisContext context, double impact)
+        private static void RecordFieldComplexity(AnalysisContext context, INode node, double impact)
         {
             context.Result.Complexity += impact;
             if (context.Result.ComplexityMap.ContainsKey(node))
