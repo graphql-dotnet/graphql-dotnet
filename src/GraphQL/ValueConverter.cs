@@ -35,7 +35,6 @@ namespace GraphQL
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
 
             Register(typeof(string), typeof(Uri), ParseUri);
-            Register(typeof(Uri), typeof(Uri), ParseUri);
         }
 
         private static object IntToDouble(object value)

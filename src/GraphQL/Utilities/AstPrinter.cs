@@ -327,6 +327,11 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
+            Config<UriValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower());
+            });
 
             // Directive
 
