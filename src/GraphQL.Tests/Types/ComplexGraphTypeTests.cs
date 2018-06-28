@@ -1,4 +1,4 @@
-﻿using GraphQL.StarWars.Types;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using System;
 using System.Collections.Generic;
@@ -120,6 +120,57 @@ namespace GraphQL.Tests.Types
             );
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
+        }
+
+        [Theory]
+        [InlineData("__id")]
+        [InlineData("___id")]
+        public void throws_when_field_name_prefix_with_reserved_underscores(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+
+            exception.Message.ShouldStartWith($"A field name: {fieldName} must not begin with \"__\", which is reserved by GraphQL introspection.");
+        }
+
+        [Theory]
+        [InlineData("i#d")]
+        [InlineData("i$d")]
+        [InlineData("id$")]
+        public void throws_when_field_name_doesnot_follow_spec(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {fieldName} does not.");
+        }
+
+        [Theory]
+        [InlineData("name")]
+        [InlineData("Name")]
+        [InlineData("_name")]
+        [InlineData("test_name")]
+        [InlineData(null)]
+        public void should_not_throw_exption_on_valid_field_name(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field<StringGraphType>(fieldName);
+
+            field.Name.ShouldBe(fieldName);
+        }
+
+        [Theory]
+        [InlineData("name")]
+        [InlineData("Name")]
+        [InlineData("_name")]
+        [InlineData("test_name")]
+        [InlineData(null)]
+        public void should_not_throw_exption_on_valid_field_name_using_field_builder(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            type.Field<StringGraphType>().Name(fieldName);
+
+            type.Fields.Last().Name.ShouldBe(fieldName);
         }
     }
 }
