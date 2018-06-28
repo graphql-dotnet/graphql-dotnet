@@ -3,6 +3,7 @@ using GraphQL.Types;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using System.Threading.Tasks;
+using GraphQL.Utilities;
 
 namespace GraphQL.Builders
 {
@@ -58,6 +59,8 @@ namespace GraphQL.Builders
 
         public FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
+            FieldValidator.ValidateName(name);
+
             _fieldType.Name = name;
             return this;
         }

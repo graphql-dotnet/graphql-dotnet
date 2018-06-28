@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -36,9 +37,11 @@ namespace GraphQL.Types
         {
             return _fields.Any(x => string.Equals(x.Name, name));
         }
-
+        
         public FieldType AddField(FieldType fieldType)
         {
+            FieldValidator.ValidateName(fieldType.Name);
+
             if (HasField(fieldType.Name))
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
