@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -129,7 +130,7 @@ namespace GraphQL
                 }
             }
 
-            graphType = GraphQL.GraphTypeRegistry.Get(type);
+            graphType = GraphTypeTypeRegistry.Get(type);
 
             if (type.IsArray)
             {

@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-
 using GraphQL.Types;
 
-namespace GraphQL
+namespace GraphQL.Utilities
 {
-    public static class GraphTypeRegistry
+    public static class GraphTypeTypeRegistry
     {
         static readonly Dictionary<Type, Type> _entries;
 
-        static GraphTypeRegistry()
+        static GraphTypeTypeRegistry()
         {
             _entries = new Dictionary<Type, Type>
             {
@@ -23,7 +22,6 @@ namespace GraphQL
                 [typeof(DateTime)] = typeof(DateGraphType),
                 [typeof(DateTimeOffset)] = typeof(DateGraphType)
             };
-
         }
 
         public static void Register(Type clrType, Type graphType)
