@@ -235,19 +235,16 @@ namespace GraphQL.Types
             });
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
+        public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
         {
-            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType));
+            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
+                .Name(name);
             AddField(builder.FieldType);
             return builder;
         }
 
         public FieldBuilder<TSourceType, object> Field<TGraphType>()
-        {
-            var builder = FieldBuilder.Create<TSourceType, object>(typeof(TGraphType));
-            AddField(builder.FieldType);
-            return builder;
-        }
+            => Field<TGraphType, object>();
 
         public FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
