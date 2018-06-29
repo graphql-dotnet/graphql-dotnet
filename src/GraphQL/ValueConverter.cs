@@ -33,6 +33,8 @@ namespace GraphQL
             Register(typeof(long), typeof(int), LongToInt);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
+
+            Register(typeof(string), typeof(Uri), ParseUri);
         }
 
         private static object IntToDouble(object value)
@@ -151,6 +153,11 @@ namespace GraphQL
         {
             return Convert.ToInt32(value, NumberFormatInfo.InvariantInfo);
         }
+
+        private static object ParseUri(object value) =>
+            value is string s
+                ? new Uri(s)
+                : (Uri) value;
 
         public static object ConvertTo(object value, Type targetType)
         {

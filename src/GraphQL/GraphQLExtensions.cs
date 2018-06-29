@@ -405,6 +405,11 @@ namespace GraphQL
                 return new DateTimeValue((DateTime)serialized);
             }
 
+            if (serialized is Uri uri)
+            {
+                return new UriValue(uri);
+            }
+
             if (serialized is string)
             {
                 if (type is EnumerationGraphType)

@@ -91,6 +91,15 @@ namespace GraphQL.Tests.Execution
             result.ShouldNotBeNull();
             result.ShouldBeOfType<ByteValue>();
         }
+
+        [Fact]
+        public void converts_uri_to_uri_value()
+        {
+            var val = new Uri("http://www.wp.pl");
+            var result = val.AstFromValue(null, new UriGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<UriValue>();
+        }
     }
 
     internal class ByteValueConverter : IAstFromValueConverter

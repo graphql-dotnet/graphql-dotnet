@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace GraphQL.Language.AST
@@ -115,6 +114,19 @@ namespace GraphQL.Language.AST
         protected override bool Equals(ValueNode<DateTime> other)
         {
             return DateTime.Equals(Value, other.Value);
+        }
+    }
+
+    public class UriValue : ValueNode<Uri>
+    {
+        public UriValue(Uri value)
+        {
+            Value = value;
+        }
+
+        protected override bool Equals(ValueNode<Uri> other)
+        {
+            return Uri.Equals(Value, other.Value);
         }
     }
 
