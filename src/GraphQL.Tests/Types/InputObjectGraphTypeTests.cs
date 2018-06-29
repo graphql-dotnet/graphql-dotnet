@@ -15,5 +15,12 @@ namespace GraphQL.Tests.Types
 
             exception.Message.ShouldContain("InputObjectGraphType cannot have fields containing a ObjectGraphType.");
         }
+
+        [Fact]
+        public void should_not_throw_an_exception_if_input_object_graph_type_doesnt_contains_object_graph_type_field()
+        {
+            var type = new InputObjectGraphType();
+            var exception = type.Field<ComplexGraphType<object>>().Name("test");
+        }
     }
 }
