@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 
 namespace GraphQL.Builders
 {
@@ -42,10 +43,11 @@ namespace GraphQL.Builders
             FieldType = fieldType;
         }
 
-        public static ConnectionBuilder<TGraphType, TSourceType> Create()
+        public static ConnectionBuilder<TGraphType, TSourceType> Create(string name = "default")
         {
             var fieldType = new FieldType
             {
+                Name = name,
                 Type = typeof(ConnectionType<TGraphType>),
                 Arguments = new QueryArguments(new QueryArgument[0]),
             };
@@ -91,6 +93,8 @@ namespace GraphQL.Builders
 
         public ConnectionBuilder<TGraphType, TSourceType> Name(string name)
         {
+            FieldValidator.ValidateName(name);
+
             FieldType.Name = name;
             return this;
         }

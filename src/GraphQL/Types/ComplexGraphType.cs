@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -39,6 +40,8 @@ namespace GraphQL.Types
 
         public virtual FieldType AddField(FieldType fieldType)
         {
+            FieldValidator.ValidateName(fieldType.Name);
+
             if (HasField(fieldType.Name))
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
@@ -232,19 +235,16 @@ namespace GraphQL.Types
             });
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
+        public FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
         {
-            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType));
+            var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
+                .Name(name);
             AddField(builder.FieldType);
             return builder;
         }
 
         public FieldBuilder<TSourceType, object> Field<TGraphType>()
-        {
-            var builder = FieldBuilder.Create<TSourceType, object>(typeof(TGraphType));
-            AddField(builder.FieldType);
-            return builder;
-        }
+            => Field<TGraphType, object>();
 
         public FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
