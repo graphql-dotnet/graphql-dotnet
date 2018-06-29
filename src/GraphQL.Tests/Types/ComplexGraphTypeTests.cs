@@ -146,11 +146,32 @@ namespace GraphQL.Tests.Types
         }
 
         [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void throws_when_field_name_is_null_or_empty(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+
+            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void throws_when_field_name_is_null_or_empty_using_field_builder(string fieldName)
+        {
+            var type = new ComplexType<TestObject>();
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>().Name(fieldName));
+
+            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+        }
+
+        [Theory]
         [InlineData("name")]
         [InlineData("Name")]
         [InlineData("_name")]
         [InlineData("test_name")]
-        [InlineData(null)]
         public void should_not_throw_exption_on_valid_field_name(string fieldName)
         {
             var type = new ComplexType<TestObject>();
@@ -164,7 +185,6 @@ namespace GraphQL.Tests.Types
         [InlineData("Name")]
         [InlineData("_name")]
         [InlineData("test_name")]
-        [InlineData(null)]
         public void should_not_throw_exption_on_valid_field_name_using_field_builder(string fieldName)
         {
             var type = new ComplexType<TestObject>();
