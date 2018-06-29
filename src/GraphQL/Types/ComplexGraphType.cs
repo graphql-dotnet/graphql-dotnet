@@ -37,7 +37,7 @@ namespace GraphQL.Types
             return _fields.Any(x => string.Equals(x.Name, name));
         }
 
-        public FieldType AddField(FieldType fieldType)
+        public virtual FieldType AddField(FieldType fieldType)
         {
             if (HasField(fieldType.Name))
             {
