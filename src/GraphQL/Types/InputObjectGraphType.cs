@@ -1,9 +1,4 @@
-using GraphQL.Builders;
-using GraphQL.Resolvers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace GraphQL.Types
 {
@@ -16,8 +11,17 @@ namespace GraphQL.Types
     }
 
     public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
-    {        
+    {
+        public override FieldType AddField(FieldType fieldType)
+        {
+            if(fieldType.Type == typeof(ObjectGraphType))
+            {
+                throw new ArgumentException(nameof(fieldType.Type),
+                    "InputObjectGraphType cannot have fields containing a ObjectGraphType.");
+            }
 
+            return base.AddField(fieldType);
+        }
     }
 }
 
