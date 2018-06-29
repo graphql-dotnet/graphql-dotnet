@@ -31,20 +31,22 @@ namespace GraphQL.Builders
             _fieldType = fieldType;
         }
 
-        public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type)
+        public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
         {
             var fieldType = new EventStreamFieldType
             {
+                Name = name,
                 ResolvedType = type,
                 Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
 
-        public static FieldBuilder<TSourceType, TReturnType> Create(Type type = null)
+        public static FieldBuilder<TSourceType, TReturnType> Create(Type type = null, string name = "default")
         {
             var fieldType = new EventStreamFieldType
             {
+                Name = name,
                 Type = type,
                 Arguments = new QueryArguments(),
             };

@@ -42,10 +42,11 @@ namespace GraphQL.Builders
             FieldType = fieldType;
         }
 
-        public static ConnectionBuilder<TGraphType, TSourceType> Create()
+        public static ConnectionBuilder<TGraphType, TSourceType> Create(string name = "default")
         {
             var fieldType = new FieldType
             {
+                Name = name,
                 Type = typeof(ConnectionType<TGraphType>),
                 Arguments = new QueryArguments(new QueryArgument[0]),
             };
