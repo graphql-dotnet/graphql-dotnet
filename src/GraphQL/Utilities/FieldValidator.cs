@@ -10,9 +10,10 @@ namespace GraphQL.Utilities
 
         public static void ValidateName(string name)
         {
-            if (name == null)
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return;
+                throw new ArgumentOutOfRangeException(nameof(name),
+                    $"A field name can not be null or empty.");
             }
 
             if (name.Length > 1 && name.StartsWith(RESERVED_PREFIX))
