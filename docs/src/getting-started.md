@@ -3,14 +3,31 @@
 
 ## Basics
 
-[GraphQL.org](http://graphql.org/learn) is the best place to get started learning GraphQL.  Here is an excerpt from the introduction:
+As its name suggests, this library is a .NET implementation of [GraphQL](http://graphql.org/learn). This document assumes you are already familiar with the fundamentals of GraphQL.
 
-> GraphQL is a query language for your API, and a server-side runtime for executing queries by using a type system you define for your data. GraphQL isn't tied to any specific database or storage engine and is instead backed by your existing code and data.
+```
++------------------------------------+
+|           Interactivity            |
++------------------------------------+
++------------------------------------+
+|         +-----------------------+  |
+|         | Queries and Mutations |  |
+| GraphQL +-----------------------+  |
+|         | Interfaces and Types  |  |
+|         +-----------------------+  |
++------------------------------------+
++------------------------------------+
+|              Database              |
++------------------------------------+
+```
 
-> A GraphQL service is created by defining types and fields on those types, then providing functions for each field on each type.
+GraphQL sits between your database the "outside world." This library only concerns itself with this middle layer. For simplicity, the documentation uses hard-coded data, but in a real-world application your database layer would consist of some sort of ORM, like Entity Framework. And the only aspect of interactivity we will discuss here is how to actually execute the query. How specifically the query is received and the output returned is beyond the scope of this document. See the ["Further Reading"](#further-reading) section at the end of this document for examples and tutorials specific to various ORMs and deployment scenarios.
 
-Here is a "Hello World" for GraphQL .NET.
+## Example
 
+Here's a commented "Hello World" example.
+
+GraphQL schema
 ```graphql
 type StarWarsQuery {
   hero: Droid
@@ -22,6 +39,7 @@ type Droid {
 }
 ```
 
+C# implementation
 ```csharp
 namespace ConsoleApplication
 {
@@ -31,6 +49,49 @@ namespace ConsoleApplication
     using GraphQL.Http;
     using GraphQL.Types;
 
+    /*
+     * Database Layer
+     * In this example, it's a simple object. In the "real world,"
+     * it would likely be an object tied to an ORM, like Entity Framework.
+     */
+    public class Droid
+    {
+      public string Id { get; set; }
+      public string Name { get; set; }
+    }
+
+    /*
+     * Interface/Type Layer
+     * Every type you wish to expose via GraphQL needs to be defined.
+     * See the "Further Reading" section of the docs for ways of automatically generating schema.
+     */
+    public class DroidType : ObjectGraphType<Droid>
+    {
+      public DroidType()
+      {
+        Field(x => x.Id).Description("The Id of the Droid.");
+        Field(x => x.Name, nullable: true).Description("The name of the Droid.");
+      }
+    }
+
+    /*
+     * Query/Mutation Layer
+     * The root query is the entry point of your GraphQL service.
+     * You must have one, and only one, root query object.
+     * This object gathers together all your defined types and configures the types
+     * of searches and filters you support.
+     */
+    public class StarWarsQuery : ObjectGraphType
+    {
+      public StarWarsQuery()
+      {
+        Field<DroidType>(
+          "hero",
+          resolve: context => new Droid { Id = "1", Name = "R2-D2" }
+        );
+      }
+    }
+
     public class Program
     {
         public static void Main(string[] args)
@@ -38,6 +99,13 @@ namespace ConsoleApplication
           Run().Wait();
         }
 
+        /*
+         * Interactivity Layer
+         * First you generate the schema using your root query object.
+         * Then you use `DocumentExecuter` to run the query against that schema.
+         * How the query is received or the results returned is beyond the scope
+         * of the library.
+         */
         private static async Task Run()
         {
           Console.WriteLine("Hello GraphQL!");
@@ -62,32 +130,6 @@ namespace ConsoleApplication
           Console.WriteLine(json);
         }
     }
-
-    public class Droid
-    {
-      public string Id { get; set; }
-      public string Name { get; set; }
-    }
-
-    public class DroidType : ObjectGraphType<Droid>
-    {
-      public DroidType()
-      {
-        Field(x => x.Id).Description("The Id of the Droid.");
-        Field(x => x.Name, nullable: true).Description("The name of the Droid.");
-      }
-    }
-
-    public class StarWarsQuery : ObjectGraphType
-    {
-      public StarWarsQuery()
-      {
-        Field<DroidType>(
-          "hero",
-          resolve: context => new Droid { Id = "1", Name = "R2-D2" }
-        );
-      }
-    }
 }
 ```
 
@@ -104,188 +146,9 @@ Hello GraphQL!
 }
 ```
 
-## GraphiQL
+## Interfaces & Types
 
-[GraphiQL](https://github.com/graphql/graphiql) is an interactive in-browser GraphQL IDE.  This is a fantastic developer tool to help you form queries and explore your Schema.  The [sample project](https://github.com/graphql-dotnet/examples/tree/master/src/AspNetCoreCustom) gives an example of hosting the GraphiQL IDE.
-
-![](http://i.imgur.com/2uGdVAj.png)
-
-## Queries
-
-To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.
-
-```graphql
-query {
-  hero {
-    id
-    name
-  }
-}
-```
-
-```csharp
-public class StarWarsQuery : ObjectGraphType
-{
-  public StarWarsQuery()
-  {
-    Field<DroidType>(
-      "hero",
-      resolve: context => new Droid { Id = "1", Name = "R2-D2" }
-    );
-  }
-}
-
-public class StarWarsSchema : Schema
-{
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-  }
-}
-```
-
-## Arguments
-
-You can provide arguments to a field.  You can use `GetArgument` on `ResolveFieldContext` to retrieve argument values.  `GetArgument` will attempt to coerce the argument values to the generic type it is given, including primitive values, objects, and enumerations.  You can gain access to the value directly through the `Arguments` dictionary on `ResolveFieldContext`.
-
-```graphql
-query {
-  droid(id: "1") {
-    id
-    name
-  }
-}
-```
-
-```csharp
-public class StarWarsQuery : ObjectGraphType
-{
-  public StarWarsQuery(IStarWarsData data)
-  {
-    Field<DroidType>(
-      "droid",
-      arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
-      resolve: context =>
-      {
-        var id = context.GetArgument<string>("id");
-        var objectId = context.Arguments["id"];
-        return data.GetDroidByIdAsync(id);
-      }
-    );
-  }
-}
-```
-
-## Variables
-
-You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
-
-* See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
-
-Here is what a query looks like with a variable:
-
-```graphql
-query DroidQuery($droidId: String!) {
-  droid(id: $droidId) {
-    id
-    name
-  }
-}
-```
-
-Here is what this query would look like as a JSON request:
-
-```json
-{
- "query": "query DroidQuery($droidId: String!) { droid(id: $droidId) { id name } }",
- "variables": {
-   "droidId": "1"
- }
-}
-```
-
-```csharp
-var variablesJson = // get from request
-// `ToInputs` converts the json to the `Inputs` class
-var inputs = variablesJson.ToInputs();
-
-var result = await executer.ExecuteAsync(_ =>
-{
-    _.Inputs = inputs;
-});
-```
-
-## Mutations
-
-To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
-
-* See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
-* See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
-
-```csharp
-public class StarWarsSchema : Schema
-{
-    public StarWarsSchema(Func<Type, GraphType> resolveType)
-        : base(resolveType)
-    {
-        Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
-        Mutation = (StarWarsMutation)resolveType(typeof (StarWarsMutation));
-    }
-}
-
-/// <example>
-/// This is an example JSON request for a mutation
-/// {
-///   "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
-///   "variables": {
-///     "human": {
-///       "name": "Boba Fett"
-///     }
-///   }
-/// }
-/// </example>
-public class StarWarsMutation : ObjectGraphType<object>
-{
-    public StarWarsMutation(StarWarsData data)
-    {
-        Field<HumanType>(
-            "createHuman",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<HumanInputType>> {Name = "human"}
-            ),
-            resolve: context =>
-            {
-                var human = context.GetArgument<Human>("human");
-                return data.AddHuman(human);
-            });
-    }
-}
-
-public class HumanInputType : InputObjectGraphType
-{
-    public HumanInputType()
-    {
-        Name = "HumanInput";
-        Field<NonNullGraphType<StringGraphType>>("name");
-        Field<StringGraphType>("homePlanet");
-    }
-}
-
-// in-memory data store
-public class StarWarsData
-{
-    ...
-
-    public Human AddHuman(Human human)
-    {
-        human.Id = Guid.NewGuid().ToString();
-        _humans.Add(human);
-        return human;
-    }
-}
-```
-
-## Interfaces
+### Interfaces
 
 A GraphQL Interface is an abstract type that includes a certain set of fields that a type must include to implement the interface.
 
@@ -359,7 +222,7 @@ public class StarWarsSchema : Schema
 }
 ```
 
-## IsTypeOf
+### IsTypeOf
 
 `IsTypeOf` is a function which helps resolve the implementing GraphQL type during execution.  For example, when you have a field that returns a GraphQL Interface the engine needs to know which concrete Graph Type to use.  So if you have a `Character` interface that is implemented by both `Human` and `Droid` types, the engine needs to know which graph type to choose.  The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
 
@@ -383,7 +246,7 @@ public class DroidType : ObjectGraphType
 
 An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface or Union.  See the `ResolveType` section for more details.
 
-## ResolveType
+### ResolveType
 
 An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhastive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
 
@@ -418,7 +281,7 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 }
 ```
 
-## Unions
+### Unions
 
 Unions are a composition of two different types.
 
@@ -433,18 +296,113 @@ public class CatOrDog : UnionGraphType
 }
 ```
 
-## Query Validation
+## Queries & Mutations
 
-There [are a number of query validation rules](http://facebook.github.io/graphql/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by accessing the `ValidationRules` property.
+### Queries
 
-```csharp
-var result = await executer.ExecuteAsync(_ =>
-{
-    _.ValidationRules = new[] {new RequiresAuthValidationRule()}.Concat(DocumentValidator.CoreRules());
-});
+To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.
+
+```graphql
+query {
+  hero {
+    id
+    name
+  }
+}
 ```
 
-## Subscriptions
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+  public StarWarsQuery()
+  {
+    Field<DroidType>(
+      "hero",
+      resolve: context => new Droid { Id = "1", Name = "R2-D2" }
+    );
+  }
+}
+
+public class StarWarsSchema : Schema
+{
+  public StarWarsSchema()
+  {
+    Query = new StarWarsQuery();
+  }
+}
+```
+
+### Mutations
+
+To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
+
+* See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
+* See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
+
+```csharp
+public class StarWarsSchema : Schema
+{
+    public StarWarsSchema(Func<Type, GraphType> resolveType)
+        : base(resolveType)
+    {
+        Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
+        Mutation = (StarWarsMutation)resolveType(typeof (StarWarsMutation));
+    }
+}
+
+/// <example>
+/// This is an example JSON request for a mutation
+/// {
+///   "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
+///   "variables": {
+///     "human": {
+///       "name": "Boba Fett"
+///     }
+///   }
+/// }
+/// </example>
+public class StarWarsMutation : ObjectGraphType<object>
+{
+    public StarWarsMutation(StarWarsData data)
+    {
+        Field<HumanType>(
+            "createHuman",
+            arguments: new QueryArguments(
+                new QueryArgument<NonNullGraphType<HumanInputType>> {Name = "human"}
+            ),
+            resolve: context =>
+            {
+                var human = context.GetArgument<Human>("human");
+                return data.AddHuman(human);
+            });
+    }
+}
+
+public class HumanInputType : InputObjectGraphType
+{
+    public HumanInputType()
+    {
+        Name = "HumanInput";
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Field<StringGraphType>("homePlanet");
+    }
+}
+
+// in-memory data store
+public class StarWarsData
+{
+    ...
+
+    public Human AddHuman(Human human)
+    {
+        human.Id = Guid.NewGuid().ToString();
+        _humans.Add(human);
+        return human;
+    }
+}
+```
+
+### Subscriptions
 
 The Schema class supports a Subscription graph type and the parser supports the `subscription` keyword.  Subscriptions are an experimental feature of the GraphQL specification.
 
@@ -460,7 +418,101 @@ subscription comments($repoName: String!) {
 }
 ```
 
-## Schema Generation
+### Arguments
+
+You can provide arguments to a field.  You can use `GetArgument` on `ResolveFieldContext` to retrieve argument values.  `GetArgument` will attempt to coerce the argument values to the generic type it is given, including primitive values, objects, and enumerations.  You can gain access to the value directly through the `Arguments` dictionary on `ResolveFieldContext`.
+
+```graphql
+query {
+  droid(id: "1") {
+    id
+    name
+  }
+}
+```
+
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+  public StarWarsQuery(IStarWarsData data)
+  {
+    Field<DroidType>(
+      "droid",
+      arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
+      resolve: context =>
+      {
+        var id = context.GetArgument<string>("id");
+        var objectId = context.Arguments["id"];
+        return data.GetDroidByIdAsync(id);
+      }
+    );
+  }
+}
+```
+
+### Variables
+
+You can pass variables received from the client to the execution engine by using the `Inputs` property.
+
+* See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
+
+Here is what a query looks like with a variable:
+
+```graphql
+query DroidQuery($droidId: String!) {
+  droid(id: $droidId) {
+    id
+    name
+  }
+}
+```
+
+Here is what this query would look like as a JSON request:
+
+```json
+{
+ "query": "query DroidQuery($droidId: String!) { droid(id: $droidId) { id name } }",
+ "variables": {
+   "droidId": "1"
+ }
+}
+```
+
+```csharp
+var variablesJson = // get from request
+// `ToInputs` converts the json to the `Inputs` class
+var inputs = variablesJson.ToInputs();
+
+var result = await executer.ExecuteAsync(_ =>
+{
+    _.Inputs = inputs;
+});
+```
+
+### Input Validation
+
+There [are a number of query validation rules](http://facebook.github.io/graphql/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by accessing the `ValidationRules` property.
+
+```csharp
+var result = await executer.ExecuteAsync(_ =>
+{
+    _.ValidationRules = new[] {new RequiresAuthValidationRule()}.Concat(DocumentValidator.CoreRules());
+});
+```
+
+## Further Reading
+
+### GraphiQL
+
+[GraphiQL](https://github.com/graphql/graphiql) is an interactive in-browser GraphQL IDE.  This is a fantastic developer tool to help you form queries and explore your Schema.  The [sample project](https://github.com/graphql-dotnet/examples/tree/master/src/AspNetCoreCustom) gives an example of hosting the GraphiQL IDE.
+
+![](http://i.imgur.com/2uGdVAj.png)
+
+### Sample Code
+
+### Tutorials
+
+### Schema Generation
 
 There is currently nothing in the core project to do GraphQL Schema generation based off of existing C# classes.  Here are a few community projects built with GraphQL .NET which do so.
 
@@ -468,7 +520,7 @@ There is currently nothing in the core project to do GraphQL Schema generation b
 * [GraphQL Annotations](https://github.com/dlukez/graphql-dotnet-annotations) by [Daniel Zimmermann](https://github.com/dlukez)
 * [GraphQL Schema Generator](https://github.com/holm0563/graphql-schemaGenerator) by [Derek Holmes](https://github.com/holm0563)
 
-## How do I use XYZ ORM/database with GraphQL.NET?
+### How do I use XYZ ORM/database with GraphQL.NET?
 
 * [Entity Framework](https://github.com/JacekKosciesza/StarWars) by [Jacek Kościesza](https://github.com/JacekKosciesza)
 * [Marten + Nancy](https://github.com/joemcbride/marten/blob/graphql2/src/DinnerParty/Modules/GraphQLModule.cs) by [Joe McBride](https://github.com/joemcbride)
