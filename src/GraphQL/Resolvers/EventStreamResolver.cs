@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Reflection;
 using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
@@ -42,6 +43,32 @@ namespace GraphQL.Resolvers
         IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
         {
             return (IObservable<object>)Subscribe(context);
+        }
+    }
+
+    public class EventStreamResolver : IEventStreamResolver
+    {
+        private IAccessor _accessor;
+        private IDependencyResolver _dependencyResolver;
+        private object _target;
+
+        public EventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
+        {
+            _accessor = accessor;
+            _dependencyResolver = dependencyResolver;
+            _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
+        }
+
+        public IObservable<object> Subscribe(ResolveEventStreamContext context)
+        {
+            var parameters = _accessor.Parameters;
+            var arguments = ReflectionHelper.BuildArguments(parameters, context);
+            return (IObservable<object>)_accessor.GetValue(_target, arguments);
+        }
+
+        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
+        {
+            return Subscribe(context);
         }
     }
 }

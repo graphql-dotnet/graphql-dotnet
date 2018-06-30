@@ -1,12 +1,11 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
-    internal class AccessorFieldResolver : FieldResolverBase
+    internal class AccessorFieldResolver : IFieldResolver
     {
         private readonly IAccessor _accessor;
         private readonly IDependencyResolver _dependencyResolver;
@@ -17,9 +16,9 @@ namespace GraphQL.Reflection
             _dependencyResolver = dependencyResolver;
         }
 
-        public override object Resolve(ResolveFieldContext context)
+        public object Resolve(ResolveFieldContext context)
         {
-            var arguments = BuildArguments(_accessor.Parameters, context);
+            var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
             var target = _accessor.DeclaringType.IsInstanceOfType(context.Source)
                     ? context.Source
