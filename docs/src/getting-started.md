@@ -13,7 +13,7 @@ As its name suggests, this library is a .NET implementation of [GraphQL](http://
 |         +-----------------------+  |
 |         | Queries and Mutations |  |
 | GraphQL +-----------------------+  |
-|         | Interfaces and Types  |  |
+|         | Types and Interfaces  |  |
 |         +-----------------------+  |
 +------------------------------------+
 +------------------------------------+
@@ -80,6 +80,9 @@ namespace ConsoleApplication
      * You must have one, and only one, root query object.
      * This object gathers together all your defined types and configures the types
      * of searches and filters you support.
+     *
+     * In this example, the data itself is hardcoded in the `resolve:` line.
+     * In the "real world," you'd be querying your database.
      */
     public class StarWarsQuery : ObjectGraphType
     {
@@ -146,7 +149,37 @@ Hello GraphQL!
 }
 ```
 
-## Interfaces & Types
+## Types & Interfaces
+
+### Types
+
+Types are the building blocks of your GraphQL service. Let's go back to our "Hello World" example:
+
+```graphql
+type Droid {
+  id: String!
+  name: String
+}
+```
+
+```csharp
+public class DroidType : ObjectGraphType<Droid>
+{
+  public DroidType()
+  {
+    Field(x => x.Id).Description("The Id of the Droid.");
+    Field(x => x.Name, nullable: true).Description("The name of the Droid.");
+  }
+}
+```
+
+> TODO: Talk about the `Field` function and the various ways it can be used (e.g., `Field<Type>(...)`). Be sure to mention the default resolver.
+
+> TODO: Be sure to introduce `ListGraphType`!
+
+> TODO: Introduce `context.Source` and how that functions.
+
+> TODO: Give some examples of more-complex fields—for example, using `Field<Type>(...)` and `resolve:` to transform types or pull information from child objects.
 
 ### Interfaces
 
@@ -208,47 +241,17 @@ public class DroidType : ObjectGraphType<Droid>
 }
 ```
 
-### RegisterType
-When the Schema is built, it looks at the "root" types (Query, Mutation, Subscription) and gathers all of the GraphTypes they expose. Often when you are working with an interface type the concrete types are not exposed on the root types (or any of their children). Since those concrete types are never exposed in the type graph the Schema doesn't know they exist. This is what the `RegisterType<>` method on the Schema is for.  By using `RegisterType<>`, it tells the Schema about the specific type and it will properly add it to the `PossibleTypes` collection on the interface type when the Schema is initialized.
+#### Resolving Ambiguity
 
-```csharp
-public class StarWarsSchema : Schema
-{
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-    RegisterType<DroidType>();
-  }
-}
-```
+When you have a field that returns a GraphQL Interface, the engine needs to know which concrete graph type to use. So if you have a Character interface that is implemented by both Human and Droid types, the engine needs to know which graph type to choose. There are two ways of resolving this ambiguity: at the interface level or at the type level.
 
-### IsTypeOf
+> TODO: Give some indication of the pros and cons of the various approaches. Are there performance implications, for example? Why choose one over the other?
 
-`IsTypeOf` is a function which helps resolve the implementing GraphQL type during execution.  For example, when you have a field that returns a GraphQL Interface the engine needs to know which concrete Graph Type to use.  So if you have a `Character` interface that is implemented by both `Human` and `Droid` types, the engine needs to know which graph type to choose.  The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
+> TODO: I'm also not clear why we're talking about this at all. If `ObjectGraphType<Type>` gives you a default `IsTypeOf`, why would anybody need to understand how this works? Are there situations where the default `IsTypeOf` doesn't work? If so, what are those situations? Can we just delete this whole "Resolving Ambiguity" section?
 
-```csharp
-public class DroidType : ObjectGraphType
-{
-  public DroidType(IStarWarsData data)
-  {
-    Name = "Droid";
+##### Interface Level (`ResolveType`)
 
-    ...
-
-    Interface<CharacterInterface>();
-
-    IsTypeOf = obj => obj is Droid;
-  }
-}
-```
-
-> `ObjectGraphType<T>` provides a default implementation of IsTypeOf for you.
-
-An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface or Union.  See the `ResolveType` section for more details.
-
-### ResolveType
-
-An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhastive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
+`ResolveType` must be exhaustive. If you add another type that implements the interface, you must add it to the `ResolveType` code.
 
 > If a type implements `ResolveType` then any `IsTypeOf` implementation is ignored.
 
@@ -256,6 +259,7 @@ An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface 
 public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 {
   public CharacterInterface(
+    //TODO: The following two lines need to be explained. What are these?
     DroidType droidType,
     HumanType humanType)
   {
@@ -281,6 +285,30 @@ public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 }
 ```
 
+##### Type Level (`IsTypeOf`)
+
+The data object being mapped is passed to the `IsTypeOf` function which should return a boolean value.
+
+```csharp
+//TODO: Isn't the following line missing the <Type> after ObjectGraphType?
+public class DroidType : ObjectGraphType
+{
+  public DroidType(IStarWarsData data)
+  {
+    Name = "Droid";
+
+    ...
+
+    Interface<CharacterInterface>();
+
+    IsTypeOf = obj => obj is Droid;
+  }
+}
+```
+
+> `ObjectGraphType<T>` provides a default implementation of IsTypeOf for you.
+
+
 ### Unions
 
 Unions are a composition of two different types.
@@ -298,9 +326,49 @@ public class CatOrDog : UnionGraphType
 
 ## Queries & Mutations
 
+### Arguments
+
+Before we get into the queries and mutations themselves, you need to understand how arguments can be passed. 
+
+In GraphQL, you can provide arguments to a field as follows:
+
+```graphql
+query {
+  droid(id: "1") {
+    id
+    name
+  }
+}
+```
+
+You can use `GetArgument` on `ResolveFieldContext` to retrieve argument values.  `GetArgument` will attempt to coerce the argument values to the generic type it is given, including primitive values, objects, and enumerations.  You can gain access to the value directly through the `Arguments` dictionary on `ResolveFieldContext`.
+
+
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+  public StarWarsQuery(IStarWarsData data)
+  {
+    Field<DroidType>(
+      "droid",
+      arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
+      resolve: context =>
+      {
+        var id = context.GetArgument<string>("id");
+        //TODO: What is the following line doing here? Is it an alternative? Or what?
+        var objectId = context.Arguments["id"];
+        return data.GetDroidByIdAsync(id);
+      }
+    );
+  }
+}
+```
+
+> TODO: We need to introduce optional (nullable) arguments.
+
 ### Queries
 
-To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.
+The query is your service's primary entry point. You must have one, and only one, root Query object that is an `ObjectGraphType`.  Queries must only fetch data and never modify it.
 
 ```graphql
 query {
@@ -322,15 +390,9 @@ public class StarWarsQuery : ObjectGraphType
     );
   }
 }
-
-public class StarWarsSchema : Schema
-{
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-  }
-}
 ```
+
+> TODO: Needs to be expanded to demonstrate basics like how to search and return multiple results. That's going to include adding an explanation of passing a database context to the constructor.
 
 ### Mutations
 
@@ -340,6 +402,7 @@ To perform a mutation you need to have a root Mutation object that is an `Object
 * See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
 
 ```csharp
+//TODO: Doesn't really belong here. This belongs in the Execution section. Focus on the mutation-specific code.
 public class StarWarsSchema : Schema
 {
     public StarWarsSchema(Func<Type, GraphType> resolveType)
@@ -402,6 +465,8 @@ public class StarWarsData
 }
 ```
 
+> TODO: And how are errors handled? What if something happens during the `AddHuman` part in the database layer? Will a meaningful error message be returned?
+
 ### Subscriptions
 
 The Schema class supports a Subscription graph type and the parser supports the `subscription` keyword.  Subscriptions are an experimental feature of the GraphQL specification.
@@ -418,39 +483,31 @@ subscription comments($repoName: String!) {
 }
 ```
 
-### Arguments
+## Execution
 
-You can provide arguments to a field.  You can use `GetArgument` on `ResolveFieldContext` to retrieve argument values.  `GetArgument` will attempt to coerce the argument values to the generic type it is given, including primitive values, objects, and enumerations.  You can gain access to the value directly through the `Arguments` dictionary on `ResolveFieldContext`.
+### Schema Generation
 
-```graphql
-query {
-  droid(id: "1") {
-    id
-    name
-  }
-}
-```
+> TODO: Needs to be expanded. So far we've seen two types of schema creation: a full-blown class inheriting `Schema` and the simple `new Schema { Query = new QueryObj(dataObj) }`. How do these work? What are the differences? How do mutations fit in? Is the only way to include both a query and a mutation the way you show in the mutation example?
+
+#### RegisterType
+When the Schema is built, it looks at the "root" types (Query, Mutation, Subscription) and gathers all of the GraphTypes they expose. Often when you are working with an interface type the concrete types are not exposed on the root types (or any of their children). Since those concrete types are never exposed in the type graph the Schema doesn't know they exist. This is what the `RegisterType<>` method on the Schema is for.  By using `RegisterType<>`, it tells the Schema about the specific type and it will properly add it to the `PossibleTypes` collection on the interface type when the Schema is initialized.
 
 ```csharp
-public class StarWarsQuery : ObjectGraphType
+public class StarWarsSchema : Schema
 {
-  public StarWarsQuery(IStarWarsData data)
+  public StarWarsSchema()
   {
-    Field<DroidType>(
-      "droid",
-      arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
-      resolve: context =>
-      {
-        var id = context.GetArgument<string>("id");
-        var objectId = context.Arguments["id"];
-        return data.GetDroidByIdAsync(id);
-      }
-    );
+    Query = new StarWarsQuery();
+    RegisterType<DroidType>();
   }
 }
 ```
 
-### Variables
+### `DocumentExecuter`
+
+> TODO: Needs expanding. What are the various inputs? Does it *have* to be asynchronous? How does it handle errors? What level of granularity can one expect in the error messages?
+
+#### Variables
 
 You can pass variables received from the client to the execution engine by using the `Inputs` property.
 
