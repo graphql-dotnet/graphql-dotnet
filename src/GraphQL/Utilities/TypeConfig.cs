@@ -25,6 +25,9 @@ namespace GraphQL.Utilities
             {
                 _type = value;
                 ApplyMetadata(value);
+
+                if (IsTypeOfFunc == null)
+                    IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(_type) ?? false;
             }
         }
 

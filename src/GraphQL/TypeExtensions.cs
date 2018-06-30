@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
+    using System.Collections;
+
     public static class TypeExtensions
     {
         /// <summary>
@@ -86,7 +89,7 @@ namespace GraphQL
         {
             var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
 
-            if (attr != null)
+            if (!string.IsNullOrEmpty(attr?.Name))
             {
                 return attr.Name;
             }
@@ -127,7 +130,7 @@ namespace GraphQL
                 }
             }
 
-            graphType = GraphQL.GraphTypeRegistry.Get(type);
+            graphType = GraphTypeTypeRegistry.Get(type);
 
             if (type.IsArray)
             {
@@ -136,7 +139,7 @@ namespace GraphQL
                 graphType = listType.MakeGenericType(elementType);
             }
 
-            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (IsAnIEnumerable(type))
             {
                 var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
                 var listType = typeof(ListGraphType<>);
@@ -157,5 +160,8 @@ namespace GraphQL
 
             return graphType;
         }
+
+        private static bool IsAnIEnumerable(Type type) =>
+            type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
     }
 }

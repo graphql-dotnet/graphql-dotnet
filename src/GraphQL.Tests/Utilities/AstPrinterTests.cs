@@ -48,6 +48,31 @@ var query = @"mutation createUser($userInput: UserInput!) {
         }
 
         [Fact]
+        public void prints_inline_fragments()
+        {
+            var query = @"query users {
+  users {
+    id
+    union {
+      ... on UserType {
+        username
+      }
+      ... on CustomerType {
+        customername
+      }
+    }
+  }
+}
+";
+
+            var document = _builder.Build(query);
+
+            var result = _printer.Visit(document);
+            result.ShouldNotBeNull();
+            result.ToString().ShouldBe(MonetizeLineBreaks(query));
+        }
+
+        [Fact]
         public void prints_int_value()
         {
             int value = 3;

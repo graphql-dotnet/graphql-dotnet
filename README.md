@@ -14,16 +14,20 @@ You can install the latest version via [NuGet](https://www.nuget.org/packages/Gr
 
 `PM> Install-Package GraphQL`
 
-## Upgrade Guide
+## Documentation
 
-* [0.11.0](/upgrade-guides/v0.11.0.md)
-* [0.8.0](/upgrade-guides/v0.8.0.md)
+http://graphql-dotnet.github.io
 
 ## Examples
 
 https://github.com/graphql-dotnet/examples
 
-## Usage
+## Upgrade Guides
+
+* [0.11.0](/upgrade-guides/v0.11.0.md)
+* [0.8.0](/upgrade-guides/v0.8.0.md)
+
+## Basic Usage
 
 Define your schema with a top level query object then execute that query.
 

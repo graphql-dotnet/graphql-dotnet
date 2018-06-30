@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    public class TypeToGraphTypeConverter
+    public class GraphTypeInstanceRegistry
     {
         private readonly IDictionary<Type, IGraphType> _typeMap;
 
-        public TypeToGraphTypeConverter()
+        public GraphTypeInstanceRegistry()
         {
             var stringType = new GraphQLTypeReference("String");
             var booleanType = new GraphQLTypeReference("Boolean");
@@ -39,15 +39,15 @@ namespace GraphQL.Utilities
             };
         }
 
-        public IGraphType Convert(Type type)
-        {
-            _typeMap.TryGetValue(type, out IGraphType graphType);
-            return graphType;
-        }
-
         public void Register(Type type, IGraphType graphType)
         {
             _typeMap[type] = graphType;
+        }
+
+        public IGraphType Get(Type type)
+        {
+            _typeMap.TryGetValue(type, out IGraphType graphType);
+            return graphType;
         }
     }
 }

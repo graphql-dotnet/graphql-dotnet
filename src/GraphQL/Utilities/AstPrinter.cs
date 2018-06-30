@@ -192,6 +192,26 @@ namespace GraphQL.Utilities
                         : join(new[] {op, join(new[] {name, variables}, ""), directives, selectionSet}, " ");
                 });
             });
+            
+            Config<InlineFragment>(c =>
+            {
+                c.Field(x => x.Directives);
+                c.Field(x => x.SelectionSet);
+                c.Field(x => x.Type);
+                c.Print(p =>
+                {
+                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var selectionSet = p.Arg(x => x.SelectionSet);
+                    var typename = p.Arg(x => x.Type);
+                    var body = string.IsNullOrWhiteSpace(directives)
+                        ? selectionSet
+                        : join(new[] { directives, selectionSet }, " ");
+
+                    return $"... on {typename} {body}";
+
+
+                });
+            });
 
             Config<VariableDefinition>(c =>
             {
@@ -326,6 +346,11 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
+            });
+            Config<UriValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower());
             });
 
             // Directive

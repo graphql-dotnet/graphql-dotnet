@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -31,6 +31,70 @@ namespace GraphQL.Tests.Utilities
             var field = query.Fields.Single(x => x.Name == "post");
             field.GetMetadata<string>("Authorize").ShouldBe("SomePolicy");
         }
+
+        [Fact]
+        public void impl_type_sets_isTypeOfFunc()
+        {
+            var defs = @"
+                interface IUniqueElement
+                {
+                    id: ID!
+                }
+
+                type ABlog implements IUniqueElement
+                {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query
+                {
+                    blog(id: ID!): ABlog
+                }
+            ";
+
+            Builder.Types.Include<ResolvingClassForABlog>();
+
+            var schema = Builder.Build(defs);
+            schema.Initialize();
+
+            var blog = schema.FindType("ABlog") as IObjectGraphType;
+
+            blog.IsTypeOf.ShouldNotBeNull();
+            blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
+        }
+
+        [Fact]
+        public void impl_type_sets_default_isTypeOfFunc()
+        {
+            var defs = @"
+                interface IUniqueElement
+                {
+                    id: ID!
+                }
+
+                type ABlog implements IUniqueElement
+                {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query
+                {
+                    blog(id: ID!): ABlog
+                }
+            ";
+
+            Builder.Types.Include<ABlog>();
+
+            var schema = Builder.Build(defs);
+            schema.Initialize();
+
+            var blog = schema.FindType("ABlog") as IObjectGraphType;
+
+            blog.IsTypeOf.ShouldNotBeNull();
+            blog.IsTypeOf(new ABlog()).ShouldBeTrue();
+        }
     }
 
     public class MyAuthorizeAttribute : GraphQLAttribute
@@ -56,5 +120,40 @@ namespace GraphQL.Tests.Utilities
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }
+
+        public ResolvingClassForABlog Blog(string id)
+        {
+            return new ResolvingClassForABlog();
+        }
+    }
+
+    public abstract class UniqueElement
+    {
+        public abstract string Id { get; }
+    }
+
+    [GraphQLMetadata(Name="ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
+    public class ResolvingClassForABlog : UniqueElement
+    {
+        public ResolvingClassForABlog()
+        {
+            Id = "Id-0";
+            Name = $"Blog Name {Id}";
+        }
+
+        public override string Id { get; }
+        public string Name { get; }
+    }
+
+    public class ABlog : UniqueElement
+    {
+        public ABlog()
+        {
+            Id = "Id-0";
+            Name = $"Blog Name {Id}";
+        }
+
+        public override string Id { get; }
+        public string Name { get; }
     }
 }

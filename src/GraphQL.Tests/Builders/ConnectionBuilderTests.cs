@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,17 @@ namespace GraphQL.Tests.Builders
         {
             var objectType = new ParentType();
             objectType.Fields.First().Name.ShouldBe("connection1");
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void should_throw_error_if_name_is_null_or_empty(string fieldName)
+        {
+            var type = new ObjectGraphType();
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+
+            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
         }
 
         [Fact]

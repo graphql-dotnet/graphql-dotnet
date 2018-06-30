@@ -9,5 +9,14 @@
         }
 
         public string TypeName { get; private set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is GraphQLTypeReference other)
+            {
+                return TypeName == other.TypeName;
+            }
+            return base.Equals(obj);
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace GraphQL
         {
             if (!(value is ExecutionResult)) return;
 
-            var result = (ExecutionResult) value;
+            var result = (ExecutionResult)value;
 
             writer.WriteStartObject();
 

@@ -25,7 +25,7 @@ namespace GraphQL.DataLoader.Tests.Stores
         private int _getAllUsersCalled;
         public int GetAllUsersCalledCount => _getAllUsersCalled;
 
-        public async Task<Dictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds,
+        public async Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             Interlocked.Increment(ref _getUsersByIdCalled);
