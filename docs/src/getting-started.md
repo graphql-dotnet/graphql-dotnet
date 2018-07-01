@@ -11,17 +11,19 @@ As its name suggests, this library is a .NET implementation of [GraphQL](http://
 +------------------------------------+
 +------------------------------------+
 |         +-----------------------+  |
-|         | Queries and Mutations |  |
-| GraphQL +-----------------------+  |
+|         | Execution             |  |
+|         +-----------------------+  |
+| GraphQL | Queries and Mutations |  |
+|         +-----------------------+  |
 |         | Types and Interfaces  |  |
 |         +-----------------------+  |
 +------------------------------------+
 +------------------------------------+
-|              Database              |
+|                Data                |
 +------------------------------------+
 ```
 
-GraphQL sits between your database the "outside world." This library only concerns itself with this middle layer. For simplicity, the documentation uses hard-coded data, but in a real-world application your database layer would consist of some sort of ORM, like Entity Framework. And the only aspect of interactivity we will discuss here is how to actually execute the query. How specifically the query is received and the output returned is beyond the scope of this document. See the ["Further Reading"](#further-reading) section at the end of this document for examples and tutorials specific to various ORMs and deployment scenarios.
+GraphQL sits between your data and the "outside world." This library only concerns itself with this middle layer. For simplicity, the documentation uses hard-coded data, but in a real-world application your data layer would consist of some sort of ORM (like Entity Framework) or other data provider. And as for interactivity, how specifically the query is received and the output returned is beyond the scope of this document. See the ["Further Reading"](#further-reading) section at the end of this document for examples and tutorials specific to various ORMs and deployment scenarios.
 
 ## Example
 
@@ -82,7 +84,7 @@ namespace ConsoleApplication
      * of searches and filters you support.
      *
      * In this example, the data itself is hardcoded in the `resolve:` line.
-     * In the "real world," you'd be querying your database.
+     * In the "real world," you'd be querying your data provider.
      */
     public class StarWarsQuery : ObjectGraphType
     {
