@@ -1,11 +1,10 @@
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 namespace GraphQL.Instrumentation
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
-
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class ApolloTrace
     {

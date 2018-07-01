@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GraphQL;
+using GraphQL.Language.AST;
+
 namespace GraphQL.Instrumentation
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using GraphQL;
-    using GraphQL.Language.AST;
-
     public static class ApolloTracingExtensions
     {
         public static void EnrichWithApolloTracing(this ExecutionResult result, DateTime start)
