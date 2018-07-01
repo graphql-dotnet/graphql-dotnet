@@ -40,9 +40,8 @@ namespace GraphQL.Execution
             var fields = CollectFields(
                 context,
                 rootType,
-                context.Operation.SelectionSet,
-                new Dictionary<string, Field>(),
-                new List<string>());
+                context.Operation.SelectionSet);
+
 
             SetSubFieldNodes(context, root, fields);
 
@@ -51,10 +50,8 @@ namespace GraphQL.Execution
 
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = new Dictionary<string, Field>();
-            var visitedFragments = new List<string>();
 
-            fields = CollectFields(context, parent.GetObjectGraphType(), parent.Field?.SelectionSet, fields, visitedFragments);
+            var fields = CollectFields(context, parent.GetObjectGraphType(), parent.Field?.SelectionSet);
 
             SetSubFieldNodes(context, parent, fields);
         }

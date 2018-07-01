@@ -65,7 +65,26 @@ namespace GraphQL.Language.AST
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Field) obj);
+            return Equals((Field)obj);
+        }
+
+        public Field MergeSelectionSet(Field other)
+        {
+            if (this.Equals(other))
+            {
+                var field = new Field(this.AliasNode, this.NameNode)
+                {
+                    Arguments = this.Arguments,
+                    SelectionSet = this.SelectionSet.Merge(other.SelectionSet),
+                    Directives = this.Directives,
+                    SourceLocation = this.SourceLocation
+                };
+                return field;
+            }
+            return this;
         }
     }
 }
+
+
+
