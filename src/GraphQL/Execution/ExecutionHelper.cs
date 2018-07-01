@@ -289,18 +289,13 @@ namespace GraphQL.Execution
             return null;
         }
 
-        public static Dictionary<string, Field> CollectFields(
+        private static Fields CollectFields(
             ExecutionContext context,
             IGraphType specificType,
             SelectionSet selectionSet,
-            Dictionary<string, Field> fields,
+            Fields fields,
             List<string> visitedFragmentNames)
         {
-            if (fields == null)
-            {
-                fields = new Dictionary<string, Field>();
-            }
-
             selectionSet?.Selections.Apply(selection =>
             {
                 if (selection is Field field)
@@ -310,8 +305,7 @@ namespace GraphQL.Execution
                         return;
                     }
 
-                    var name = field.Alias ?? field.Name;
-                    fields[name] = field;
+                    fields.Add(field);
                 }
                 else if (selection is FragmentSpread spread)
                 {
@@ -348,6 +342,14 @@ namespace GraphQL.Execution
             });
 
             return fields;
+        }
+
+        public static Dictionary<string, Field> CollectFields(
+            ExecutionContext context,
+            IGraphType specificType,
+            SelectionSet selectionSet)
+        {
+            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
@@ -444,10 +446,7 @@ namespace GraphQL.Execution
             {
                 return null;
             }
-
-            var subFields = new Dictionary<string, Field>();
-            var visitedFragments = new List<string>();
-            return CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
+            return CollectFields(context, fieldType, field.SelectionSet);
         }
 
         public static string[] AppendPath(string[] path, string pathSegment)
