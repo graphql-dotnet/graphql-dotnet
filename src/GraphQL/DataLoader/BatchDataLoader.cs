@@ -102,17 +102,16 @@ namespace GraphQL.DataLoader
                 _pendingKeys.Clear();
             }
 
-            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            var dictionary = (await _loader(keys, cancellationToken).ConfigureAwait(false)).ToDictionary(x => x.Key, x => x.Value);
 
             // Populate cache
             lock (_cache)
             {
                 foreach (TKey key in keys)
                 {
-                    var keyValuePair = dictionary.FirstOrDefault(x => x.Key.Equals(key));
-                    if (!keyValuePair.Equals(default(KeyValuePair<TKey, T>)))
+                    if (dictionary.TryGetValue(key, out T value))
                     {
-                        _cache[key] = keyValuePair.Value;
+                        _cache[key] = value;
                     }
                     else
                     {
