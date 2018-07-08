@@ -107,7 +107,7 @@ namespace ConsoleApplication
         }
 
         /*
-         * Interactivity Layer
+         * Execution Layer
          * First you generate the schema using your root query object.
          * Then you use `DocumentExecuter` to run the query against that schema.
          * How the query is received or the results returned is beyond the scope
