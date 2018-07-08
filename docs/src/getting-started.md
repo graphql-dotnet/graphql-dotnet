@@ -52,9 +52,10 @@ namespace ConsoleApplication
     using GraphQL.Types;
 
     /*
-     * Database Layer
+     * Data Layer
      * In this example, it's a simple object. In the "real world,"
-     * it would likely be an object tied to an ORM, like Entity Framework.
+     * it would likely be an object tied to an ORM, like Entity Framework,
+     * or a data transfer object tied to some other data provider.
      */
     public class Droid
     {
@@ -65,7 +66,8 @@ namespace ConsoleApplication
     /*
      * Interface/Type Layer
      * Every type you wish to expose via GraphQL needs to be defined.
-     * See the "Further Reading" section of the docs for ways of automatically generating schema.
+     * See the "Further Reading" section of the docs for ways of automatically
+     * generating GraphQL code from existing data objects.
      */
     public class DroidType : ObjectGraphType<Droid>
     {
@@ -175,13 +177,45 @@ public class DroidType : ObjectGraphType<Droid>
 }
 ```
 
-> TODO: Talk about the `Field` function and the various ways it can be used (e.g., `Field<Type>(...)`). Be sure to mention the default resolver.
+> TODO: Talk about the `Field` function and the various ways it can be used (e.g., `Field<Type>(...)`). Be sure to mention the default resolver. Also, there appears to be some case transformation of the property name happening in the background (e.g., "Id" automatically becoming "id").
 
 > TODO: Be sure to introduce `ListGraphType`!
 
 > TODO: Introduce `context.Source` and how that functions.
 
 > TODO: Give some examples of more-complex fields—for example, using `Field<Type>(...)` and `resolve:` to transform types or pull information from child objects.
+
+The type's class must inherit from `ObjectGraphType<T>` where `T` is the class from the data layer (ORM object or other sort of data transfer object).
+
+You define fields using the simple `Field()` syntax or the more granular `Field<T>()` syntax. For most fields you can just mimic the example code: point to the property,  give it a helpful description, and be done. But for more complex scenarios, you'll need the full syntax.
+
+`Field<TGraph>("NAME", resolve: context => ..., description: "Some sort of description");`
+
+`TGraph` should be the type of the field. The basic types are `BooleanGraphType`, `DateGraphType`, `DecimalGraphType`, `EnumerationGraphType`, `FloatGraphType`, `IntGraphType`, and `StringGraphType`, among others.
+
+> TODO: But I see these are marked as "obsolete" in the source code, so...
+
+The first parameter is the name of the field (what users will use in their GraphQL queries). Then, most importantly, you need some sort of resolver. In the basic case, the system just fetches the value of the given property. But in these more complex cases, you will need to provide specific code.
+
+#### Transformed or Calculated Values
+
+What if the value in the database is binary but you want to transform it into a string when it is fetched?
+
+`Field<StringGraphType>("bytecode", resolve: context => ((T)context.Source).ByteCode.ToString(), description: "Some sort of description");`
+
+In the resolver, we use the `Source` property of the parameter (`context`) to refer to the underlying data object (of type `T`). We then access the `ByteCode` property and convert it to a string.
+
+You could use this same approach to calculate the value:
+
+`Field<StringGraphType>("fullName", resolve: context => ((T)context.Source).FirstName + ((T)context.Source).LastName, description: "User's full name");`
+
+#### List Fields
+
+A common need is to return a list of items. You do this using the `ListGraphType`.
+
+Imagine a student class (`Student`) with a property containing all the courses they're currently taking (`Courses`). You must also have defined a GraphQL type representing courses (`CourseType`). You could return those as follows:
+
+`Field<ListGraphType<CourseType>>("currentCourses", resolve: context => ((Student)context.Source).Courses.ToArray(), description: "Courses this student is enrolled in");`
 
 ### Interfaces
 
@@ -396,78 +430,120 @@ public class StarWarsQuery : ObjectGraphType
 
 > TODO: Needs to be expanded to demonstrate basics like how to search and return multiple results. That's going to include adding an explanation of passing a database context to the constructor.
 
+Let's look at an example that connects to an actual data source. For that to work, you need to pass some sort of encapsulating object into the query, like an Entity Framework "context" object. Let's make it possible to search for a specific individual user or to get a list of all users.
+
+```csharp
+public class MyQuery : ObjectGraphType
+{
+  public MyQuery(MyContext db)
+  {
+    Field<UserType>(
+      "user",
+      arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
+      resolve: _ =>
+      {
+          var id = _.GetArgument<int>("id");
+          return db.Users.Single(x => x.Id.Equals(id));
+      }
+    );
+    Field<ListGraphType<UserType>>(
+      "users",
+      resolve: _ =>
+      {
+        return db.Users.ToArray();
+      }
+    );
+  }
+}
+```
+
+This would support queries like the following:
+
+```graphql
+query {
+  user(id: 1) {
+    id
+    name
+  }
+}
+
+query {
+  users {
+    id
+    name
+  }
+}
+```
+
 ### Mutations
 
 To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
 
-* See the [StarWars example](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.StarWars) for more details.
-* See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
+Mutations are a little more complex. The basic approach is as follows:
+
+* Define an `InputObjectGraphType` class that defines what input the mutation requires.
+* Define a data transfer object (DTO) class to receive the input.
+* Define an `ObjectGraphType` class that represents the mutator. This is where the input is processed, the mutation executed, and final data returned.
+
+Here's a very simple example that creates a user with a given name (required) and an optional tagline. 
 
 ```csharp
-//TODO: Doesn't really belong here. This belongs in the Execution section. Focus on the mutation-specific code.
-public class StarWarsSchema : Schema
+public class UserInputType : InputObjectGraphType
 {
-    public StarWarsSchema(Func<Type, GraphType> resolveType)
-        : base(resolveType)
-    {
-        Query = (StarWarsQuery)resolveType(typeof (StarWarsQuery));
-        Mutation = (StarWarsMutation)resolveType(typeof (StarWarsMutation));
-    }
+  /*
+   * Note the use of `NonNullGraphType`. Use this to mark
+   * fields as required.
+   */
+  public UserInputType()
+  {
+    Name = "UserInput";
+    Field<NonNullGraphType<StringGraphType>>("name");
+    Field<StringGraphType>("tagline");
+  }
 }
 
-/// <example>
-/// This is an example JSON request for a mutation
-/// {
-///   "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
-///   "variables": {
-///     "human": {
-///       "name": "Boba Fett"
-///     }
-///   }
-/// }
-/// </example>
-public class StarWarsMutation : ObjectGraphType<object>
+/*
+ * All that matters is that the class have gettable and settable attributes
+ * for each of the input fields. Nothing else is needed.
+ */
+public class UserDTO
 {
-    public StarWarsMutation(StarWarsData data)
-    {
-        Field<HumanType>(
-            "createHuman",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<HumanInputType>> {Name = "human"}
-            ),
-            resolve: context =>
-            {
-                var human = context.GetArgument<Human>("human");
-                return data.AddHuman(human);
-            });
-    }
+  public string name {get; set;}
+  public string tagline {get; set;}
 }
 
-public class HumanInputType : InputObjectGraphType
+public class MyMutator : ObjectGraphType
 {
-    public HumanInputType()
-    {
-        Name = "HumanInput";
-        Field<NonNullGraphType<StringGraphType>>("name");
-        Field<StringGraphType>("homePlanet");
-    }
-}
-
-// in-memory data store
-public class StarWarsData
-{
-    ...
-
-    public Human AddHuman(Human human)
-    {
-        human.Id = Guid.NewGuid().ToString();
-        _humans.Add(human);
-        return human;
-    }
+  public MyMutator(MyContext db)
+  {
+    //`UserType` is the GraphQL type for your user object that you created earlier
+    Field<UserType>(
+      "createUser",
+      arguments: new QueryArguments(
+        /*
+         * Best practice is to pass everything through a single `input` field
+         * rather than passing each field individually. It's more maintainable.
+         */
+        new QueryArgument<NonNullGraphType<UserInputType>> {Name = "input"}
+      ),
+      resolve: _ => {
+        var profile = _.GetArgument<UserDTO>("input");
+        /*
+         * Use the data now stored in `profile` to populate a new record.
+         * Return the record and the library will convert it to `UserType`
+         * if everything was done right.
+         */
+        var newrec = //magic goes here
+        return newrec;
+      }
+    );
+  }
 }
 ```
 
 > TODO: And how are errors handled? What if something happens during the `AddHuman` part in the database layer? Will a meaningful error message be returned?
+
+See the [Execution](#execution) section for more information on how to accept input cleanly.
 
 ### Subscriptions
 
@@ -487,11 +563,40 @@ subscription comments($repoName: String!) {
 
 ## Execution
 
+So we've established interfaces and types that represent the various types of information we expose. We then created queries and mutations that work with these types in various ways. Now we're ready to actually process a query.
+
 ### Schema Generation
 
-> TODO: Needs to be expanded. So far we've seen two types of schema creation: a full-blown class inheriting `Schema` and the simple `new Schema { Query = new QueryObj(dataObj) }`. How do these work? What are the differences? How do mutations fit in? Is the only way to include both a query and a mutation the way you show in the mutation example?
+First you need a schema, which is a class that inherits `Schema`. It has two properties:
+
+* `Query` (required): This is the root query object.
+* `Mutation` (optional): This is the root mutation object.
+
+And you'll need to pass in some sort of object that encapsulates your data provider. In this case, it's an Entity Framework "context" object.
+
+```csharp
+// Read only: No mutation requests are supported
+public class MySchemaRO : Schema
+{
+  public MySchemaRO(MyContext db)
+  {
+    Query = new MyQuery(db);
+  }
+}
+
+// Read/Write: Both queries and mutations are supported
+public class MySchemaRW : Schema
+{
+  public MySchemaRW(MyContext db)
+  {
+    Query = new MyQuery(db);
+    Mutation = new MyMutator(db);
+  }
+}
+```
 
 #### RegisterType
+
 When the Schema is built, it looks at the "root" types (Query, Mutation, Subscription) and gathers all of the GraphTypes they expose. Often when you are working with an interface type the concrete types are not exposed on the root types (or any of their children). Since those concrete types are never exposed in the type graph the Schema doesn't know they exist. This is what the `RegisterType<>` method on the Schema is for.  By using `RegisterType<>`, it tells the Schema about the specific type and it will properly add it to the `PossibleTypes` collection on the interface type when the Schema is initialized.
 
 ```csharp
@@ -509,11 +614,24 @@ public class StarWarsSchema : Schema
 
 > TODO: Needs expanding. What are the various inputs? Does it *have* to be asynchronous? How does it handle errors? What level of granularity can one expect in the error messages?
 
-#### Variables
+> TODO: Needs to include `ExposeExceptions`.
+
+`DocumentExecuter` is an `async` function that executes the query against your schema. Here's a simple example also uses the `ExposeExceptions` property, which will pass any exceptions and stack traces to the final output, useful during development.
+
+```csharp
+string query = //get from incoming request
+var result = await new DocumentExecuter().ExecuteAsync(_ =>
+{
+  _.Schema = new MySchemaRO(dbObj);
+  _.Query = query;
+  _.ExposeExceptions = true;
+}).ConfigureAwait(false);
+```
 
 You can pass variables received from the client to the execution engine by using the `Inputs` property.
 
 * See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
+* See also the [offical GraphQL documentation on serving queries over HTTP](https://graphql.org/learn/serving-over-http/)
 
 Here is what a query looks like with a variable:
 
@@ -538,7 +656,7 @@ Here is what this query would look like as a JSON request:
 ```
 
 ```csharp
-var variablesJson = // get from request
+string variablesJson = // get from request
 // `ToInputs` converts the json to the `Inputs` class
 var inputs = variablesJson.ToInputs();
 
