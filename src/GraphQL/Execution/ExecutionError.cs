@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 using GraphQLParser;
@@ -16,6 +15,12 @@ namespace GraphQL
         public ExecutionError(string message)
             : base(message)
         {
+        }
+
+        public ExecutionError(string message, IDictionary data)
+            : base(message)
+        {
+            SetData(data);
         }
 
         public ExecutionError(string message, Exception exception)
@@ -53,14 +58,18 @@ namespace GraphQL
 
         private void SetData(Exception exception)
         {
-            if (exception?.Data == null || exception.Data.Count == 0)
-            {
+            if (exception?.Data == null)
                 return;
-            }
-            foreach (DictionaryEntry entry in exception.Data)
+
+            SetData(exception.Data);
+        }
+
+        private void SetData(IDictionary dict)
+        {
+            foreach (DictionaryEntry keyValuePair in dict)
             {
-                var key = entry.Key.ToString();
-                var value = entry.Value;
+                var key = keyValuePair.Key.ToString();
+                var value = keyValuePair.Value;
                 Data[key] = value;
             }
         }
