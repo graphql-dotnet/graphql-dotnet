@@ -58,8 +58,7 @@ namespace GraphQL
 
         private void SetData(Exception exception)
         {
-            var exceptionDoesntContainData = exception?.Data == null || exception.Data.Count == 0;
-            if (exceptionDoesntContainData)
+            if (exception?.Data == null)
                 return;
 
             SetData(exception.Data);
