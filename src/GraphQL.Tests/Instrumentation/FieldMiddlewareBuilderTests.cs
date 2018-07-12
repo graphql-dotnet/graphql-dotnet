@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -112,6 +113,36 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBeNull();
             _context.Errors.ShouldContain(x => x.Message == "Custom error");
+        }
+
+        [Fact]
+        public void can_report_errors_with_data()
+        {
+            var additionalData = new Dictionary<string, string[]>
+            {
+                ["errorCodes"] = new[] {"one", "two"},
+                ["otherErrorCodes"] = new[] {"one", "four"}
+            };
+            _builder.Use(next =>
+            {
+                return context =>
+                {
+                    context.Errors.Add(new ExecutionError("Custom error", additionalData));
+                    return Task.FromResult((object)null);
+                };
+            });
+
+            var result = _builder.Build().Invoke(_context).Result;
+
+            result.ShouldBeNull();
+            _context.Errors.ShouldContain(x => x.Message == "Custom error");
+            AssertData(_context.Errors.Single(), additionalData);
+        }
+
+        private static void AssertData(ExecutionError errors, Dictionary<string, string[]> additionalData)
+        {
+            foreach (var ad in additionalData)
+                errors.Data[ad.Key].ShouldBe(ad.Value);
         }
 
         public class Person
