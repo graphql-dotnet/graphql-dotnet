@@ -1,15 +1,14 @@
-import { exec, rm } from 'shelljs';
-import Deferred from './Deferred';
+import { rm } from 'shelljs'
+import { log } from 'simple-make/lib/logUtils'
 
-export default function clean() {
-  const deferred = new Deferred();
-  rm('-rf', `src/GraphQL/obj`);
-  rm('-rf', `src/GraphQL/bin`);
+export default function clean(settings) {
 
-  rm('-rf', `src/GraphQL.Tests/obj`);
-  rm('-rf', `src/GraphQL.Tests/bin`);
+  const paths = settings.cleanPaths
 
-  deferred.resolve();
+  for(let i=0; i<paths.length; i++) {
+    log(`cleaning ${paths[i]}`)
+    rm('-rf', paths[i])
+  }
 
-  return deferred.promise;
+  return Promise.resolve()
 }

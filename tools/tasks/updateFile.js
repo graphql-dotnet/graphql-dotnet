@@ -1,28 +1,29 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
+import { log } from 'simple-make/lib/logUtils'
 
-export default function updateFile(version, note, fileName, replacer) {
+export default function updateFile(note, fileName, replacer) {
   return new Promise((resolve, reject) => {
-    console.log(note);
+    log(note)
 
-    const targetFile = path.resolve(fileName);
+    const targetFile = path.resolve(fileName)
     fs.readFile(targetFile, (readError, data) => {
 
       if(readError) {
-        reject(readError);
-        return;
+        reject(readError)
+        return
       }
 
-      let updated = data.toString();
-      updated = replacer(updated);
+      let updated = data.toString()
+      updated = replacer(updated)
 
       fs.writeFile(targetFile, updated, writeError => {
         if (writeError) {
-          reject(writeError);
+          reject(writeError)
         } else {
-          resolve();
+          resolve()
         }
-      });
-    });
-  });
+      })
+    })
+  })
 }

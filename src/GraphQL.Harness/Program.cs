@@ -17,9 +17,15 @@ namespace GraphQL.Harness
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            var directory = Directory.GetCurrentDirectory();
+
+            return WebHost.CreateDefaultBuilder(args)
+                .UseContentRoot(directory)
+                .UseWebRoot(Path.Combine(directory, "public"))
                 .UseStartup<Startup>()
                 .Build();
+        }
     }
 }
