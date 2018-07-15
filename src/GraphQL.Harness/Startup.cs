@@ -55,6 +55,9 @@ namespace GraphQL.Harness
                     User = ctx.User
                 }
             });
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
     }
 }

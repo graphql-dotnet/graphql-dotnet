@@ -1,24 +1,25 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import { exec } from 'child-process-promise';
-import settings from './settings';
+import chalk from 'chalk'
+import fs from 'fs'
+import { exec } from 'child-process-promise'
+import { log, logError } from 'simple-make/lib/logUtils'
+import settings from './settings'
 
 function gitCommit() {
-  const git = `git log -1 --pretty=format:%H`;
+  const git = 'git log -1 --pretty=format:%H'
   return exec(git)
     .then(function (result) {
-      return result.stdout;
+      return result.stdout
     })
     .fail(function (err) {
-        console.error(chalk.red(err.stdout));
-    });
+      logError(chalk.red(err.stdout))
+    })
 }
 
 export default function version() {
 
   return gitCommit().then(commit => {
 
-    console.log(`Writing CommonAssemblyInfo.cs\n`);
+    log('Writing CommonAssemblyInfo.cs\n')
 
     const options = {
       description: 'GraphQL for .NET',
@@ -28,7 +29,7 @@ export default function version() {
       version: settings.version,
       fileVersion: settings.version,
       informationalVersion: settings.version
-    };
+    }
 
     const fileInfo = `using System;
 using System.Reflection;
@@ -40,16 +41,16 @@ using System.Reflection;
 [assembly: AssemblyVersion("${options.version}")]
 [assembly: AssemblyFileVersion("${options.fileVersion}")]
 [assembly: AssemblyInformationalVersion("${options.informationalVersion}")]
-[assembly: CLSCompliant(false)]`;
+[assembly: CLSCompliant(false)]`
 
     return new Promise((resolve, reject) => {
       fs.writeFile('./src/CommonAssemblyInfo.cs', fileInfo, err =>{
         if (err) {
-          reject(err);
+          reject(err)
         } else {
-          resolve();
+          resolve()
         }
-      });
-    });
-  });
+      })
+    })
+  })
 }

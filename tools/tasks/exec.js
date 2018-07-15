@@ -1,5 +1,6 @@
 import { exec } from 'shelljs'
-import Deferred from './Deferred'
+import Deferred from 'simple-make/lib/Deferred'
+import { log } from 'simple-make/lib/logUtils'
 
 const defaultOptions = {
   echo: true,
@@ -9,7 +10,7 @@ export default function exec2(cmd, options) {
   const { echo } = { ...defaultOptions, ...options }
 
   if (echo) {
-    console.log(cmd)
+    log(cmd)
   }
 
   const deferred = new Deferred()

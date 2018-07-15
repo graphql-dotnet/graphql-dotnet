@@ -1,7 +1,6 @@
 *.DS_Store
 
 .vs/
-.vscode/
 .idea/
 *.user
 *.suo
@@ -28,3 +27,6 @@ doc-target
 _NCrunch_*/
 *.ncrunchproject
 *.ncrunchsolution
+
+bundle.js
+style.css

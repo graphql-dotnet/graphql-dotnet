@@ -1,15 +1,13 @@
-import artifacts from './artifacts';
-import compile from './compile';
-import clean from './clean';
-import dotnetPack from './dotnetPack';
-import dotnetTest from './test.dotnet';
-import restore from './restore';
-import settings from './settings';
-import setVersion from './setVersion';
-import version from './version';
+import compile from './compile'
+import clean from './clean'
+import dotnetPack from './dotnetPack'
+import dotnetTest from './test.dotnet'
+import restore from './restore'
+import settings from './settings'
+import setVersion from './setVersion'
+import version from './version'
 
-export default {
-  artifacts,
+export {
   compile,
   clean,
   dotnetPack,
@@ -18,4 +16,4 @@ export default {
   settings,
   setVersion,
   version
-};
+}
