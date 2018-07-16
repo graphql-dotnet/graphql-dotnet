@@ -29,7 +29,9 @@
   "devDependencies": {
     "chokidar": "^2.0.4",
     "gatsby-node-helpers": "^0.3.0",
+    "github-slugger": "^1.2.0",
     "js-yaml": "^3.12.0",
+    "lodash": "^4.17.10",
     "prettier": "^1.12.0"
   }
 }

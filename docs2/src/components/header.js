@@ -1,7 +1,15 @@
 import React from 'react'
 import Link from 'gatsby-link'
 
-const Header = ({ siteTitle }) => (
+const buildLinks = links => {
+  return links.map(link => (
+    <li key={link.url}>
+      <Link to={link.url}>{link.title}</Link>
+    </li>
+  ))
+}
+
+const Header = ({ siteTitle, links }) => (
   <div
     style={{
       marginBottom: '1.45rem'
@@ -21,6 +29,11 @@ const Header = ({ siteTitle }) => (
       >
         {siteTitle}
       </Link>
+      <nav>
+        <ul>
+        {buildLinks(links)}
+        </ul>
+      </nav>
     </div>
   </div>
 )

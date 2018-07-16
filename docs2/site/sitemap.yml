@@ -1,15 +1,15 @@
 - title: Home
-  dir: ./src
+  dir: ./
   url: /
   file: pages/landing.js
 
 - title: DOCS
   dir: ./docs
   url: docs
-  another: abcd
   sidemenu:
       - title: Getting Started
         dir: getting-started
+
         items:
           - title: Overview
             file: introduction.md
@@ -18,5 +18,5 @@
       - title: Guides
         dir: guides
         items:
-          - title: Markdown features
-            file: markdown-features.md
+          - title: Kitchen Sink
+            file: old.md

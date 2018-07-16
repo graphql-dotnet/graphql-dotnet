@@ -1,8 +1,4 @@
----
-title: Getting Started
----
-
-## Basics
+# Old Basics
 
 [GraphQL.org](http://graphql.org/learn) is the best place to get started learning GraphQL.  Here is an excerpt from the introduction:
 

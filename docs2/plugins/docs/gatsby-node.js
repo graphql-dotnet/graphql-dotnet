@@ -1,100 +1,93 @@
-const fs = require('fs')
 const path = require('path')
-const chokidar = require('chokidar')
-const yamlParser = require('js-yaml').safeLoad
-const { createFilePath } = require('gatsby-source-filesystem')
-const createNodeHelpers = require('gatsby-node-helpers').default
+const sourceNodes = require('./gatsby/sourceNodes')
 const menuNodeType = require('./menuNodeType')
+const GithubSlugger = require('github-slugger')
+const slugger = new GithubSlugger()
 
-const {
-  createNodeFactory,
-  generateNodeId,
-  generateTypeName,
-} = createNodeHelpers({
-  typePrefix: 'Docs'
-})
+exports.sourceNodes = sourceNodes
 
-const MenuNode = createNodeFactory('Menu', node => {
-  return node
-})
-
-const readConfigFile = filePath => {
-  const fileContent = fs.readFileSync(filePath, 'utf8')
-  const parsedContent = yamlParser(fileContent)
-  return {
-    id: '',
-    pages: parsedContent
-  }
-}
-
-const createMenuNode = filePath => {
-  const pages = readConfigFile(filePath)
-  const menu = MenuNode(pages)
-  menu.internal.mediaType = 'application/json'
-  console.log('MenuNode', JSON.stringify(menu, null, 2))
-  return menu
-}
-
-exports.sourceNodes = ({ boundActionCreators }, options = {}) => {
-  if (!options.config) {
-    throw new Error('A configuration file is required!')
-  }
-
-  const { createNode } = boundActionCreators
-
-  // watch for file changes
-  chokidar.watch(options.config)
-    .on('add', configPath => createNode(createMenuNode(configPath)))
-    .on('change', configPath => createNode(createMenuNode(configPath)))
-    .on('unlink', configPath => {
-      throw new Error(`Site configuration file '${configPath}' has been deleted. A configuration file is required.`)
-    })
-}
-
-exports.onCreateNode = ({ node, boundActionCreators, getNode }, pluginOptions) => {
+exports.onCreateNode = ({ node, boundActionCreators, getNode }, options) => {
   if (node.internal.type !== 'MarkdownRemark') {
     return
   }
 
-  console.log(pluginOptions)
-
   const { createNodeField } = boundActionCreators
-  const slug = createFilePath({ node, getNode, basePath: 'docs' })
+
+  const markdownAbsolutePath = getNode(node.parent).absolutePath
+  const docsAbsolutePath = path.parse(options.config).dir
+
   createNodeField({
     node,
-    name: 'slug',
-    value: 'docs'+slug,
+    name: 'relativePath',
+    value: path.relative(docsAbsolutePath, markdownAbsolutePath)
   })
 }
 
-exports.createPages = ({ graphql, boundActionCreators }) => {
+exports.createPages = ({ graphql, boundActionCreators }, options) => {
   const { createPage } = boundActionCreators
+  const docsSiteDirectory = path.dirname(options.config)
+
+  slugger.reset()
+
   return new Promise((resolve, reject) => {
     graphql(`
       {
-        allMarkdownRemark {
-          edges {
-            node {
-              fields {
-                slug
-              }
-            }
-          }
+        docsMenu {
+          pages
         }
       }
     `
     ).then(result => {
-      result.data.allMarkdownRemark.edges.forEach(({ node }) => {
-        createPage({
-          path: node.fields.slug,
-          component: path.resolve('./src/templates/docs-page.js'),
-          context: {
-            // Data passed to context is available
-            // in page queries as GraphQL variables.
-            slug: node.fields.slug,
-          },
+      result.data.docsMenu.pages.forEach(page => {
+
+        console.log('page', page)
+
+        if (page.file && page.file.endsWith('.js')) {
+            createPage({
+              path: page.url,
+              component: path.resolve(path.join(docsSiteDirectory, page.file)),
+              context: {
+                relativePath: page.url
+              }
+            })
+            return
+        }
+
+        if (!page.sidemenu) return
+
+        page.sidemenu.forEach(side => {
+          side.items.forEach(item => {
+            const pagePath = path.join(page.dir, side.dir)
+            const basename = path.basename(item.file, path.extname(item.file))
+            const slug = slugger.slug(basename)
+
+            console.log({
+              slug,
+              pagePath,
+              joined: path.join(pagePath, slug)
+            })
+            createPage({
+              path: path.join(pagePath, slug),
+              component: path.resolve('./src/templates/docs-page.js'),
+              context: {
+                relativePath: path.join(pagePath, item.file)
+              }
+            })
+          })
         })
+
       })
+      // result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+      //   createPage({
+      //     path: node.fields.slug,
+      //     component: path.resolve('./src/templates/docs-page.js'),
+      //     context: {
+      //       // Data passed to context is available
+      //       // in page queries as GraphQL variables.
+      //       slug: node.fields.slug,
+      //     },
+      //   })
+      // })
       resolve()
     })
   })
