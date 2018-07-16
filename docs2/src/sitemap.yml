@@ -1,0 +1,22 @@
+- title: Home
+  dir: ./src
+  url: /
+  file: pages/landing.js
+
+- title: DOCS
+  dir: ./docs
+  url: docs
+  another: abcd
+  sidemenu:
+      - title: Getting Started
+        dir: getting-started
+        items:
+          - title: Overview
+            file: introduction.md
+          - title: Installation
+            file: installation.md
+      - title: Guides
+        dir: guides
+        items:
+          - title: Markdown features
+            file: markdown-features.md

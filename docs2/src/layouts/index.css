@@ -1,0 +1,25 @@
+html {
+  font-family: Open Sans,Helvetica Neue,Helvetica,sans-serif;
+}
+
+body {
+  font-family: Open Sans,Helvetica Neue,Helvetica,sans-serif;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #3eaf7c;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+h2, h3, h4, h5 {
+  padding-top: 1.5rem;
+}
+
+h2 {
+  font-size: 1.65rem;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid #eaecef;
+}
