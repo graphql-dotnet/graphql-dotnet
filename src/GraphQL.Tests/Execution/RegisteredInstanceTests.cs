@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -79,12 +79,24 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
 scalar Decimal
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
 
 type NestedObjType {
   intField: Int
@@ -93,6 +105,9 @@ type NestedObjType {
 type root {
   listOfObjField: [NestedObjType]
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ");
         }
 
@@ -103,12 +118,24 @@ type root {
   query: root
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
 scalar Decimal
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
 
 type NestedObjType {
   intField: Int
@@ -117,6 +144,9 @@ type NestedObjType {
 type root {
   listOfObjField: NestedObjType!
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ");
         }
 
@@ -127,12 +157,24 @@ type root {
   query: root
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
 scalar Decimal
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
 
 type NestedObjType {
   intField: Int
@@ -141,6 +183,9 @@ type NestedObjType {
 type root {
   listOfObjField: NestedObjType
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ");
         }
 
