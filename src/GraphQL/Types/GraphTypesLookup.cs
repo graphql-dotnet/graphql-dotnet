@@ -22,6 +22,8 @@ namespace GraphQL.Types
             AddType<DateGraphType>();
             AddType<DateTimeGraphType>();
             AddType<DateTimeOffsetGraphType>();
+            AddType<TimeSpanSecondsGraphType>();
+            AddType<TimeSpanMillisecondsGraphType>();
             AddType<DecimalGraphType>();
 
             AddType<__Schema>();
