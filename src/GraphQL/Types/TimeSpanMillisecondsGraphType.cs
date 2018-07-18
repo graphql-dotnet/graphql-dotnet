@@ -22,7 +22,19 @@ namespace GraphQL.Types
             return null;
         }
 
-        public override object ParseValue(object value) =>  ValueConverter.ConvertTo(value, typeof(TimeSpan));
+        public override object ParseValue(object value)
+        {
+            if (value is int i)
+            {
+                return TimeSpan.FromMilliseconds(i);
+            }
+            else if (value is long l)
+            {
+                return TimeSpan.FromMilliseconds(l);
+            }
+
+            return null;
+        }
 
         public override object ParseLiteral(IValue value)
         {
