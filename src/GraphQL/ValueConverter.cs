@@ -101,7 +101,7 @@ namespace GraphQL
         private static object DateTimeToDateTimeOffset(object value)
         {
             var dateTime = (DateTime)value;
-            return new DateTimeOffset(dateTime, TimeSpan.Zero);
+            return (DateTimeOffset)dateTime;
         }
 
         private static object IntToTimeSpan(object value) => TimeSpan.FromSeconds((int)value);
