@@ -34,15 +34,6 @@ namespace GraphQL.Tests.Types
             });
         }
 
-        [Fact(Skip = "Why?")]
-        public void coerces_integer_to_null()
-        {
-            CultureTestHelper.UseCultures(() =>
-            {
-                _type.ParseValue(0).ShouldBe(null);
-            });
-        }
-
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
