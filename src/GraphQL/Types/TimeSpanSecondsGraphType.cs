@@ -14,7 +14,12 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            return ParseValue(value);
+            if (value is TimeSpan timeSpan)
+            {
+                return (long)timeSpan.TotalSeconds;
+            }
+
+            return null;
         }
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(TimeSpan));
