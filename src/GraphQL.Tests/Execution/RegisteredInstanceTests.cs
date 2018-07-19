@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -146,11 +146,11 @@ type root {
 
         private string build_schema(string propType)
         {
-            var nestedObjType = new ObjectGraphType()
+            var nestedObjType = new ObjectGraphType
             {
                 Name = "NestedObjType"
             };
-            nestedObjType.AddField(new FieldType()
+            nestedObjType.AddField(new FieldType
             {
                 ResolvedType = new IntGraphType(),
                 Name = "intField"
@@ -180,13 +180,13 @@ type root {
                 }
             }
 
-            rootType.AddField(new FieldType()
+            rootType.AddField(new FieldType
             {
                 Name = "listOfObjField",
                 ResolvedType = resolvedType
             });
 
-            var s = new Schema()
+            var s = new Schema
             {
                 Query = rootType
             };

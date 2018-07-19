@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using GraphQL.Execution;
-using GraphQL.StarWars;
 using GraphQL.Tests.StarWars;
-using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 
 namespace GraphQL.Tests.Complexity

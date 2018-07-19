@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using GraphQL.DataLoader;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;

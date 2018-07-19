@@ -170,7 +170,7 @@ namespace GraphQL
 
                 if (!validationResult.IsValid)
                 {
-                    return new ExecutionResult()
+                    return new ExecutionResult
                     {
                         Errors = validationResult.Errors
                     };
@@ -189,7 +189,7 @@ namespace GraphQL
 
                 if (context.Errors.Any())
                 {
-                    return new ExecutionResult()
+                    return new ExecutionResult
                     {
                         Errors = context.Errors
                     };
@@ -235,7 +235,7 @@ namespace GraphQL
             {
                 result = new ExecutionResult
                 {
-                    Errors = new ExecutionErrors()
+                    Errors = new ExecutionErrors
                     {
                         new ExecutionError(ex.Message, ex)
                     }

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using Shouldly;
@@ -25,13 +22,12 @@ namespace GraphQL.DataLoader.Tests
             );
 
             Orders.AddOrders(
-                new Order()
+                new Order
                 {
                     OrderId = 1,
                     UserId = 1
-                    
                 },
-                new Order()
+                new Order
                 {
                     OrderId = 2,
                     UserId = 1
