@@ -24,13 +24,16 @@ namespace GraphQL
 
             Register(typeof(DateTime), typeof(DateTimeOffset), DateTimeToDateTimeOffset);
             Register(typeof(DateTimeOffset), typeof(DateTime), DateTimeOffsetToDateTime);
+            Register(typeof(TimeSpan), typeof(long), TimeSpanToLong);
 
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(long), IntToLong);
             Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
+            Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
 
             Register(typeof(long), typeof(int), LongToInt);
+            Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
 
@@ -45,31 +48,31 @@ namespace GraphQL
 
         private static object IntToDecimal(object value)
         {
-            var intValue = (int) value;
+            var intValue = (int)value;
             return Convert.ToDecimal(intValue, NumberFormatInfo.InvariantInfo);
         }
 
         private static object DoubleToDecimal(object value)
         {
-            var doubleValue = (double) value;
+            var doubleValue = (double)value;
             return Convert.ToDecimal(doubleValue, NumberFormatInfo.InvariantInfo);
         }
 
         private static object LongToInt(object value)
         {
-            var longValue = (long) value;
-            return (int) longValue;
+            var longValue = (long)value;
+            return (int)longValue;
         }
 
         private static object IntToLong(object value)
         {
-            var intValue = (int) value;
-            return (long) intValue;
+            var intValue = (int)value;
+            return (long)intValue;
         }
 
         private static object ParseGuid(object value)
         {
-            var stringValue = (string) value;
+            var stringValue = (string)value;
             return Guid.Parse(stringValue);
         }
 
@@ -91,19 +94,25 @@ namespace GraphQL
 
         private static object DateTimeOffsetToDateTime(object value)
         {
-            var dateTimeOffset = (DateTimeOffset) value;
+            var dateTimeOffset = (DateTimeOffset)value;
             return dateTimeOffset.UtcDateTime;
         }
 
         private static object DateTimeToDateTimeOffset(object value)
         {
-            var dateTime = (DateTime) value;
-            return new DateTimeOffset(dateTime, TimeSpan.Zero);
+            var dateTime = (DateTime)value;
+            return (DateTimeOffset)dateTime;
         }
+
+        private static object IntToTimeSpan(object value) => TimeSpan.FromSeconds((int)value);
+
+        private static object LongToTimeSpan(object value) => TimeSpan.FromSeconds((long)value);
+
+        private static object TimeSpanToLong(object value) => ((TimeSpan)value).TotalSeconds;
 
         private static object ParseDateTimeOffset(object value)
         {
-            var stringValue = (string) value;
+            var stringValue = (string)value;
             return DateTimeOffset.Parse(
                 stringValue,
                 DateTimeFormatInfo.InvariantInfo);
@@ -111,7 +120,7 @@ namespace GraphQL
 
         private static object ParseDateTime(object value)
         {
-            var stringValue = (string) value;
+            var stringValue = (string)value;
             return DateTimeOffset.Parse(
                 stringValue,
                 DateTimeFormatInfo.InvariantInfo,
@@ -125,7 +134,7 @@ namespace GraphQL
 
         private static object ParseDouble(object value)
         {
-            var v =  double.Parse(
+            var v = double.Parse(
                 (string)value,
                 NumberStyles.Float,
                 NumberFormatInfo.InvariantInfo);
@@ -178,7 +187,7 @@ namespace GraphQL
             if (v == null)
                 return default(T);
 
-            return (T) v;
+            return (T)v;
         }
 
         private static Func<object, object> GetConversion(Type valueType, Type targetType)

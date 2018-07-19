@@ -220,6 +220,22 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR'
                 },
                 {
+                  'name': 'DateTime',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'DateTimeOffset',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'Seconds',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'Milliseconds',
+                  'kind': 'SCALAR'
+                },
+                {
                   'name': 'Decimal',
                   'kind': 'SCALAR'
                 },

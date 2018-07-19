@@ -11,14 +11,43 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaPrinterTests
     {
-        private const string built_in_scalars = @"
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
+        private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>()
+        {
+            {
+                "Date",
+@"# The `Date` scalar type represents a year, month and day in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date"
+            },
+            {
+                "DateTime",
+@"# The `DateTime` scalar type represents a date and time. `DateTime` expects
 # timestamps to be formatted in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-scalar Decimal
-";
+scalar DateTime"
+            },
+            {
+                "DateTimeOffset",
+@"# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset"
+            },
+            {
+                "Decimal",
+@"scalar Decimal"
+            },
+            {
+                "Milliseconds",
+@"# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds"
+            },
+            {
+                "Seconds",
+@"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds"
+            },
+        };
 
         private string printSingleFieldSchema<T>(
             IEnumerable<QueryArgument> arguments = null)
@@ -53,9 +82,33 @@ scalar Decimal
             return Environment.NewLine + printer.Print();
         }
 
-        private void AssertEqual(string result, string expected, bool excludeScalars = false)
+        private void AssertEqual(string result, string expectedName, string expected, bool excludeScalars = false)
         {
-            var exp = excludeScalars ? expected : built_in_scalars + expected;
+            AssertEqual(
+                result,
+                new Dictionary<string, string>() { { expectedName, expected } },
+                excludeScalars);
+        }
+
+        private void AssertEqual(string result, Dictionary<string, string> expected, bool excludeScalars = false)
+        {
+            string exp;
+            if (excludeScalars)
+            {
+                exp = string.Join($"{Environment.NewLine}{Environment.NewLine}", expected
+                    .OrderBy(x => x.Key)
+                    .Select(x => x.Value));
+            }
+            else
+            {
+                var orderedScalars = built_in_scalars
+                    .ToDictionary(x => x.Key, x => x.Value)
+                    .Union(expected)
+                    .OrderBy(x => x.Key)
+                    .Select(x => x.Value);
+                exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
+            }
+
             result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
         }
 
@@ -72,67 +125,62 @@ directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(result, expected, excludeScalars: true);
+            AssertEqual(result, "directive", expected, excludeScalars: true);
         }
 
         [Fact]
         public void prints_string_field()
         {
             var result = printSingleFieldSchema<StringGraphType>();
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField: String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
         public void prints_string_list_field()
         {
             var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField: [String]
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
         public void prints_non_null_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField: String!
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
         public void prints_non_null_list_of_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField: [String]!
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
         public void prints_non_null_list_of_non_null_string_field()
         {
             var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField: [String!]!
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -143,15 +191,22 @@ type Query {
 
             var schema = new Schema {Query = root};
 
-            AssertEqual(print(schema), @"
-type Foo {
+            var expected = new Dictionary<string, string>()
+            {
+                {
+                    "Foo",
+@"type Foo {
   str: String
-}
-
-type Query {
+}"
+                },
+                {
+                    "Query",
+@"type Query {
   foo: Foo
-}
-");
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]
@@ -163,12 +218,11 @@ type Query {
                     new QueryArgument<IntGraphType> {Name = "argOne"}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -180,12 +234,11 @@ type Query {
                     new QueryArgument<IntGraphType> {Name = "argOne", DefaultValue = 2}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int = 2): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -197,12 +250,11 @@ type Query {
                     new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "argOne"}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int!): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -215,12 +267,11 @@ type Query {
                     new QueryArgument<StringGraphType> {Name = "argTwo"}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int, argTwo: String): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -234,12 +285,11 @@ type Query {
                     new QueryArgument<BooleanGraphType> {Name = "argThree"}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -253,12 +303,11 @@ type Query {
                     new QueryArgument<BooleanGraphType> {Name = "argThree"}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int, argTwo: String = ""foo"", argThree: Boolean): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -272,12 +321,11 @@ type Query {
                     new QueryArgument<BooleanGraphType> {Name = "argThree", DefaultValue = false}
                 });
 
-            const string expected = @"
-type Query {
+            const string expected =
+@"type Query {
   singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
-}
-";
-            AssertEqual(result, expected);
+}";
+            AssertEqual(result, "Query", expected);
         }
 
         [Fact]
@@ -288,7 +336,7 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
+            AssertEqual(print(schema), "", @"
 schema {
   query: Root
 }
@@ -297,10 +345,19 @@ type Bar implements Foo {
   str: String
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
 
 scalar Decimal
 
@@ -308,9 +365,15 @@ interface Foo {
   str: String
 }
 
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
 type Root {
   bar: Bar
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ", excludeScalars: true);
         }
 
@@ -322,7 +385,7 @@ type Root {
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
+            AssertEqual(print(schema), "", @"
 interface Baaz {
   int: Int
 }
@@ -331,10 +394,19 @@ type Bar implements Foo, Baaz {
   str: String
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
 
 scalar Decimal
 
@@ -342,9 +414,15 @@ interface Foo {
   str: String
 }
 
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
 type Query {
   bar: Bar
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ", excludeScalars: true);
         }
 
@@ -357,15 +435,24 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
+            AssertEqual(print(schema), "", @"
 type Bar implements Foo {
   str: String
 }
 
-# The `Date` scalar type represents a timestamp provided in UTC. `Date` expects
-# timestamps to be formatted in accordance with the
+# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
 
 scalar Decimal
 
@@ -373,12 +460,18 @@ interface Foo {
   str: String
 }
 
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
 union MultipleUnion = Foo | Bar
 
 type Query {
   single: SingleUnion
   multiple: MultipleUnion
 }
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 
 union SingleUnion = Foo
 ", excludeScalars: true);
@@ -394,15 +487,22 @@ union SingleUnion = Foo
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
-input InputType {
+            var expected = new Dictionary<string, string>()
+            {
+                {
+                    "InputType",
+@"input InputType {
   int: Int
-}
-
-type Query {
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
   str(argOne: InputType): String!
-}
-");
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]
@@ -413,13 +513,17 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
-scalar Odd
-
-type Query {
+            var expected = new Dictionary<string, string>()
+            {
+                { "Odd", @"scalar Odd" },
+                {
+                    "Query",
+@"type Query {
   odd: Odd
-}
-");
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]
@@ -430,17 +534,23 @@ type Query {
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), @"
-type Query {
+            var expected = new Dictionary<string, string>()
+            {
+                {
+                    "Query",
+@"type Query {
   rgb: RGB
-}
-
-enum RGB {
+}"
+                },
+                {
+                    "RGB",
+@"enum RGB {
   RED
   GREEN
   BLUE
-}
-");
+}"
+                },
+            };
         }
 
         [Fact]
@@ -590,7 +700,7 @@ enum __TypeKind {
 }
 ";
 
-            AssertEqual(result, expected, excludeScalars: true);
+            AssertEqual(result, "", expected, excludeScalars: true);
         }
 
         public class FooType : ObjectGraphType

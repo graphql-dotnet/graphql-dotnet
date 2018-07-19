@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
@@ -98,7 +98,7 @@ namespace GraphQL.Tests.Execution
         public DateTimeHolderType()
         {
             Name = "DateTimeHolder";
-            Field<DateGraphType>("theDateTime");
+            Field<DateTimeGraphType>("theDateTime");
         }
     }
 
@@ -189,7 +189,7 @@ namespace GraphQL.Tests.Execution
             Field<DateTimeHolderType>(
                 "immediatelyChangeTheDateTime",
                 arguments: new QueryArguments(
-                    new QueryArgument<DateGraphType>
+                    new QueryArgument<DateTimeGraphType>
                     {
                         Name = "newDateTime"
                     }
@@ -205,7 +205,7 @@ namespace GraphQL.Tests.Execution
             Field<DateTimeHolderType>(
                 "promiseToChangeTheDateTime",
                 arguments: new QueryArguments(
-                    new QueryArgument<DateGraphType>
+                    new QueryArgument<DateTimeGraphType>
                     {
                         Name = "newDateTime"
                     }
@@ -221,7 +221,7 @@ namespace GraphQL.Tests.Execution
             Field<DateTimeHolderType>(
                 "failToChangeTheDateTime",
                 arguments: new QueryArguments(
-                    new QueryArgument<DateGraphType>
+                    new QueryArgument<DateTimeGraphType>
                     {
                         Name = "newDateTime"
                     }
@@ -237,7 +237,7 @@ namespace GraphQL.Tests.Execution
             Field<DateTimeHolderType>(
                 "promiseAndFailToChangeTheDateTime",
                 arguments: new QueryArguments(
-                    new QueryArgument<DateGraphType>
+                    new QueryArgument<DateTimeGraphType>
                     {
                         Name = "newDateTime"
                     }
@@ -430,10 +430,10 @@ namespace GraphQL.Tests.Execution
                   },
                   'third': null,
                   'fourth': {
-                    'theDateTime': ""2017-04-27T20:19:53.123""
+                    'theDateTime': ""2017-04-27T20:19:53.123Z""
                   },
                   'fifth': {
-                    'theDateTime': ""2017-05-27T13:19:53.123""
+                    'theDateTime': ""2017-05-27T13:19:53.123Z""
                   },
                   'sixth': null
                 }";

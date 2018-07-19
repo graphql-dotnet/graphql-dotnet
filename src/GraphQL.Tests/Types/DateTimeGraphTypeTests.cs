@@ -6,35 +6,9 @@ using Xunit;
 
 namespace GraphQL.Tests.Types
 {
-    public class DateGraphTypeTests
+    public class DateTimeGraphTypeTests
     {
-        private readonly DateGraphType _type = new DateGraphType();
-
-        [Fact]
-        public void serialize_local_date_returns_date_only()
-        {
-            CultureTestHelper.UseCultures(() =>
-            {
-                var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Local);
-
-                var actual = _type.Serialize(date);
-
-                actual.ShouldBe("2000-01-02");
-            });
-        }
-
-        [Fact]
-        public void serialize_utc_date_returns_date_only()
-        {
-            CultureTestHelper.UseCultures(() =>
-            {
-                var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Utc);
-
-                var actual = _type.Serialize(date);
-
-                actual.ShouldBe("2000-01-02");
-            });
-        }
+        private readonly DateTimeGraphType _type = new DateTimeGraphType();
 
         [Fact]
         public void coerces_valid_date()
