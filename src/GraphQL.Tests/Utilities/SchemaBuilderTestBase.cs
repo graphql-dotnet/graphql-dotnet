@@ -3,7 +3,6 @@ using System.Linq;
 using GraphQL.Http;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 

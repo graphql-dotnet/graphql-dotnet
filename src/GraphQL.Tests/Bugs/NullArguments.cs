@@ -1,9 +1,6 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Shouldly;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs

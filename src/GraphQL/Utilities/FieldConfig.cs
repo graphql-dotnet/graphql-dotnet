@@ -1,4 +1,3 @@
-﻿using System.Reflection;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 

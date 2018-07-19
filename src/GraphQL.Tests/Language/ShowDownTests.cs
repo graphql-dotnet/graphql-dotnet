@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GraphQL.Execution;
-using GraphQL.Introspection;
-using Xunit;
 
 namespace GraphQL.Tests.Language
 {

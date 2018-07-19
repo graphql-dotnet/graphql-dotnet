@@ -1,5 +1,4 @@
 using System;
-using GraphQL;
 
 namespace GraphQL.DataLoader.Tests
 {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Conversion;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;

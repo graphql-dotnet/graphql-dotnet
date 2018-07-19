@@ -161,7 +161,7 @@ namespace GraphQL.Tests.StarWars
             RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: (ctx) =>
             {
                 ctx.SubFields.ShouldBeNull();
-                return new int[] { 1, 2 };
+                return new[] { 1, 2 };
             });
 
             var query = @"

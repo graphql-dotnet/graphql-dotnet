@@ -1,10 +1,7 @@
 using System.Diagnostics;
 using System.Threading;
 using GraphQL.Conversion;
-using GraphQL.Execution;
 using GraphQL.Tests.StarWars;
-using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using Xunit;
 using Xunit.Abstractions;
 
