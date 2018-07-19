@@ -1,5 +1,3 @@
-const path = require('path')
-
 const config = {
   config: `${__dirname}/site/sitemap.yml`,
   resources: `${__dirname}/site/docs`
@@ -13,7 +11,7 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: path.resolve('./plugins/docs'),
+      resolve: 'docs',
       options: {
         config: config.config
       }

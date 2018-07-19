@@ -1,26 +1,10 @@
-# gatsby-starter-default
-The default Gatsby starter.
+# GraphQL .NET Docs
 
-For an overview of the project structure please refer to the [Gatsby documentation - Building with Components](https://www.gatsbyjs.org/docs/building-with-components/).
+Some code + setup inspired & borrowed from https://github.com/brainhubeu/gatsby-docs-kit
 
-## Install
+To run the docs:
 
-Make sure that you have the Gatsby CLI program installed:
-```sh
-npm install --global gatsby-cli
 ```
-
-And run from your CLI:
-```sh
-gatsby new gatsby-example-site
+yarn
+yarn develop
 ```
-
-Then you can run it by:
-```sh
-cd gatsby-example-site
-gatsby develop
-```
-
-## Deploy
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-default)

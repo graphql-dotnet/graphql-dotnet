@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
+import './reset.css'
 import 'prismjs/themes/prism-solarizedlight.css'
 
 import Header from '../components/header'
 import SideNav from '../components/SideNav'
-import './reset.css'
 import './index.css'
 
 import { findMatchingPage  } from '../utils/navigation'
@@ -29,36 +29,28 @@ const getPathName = (location, pathNamePrefix = '') => {
   return pathName
 }
 
-const Layout = ({ children, location, data }) =>{
+const hasMenu = config => config && config.sidemenu && config.sidemenu.length > 0
+
+const Layout = ({ children, location, data }) => {
   const pathName = getPathName(location)
   const pageConfig = findMatchingPage(data.menu.pages, pathName)
-  const nav = pageConfig ? <SideNav activeItem={pageConfig} location={location} /> : null
+  const nav = hasMenu(pageConfig) ? <SideNav activeItem={pageConfig} location={location} /> : null
 
   return (
-    <div>
+    <Fragment>
       <Helmet
         title={data.site.siteMetadata.title}
         meta={[
-          { name: 'description', content: 'Sample' },
+          { name: 'description', content: data.site.siteMetadata.description },
           { name: 'keywords', content: 'sample, something' }
         ]}
       />
       <Header siteTitle={data.site.siteMetadata.title} links={data.menu.pages} />
-      <div style={{ float: 'left' }}>
-      {nav}
-      </div>
-      <div
-        style={{
-          float: 'left',
-          margin: '0 auto',
-          maxWidth: 960,
-          padding: '0px 1.0875rem 1.45rem',
-          paddingTop: 0
-        }}
-      >
+      <div className="page-body">
         {children()}
+        {nav}
       </div>
-    </div>
+    </Fragment>
   )
 }
 
@@ -77,6 +69,7 @@ export const query = graphql`
     site {
       siteMetadata {
         title
+        description
       }
     }
 

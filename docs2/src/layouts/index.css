@@ -1,25 +1,94 @@
+/**
+ * 1. Avoid the IE 10-11 `min-height` bug.
+ * 2. Set `flex-shrink` to `0` to prevent some browsers from
+ *    letting these items shrink to smaller than their content's default
+ *    minimum size. See http://bit.ly/1Mn35US for details.
+ * 3. Use `%` instead of `vh` since `vh` is buggy in older mobile Safari.
+ */
+
 html {
-  font-family: Open Sans,Helvetica Neue,Helvetica,sans-serif;
+  color: hsl(0,0%,25%);
+  font: 400 1em/1.4 'Open Sans', sans-serif;
+  text-rendering: optimizeLegibility;
+  overflow: auto;
 }
 
 body {
-  font-family: Open Sans,Helvetica Neue,Helvetica,sans-serif;
-  color: #2c3e50;
-  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  overflow: auto;
 }
 
-a {
-  color: #3eaf7c;
-  font-weight: 500;
-  text-decoration: none;
+#___gatsby {
+  overflow: auto;
 }
 
-h2, h3, h4, h5 {
-  padding-top: 1.5rem;
+ul {
+  margin: 0;
+  padding: 0;
 }
 
-h2 {
-  font-size: 1.65rem;
-  padding-bottom: .3rem;
-  border-bottom: 1px solid #eaecef;
+li {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* layout */
+
+.header {
+  height: 100px;
+}
+
+.footer {
+  height: 100px;
+}
+
+.header,
+.footer {
+  flex: none; /* 2 */
+  background-color: lightblue;
+}
+
+.page-body {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 100px);
+  background-color: lightgreen;
+}
+
+.content {
+  height: 100%;
+  width: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  padding: 2em;
+}
+
+.nav {
+  padding: 2em;
+  order: 1;
+  background-color: lightsalmon;
+  overflow-y: inherit;
+  overflow-x: hidden;
+  flex-grow: 1;
+}
+
+@media (min-width: 768px) {
+  html, body, #___gatsby {
+    height: 100%;
+    overflow-y: hidden;
+  }
+
+  .page-body {
+    flex-direction: row;
+  }
+  .content {
+    overflow-y: auto;
+  }
+  .nav, .ads {
+    order: -1;
+  }
+
+  .nav {
+    overflow-y: auto;
+  }
 }

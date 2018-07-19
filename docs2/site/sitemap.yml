@@ -1,4 +1,4 @@
-- title: Home
+- title: HOME
   dir: ./
   url: /
   file: pages/landing.js

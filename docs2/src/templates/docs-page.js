@@ -4,7 +4,9 @@ import PropTypes from 'prop-types'
 const DocsPage = ({ data }) => {
   const page = data.markdownRemark
   return (
-    <div dangerouslySetInnerHTML={{ __html: page.html }} />
+    <article
+      className="content"
+      dangerouslySetInnerHTML={{ __html: page.html }} />
   )
 }
 

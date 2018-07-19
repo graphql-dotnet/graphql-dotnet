@@ -1,38 +1,40 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import Link from 'gatsby-link'
 import classnames from 'classnames'
 
-const styles = {}
+import styles from './SideNav.module.css'
+console.log('styles', styles)
 
 const createMenuList = (listData, location) => (
-  <ul className={styles.sideNav__sideList}>
-    {listData.map( element => (
-      <li key={element.title} className={styles.sideList__item}>
-        {element.file && (
-          <Link
-            to={element.url || element.href}
-            className={classnames([
-              styles.subNav__link,
-              location === element.url && styles['subNav__link--active'],
-            ])}
-          >
-            {element.title}
-          </Link>
-        )}
-        {!element.file && (
-          <span className={styles.subNav__header}>{element.title}</span>
-        )}
-        {element.items && createMenuList(element.items, location)}
-      </li>
-    ))}
-  </ul>
+  console.log(location) ||
+  <nav>
+    <ul className={styles.sideList}>
+      {listData.map( element => (
+        <li key={element.title}>
+          {element.file && (
+            <Link
+              to={element.url || element.href}
+              className={classnames([
+                styles.subNav_link,
+                location.pathname === element.url && styles.active
+              ])}
+            >
+              {element.title}
+            </Link>
+          )}
+          {!element.file && (
+            <span className={styles.subNav_title}>{element.title}</span>
+          )}
+          {element.items && element.items.length > 0 && createMenuList(element.items, location)}
+        </li>
+      ))}
+    </ul>
+  </nav>
 )
 
 const SideNav = ({ activeItem, location }) => (
-  <div className={styles.sideNav__scrollableWrapper}>
-    <nav className={styles.sideNav}>
-      {createMenuList(activeItem.sidemenu, location)}
-    </nav>
+  <div className="nav">
+    {createMenuList(activeItem.sidemenu, location)}
   </div>
 )
 
