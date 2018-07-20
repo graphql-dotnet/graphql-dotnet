@@ -106,9 +106,7 @@ namespace GraphQL
         {
             get
             {
-                TValue value;
-
-                if (!_values.TryGetValue(key, out value))
+                if (!_values.TryGetValue(key, out var value))
                 {
                     value = _onMissing(key);
 

@@ -50,8 +50,7 @@ namespace GraphQL.Utilities
 
         public object Arg(string key)
         {
-            object arg;
-            _args.TryGetValue(key, out arg);
+            _args.TryGetValue(key, out var arg);
             return arg;
         }
 

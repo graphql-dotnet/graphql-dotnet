@@ -21,8 +21,7 @@ namespace GraphQL.Types
                 return defaultValue;
             }
 
-            object item;
-            if (Metadata.TryGetValue(key, out item))
+            if (Metadata.TryGetValue(key, out var item))
             {
                 return (TType) item;
             }

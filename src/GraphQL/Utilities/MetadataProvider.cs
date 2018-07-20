@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using GraphQL.Types;
 
@@ -15,8 +15,7 @@ namespace GraphQL.Utilities
                 return defaultValue;
             }
 
-            object item;
-            if (Metadata.TryGetValue(key, out item))
+            if (Metadata.TryGetValue(key, out var item))
             {
                 return (TType) item;
             }
