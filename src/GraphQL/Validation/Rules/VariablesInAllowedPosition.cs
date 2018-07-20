@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -34,8 +34,7 @@ namespace GraphQL.Validation.Rules
                         usages.Apply(usage =>
                         {
                             var varName = usage.Node.Name;
-                            VariableDefinition varDef;
-                            if (!varDefMap.TryGetValue(varName, out varDef))
+                            if (!varDefMap.TryGetValue(varName, out var varDef))
                             {
                                 return;
                             }

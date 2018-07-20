@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaPrinterTests
     {
-        private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
         {
             {
                 "Date",
@@ -86,7 +86,7 @@ scalar Seconds"
         {
             AssertEqual(
                 result,
-                new Dictionary<string, string>() { { expectedName, expected } },
+                new Dictionary<string, string> { { expectedName, expected } },
                 excludeScalars);
         }
 
@@ -191,7 +191,7 @@ directive @skip(
 
             var schema = new Schema {Query = root};
 
-            var expected = new Dictionary<string, string>()
+            var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
@@ -487,7 +487,7 @@ union SingleUnion = Foo
 
             var schema = new Schema { Query = root };
 
-            var expected = new Dictionary<string, string>()
+            var expected = new Dictionary<string, string>
             {
                 {
                     "InputType",
@@ -513,7 +513,7 @@ union SingleUnion = Foo
 
             var schema = new Schema { Query = root };
 
-            var expected = new Dictionary<string, string>()
+            var expected = new Dictionary<string, string>
             {
                 { "Odd", @"scalar Odd" },
                 {
@@ -534,7 +534,7 @@ union SingleUnion = Foo
 
             var schema = new Schema { Query = root };
 
-            var expected = new Dictionary<string, string>()
+            var expected = new Dictionary<string, string>
             {
                 {
                     "Query",

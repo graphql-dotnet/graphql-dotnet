@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -58,8 +58,7 @@ namespace GraphQL.Validation
 
         public IEnumerable<VariableUsage> GetRecursiveVariables(Operation operation)
         {
-            IEnumerable<VariableUsage> results;
-            if (_variables.TryGetValue(operation, out results))
+            if (_variables.TryGetValue(operation, out var results))
             {
                 return results;
             }
@@ -114,8 +113,7 @@ namespace GraphQL.Validation
 
         public IEnumerable<FragmentDefinition> GetRecursivelyReferencedFragments(Operation operation)
         {
-            IEnumerable<FragmentDefinition> results;
-            if (_fragments.TryGetValue(operation, out results))
+            if (_fragments.TryGetValue(operation, out var results))
             {
                 return results;
             }

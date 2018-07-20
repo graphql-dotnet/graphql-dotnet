@@ -44,9 +44,7 @@ namespace GraphQL.Instrumentation
 
         public T MetaField<T>(string key)
         {
-            object value;
-
-            if (Metadata.TryGetValue(key, out value))
+            if (Metadata.TryGetValue(key, out var value))
             {
                 return (T)value;
             }

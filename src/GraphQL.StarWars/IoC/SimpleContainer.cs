@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -60,8 +60,7 @@ namespace GraphQL.StarWars.IoC
 
         public object Get(Type serviceType)
         {
-            Func<object> creator;
-            if (_registrations.TryGetValue(serviceType, out creator))
+            if (_registrations.TryGetValue(serviceType, out var creator))
             {
                 return creator();
             }
