@@ -11,6 +11,7 @@ module.exports = {
   },
   plugins: [
     {
+      // local plugin, /plugins/docs
       resolve: 'docs',
       options: {
         config: config.config
