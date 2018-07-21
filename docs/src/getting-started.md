@@ -177,7 +177,7 @@ public class DroidType : ObjectGraphType<Droid>
 }
 ```
 
-> TODO: Talk about the `Field` function and the various ways it can be used (e.g., `Field<Type>(...)`). Be sure to mention the default resolver. Also, there appears to be some case transformation of the property name happening in the background (e.g., "Id" automatically becoming "id").
+> TODO: Talk about the `Field` function and the various ways it can be used (e.g., `Field<Type>(...)`). Be sure to mention the default resolver. Also, there appears to be some case transformation of the property name happening in the background (e.g., "Id" automatically becoming "id"). Some introduction of `FieldAsync` would probably be appropriate at this point, too.
 
 > TODO: Be sure to introduce `ListGraphType`!
 
