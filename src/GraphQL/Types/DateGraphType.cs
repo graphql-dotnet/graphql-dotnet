@@ -14,7 +14,9 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            if (value is DateTime dateTime)
+            var date = ParseValue(value);
+
+            if (date is DateTime dateTime)
             {
                 return dateTime.ToString("yyyy-MM-dd");
             }
