@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace GraphQL.Language.AST
 
         public Directive Find(string name)
         {
-            return _directives.FirstOrDefault(d => d.Name == name);
+            return _directives.FirstOrDefault(d => d.Name.Equals(name, StringComparison.Ordinal));
         }
 
         public IEnumerator<Directive> GetEnumerator()
