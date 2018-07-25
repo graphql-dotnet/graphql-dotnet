@@ -145,14 +145,14 @@ namespace GraphQL.Validation
                 _inputTypeStack.Push(type);
             }
 
-            if (node is ObjectField)
+            if (node is ObjectField objectField)
             {
                 var objectType = GetInputType().GetNamedType();
                 IGraphType fieldType = null;
 
                 if (objectType is IInputObjectGraphType complexType)
                 {
-                    var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField)node).Name);
+                    var inputField = complexType.GetField(objectField.Name);
 
                     fieldType = inputField?.ResolvedType;
                 }
@@ -237,7 +237,7 @@ namespace GraphQL.Validation
             {
                 var complexType = (IComplexGraphType) parentType;
 
-                return complexType.Fields.FirstOrDefault(x => x.Name == field.Name);
+                return complexType.GetField(field.Name);
             }
 
             return null;
