@@ -69,7 +69,6 @@ namespace GraphQL.Types
         public EnumerationGraphType()
         {
             var type = typeof(TEnum);
-            var typeInfo = type.GetTypeInfo();
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
 
