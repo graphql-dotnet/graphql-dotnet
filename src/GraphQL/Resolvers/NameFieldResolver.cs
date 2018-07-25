@@ -1,13 +1,10 @@
 using System;
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
     internal class NameFieldResolver : IFieldResolver
     {
-        private static readonly BindingFlags _flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
-
         public object Resolve(ResolveFieldContext context)
         {
             return Resolve(context?.Source, context?.FieldAst?.Name);
@@ -20,7 +17,14 @@ namespace GraphQL.Resolvers
                 return null;
             }
 
-            return source.GetPropertyValue(name);
+            var propertyValue = source.GetPropertyValue(name);
+
+            if (propertyValue == null)
+            {
+                throw new InvalidOperationException($"Expected to find property {name} on {source.GetType().Name} but it does not exist.");
+            }
+
+            return propertyValue;
         }
     }
 }
