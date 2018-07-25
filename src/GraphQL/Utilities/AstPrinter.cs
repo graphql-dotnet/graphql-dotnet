@@ -134,16 +134,16 @@ namespace GraphQL.Utilities
 
     public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
     {
-        private readonly Expression<Func<TObject, TProperty>> _property;
+        private readonly Func<TObject, TProperty> _property;
 
         public ExpressionValueResolver(Expression<Func<TObject, TProperty>> property)
         {
-            _property = property;
+            _property = property.Compile();
         }
 
         public TProperty Resolve(ResolveValueContext context)
         {
-            return _property.Compile()(context.SourceAs<TObject>());
+            return _property(context.SourceAs<TObject>());
         }
 
         object IValueResolver.Resolve(ResolveValueContext context)
