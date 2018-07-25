@@ -20,15 +20,7 @@ namespace GraphQL.Resolvers
                 return null;
             }
 
-            var prop = source.GetType()
-                .GetProperty(name, _flags);
-
-            if (prop == null)
-            {
-                throw new InvalidOperationException($"Expected to find property {name} on {source.GetType().Name} but it does not exist.");
-            }
-
-            return prop.GetValue(source, null);
+            return source.GetPropertyValue(name);
         }
     }
 }
