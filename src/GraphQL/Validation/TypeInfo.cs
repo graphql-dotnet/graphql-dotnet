@@ -67,9 +67,8 @@ namespace GraphQL.Validation
                 return;
             }
 
-            if (node is Field)
+            if (node is Field field)
             {
-                var field = (Field) node;
                 var parentType = _parentTypeStack.Peek().GetNamedType();
                 var fieldType = GetFieldDef(_schema, parentType, field);
                 _fieldDefStack.Push(fieldType);
@@ -78,15 +77,13 @@ namespace GraphQL.Validation
                 return;
             }
 
-            if (node is Directive)
+            if (node is Directive directive)
             {
-                var directive = (Directive) node;
                 _directive = _schema.FindDirective(directive.Name);
             }
 
-            if (node is Operation)
+            if (node is Operation op)
             {
-                var op = (Operation) node;
                 IGraphType type = null;
                 if (op.OperationType == OperationType.Query)
                 {
@@ -104,33 +101,29 @@ namespace GraphQL.Validation
                 return;
             }
 
-            if (node is FragmentDefinition)
+            if (node is FragmentDefinition def1)
             {
-                var def = (FragmentDefinition) node;
-                var type = _schema.FindType(def.Type.Name);
+                var type = _schema.FindType(def1.Type.Name);
                 _typeStack.Push(type);
                 return;
             }
 
-            if (node is InlineFragment)
+            if (node is InlineFragment def)
             {
-                var def = (InlineFragment) node;
                 var type = def.Type != null ? _schema.FindType(def.Type.Name) : GetLastType();
                 _typeStack.Push(type);
                 return;
             }
 
-            if (node is VariableDefinition)
+            if (node is VariableDefinition varDef)
             {
-                var varDef = (VariableDefinition) node;
                 var inputType = varDef.Type.GraphTypeFromType(_schema);
                 _inputTypeStack.Push(inputType);
                 return;
             }
 
-            if (node is Argument)
+            if (node is Argument argAst)
             {
-                var argAst = (Argument) node;
                 QueryArgument argDef = null;
                 IGraphType argType = null;
 
@@ -152,15 +145,15 @@ namespace GraphQL.Validation
                 _inputTypeStack.Push(type);
             }
 
-            if (node is ObjectField)
+            if (node is ObjectField objectField)
             {
                 var objectType = GetInputType().GetNamedType();
                 IGraphType fieldType = null;
 
-                if (objectType is IInputObjectGraphType)
+                if (objectType is IInputObjectGraphType complexType)
                 {
-                    var complexType = objectType as IComplexGraphType;
-                    var inputField = complexType.Fields.FirstOrDefault(x => x.Name == ((ObjectField) node).Name);
+                    var inputField = complexType.GetField(objectField.Name);
+
                     fieldType = inputField?.ResolvedType;
                 }
 
@@ -242,8 +235,9 @@ namespace GraphQL.Validation
 
             if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)
             {
-                var complexType = parentType as IComplexGraphType;
-                return complexType.Fields.FirstOrDefault(x => x.Name == field.Name);
+                var complexType = (IComplexGraphType) parentType;
+
+                return complexType.GetField(field.Name);
             }
 
             return null;

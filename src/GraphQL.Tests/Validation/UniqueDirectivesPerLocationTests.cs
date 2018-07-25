@@ -57,7 +57,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void duplicare_directives_in_one_location()
+        public void duplicate_directives_in_one_location()
         {
             ShouldFailRule(_ =>
             {
@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void many_duplicare_directives_in_one_location()
+        public void many_duplicate_directives_in_one_location()
         {
             ShouldFailRule(_ =>
             {
@@ -86,7 +86,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void different_duplicare_directives_in_one_location()
+        public void different_duplicate_directives_in_one_location()
         {
             ShouldFailRule(_ =>
             {
@@ -101,7 +101,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void duplicare_directives_in_many_locations()
+        public void duplicate_directives_in_many_locations()
         {
             ShouldFailRule(_ =>
             {

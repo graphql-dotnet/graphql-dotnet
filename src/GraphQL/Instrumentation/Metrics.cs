@@ -9,13 +9,19 @@ namespace GraphQL.Instrumentation
     public class Metrics : IDisposable
     {
         private readonly bool _enabled;
-        private readonly Stopwatch _stopwatch = new Stopwatch();
-        private readonly ConcurrentBag<PerfRecord> _records = new ConcurrentBag<PerfRecord>();
+        private readonly Stopwatch _stopwatch;
+        private readonly ConcurrentBag<PerfRecord> _records;
         private PerfRecord _main;
 
         public Metrics(bool enabled = true)
         {
             _enabled = enabled;
+
+            if (enabled)
+            {
+                _stopwatch = new Stopwatch();
+                _records = new ConcurrentBag<PerfRecord>();
+            }
         }
 
         public void Start(string operationName)

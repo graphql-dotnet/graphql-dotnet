@@ -17,6 +17,8 @@ namespace GraphQL.Types
         FieldType AddField(FieldType fieldType);
 
         bool HasField(string name);
+
+        FieldType GetField(string name);
     }
 
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
@@ -35,7 +37,16 @@ namespace GraphQL.Types
 
         public bool HasField(string name)
         {
-            return _fields.Any(x => string.Equals(x.Name, name));
+            if (string.IsNullOrWhiteSpace(name)) return false;
+
+            return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
+        }
+
+        public FieldType GetField(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+
+            return _fields.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public virtual FieldType AddField(FieldType fieldType)
