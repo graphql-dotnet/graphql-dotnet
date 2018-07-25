@@ -35,7 +35,8 @@ namespace GraphQL.Types
 
         public override object Serialize(object value)
         {
-            var foundByName = Values.FirstOrDefault(v => v.Name.Equals(value + "", StringComparison.OrdinalIgnoreCase));
+            var valueString = value.ToString();
+            var foundByName = Values.FirstOrDefault(v => v.Name.Equals(valueString, StringComparison.OrdinalIgnoreCase));
             if (foundByName != null)
             {
                 return foundByName.Name;
