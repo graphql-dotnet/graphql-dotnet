@@ -37,14 +37,14 @@ namespace GraphQL.Types
 
         public bool HasField(string name)
         {
-            if (string.IsNullOrEmpty(name)) return false;
+            if (string.IsNullOrWhiteSpace(name)) return false;
 
             return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrEmpty(name)) return null;
+            if (string.IsNullOrWhiteSpace(name)) return null;
 
             return _fields.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
