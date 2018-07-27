@@ -282,12 +282,6 @@ Or simply put on average we will have **2x Products** each will have 1 Title for
 
 Now if we set the ```avgImpact``` to 2.0 and set the ```MaxComplexity``` to 23 (or higher) the query will execute correctly. If we change the ```MaxComplexity``` to something like 20 the DocumentExecutor will fail right after parsing the AST tree and will not attempt to resolve any of the fields (or talk to the database).
 
-## DataLoader
-
-GraphQL .NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader).
-
-Documentation is here: <[linkto:dataloader]>
-
 ## Metrics
 
 Metrics are captured during execution.  This can help you determine performance issues within a resolver or validation.  Field metrics are captured using Field Middleware and the results are returned as a `PerfRecord` array on the `ExecutionResult`.  You can then generate a report from those records using `StatsReport`.
