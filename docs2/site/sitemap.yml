@@ -1,0 +1,23 @@
+- title: GraphQL .NET
+  dir: ./
+  url: /
+  file: pages/landing.js
+
+- title: Docs
+  dir: ./docs
+  url: docs
+  sidemenu:
+      - title: Getting Started
+        dir: getting-started
+        items:
+          - title: Introduction
+            file: introduction.md
+          - title: Installation
+            file: installation.md
+      - title: Guides
+        dir: guides
+        items:
+          - title: Dataloader
+            file: dataloader.md
+          - title: Advanced Topics
+            file: advanced.md
