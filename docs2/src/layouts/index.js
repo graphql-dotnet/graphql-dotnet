@@ -42,10 +42,13 @@ const Layout = ({ children, location, data }) => {
         title={data.site.siteMetadata.title}
         meta={[
           { name: 'description', content: data.site.siteMetadata.description },
-          { name: 'keywords', content: 'sample, something' }
+          { name: 'keywords', content: data.site.siteMetadata.keywords }
         ]}
       />
-      <Header siteTitle={data.site.siteMetadata.title} links={data.menu.pages} />
+      <Header
+        siteTitle={data.site.siteMetadata.title}
+        links={data.menu.pages}
+        githubUrl={data.site.siteMetadata.githubUrl} />
       <div className="page-body">
         {children()}
         {nav}
@@ -70,6 +73,8 @@ export const query = graphql`
       siteMetadata {
         title
         description
+        keywords
+        githubUrl
       }
     }
 

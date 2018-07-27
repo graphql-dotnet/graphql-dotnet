@@ -40,8 +40,6 @@ exports.createPages = ({ graphql, boundActionCreators }, options) => {
     ).then(result => {
       result.data.docsMenu.pages.forEach(page => {
 
-        console.log('page', page)
-
         if (page.file && page.file.endsWith('.js')) {
             createPage({
               path: page.url,
@@ -61,11 +59,6 @@ exports.createPages = ({ graphql, boundActionCreators }, options) => {
             const basename = path.basename(item.file, path.extname(item.file))
             const slug = slugger.slug(basename)
 
-            console.log({
-              slug,
-              pagePath,
-              joined: path.join(pagePath, slug)
-            })
             createPage({
               path: path.join(pagePath, slug),
               component: path.resolve('./src/templates/docs-page.js'),
@@ -77,17 +70,7 @@ exports.createPages = ({ graphql, boundActionCreators }, options) => {
         })
 
       })
-      // result.data.allMarkdownRemark.edges.forEach(({ node }) => {
-      //   createPage({
-      //     path: node.fields.slug,
-      //     component: path.resolve('./src/templates/docs-page.js'),
-      //     context: {
-      //       // Data passed to context is available
-      //       // in page queries as GraphQL variables.
-      //       slug: node.fields.slug,
-      //     },
-      //   })
-      // })
+
       resolve()
     })
   })

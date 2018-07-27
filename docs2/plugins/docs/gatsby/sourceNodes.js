@@ -21,9 +21,6 @@ const readConfigFile = filePath => {
     id: '',
     pages: attachUrlToNavNode(parsedContent)
   }
-
-  console.log('hrm', res)
-
   return res
 }
 
@@ -31,8 +28,6 @@ const createMenuNode = filePath => {
   const pages = readConfigFile(filePath)
   const menu = MenuNode(pages)
   menu.internal.mediaType = 'application/json'
-
-  console.log('menu', menu)
 
   return menu
 }

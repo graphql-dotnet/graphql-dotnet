@@ -1,4 +1,4 @@
-const config = {
+const settings = {
   config: `${__dirname}/site/sitemap.yml`,
   resources: `${__dirname}/site/docs`
 }
@@ -7,14 +7,15 @@ module.exports = {
   siteMetadata: {
     title: 'GraphQL .NET',
     description: '',
-    githubUrl: 'https://github.com/graphql-dotnet/graphql-dotnet'
+    githubUrl: 'https://github.com/graphql-dotnet/graphql-dotnet',
+    keywords: ''
   },
   plugins: [
     {
       // local plugin, /plugins/docs
       resolve: 'docs',
       options: {
-        config: config.config
+        config: settings.config
       }
     },
     'gatsby-plugin-react-helmet',
@@ -23,7 +24,7 @@ module.exports = {
       resolve: 'gatsby-source-filesystem',
       options: {
         name: 'content-pages',
-        path: config.resources
+        path: settings.resources
       }
     },
     {

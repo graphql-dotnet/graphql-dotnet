@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import Link from 'gatsby-link'
 import classnames from 'classnames'
 
 import styles from './SideNav.module.css'
-console.log('styles', styles)
 
 const createMenuList = (listData, location) => (
   console.log(location) ||
@@ -16,7 +16,7 @@ const createMenuList = (listData, location) => (
               to={element.url || element.href}
               className={classnames([
                 styles.subNav_link,
-                location.pathname === element.url && styles.active
+                location.pathname === element.url && 'active'
               ])}
             >
               {element.title}
@@ -37,5 +37,12 @@ const SideNav = ({ activeItem, location }) => (
     {createMenuList(activeItem.sidemenu, location)}
   </div>
 )
+
+SideNav.propTypes = {
+  activeItem: PropTypes.shape({
+    sidemenu: PropTypes.array
+  }),
+  location: PropTypes.object
+}
 
 export default SideNav

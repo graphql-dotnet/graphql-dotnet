@@ -1,7 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Link from 'gatsby-link'
-
-import styles from './header.module.css'
 
 const buildLinks = links => {
   return links.map(link => (
@@ -11,18 +10,21 @@ const buildLinks = links => {
   ))
 }
 
-const Header = ({ siteTitle, links }) => (
+const Header = ({ siteTitle, links, githubUrl }) => (
   <nav className="header">
-    <ul >
-      <li key={'/'}>
-        <Link
-          to="/">
-          {siteTitle}
-        </Link>
-      </li>
+    <ul>
       {buildLinks(links)}
+      <li key="github-link">
+        <a href={githubUrl} rel="noopener noreferrer" target="_blank">Github</a>
+      </li>
     </ul>
   </nav>
 )
+
+Header.propTypes = {
+  siteTitle: PropTypes.string,
+  links: PropTypes.array,
+  githubUrl: PropTypes.string
+}
 
 export default Header

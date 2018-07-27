@@ -1,3 +1,0 @@
-# Features
-
-Something about features
