@@ -78,8 +78,11 @@ namespace GraphQL
 
                 if (!string.IsNullOrWhiteSpace(error.Code))
                 {
+                    writer.WritePropertyName("extensions");
+                    writer.WriteStartObject();
                     writer.WritePropertyName("code");
                     serializer.Serialize(writer, error.Code);
+                    writer.WriteEndObject();
                 }
 
                 if (error.Data.Count > 0)
