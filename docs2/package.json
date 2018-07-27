@@ -7,6 +7,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
+    "deploy": "bash publish_docs.sh",
     "format": "prettier --write 'src/**/*.js'"
   },
   "dependencies": {
