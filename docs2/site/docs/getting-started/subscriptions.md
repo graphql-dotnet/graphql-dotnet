@@ -1,4 +1,4 @@
-## Subscriptions
+# Subscriptions
 
 Subscriptions are supported through the use of `IObservable<T>`.  You will need a server that supports a Subscription protocol.  The [GraphQL Server](https://github.com/graphql-dotnet/server/) project provides a .NET Core server that implements the Apollo GraphQL subscription protocol.  See the [GraphQL Server project samples](https://github.com/graphql-dotnet/server/tree/develop/samples).
 

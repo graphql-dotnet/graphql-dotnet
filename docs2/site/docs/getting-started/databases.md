@@ -1,4 +1,4 @@
-## How do I use XYZ ORM/database with GraphQL.NET?
+# How do I use XYZ ORM/database with GraphQL.NET?
 
 This library will work with any data source that you provide.
 

@@ -1,4 +1,4 @@
-## Unions
+# Unions
 
 Unions are a composition of two different types.
 
