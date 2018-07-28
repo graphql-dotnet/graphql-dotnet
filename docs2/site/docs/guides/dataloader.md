@@ -4,7 +4,7 @@ GraphQL .NET includes an implementation of Facebook's [DataLoader](https://githu
 
 Consider a GraphQL query like this:
 
-```
+```graphql
 {
 	orders(date: "2017-01-01") {
 		orderId
@@ -167,3 +167,5 @@ public interface IUsersStore
 	Task<IEnumerable<User>> GetAllUsersAsync();
 }
 ```
+
+See this [blog series](http://fiyazhasan.me/graphql-with-asp-net-core-part-x-data-loader-series-finale/) for an example using Entity Framework.

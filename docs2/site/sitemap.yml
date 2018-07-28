@@ -14,10 +14,50 @@
             file: introduction.md
           - title: Installation
             file: installation.md
+          - title: GraphiQL
+            file: graphiql.md
+          - title: Queries
+            file: queries.md
+          - title: Arguments
+            file: arguments.md
+          - title: Variables
+            file: variables.md
+          - title: Mutations
+            file: mutations.md
+          - title: Interfaces
+            file: interfaces.md
+          - title: Unions
+            file: unions.md
+          - title: Subscriptions
+            file: subscriptions.md
+          - title: Query Validation
+            file: query-validation.md
+          - title: User Context
+            file: user-context.md
+          - title: Error Handling
+            file: errors.md
+          - title: Dependency Injection
+            file: dependency-injection.md
+          - title: Databases
+            file: databases.md
+          - title: Malicious Queries
+            file: malicious-queries.md
+          - title: Object/Field Metadata
+            file: metadata.md
+          - title: Field Middleware
+            file: field-middleware.md
+          - title: Metrics
+            file: metrics.md
+          - title: Authorization
+            file: authorization.md
+          - title: Relay
+            file: relay.md
       - title: Guides
         dir: guides
         items:
           - title: Dataloader
             file: dataloader.md
-          - title: Advanced Topics
-            file: advanced.md
+          - title: Schema Generation
+            file: schema-generation.md
+          - title: Links
+            file: links.md
