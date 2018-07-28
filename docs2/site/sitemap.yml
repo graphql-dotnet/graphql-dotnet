@@ -20,8 +20,14 @@
             file: queries.md
           - title: Arguments
             file: arguments.md
+          - title: Aliases
+            file: aliases.md
+          - title: Fragments
+            file: fragments.md
           - title: Variables
             file: variables.md
+          - title: Directives
+            file: directives.md
           - title: Mutations
             file: mutations.md
           - title: Interfaces

@@ -1,3 +1,3 @@
 # Links
 
-* [Fiyaz Hasan](https://twitter.com/FiyazBinHasan) [10 part blog series](http://fiyazhasan.me/tag/graphql-dotnet/)
+* [10 part blog series](http://fiyazhasan.me/tag/graphql-dotnet/) by [Fiyaz Hasan](https://twitter.com/FiyazBinHasan)

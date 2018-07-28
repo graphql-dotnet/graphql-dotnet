@@ -11,12 +11,35 @@ query {
 }
 ```
 
+If you have only a single query, you can use shorthand syntax.
+
+```graphql
+hero {
+  id
+  name
+}
+```
+
+To provide an `Operation` name for your query, you add it after the `query` keyword.  An `Operation` name is optional if there is only a single operation in the request.
+
+```graphql
+query MyHeroQuery {
+  hero {
+    id
+    name
+  }
+}
+```
+
+You can also provide that operation name to the `ExecutionOptions`.
+
 ```csharp
-var schema = new StarWarsSchema();
+var schema = new Schema { Query = new StarWarsQuery() };
 var json = schema.Execute(_ =>
 {
+  _.OperationName = "MyHeroQuery";
   _.Query = @"
-    query {
+    query MyHeroQuery {
       hero {
         id
         name
@@ -27,14 +50,6 @@ var json = schema.Execute(_ =>
 ```
 
 ```csharp
-public class StarWarsSchema : Schema
-{
-  public StarWarsSchema()
-  {
-    Query = new StarWarsQuery();
-  }
-}
-
 public class StarWarsQuery : ObjectGraphType
 {
   public StarWarsQuery()

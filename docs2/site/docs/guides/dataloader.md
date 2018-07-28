@@ -168,4 +168,4 @@ public interface IUsersStore
 }
 ```
 
-See this [blog series](http://fiyazhasan.me/graphql-with-asp-net-core-part-x-data-loader-series-finale/) for an example using Entity Framework.
+See this [blog series](http://fiyazhasan.me/graphql-with-asp-net-core-part-x-data-loader-series-finale/) for an in depth example using Entity Framework.

@@ -8,6 +8,45 @@
 
 Here is a "Hello World" for GraphQL .NET.
 
+```csharp
+using System;
+using GraphQL;
+using GraphQL.Types;
+
+public class Program
+{
+  public static void Main(string[] args)
+  {
+    var schema = Schema.For(@"
+      type Query {
+        hello: String
+      }
+    ");
+
+    var json = schema.Execute(_ =>
+    {
+      _.Query = "{ hello }";
+      _.Root = new { Hello = "Hello World!" };
+    });
+
+    Console.WriteLine(json);
+  }
+}
+```
+
+Output
+```json
+{
+  "data": {
+    "hello": "Hello World!"
+  }
+}
+```
+
+There are two ways you can build your schema.  One is with a Handler / Enpoints approach using Schema Syntax.  The other is through GraphTypes.  The basics of both are demonstrated using the following schema definition.
+
+> The `!` signifies a field is non-nullable.
+
 ```graphql
 type StarWarsQuery {
   hero: Droid
@@ -15,39 +54,71 @@ type StarWarsQuery {
 
 type Droid {
   id: String!
-  name: String
+  name: String!
 }
 ```
 
+## Handler / Endpoints Approach
+
+The endpoints approach relys upon Schema Syntax, coding conventions, and tries to provide a minmal amount of syntax.  It is the easiest to get started using though does not currently support some advanced scenarios.
+
+> Use the `GraphQLMetadata` attribute to customize the endpoint
+
 ```csharp
-using System;
-using System.Threading.Tasks;
-using GraphQL;
-using GraphQL.Http;
-using GraphQL.Types;
-
-public class Program
+public class Droid
 {
-  public static void Main(string[] args)
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class Query
+{
+  [GraphQLMetadata("hero")]
+  public Droid GetHero()
   {
-    var schema = new Schema { Query = new StarWarsQuery() };
-
-    var json = schema.Execute(_ =>
-    {
-      _.Schema = schema;
-      _.Query = @"
-          query {
-            hero {
-              id
-              name
-            }
-          }
-        ";
-    });
-
-    Console.WriteLine(json);
+    return new Droid { Id = "1", Name = "R2-D2" };
   }
 }
+
+var schema = Schema.For(@"
+  type Droid {
+    id: String!
+    name: String!
+  }
+
+  type Query {
+    hero: Droid
+  }
+", _ => {
+    _.Types.Include<Query>();
+});
+
+var json = schema.Execute(_ =>
+{
+  _.Query = "{ hero { id name } }";
+});
+```
+
+Output
+```json
+{
+  "data": {
+    "hero": {
+      "id": "1",
+      "name": "R2-D2"
+    }
+  }
+}
+```
+
+## GraphType Types Approach
+
+The `GraphType` "Type" approach can be more verbose, but gives you access to all of the provided properties of your `GraphType`'s and `Schema`.  You are required to use inheritance to leverage that functionality.
+
+```csharp
+using System;
+using GraphQL;
+using GraphQL.Types;
 
 public class Droid
 {
@@ -74,10 +145,26 @@ public class StarWarsQuery : ObjectGraphType
     );
   }
 }
+
+public class Program
+{
+  public static void Main(string[] args)
+  {
+    var schema = new Schema { Query = new StarWarsQuery() };
+
+    var json = schema.Execute(_ =>
+    {
+      _.Schema = schema;
+      _.Query = "hero { id name }";
+    });
+
+    Console.WriteLine(json);
+  }
+}
 ```
 
 Output
-```
+```json
 {
   "data": {
     "hero": {

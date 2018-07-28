@@ -31,7 +31,7 @@ https://github.com/graphql-dotnet/examples
 
 Define your schema with a top level query object then execute that query.
 
-A more full-featured example can be found [here](https://github.com/graphql-dotnet/examples).
+Fully-featured examples can be found [here](https://github.com/graphql-dotnet/examples).
 
 ### Hello World
 
@@ -43,13 +43,13 @@ var schema = Schema.For(@"
 ");
 
 var root = new { Hello = "Hello World!" };
-var result = schema.Execute(_ =>
+var json = schema.Execute(_ =>
 {
   _.Query = "{ hello }";
   _.Root = root;
 });
 
-Console.WriteLine(result);
+Console.WriteLine(json);
 ```
 
 ### Handler/Endpoints
@@ -83,7 +83,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var result = schema.Execute(_ =>
+var json = schema.Execute(_ =>
 {
   _.Query = "{ hero { id name } }";
 });
@@ -125,8 +125,8 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-string id = "123";
-var result = schema.Execute(_ =>
+var id = "123";
+var json = schema.Execute(_ =>
 {
   _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
 });

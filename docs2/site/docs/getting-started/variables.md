@@ -26,6 +26,8 @@ Here is what this query would look like as a JSON request:
 }
 ```
 
+Call `.ToInputs()` to translate JSON variables into a format that the library can work with.
+
 ```csharp
 var variablesJson = // get from request
 // `ToInputs` extension method converts the json to the `Inputs` class
