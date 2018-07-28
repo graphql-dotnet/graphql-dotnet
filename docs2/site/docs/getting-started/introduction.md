@@ -43,18 +43,18 @@ Output
 }
 ```
 
-There are two ways you can build your schema.  One is with a Handler / Enpoints approach using Schema Syntax.  The other is through GraphTypes.  The basics of both are demonstrated using the following schema definition.
+There are two ways you can build your schema.  One is with a Handler / Endpoints approach using Schema Syntax.  The other is through GraphTypes.  The basics of both are demonstrated using the following schema definition.
 
 > The `!` signifies a field is non-nullable.
 
 ```graphql
-type StarWarsQuery {
-  hero: Droid
-}
-
 type Droid {
   id: String!
   name: String!
+}
+
+type Query {
+  hero: Droid
 }
 ```
 
@@ -131,7 +131,7 @@ public class DroidType : ObjectGraphType<Droid>
   public DroidType()
   {
     Field(x => x.Id).Description("The Id of the Droid.");
-    Field(x => x.Name, nullable: true).Description("The name of the Droid.");
+    Field(x => x.Name).Description("The name of the Droid.");
   }
 }
 
