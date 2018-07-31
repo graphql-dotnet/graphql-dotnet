@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -127,7 +127,7 @@ namespace GraphQL.Tests.Validation
 
         // this is not yet supported
         //[Fact]
-        public void within_schema_lanuage_well_placed_directives()
+        public void within_schema_language_well_placed_directives()
         {
             ShouldPassRule(@"
               type MyObj implements MyInterface @onObject {

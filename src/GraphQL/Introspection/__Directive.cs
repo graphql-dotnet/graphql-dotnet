@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Types;
 using System.Linq;
 
@@ -56,7 +56,7 @@ namespace GraphQL.Introspection
             AddValue("QUERY", "Location adjacent to a query operation.", DirectiveLocation.Query);
             AddValue("MUTATION", "Location adjacent to a mutation operation.", DirectiveLocation.Mutation);
             AddValue("SUBSCRIPTION", "Location adjacent to a subscription operation.", DirectiveLocation.Subscription);
-            AddValue("FIELD", "Location ajdacent to a field.", DirectiveLocation.Field);
+            AddValue("FIELD", "Location adjacent to a field.", DirectiveLocation.Field);
             AddValue("FRAGMENT_DEFINITION", "Location adjacent to a fragment definition.", DirectiveLocation.FragmentDefinition);
             AddValue("FRAGMENT_SPREAD", "Location adjacent to a fragment spread.", DirectiveLocation.FragmentSpread);
             AddValue("INLINE_FRAGMENT", "Location adjacent to an inline fragment.", DirectiveLocation.InlineFragment);
@@ -64,12 +64,12 @@ namespace GraphQL.Introspection
             AddValue("SCALAR", "Location adjacent to a scalar definition.", DirectiveLocation.Scalar);
             AddValue("OBJECT", "Location adjacent to an object type definition.", DirectiveLocation.Object);
             AddValue("FIELD_DEFINITION", "Location adjacent to a field definition.", DirectiveLocation.FieldDefinition);
-            AddValue("ARGUMENT_DEFINITION", "Location adjacent to an argument defintion.", DirectiveLocation.ArgumentDefinition);
+            AddValue("ARGUMENT_DEFINITION", "Location adjacent to an argument definition.", DirectiveLocation.ArgumentDefinition);
             AddValue("INTERFACE", "Location adjacent to an interface definition.", DirectiveLocation.Interface);
             AddValue("UNION", "Location adjacent to a union definition.", DirectiveLocation.Union);
             AddValue("ENUM", "Location adjacent to an enum definition", DirectiveLocation.Enum);
             AddValue("ENUM_VALUE", "Location adjacent to an enum value definition", DirectiveLocation.EnumValue);
-            AddValue("INPUT_OBJECT", "Location adjacent to an input object type defintion.", DirectiveLocation.InputObject);
+            AddValue("INPUT_OBJECT", "Location adjacent to an input object type definition.", DirectiveLocation.InputObject);
             AddValue("INPUT_FIELD_DEFINITION", "Location adjacent to an input object field definition.", DirectiveLocation.InputFieldDefinition);
         }
     }

@@ -36,7 +36,7 @@ namespace GraphQL.Utilities
         {
             if (_fields.Exists(x => x.Name == field.Name))
             {
-                throw new ExecutionError($"A field with name \"{field.Name}\" aleady exists!");
+                throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
             }
 
             _fields.Add(field);
@@ -194,7 +194,7 @@ namespace GraphQL.Utilities
                         : join(new[] {op, join(new[] {name, variables}, ""), directives, selectionSet}, " ");
                 });
             });
-            
+
             Config<InlineFragment>(c =>
             {
                 c.Field(x => x.Directives);

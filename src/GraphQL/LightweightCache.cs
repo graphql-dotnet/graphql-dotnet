@@ -299,7 +299,7 @@ namespace GraphQL
         /// If the dictionary contains the indicated key, performs the action with its value.
         /// </summary>
         /// <param name="key">The key.</param>
-        /// <param name="action">The action to be perfomed.</param>
+        /// <param name="action">The action to be performed.</param>
         public void WithValue(TKey key, Action<TValue> action)
         {
             if (_values.ContainsKey(key))

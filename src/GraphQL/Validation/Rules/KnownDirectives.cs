@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -35,13 +35,13 @@ namespace GraphQL.Validation.Rules
                         return;
                     }
 
-                    var canidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
-                    if (!directiveDef.Locations.Any(x => x == canidateLocation))
+                    var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
+                    if (!directiveDef.Locations.Any(x => x == candidateLocation))
                     {
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,
                             "5.6.1",
-                            MisplacedDirectiveMessage(node.Name, canidateLocation.ToString()),
+                            MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()),
                             node));
                     }
                 });

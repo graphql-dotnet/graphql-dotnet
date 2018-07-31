@@ -31,13 +31,13 @@ namespace GraphQL.Instrumentation
                     throw new InvalidOperationException($"Could not find a method named {InvokeMethodName}");
                 }
 
-                var methodinfo = invokeMethods[0];
-                if (!typeof(Task<object>).IsAssignableFrom(methodinfo.ReturnType))
+                var methodInfo = invokeMethods[0];
+                if (!typeof(Task<object>).IsAssignableFrom(methodInfo.ReturnType))
                 {
                     throw new InvalidOperationException($"The {InvokeMethodName} method should return a Task<object>.");
                 }
 
-                var parameters = methodinfo.GetParameters();
+                var parameters = methodInfo.GetParameters();
                 if (parameters.Length == 0 || parameters[0].ParameterType != typeof(ResolveFieldContext))
                 {
                     throw new InvalidOperationException($"The {InvokeMethodName} method should take a parameter of type ResolveFieldContext as the first parameter.");
@@ -50,7 +50,7 @@ namespace GraphQL.Instrumentation
 
                 var instance = Activator.CreateInstance(middleware);
 
-                return context => (Task<object>)methodinfo.Invoke(instance, new object[] { context, next });
+                return context => (Task<object>)methodInfo.Invoke(instance, new object[] { context, next });
             });
         }
     }

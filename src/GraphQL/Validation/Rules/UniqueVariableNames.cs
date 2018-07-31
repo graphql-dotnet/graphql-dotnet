@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Unique variable names
-    /// 
-    /// A GraphQL operation is onlys valid if all its variables are uniquely named.
+    ///
+    /// A GraphQL operation is only valid if all its variables are uniquely named.
     /// </summary>
     public class UniqueVariableNames : IValidationRule
   {

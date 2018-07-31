@@ -372,7 +372,7 @@ namespace GraphQL.Tests.Execution
     public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     {
         [Fact]
-        public void allows_nullable_int_input_to_be_ommited()
+        public void allows_nullable_int_input_to_be_omitted()
         {
             var query = @"
 {
@@ -390,7 +390,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void allows_nullable_inputs_to_be_ommited()
+        public void allows_nullable_inputs_to_be_omitted()
         {
             var query = @"
             {
@@ -408,7 +408,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void allows_nullable_inputs_to_be_ommited_in_a_variable()
+        public void allows_nullable_inputs_to_be_omitted_in_a_variable()
         {
             var query = @"
                 query SetsNullable($value: String) {
@@ -426,7 +426,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void allows_nullable_inputs_to_be_ommited_in_an_unlisted_variable()
+        public void allows_nullable_inputs_to_be_omitted_in_an_unlisted_variable()
         {
             var query = @"
                 query SetsNullable {
@@ -604,7 +604,7 @@ namespace GraphQL.Tests.Execution
             }.ToString();
 
             var inputs = $"{{ 'input': '{jsonString}' }}".ToInputs();
-            
+
             AssertQuerySuccess(query, expected, inputs);
         }
     }
