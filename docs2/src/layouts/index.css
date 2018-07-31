@@ -36,7 +36,6 @@ ul {
 
 li {
   margin: 0;
-  white-space: nowrap;
 }
 
 a {
@@ -100,13 +99,24 @@ a {
 }
 
 .content blockquote {
-  padding-left: 10px;
-  border-left: 5px solid #eaecef;
-  margin: 0 0 15px 0;
+  padding: 30px;
+  border-left: 7px solid #eaecef;
+  margin: 0 0 1.45rem 0;
 }
 
 .content pre {
   margin-bottom: 1.45rem;
+}
+
+.content-body {
+  margin: 0 auto;
+  max-width: 740px;
+}
+
+.content-toolbar {
+  margin: 0 auto;
+  padding: 1rem 0;
+  max-width: 740px;
 }
 
 .nav {
@@ -118,7 +128,7 @@ a {
   overflow-x: hidden;
   flex-grow: 1;
   border: 0;
-  min-width: 250px;
+  min-width: 18rem;
 }
 
 .nav li {

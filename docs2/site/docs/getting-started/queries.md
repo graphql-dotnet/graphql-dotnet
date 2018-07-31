@@ -1,6 +1,6 @@
 # Queries
 
-To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.
+To perform a query you need to have a root Query object that is an `ObjectGraphType`.  Queries should only fetch data and never modify it.  You can only have a single root Query object.  Queries are executed in parallel.
 
 ```graphql
 query {

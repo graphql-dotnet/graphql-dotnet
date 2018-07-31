@@ -63,8 +63,8 @@ public class Droid
 
 public class Query
 {
-  [GraphQLMetadata("hero")]
-  public Droid GetHero()
+  [GraphQLMetadata("droid")]
+  public Droid GetDroid()
   {
     return new Droid { Id = "123", Name = "R2-D2" };
   }
@@ -72,12 +72,12 @@ public class Query
 
 var schema = Schema.For(@"
   type Droid {
-    id: String
+    id: ID
     name: String
   }
 
   type Query {
-    hero: Droid
+    droid: Droid
   }
 ", _ => {
     _.Types.Include<Query>();
@@ -105,8 +105,8 @@ public class Query
     new Droid { Id = "123", Name = "R2-D2" }
   };
 
-  [GraphQLMetadata("hero")]
-  public Droid GetHero(string id)
+  [GraphQLMetadata("droid")]
+  public Droid GetDroid(string id)
   {
     return _droids.FirstOrDefault(x => x.Id == id);
   }
@@ -114,21 +114,20 @@ public class Query
 
 var schema = Schema.For(@"
   type Droid {
-    id: String
+    id: ID
     name: String
   }
 
   type Query {
-    hero(id: String): Droid
+    droid(id: ID): Droid
   }
 ", _ => {
     _.Types.Include<Query>();
 });
 
-var id = "123";
 var json = schema.Execute(_ =>
 {
-  _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
+  _.Query = $"{{ hero(id: \"123\") {{ id name }} }}";
 });
 ```
 

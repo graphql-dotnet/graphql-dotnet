@@ -4,27 +4,99 @@ You can provide arguments to a field.  You can use `GetArgument` on `ResolveFiel
 
 ```graphql
 query {
-  droid(id: "1") {
+  droid(id: "123") {
     id
     name
   }
 }
 ```
 
+## Handler / Endpoints
+
 ```csharp
+public class Droid
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class Query
+{
+  private List<Droid> _droids = new List<Droid>
+  {
+    new Droid { Id = "123", Name = "R2-D2" }
+  };
+
+  [GraphQLMetadata("droid")]
+  public Droid GetDroid(string id)
+  {
+    return _droids.FirstOrDefault(x => x.Id == id);
+  }
+}
+
+var schema = Schema.For(@"
+  type Droid {
+    id: ID!
+    name: String
+  }
+
+  type Query {
+    droid(id: ID!): Droid
+  }
+", _ => {
+    _.Types.Include<Query>();
+});
+
+var json = schema.Execute(_ =>
+{
+  _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
+});
+```
+
+## GraphTypes
+
+```csharp
+public class Droid
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class DroidType : ObjectGraphType
+{
+  public DroidType()
+  {
+    Field<NonNullGraphType<IdGraphType>>("id");
+    Field<StringGraphType>("name");
+  }
+}
+
 public class StarWarsQuery : ObjectGraphType
 {
-  public StarWarsQuery(IStarWarsData data)
+  private List<Droid> _droids = new List<Droid>
+  {
+    new Droid { Id = "123", Name = "R2-D2" }
+  };
+
+  public StarWarsQuery()
   {
     Field<DroidType>(
       "droid",
-      arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
+      arguments: new QueryArguments(
+        new QueryArgument<IdGraphType> { Name = "id" }
+      ),
       resolve: context =>
       {
         var id = context.GetArgument<string>("id");
-        return data.GetDroidByIdAsync(id);
+        return _droids.FirstOrDefault(x => x.Id == id);
       }
     );
   }
 }
+
+var schema = new Schema { Query = new StarWarsQuery() };
+var json = schema.Execute(_ =>
+{
+  _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
+})
 ```

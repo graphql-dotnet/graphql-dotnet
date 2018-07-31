@@ -6,9 +6,10 @@ const settings = {
 module.exports = {
   siteMetadata: {
     title: 'GraphQL .NET',
-    description: '',
+    description: 'GraphQL for .NET',
     githubUrl: 'https://github.com/graphql-dotnet/graphql-dotnet',
-    keywords: ''
+    githubEditUrl: 'https://github.com/graphql-dotnet/graphql-dotnet/edit/master/docs2/site',
+    keywords: 'graphql,api,web api,.net,.net core'
   },
   plugins: [
     {

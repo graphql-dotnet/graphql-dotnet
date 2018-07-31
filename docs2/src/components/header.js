@@ -15,7 +15,7 @@ const Header = ({ siteTitle, links, githubUrl }) => (
     <ul>
       {buildLinks(links)}
       <li key="github-link">
-        <a href={githubUrl} rel="noopener noreferrer" target="_blank">Github</a>
+        <a href={githubUrl} rel="noopener noreferrer" target="_blank">GitHub</a>
       </li>
     </ul>
   </nav>

@@ -45,7 +45,7 @@ Output
 
 There are two ways you can build your schema.  One is with a Handler / Endpoints approach using Schema Syntax.  The other is through GraphTypes.  The basics of both are demonstrated using the following schema definition.
 
-> The `!` signifies a field is non-nullable.
+> `!` signifies a field is non-nullable.
 
 ```graphql
 type Droid {
@@ -62,7 +62,7 @@ type Query {
 
 The endpoints approach relys upon Schema Syntax, coding conventions, and tries to provide a minmal amount of syntax.  It is the easiest to get started using though does not currently support some advanced scenarios.
 
-> Use the `GraphQLMetadata` attribute to customize the endpoint
+> Use the optional `GraphQLMetadata` attribute to customize the endpoint.
 
 ```csharp
 public class Droid

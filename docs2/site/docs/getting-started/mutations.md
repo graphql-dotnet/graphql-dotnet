@@ -1,9 +1,35 @@
 # Mutations
 
-To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.
+To perform a mutation you need to have a root Mutation object that is an `ObjectGraphType`.  Mutations make modifications to data and return a result.  You can only have a single root Mutation object.  Mutations are executed serially.
 
-* See the [StarWars example](https://github.com/graphql-dotnet/examples/tree/master/src/StarWars) for more details.
-* See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
+> See the [official GraphQL documentation on mutations](http://graphql.org/learn/queries/#mutations).
+
+Instead of using the `query` keyword, you are required to use `mutation`.  Similar to a `query`, you can omit the `Operation` name if there is only a single operation in the request.
+
+```graphql
+mutation ($human:HumanInput!) {
+  createHuman(human: $human) {
+    id
+    name
+  }
+}
+```
+
+The JSON request for this mutation would look like:
+
+```json
+{
+  "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
+  "variables": {
+    "human": {
+      "name": "Boba Fett",
+      "homePlanet": "Kamino"
+    }
+  }
+}
+```
+
+Set the `Mutation` property on your `Schema`.
 
 ```csharp
 public class StarWarsSchema : Schema
@@ -15,18 +41,11 @@ public class StarWarsSchema : Schema
     Mutation = resolver.Resolve<StarWarsMutation>();
   }
 }
+```
 
-/// <example>
-/// This is an example JSON request for a mutation
-/// {
-///   "query": "mutation ($human:HumanInput!){ createHuman(human: $human) { id name } }",
-///   "variables": {
-///     "human": {
-///       "name": "Boba Fett"
-///     }
-///   }
-/// }
-/// </example>
+A `mutation` `GraphType` looks idential to a `query` `GraphType`.  The difference is you are allowed to mutate data.
+
+```csharp
 public class StarWarsMutation : ObjectGraphType
 {
   public StarWarsMutation(StarWarsData data)
@@ -43,7 +62,11 @@ public class StarWarsMutation : ObjectGraphType
       });
   }
 }
+```
 
+To provide a set of input values you must use `InputObjectGraphType`.
+
+```csharp
 public class HumanInputType : InputObjectGraphType
 {
   public HumanInputType()
@@ -53,11 +76,14 @@ public class HumanInputType : InputObjectGraphType
     Field<StringGraphType>("homePlanet");
   }
 }
+```
 
-// in-memory data store
+`StarWarsData` is an in-memory data store.
+
+```csharp
 public class StarWarsData
 {
-  ...
+  private List<Human> _humans = new List<Human>();
 
   public Human AddHuman(Human human)
   {
@@ -67,3 +93,5 @@ public class StarWarsData
   }
 }
 ```
+
+> See the [StarWars example](https://github.com/graphql-dotnet/examples/tree/master/src/StarWars) for a full implementation.
