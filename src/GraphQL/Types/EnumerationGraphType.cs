@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Language.AST;
 using System.Reflection;
+using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -28,6 +28,7 @@ namespace GraphQL.Types
 
         public void AddValue(EnumValueDefinition value)
         {
+            NameValidator.ValidateName(value.Name, "enum");
             Values.Add(value);
         }
 

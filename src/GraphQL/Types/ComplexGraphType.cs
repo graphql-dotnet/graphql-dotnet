@@ -51,7 +51,7 @@ namespace GraphQL.Types
 
         public virtual FieldType AddField(FieldType fieldType)
         {
-            FieldValidator.ValidateName(fieldType.Name);
+            NameValidator.ValidateName(fieldType.Name);
 
             if (HasField(fieldType.Name))
             {

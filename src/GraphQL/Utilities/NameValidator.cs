@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
-    public class FieldValidator
+    public class NameValidator
     {
         private static readonly string RESERVED_PREFIX = "__";
         private static readonly string NAME_RX = @"^[_A-Za-z][_0-9A-Za-z]*$";

@@ -32,7 +32,7 @@ namespace GraphQL.Types
             {
                 if (value != null)
                 {
-                    FieldValidator.ValidateName(value.Name, "argument");
+                    NameValidator.ValidateName(value.Name, "argument");
                 }
 
                 _arguments[index] = value;
@@ -43,7 +43,7 @@ namespace GraphQL.Types
 
         public void Add(QueryArgument argument)
         {
-            FieldValidator.ValidateName(argument.Name, "argument");
+            NameValidator.ValidateName(argument.Name, "argument");
             _arguments.Add(argument);
         }
 
