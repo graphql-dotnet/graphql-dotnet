@@ -93,7 +93,7 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact]
-        public async Task Mutations_RunSyncronously()
+        public async Task Mutations_RunSynchronously()
         {
             var query = @"
                 mutation Multiple {

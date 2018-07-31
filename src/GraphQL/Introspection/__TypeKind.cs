@@ -9,7 +9,7 @@ namespace GraphQL.Introspection
             Name = "__TypeKind";
             Description = "An enum describing what kind of type a given __Type is.";
             AddValue("SCALAR", "Indicates this type is a scalar.", TypeKind.SCALAR);
-            AddValue("OBJECT", "Indicates this type is an object.  `fields` and `possibletypes` are valid fields.", TypeKind.OBJECT);
+            AddValue("OBJECT", "Indicates this type is an object.  `fields` and `possibleTypes` are valid fields.", TypeKind.OBJECT);
             AddValue("INTERFACE", "Indicates this type is an interface.  `fields` and `possibleTypes` are valid fields.", TypeKind.INTERFACE);
             AddValue("UNION", "Indicates this type is a union.  `possibleTypes` is a valid field.", TypeKind.UNION);
             AddValue("ENUM", "Indicates this type is an num.  `enumValues` is a valid field.", TypeKind.ENUM);

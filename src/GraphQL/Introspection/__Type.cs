@@ -26,7 +26,7 @@ namespace GraphQL.Introspection
                     return KindForInstance((GraphType)context.Source);
                 }
 
-                throw new ExecutionError("Unkown kind of type: {0}".ToFormat(context.Source));
+                throw new ExecutionError("Unknown kind of type: {0}".ToFormat(context.Source));
             });
             Field<StringGraphType>("name", resolve: context =>
             {
@@ -147,7 +147,7 @@ namespace GraphQL.Introspection
                 return TypeKind.NON_NULL;
             }
 
-            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
+            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
 
         public TypeKind KindForType(Type type)
@@ -185,7 +185,7 @@ namespace GraphQL.Introspection
                 return TypeKind.NON_NULL;
             }
 
-            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
+            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
     }
 }
