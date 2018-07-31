@@ -31,7 +31,7 @@ namespace GraphQL.Resolvers
         {
             if (resolver == null)
             {
-                throw new ArgumentNullException("A resolver function must be specified");
+                throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
             }
             _resolver = resolver;
         }

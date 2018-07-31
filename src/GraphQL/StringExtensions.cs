@@ -49,7 +49,7 @@ namespace GraphQL
         /// <param name="this">The this.</param>
         public static IEnumerable<char> ToEnumerable(this string @this)
         {
-            if (@this == null) throw new ArgumentNullException("@this");
+            if (@this == null) throw new ArgumentNullException(nameof(@this));
 
             for (var i = 0; i < @this.Length; ++i)
             {

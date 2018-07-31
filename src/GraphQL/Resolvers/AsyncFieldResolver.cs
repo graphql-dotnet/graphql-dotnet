@@ -30,7 +30,7 @@ namespace GraphQL.Resolvers
 
         public AsyncFieldResolver(Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException("A resolver function must be specified");
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
         public Task<TReturnType> Resolve(ResolveFieldContext context)
