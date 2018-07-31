@@ -77,8 +77,7 @@ namespace GraphQL.Introspection
                 }),
                 context =>
                 {
-                    var type = context.Source as EnumerationGraphType;
-                    if (type != null)
+                    if (context.Source is EnumerationGraphType type)
                     {
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var values = !includeDeprecated
