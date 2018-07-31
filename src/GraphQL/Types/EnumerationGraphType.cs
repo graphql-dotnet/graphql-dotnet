@@ -8,6 +8,8 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    using System.Text.RegularExpressions;
+
     public class EnumerationGraphType : ScalarGraphType
     {
         public EnumerationGraphType()
@@ -17,13 +19,23 @@ namespace GraphQL.Types
 
         public void AddValue(string name, string description, object value, string deprecationReason = null)
         {
-            AddValue(new EnumValueDefinition
+            var result = new EnumValueDefinition
             {
                 Name = name,
                 Description = description,
                 Value = value,
                 DeprecationReason = deprecationReason
-            });
+            };
+            Validate(result);
+            AddValue(result);
+        }
+
+        private static void Validate(EnumValueDefinition value)
+        {
+            var match = Regex.Match(value.Name, "[_A-Za-z][_0-9A-Za-z]*").Success;
+            if (!match)
+                throw new ArgumentException(
+                    $"{nameof(value.Name)} should be valid in terms of following pattern: /[_A-Za-z][_0-9A-Za-z]*/, read the docs here: http://facebook.github.io/graphql/June2018/#sec-Names");
         }
 
         public void AddValue(EnumValueDefinition value)
