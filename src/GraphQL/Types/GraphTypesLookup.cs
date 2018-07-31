@@ -216,8 +216,7 @@ namespace GraphQL.Types
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
-                    var interfaceInstance = this[objectInterface] as IInterfaceGraphType;
-                    if (interfaceInstance != null)
+                    if (this[objectInterface] is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);

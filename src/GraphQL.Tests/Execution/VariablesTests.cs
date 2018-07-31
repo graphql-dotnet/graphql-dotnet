@@ -64,16 +64,14 @@ namespace GraphQL.Tests.Execution
 
         public override object ParseValue(object value)
         {
-            var stringValue = value as string;
-            if (stringValue == null)
+            if (!(value is string stringValue))
                 return null;
             return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue);
         }
 
         public override object ParseLiteral(IValue value)
         {
-            var stringValue = value as StringValue;
-            if (stringValue == null)
+            if (!(value is StringValue stringValue))
                 return null;
             return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue.Value);
         }

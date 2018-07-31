@@ -97,9 +97,8 @@ namespace GraphQL.Execution
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType;
 
-            var data = parent.Result as IEnumerable;
 
-            if (data == null)
+            if (!(parent.Result is IEnumerable data))
             {
                 var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
                 throw error;

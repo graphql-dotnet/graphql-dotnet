@@ -60,8 +60,7 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value)
         {
-            var enumValue = value as EnumValue;
-            return enumValue == null ? null : ParseValue(enumValue.Name);
+            return !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
         }
     }
 
