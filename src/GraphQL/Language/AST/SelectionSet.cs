@@ -5,12 +5,15 @@ namespace GraphQL.Language.AST
 {
     public class SelectionSet : AbstractNode
     {
+        public SelectionSet()
+        {
+        }
+
         private SelectionSet(List<ISelection> selections)
         {
             _selections = selections;
         }
 
-        public SelectionSet() {}
         private readonly List<ISelection> _selections = new List<ISelection>();
 
         public IEnumerable<ISelection> Selections => _selections;
@@ -23,7 +26,7 @@ namespace GraphQL.Language.AST
 
         public SelectionSet Merge(SelectionSet otherSelection)
         {
-            var newSelection = otherSelection.Selections.Union(_selections).ToList();
+            var newSelection = _selections.Union(otherSelection.Selections).ToList();
             return new SelectionSet(newSelection);
         }
 

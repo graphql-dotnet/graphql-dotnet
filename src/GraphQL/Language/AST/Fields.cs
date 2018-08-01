@@ -1,9 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Language.AST
 {
-    public class Fields
+    public class Fields : IEnumerable<Field>
     {
         private readonly Dictionary<string, Field> _fields;
 
@@ -20,6 +21,15 @@ namespace GraphQL.Language.AST
             _fields[name] = _fields.ContainsKey(name) ? MergeField(_fields[name], field) : field;
         }
 
+        public IEnumerator<Field> GetEnumerator()
+        {
+            return _fields.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         private Field MergeField(Field originalField, Field newField) => originalField.MergeSelectionSet(newField);
 

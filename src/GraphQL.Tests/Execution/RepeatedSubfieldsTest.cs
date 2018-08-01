@@ -4,13 +4,14 @@ using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
-    public class RepeatedSubfieldsShould
+    public class RepeatedSubfieldsTests
     {
-        public RepeatedSubfieldsShould()
+        public RepeatedSubfieldsTests()
         {
             FirstInnerField = new Field(null, new NameNode("first"));
             FirstFieldSelection = new SelectionSet();
@@ -44,9 +45,9 @@ namespace GraphQL.Tests.Execution
 
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
-            Assert.True(fields.ContainsKey("test"));
-            Assert.Contains(fields["test"].SelectionSet.Selections, x => x.IsEqualTo(FirstInnerField));
-            Assert.Contains(fields["test"].SelectionSet.Selections, x => x.IsEqualTo(SecondInnerField));
+            fields.ContainsKey("test").ShouldBeTrue();
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
         }
 
         [Fact]
@@ -58,10 +59,10 @@ namespace GraphQL.Tests.Execution
 
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
-            Assert.Single(fields["test"].SelectionSet.Selections);
-            Assert.Contains(fields["test"].SelectionSet.Selections, x => x.IsEqualTo(FirstInnerField));
-            Assert.Single(fields["alias"].SelectionSet.Selections);
-            Assert.Contains(fields["alias"].SelectionSet.Selections, x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["alias"].SelectionSet.Selections.ShouldHaveSingleItem();
+            fields["alias"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
         }
 
         [Fact]
@@ -76,7 +77,7 @@ namespace GraphQL.Tests.Execution
 
             var fragments = new Fragments();
             fragments.Add(fragment);
-            
+
             var schema = new Schema();
             schema.RegisterType(new PersonType());
 
@@ -96,11 +97,9 @@ namespace GraphQL.Tests.Execution
                 new PersonType(),
                 outerSelection);
 
-            Assert.Single(fields);
-            Assert.Contains(fields["test"].SelectionSet.Selections,
-                x => x.IsEqualTo(FirstInnerField));
-            Assert.Contains(fields["test"].SelectionSet.Selections,
-                x => x.IsEqualTo(SecondInnerField));
+            fields.ShouldHaveSingleItem();
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
         }
     }
 }
