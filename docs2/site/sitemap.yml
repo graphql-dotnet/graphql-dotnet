@@ -65,5 +65,7 @@
             file: dataloader.md
           - title: Schema Generation
             file: schema-generation.md
+          - title: Version Migration Guide
+            file: migration.md
           - title: Links
             file: links.md
