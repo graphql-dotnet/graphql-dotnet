@@ -24,6 +24,7 @@ https://github.com/graphql-dotnet/examples
 
 ## Upgrade Guides
 
+* [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
