@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.Reflection;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -46,7 +47,7 @@ namespace GraphQL.Utilities
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
-            
+
             if(Type != null)
             {
                 if(config.ResolverAccessor == null)
