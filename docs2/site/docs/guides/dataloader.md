@@ -1,4 +1,4 @@
-# Dataloader
+# DataLoader
 
 GraphQL .NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader).
 
