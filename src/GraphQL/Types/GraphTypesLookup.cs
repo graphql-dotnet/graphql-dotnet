@@ -292,6 +292,8 @@ namespace GraphQL.Types
 
             field.Arguments?.Apply(arg =>
             {
+                arg.Name = FieldNameConverter.NameFor(arg.Name, null);
+
                 if (arg.ResolvedType != null)
                 {
                     AddTypeIfNotRegistered(arg.ResolvedType, context);

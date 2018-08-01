@@ -1,13 +1,14 @@
 using GraphQL.Conversion;
 using GraphQL.Tests.Execution;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Conversion
 {
     public class FieldNameConverterTests : BasicQueryTestBase
     {
-        public ISchema build_schema(IFieldNameConverter converter = null)
+        public ISchema build_schema(IFieldNameConverter converter = null, string argument = "Id")
         {
             var schema = new Schema();
             schema.FieldNameConverter = converter ?? new CamelCaseFieldNameConverter();
@@ -18,10 +19,14 @@ namespace GraphQL.Tests.Conversion
 
             var query = new ObjectGraphType();
             query.Name = "Query";
-            query.Field("PeRsoN", person, resolve: ctx =>
-            {
-                return new Person{ Name = "Quinn" };
-            });
+            query.Field(
+                "PeRsoN",
+                person,
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
+                resolve: ctx =>
+                {
+                    return new Person{ Name = "Quinn" };
+                });
 
             schema.Query = query;
             return schema;
@@ -74,6 +79,28 @@ namespace GraphQL.Tests.Conversion
                 _.FieldNameConverter = converter;
             },
             "{ PeRsoN: { naME: \"Quinn\" } }");
+        }
+
+        [Fact]
+        public void arguments_default_to_camel_case()
+        {
+            var schema = build_schema();
+            schema.Initialize();
+
+            var query = schema.FindType("Query") as IObjectGraphType;
+            var field = query.GetField("peRsoN");
+            field.Arguments.Find("id").ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void arguments_can_use_pascal_case()
+        {
+            var schema = build_schema(new PascalCaseFieldNameConverter(), "iD");
+            schema.Initialize();
+
+            var query = schema.FindType("Query") as IObjectGraphType;
+            var field = query.GetField("PeRsoN");
+            field.Arguments.Find("ID").ShouldNotBeNull();
         }
     }
 }
