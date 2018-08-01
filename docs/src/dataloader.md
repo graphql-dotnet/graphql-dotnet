@@ -28,8 +28,7 @@ A DataLoader helps in two ways:
 
 In the example above, a using a DataLoader will allow us to batch together all of the requests for the users. So there would be 1 request to retrieve the list of orders and 1 request to load all users associated with those orders. This would always be a total of 2 requests rather than N+1.
 
-## Setup
-
+## Setup using Dependency Injection
 1. Register `IDataLoaderContextAccessor` in your IoC container.
 2. Register `DataLoaderDocumentListener` in your IoC container.
 
@@ -52,7 +51,28 @@ var result = executer.ExecuteAsync(opts => {
 });
 ```
 
-## Usage
+## Example of Setup *without* Dependency injection
+
+1. Instantiate a `DataLoaderContextAccessor` and a `DataLoaderContext` and `DataLoaderDocumentListener`
+in the GraphQL controller. Perhaps like this:
+``` chsarp
+    var ctxAc = new DataLoader.DataLoaderContextAccessor();
+    ctxAc.Context = new DataLoaderContext();
+    var listener = new DataLoader.DataLoaderDocumentListener(ctxAc);
+
+    await new DocumentExecuter().ExecuteAsync( (s) =>
+        s.Schema = new Schema() { Query = new RootQuery(), Mutation = new RootMutation() };
+        s.Query = q.query;
+        s.Listeners.Add(listener);
+        s.Root = ctxAc;
+        if ((q.variables != null))
+            s.Inputs = JsonConvert.SerializeObject(q.variables).ToInputs;
+    ).ConfigureAwait(False)
+
+```
+__Further down you will find usage examples.__
+
+## Usage with Dependency Injection
 
 First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
@@ -167,4 +187,51 @@ public interface IUsersStore
 {
 	Task<IEnumerable<User>> GetAllUsersAsync();
 }
+```
+## Usage *without* Dependency Injection
+Because the DataLoaderContext is defined in the GraphQL Root object we can get it in our resolvers like this:
+```csharp
+public class ordertype : ObjectGraphType<order>
+{
+    public ordertype()
+    {
+        Name = "Ordertype";
+        UserStore store = new UserStore();
+
+        Field<IntGraphType>("id");
+        Field<StringGraphType>("userId");
+        Field<IntGraphType>("category");
+        Field<StringGraphType>("name");
+        Field<DateGraphType>("date");
+        Field<Usertype, User>.Name("user").ResolveAsync(ctx =>
+        {
+            store.SetResolveContext(ctx); //Make ctx availabele
+            var loader = ctx.RootValue.Context as DataLoaderContext.GetOrAddBatchLoader<int, User>("GetUserIds", store.GetUserIds);
+
+            return loader.LoadAsync(ctx.Source.userId);
+        });
+    }
+}
+
+```
+And we can define the UserStore like this:
+```csharp
+public class UserStore
+{
+    private object ctx;
+    public void SetResolveContext(object c)
+    {
+        ctx = c;
+    }
+    public async Task<Dictionary<int, User>> GetObjektByIdAsync(IEnumerable<int> userIds)
+    {
+        var users = db.Users.. //make db call
+        Dictionary<int, User> dic = new Dictionary<int, User>();
+        
+        foreach (var i in users)
+            dic.Add(userIds(users.IndexOf(i)), i);
+        return dic;
+    }
+}
+
 ```
