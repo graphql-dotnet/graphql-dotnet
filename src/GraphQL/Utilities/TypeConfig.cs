@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Types;
 
@@ -44,17 +45,51 @@ namespace GraphQL.Utilities
         public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
         {
             var config = _fields[field];
-            config.Accessor = Type.ToAccessor(field);
-
+            config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
+            
             if(Type != null)
             {
-                if(config.Accessor == null)
+                if(config.ResolverAccessor == null)
                 {
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                config.Resolver = new AccessorFieldResolver(config.Accessor, dependencyResolver);
-                config.Accessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+            }
+
+            return config;
+        }
+
+        public FieldConfig SubscriptionFieldFor(string field, IDependencyResolver dependencyResolver)
+        {
+            var config = _fields[field];
+            config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
+            config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
+
+            if (Type != null)
+            {
+                if (config.ResolverAccessor == null)
+                {
+                    throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
+                }
+
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
+
+                if (config.SubscriberAccessor == null)
+                {
+                    throw new InvalidOperationException($"Expected to find Subscribe method {field} on {Type.Name} but could not.");
+                }
+
+                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                }
+                else
+                {
+                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                }
             }
 
             return config;
