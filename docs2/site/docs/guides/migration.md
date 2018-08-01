@@ -4,6 +4,7 @@
 
 * This documentation!
 * Subscriptions - [details](https://graphql-dotnet.github.io/docs/getting-started/subscriptions)
+* DataLoader - helps solve N+1 requests - [details](https://graphql-dotnet.github.io/docs/guides/dataloader)
 * Unique Directive Per Location Validation Rule -  [details](https://github.com/graphql-dotnet/graphql-dotnet/issues/231)
 * Apollo Tracing - [details](https://graphql-dotnet.github.io/docs/getting-started/metrics)
 * Parser support for the `null` keyword
@@ -25,6 +26,7 @@ public Schema(Func<Type, IGraphType> resolveType)
 
 public Schema(IDependencyResolver dependencyResolver)
 {
+  ...
 }
 ```
 
