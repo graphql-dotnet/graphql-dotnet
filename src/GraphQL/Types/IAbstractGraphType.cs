@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,8 +22,8 @@ namespace GraphQL.Types
 
         public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value)
         {
-            return abstractType.ResolveType != null 
-                ? abstractType.ResolveType(value) 
+            return abstractType.ResolveType != null
+                ? abstractType.ResolveType(value)
                 : GetTypeOf(abstractType, value);
         }
 

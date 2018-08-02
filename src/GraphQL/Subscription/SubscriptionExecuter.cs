@@ -14,8 +14,8 @@ namespace GraphQL.Subscription
         }
 
         public SubscriptionExecuter(
-            IDocumentBuilder documentBuilder, 
-            IDocumentValidator documentValidator, 
+            IDocumentBuilder documentBuilder,
+            IDocumentValidator documentValidator,
             IComplexityAnalyzer complexityAnalyzer)
             : base(documentBuilder, documentValidator, complexityAnalyzer)
         {

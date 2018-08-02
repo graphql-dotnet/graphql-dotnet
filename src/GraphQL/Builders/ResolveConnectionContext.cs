@@ -25,11 +25,11 @@ namespace GraphQL.Builders
                 {
                     return _defaultPageSize;
                 }
-                
+
                 return first;
             }
         }
-        
+
         private int? FirstInternal
         {
             get

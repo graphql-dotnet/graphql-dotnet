@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Execution
             var schema = new Schema();
             schema.RegisterType(new PersonType());
 
-            var context = new ExecutionContext()
+            var context = new ExecutionContext
             {
                 Fragments = fragments,
                 Schema = schema

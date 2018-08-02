@@ -61,7 +61,7 @@ namespace GraphQL.Resolvers
             _dependencyResolver = dependencyResolver;
             _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
         }
-        
+
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;

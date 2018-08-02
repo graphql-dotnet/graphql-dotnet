@@ -134,7 +134,7 @@ namespace GraphQL.Tests.StarWars
 
 
         [Fact]
-        public void subfields_does_not_throw_for_primative()
+        public void subfields_does_not_throw_for_primitive()
         {
             RootQuery.Field<IntGraphType>("someNumber", resolve: (ctx) =>
             {
@@ -156,7 +156,7 @@ namespace GraphQL.Tests.StarWars
         }
 
         [Fact]
-        public void subfields_does_not_throw_for_list_of_primative()
+        public void subfields_does_not_throw_for_list_of_primitive()
         {
             RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: (ctx) =>
             {

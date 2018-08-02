@@ -20,9 +20,9 @@ namespace GraphQL.Validation.Complexity
             public int LoopCounter { get; set; }
             public Dictionary<string, FragmentComplexity> FragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
         }
-        
+
         private readonly int _maxRecursionCount;
-        
+
         /// <summary>
         /// Creates a new instance of ComplexityAnalyzer
         /// </summary>
@@ -56,20 +56,20 @@ namespace GraphQL.Validation.Complexity
 
         /// <summary>
         /// Analyzes the complexity of a document.
-        /// </summary>  
+        /// </summary>
         internal ComplexityResult Analyze(Document doc, double avgImpact = 2.0d)
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
-            
+
             var context = new AnalysisContext();
 
             doc.Children.OfType<FragmentDefinition>().Apply(node =>
             {
                 var fragResult = new FragmentComplexity();
-                FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);                
+                FragmentIterator(context, node, fragResult, avgImpact, avgImpact, 1d);
                 context.FragmentMap[node.Name] = fragResult;
             });
-            
+
             TreeIterator(context, doc, avgImpact, avgImpact, 1d);
 
             return context.Result;

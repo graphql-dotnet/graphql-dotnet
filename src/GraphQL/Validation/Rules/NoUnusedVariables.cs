@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 
@@ -6,10 +6,10 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// No unused variables
-    /// 
+    ///
     /// A GraphQL operation is only valid if all variables defined by that operation
     /// are used in that operation or a fragment transitively included by that
-    /// operation. 
+    /// operation.
     /// </summary>
     public class NoUnusedVariables : IValidationRule
   {
@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
     public INodeVisitor Validate(ValidationContext context)
     {
       var variableDefs = new List<VariableDefinition>();
-      
+
       return new EnterLeaveListener(_ =>
       {
         _.Match<VariableDefinition>(def => variableDefs.Add(def));

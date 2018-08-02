@@ -27,7 +27,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Equivalent to .Select(...).ToList(), except the Select function is executed asynchronously. 
+        /// Equivalent to .Select(...).ToList(), except the Select function is executed asynchronously.
         /// </summary>
         public static Task<object[]> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
         {
@@ -124,14 +124,12 @@ namespace GraphQL
         /// <summary>
         /// Adds the item to the list, unless the list already contains the item.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="items">The list to be updated.</param>
         /// <param name="itemToAdd">The item to be conditionally added.</param>
         public static void Fill<T>(this IList<T> items, T itemToAdd)
         {
             Fill(items, new[] { itemToAdd });
         }
-
 
         /// <summary>
         /// Adds each item to the list, unless the list already contains the item.
