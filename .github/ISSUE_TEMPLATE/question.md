@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Usage question or discussion about GraphQL .NET
+about: Usage question or discussion about GraphQL .NET.
 ---
 
 <!--
