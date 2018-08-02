@@ -27,7 +27,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Equivalent to .Select(...).ToList(), except the Select function is executed asynchronously. 
+        /// Equivalent to .Select(...).ToList(), except the Select function is executed asynchronously.
         /// </summary>
         public static Task<object[]> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +11,6 @@ namespace GraphQL.Types
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 
-  
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();

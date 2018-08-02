@@ -32,7 +32,7 @@ namespace GraphQL.DataLoader
     }
 
     /// <summary>
-    /// Provides a method of queueing a data loading operation to be dispatched later. 
+    /// Provides a method of queueing a data loading operation to be dispatched later.
     /// </summary>
     /// <typeparam name="TKey">The type of key to use to load data</typeparam>
     /// <typeparam name="T">The type of data to be loaded</typeparam>

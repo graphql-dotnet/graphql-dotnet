@@ -161,7 +161,7 @@ namespace GraphQL.DataLoader.Tests
             user2 = await task2;
             user3 = await task3;
 
-            // Load key 3 again. 
+            // Load key 3 again.
             var task3b = loader.LoadAsync(3);
 
             task3b.Status.ShouldBe(TaskStatus.RanToCompletion,

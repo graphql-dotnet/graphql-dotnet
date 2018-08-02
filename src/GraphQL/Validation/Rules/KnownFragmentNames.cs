@@ -1,10 +1,10 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// Known fragment names
-    /// 
+    ///
     /// A GraphQL document is only valid if all <c>...Fragment</c> fragment spreads refer
     /// to fragments defined in the same document.
     /// </summary>

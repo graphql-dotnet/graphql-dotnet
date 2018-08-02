@@ -16,7 +16,7 @@ namespace GraphQL.Tests
         public void StringConversions(string source, object expected)
         {
             var actual = ValueConverter.ConvertTo(source, expected.GetType());
- 
+
             actual.ShouldNotBeNull();
             actual.ShouldBeOfType(expected.GetType());
             actual.ShouldBe(expected);
@@ -28,7 +28,7 @@ namespace GraphQL.Tests
             string source = "100.1";
             decimal expected = 100.1m;
             var actual = ValueConverter.ConvertTo(source, expected.GetType());
- 
+
             actual.ShouldNotBeNull();
             actual.ShouldBeOfType(expected.GetType());
             actual.ShouldBe(expected);
@@ -41,7 +41,7 @@ namespace GraphQL.Tests
             string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
             DateTime expected = utcNow;
             var actual = ValueConverter.ConvertTo(source, expected.GetType());
- 
+
             actual.ShouldNotBeNull();
             actual.ShouldBeOfType(expected.GetType());
             actual.ShouldBe(expected);
@@ -54,7 +54,7 @@ namespace GraphQL.Tests
             string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
             DateTimeOffset expected = utcNow;
             var actual = ValueConverter.ConvertTo(source, expected.GetType());
- 
+
             actual.ShouldNotBeNull();
             actual.ShouldBeOfType(expected.GetType());
             actual.ShouldBe(expected);

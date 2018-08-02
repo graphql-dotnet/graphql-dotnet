@@ -29,7 +29,7 @@ namespace GraphQL.Validation
         public object UserContext { get; set; }
 
         public IEnumerable<ValidationError> Errors => _errors;
-        
+
         public Inputs Inputs { get; set; }
 
         public void ReportError(ValidationError error)
