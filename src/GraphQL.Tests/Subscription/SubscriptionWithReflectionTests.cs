@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Subscription
             var addedMessage = new Message
             {
                 Content = "test",
-                From = new MessageFrom()
+                From = new MessageFrom
                 {
                     DisplayName = "test",
                     Id = "1"
@@ -73,7 +73,7 @@ namespace GraphQL.Tests.Subscription
             var addedMessage = new Message
             {
                 Content = "test",
-                From = new MessageFrom()
+                From = new MessageFrom
                 {
                     DisplayName = "test",
                     Id = "1"
@@ -110,7 +110,7 @@ namespace GraphQL.Tests.Subscription
             var addedMessage = new Message
             {
                 Content = "test",
-                From = new MessageFrom()
+                From = new MessageFrom
                 {
                     DisplayName = "test",
                     Id = "1"
@@ -126,7 +126,7 @@ namespace GraphQL.Tests.Subscription
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
-                Inputs = new Inputs(new Dictionary<string, object>()
+                Inputs = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })
@@ -150,7 +150,7 @@ namespace GraphQL.Tests.Subscription
             var addedMessage = new Message
             {
                 Content = "test",
-                From = new MessageFrom()
+                From = new MessageFrom
                 {
                     DisplayName = "test",
                     Id = "1"
@@ -166,7 +166,7 @@ namespace GraphQL.Tests.Subscription
             {
                 Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
                 Schema = schema,
-                Inputs = new Inputs(new Dictionary<string, object>()
+                Inputs = new Inputs(new Dictionary<string, object>
                 {
                     ["id"] = "1"
                 })
