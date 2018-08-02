@@ -417,8 +417,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Unwrap nested Tasks to get the result
         /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
         public static async Task<object> UnwrapResultAsync(object result)
         {
             while (result is Task task)
