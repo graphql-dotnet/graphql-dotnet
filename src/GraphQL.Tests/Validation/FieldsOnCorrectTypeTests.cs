@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Validation.Rules;
 using Xunit;
@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void reports_errors_when_type_is_kown_again()
+        public void reports_errors_when_type_is_known_again()
         {
             ShouldFailRule(_ =>
             {
