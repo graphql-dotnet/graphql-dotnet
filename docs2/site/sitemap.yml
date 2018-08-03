@@ -18,6 +18,10 @@
             file: graphiql.md
           - title: Queries
             file: queries.md
+          - title: Schema Types
+            file: schema-types.md
+          - title: Lists and Non-Null
+            file: lists-non-null.md
           - title: Arguments
             file: arguments.md
           - title: Aliases
@@ -38,6 +42,8 @@
             file: subscriptions.md
           - title: Query Validation
             file: query-validation.md
+          - title: Query Organization
+            file: query-organization.md
           - title: User Context
             file: user-context.md
           - title: Error Handling

@@ -29,6 +29,16 @@ The JSON request for this mutation would look like:
 }
 ```
 
+C# class would looks like:
+
+```csharp
+public class Human
+{
+    public string Name { get; set; }
+    public string HomePlanet { get; set; }
+}
+```
+
 Set the `Mutation` property on your `Schema`.
 
 ```csharp
