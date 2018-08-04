@@ -26,9 +26,9 @@ export default function version() {
       productName: 'GraphQL',
       copyright: 'Copyright 2015-2017 Joseph T. McBride et al.  All rights reserved.',
       trademark: commit,
-      version: settings.version,
-      fileVersion: settings.version,
-      informationalVersion: settings.version
+      version: settings.assemblyVersion,
+      fileVersion: settings.assemblyVersion,
+      informationalVersion: settings.assemblyVersion
     }
 
     const fileInfo = `using System;

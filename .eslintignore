@@ -1,3 +1,6 @@
 /docs
+/docs2/.cache
+/docs2/node_modules
+/docs2/public
 /node_modules
 /src/GraphQL.Harness/public

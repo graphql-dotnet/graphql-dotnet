@@ -1,12 +1,28 @@
 import exec from './exec'
+import git from './utils/git'
 
-export default function compile(settings) {
+export default async function compile(settings) {
 
-  let versionSuffix = ''
-  if(settings.versionSuffix.length > 0) {
-    versionSuffix = `--version-suffix ${settings.versionSuffix}${settings.revision}`
+  const { branch } = await git({ CI: settings.CI })
+
+  let versions = []
+
+  if (branch !== 'master') {
+    versions.push(branch)
   }
 
-  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} ${versionSuffix} --include-symbols --include-source`
+  if (settings.versionSuffix.length > 0) {
+    versions.push(settings.versionSuffix)
+  }
+
+  versions.push(settings.revision)
+
+  let sep = versions.length > 1 ? '-' : '.'
+
+  versions.unshift(settings.version)
+
+  const version = versions.join(sep)
+
+  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} --include-symbols --include-source /p:PackageVersion=${version}`
   return exec(cmd)
 }
