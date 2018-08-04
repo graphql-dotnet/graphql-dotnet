@@ -718,7 +718,7 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void partial_object_required_field_can_be_falsey()
+        public void partial_object_required_field_can_be_false()
         {
             ShouldPassRule(@"{
               complicatedArgs {

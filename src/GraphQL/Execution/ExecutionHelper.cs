@@ -165,10 +165,9 @@ namespace GraphQL.Execution
 
             if (type is IObjectGraphType || type is IInputObjectGraphType)
             {
-                var dict = input as Dictionary<string, object>;
                 var complexType = (IComplexGraphType)type;
 
-                if (dict == null)
+                if (!(input is Dictionary<string, object> dict))
                 {
                     throw new InvalidValueException(fieldName,
                         $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
@@ -250,9 +249,8 @@ namespace GraphQL.Execution
             if (type is ListGraphType listType)
             {
                 var listItemType = listType.ResolvedType;
-                var list = input as ListValue;
 
-                return list != null
+                return input is ListValue list
                     ? list.Values.Map(item => CoerceValue(schema, listItemType, item, variables)).ToArray()
                     : new[] { CoerceValue(schema, listItemType, input, variables) };
             }
@@ -262,8 +260,7 @@ namespace GraphQL.Execution
                 var complexType = type as IComplexGraphType;
                 var obj = new Dictionary<string, object>();
 
-                var objectValue = input as ObjectValue;
-                if (objectValue == null)
+                if (!(input is ObjectValue objectValue))
                 {
                     return null;
                 }
@@ -292,18 +289,13 @@ namespace GraphQL.Execution
             return null;
         }
 
-        public static Dictionary<string, Field> CollectFields(
+        private static Fields CollectFields(
             ExecutionContext context,
             IGraphType specificType,
             SelectionSet selectionSet,
-            Dictionary<string, Field> fields,
+            Fields fields,
             List<string> visitedFragmentNames)
         {
-            if (fields == null)
-            {
-                fields = new Dictionary<string, Field>();
-            }
-
             selectionSet?.Selections.Apply(selection =>
             {
                 if (selection is Field field)
@@ -313,8 +305,7 @@ namespace GraphQL.Execution
                         return;
                     }
 
-                    var name = field.Alias ?? field.Name;
-                    fields[name] = field;
+                    fields.Add(field);
                 }
                 else if (selection is FragmentSpread spread)
                 {
@@ -351,6 +342,14 @@ namespace GraphQL.Execution
             });
 
             return fields;
+        }
+
+        public static Dictionary<string, Field> CollectFields(
+            ExecutionContext context,
+            IGraphType specificType,
+            SelectionSet selectionSet)
+        {
+            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
@@ -418,8 +417,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Unwrap nested Tasks to get the result
         /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
         public static async Task<object> UnwrapResultAsync(object result)
         {
             while (result is Task task)
@@ -447,10 +444,7 @@ namespace GraphQL.Execution
             {
                 return null;
             }
-
-            var subFields = new Dictionary<string, Field>();
-            var visitedFragments = new List<string>();
-            return CollectFields(context, fieldType, field.SelectionSet, subFields, visitedFragments);
+            return CollectFields(context, fieldType, field.SelectionSet);
         }
 
         public static string[] AppendPath(string[] path, string pathSegment)

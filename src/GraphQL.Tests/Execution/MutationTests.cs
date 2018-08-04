@@ -300,7 +300,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void evaluates_mutations_correctly_in_the_presense_of_a_failed_mutation()
+        public void evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
         {
             var query = @"
                 mutation M {
@@ -395,7 +395,7 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void evaluates_datetime_mutations_correctly_in_the_presense_of_a_failed_mutation()
+        public void evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
         {
             var query = @"
                 mutation M {

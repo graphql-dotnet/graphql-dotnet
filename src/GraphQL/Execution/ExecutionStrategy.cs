@@ -40,9 +40,8 @@ namespace GraphQL.Execution
             var fields = CollectFields(
                 context,
                 rootType,
-                context.Operation.SelectionSet,
-                new Dictionary<string, Field>(),
-                new List<string>());
+                context.Operation.SelectionSet);
+
 
             SetSubFieldNodes(context, root, fields);
 
@@ -51,10 +50,8 @@ namespace GraphQL.Execution
 
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = new Dictionary<string, Field>();
-            var visitedFragments = new List<string>();
 
-            fields = CollectFields(context, parent.GetObjectGraphType(), parent.Field?.SelectionSet, fields, visitedFragments);
+            var fields = CollectFields(context, parent.GetObjectGraphType(), parent.Field?.SelectionSet);
 
             SetSubFieldNodes(context, parent, fields);
         }
@@ -97,9 +94,8 @@ namespace GraphQL.Execution
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType;
 
-            var data = parent.Result as IEnumerable;
 
-            if (data == null)
+            if (!(parent.Result is IEnumerable data))
             {
                 var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
                 throw error;
@@ -158,9 +154,6 @@ namespace GraphQL.Execution
         /// <remarks>
         /// Builds child nodes, but does not execute them
         /// </remarks>
-        /// <param name="context"></param>
-        /// <param name="node"></param>
-        /// <returns></returns>
         protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();

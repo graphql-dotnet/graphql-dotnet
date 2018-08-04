@@ -93,7 +93,7 @@ namespace GraphQL.Builders
 
         public ConnectionBuilder<TGraphType, TSourceType> Name(string name)
         {
-            FieldValidator.ValidateName(name);
+            NameValidator.ValidateName(name);
 
             FieldType.Name = name;
             return this;

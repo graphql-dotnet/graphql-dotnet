@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// No unused fragments
-    /// 
+    ///
     /// A GraphQL document is only valid if all fragment definitions are spread
     /// within operations, or spread within other fragments spread within operations.
     /// </summary>

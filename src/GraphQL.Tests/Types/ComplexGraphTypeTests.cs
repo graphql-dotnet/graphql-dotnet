@@ -172,7 +172,7 @@ namespace GraphQL.Tests.Types
         [InlineData("Name")]
         [InlineData("_name")]
         [InlineData("test_name")]
-        public void should_not_throw_exption_on_valid_field_name(string fieldName)
+        public void should_not_throw_exception_on_valid_field_name(string fieldName)
         {
             var type = new ComplexType<TestObject>();
             var field = type.Field<StringGraphType>(fieldName);
@@ -185,7 +185,7 @@ namespace GraphQL.Tests.Types
         [InlineData("Name")]
         [InlineData("_name")]
         [InlineData("test_name")]
-        public void should_not_throw_exption_on_valid_field_name_using_field_builder(string fieldName)
+        public void should_not_throw_exception_on_valid_field_name_using_field_builder(string fieldName)
         {
             var type = new ComplexType<TestObject>();
             type.Field<StringGraphType>().Name(fieldName);

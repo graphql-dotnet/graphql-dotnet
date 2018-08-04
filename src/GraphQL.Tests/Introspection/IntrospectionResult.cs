@@ -419,7 +419,7 @@ namespace GraphQL.Tests.Introspection
           },
           {
             ""name"": ""OBJECT"",
-            ""description"": ""Indicates this type is an object.  `fields` and `possibletypes` are valid fields."",
+            ""description"": ""Indicates this type is an object.  `fields` and `possibleTypes` are valid fields."",
             ""isDeprecated"": false,
             ""deprecationReason"": null
           },
@@ -866,7 +866,7 @@ namespace GraphQL.Tests.Introspection
           },
           {
             ""name"": ""FIELD"",
-            ""description"": ""Location ajdacent to a field."",
+            ""description"": ""Location adjacent to a field."",
             ""isDeprecated"": false,
             ""deprecationReason"": null
           },
@@ -914,7 +914,7 @@ namespace GraphQL.Tests.Introspection
           },
           {
             ""name"": ""ARGUMENT_DEFINITION"",
-            ""description"": ""Location adjacent to an argument defintion."",
+            ""description"": ""Location adjacent to an argument definition."",
             ""isDeprecated"": false,
             ""deprecationReason"": null
           },
@@ -944,7 +944,7 @@ namespace GraphQL.Tests.Introspection
           },
           {
             ""name"": ""INPUT_OBJECT"",
-            ""description"": ""Location adjacent to an input object type defintion."",
+            ""description"": ""Location adjacent to an input object type definition."",
             ""isDeprecated"": false,
             ""deprecationReason"": null
           },

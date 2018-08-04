@@ -49,7 +49,7 @@ namespace GraphQL
         /// <param name="this">The this.</param>
         public static IEnumerable<char> ToEnumerable(this string @this)
         {
-            if (@this == null) throw new ArgumentNullException("@this");
+            if (@this == null) throw new ArgumentNullException(nameof(@this));
 
             for (var i = 0; i < @this.Length; ++i)
             {
@@ -151,8 +151,7 @@ namespace GraphQL
         /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
         public static object GetValue(this object value)
         {
-            var objectValue = value as JObject;
-            if (objectValue != null)
+            if (value is JObject objectValue)
             {
                 var output = new Dictionary<string, object>();
                 foreach (var kvp in objectValue)
@@ -162,8 +161,7 @@ namespace GraphQL
                 return output;
             }
 
-            var propertyValue = value as JProperty;
-            if (propertyValue != null)
+            if (value is JProperty propertyValue)
             {
                 return new Dictionary<string, object>
                 {
@@ -171,8 +169,7 @@ namespace GraphQL
                 };
             }
 
-            var arrayValue = value as JArray;
-            if (arrayValue != null)
+            if (value is JArray arrayValue)
             {
                 return arrayValue.Children().Aggregate(new List<object>(), (list, token) =>
                 {
@@ -181,8 +178,7 @@ namespace GraphQL
                 });
             }
 
-            var rawValue = value as JValue;
-            if (rawValue != null)
+            if (value is JValue rawValue)
             {
                 var val = rawValue.Value;
                 if (val is long)

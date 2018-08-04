@@ -61,7 +61,7 @@ namespace GraphQL.Builders
 
         public FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
-            FieldValidator.ValidateName(name);
+            NameValidator.ValidateName(name);
 
             _fieldType.Name = name;
             return this;

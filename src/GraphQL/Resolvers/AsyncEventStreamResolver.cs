@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Reflection;
 using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
@@ -47,4 +48,36 @@ namespace GraphQL.Resolvers
             return (IObservable<object>)result;
         }
     }
+
+    public class AsyncEventStreamResolver : IAsyncEventStreamResolver
+    {
+        private IAccessor _accessor;
+        private IDependencyResolver _dependencyResolver;
+        private object _target;
+
+        public AsyncEventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
+        {
+            _accessor = accessor;
+            _dependencyResolver = dependencyResolver;
+            _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
+        }
+
+        async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
+        {
+            var parameters = _accessor.Parameters;
+            var arguments = ReflectionHelper.BuildArguments(parameters, context);
+            var result = _accessor.GetValue(_target, arguments);
+
+            if (!(result is Task task))
+            {
+                throw new ArgumentException($"Return type of {_accessor.FieldName} should be Task<IObservable<T>>, instead of {_accessor.ReturnType}");
+            }
+
+            await task;
+
+            return ((dynamic)task).Result;
+        }
+    }
+
+
 }

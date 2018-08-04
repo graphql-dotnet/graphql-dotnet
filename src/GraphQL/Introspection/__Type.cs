@@ -26,7 +26,7 @@ namespace GraphQL.Introspection
                     return KindForInstance((GraphType)context.Source);
                 }
 
-                throw new ExecutionError("Unkown kind of type: {0}".ToFormat(context.Source));
+                throw new ExecutionError("Unknown kind of type: {0}".ToFormat(context.Source));
             });
             Field<StringGraphType>("name", resolve: context =>
             {
@@ -77,8 +77,7 @@ namespace GraphQL.Introspection
                 }),
                 context =>
                 {
-                    var type = context.Source as EnumerationGraphType;
-                    if (type != null)
+                    if (context.Source is EnumerationGraphType type)
                     {
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var values = !includeDeprecated
@@ -147,7 +146,7 @@ namespace GraphQL.Introspection
                 return TypeKind.NON_NULL;
             }
 
-            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
+            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
 
         public TypeKind KindForType(Type type)
@@ -185,7 +184,7 @@ namespace GraphQL.Introspection
                 return TypeKind.NON_NULL;
             }
 
-            throw new ExecutionError("Unkown kind of type: {0}".ToFormat(type));
+            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
     }
 }

@@ -24,6 +24,7 @@ https://github.com/graphql-dotnet/examples
 
 ## Upgrade Guides
 
+* [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
 
@@ -31,7 +32,7 @@ https://github.com/graphql-dotnet/examples
 
 Define your schema with a top level query object then execute that query.
 
-A more full-featured example can be found [here](https://github.com/graphql-dotnet/examples).
+Fully-featured examples can be found [here](https://github.com/graphql-dotnet/examples).
 
 ### Hello World
 
@@ -43,13 +44,13 @@ var schema = Schema.For(@"
 ");
 
 var root = new { Hello = "Hello World!" };
-var result = schema.Execute(_ =>
+var json = schema.Execute(_ =>
 {
   _.Query = "{ hello }";
   _.Root = root;
 });
 
-Console.WriteLine(result);
+Console.WriteLine(json);
 ```
 
 ### Handler/Endpoints
@@ -63,8 +64,8 @@ public class Droid
 
 public class Query
 {
-  [GraphQLMetadata("hero")]
-  public Droid GetHero()
+  [GraphQLMetadata("droid")]
+  public Droid GetDroid()
   {
     return new Droid { Id = "123", Name = "R2-D2" };
   }
@@ -72,18 +73,18 @@ public class Query
 
 var schema = Schema.For(@"
   type Droid {
-    id: String
+    id: ID
     name: String
   }
 
   type Query {
-    hero: Droid
+    droid: Droid
   }
 ", _ => {
     _.Types.Include<Query>();
 });
 
-var result = schema.Execute(_ =>
+var json = schema.Execute(_ =>
 {
   _.Query = "{ hero { id name } }";
 });
@@ -105,8 +106,8 @@ public class Query
     new Droid { Id = "123", Name = "R2-D2" }
   };
 
-  [GraphQLMetadata("hero")]
-  public Droid GetHero(string id)
+  [GraphQLMetadata("droid")]
+  public Droid GetDroid(string id)
   {
     return _droids.FirstOrDefault(x => x.Id == id);
   }
@@ -114,21 +115,20 @@ public class Query
 
 var schema = Schema.For(@"
   type Droid {
-    id: String
+    id: ID
     name: String
   }
 
   type Query {
-    hero(id: String): Droid
+    droid(id: ID): Droid
   }
 ", _ => {
     _.Types.Include<Query>();
 });
 
-string id = "123";
-var result = schema.Execute(_ =>
+var json = schema.Execute(_ =>
 {
-  _.Query = $"{{ hero(id: \"{id}\") {{ id name }} }}";
+  _.Query = $"{{ hero(id: \"123\") {{ id name }} }}";
 });
 ```
 
@@ -206,20 +206,11 @@ var result = schema.Execute(_ =>
 ### Publishing Nugets
 
 ```
-yarn run setVersion 0.17.0
+yarn run setVersion 2.0.0
 git commit/push
 download nuget from AppVeyor
 upload nuget package to github
 publish nuget from MyGet
-```
-
-### Publishing Documentation
-
-Publishing documentation requires access to https://github.com/graphql-dotnet/graphql-dotnet.github.io
-
-```
-cd docs
-./publish_docs.sh 2.0.0
 ```
 
 ### Running on OSX with mono

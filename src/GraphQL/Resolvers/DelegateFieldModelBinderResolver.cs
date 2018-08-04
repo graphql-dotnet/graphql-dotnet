@@ -1,10 +1,11 @@
 using System;
 using System.Reflection;
+using GraphQL.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class DelegateFieldModelBinderResolver : FieldResolverBase
+    public class DelegateFieldModelBinderResolver : IFieldResolver
     {
         private readonly Delegate _resolver;
         private readonly ParameterInfo[] _parameters;
@@ -15,9 +16,9 @@ namespace GraphQL.Resolvers
             _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
-        public override object Resolve(ResolveFieldContext context)
+        public object Resolve(ResolveFieldContext context)
         {
-            var arguments = BuildArguments(_parameters, context);
+            var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             return _resolver.DynamicInvoke(arguments);
         }
     }
