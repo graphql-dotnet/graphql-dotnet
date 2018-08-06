@@ -155,7 +155,7 @@ public class Program
     var json = schema.Execute(_ =>
     {
       _.Schema = schema;
-      _.Query = "hero { id name }";
+      _.Query = "{ hero { id name } }";
     });
 
     Console.WriteLine(json);
