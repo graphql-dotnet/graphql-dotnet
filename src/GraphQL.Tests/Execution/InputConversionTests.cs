@@ -19,6 +19,7 @@ namespace GraphQL.Tests.Execution
             public List<List<int?>> G { get; set; }
             public DateTime H { get; set; }
             public Double I { get; set; }
+            public long J { get; set; }
         }
 
         public class EnumInput
@@ -167,6 +168,17 @@ namespace GraphQL.Tests.Execution
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
             myInput.D.ShouldBe(5);
+        }
+
+        [Fact]
+        public void can_read_long()
+        {
+            var json = @"{'j': 89429901947254093 }";
+            var inputs = json.ToInputs();
+            inputs.ShouldNotBeNull();
+            var myInput = inputs.ToObject<MyInput>();
+            myInput.ShouldNotBeNull();
+            myInput.J.ShouldBe(89429901947254093);
         }
 
         [Fact]
