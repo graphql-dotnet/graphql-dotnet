@@ -61,7 +61,7 @@ namespace GraphQL
         private static object LongToInt(object value)
         {
             var longValue = (long)value;
-            return (int)longValue;
+            return Convert.ToInt32(longValue, NumberFormatInfo.InvariantInfo);
         }
 
         private static object IntToLong(object value)

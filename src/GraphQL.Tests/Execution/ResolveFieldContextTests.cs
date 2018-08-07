@@ -38,6 +38,14 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void long_to_int_should_throw_for_out_of_range()
+        {
+            long val = 89429901947254093;
+            _context.Arguments["a"] = val;
+            Assert.Throws<OverflowException>(() => _context.GetArgument<int>("a"));
+        }
+
+        [Fact]
         public void argument_returns_boxed_string_uncast()
         {
             _context.Arguments["a"] = "one";
