@@ -57,6 +57,7 @@
     "style-loader": "^0.19.1",
     "superagent": "^2.0.0",
     "webpack": "^3.10.0",
+    "xml-reader": "^2.4.3",
     "xmlbuilder": "^8.2.2"
   }
 }

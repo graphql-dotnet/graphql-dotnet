@@ -2,7 +2,7 @@ import path from 'path'
 import moment from 'moment'
 import pjson from '../../package.json'
 
-const target = process.env.CONFIGURATION || 'debug'
+const target = process.env.CONFIGURATION || 'Debug'
 
 const buildNumber = process.env.APPVEYOR_BUILD_NUMBER
 let version = pjson.version
@@ -15,7 +15,7 @@ const CI = process.env.CI && process.env.CI.toString().toLowerCase() === 'true'
 
 const artifacts = path.resolve('./artifacts')
 
-const versionSuffix = 'alpha-'
+const versionSuffix = 'preview'
 
 const cleanPaths = [
   'src/GraphQL/obj',
@@ -32,9 +32,10 @@ export default {
   slnPath: path.resolve('./src/GraphQL.sln'),
   sourcePath: path.resolve('./src'),
   target,
+  version,
   revision,
   nugetVersion,
+  assemblyVersion,
   taskTimeout: 120000,
-  version: assemblyVersion,
   versionSuffix
 }
