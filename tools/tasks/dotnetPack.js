@@ -7,7 +7,7 @@ export default async function compile(settings) {
 
   let versions = []
 
-  if (branch !== 'master') {
+  if (branch !== 'master' && branch.length > 0) {
     versions.push(branch)
   }
 
