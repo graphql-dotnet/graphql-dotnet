@@ -43,7 +43,7 @@ Output
 }
 ```
 
-There are two ways you can build your schema.  One is with a Handler / Endpoints approach using Schema Syntax.  The other is through GraphTypes.  The basics of both are demonstrated using the following schema definition.
+There are two ways you can build your schema.  One is with a Schema first approach using the [GraphQL schema language](https://graphql.org/learn/schema/#type-language).  The other is a `GraphType` or Code first approach by writing `GraphType` classes.  The basics of both are demonstrated using the following schema definition.
 
 > `!` signifies a field is non-nullable.
 
@@ -58,11 +58,11 @@ type Query {
 }
 ```
 
-## Handler / Endpoints Approach
+## Schema First Approach
 
-The endpoints approach relys upon Schema Syntax, coding conventions, and tries to provide a minmal amount of syntax.  It is the easiest to get started using though does not currently support some advanced scenarios.
+The Schema first approach relys upon the [GraphQL schema language](https://graphql.org/learn/schema/#type-language), coding conventions, and tries to provide a minmal amount of syntax.  It is the easiest to get started using though does not currently support some advanced scenarios.
 
-> Use the optional `GraphQLMetadata` attribute to customize the endpoint.
+> Use the optional `GraphQLMetadata` attribute to customize the mapping to the schema type.
 
 ```csharp
 public class Droid
@@ -111,9 +111,9 @@ Output
 }
 ```
 
-## GraphType Types Approach
+## GraphType First Approach
 
-The `GraphType` "Type" approach can be more verbose, but gives you access to all of the provided properties of your `GraphType`'s and `Schema`.  You are required to use inheritance to leverage that functionality.
+The `GraphType` first approach can be more verbose, but gives you access to all of the provided properties of your `GraphType`'s and `Schema`.  You are required to use inheritance to leverage that functionality.
 
 ```csharp
 using System;
@@ -170,6 +170,86 @@ Output
     "hero": {
       "id": "1",
       "name": "R2-D2"
+    }
+  }
+}
+```
+
+## Schema First Nested Types
+
+You can provide multiple "top level" schema types using the Schema first approach.
+
+```csharp
+public class Droid
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+}
+
+public class Character
+{
+  public string Name { get; set; }
+}
+
+public class Query
+{
+  [GraphQLMetadata("hero")]
+  public Droid GetHero()
+  {
+    return new Droid { Id = "1", Name = "R2-D2" };
+  }
+}
+
+[GraphQLMetadata("Droid")]
+public class DroidType
+{
+  public string Id(Droid droid) => droid.Id;
+  public string Name(Droid droid) => droid.Name;
+
+  // these two parameters are optional
+  // ResolveFieldContext provides contextual information about the field
+  public Character Friend(ResolveFieldContext context, Droid source)
+  {
+    return new Character { Name = "C3-PO" };
+  }
+}
+
+var schema = Schema.For(@"
+  type Droid {
+    id: String!
+    name: String!
+    friend: Character
+  }
+
+  type Character {
+    name: String!
+  }
+
+  type Query {
+    hero: Droid
+  }
+", _ => {
+    _.Types.Include<DroidType>();
+    _.Types.For("Droid").IsTypeOf<Droid>();
+    _.Types.Include<Query>();
+});
+
+var json = schema.Execute(_ =>
+{
+  _.Query = "{ hero { id name friend { name } } }";
+});
+```
+
+Output
+```json
+{
+  "data": {
+    "hero": {
+      "id": "1",
+      "name": "R2-D2",
+      "friend": {
+        "name": "C3-PO"
+      }
     }
   }
 }

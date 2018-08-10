@@ -53,7 +53,9 @@ var json = schema.Execute(_ =>
 Console.WriteLine(json);
 ```
 
-### Handler/Endpoints
+### Schema First Approach
+
+This example uses the [Graphql schema language](https://graphql.org/learn/schema/#type-language).  See the [documentation](https://graphql-dotnet.github.io/docs/getting-started/introduction) for more examples and information.
 
 ```csharp
 public class Droid

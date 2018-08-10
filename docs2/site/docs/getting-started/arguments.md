@@ -11,7 +11,7 @@ query {
 }
 ```
 
-## Handler / Endpoints
+## Schema First
 
 ```csharp
 public class Droid
@@ -53,7 +53,7 @@ var json = schema.Execute(_ =>
 });
 ```
 
-## GraphTypes
+## GraphType First
 
 ```csharp
 public class Droid
