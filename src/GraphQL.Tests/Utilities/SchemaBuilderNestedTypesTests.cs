@@ -1,5 +1,6 @@
 ﻿using System;
 using GraphQL;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
@@ -26,7 +27,40 @@ namespace GraphQL.Tests.Utilities
             ";
 
             Builder.Types.Include<DroidType>();
-            Builder.Types.For("Droid").IsTypeOf<Droid>();
+            Builder.Types.Include<Query>();
+
+            var query = @"{ hero { id name friend { name } } }";
+            var expected = @"{ 'hero': { 'id' : '1', 'name': 'R2-D2', 'friend': { 'name': 'C3-PO' } } }";
+
+            AssertQuery(_ =>
+            {
+                _.Query = query;
+                _.Definitions = defs;
+                _.ExpectedResult = expected;
+            });
+        }
+
+        [Fact]
+        public void supports_type_references_in_resolve_type()
+        {
+            var defs = @"
+              type Droid {
+                  id: String
+                  name: String
+                  friend: Character
+              }
+
+              type Character {
+                  name: String
+              }
+
+              type Query {
+                  hero: Droid
+              }
+            ";
+
+            Builder.Types.Include<DroidType>();
+            Builder.Types.For("Droid").ResolveType = obj => new GraphQLTypeReference("Droid");
             Builder.Types.Include<Query>();
 
             var query = @"{ hero { id name friend { name } } }";
@@ -55,7 +89,7 @@ namespace GraphQL.Tests.Utilities
         {
         }
 
-        [GraphQLMetadata("Droid")]
+        [GraphQLMetadata("Droid", IsTypeOf = typeof(Droid))]
         public class DroidType
         {
             public string Id(Droid droid) => droid.Id;

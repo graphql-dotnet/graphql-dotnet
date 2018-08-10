@@ -4,7 +4,7 @@ import exec from './exec'
 function test(settings, project) {
   return () => {
     const platform = process.platform === 'darwin'
-      ? '-f netcoreapp2.0'
+      ? '-f netcoreapp2.1'
       : ''
     const cmd = `dotnet test ${platform} "${project}" -c ${settings.target} --no-restore`
     return exec(cmd)

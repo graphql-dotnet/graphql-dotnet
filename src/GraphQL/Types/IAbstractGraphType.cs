@@ -13,18 +13,23 @@ namespace GraphQL.Types
         void AddPossibleType(IObjectGraphType type);
     }
 
-    public static class AbstractGraphTypeExtensions {
-
+    public static class AbstractGraphTypeExtensions
+    {
         public static bool IsPossibleType(this IAbstractGraphType abstractType, IGraphType type)
         {
             return abstractType.PossibleTypes.Any(x => x.Equals(type));
         }
 
-        public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value)
+        public static IObjectGraphType GetObjectType(this IAbstractGraphType abstractType, object value, ISchema schema)
         {
-            return abstractType.ResolveType != null
+            var result = abstractType.ResolveType != null
                 ? abstractType.ResolveType(value)
                 : GetTypeOf(abstractType, value);
+
+            if (result is GraphQLTypeReference reference)
+                result = schema.FindType(reference.Name) as IObjectGraphType;
+
+            return result;
         }
 
         public static IObjectGraphType GetTypeOf(this IAbstractGraphType abstractType, object value)

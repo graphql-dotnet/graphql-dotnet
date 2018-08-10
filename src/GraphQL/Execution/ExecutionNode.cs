@@ -46,7 +46,7 @@ namespace GraphQL.Execution
 
         public abstract object ToValue();
 
-        public IObjectGraphType GetParentType()
+        public IObjectGraphType GetParentType(ISchema schema)
         {
             IGraphType parentType = Parent?.GraphType;
 
@@ -54,7 +54,7 @@ namespace GraphQL.Execution
                 return objectType;
 
             if (parentType is IAbstractGraphType abstractType && Parent.IsResultSet)
-                return abstractType.GetObjectType(Parent.Result);
+                return abstractType.GetObjectType(Parent.Result, schema);
 
             return null;
         }
@@ -72,15 +72,14 @@ namespace GraphQL.Execution
         public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
             : base(parent, graphType, field, fieldDefinition, path)
         {
-
         }
 
-        public IObjectGraphType GetObjectGraphType()
+        public IObjectGraphType GetObjectGraphType(ISchema schema)
         {
             var objectGraphType = GraphType as IObjectGraphType;
 
             if (GraphType is IAbstractGraphType abstractGraphType && IsResultSet)
-                objectGraphType = abstractGraphType.GetObjectType(Result);
+                objectGraphType = abstractGraphType.GetObjectType(Result, schema);
 
             return objectGraphType;
         }
