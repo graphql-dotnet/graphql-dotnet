@@ -11,11 +11,13 @@ export default async function compile(settings) {
     versions.push(branch)
   }
 
-  if (settings.versionSuffix.length > 0) {
+  if (settings.includeRevision && settings.versionSuffix.length > 0) {
     versions.push(settings.versionSuffix)
   }
 
-  versions.push(settings.revision)
+  if (settings.includeRevision) {
+    versions.push(settings.revision)
+  }
 
   let sep = versions.length > 1 ? '-' : '.'
 

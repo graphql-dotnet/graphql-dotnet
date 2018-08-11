@@ -7,8 +7,8 @@ const target = process.env.CONFIGURATION || 'Debug'
 const buildNumber = process.env.APPVEYOR_BUILD_NUMBER
 let version = pjson.version
 const revision = buildNumber || moment().format('HHmm')
-const assemblyVersion = `${version}.${revision}`
-const nugetVersion = `${version}.${revision}`
+const includeRevision = true
+const assemblyVersion = includeRevision ? `${version}.${revision}` : `${version}.0`
 
 const appVeyorJobId = process.env.APPVEYOR_JOB_ID
 const CI = process.env.CI && process.env.CI.toString().toLowerCase() === 'true'
@@ -34,7 +34,7 @@ export default {
   target,
   version,
   revision,
-  nugetVersion,
+  includeRevision,
   assemblyVersion,
   taskTimeout: 120000,
   versionSuffix
