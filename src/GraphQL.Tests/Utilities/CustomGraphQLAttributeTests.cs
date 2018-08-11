@@ -85,7 +85,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            Builder.Types.Include<ABlog>();
+            Builder.Types.Include<ABlog, ABlog>();
 
             var schema = Builder.Build(defs);
             schema.Initialize();

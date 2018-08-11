@@ -63,15 +63,7 @@ namespace GraphQL.Tests.Utilities
             object expected = null;
             if (!string.IsNullOrWhiteSpace(result))
             {
-                expected = JObject.Parse(result); /*/JsonConvert.SerializeObject(
-                    result,
-                    new JsonSerializerSettings
-                    {
-                        // ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                        Formatting = Formatting.Indented,
-                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                        DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFF'Z'",
-                    });*/
+                expected = JObject.Parse(result);
             }
             return new ExecutionResult { Data = expected };
         }

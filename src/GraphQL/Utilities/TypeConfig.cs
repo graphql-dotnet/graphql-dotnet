@@ -26,9 +26,6 @@ namespace GraphQL.Utilities
             {
                 _type = value;
                 ApplyMetadata(value);
-
-                if (IsTypeOfFunc == null)
-                    IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(_type) ?? false;
             }
         }
 
@@ -40,7 +37,7 @@ namespace GraphQL.Utilities
 
         public void IsTypeOf<T>()
         {
-            IsTypeOfFunc = obj => obj?.GetType() == typeof(T);
+            IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeof(T)) ?? false;
         }
 
         public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)

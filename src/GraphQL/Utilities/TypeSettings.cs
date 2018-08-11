@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace GraphQL.Utilities
 {
@@ -17,10 +18,9 @@ namespace GraphQL.Utilities
             return _typeConfigurations[typeName];
         }
 
-        public void Include<T>()
+        public void Include<TType>()
         {
-            var type = typeof(T);
-            Include(type);
+            Include(typeof(TType));
         }
 
         public void Include(Type type)
@@ -32,6 +32,24 @@ namespace GraphQL.Utilities
         public void Include(string name, Type type)
         {
             _typeConfigurations[name].Type = type;
+        }
+
+        public void Include<TType, TTypeOfType>()
+        {
+            Include(typeof(TType), typeof(TTypeOfType));
+        }
+
+        public void Include(Type type, Type typeOfType)
+        {
+            var name = type.GraphQLName();
+            Include(name, type, typeOfType);
+        }
+
+        public void Include(string name, Type type, Type typeOfType)
+        {
+            var config = _typeConfigurations[name];
+            config.Type = type;
+            config.IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeOfType) ?? false;
         }
     }
 }
