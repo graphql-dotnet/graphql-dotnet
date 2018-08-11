@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Utilities
               }
             ";
 
-            Builder.Types.Include<DroidType>();
+            Builder.Types.Include<DroidType, Droid>("Droid");
             Builder.Types.Include<Query>();
 
             var query = @"{ hero { id name friend { name } } }";
@@ -59,7 +59,7 @@ namespace GraphQL.Tests.Utilities
               }
             ";
 
-            Builder.Types.Include<DroidType>();
+            Builder.Types.Include<DroidType>("Droid");
             Builder.Types.For("Droid").ResolveType = obj => new GraphQLTypeReference("Droid");
             Builder.Types.Include<Query>();
 
@@ -89,7 +89,7 @@ namespace GraphQL.Tests.Utilities
         {
         }
 
-        [GraphQLMetadata("Droid", IsTypeOf = typeof(Droid))]
+        // [GraphQLMetadata("Droid", IsTypeOf = typeof(Droid))]
         public class DroidType
         {
             public string Id(Droid droid) => droid.Id;

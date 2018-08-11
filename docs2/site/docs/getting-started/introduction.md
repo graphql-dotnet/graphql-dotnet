@@ -200,7 +200,7 @@ public class Query
   }
 }
 
-[GraphQLMetadata("Droid")]
+[GraphQLMetadata("Droid", IsTypeOf=typeof(Droid))]
 public class DroidType
 {
   public string Id(Droid droid) => droid.Id;
@@ -230,7 +230,6 @@ var schema = Schema.For(@"
   }
 ", _ => {
     _.Types.Include<DroidType>();
-    _.Types.For("Droid").IsTypeOf<Droid>();
     _.Types.Include<Query>();
 });
 

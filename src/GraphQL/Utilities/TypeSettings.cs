@@ -23,6 +23,11 @@ namespace GraphQL.Utilities
             Include(typeof(TType));
         }
 
+        public void Include<TType>(string name)
+        {
+            Include(name, typeof(TType));
+        }
+
         public void Include(Type type)
         {
             var name = type.GraphQLName();
@@ -37,6 +42,11 @@ namespace GraphQL.Utilities
         public void Include<TType, TTypeOfType>()
         {
             Include(typeof(TType), typeof(TTypeOfType));
+        }
+
+        public void Include<TType, TTypeOfType>(string name)
+        {
+            Include(name, typeof(TType), typeof(TTypeOfType));
         }
 
         public void Include(Type type, Type typeOfType)
