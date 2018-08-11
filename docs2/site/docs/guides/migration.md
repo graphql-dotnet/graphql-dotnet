@@ -9,6 +9,8 @@
 * Apollo Tracing - [details](https://graphql-dotnet.github.io/docs/getting-started/metrics)
 * Parser support for the `null` keyword
 * Addition of `IDependencyResolver` for dependency injection - [details](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection)
+* Add `ThrowOnUnhandledException` to `ExecutionOptions`. [details](https://github.com/graphql-dotnet/graphql-dotnet/pull/776)
+* Add the ability to return a `GraphQLTypeReference` from `ResolveType` [details](https://github.com/graphql-dotnet/graphql-dotnet/pull/775)
 * General updates to conform to the June 2018 Specification - [details](https://github.com/facebook/graphql/releases/tag/June2018)
 
 ## Breaking Changes
