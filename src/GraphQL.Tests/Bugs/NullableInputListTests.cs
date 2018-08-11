@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Bugs
     public class NullableInputListTests : QueryTestBase<TestSchema>
     {
         [Fact]
-        public async void Can_Accept_Null_List_From_Literal()
+        public void Can_Accept_Null_List_From_Literal()
         {
             var query = @"
                 query _ {
@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public async void Can_Accept_Null_List_From_Input()
+        public void Can_Accept_Null_List_From_Input()
         {
             var query = @"
                 query _($inputs:[TestInput]) {

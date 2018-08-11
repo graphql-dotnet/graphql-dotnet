@@ -13,15 +13,6 @@ namespace GraphQL.Tests.Bugs
     {
         private readonly IDocumentExecuter _executer = new DocumentExecuter();
 
-        ExecutionResult ExecuteQuery(ISchema schema, string query)
-        {
-            return _executer.ExecuteAsync(_ =>
-            {
-                _.Schema = schema;
-                _.Query = query;
-            }).GetAwaiter().GetResult();
-        }
-
         [Fact]
         public void only_nullable_is_happy()
         {
@@ -40,7 +31,16 @@ namespace GraphQL.Tests.Bugs
             VerifyIntrospection(new NullableSchema(true, true));
         }
 
-        public void VerifyIntrospection(ISchema schema)
+        private ExecutionResult ExecuteQuery(ISchema schema, string query)
+        {
+            return _executer.ExecuteAsync(_ =>
+            {
+                _.Schema = schema;
+                _.Query = query;
+            }).GetAwaiter().GetResult();
+        }
+
+        private void VerifyIntrospection(ISchema schema)
         {
             var result = ExecuteQuery(schema, SchemaIntrospection.IntrospectionQuery);
             result.ShouldNotBeNull();

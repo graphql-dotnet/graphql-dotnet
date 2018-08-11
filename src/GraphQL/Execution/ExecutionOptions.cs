@@ -36,5 +36,6 @@ namespace GraphQL
         //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
         public bool SetFieldMiddleware { get; set; } = true;
 
+        public bool ThrowOnUnhandledException { get; set; } = false;
     }
 }

@@ -34,6 +34,8 @@ namespace GraphQL.Tests.Utilities
                 _.Schema = schema;
                 _.Query = config.Query;
                 _.Inputs = config.Variables.ToInputs();
+                _.Root = config.Root;
+                _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
             }, queryResult);
         }
 
@@ -75,5 +77,7 @@ namespace GraphQL.Tests.Utilities
         public string Query { get; set; }
         public string Variables { get; set; }
         public string ExpectedResult { get; set; }
+        public object Root { get; set; }
+        public bool ThrowOnUnhandledException { get; set; }
     }
 }

@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Types
             DoesNotContainTypeNames(schema, "ASchemaType!");
         }
 
-        public void ContainsTypeNames(ISchema schema, params string[] typeNames)
+        private void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
             {
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Types
             });
         }
 
-        public void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
+        private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
             {
