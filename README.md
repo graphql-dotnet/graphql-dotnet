@@ -22,6 +22,10 @@ http://graphql-dotnet.github.io
 
 https://github.com/graphql-dotnet/examples
 
+## Training
+
+* [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.
+
 ## Upgrade Guides
 
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
