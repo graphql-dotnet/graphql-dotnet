@@ -474,7 +474,7 @@ namespace GraphQL.Execution
 
         private static T UnwrapTaskOfT<T>(Task<T> task)
         {
-            return task.Result;
+            return task.GetAwaiter().GetResult();
         }
 
         private static readonly MethodInfo UnwrapTaskOfTMethod = typeof(ExecutionHelper).GetMethod(nameof(UnwrapTaskOfT), BindingFlags.Static | BindingFlags.NonPublic);
