@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace GraphQL
 {
@@ -40,10 +40,17 @@ namespace GraphQL
         /// Resolves the specified type.
         /// </summary>
         /// <param name="type">Desired type</param>
-        /// <returns>System.Object.</returns>
+        /// <returns>An instance of <paramref name="type"/>.</returns>
         public object Resolve(Type type)
         {
-            return Activator.CreateInstance(type);
+            try
+            {
+                return Activator.CreateInstance(type);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception($"Failed to call Activator.CreateInstance. Type: {type.FullName}", exception);
+            }
         }
     }
 
