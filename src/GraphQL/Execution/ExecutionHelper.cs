@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
@@ -430,7 +431,17 @@ namespace GraphQL.Execution
                 }
                 else
                 {
-                    result = ((dynamic)task).Result;
+                    var taskType = task.GetType();
+                    if (taskType.GetGenericTypeDefinition() == typeof(Task<>))
+                    {
+                        var wrappedType = taskType.GetGenericArguments()[0];
+                        var method = UnwrapTaskOfTMethod.MakeGenericMethod(wrappedType);
+                        result = method.Invoke(null, new object[] { task });
+                    }
+                    else
+                    {
+                        result = null;
+                    }
                 }
             }
 
@@ -460,5 +471,12 @@ namespace GraphQL.Execution
 
             return newPath;
         }
+
+        private static T UnwrapTaskOfT<T>(Task<T> task)
+        {
+            return task.GetAwaiter().GetResult();
+        }
+
+        private static readonly MethodInfo UnwrapTaskOfTMethod = typeof(ExecutionHelper).GetMethod(nameof(UnwrapTaskOfT), BindingFlags.Static | BindingFlags.NonPublic);
     }
 }
