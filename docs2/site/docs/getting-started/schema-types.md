@@ -22,7 +22,7 @@ These are additional scalars provided by this project.
 |------------------|---------------------------------|--------------------|
 | `Date`           | `DateGraphType`                 | `DateTime`         |
 | `DateTime`       | `DateTimeGraphType`             | `DateTime`         |
-| `DateTimeOffSet` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   |
+| `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   |
 | `Seconds`        | `TimeSpanSecondsGraphType`      | `TimeSpan`         |
 | `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         |
 

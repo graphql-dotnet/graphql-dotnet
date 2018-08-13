@@ -141,7 +141,7 @@ var json = schema.Execute(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the October 2016 specification.
+- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](http://facebook.github.io/graphql/June2018/).
 
 ### Operation Execution
 - [x] Scalars
