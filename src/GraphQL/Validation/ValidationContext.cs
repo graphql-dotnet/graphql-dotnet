@@ -93,9 +93,9 @@ namespace GraphQL.Validation
                 var set = setsToVisit.Pop();
                 set.Selections.Apply(selection =>
                 {
-                    if (selection is FragmentSpread)
+                    if (selection is FragmentSpread spread)
                     {
-                        spreads.Add((FragmentSpread)selection);
+                        spreads.Add(spread);
                     }
                     else
                     {

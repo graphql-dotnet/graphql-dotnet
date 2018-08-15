@@ -25,13 +25,13 @@ namespace GraphQL.Language.AST
         {
             _definitions.Add(definition);
 
-            if (definition is FragmentDefinition)
+            if (definition is FragmentDefinition fragmentDefinition)
             {
-                Fragments.Add((FragmentDefinition) definition);
+                Fragments.Add(fragmentDefinition);
             }
-            else if (definition is Operation)
+            else if (definition is Operation operation)
             {
-                Operations.Add((Operation) definition);
+                Operations.Add(operation);
             }
             else
             {

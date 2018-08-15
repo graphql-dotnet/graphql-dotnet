@@ -120,9 +120,9 @@ namespace GraphQL.Execution
 
         public static void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType graphType)
             {
-                var nonNullType = ((NonNullGraphType)type).ResolvedType;
+                var nonNullType = graphType.ResolvedType;
 
                 if (input == null)
                 {
@@ -197,9 +197,9 @@ namespace GraphQL.Execution
 
         private static object ValueFromScalar(ScalarGraphType scalar, object input)
         {
-            if (input is IValue)
+            if (input is IValue value)
             {
-                return scalar.ParseLiteral((IValue)input);
+                return scalar.ParseLiteral(value);
             }
 
             return scalar.ParseValue(input);
@@ -230,9 +230,8 @@ namespace GraphQL.Execution
 
         public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nonNull)
             {
-                var nonNull = type as NonNullGraphType;
                 return CoerceValue(schema, nonNull.ResolvedType, input, variables);
             }
 
@@ -280,9 +279,8 @@ namespace GraphQL.Execution
                 return obj;
             }
 
-            if (type is ScalarGraphType)
+            if (type is ScalarGraphType scalarType)
             {
-                var scalarType = type as ScalarGraphType;
                 return scalarType.ParseLiteral(input);
             }
 

@@ -82,12 +82,11 @@ namespace GraphQL.Validation.Rules
           IGraphType type,
           string fieldName)
         {
-            if (type is IAbstractGraphType)
+            if (type is IAbstractGraphType absType)
             {
                 var suggestedObjectTypes = new List<string>();
                 var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
 
-                var absType = type as IAbstractGraphType;
                 absType.PossibleTypes.Apply(possibleType =>
                 {
                     if (!possibleType.HasField(fieldName))
@@ -123,9 +122,8 @@ namespace GraphQL.Validation.Rules
           IGraphType type,
           string fieldName)
         {
-            if (type is IComplexGraphType)
+            if (type is IComplexGraphType complexType)
             {
-                var complexType = type as IComplexGraphType;
                 return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
             }
 

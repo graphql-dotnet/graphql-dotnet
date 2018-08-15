@@ -181,9 +181,8 @@ namespace GraphQL
             if (value is JValue rawValue)
             {
                 var val = rawValue.Value;
-                if (val is long)
+                if (val is long l)
                 {
-                    long l = (long)val;
                     if (l >= int.MinValue && l <= int.MaxValue)
                     {
                         return (int)l;

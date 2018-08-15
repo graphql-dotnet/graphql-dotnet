@@ -462,9 +462,9 @@ namespace GraphQL.Utilities
             var list = new List<object>();
             foreach (var item in enumerable)
             {
-                if (item is INode)
+                if (item is INode node)
                 {
-                    var listResult = ApplyConfig(item as INode);
+                    var listResult = ApplyConfig(node);
                     if (listResult != null)
                     {
                         list.Add(listResult);

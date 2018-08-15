@@ -159,34 +159,34 @@ namespace GraphQL.Utilities
 
         public string PrintType(IGraphType type)
         {
-            if (type is EnumerationGraphType)
+            if (type is EnumerationGraphType graphType)
             {
-                return PrintEnum((EnumerationGraphType)type);
+                return PrintEnum(graphType);
             }
 
-            if (type is ScalarGraphType)
+            if (type is ScalarGraphType scalarGraphType)
             {
-                return PrintScalar((ScalarGraphType)type);
+                return PrintScalar(scalarGraphType);
             }
 
-            if (type is IObjectGraphType)
+            if (type is IObjectGraphType objectGraphType)
             {
-                return PrintObject((IObjectGraphType)type);
+                return PrintObject(objectGraphType);
             }
 
-            if (type is IInterfaceGraphType)
+            if (type is IInterfaceGraphType interfaceGraphType)
             {
-                return PrintInterface((IInterfaceGraphType)type);
+                return PrintInterface(interfaceGraphType);
             }
 
-            if (type is UnionGraphType)
+            if (type is UnionGraphType unionGraphType)
             {
-                return PrintUnion((UnionGraphType)type);
+                return PrintUnion(unionGraphType);
             }
 
-            if (type is DirectiveGraphType)
+            if (type is DirectiveGraphType directiveGraphType)
             {
-                return PrintDirective((DirectiveGraphType)type);
+                return PrintDirective(directiveGraphType);
             }
 
             if (!(type is IInputObjectGraphType))
@@ -344,9 +344,8 @@ namespace GraphQL.Utilities
 
         private static object SerializeEnumValue(IGraphType type, object value)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nullable)
             {
-                var nullable = (NonNullGraphType)type;
                 type = nullable.ResolvedType;
             }
 
@@ -355,15 +354,13 @@ namespace GraphQL.Utilities
 
         public static string ResolveName(IGraphType type)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nullable)
             {
-                var nullable = (NonNullGraphType)type;
                 return "{0}!".ToFormat(ResolveName(nullable.ResolvedType));
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType list)
             {
-                var list = (ListGraphType)type;
                 return "[{0}]".ToFormat(ResolveName(list.ResolvedType));
             }
 

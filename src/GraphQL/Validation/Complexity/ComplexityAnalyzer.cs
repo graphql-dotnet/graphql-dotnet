@@ -84,7 +84,7 @@ namespace GraphQL.Validation.Complexity
 
             if (node.Children != null &&
                 node.Children.Any(
-                    n => n is Field || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
+                    n => n is Field || (n is SelectionSet set && set.Children.Any()) || n is Operation))
             {
                 if (node is Field)
                 {
@@ -112,7 +112,7 @@ namespace GraphQL.Validation.Complexity
             if (node is FragmentDefinition) return;
 
             if (node.Children != null &&
-                node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet && ((SelectionSet)n).Children.Any()) || n is Operation))
+                node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet set && set.Children.Any()) || n is Operation))
             {
                 if (node is Field)
                 {
@@ -128,10 +128,10 @@ namespace GraphQL.Validation.Complexity
             }
             else if (node is Field)
                 RecordFieldComplexity(context, node, currentEndNodeImpact);
-            else if (node is FragmentSpread)
+            else if (node is FragmentSpread spread)
             {
-                var fragmentComplexity = context.FragmentMap[((FragmentSpread)node).Name];
-                RecordFieldComplexity(context, node, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
+                var fragmentComplexity = context.FragmentMap[spread.Name];
+                RecordFieldComplexity(context, spread, currentSubSelectionImpact / avgImpact * fragmentComplexity.Complexity);
                 context.Result.TotalQueryDepth += fragmentComplexity.Depth;
             }
         }
