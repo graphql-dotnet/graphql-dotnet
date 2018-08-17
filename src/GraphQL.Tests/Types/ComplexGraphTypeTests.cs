@@ -122,6 +122,24 @@ namespace GraphQL.Tests.Types
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
         }
 
+        [Fact]
+        public void throws_informative_exception_when_no_types_defined()
+        {
+            var type = new ComplexType<Droid>();
+
+            var fieldType = new FieldType()
+            {
+                Name = "name",
+                ResolvedType = null,
+                Type = null,
+            };
+
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
+
+            exception.ParamName.ShouldBe("Type");
+            exception.Message.ShouldStartWith("FieldType.Type is required when ResolvedType is unspecified.");
+        }
+
         [Theory]
         [InlineData("__id")]
         [InlineData("___id")]
