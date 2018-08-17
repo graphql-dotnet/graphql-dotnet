@@ -59,10 +59,18 @@ namespace GraphQL.Types
                     $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
             }
 
-            if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
+            if (fieldType.ResolvedType == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
-                    $"The declared Field type: {fieldType.Type.Name} should derive from GraphType, but doesn't.");
+                if (fieldType.Type == null)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
+                        $"Type is required when ResolvedType is unspecified.");
+                }
+                else if (!fieldType.Type.IsGraphType())
+                {
+                    throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
+                        $"The declared Field type: {fieldType.Type.Name} should derive from GraphType, but doesn't.");
+                }
             }
 
             _fields.Add(fieldType);
