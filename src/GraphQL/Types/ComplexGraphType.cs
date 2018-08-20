@@ -64,7 +64,7 @@ namespace GraphQL.Types
                 if (fieldType.Type == null)
                 {
                     throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
-                        $"{fieldType.GetType().Name}.Type is required when ResolvedType is unspecified.");
+                        $"The declared field '{fieldType.Name ?? fieldType.GetType().GetFriendlyName()}' on '{Name ?? GetType().GetFriendlyName()}' requires a field '{nameof(fieldType.Type)}' when no '{nameof(fieldType.ResolvedType)}' is provided.");
                 }
                 else if (!fieldType.Type.IsGraphType())
                 {
