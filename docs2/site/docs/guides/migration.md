@@ -55,12 +55,12 @@ The `DateGraphType` has been split into multiple types.  [See the GitHub issue](
   - Format: : `2018-05-17T13:11:06.368408+01:00` (ISO8601 compliant).
   - Maps to .NET type `System.DateTimeOffset`
   - Added to `GraphTypeRegistry` as the default representation of `System.DateTimeOffset`.
-- `TimeSpanSecondsGraphType` - A peroid of time as seconds.
+- `TimeSpanSecondsGraphType` - A period of time as seconds.
   - Scalar Name: `Seconds`
   - Format: `10`
   - Maps to .NET type - `System.TimeSpan`
   - Added to `GraphTypeRegistry` as the default representation of `System.TimeSpan`.
-- `TimeSpanMillisecondsGraphType` - A peroid of time as milliseconds.
+- `TimeSpanMillisecondsGraphType` - A period of time as milliseconds.
   - Scalar Name: `Milliseconds`
   - Format: `100`
   - Maps to .NET type - `System.TimeSpan`
