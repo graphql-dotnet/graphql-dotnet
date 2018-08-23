@@ -1,10 +1,9 @@
-using GraphQL.DataLoader.Tests.Stores;
+using GraphQL.DataLoader.Tests.Models;
 
 namespace GraphQL.DataLoader.Tests
 {
     public abstract class DataLoaderTestBase
     {
-        protected UsersStore Users { get; } = new UsersStore();
-        protected OrdersStore Orders { get; } = new OrdersStore();
+        protected Fake Fake { get; } = new Fake();
     }
 }

@@ -8,13 +8,14 @@ using GraphQL.Http;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
 
 namespace GraphQL.DataLoader.Tests
 {
-    public abstract class QueryTestBase
+    public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new DocumentExecuter();
         private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
@@ -35,10 +36,16 @@ namespace GraphQL.DataLoader.Tests
             services.AddSingleton<QueryType>();
             services.AddSingleton<OrderType>();
             services.AddSingleton<UserType>();
-            services.AddSingleton<OrdersStore>();
-            services.AddSingleton<UsersStore>();
             services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
             services.AddTransient<DataLoaderDocumentListener>();
+
+            var ordersMock = new Mock<IOrdersStore>();
+            var usersMock = new Mock<IUsersStore>();
+
+            services.AddSingleton(ordersMock);
+            services.AddSingleton(ordersMock.Object);
+            services.AddSingleton(usersMock);
+            services.AddSingleton(usersMock.Object);
         }
 
         public ExecutionResult AssertQuerySuccess<TSchema>(

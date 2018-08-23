@@ -6,13 +6,13 @@ namespace GraphQL.DataLoader.Tests.Types
 {
     public class OrderType : ObjectGraphType<Order>
     {
-        public OrderType(IDataLoaderContextAccessor accessor, UsersStore users)
+        public OrderType(IDataLoaderContextAccessor accessor, IUsersStore users)
         {
             Name = "Order";
 
             Field(x => x.OrderId);
             Field(x => x.OrderedOn);
-            Field(x => x.Total);
+            //Field(x => x.Total);
 
             Field<UserType, User>()
                 .Name("User")

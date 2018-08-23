@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
+using Moq;
 using Xunit;
 
 namespace GraphQL.DataLoader.Tests
@@ -11,18 +13,12 @@ namespace GraphQL.DataLoader.Tests
         [Fact]
         public void SingleQueryRoot_Works()
         {
-            var users = Services.GetRequiredService<UsersStore>();
+            var users = Fake.Users.Generate(2);
 
-            users.AddUsers(new User
-            {
-                UserId = 1,
-                FirstName = "John"
-            },
-            new User
-            {
-                UserId = 2,
-                FirstName = "Bob"
-            });
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
+
+            usersMock.Setup(store => store.GetAllUsersAsync(default))
+                .ReturnsAsync(users);
 
             AssertQuerySuccess<DataLoaderTestSchema>(
                 query: "{ users { userId firstName } }",
@@ -30,38 +26,36 @@ namespace GraphQL.DataLoader.Tests
 { users: [
     {
         userId: 1,
-        firstName: ""John""
+        firstName: """ + users[0].FirstName + @"""
     },
     {
         userId: 2,
-        firstName: ""Bob""
+        firstName: """ + users[1].FirstName + @"""
     }
 ] }
 ",
                 listenerType: typeof(DataLoaderDocumentListener)
             );
 
-            users.GetAllUsersCalledCount.ShouldBe(1);
+            usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         }
 
         [Fact]
         public void TwoLevel_SingleResult_Works()
         {
-            var orders = Services.GetRequiredService<OrdersStore>();
-            var users = Services.GetRequiredService<UsersStore>();
+            var users = Fake.Users.Generate(1);
 
-            orders.AddOrders(new Order
-            {
-                OrderId = 1,
-                UserId = 1,
-                Total = 100.00m
-            });
+            var order = Fake.Orders.Generate();
+            order.UserId = users[0].UserId;
 
-            users.AddUsers(new User
-            {
-                UserId = 1,
-                FirstName = "John"
-            });
+            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
+
+            ordersMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(new[] { order });
+
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
             AssertQuerySuccess<DataLoaderTestSchema>(
                 query: @"
@@ -80,7 +74,7 @@ namespace GraphQL.DataLoader.Tests
         orderId: 1,
         user: {
             userId: 1,
-            firstName: ""John""
+            firstName: """ + users[0].FirstName + @"""
         }
     }
 }
@@ -88,38 +82,27 @@ namespace GraphQL.DataLoader.Tests
                 listenerType: typeof(DataLoaderDocumentListener)
             );
 
-            orders.GetOrderByIdCalledCount.ShouldBe(1);
-            users.GetUsersByIdCalledCount.ShouldBe(1);
+            ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
+            ordersMock.VerifyNoOtherCalls();
+
+            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Once);
+            usersMock.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
-            var orders = Services.GetRequiredService<OrdersStore>();
-            var users = Services.GetRequiredService<UsersStore>();
+            var users = Fake.Users.Generate(2);
+            var orders = Fake.GenerateOrdersForUsers(users, 1);
 
-            orders.AddOrders(new Order
-            {
-                OrderId = 1,
-                UserId = 1,
-                Total = 100.00m
-            }, new Order
-            {
-                OrderId = 2,
-                UserId = 2,
-                Total = 50.00m
-            });
+            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
 
-            users.AddUsers(new User
-            {
-                UserId = 1,
-                FirstName = "John"
-            },
-            new User
-            {
-                UserId = 2,
-                FirstName = "Bob"
-            });
+            ordersMock.Setup(x => x.GetAllOrdersAsync())
+                .ReturnsAsync(orders);
+
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
             AssertQuerySuccess<DataLoaderTestSchema>(
                 query: @"
@@ -139,14 +122,14 @@ namespace GraphQL.DataLoader.Tests
         orderId: 1,
         user: {
             userId: 1,
-            firstName: ""John""
+            firstName: """ + users[0].FirstName + @"""
         }
     },
     {
         orderId: 2,
         user: {
             userId: 2,
-            firstName: ""Bob""
+            firstName: """ + users[1].FirstName + @"""
         }
     }]
 }
@@ -154,8 +137,11 @@ namespace GraphQL.DataLoader.Tests
                 listenerType: typeof(DataLoaderDocumentListener)
             );
 
-            orders.GetAllOrdersCalledCount.ShouldBe(1);
-            users.GetUsersByIdCalledCount.ShouldBe(1, "Second level resolution not batched");
+            ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
+            ordersMock.VerifyNoOtherCalls();
+
+            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
+            usersMock.VerifyNoOtherCalls();
         }
     }
 }
