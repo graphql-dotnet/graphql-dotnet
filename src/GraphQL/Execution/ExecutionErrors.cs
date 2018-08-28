@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace GraphQL
@@ -18,6 +18,8 @@ namespace GraphQL
         }
 
         public int Count => _errors.Count;
+
+        public ExecutionError this[int index] => _errors[index];
 
         public IEnumerator<ExecutionError> GetEnumerator()
         {

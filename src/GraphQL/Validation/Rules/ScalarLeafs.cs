@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Types;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -36,13 +36,13 @@ namespace GraphQL.Validation.Rules
 
             if (type.IsLeafType())
             {
-                if (field.SelectionSet != null && field.SelectionSet.Selections.Any())
+                if (field.SelectionSet != null && field.SelectionSet.Selections.Count > 0)
                 {
                     var error = new ValidationError(context.OriginalQuery, "5.2.3", NoSubselectionAllowedMessage(field.Name, context.Print(type)), field.SelectionSet);
                     context.ReportError(error);
                 }
             }
-            else if(field.SelectionSet == null || !field.SelectionSet.Selections.Any())
+            else if(field.SelectionSet == null || field.SelectionSet.Selections.Count == 0)
             {
                 var error = new ValidationError(context.OriginalQuery, "5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
                 context.ReportError(error);

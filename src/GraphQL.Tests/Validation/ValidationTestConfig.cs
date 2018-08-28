@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Validation;
 
@@ -10,8 +10,8 @@ namespace GraphQL.Tests.Validation
         private readonly List<ValidationErrorAssertion> _assertions = new List<ValidationErrorAssertion>();
 
         public string Query { get; set; }
-        public IEnumerable<IValidationRule> Rules => _rules;
-        public IEnumerable<ValidationErrorAssertion> Assertions => _assertions;
+        public IList<IValidationRule> Rules => _rules;
+        public IList<ValidationErrorAssertion> Assertions => _assertions;
 
         public void Error(string message, int? line = null, int? column = null)
         {

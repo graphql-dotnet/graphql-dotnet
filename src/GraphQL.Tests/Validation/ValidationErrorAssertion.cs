@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace GraphQL.Tests.Validation
 {
@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Validation
         private readonly List<ErrorLocation> _locations = new List<ErrorLocation>();
 
         public string Message { get; set; }
-        public IEnumerable<ErrorLocation> Locations => _locations;
+        public IList<ErrorLocation> Locations => _locations;
 
         public void Loc(int line, int column)
         {

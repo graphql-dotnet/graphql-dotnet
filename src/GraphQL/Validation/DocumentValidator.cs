@@ -54,7 +54,7 @@ namespace GraphQL.Validation
 //             visitors.Insert(1, new DebugNodeVisitor());
 // #endif
 
-            var basic = new BasicVisitor(visitors.ToArray());
+            var basic = new BasicVisitor(visitors);
 
             basic.Visit(document);
 

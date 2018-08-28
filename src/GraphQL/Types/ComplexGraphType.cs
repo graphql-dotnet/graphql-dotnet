@@ -46,7 +46,7 @@ namespace GraphQL.Types
         {
             if (string.IsNullOrWhiteSpace(name)) return null;
 
-            return _fields.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.Ordinal));
+            return _fields.Find(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public virtual FieldType AddField(FieldType fieldType)

@@ -21,11 +21,14 @@ namespace GraphQL.Language.AST
 
         public override string ToString()
         {
-            return "Directive{{name='{0}',arguments={1}}}".ToFormat(Name, Arguments);
+            return $"Directive{{name='{Name}',arguments={Arguments}}}";
         }
 
         protected bool Equals(Directive other)
         {
+            if (other == null)
+                return false;
+
             return string.Equals(Name, other.Name);
         }
 

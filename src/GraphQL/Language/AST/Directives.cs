@@ -1,24 +1,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Language.AST
 {
     public class Directives : AbstractNode, IEnumerable<Directive>
     {
         private readonly List<Directive> _directives = new List<Directive>();
+        private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
 
         public override IEnumerable<INode> Children => _directives;
 
         public void Add(Directive directive)
         {
             _directives.Add(directive);
+
+            if (!_unique.ContainsKey(directive.Name))
+            {
+                _unique.Add(directive.Name, directive);
+            }
         }
 
         public Directive Find(string name)
         {
-            return _directives.FirstOrDefault(d => d.Name.Equals(name, StringComparison.Ordinal));
+            _unique.TryGetValue(name, out Directive value);
+            return value;
         }
 
         public IEnumerator<Directive> GetEnumerator()

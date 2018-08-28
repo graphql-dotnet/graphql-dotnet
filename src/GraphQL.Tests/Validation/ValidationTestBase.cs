@@ -34,29 +34,34 @@ namespace GraphQL.Tests.Validation
 
             result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
             result.Errors.Count.ShouldBe(
-                config.Assertions.Count(),
+                config.Assertions.Count,
                 $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
 
-            config.Assertions.Apply((assert, idx) =>
+            for (int i = 0; i < config.Assertions.Count; i++)
             {
-                var error = result.Errors.Skip(idx).First();
+                var assert = config.Assertions[i];
+                var error = result.Errors[i];
+
                 error.Message.ShouldBe(assert.Message);
 
-                var allLocations = string.Join("", error.Locations.Select(l => $"({l.Line},{l.Column})"));
+                var allLocations = string.Concat(error.Locations.Select(l => $"({l.Line},{l.Column})"));
+                var locations = error.Locations.ToList();
 
-                assert.Locations.Apply((assertLoc, locIdx) =>
+                for (int j = 0; j < assert.Locations.Count; j++)
                 {
-                    var errorLoc = error.Locations.Skip(locIdx).First();
+                    var assertLoc = assert.Locations[j];
+                    var errorLoc = locations[j];
+
                     errorLoc.Line.ShouldBe(
                         assertLoc.Line,
                         $"Expected line {assertLoc.Line} but was {errorLoc.Line} - {error.Message} {allLocations}");
                     errorLoc.Column.ShouldBe(
                         assertLoc.Column,
                         $"Expected column {assertLoc.Column} but was {errorLoc.Column} - {error.Message} {allLocations}");
-                });
+                }
 
-                error.Locations.Count().ShouldBe(assert.Locations.Count());
-            });
+                locations.Count.ShouldBe(assert.Locations.Count);
+            }
         }
 
         protected void ShouldPassRule(string query)

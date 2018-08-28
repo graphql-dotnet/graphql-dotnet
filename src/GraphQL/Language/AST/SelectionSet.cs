@@ -5,8 +5,11 @@ namespace GraphQL.Language.AST
 {
     public class SelectionSet : AbstractNode
     {
+        private readonly List<ISelection> _selections;
+
         public SelectionSet()
         {
+            _selections = new List<ISelection>();
         }
 
         private SelectionSet(List<ISelection> selections)
@@ -14,9 +17,7 @@ namespace GraphQL.Language.AST
             _selections = selections;
         }
 
-        private readonly List<ISelection> _selections = new List<ISelection>();
-
-        public IEnumerable<ISelection> Selections => _selections;
+        public IList<ISelection> Selections => _selections;
         public override IEnumerable<INode> Children => _selections;
 
         public void Add(ISelection selection)

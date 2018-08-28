@@ -52,10 +52,10 @@ namespace GraphQL.Types
                 }
             });
 
-            types.Apply(type =>
+            foreach (var type in types)
             {
                 lookup.AddType(type, ctx);
-            });
+            }
 
             var introspectionType = typeof(SchemaIntrospection);
 
@@ -63,19 +63,23 @@ namespace GraphQL.Types
             lookup.HandleField(introspectionType, SchemaIntrospection.TypeMeta, ctx);
             lookup.HandleField(introspectionType, SchemaIntrospection.TypeNameMeta, ctx);
 
-            directives.Apply(directive =>
+            foreach (var directive in directives)
             {
-                directive.Arguments?.Apply(arg =>
+                if (directive.Arguments == null)
+                    continue;
+
+                foreach (var arg in directive.Arguments)
                 {
                     if (arg.ResolvedType != null)
                     {
                         arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
-                        return;
                     }
-
-                    arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
-                });
-            });
+                    else
+                    {
+                        arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                    }
+                }
+            }
 
             lookup.ApplyTypeReferences();
 
@@ -144,16 +148,16 @@ namespace GraphQL.Types
             var context = new TypeCollectionContext(
                 type =>
                 {
-                    return BuildNamedType(type, t => (IGraphType) Activator.CreateInstance(t));
+                    return BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t));
                 },
-                (name, type, _) =>
+                (name, type, ctx) =>
                 {
                     var trimmed = name.TrimGraphQLTypes();
                     lock (_lock)
                     {
                         _types[trimmed] = type;
                     }
-                    _?.AddType(trimmed, type, null);
+                    ctx?.AddType(trimmed, type, null);
                 });
 
             AddType<TType>(context);
@@ -161,17 +165,7 @@ namespace GraphQL.Types
 
         private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver)
         {
-            return type.BuildNamedType(t =>
-            {
-                var exists = this[t];
-
-                if (exists != null)
-                {
-                    return exists;
-                }
-
-                return resolver(t);
-            });
+            return type.BuildNamedType(t => this[t] ?? resolver(t));
         }
 
         public void AddType<TType>(TypeCollectionContext context)
@@ -202,15 +196,15 @@ namespace GraphQL.Types
 
             if (type is IComplexGraphType complexType)
             {
-                complexType.Fields.Apply(field =>
+                foreach (var field in complexType.Fields)
                 {
                     HandleField(type.GetType(), field, context);
-                });
+                }
             }
 
             if (type is IObjectGraphType obj)
             {
-                obj.Interfaces.Apply(objectInterface =>
+                foreach (var objectInterface in obj.Interfaces)
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
 
@@ -228,7 +222,7 @@ namespace GraphQL.Types
                                 .ToFormat(interfaceInstance.Name, obj.Name));
                         }
                     }
-                });
+                }
             }
 
             if (type is UnionGraphType union)
@@ -238,7 +232,7 @@ namespace GraphQL.Types
                     throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
                 }
 
-                union.PossibleTypes.Apply(unionedType =>
+                foreach (var unionedType in union.PossibleTypes)
                 {
                     AddTypeIfNotRegistered(unionedType, context);
 
@@ -250,9 +244,9 @@ namespace GraphQL.Types
                             "There is no way to resolve this possible type during execution.")
                             .ToFormat(union.Name, unionedType.Name));
                     }
-                });
+                }
 
-                union.Types.Apply(unionedType =>
+                foreach (var unionedType in union.Types)
                 {
                     AddTypeIfNotRegistered(unionedType, context);
 
@@ -268,7 +262,7 @@ namespace GraphQL.Types
                     }
 
                     union.AddPossibleType(objType);
-                });
+                }
             }
         }
 
@@ -286,7 +280,10 @@ namespace GraphQL.Types
                 AddTypeIfNotRegistered(field.ResolvedType, context);
             }
 
-            field.Arguments?.Apply(arg =>
+            if (field.Arguments == null)
+                return;
+
+            foreach (var arg in field.Arguments)
             {
                 arg.Name = FieldNameConverter.NameFor(arg.Name, null);
 
@@ -298,7 +295,7 @@ namespace GraphQL.Types
 
                 AddTypeIfNotRegistered(arg.Type, context);
                 arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
-            });
+            }
         }
 
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
@@ -323,27 +320,33 @@ namespace GraphQL.Types
 
         public void ApplyTypeReferences()
         {
-            var types = _types.Select(x => x.Value).ToList();
-            types.Apply(ApplyTypeReference);
+            foreach (var type in _types.Values.ToList())
+            {
+                ApplyTypeReference(type);
+            }
         }
 
         public void ApplyTypeReference(IGraphType type)
         {
             if (type is IComplexGraphType complexType)
             {
-                complexType.Fields.Apply(field =>
+                foreach (var field in complexType.Fields)
                 {
                     field.ResolvedType = ConvertTypeReference(type, field.ResolvedType);
-                    field.Arguments?.Apply(arg =>
+
+                    if (field.Arguments == null)
+                        continue;
+
+                    foreach (var arg in field.Arguments)
                     {
                         arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
-                    });
-                });
+                    }
+                }
             }
 
             if (type is IObjectGraphType objectType)
             {
-                var types = objectType
+                objectType.ResolvedInterfaces = objectType
                     .ResolvedInterfaces
                     .Select(i =>
                     {
@@ -363,12 +366,11 @@ namespace GraphQL.Types
                         return interfaceType;
                     })
                     .ToList();
-                objectType.ResolvedInterfaces = types;
             }
 
             if (type is UnionGraphType union)
             {
-                var types = union
+                union.PossibleTypes = union
                     .PossibleTypes
                     .Select(t =>
                     {
@@ -386,7 +388,6 @@ namespace GraphQL.Types
                         return unionType;
                     })
                     .ToList();
-                union.PossibleTypes = types;
             }
         }
 

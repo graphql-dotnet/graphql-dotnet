@@ -38,7 +38,7 @@ namespace GraphQL.Validation
             _errors.Add(error);
         }
 
-        public IEnumerable<VariableUsage> GetVariables(IHaveSelectionSet node)
+        public List<VariableUsage> GetVariables(IHaveSelectionSet node)
         {
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
@@ -46,7 +46,7 @@ namespace GraphQL.Validation
             var listener = new EnterLeaveListener(_ =>
             {
                 _.Match<VariableReference>(
-                    varRef => usages.Add(new VariableUsage {Node = varRef, Type = info.GetInputType()})
+                    varRef => usages.Add(new VariableUsage(varRef, info.GetInputType()))
                 );
             });
 
@@ -63,14 +63,12 @@ namespace GraphQL.Validation
                 return results;
             }
 
-            var usages = GetVariables(operation).ToList();
+            var usages = GetVariables(operation);
 
-            var fragments = GetRecursivelyReferencedFragments(operation);
-
-            fragments.Apply(fragment =>
+            foreach (var fragment in GetRecursivelyReferencedFragments(operation))
             {
                 usages.AddRange(GetVariables(fragment));
-            });
+            }
 
             _variables[operation] = usages;
 
@@ -82,30 +80,30 @@ namespace GraphQL.Validation
             return Document.Fragments.FindDefinition(name);
         }
 
-        public IEnumerable<FragmentSpread> GetFragmentSpreads(SelectionSet node)
+        public List<FragmentSpread> GetFragmentSpreads(SelectionSet node)
         {
             var spreads = new List<FragmentSpread>();
 
-            var setsToVisit = new Stack<SelectionSet>(new[] {node});
+            var setsToVisit = new Stack<SelectionSet>(new[] { node });
 
-            while (setsToVisit.Any())
+            while (setsToVisit.Count > 0)
             {
                 var set = setsToVisit.Pop();
-                set.Selections.Apply(selection =>
+
+                foreach (var selection in set.Selections)
                 {
                     if (selection is FragmentSpread spread)
                     {
                         spreads.Add(spread);
                     }
-                    else
+                    else if (selection is IHaveSelectionSet hasSet)
                     {
-                        var hasSet = selection as IHaveSelectionSet;
-                        if (hasSet?.SelectionSet != null)
+                        if (hasSet.SelectionSet != null)
                         {
                             setsToVisit.Push(hasSet.SelectionSet);
                         }
                     }
-                });
+                }
             }
 
             return spreads;
@@ -122,11 +120,11 @@ namespace GraphQL.Validation
             var nodesToVisit = new Stack<SelectionSet>(new[] {operation.SelectionSet});
             var collectedNames = new Dictionary<string, bool>();
 
-            while (nodesToVisit.Any())
+            while (nodesToVisit.Count > 0)
             {
                 var node = nodesToVisit.Pop();
-                var spreads = GetFragmentSpreads(node);
-                spreads.Apply(spread =>
+
+                foreach (var spread in GetFragmentSpreads(node))
                 {
                     var fragName = spread.Name;
                     if (!collectedNames.ContainsKey(fragName))
@@ -140,7 +138,7 @@ namespace GraphQL.Validation
                             nodesToVisit.Push(fragment.SelectionSet);
                         }
                     }
-                });
+                }
             }
 
             _fragments[operation] = fragments;
@@ -159,9 +157,15 @@ namespace GraphQL.Validation
         }
     }
 
-    public struct VariableUsage
+    public class VariableUsage
     {
-        public VariableReference Node;
-        public IGraphType Type;
+        public VariableReference Node { get; }
+        public IGraphType Type { get; }
+
+        public VariableUsage(VariableReference node, IGraphType type)
+        {
+            Node = node;
+            Type = type;
+        }
     }
 }

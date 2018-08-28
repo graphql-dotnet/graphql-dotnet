@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 
@@ -49,8 +49,8 @@ namespace GraphQL.Validation.Rules
             var fragmentName = fragment.Name;
             visitedFrags[fragmentName] = true;
 
-            var spreadNodes = context.GetFragmentSpreads(fragment.SelectionSet).ToArray();
-            if (!spreadNodes.Any())
+            var spreadNodes = context.GetFragmentSpreads(fragment.SelectionSet);
+            if (spreadNodes.Count == 0)
             {
                 return;
             }

@@ -58,7 +58,7 @@ namespace GraphQL.Execution
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
-            var subFields = new Dictionary<string, ExecutionNode>();
+            var subFields = new Dictionary<string, ExecutionNode>(fields.Count);
 
             foreach (var kvp in fields)
             {
@@ -92,7 +92,6 @@ namespace GraphQL.Execution
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType;
 
-
             if (!(parent.Result is IEnumerable data))
             {
                 var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
@@ -100,7 +99,9 @@ namespace GraphQL.Execution
             }
 
             var index = 0;
-            var arrayItems = new List<ExecutionNode>();
+            var arrayItems = (data is ICollection collection)
+                ? new List<ExecutionNode>(collection.Count)
+                : new List<ExecutionNode>();
 
             foreach (var d in data)
             {

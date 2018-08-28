@@ -26,7 +26,10 @@ namespace GraphQL.Types
 
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
-            _resolvedInterfaces.Fill(graphType);
+            if (!_resolvedInterfaces.Contains(graphType))
+            {
+                _resolvedInterfaces.Add(graphType);
+            }
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces

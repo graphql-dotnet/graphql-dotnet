@@ -49,25 +49,28 @@ namespace GraphQL.Validation.Rules
 
         private void CheckDirectives(ValidationContext context, Directives directives)
         {
+            if (directives == null)
+                return;
+
             var knownDirectives = new Dictionary<string, Directive>();
-            directives?.Apply(directive =>
+
+            foreach (var directive in directives)
             {
-                var directiveName = directive.Name;
-                if (knownDirectives.ContainsKey(directiveName))
+                if (knownDirectives.ContainsKey(directive.Name))
                 {
                     var error = new ValidationError(
                         context.OriginalQuery,
                         "5.6.3",
-                        DuplicateDirectiveMessage(directiveName),
-                        knownDirectives[directiveName],
+                        DuplicateDirectiveMessage(directive.Name),
+                        knownDirectives[directive.Name],
                         directive);
                     context.ReportError(error);
                 }
                 else
                 {
-                    knownDirectives[directiveName] = directive;
+                    knownDirectives[directive.Name] = directive;
                 }
-            });
+            }
         }
     }
 }
