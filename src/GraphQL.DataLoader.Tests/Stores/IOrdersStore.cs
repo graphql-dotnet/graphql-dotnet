@@ -11,5 +11,6 @@ namespace GraphQL.DataLoader.Tests.Stores
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task<IEnumerable<Order>> GetOrderByIdAsync(IEnumerable<int> orderIds);
         Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+        Task<ILookup<int, OrderItem>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds);
     }
 }

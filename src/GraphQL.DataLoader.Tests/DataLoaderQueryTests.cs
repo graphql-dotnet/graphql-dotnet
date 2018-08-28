@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.DataLoader.Tests
@@ -33,9 +35,7 @@ namespace GraphQL.DataLoader.Tests
         firstName: """ + users[1].FirstName + @"""
     }
 ] }
-",
-                listenerType: typeof(DataLoaderDocumentListener)
-            );
+");
 
             usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         }
@@ -78,9 +78,7 @@ namespace GraphQL.DataLoader.Tests
         }
     }
 }
-",
-                listenerType: typeof(DataLoaderDocumentListener)
-            );
+");
 
             ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
             ordersMock.VerifyNoOtherCalls();
@@ -133,15 +131,66 @@ namespace GraphQL.DataLoader.Tests
         }
     }]
 }
-",
-                listenerType: typeof(DataLoaderDocumentListener)
-            );
+");
 
             ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
             ordersMock.VerifyNoOtherCalls();
 
             usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
             usersMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task Large_Query_Performance()
+        {
+            var users = Fake.Users.Generate(1000);
+            var products = Fake.Products.Generate(2000);
+            var orders = Fake.GenerateOrdersForUsers(users, 10);
+            var orderItems = Fake.GetItemsForOrders(orders, 5);
+
+            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
+            var productsMock = Services.GetRequiredService<Mock<IProductsStore>>();
+
+            ordersMock.Setup(x => x.GetAllOrdersAsync())
+                .ReturnsAsync(orders);
+
+            ordersMock.Setup(x => x.GetItemsByOrderIdAsync(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(orderItems.ToLookup(x => x.OrderId));
+
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(users.ToDictionary(x => x.UserId));
+
+            productsMock.Setup(x => x.GetProductsByIdAsync(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(products.ToDictionary(x => x.ProductId));
+
+            var result = await ExecuteQueryAsync<DataLoaderTestSchema>(
+                query: @"
+{
+    orders {
+        orderId
+        orderedOn
+        user {
+            userId
+            firstName
+            lastName
+            email
+        }
+        items {
+            orderItemId
+            quantity
+            unitPrice
+            product {
+                productId
+                name
+                price
+                description
+            }
+        }
+    }
+}");
+
+            result.Errors.ShouldBeNull();
         }
     }
 }
