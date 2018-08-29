@@ -9,6 +9,7 @@
     <PackageId>GraphQL</PackageId>
     <PackageTags>GraphQL;json;api</PackageTags>
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/graphql-dotnet/graphql-dotnet/master/assets/logo.64x64.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
