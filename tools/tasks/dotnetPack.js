@@ -15,7 +15,7 @@ export default async function compile(settings) {
     versions.push(settings.versionSuffix)
   }
 
-  if (settings.includeRevision) {
+  if (settings.includeRevision || versions.length > 0) {
     versions.push(settings.revision)
   }
 
