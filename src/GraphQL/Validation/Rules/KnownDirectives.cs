@@ -57,9 +57,8 @@ namespace GraphQL.Validation.Rules
                 appliedTo = ancestors[ancestors.Length - 2];
             }
 
-            if (appliedTo is Operation)
+            if (appliedTo is Operation op)
             {
-                var op = (Operation) appliedTo;
                 switch (op.OperationType)
                 {
                     case OperationType.Query: return DirectiveLocation.Query;

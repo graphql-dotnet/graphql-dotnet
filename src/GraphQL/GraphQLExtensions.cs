@@ -49,15 +49,13 @@ namespace GraphQL
         {
             IGraphType unmodifiedType = type;
 
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nonNull)
             {
-                var nonNull = (NonNullGraphType) type;
                 return GetNamedType(nonNull.ResolvedType);
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType list)
             {
-                var list = (ListGraphType) type;
                 return GetNamedType(list.ResolvedType);
             }
 
@@ -107,9 +105,8 @@ namespace GraphQL
 
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nonNull)
             {
-                var nonNull = (NonNullGraphType) type;
                 var ofType = nonNull.ResolvedType;
 
                 if (valueAst == null || valueAst is NullValue)
@@ -142,15 +139,14 @@ namespace GraphQL
                 return new string[] {};
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType list)
             {
-                var list = (ListGraphType)type;
                 var ofType = list.ResolvedType;
 
-                if (valueAst is ListValue)
+                if (valueAst is ListValue listValue)
                 {
                     var index = 0;
-                    return ((ListValue) valueAst).Values.Aggregate(new string[] {}, (acc, value) =>
+                    return listValue.Values.Aggregate(new string[] {}, (acc, value) =>
                     {
                         var errors = IsValidLiteralValue(ofType, value, schema);
                         var result = acc.Concat(errors.Map(err => $"In element #{index}: {err}")).ToArray();
@@ -162,14 +158,12 @@ namespace GraphQL
                 return IsValidLiteralValue(ofType, valueAst, schema);
             }
 
-            if (type is IInputObjectGraphType)
+            if (type is IInputObjectGraphType inputType)
             {
                 if (!(valueAst is ObjectValue))
                 {
-                    return new[] {$"Expected \"{type.Name}\", found not an object."};
+                    return new[] {$"Expected \"{inputType.Name}\", found not an object."};
                 }
-
-                var inputType = (IInputObjectGraphType) type;
 
                 var fields = inputType.Fields.ToList();
                 var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
@@ -228,30 +222,25 @@ namespace GraphQL
             }
 
             // If superType is non-null, maybeSubType must also be nullable.
-            if (superType is NonNullGraphType)
+            if (superType is NonNullGraphType sup1)
             {
-                if (maybeSubType is NonNullGraphType)
+                if (maybeSubType is NonNullGraphType sub)
                 {
-                    var sub = (NonNullGraphType) maybeSubType;
-                    var sup = (NonNullGraphType) superType;
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, schema);
                 }
 
                 return false;
             }
-            else if (maybeSubType is NonNullGraphType)
+            else if (maybeSubType is NonNullGraphType sub)
             {
-                var sub = (NonNullGraphType) maybeSubType;
                 return IsSubtypeOf(sub.ResolvedType, superType, schema);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
-            if (superType is ListGraphType)
+            if (superType is ListGraphType sup)
             {
-                if (maybeSubType is ListGraphType)
+                if (maybeSubType is ListGraphType sub)
                 {
-                    var sub = (ListGraphType) maybeSubType;
-                    var sup = (ListGraphType) superType;
                     return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
                 }
 
@@ -265,10 +254,10 @@ namespace GraphQL
 
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
-            if (superType is IAbstractGraphType &&
+            if (superType is IAbstractGraphType type &&
                 maybeSubType is IObjectGraphType)
             {
-                return ((IAbstractGraphType) superType).IsPossibleType(maybeSubType);
+                return type.IsPossibleType(maybeSubType);
             }
 
             return false;
@@ -312,9 +301,8 @@ namespace GraphQL
 
         public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nonnull)
             {
-                var nonnull = (NonNullGraphType)type;
                 return AstFromValue(value, schema, nonnull.ResolvedType);
             }
 
@@ -325,14 +313,12 @@ namespace GraphQL
 
             // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
             // the value is not an IEnumerable, convert the value using the list's item type.
-            if (type is ListGraphType)
+            if (type is ListGraphType listType)
             {
-                var listType = (ListGraphType) type;
                 var itemType = listType.ResolvedType;
 
-                if (!(value is string) && value is IEnumerable)
+                if (!(value is string) && value is IEnumerable list)
                 {
-                    var list = (IEnumerable)value;
                     var values = list.Map(item => AstFromValue(item, schema, itemType));
                     return new ListValue(values);
                 }
@@ -342,14 +328,13 @@ namespace GraphQL
 
             // Populate the fields of the input object by creating ASTs from each value
             // in the dictionary according to the fields in the input type.
-            if (type is IInputObjectGraphType)
+            if (type is IInputObjectGraphType input)
             {
                 if (!(value is Dictionary<string, object>))
                 {
                     return null;
                 }
 
-                var input = (IInputObjectGraphType) type;
                 var dict = (Dictionary<string, object>)value;
 
                 var fields = dict
@@ -379,34 +364,34 @@ namespace GraphQL
                 return null;
             }
 
-            if (serialized is bool)
+            if (serialized is bool b)
             {
-                return new BooleanValue((bool)serialized);
+                return new BooleanValue(b);
             }
 
-            if (serialized is int)
+            if (serialized is int i)
             {
-                return new IntValue((int)serialized);
+                return new IntValue(i);
             }
 
-            if (serialized is long)
+            if (serialized is long l)
             {
-                return new LongValue((long)serialized);
+                return new LongValue(l);
             }
 
-            if (serialized is decimal)
+            if (serialized is decimal @decimal)
             {
-                return new DecimalValue((decimal)serialized);
+                return new DecimalValue(@decimal);
             }
 
-            if (serialized is double)
+            if (serialized is double d)
             {
-                return new FloatValue((double)serialized);
+                return new FloatValue(d);
             }
 
-            if (serialized is DateTime)
+            if (serialized is DateTime time)
             {
-                return new DateTimeValue((DateTime)serialized);
+                return new DateTimeValue(time);
             }
 
             if (serialized is Uri uri)
@@ -414,14 +399,14 @@ namespace GraphQL
                 return new UriValue(uri);
             }
 
-            if (serialized is DateTimeOffset)
+            if (serialized is DateTimeOffset offset)
             {
-                return new DateTimeOffsetValue((DateTimeOffset)serialized);
+                return new DateTimeOffsetValue(offset);
             }
 
-            if (serialized is TimeSpan)
+            if (serialized is TimeSpan span)
             {
-                return new TimeSpanValue((TimeSpan)serialized);
+                return new TimeSpanValue(span);
             }
 
             if (serialized is string)

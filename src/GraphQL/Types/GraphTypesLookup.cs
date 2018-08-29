@@ -200,18 +200,16 @@ namespace GraphQL.Types
                 _types[name] = type;
             }
 
-            if (type is IComplexGraphType)
+            if (type is IComplexGraphType complexType)
             {
-                var complexType = type as IComplexGraphType;
                 complexType.Fields.Apply(field =>
                 {
                     HandleField(type.GetType(), field, context);
                 });
             }
 
-            if (type is IObjectGraphType)
+            if (type is IObjectGraphType obj)
             {
-                var obj = (IObjectGraphType) type;
                 obj.Interfaces.Apply(objectInterface =>
                 {
                     AddTypeIfNotRegistered(objectInterface, context);
@@ -233,10 +231,8 @@ namespace GraphQL.Types
                 });
             }
 
-            if (type is UnionGraphType)
+            if (type is UnionGraphType union)
             {
-                var union = (UnionGraphType) type;
-
                 if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
                     throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
@@ -333,9 +329,8 @@ namespace GraphQL.Types
 
         public void ApplyTypeReference(IGraphType type)
         {
-            if (type is IComplexGraphType)
+            if (type is IComplexGraphType complexType)
             {
-                var complexType = (IComplexGraphType)type;
                 complexType.Fields.Apply(field =>
                 {
                     field.ResolvedType = ConvertTypeReference(type, field.ResolvedType);
@@ -346,9 +341,8 @@ namespace GraphQL.Types
                 });
             }
 
-            if (type is IObjectGraphType)
+            if (type is IObjectGraphType objectType)
             {
-                var objectType = (IObjectGraphType) type;
                 var types = objectType
                     .ResolvedInterfaces
                     .Select(i =>
@@ -372,9 +366,8 @@ namespace GraphQL.Types
                 objectType.ResolvedInterfaces = types;
             }
 
-            if (type is UnionGraphType)
+            if (type is UnionGraphType union)
             {
-                var union = (UnionGraphType)type;
                 var types = union
                     .PossibleTypes
                     .Select(t =>
@@ -399,16 +392,14 @@ namespace GraphQL.Types
 
         private IGraphType ConvertTypeReference(INamedType parentType, IGraphType type)
         {
-            if (type is NonNullGraphType)
+            if (type is NonNullGraphType nonNull)
             {
-                var nonNull = (NonNullGraphType)type;
                 nonNull.ResolvedType = ConvertTypeReference(parentType, nonNull.ResolvedType);
                 return nonNull;
             }
 
-            if (type is ListGraphType)
+            if (type is ListGraphType list)
             {
-                var list = (ListGraphType)type;
                 list.ResolvedType = ConvertTypeReference(parentType, list.ResolvedType);
                 return list;
             }

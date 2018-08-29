@@ -21,9 +21,9 @@ namespace GraphQL.Introspection
                 "at runtime. List and NonNull types compose other types.";
             Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
-                if (context.Source is GraphType)
+                if (context.Source is GraphType type)
                 {
-                    return KindForInstance((GraphType)context.Source);
+                    return KindForInstance(type);
                 }
 
                 throw new ExecutionError("Unknown kind of type: {0}".ToFormat(context.Source));
@@ -61,9 +61,8 @@ namespace GraphQL.Introspection
             });
             Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
             {
-                if (context.Source is IAbstractGraphType)
+                if (context.Source is IAbstractGraphType type)
                 {
-                    var type = (IAbstractGraphType)context.Source;
                     return type.PossibleTypes;
                 }
 
@@ -97,14 +96,14 @@ namespace GraphQL.Introspection
             {
                 if (context.Source == null) return null;
 
-                if (context.Source is NonNullGraphType)
+                if (context.Source is NonNullGraphType type)
                 {
-                    return ((NonNullGraphType) context.Source).ResolvedType;
+                    return type.ResolvedType;
                 }
 
-                if (context.Source is ListGraphType)
+                if (context.Source is ListGraphType graphType)
                 {
-                    return ((ListGraphType) context.Source).ResolvedType;
+                    return graphType.ResolvedType;
                 }
 
                 return null;

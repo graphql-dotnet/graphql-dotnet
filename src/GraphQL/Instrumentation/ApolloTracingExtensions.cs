@@ -64,7 +64,7 @@ namespace GraphQL.Instrumentation
         {
              foreach (var step in stringPath)
             {
-                if (int.TryParse(step, out int arrayIndex))
+                if (int.TryParse(step, out var arrayIndex))
                 {
                     yield return arrayIndex;
                 }

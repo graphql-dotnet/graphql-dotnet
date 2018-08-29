@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -36,15 +36,14 @@ namespace GraphQL.Validation.Rules
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
 
-                    if (inputType is NonNullGraphType && defaultValue != null)
+                    if (inputType is NonNullGraphType nonNullType && defaultValue != null)
                     {
-                        var nonNullType = (NonNullGraphType) inputType;
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,
                             "5.7.2",
                             BadValueForNonNullArgMessage(
                                 name,
-                                context.Print(inputType),
+                                context.Print(nonNullType),
                                 context.Print(nonNullType.ResolvedType)),
                             defaultValue));
                     }

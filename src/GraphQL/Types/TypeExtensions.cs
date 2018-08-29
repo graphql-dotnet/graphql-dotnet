@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -9,9 +9,8 @@ namespace GraphQL.Types
         {
             if (type == null) return null;
 
-            if (type is NonNullType)
+            if (type is NonNullType nonnull)
             {
-                var nonnull = (NonNullType)type;
                 var ofType = GraphTypeFromType(nonnull.Type, schema);
                 if(ofType == null)
                 {
@@ -23,9 +22,8 @@ namespace GraphQL.Types
                 return instance;
             }
 
-            if (type is ListType)
+            if (type is ListType list)
             {
-                var list = (ListType)type;
                 var ofType = GraphTypeFromType(list.Type, schema);
                 if(ofType == null)
                 {
@@ -37,9 +35,8 @@ namespace GraphQL.Types
                 return instance;
             }
 
-            if (type is NamedType)
+            if (type is NamedType named)
             {
-                var named = (NamedType)type;
                 return schema.FindType(named.Name);
             }
 
@@ -48,15 +45,13 @@ namespace GraphQL.Types
 
         public static string Name(this IType type)
         {
-            if (type is NonNullType)
+            if (type is NonNullType nonnull)
             {
-                var nonnull = (NonNullType)type;
                 return Name(nonnull.Type);
             }
 
-            if (type is ListType)
+            if (type is ListType list)
             {
-                var list = (ListType)type;
                 return Name(list.Type);
             }
 
@@ -65,15 +60,13 @@ namespace GraphQL.Types
 
         public static string FullName(this IType type)
         {
-            if (type is NonNullType)
+            if (type is NonNullType nonnull)
             {
-                var nonnull = (NonNullType)type;
                 return "{0}!".ToFormat(FullName(nonnull.Type));
             }
 
-            if (type is ListType)
+            if (type is ListType list)
             {
-                var list = (ListType)type;
                 return "[{0}]".ToFormat(FullName(list.Type));
             }
 

@@ -21,29 +21,29 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value)
         {
-            if (value is StringValue)
+            if (value is StringValue stringValue)
             {
-                return ParseValue(((StringValue)value).Value);
+                return ParseValue(stringValue.Value);
             }
 
-            if (value is IntValue)
+            if (value is IntValue intValue)
             {
-                return ParseValue(((IntValue)value).Value);
+                return ParseValue(intValue.Value);
             }
 
-            if (value is LongValue)
+            if (value is LongValue longValue)
             {
-                return ParseValue(((LongValue)value).Value);
+                return ParseValue(longValue.Value);
             }
 
-            if (value is FloatValue)
+            if (value is FloatValue floatValue)
             {
-                return ParseValue(((FloatValue)value).Value);
+                return ParseValue(floatValue.Value);
             }
 
-            if (value is DecimalValue)
+            if (value is DecimalValue decimalValue)
             {
-                return ParseValue(((DecimalValue)value).Value);
+                return ParseValue(decimalValue.Value);
             }
 
             return null;

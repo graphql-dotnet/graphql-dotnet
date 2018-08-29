@@ -118,7 +118,6 @@ namespace GraphQL
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             TypeInfo info = type.GetTypeInfo();
-            Type graphType = null;
 
             if (info.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -130,7 +129,7 @@ namespace GraphQL
                 }
             }
 
-            graphType = GraphTypeTypeRegistry.Get(type);
+            var graphType = GraphTypeTypeRegistry.Get(type);
 
             if (type.IsArray)
             {

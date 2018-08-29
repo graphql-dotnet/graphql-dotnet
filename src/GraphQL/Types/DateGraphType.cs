@@ -31,14 +31,14 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value)
         {
-            if (value is DateTimeValue)
+            if (value is DateTimeValue timeValue)
             {
-                return ParseValue(((DateTimeValue)value).Value);
+                return ParseValue(timeValue.Value);
             }
 
-            if (value is StringValue)
+            if (value is StringValue stringValue)
             {
-                return ParseValue(((StringValue)value).Value);
+                return ParseValue(stringValue.Value);
             }
 
             return null;
