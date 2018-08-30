@@ -7,7 +7,6 @@ namespace GraphQL.Language.AST
         public FragmentSpread(NameNode node)
             : this()
         {
-            Name = node.Name;
             NameNode = node;
         }
 
@@ -16,7 +15,7 @@ namespace GraphQL.Language.AST
             Directives = new Directives();
         }
 
-        public string Name { get; set; }
+        public string Name => NameNode?.Name;
         public NameNode NameNode { get; }
 
         public Directives Directives { get; set; }
