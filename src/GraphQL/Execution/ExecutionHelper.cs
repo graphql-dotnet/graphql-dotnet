@@ -435,29 +435,6 @@ namespace GraphQL.Execution
             return false;
         }
 
-        /// <summary>
-        /// Unwrap nested Tasks to get the result
-        /// </summary>
-        public static async Task<object> UnwrapResultAsync(object result)
-        {
-            while (result is Task task)
-            {
-                await task.ConfigureAwait(false);
-
-                // Most performant if available
-                if (task is Task<object> t)
-                {
-                    result = t.Result;
-                }
-                else
-                {
-                    result = ((dynamic)task).Result;
-                }
-            }
-
-            return result;
-        }
-
         public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
         {
             var selections = field?.SelectionSet?.Selections;

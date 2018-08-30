@@ -191,8 +191,11 @@ namespace GraphQL.Execution
                 var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
                 var result = resolver.Resolve(resolveContext);
 
-                result = await UnwrapResultAsync(result)
-                    .ConfigureAwait(false);
+                if (result is Task task)
+                {
+                    await task.ConfigureAwait(false);
+                    result = task.GetResult();
+                }
 
                 node.Result = result;
 
