@@ -17,11 +17,10 @@ namespace GraphQL.Language.AST
 
         public VariableDefinition(NameNode node)
         {
-            Name = node.Name;
             NameNode = node;
         }
 
-        public string Name { get; set; }
+        public string Name => NameNode?.Name;
         public NameNode NameNode { get; set; }
         public IType Type { get; set; }
         public IValue DefaultValue { get; set; }

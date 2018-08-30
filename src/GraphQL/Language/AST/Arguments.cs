@@ -18,7 +18,7 @@ namespace GraphQL.Language.AST
         public IValue ValueFor(string name)
         {
             var arg = _arguments.FirstOrDefault(x => x.Name == name);
-            return arg != null ? arg.Value : null;
+            return arg?.Value;
         }
 
         protected bool Equals(Arguments args)

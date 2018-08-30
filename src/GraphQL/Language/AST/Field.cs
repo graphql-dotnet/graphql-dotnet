@@ -12,11 +12,10 @@ namespace GraphQL.Language.AST
         {
             Alias = alias?.Name;
             AliasNode = alias;
-            Name = name.Name;
             NameNode = name;
         }
 
-        public string Name { get; set; }
+        public string Name => NameNode?.Name;
         public NameNode NameNode { get; }
 
         public string Alias { get; set; }

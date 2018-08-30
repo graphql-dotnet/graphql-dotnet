@@ -7,7 +7,6 @@ namespace GraphQL.Language.AST
         public Operation(NameNode name)
             : this()
         {
-            Name = name?.Name;
             NameNode = name;
         }
 
@@ -18,7 +17,7 @@ namespace GraphQL.Language.AST
             Variables = new VariableDefinitions();
         }
 
-        public string Name { get; set; }
+        public string Name => NameNode?.Name;
         public NameNode NameNode { get; }
 
         public OperationType OperationType { get; set; }
