@@ -37,7 +37,7 @@ namespace GraphQL.DataLoader.Tests
                 var task2 = loader.LoadAsync(2);
 
                 // Dispatch loading
-                loader.Dispatch();
+                await loader.DispatchAsync();
 
                 // Now await tasks
                 user1 = await task1;
@@ -79,7 +79,7 @@ namespace GraphQL.DataLoader.Tests
                 var task2 = loader.LoadAsync(2);
 
                 // Dispatch loading
-                loader.Dispatch();
+                await loader.DispatchAsync();
 
                 // Now await tasks
                 user1 = await task1;
@@ -91,7 +91,7 @@ namespace GraphQL.DataLoader.Tests
                     "Task should already be complete because value comes from cache");
 
                 // This should not actually run the fetch delegate again
-                loader.Dispatch();
+                await loader.DispatchAsync();
 
                 user3 = await task3;
             });
@@ -130,7 +130,7 @@ namespace GraphQL.DataLoader.Tests
                 var task3 = loader.LoadAsync(3);
 
                 // Dispatch loading
-                loader.Dispatch();
+                await loader.DispatchAsync();
 
                 // Now await tasks
                 user1 = await task1;
@@ -174,7 +174,7 @@ namespace GraphQL.DataLoader.Tests
             var task3 = loader.LoadAsync(3);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             // Now await tasks
             user1 = await task1;
@@ -187,7 +187,7 @@ namespace GraphQL.DataLoader.Tests
             task3b.Status.ShouldBe(TaskStatus.RanToCompletion,
                 "Should be cached because it was requested in the first batch even though it wasn't in the result dictionary");
 
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user3b = await task3b;
 
@@ -218,7 +218,7 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
 
             Exception ex = await Should.ThrowAsync<ArgumentException>(async () =>
@@ -249,7 +249,7 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(1);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             // Now await tasks
             var user1 = await task1;

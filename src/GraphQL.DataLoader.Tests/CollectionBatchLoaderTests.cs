@@ -31,7 +31,7 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -69,7 +69,7 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -92,7 +92,7 @@ namespace GraphQL.DataLoader.Tests
             task3.Status.ShouldNotBe(TaskStatus.RanToCompletion, "Result should already be cached");
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1bOrders = await task1b;
             var user2bOrders = await task2b;
@@ -132,7 +132,7 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(1);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             // Now await tasks
             var user1Orders = await task1;

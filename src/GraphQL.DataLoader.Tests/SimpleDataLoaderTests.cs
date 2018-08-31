@@ -28,7 +28,7 @@ namespace GraphQL.DataLoader.Tests
 
             var task = loader.LoadAsync();
 
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var result1 = await task;
 
@@ -59,7 +59,7 @@ namespace GraphQL.DataLoader.Tests
             mock.Setup(store => store.GetAllUsersAsync(cts.Token))
                 .Returns(async (CancellationToken ct) =>
                 {
-                    await Task.Delay(20);
+                    await Task.Delay(30);
                     ct.ThrowIfCancellationRequested();
 
                     return users;
@@ -71,9 +71,9 @@ namespace GraphQL.DataLoader.Tests
 
             var task = loader.LoadAsync();
 
-            cts.CancelAfter(TimeSpan.FromMilliseconds(5));
+            cts.CancelAfter(TimeSpan.FromMilliseconds(10));
 
-            loader.Dispatch(cts.Token);
+            await loader.DispatchAsync(cts.Token);
 
             await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
@@ -101,7 +101,7 @@ namespace GraphQL.DataLoader.Tests
 
             cts.Cancel();
 
-            loader.Dispatch(cts.Token);
+            await loader.DispatchAsync(cts.Token);
 
             await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
@@ -130,7 +130,7 @@ namespace GraphQL.DataLoader.Tests
 
             var task = loader.LoadAsync();
 
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var ex = await Should.ThrowAsync<Exception>(async () =>
             {
@@ -156,7 +156,7 @@ namespace GraphQL.DataLoader.Tests
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var ex = await Should.ThrowAsync<Exception>(async () =>
             {

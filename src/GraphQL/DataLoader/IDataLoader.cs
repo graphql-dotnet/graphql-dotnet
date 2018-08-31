@@ -12,7 +12,7 @@ namespace GraphQL.DataLoader
         /// Dispatch any pending operations
         /// </summary>
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        void Dispatch(CancellationToken cancellationToken = default(CancellationToken));
+        Task DispatchAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>

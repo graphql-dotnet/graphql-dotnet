@@ -13,7 +13,7 @@ namespace GraphQL.DataLoader
 
         protected abstract bool IsFetchNeeded();
 
-        public void Dispatch(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task DispatchAsync(CancellationToken cancellationToken = default)
         {
             if (!IsFetchNeeded())
             {
@@ -30,40 +30,21 @@ namespace GraphQL.DataLoader
                 return;
             }
 
-            Task<T> fetchTask = null;
-
             try
             {
-                fetchTask = FetchAsync(cancellationToken);
+                var result = await FetchAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                tcs.SetResult(result);
+            }
+            catch (OperationCanceledException)
+            {
+                tcs.TrySetCanceled();
             }
             catch (Exception ex)
             {
                 tcs.SetException(ex);
-                return;
             }
-
-            fetchTask.ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                {
-                    Exception ex = task.Exception;
-
-                    while (ex is AggregateException && ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                    }
-
-                    tcs.SetException(ex);
-                }
-                else if (task.IsCanceled)
-                {
-                    tcs.SetCanceled();
-                }
-                else
-                {
-                    tcs.SetResult(task.Result);
-                }
-            });
         }
     }
 }
