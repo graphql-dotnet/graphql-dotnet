@@ -32,7 +32,9 @@ namespace GraphQL.Validation.Rules
                 enter: op => variableDefs = new List<VariableDefinition>(),
                 leave: op =>
                 {
-                    var usages = context.GetRecursiveVariables(op).Select(usage => usage.Node.Name);
+                    var usages = context.GetRecursiveVariables(op)
+                        .Select(usage => usage.Node.Name)
+                        .ToList();
 
                     foreach (var variableDef in variableDefs)
                     {

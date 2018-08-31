@@ -27,6 +27,10 @@ namespace GraphQL.Language.AST
             return value;
         }
 
+        public int Count => _directives.Count;
+
+        public bool HasDuplicates => _directives.Count != _unique.Count;
+
         public IEnumerator<Directive> GetEnumerator()
         {
             return _directives.GetEnumerator();

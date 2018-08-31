@@ -49,10 +49,13 @@ namespace GraphQL.Validation.Rules
 
         private void CheckDirectives(ValidationContext context, Directives directives)
         {
-            if (directives == null)
+            if (directives == null || directives.Count == 0)
                 return;
 
-            var knownDirectives = new Dictionary<string, Directive>();
+            if (!directives.HasDuplicates)
+                return;
+
+            var knownDirectives = new Dictionary<string, Directive>(directives.Count);
 
             foreach (var directive in directives)
             {
@@ -64,6 +67,7 @@ namespace GraphQL.Validation.Rules
                         DuplicateDirectiveMessage(directive.Name),
                         knownDirectives[directive.Name],
                         directive);
+
                     context.ReportError(error);
                 }
                 else
