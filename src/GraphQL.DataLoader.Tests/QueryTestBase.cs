@@ -74,8 +74,8 @@ namespace GraphQL.DataLoader.Tests
                 opts.ExposeExceptions = true;
             }));
 
-            var writtenResult = writer.Write(runResult);
-            var expectedResult = writer.Write(expectedExecutionResult);
+            var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
+            var expectedResult = AsyncContext.Run(() => writer.WriteToStringAsync(expectedExecutionResult));
 
             string additionalInfo = null;
 

@@ -15,7 +15,7 @@ namespace GraphQL.Harness.Tests
         public override void Assert(Scenario scenario, ScenarioAssertionException ex)
         {
             var writer = (IDocumentWriter)scenario.Context.RequestServices.GetService(typeof(IDocumentWriter));
-            var expectedResult = writer.Write(CreateQueryResult(_result));
+            var expectedResult = writer.WriteToStringAsync(CreateQueryResult(_result)).GetAwaiter().GetResult();
 
             var body = ex.ReadBody(scenario);
             if (!body.Equals(expectedResult))
