@@ -12,6 +12,7 @@ namespace GraphQL
 
         static ValueConverter()
         {
+            Register(typeof(string), typeof(short), ParseShort);
             Register(typeof(string), typeof(int), ParseInt);
             Register(typeof(string), typeof(long), ParseLong);
             Register(typeof(string), typeof(float), ParseFloat);
@@ -26,12 +27,14 @@ namespace GraphQL
             Register(typeof(DateTimeOffset), typeof(DateTime), DateTimeOffsetToDateTime);
             Register(typeof(TimeSpan), typeof(long), TimeSpanToLong);
 
+            Register(typeof(int), typeof(short), IntToShort);
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(long), IntToLong);
             Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
             Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
 
+            Register(typeof(long), typeof(short), LongToShort);
             Register(typeof(long), typeof(int), LongToInt);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
 
@@ -167,6 +170,14 @@ namespace GraphQL
             value is string s
                 ? new Uri(s)
                 : (Uri) value;
+
+        private static object ParseShort(object value) => convertToInt16((string)value);
+        private static object IntToShort(object value) => convertToInt16((int) value);
+        private static object LongToShort(object value) => convertToInt16((long) value);
+
+        private static object convertToInt16<T>(T value) =>
+            Convert.ToInt16(value, NumberFormatInfo.InvariantInfo);
+
 
         public static object ConvertTo(object value, Type targetType)
         {
