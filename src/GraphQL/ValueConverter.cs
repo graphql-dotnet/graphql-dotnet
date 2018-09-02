@@ -17,6 +17,7 @@ namespace GraphQL
             Register(typeof(string), typeof(int), ParseInt);
             Register(typeof(string), typeof(uint), ParseUInt);
             Register(typeof(string), typeof(long), ParseLong);
+            Register(typeof(string), typeof(ulong), ParseULong);
             Register(typeof(string), typeof(float), ParseFloat);
             Register(typeof(string), typeof(double), ParseDouble);
             Register(typeof(string), typeof(decimal), ParseDecimal);
@@ -34,6 +35,7 @@ namespace GraphQL
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(uint), IntToUInt);
             Register(typeof(int), typeof(long), IntToLong);
+            Register(typeof(int), typeof(ulong), IntToULong); 
             Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
             Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
@@ -42,6 +44,7 @@ namespace GraphQL
             Register(typeof(long), typeof(ushort), LongToUShort);
             Register(typeof(long), typeof(int), LongToInt);
             Register(typeof(long), typeof(uint), LongToUInt);
+            Register(typeof(long), typeof(ulong), LongToULong);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
@@ -198,6 +201,14 @@ namespace GraphQL
 
         private static object convertToUInt32<T>(T value) =>
             Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo);
+
+
+        private static object ParseULong(object value) => convertToUInt64(value);
+        private static object IntToULong(object value) => convertToUInt64((int)value);
+        private static object LongToULong(object value) => convertToUInt64((long)value);
+
+        private static object convertToUInt64<T>(T value) =>
+            Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo);
 
 
 
