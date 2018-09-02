@@ -25,9 +25,9 @@ namespace GraphQL.Validation
                 return;
             }
 
-            foreach (var visitor in _visitors)
+            for (int i = 0; i < _visitors.Count; i++)
             {
-                visitor.Enter(node);
+                _visitors[i].Enter(node);
             }
 
             if (node.Children != null)
@@ -38,9 +38,9 @@ namespace GraphQL.Validation
                 }
             }
 
-            foreach (var visitor in _visitors.Reverse())
+            for (int i = _visitors.Count - 1; i >= 0; i--)
             {
-                visitor.Leave(node);
+                _visitors[i].Leave(node);
             }
         }
     }
