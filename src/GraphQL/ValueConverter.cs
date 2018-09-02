@@ -13,6 +13,7 @@ namespace GraphQL
         static ValueConverter()
         {
             Register(typeof(string), typeof(short), ParseShort);
+            Register(typeof(string), typeof(ushort), ParseUShort);
             Register(typeof(string), typeof(int), ParseInt);
             Register(typeof(string), typeof(long), ParseLong);
             Register(typeof(string), typeof(float), ParseFloat);
@@ -28,6 +29,7 @@ namespace GraphQL
             Register(typeof(TimeSpan), typeof(long), TimeSpanToLong);
 
             Register(typeof(int), typeof(short), IntToShort);
+            Register(typeof(int), typeof(ushort), IntToUShort);
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(long), IntToLong);
             Register(typeof(int), typeof(double), IntToDouble);
@@ -35,6 +37,7 @@ namespace GraphQL
             Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
 
             Register(typeof(long), typeof(short), LongToShort);
+            Register(typeof(long), typeof(ushort), LongToUShort);
             Register(typeof(long), typeof(int), LongToInt);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
 
@@ -177,6 +180,14 @@ namespace GraphQL
 
         private static object convertToInt16<T>(T value) =>
             Convert.ToInt16(value, NumberFormatInfo.InvariantInfo);
+
+        private static object ParseUShort(object value) => convertToUInt16(value);
+        private static object IntToUShort(object value) => convertToUInt16((int)value);
+        private static object LongToUShort(object value) => convertToUInt16((long)value);
+
+        private static object convertToUInt16<T>(T value) =>
+            Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo);
+
 
 
         public static object ConvertTo(object value, Type targetType)
