@@ -1,4 +1,3 @@
-using GraphQL.Execution;
 using GraphQL.Tests.Execution;
 using GraphQL.Types;
 using Xunit;
