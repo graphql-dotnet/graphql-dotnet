@@ -6,7 +6,7 @@
 
 > A GraphQL service is created by defining types and fields on those types, then providing functions for each field on each type.
 
-Here is a "Hello World" for GraphQL .NET.
+Here is a "Hello World" example for GraphQL .NET.
 
 ```csharp
 using System;
@@ -60,7 +60,7 @@ type Query {
 
 ## Schema First Approach
 
-The Schema first approach relys upon the [GraphQL schema language](https://graphql.org/learn/schema/#type-language), coding conventions, and tries to provide a minmal amount of syntax.  It is the easiest to get started using though does not currently support some advanced scenarios.
+The Schema first approach relies upon the [GraphQL schema language](https://graphql.org/learn/schema/#type-language), coding conventions, and tries to provide a minimal amount of syntax.  It is the easiest to get started though it does not currently support some advanced scenarios.
 
 > Use the optional `GraphQLMetadata` attribute to customize the mapping to the schema type.
 
