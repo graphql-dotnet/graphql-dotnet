@@ -101,7 +101,7 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value => new ObjectExecutionNode(null, node.GraphType, node.Field, node.FieldDefinition, node.Path)
+                    .Select(value => new ObjectExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.Path)
                     {
                         Source = value
                     })
