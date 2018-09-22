@@ -20,6 +20,7 @@ namespace GraphQL.Http
     public class DocumentWriter : IDocumentWriter
     {
         private readonly ArrayPool<byte> _pool = ArrayPool<byte>.Shared;
+        private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly int _maxArrayLength = 1048576;
         private readonly JsonSerializer _serializer;
         private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
@@ -42,15 +43,19 @@ namespace GraphQL.Http
             _serializer.Formatting = formatting;
         }
 
-        public Task WriteAsync<T>(Stream stream, T value)
+        public async Task WriteAsync<T>(Stream stream, T value)
         {
             using (var writer = new StreamWriter(stream, Utf8Encoding, 1024, true))
-            using (var jsonWriter = new JsonTextWriter(writer))
+            using (var jsonWriter = new JsonTextWriter(writer)
+            {
+                ArrayPool = _jsonArrayPool,
+                CloseOutput = false,
+                AutoCompleteOnClose = false
+            })
             {
                 _serializer.Serialize(jsonWriter, value);
+                await jsonWriter.FlushAsync().ConfigureAwait(false);
             }
-
-            return TaskExtensions.CompletedTask;
         }
 
         public async Task<IByteResult> WriteAsync<T>(T value)
