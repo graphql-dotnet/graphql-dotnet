@@ -45,7 +45,7 @@ namespace GraphQL.Http
 
         public async Task WriteAsync<T>(Stream stream, T value)
         {
-            using (var writer = new StreamWriter(stream, Utf8Encoding, 1024, true))
+            using (var writer = new HttpResponseStreamWriter(stream, Utf8Encoding))
             using (var jsonWriter = new JsonTextWriter(writer)
             {
                 ArrayPool = _jsonArrayPool,
