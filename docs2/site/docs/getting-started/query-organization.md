@@ -26,14 +26,18 @@ public class Query : ObjectGraphType
 Split into groups.
 
 ```graphql
+type Account {
+  customer(id: ID): Customer
+  order(id: ID): Order
+}
+
+type Retail {
+  products: [Product]
+}
+
 type Query {
-  account {
-    customer(id: ID): Customer
-    order(id: ID): Order
-  }
-  retail {
-    products: [Product]
-  }
+  account: Account
+  retail: Retail
 }
 ```
 
@@ -47,6 +51,16 @@ public class Query : ObjectGraphType
     Name = "Query";
     Field<AccountGroupGraphType>("account", resolve: context => new {});
     Field<RetailGroupGraphType>("retail", resolve: context => new {});
+  }
+}
+
+public class AccountGroupGraphType : ObjectGraphType
+{
+  public AccountGroupGraphType()
+  {
+    Name = "Account";
+    Field<CustomerGraphType>("customer", arguments: ..., resolve:...);
+    Field<OrderGraphType>("order", arguments: ..., resolve:...);
   }
 }
 
