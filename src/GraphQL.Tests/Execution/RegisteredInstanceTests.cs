@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -9,6 +10,48 @@ namespace GraphQL.Tests.Execution
 {
     public class RegisteredInstanceTests : BasicQueryTestBase
     {
+        public class Product
+        {
+            public string Name { get; set; }
+        }
+
+        [Fact]
+        public void nested_groups_work()
+        {
+            var product = new ObjectGraphType();
+            product.Name = "Product";
+            product.Field("name", new StringGraphType());
+            product.IsTypeOf = obj => obj is Product;
+
+            var catalog = new ObjectGraphType();
+            catalog.Name = "Catalog";
+            catalog.Field("products", new ListGraphType(product), resolve: ctx =>
+            {
+                return new List<Product> {
+                    new Product { Name = "Book" }
+                };
+            });
+
+            var retail = new ObjectGraphType();
+            retail.Name = "Retail";
+            retail.Field("catalog", catalog, resolve: ctx => new {});
+
+            var root = new ObjectGraphType();
+            root.Name = "Root";
+            root.Field("retail", retail, resolve: ctx => new {});
+
+            var schema = new Schema();
+            schema.Query = root;
+            schema.RegisterTypes(retail);
+            schema.RegisterTypes(catalog);
+
+            AssertQuerySuccess(
+                schema,
+                @"{ retail { catalog { products { name } } } }",
+                @"{ retail: { catalog: { products: [ { name: 'Book' }] } } }"
+            );
+        }
+
         [Fact]
         public void build_dynamic_schema()
         {
