@@ -1,7 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Validation;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
@@ -25,8 +25,7 @@ namespace GraphQL.DataLoader
 
         public Task BeforeExecutionAsync(object userContext, CancellationToken token)
         {
-            if (_accessor.Context == null)
-                _accessor.Context = new DataLoaderContext();
+            EnsureContextExists();
 
             return TaskExtensions.CompletedTask;
         }
@@ -45,10 +44,18 @@ namespace GraphQL.DataLoader
 
         public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
         {
+            EnsureContextExists();
+
             var context = _accessor.Context;
             context.DispatchAll(token);
 
             return TaskExtensions.CompletedTask;
+        }
+
+        private void EnsureContextExists()
+        {
+            if (_accessor.Context == null)
+                _accessor.Context = new DataLoaderContext();
         }
     }
 }
