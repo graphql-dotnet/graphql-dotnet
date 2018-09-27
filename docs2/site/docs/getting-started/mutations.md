@@ -53,7 +53,7 @@ public class StarWarsSchema : Schema
 }
 ```
 
-A `mutation` `GraphType` looks idential to a `query` `GraphType`.  The difference is you are allowed to mutate data.
+A `mutation` `GraphType` looks identical to a `query` `GraphType`.  The difference is you are allowed to mutate data.
 
 ```csharp
 public class StarWarsMutation : ObjectGraphType
