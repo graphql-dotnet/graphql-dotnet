@@ -78,6 +78,14 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
+                if (context.NodeFilter != null)
+                {
+                    if (!context.NodeFilter(node))
+                    {
+                        continue;
+                    }
+                }
+
                 subFields[kvp.Key] = node;
             }
 
@@ -114,9 +122,15 @@ namespace GraphQL.Execution
                     SetSubFieldNodes(context, objectNode);
                 }
 
+                if (context.NodeFilter != null)
+                {
+                    if (!context.NodeFilter(node))
+                    {
+                        continue;
+                    }
+                }
                 arrayItems.Add(node);
             }
-
             parent.Items = arrayItems;
         }
 

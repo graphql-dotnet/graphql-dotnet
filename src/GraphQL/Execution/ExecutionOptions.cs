@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
@@ -32,6 +33,8 @@ namespace GraphQL
 
         //Note disabling will increase performance
         public bool EnableMetrics { get; set; } = true;
+
+        public Func<ExecutionNode, bool> NodeFilter { get; set; }
 
         //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
         public bool SetFieldMiddleware { get; set; } = true;

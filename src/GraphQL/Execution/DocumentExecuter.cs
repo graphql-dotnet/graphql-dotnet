@@ -69,7 +69,7 @@ namespace GraphQL
                 Inputs = inputs,
                 UserContext = userContext,
                 CancellationToken = cancellationToken,
-                ValidationRules = rules
+                ValidationRules = rules,
             });
         }
 
@@ -186,7 +186,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.NodeFilter);
 
                 if (context.Errors.Any())
                 {
@@ -265,7 +266,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            Func<ExecutionNode, bool> nodeFilter = null)
         {
             var context = new ExecutionContext();
             context.Document = document;
@@ -277,11 +279,10 @@ namespace GraphQL
             context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs);
             context.Fragments = document.Fragments;
             context.CancellationToken = cancellationToken;
-
+            context.NodeFilter = nodeFilter;
             context.Metrics = metrics;
             context.Listeners = listeners;
             context.ThrowOnUnhandledException = throwOnUnhandledException;
-
             return context;
         }
 
