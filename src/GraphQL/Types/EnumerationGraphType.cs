@@ -79,8 +79,13 @@ namespace GraphQL.Types
                     .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
                     .First();
 
-                AddValue(StringUtils.ToConstantCase(enumMember.Name), null, Enum.Parse(type, enumName));
+                AddValue(ChangeEnumCase(enumMember.Name), null, Enum.Parse(type, enumName));
             }
+        }
+
+        protected virtual string ChangeEnumCase(string val)
+        {
+            return StringUtils.ToConstantCase(val);
         }
     }
 
