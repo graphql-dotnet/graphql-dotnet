@@ -30,8 +30,7 @@ namespace GraphQL.Validation.Rules
                     enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
                     leave: op =>
                     {
-                        var usages = context.GetRecursiveVariables(op);
-                        usages.Apply(usage =>
+                        foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;
                             if (!varDefMap.TryGetValue(varName, out var varDef))
@@ -60,7 +59,7 @@ namespace GraphQL.Validation.Rules
                                     context.ReportError(error);
                                 }
                             }
-                        });
+                        }
                     }
                 );
             });

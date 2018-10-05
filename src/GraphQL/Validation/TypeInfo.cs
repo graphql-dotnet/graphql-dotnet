@@ -29,22 +29,22 @@ namespace GraphQL.Validation
 
         public IGraphType GetLastType()
         {
-            return _typeStack.Any() ? _typeStack.Peek() : null;
+            return _typeStack.Count > 0 ? _typeStack.Peek() : null;
         }
 
         public IGraphType GetInputType()
         {
-            return _inputTypeStack.Any() ? _inputTypeStack.Peek() : null;
+            return _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
         }
 
         public IGraphType GetParentType()
         {
-            return _parentTypeStack.Any() ? _parentTypeStack.Peek() : null;
+            return _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
         }
 
         public FieldType GetFieldDef()
         {
-            return _fieldDefStack.Any() ? _fieldDefStack.Peek() : null;
+            return _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
         }
 
         public DirectiveGraphType GetDirective()

@@ -96,7 +96,14 @@ namespace GraphQL.Utilities
         private void ApplyMetadata(Type type)
         {
             var attributes = type?.GetTypeInfo().GetCustomAttributes<GraphQLAttribute>();
-            attributes?.Apply(a => a.Modify(this));
+
+            if (attributes == null)
+                return;
+
+            foreach (var a in attributes)
+            {
+                a.Modify(this);
+            }
         }
     }
 }

@@ -89,7 +89,7 @@ namespace GraphQL.Execution
             if (SubFields == null)
                 return null;
 
-            var fields = new Dictionary<string, object>();
+            var fields = new Dictionary<string, object>(SubFields.Count);
 
             foreach (var kvp in SubFields)
             {
@@ -131,7 +131,7 @@ namespace GraphQL.Execution
 
             return Items
                 .Select(x => x.ToValue())
-                .ToArray();
+                .ToList();
         }
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes()

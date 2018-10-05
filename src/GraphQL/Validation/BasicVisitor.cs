@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
     public class BasicVisitor
     {
-        private readonly IEnumerable<INodeVisitor> _visitors;
+        private readonly IList<INodeVisitor> _visitors;
 
         public BasicVisitor(params INodeVisitor[] visitors)
+        {
+            _visitors = visitors;
+        }
+
+        public BasicVisitor(IList<INodeVisitor> visitors)
         {
             _visitors = visitors;
         }
@@ -19,11 +25,23 @@ namespace GraphQL.Validation
                 return;
             }
 
-            _visitors.Apply(l => l.Enter(node));
+            for (int i = 0; i < _visitors.Count; i++)
+            {
+                _visitors[i].Enter(node);
+            }
 
-            node.Children?.Apply(Visit);
+            if (node.Children != null)
+            {
+                foreach (var child in node.Children)
+                {
+                    Visit(child);
+                }
+            }
 
-            _visitors.ApplyReverse(l => l.Leave(node));
+            for (int i = _visitors.Count - 1; i >= 0; i--)
+            {
+                _visitors[i].Leave(node);
+            }
         }
     }
 }

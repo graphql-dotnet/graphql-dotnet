@@ -133,7 +133,7 @@ namespace GraphQL.Types
                 }
 
                 _directives.Clear();
-                _directives.Fill(value);
+                _directives.AddRange(value);
             }
         }
 
@@ -162,7 +162,10 @@ namespace GraphQL.Types
                 throw new ArgumentNullException(nameof(types));
             }
 
-            types.Apply(RegisterType);
+            foreach (var type in types)
+            {
+                RegisterType(type);
+            }
         }
 
         public void RegisterType<T>() where T : IGraphType
@@ -177,7 +180,7 @@ namespace GraphQL.Types
 
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
-            directives.Apply(RegisterDirective);
+            _directives.AddRange(directives);
         }
 
         public DirectiveGraphType FindDirective(string name)
@@ -228,7 +231,10 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
             }
 
-            _additionalTypes.Fill(type);
+            if (!_additionalTypes.Contains(type))
+            {
+                _additionalTypes.Add(type);
+            }
         }
 
         private GraphTypesLookup CreateTypesLookup()

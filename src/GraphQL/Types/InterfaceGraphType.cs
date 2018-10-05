@@ -17,7 +17,10 @@ namespace GraphQL.Types
 
         public void AddPossibleType(IObjectGraphType type)
         {
-            _possibleTypes.Fill(type);
+            if (!_possibleTypes.Contains(type))
+            {
+                _possibleTypes.Add(type);
+            }
         }
     }
 

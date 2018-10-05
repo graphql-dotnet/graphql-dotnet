@@ -103,6 +103,8 @@ namespace GraphQL
             return type;
         }
 
+        private static readonly IEnumerable<string> EmptyStringArray = new string[0];
+
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             if (type is NonNullGraphType nonNull)
@@ -123,20 +125,19 @@ namespace GraphQL
             }
             else if (valueAst is NullValue)
             {
-                return new string[] { };
+                return EmptyStringArray;
             }
-
 
             if (valueAst == null)
             {
-                return new string[] {};
+                return EmptyStringArray;
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return new string[] {};
+                return EmptyStringArray;
             }
 
             if (type is ListGraphType list)
@@ -145,14 +146,12 @@ namespace GraphQL
 
                 if (valueAst is ListValue listValue)
                 {
-                    var index = 0;
-                    return listValue.Values.Aggregate(new string[] {}, (acc, value) =>
-                    {
-                        var errors = IsValidLiteralValue(ofType, value, schema);
-                        var result = acc.Concat(errors.Map(err => $"In element #{index}: {err}")).ToArray();
-                        index++;
-                        return result;
-                    });
+                    return listValue.Values
+                        .SelectMany(value =>
+                            IsValidLiteralValue(ofType, value, schema)
+                                .Select((err, index) => $"In element #{index + 1}: {err}")
+                        )
+                        .ToList();
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -160,34 +159,34 @@ namespace GraphQL
 
             if (type is IInputObjectGraphType inputType)
             {
-                if (!(valueAst is ObjectValue))
+                if (!(valueAst is ObjectValue objValue))
                 {
                     return new[] {$"Expected \"{inputType.Name}\", found not an object."};
                 }
 
                 var fields = inputType.Fields.ToList();
-                var fieldAsts = ((ObjectValue) valueAst).ObjectFields.ToList();
+                var fieldAsts = objValue.ObjectFields.ToList();
 
                 var errors = new List<string>();
 
                 // ensure every provided field is defined
-                fieldAsts.Apply(providedFieldAst =>
+                foreach (var providedFieldAst in fieldAsts)
                 {
-                    var found = fields.FirstOrDefault(x => x.Name == providedFieldAst.Name);
+                    var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
                         errors.Add($"In field \"{providedFieldAst.Name}\": Unknown field.");
                     }
-                });
+                }
 
                 // ensure every defined field is valid
-                fields.Apply(field =>
+                foreach (var field in fields)
                 {
-                    var fieldAst = fieldAsts.FirstOrDefault(x => x.Name == field.Name);
+                    var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
                     var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value, schema);
 
-                    errors.AddRange(result.Map(err=> $"In field \"{field.Name}\": {err}"));
-                });
+                    errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
+                }
 
                 return errors;
             }
@@ -198,10 +197,10 @@ namespace GraphQL
 
             if (parseResult == null)
             {
-                return new [] {$"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}."};
+                return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            return new string[] {};
+            return EmptyStringArray;
         }
 
         public static string NameOf<T, P>(this Expression<Func<T, P>> expression)
@@ -319,7 +318,11 @@ namespace GraphQL
 
                 if (!(value is string) && value is IEnumerable list)
                 {
-                    var values = list.Map(item => AstFromValue(item, schema, itemType));
+                    var values = list
+                        .Cast<object>()
+                        .Select(item => AstFromValue(item, schema, itemType))
+                        .ToList();
+
                     return new ListValue(values);
                 }
 
@@ -330,12 +333,10 @@ namespace GraphQL
             // in the dictionary according to the fields in the input type.
             if (type is IInputObjectGraphType input)
             {
-                if (!(value is Dictionary<string, object>))
+                if (!(value is Dictionary<string, object> dict))
                 {
                     return null;
                 }
-
-                var dict = (Dictionary<string, object>)value;
 
                 var fields = dict
                     .Select(pair =>

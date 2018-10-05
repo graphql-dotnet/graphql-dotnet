@@ -1,4 +1,4 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -29,12 +29,12 @@ namespace GraphQL.Validation.Rules
                 {
                     var fieldDef = context.TypeInfo.GetFieldDef();
 
-                    if (fieldDef == null)
+                    if (fieldDef == null || fieldDef.Arguments == null)
                     {
                         return;
                     }
 
-                    fieldDef.Arguments?.Apply(arg =>
+                    foreach (var arg in fieldDef.Arguments)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;
@@ -48,19 +48,19 @@ namespace GraphQL.Validation.Rules
                                     MissingFieldArgMessage(node.Name, arg.Name, context.Print(type)),
                                     node));
                         }
-                    });
+                    }
                 });
 
                 _.Match<Directive>(leave: node =>
                 {
                     var directive = context.TypeInfo.GetDirective();
 
-                    if (directive == null)
+                    if (directive == null || directive.Arguments == null)
                     {
                         return;
                     }
 
-                    directive.Arguments?.Apply(arg =>
+                    foreach (var arg in directive.Arguments)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;
@@ -74,7 +74,7 @@ namespace GraphQL.Validation.Rules
                                     MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(type)),
                                     node));
                         }
-                    });
+                    }
                 });
             });
         }

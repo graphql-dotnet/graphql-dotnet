@@ -38,18 +38,17 @@ namespace GraphQL.Instrumentation
 
         public void ApplyTo(ISchema schema)
         {
-            schema.AllTypes.Apply(item =>
+            foreach (var complex in schema.AllTypes.OfType<IComplexGraphType>())
             {
-                var complex = item as IComplexGraphType;
-                complex?.Fields.Apply(field =>
+                foreach (var field in complex.Fields)
                 {
                     var resolver = new MiddlewareResolver(field.Resolver);
 
                     FieldMiddlewareDelegate app = Build(resolver.Resolve);
 
                     field.Resolver = new FuncFieldResolver<object>(app.Invoke);
-                });
-            });
+                }
+            }
         }
     }
 }

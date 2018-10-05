@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
@@ -29,8 +29,7 @@ namespace GraphQL.Validation.Rules
                     enter: op => variableNameDefined = new Dictionary<string, bool>(),
                     leave: op =>
                     {
-                        var usages = context.GetRecursiveVariables(op);
-                        usages.Apply(usage =>
+                        foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;
                             bool found;
@@ -44,7 +43,7 @@ namespace GraphQL.Validation.Rules
                                     op);
                                 context.ReportError(error);
                             }
-                        });
+                        }
                     });
             });
         }

@@ -74,25 +74,30 @@ namespace GraphQL.Execution
                 throw error;
             }
 
-            return parentType.Fields.FirstOrDefault(f => f.Name == field.Name);
+            return parentType.GetField(field.Name);
         }
 
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
-            variableDefinitions?.Apply(v =>
+
+            if (variableDefinitions != null)
             {
-                var variable = new Variable
+                foreach (var v in variableDefinitions)
                 {
-                    Name = v.Name
-                };
+                    var variable = new Variable
+                    {
+                        Name = v.Name
+                    };
 
-                object variableValue = null;
-                inputs?.TryGetValue(v.Name, out variableValue);
-                variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    object variableValue = null;
+                    inputs?.TryGetValue(v.Name, out variableValue);
+                    variable.Value = GetVariableValue(document, schema, v, variableValue);
 
-                variables.Add(variable);
-            });
+                    variables.Add(variable);
+                }
+            }
+
             return variables;
         }
 
@@ -174,11 +179,16 @@ namespace GraphQL.Execution
                 }
 
                 // ensure every provided field is defined
-                var unknownFields = type is IInputObjectGraphType
-                    ? dict.Keys.Where(key => complexType.Fields.All(field => field.Name != key)).ToArray()
-                    : null;
+                IList<string> unknownFields = null;
 
-                if (unknownFields?.Any() == true)
+                if (type is IInputObjectGraphType)
+                {
+                    unknownFields = dict.Keys
+                        .Except(complexType.Fields.Select(f => f.Name))
+                        .ToList();
+                }
+
+                if (unknownFields?.Count > 0)
                 {
                     throw new InvalidValueException(fieldName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
@@ -207,25 +217,27 @@ namespace GraphQL.Execution
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
         {
-            if (definitionArguments == null || !definitionArguments.Any())
+            if (definitionArguments == null || definitionArguments.Count == 0)
             {
                 return null;
             }
 
-            return definitionArguments.Aggregate(new Dictionary<string, object>(), (acc, arg) =>
+            var values = new Dictionary<string, object>(definitionArguments.Count);
+
+            foreach (var arg in definitionArguments)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
 
-                var coercedValue = CoerceValue(schema, type, value, variables);
-                coercedValue = coercedValue ?? arg.DefaultValue;
+                var coercedValue = CoerceValue(schema, type, value, variables) ?? arg.DefaultValue;
+
                 if (coercedValue != null)
                 {
-                    acc[arg.Name] = coercedValue;
+                    values[arg.Name] = coercedValue;
                 }
+            }
 
-                return acc;
-            });
+            return values;
         }
 
         public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
@@ -249,22 +261,29 @@ namespace GraphQL.Execution
             {
                 var listItemType = listType.ResolvedType;
 
-                return input is ListValue list
-                    ? list.Values.Map(item => CoerceValue(schema, listItemType, item, variables)).ToArray()
-                    : new[] { CoerceValue(schema, listItemType, input, variables) };
+                if (input is ListValue list)
+                {
+                    return list.Values
+                        .Select(item => CoerceValue(schema, listItemType, item, variables))
+                        .ToList();
+                }
+                else
+                {
+                    return new[] { CoerceValue(schema, listItemType, input, variables) };
+                }
             }
 
             if (type is IObjectGraphType || type is IInputObjectGraphType)
             {
-                var complexType = type as IComplexGraphType;
-                var obj = new Dictionary<string, object>();
-
                 if (!(input is ObjectValue objectValue))
                 {
                     return null;
                 }
 
-                complexType.Fields.Apply(field =>
+                var complexType = type as IComplexGraphType;
+                var obj = new Dictionary<string, object>();
+
+                foreach (var field in complexType.Fields)
                 {
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
@@ -274,7 +293,7 @@ namespace GraphQL.Execution
 
                         obj[field.Name] = fieldValue;
                     }
-                });
+                }
 
                 return obj;
             }
@@ -294,50 +313,54 @@ namespace GraphQL.Execution
             Fields fields,
             List<string> visitedFragmentNames)
         {
-            selectionSet?.Selections.Apply(selection =>
+            if (selectionSet != null)
             {
-                if (selection is Field field)
+                foreach (var selection in selectionSet.Selections)
                 {
-                    if (!ShouldIncludeNode(context, field.Directives))
+                    if (selection is Field field)
                     {
-                        return;
+                        if (!ShouldIncludeNode(context, field.Directives))
+                        {
+                            continue;
+                        }
+
+                        fields.Add(field);
+                    }
+                    else if (selection is FragmentSpread spread)
+                    {
+                        if (visitedFragmentNames.Contains(spread.Name)
+                            || !ShouldIncludeNode(context, spread.Directives))
+                        {
+                            continue;
+                        }
+
+                        visitedFragmentNames.Add(spread.Name);
+
+                        var fragment = context.Fragments.FindDefinition(spread.Name);
+                        if (fragment == null
+                            || !ShouldIncludeNode(context, fragment.Directives)
+                            || !DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
+                        {
+                            continue;
+                        }
+
+                        CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
+                    }
+                    else if (selection is InlineFragment inline)
+                    {
+                        var name = inline.Type != null ? inline.Type.Name : specificType.Name;
+
+                        if (!ShouldIncludeNode(context, inline.Directives)
+                          || !DoesFragmentConditionMatch(context, name, specificType))
+                        {
+                            continue;
+                        }
+
+                        CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
 
-                    fields.Add(field);
                 }
-                else if (selection is FragmentSpread spread)
-                {
-                    if (visitedFragmentNames.Contains(spread.Name)
-                        || !ShouldIncludeNode(context, spread.Directives))
-                    {
-                        return;
-                    }
-
-                    visitedFragmentNames.Add(spread.Name);
-
-                    var fragment = context.Fragments.FindDefinition(spread.Name);
-                    if (fragment == null
-                        || !ShouldIncludeNode(context, fragment.Directives)
-                        || !DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                    {
-                        return;
-                    }
-
-                    CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
-                }
-                else if (selection is InlineFragment inline)
-                {
-                    var name = inline.Type != null ? inline.Type.Name : specificType.Name;
-
-                    if (!ShouldIncludeNode(context, inline.Directives)
-                      || !DoesFragmentConditionMatch(context, name, specificType))
-                    {
-                        return;
-                    }
-
-                    CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
-                }
-            });
+            }
 
             return fields;
         }
@@ -412,33 +435,10 @@ namespace GraphQL.Execution
             return false;
         }
 
-        /// <summary>
-        /// Unwrap nested Tasks to get the result
-        /// </summary>
-        public static async Task<object> UnwrapResultAsync(object result)
-        {
-            while (result is Task task)
-            {
-                await task.ConfigureAwait(false);
-
-                // Most performant if available
-                if (task is Task<object> t)
-                {
-                    result = t.Result;
-                }
-                else
-                {
-                    result = ((dynamic)task).Result;
-                }
-            }
-
-            return result;
-        }
-
         public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
         {
             var selections = field?.SelectionSet?.Selections;
-            if (selections == null || selections.Any() == false)
+            if (selections == null || selections.Count == 0)
             {
                 return null;
             }
@@ -447,9 +447,6 @@ namespace GraphQL.Execution
 
         public static string[] AppendPath(string[] path, string pathSegment)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-
             var newPath = new string[path.Length + 1];
 
             path.CopyTo(newPath, 0);

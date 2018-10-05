@@ -28,7 +28,7 @@ namespace GraphQL.Language
 
         public void AddDefinitions(GraphQLDocument source, Document target)
         {
-            source.Definitions.Apply(def =>
+            foreach (var def in source.Definitions)
             {
                 if (def is GraphQLOperationDefinition op)
                 {
@@ -39,7 +39,7 @@ namespace GraphQL.Language
                 {
                     target.AddDefinition(Fragment(frag));
                 }
-            });
+            }
         }
 
         public Operation Operation(GraphQLOperationDefinition source)
@@ -82,8 +82,14 @@ namespace GraphQL.Language
         public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
             var defs = new VariableDefinitions();
-            var list = source?.Select(VariableDefinition);
-            list?.Apply(defs.Add);
+
+            if (source != null)
+            {
+                foreach (var def in source.Select(VariableDefinition))
+                {
+                    defs.Add(def);
+                }
+            }
             return defs;
         }
 
@@ -105,10 +111,16 @@ namespace GraphQL.Language
         public SelectionSet SelectionSet(GraphQLSelectionSet source)
         {
             var set = new SelectionSet().WithLocation(source, _body);
-            source?.Selections.Apply(s =>
+
+            if (source != null)
             {
-                set.Add(Selection(s));
-            });
+                foreach (var s in source.Selections)
+                {
+                    set.Add(Selection(s));
+
+                }
+            }
+
             return set;
         }
 
@@ -146,12 +158,17 @@ namespace GraphQL.Language
         public Directives Directives(IEnumerable<GraphQLDirective> directives)
         {
             var target = new Directives();
-            directives?.Apply(d =>
+
+            if (directives != null)
             {
-                var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
-                dir.Arguments = Arguments(d.Arguments);
-                target.Add(dir);
-            });
+                foreach (var d in directives)
+                {
+                    var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
+                    dir.Arguments = Arguments(d.Arguments);
+                    target.Add(dir);
+                }
+            }
+
             return target;
         }
 
@@ -159,12 +176,12 @@ namespace GraphQL.Language
         {
             var target = new Arguments();
 
-            source.Apply(s =>
+            foreach (var s in source)
             {
                 var arg = new Argument(Name(s.Name)).WithLocation(s.Name, _body);
                 arg.Value = Value(s.Value);
                 target.Add(arg);
-            });
+            }
 
             return target;
         }

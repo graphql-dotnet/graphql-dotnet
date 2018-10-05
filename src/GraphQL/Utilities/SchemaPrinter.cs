@@ -33,7 +33,7 @@ namespace GraphQL.Utilities
 
             if (_options.CustomScalars?.Count > 0)
             {
-                _scalars.Fill(_options.CustomScalars);
+                _scalars.AddRange(_options.CustomScalars);
             }
         }
 
