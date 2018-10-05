@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests.Types
 {
     public class QueryType : ObjectGraphType
     {
-        public QueryType(IDataLoaderContextAccessor accessor, UsersStore users, OrdersStore orders)
+        public QueryType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders)
         {
             Name = "Query";
 
@@ -18,7 +18,7 @@ namespace GraphQL.DataLoader.Tests.Types
                 .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
-                        () => users.GetAllUsersAsync());
+                        users.GetAllUsersAsync);
 
                     return loader.LoadAsync();
                 });

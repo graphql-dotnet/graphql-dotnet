@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Stores;
+using Moq;
 using Shouldly;
 using Xunit;
 
@@ -8,44 +11,27 @@ namespace GraphQL.DataLoader.Tests
 {
     public class CollectionBatchLoaderTests : DataLoaderTestBase
     {
-        public CollectionBatchLoaderTests()
-        {
-            Users.AddUsers(
-                new User
-                {
-                    UserId = 1
-                },
-                new User
-                {
-                    UserId = 2
-                }
-            );
-
-            Orders.AddOrders(
-                new Order
-                {
-                    OrderId = 1,
-                    UserId = 1
-                },
-                new Order
-                {
-                    OrderId = 2,
-                    UserId = 1
-                }
-            );
-        }
-
         [Fact]
         public async Task NonExistent_Key_Should_Return_Empty()
         {
-            var loader = new CollectionBatchDataLoader<int, Order>((ids, ct) => Orders.GetOrdersByUserIdAsync(ids));
+            var mock = new Mock<IOrdersStore>();
+
+            var orders = Fake.Orders.Generate(2);
+            orders.ForEach(o => o.UserId = 1);
+
+            mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(orders.ToLookup(o => o.UserId));
+
+            var ordersStore = mock.Object;
+
+            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -57,20 +43,33 @@ namespace GraphQL.DataLoader.Tests
             user2Orders.Count().ShouldBe(0);
 
             // This should have been called only once to load in a single batch
-            Orders.GetOrdersByUserIdCalledCount.ShouldBe(1, "Operations should be batched");
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1, 2 }, default), Times.Once,
+                "Operations should be batched");
+
+            mock.VerifyNoOtherCalls();
         }
 
         [Fact]
         public async Task All_Requested_Keys_Should_Be_Cached()
         {
-            var loader = new CollectionBatchDataLoader<int, Order>((ids, ct) => Orders.GetOrdersByUserIdAsync(ids));
+            var mock = new Mock<IOrdersStore>();
+
+            var orders = Fake.Orders.Generate(2);
+            orders.ForEach(o => o.UserId = 1);
+
+            mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(orders.ToLookup(o => o.UserId));
+
+            var ordersStore = mock.Object;
+
+            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -93,7 +92,7 @@ namespace GraphQL.DataLoader.Tests
             task3.Status.ShouldNotBe(TaskStatus.RanToCompletion, "Result should already be cached");
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             var user1bOrders = await task1b;
             var user2bOrders = await task2b;
@@ -107,29 +106,40 @@ namespace GraphQL.DataLoader.Tests
             user2Orders.Count().ShouldBe(0);
             user3Orders.Count().ShouldBe(0);
 
-
-            // This should have been called only once to load in a single batch
-            Orders.GetOrdersByUserIdCalledCount.ShouldBe(2, "Operations should be batched");
+            // Verify calls to order store were cached properly
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1, 2 }, default), Times.Once);
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 3 }, default), Times.Once);
+            mock.VerifyNoOtherCalls();
         }
 
         [Fact]
         public async Task Keys_Are_DeDuped()
         {
-            var loader = new CollectionBatchDataLoader<int, Order>((ids, ct) => Orders.GetOrdersByUserIdAsync(ids));
+            var mock = new Mock<IOrdersStore>();
+
+            var orders = Fake.Orders.Generate(2);
+            orders.ForEach(o => o.UserId = 1);
+
+            mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(orders.ToLookup(o => o.UserId));
+
+            var ordersStore = mock.Object;
+
+            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load duplicate keys
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(1);
 
             // Dispatch loading
-            loader.Dispatch();
+            await loader.DispatchAsync();
 
             // Now await tasks
             var user1Orders = await task1;
             var user1bOrders = await task2;
 
-            Orders.GetOrdersByUserIdCalledCount.ShouldBe(1);
-            Orders.GetOrdersByUserId_UserIds.Count().ShouldBe(1, "The keys passed to the fetch delegate should be de-duplicated");
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Once,
+                "The keys passed to the fetch delegate should be de-duplicated");
         }
     }
 }

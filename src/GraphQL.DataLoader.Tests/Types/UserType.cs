@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests.Types
 {
     public class UserType : ObjectGraphType<User>
     {
-        public UserType(IDataLoaderContextAccessor accessor, OrdersStore orders)
+        public UserType(IDataLoaderContextAccessor accessor, IOrdersStore orders)
         {
             Name = "User";
 
