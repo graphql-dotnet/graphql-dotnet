@@ -106,15 +106,26 @@ namespace GraphQL.Execution
             {
                 var path = AppendPath(parent.Path, (index++).ToString());
 
-                ExecutionNode node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
-                node.Result = d;
-
-                if (node is ObjectExecutionNode objectNode)
+                if (d != null)
                 {
-                    SetSubFieldNodes(context, objectNode);
-                }
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
+                    node.Result = d;
 
-                arrayItems.Add(node);
+                    if (node is ObjectExecutionNode objectNode)
+                    {
+                        SetSubFieldNodes(context, objectNode);
+                    }
+
+                    arrayItems.Add(node);
+                }
+                else
+                {
+                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
+                    {
+                        Result = null
+                    };
+                    arrayItems.Add(valueExecutionNode);
+                }
             }
 
             parent.Items = arrayItems;
