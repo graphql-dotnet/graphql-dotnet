@@ -23,6 +23,19 @@ namespace GraphQL.Tests.Types
             }
         }
 
+        class ColorEnumInverseCasing : EnumerationGraphType<Colors>
+        {
+            public ColorEnumInverseCasing()
+            {
+                Name = "ColorsEnum";
+            }
+
+            protected override string ChangeEnumCase(string val)
+            {
+                return new string(val.Select(c => char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c)).ToArray());
+            }
+        }
+
         private EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
 
         [Fact]
@@ -30,6 +43,12 @@ namespace GraphQL.Tests.Types
         {
             type.Values.Count().ShouldBe(5);
             type.Values.First().Name.ShouldBe("RED");
+        }
+
+        [Fact]
+        public void adds_values_from_enum_custom_casing()
+        {
+            type.ParseValue("rED").ShouldBe(Colors.Red);
         }
 
         [Fact]
