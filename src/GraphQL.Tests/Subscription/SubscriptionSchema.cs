@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -189,7 +190,7 @@ namespace GraphQL.Tests.Subscription
     public interface IChat
     {
         ConcurrentStack<Message> AllMessages { get; }
-
+        ConcurrentStack<List<Message>> AllBatchMessages { get; }
         Message AddMessage(Message message);
 
         IObservable<Message> Messages();
@@ -202,6 +203,7 @@ namespace GraphQL.Tests.Subscription
     public class Chat : IChat
     {
         private readonly ISubject<Message> _messageStream = new ReplaySubject<Message>(1);
+        private readonly ISubject<List<Message>> _allMessageStream = new ReplaySubject<List<Message>>(1);
 
 
         public Chat()
@@ -217,6 +219,8 @@ namespace GraphQL.Tests.Subscription
         public ConcurrentDictionary<string, string> Users { get; set; }
 
         public ConcurrentStack<Message> AllMessages { get; }
+
+        public ConcurrentStack<List<Message>> AllBatchMessages => throw new NotImplementedException();
 
         public Message AddMessage(ReceivedMessage message)
         {
@@ -244,6 +248,13 @@ namespace GraphQL.Tests.Subscription
             return Messages();
         }
 
+        public List<Message> AddMessageAll(Message message)
+        {
+            AllMessages.Push(message);
+            var l = new List<Message>(AllMessages);
+            _allMessageStream.OnNext(l);
+            return l;
+        }
         public Message AddMessage(Message message)
         {
             AllMessages.Push(message);
@@ -254,6 +265,10 @@ namespace GraphQL.Tests.Subscription
         public IObservable<Message> Messages()
         {
             return _messageStream.AsObservable();
+        }
+
+        public IObservable <List<Message>> MessagesAll() {
+            return _allMessageStream.AsObservable();   
         }
 
         public void AddError(Exception exception)

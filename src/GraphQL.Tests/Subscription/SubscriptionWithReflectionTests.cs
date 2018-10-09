@@ -66,6 +66,45 @@ namespace GraphQL.Tests.Subscription
             message.Data.ShouldNotBeAssignableTo<Task>();
         }
 
+
+        [Fact]
+        public async Task SubscribeGetAll()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now
+            };
+
+            var chat = SubscriptionSchemaWithReflection.Chat;
+            var schema = SubscriptionSchemaWithReflection.Schema;
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription messageGetAll { messageGetAll { from { id displayName } content sentAt } }",
+                Schema = schema
+            });
+
+            chat.AddMessageAll(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            var data = ((Dictionary<string, object>)message.Data);
+            data.ShouldNotBeNull();
+            data["messageGetAll"].ShouldNotBeNull();
+        }
+
+
         [Fact]
         public async Task SubscribeAsync()
         {
