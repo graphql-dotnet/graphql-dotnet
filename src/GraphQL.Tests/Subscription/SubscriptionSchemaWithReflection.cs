@@ -62,7 +62,7 @@ namespace GraphQL.Tests.Subscription
         [GraphQLMetadata(Name = "messageGetAll", Type = ResolverType.Subscriber)]
         public IObservable<List<Message>> SubscribeMessageGetAll(ResolveEventStreamContext context)
         {
-            return SubscriptionSchemaWithReflection.Chat.MessagesAll();
+            return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
         }
 
         [GraphQLMetadata(Name = "messageGetAll")]
@@ -70,8 +70,6 @@ namespace GraphQL.Tests.Subscription
         {
             return context.Source as List<Message>;
         }
-
-
 
         [GraphQLMetadata(Name = "messageAddedByUser", Type = ResolverType.Subscriber)]
         public IObservable<Message> SubscribeMessageAddedByUser(ResolveEventStreamContext context, string id)

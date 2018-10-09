@@ -66,7 +66,6 @@ namespace GraphQL.Tests.Subscription
             message.Data.ShouldNotBeAssignableTo<Task>();
         }
 
-
         [Fact]
         public async Task SubscribeGetAll()
         {
@@ -92,7 +91,7 @@ namespace GraphQL.Tests.Subscription
                 Schema = schema
             });
 
-            chat.AddMessageAll(addedMessage);
+            chat.AddMessageGetAll(addedMessage);
 
             /* Then */
             var stream = result.Streams.Values.FirstOrDefault();
@@ -103,7 +102,6 @@ namespace GraphQL.Tests.Subscription
             data.ShouldNotBeNull();
             data["messageGetAll"].ShouldNotBeNull();
         }
-
 
         [Fact]
         public async Task SubscribeAsync()

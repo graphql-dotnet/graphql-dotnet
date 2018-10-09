@@ -190,7 +190,6 @@ namespace GraphQL.Tests.Subscription
     public interface IChat
     {
         ConcurrentStack<Message> AllMessages { get; }
-        ConcurrentStack<List<Message>> AllBatchMessages { get; }
         Message AddMessage(Message message);
 
         IObservable<Message> Messages();
@@ -220,8 +219,6 @@ namespace GraphQL.Tests.Subscription
 
         public ConcurrentStack<Message> AllMessages { get; }
 
-        public ConcurrentStack<List<Message>> AllBatchMessages => throw new NotImplementedException();
-
         public Message AddMessage(ReceivedMessage message)
         {
             if (!Users.TryGetValue(message.FromId, out var displayName))
@@ -248,7 +245,7 @@ namespace GraphQL.Tests.Subscription
             return Messages();
         }
 
-        public List<Message> AddMessageAll(Message message)
+        public List<Message> AddMessageGetAll(Message message)
         {
             AllMessages.Push(message);
             var l = new List<Message>(AllMessages);
@@ -267,7 +264,8 @@ namespace GraphQL.Tests.Subscription
             return _messageStream.AsObservable();
         }
 
-        public IObservable <List<Message>> MessagesAll() {
+        public IObservable<List<Message>> MessagesGetAll()
+        {
             return _allMessageStream.AsObservable();   
         }
 
