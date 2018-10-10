@@ -35,6 +35,7 @@ namespace GraphQL.DataLoader.Tests
         protected virtual void ConfigureServices(ServiceCollection services)
         {
             services.AddSingleton<DataLoaderTestSchema>();
+            services.AddSingleton<SubscriptionType>();
             services.AddSingleton<QueryType>();
             services.AddSingleton<OrderType>();
             services.AddSingleton<UserType>();
