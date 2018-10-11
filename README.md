@@ -92,7 +92,7 @@ var schema = Schema.For(@"
 
 var json = schema.Execute(_ =>
 {
-  _.Query = "{ hero { id name } }";
+  _.Query = "{ droid { id name } }";
 });
 ```
 
