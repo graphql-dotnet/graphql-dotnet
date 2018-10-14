@@ -24,11 +24,11 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+            var loader = new SimpleDataLoader<IEnumerable<User>>(_ => { }, usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
 
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var result1 = await task;
 
@@ -67,13 +67,13 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+            var loader = new SimpleDataLoader<IEnumerable<User>>(_ => { }, usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
 
             cts.CancelAfter(TimeSpan.FromMilliseconds(10));
 
-            await loader.DispatchAsync(cts.Token);
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(cts.Token);
 
             await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
@@ -95,13 +95,13 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+            var loader = new SimpleDataLoader<IEnumerable<User>>(_ => { }, usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
 
             cts.Cancel();
 
-            await loader.DispatchAsync(cts.Token);
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(cts.Token);
 
             await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
@@ -126,11 +126,11 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+            var loader = new SimpleDataLoader<IEnumerable<User>>(_ => { }, usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
 
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var ex = await Should.ThrowAsync<Exception>(async () =>
             {
@@ -153,10 +153,10 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+            var loader = new SimpleDataLoader<IEnumerable<User>>(_ => { }, usersStore.GetAllUsersAsync);
 
             var task = loader.LoadAsync();
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var ex = await Should.ThrowAsync<Exception>(async () =>
             {

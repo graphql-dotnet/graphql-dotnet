@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
@@ -30,14 +31,14 @@ namespace GraphQL.DataLoader.Tests
             // Run within an async context to make sure we won't deadlock
             AsyncContext.Run(async () =>
             {
-                var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+                var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync);
 
                 // Start async tasks to load by ID
                 var task1 = loader.LoadAsync(1);
                 var task2 = loader.LoadAsync(2);
 
                 // Dispatch loading
-                await loader.DispatchAsync();
+                await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
                 // Now await tasks
                 user1 = await task1;
@@ -72,14 +73,14 @@ namespace GraphQL.DataLoader.Tests
             // Run within an async context to make sure we won't deadlock
             AsyncContext.Run(async () =>
             {
-                var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+            var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync);
 
                 // Start async tasks to load by ID
                 var task1 = loader.LoadAsync(1);
                 var task2 = loader.LoadAsync(2);
 
                 // Dispatch loading
-                await loader.DispatchAsync();
+                await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
                 // Now await tasks
                 user1 = await task1;
@@ -91,7 +92,7 @@ namespace GraphQL.DataLoader.Tests
                     "Task should already be complete because value comes from cache");
 
                 // This should not actually run the fetch delegate again
-                await loader.DispatchAsync();
+                await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
                 user3 = await task3;
             });
@@ -122,7 +123,7 @@ namespace GraphQL.DataLoader.Tests
             {
                 // There is no user with the ID of 3
                 // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
-                var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
+                var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
 
                 // Start async tasks to load by ID
                 var task1 = loader.LoadAsync(1);
@@ -130,7 +131,7 @@ namespace GraphQL.DataLoader.Tests
                 var task3 = loader.LoadAsync(3);
 
                 // Dispatch loading
-                await loader.DispatchAsync();
+                await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
                 // Now await tasks
                 user1 = await task1;
@@ -166,7 +167,7 @@ namespace GraphQL.DataLoader.Tests
 
             // There is no user with the ID of 3
             // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
+            var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
 
             // Start async tasks to load by ID
             var task1 = loader.LoadAsync(1);
@@ -174,7 +175,7 @@ namespace GraphQL.DataLoader.Tests
             var task3 = loader.LoadAsync(3);
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             // Now await tasks
             user1 = await task1;
@@ -187,7 +188,7 @@ namespace GraphQL.DataLoader.Tests
             task3b.Status.ShouldBe(TaskStatus.RanToCompletion,
                 "Should be cached because it was requested in the first batch even though it wasn't in the result dictionary");
 
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var user3b = await task3b;
 
@@ -211,15 +212,14 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+            var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync);
 
             // Start async tasks to load by ID
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            await loader.DispatchAsync();
-
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             Exception ex = await Should.ThrowAsync<ArgumentException>(async () =>
             {
@@ -242,14 +242,14 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+            var loader = new BatchDataLoader<int, User>(_ => { }, usersStore.GetUsersByIdAsync);
 
             // Start async tasks to load duplicate IDs
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(1);
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             // Now await tasks
             var user1 = await task1;

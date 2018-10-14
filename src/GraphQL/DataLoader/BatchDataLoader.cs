@@ -6,37 +6,37 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class BatchDataLoader<TKey, T> : DataLoaderBase<IDictionary<TKey, T>>, IDataLoader<TKey, T>
+    public class BatchDataLoader<TKey, T> : IDataLoader<TKey, T>, IDispatchableDataLoader
     {
+        private readonly Action<IDispatchableDataLoader> _queueFunc;
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> _loader;
+        private readonly object _lock = new object();
+        private readonly Dictionary<TKey, TaskCompletionSource<T>> _taskCompletionSources;
         private readonly HashSet<TKey> _pendingKeys;
-        private readonly Dictionary<TKey, T> _cache;
         private readonly T _defaultValue;
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
+        internal BatchDataLoader(Action<IDispatchableDataLoader> queueFunc,
+            Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
             IEqualityComparer<TKey> keyComparer = null,
             T defaultValue = default(T))
         {
+            _queueFunc = queueFunc ?? throw new ArgumentNullException(nameof(queueFunc));
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
-
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
-
             _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+            _taskCompletionSources = new Dictionary<TKey, TaskCompletionSource<T>>(keyComparer);
             _defaultValue = defaultValue;
         }
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
+        internal BatchDataLoader(Action<IDispatchableDataLoader> queueFunc,
+            Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
             T defaultValue = default(T))
         {
-            if (loader == null)
-                throw new ArgumentNullException(nameof(loader));
-
-            if (keySelector == null)
-                throw new ArgumentNullException(nameof(keySelector));
-
+            _queueFunc = queueFunc ?? throw new ArgumentNullException(nameof(queueFunc));
+            loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
 
             async Task<IDictionary<TKey, T>> LoadAndMapToDictionary(IEnumerable<TKey> keys, CancellationToken cancellationToken)
@@ -47,77 +47,73 @@ namespace GraphQL.DataLoader
 
             _loader = LoadAndMapToDictionary;
             _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+            _taskCompletionSources = new Dictionary<TKey, TaskCompletionSource<T>>(keyComparer);
             _defaultValue = defaultValue;
         }
 
-        public async Task<T> LoadAsync(TKey key)
+        public Task<T> LoadAsync(TKey key)
         {
-            lock (_cache)
+            lock (_lock)
             {
-                // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out T cacheValue))
-                {
-                    return cacheValue;
-                }
+                if (_taskCompletionSources.TryGetValue(key, out TaskCompletionSource<T> taskCompletionSource))
+                    return taskCompletionSource.Task;
 
-                // Otherwise add to pending keys
-                if (!_pendingKeys.Contains(key))
-                {
-                    _pendingKeys.Add(key);
-                }
-            }
+                taskCompletionSource = new TaskCompletionSource<T>();
+                _taskCompletionSources.Add(key, taskCompletionSource);
+                _pendingKeys.Add(key);
+                _queueFunc(this);
 
-            var result = await DataLoaded;
-
-            if (result.TryGetValue(key, out T value))
-            {
-                return value;
-            }
-            else
-            {
-                return _defaultValue;
+                return taskCompletionSource.Task;
             }
         }
 
-        protected override bool IsFetchNeeded()
+        async Task<Task> IDispatchableDataLoader.DispatchAsync(CancellationToken cancellationToken)
         {
-            lock (_cache)
-            {
-                return _pendingKeys.Count > 0;
-            }
-        }
+            TKey[] keys;
 
-        protected override async Task<IDictionary<TKey, T>> FetchAsync(CancellationToken cancellationToken)
-        {
-            IList<TKey> keys;
-
-            lock (_cache)
+            lock (_lock)
             {
                 // Get pending keys and clear pending list
                 keys = _pendingKeys.ToArray();
                 _pendingKeys.Clear();
             }
 
-            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            if (!keys.Any())
+                return Task.FromResult(0);
 
-            // Populate cache
-            lock (_cache)
+            if (cancellationToken.IsCancellationRequested)
             {
-                foreach (TKey key in keys)
-                {
-                    if (dictionary.TryGetValue(key, out T value))
-                    {
-                        _cache[key] = value;
-                    }
-                    else
-                    {
-                        _cache[key] = _defaultValue;
-                    }
-                }
+                foreach (var key in keys)
+                    _taskCompletionSources[key].TrySetCanceled();
+
+                return Task.FromResult(0);
             }
 
-            return dictionary;
+            try
+            {
+                var result = await _loader(keys, cancellationToken).ConfigureAwait(false);
+                return Task.Run(() =>
+                {
+                    foreach (var key in keys)
+                    {
+                        if (result == null || !result.TryGetValue(key, out T value))
+                            value = _defaultValue;
+                        _taskCompletionSources[key].SetResult(value);
+                    }
+                }, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                foreach (var key in keys)
+                    _taskCompletionSources[key].TrySetCanceled();
+            }
+            catch (Exception ex)
+            {
+                foreach (var key in keys)
+                    _taskCompletionSources[key].TrySetException(ex);
+            }
+
+            return Task.FromResult(0);
         }
     }
 }

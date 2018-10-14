@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,18 +12,18 @@ namespace GraphQL.DataLoader
     /// </summary>
     public class DataLoaderContext
     {
-        private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
-        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+        private readonly ConcurrentDictionary<string, IDispatchableDataLoader> _loaders = new ConcurrentDictionary<string, IDispatchableDataLoader>();
+        private Queue<IDispatchableDataLoader> _queue = new Queue<IDispatchableDataLoader>();
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
         /// </summary>
-        /// <typeparam name="TDataLoader">The type of <seealso cref="IDataLoader"/></typeparam>
-        /// <param name="loaderKey">Unique string to identify the <seealso cref="IDataLoader"/> instance</param>
+        /// <typeparam name="TDataLoader">The type of <seealso cref="IDispatchableDataLoader"/></typeparam>
+        /// <param name="loaderKey">Unique string to identify the <seealso cref="IDispatchableDataLoader"/> instance</param>
         /// <param name="dataLoaderFactory">Function to create the TDataLoader instance if it does not already exist</param>
         /// <returns>Returns an existing TDataLoader instance or a newly created instance if it did not exist already</returns>
-        public TDataLoader GetOrAdd<TDataLoader>(string loaderKey, Func<TDataLoader> dataLoaderFactory)
-            where TDataLoader : IDataLoader
+        internal TDataLoader GetOrAdd<TDataLoader>(string loaderKey, Func<Action<IDispatchableDataLoader>, TDataLoader> dataLoaderFactory)
+            where TDataLoader : IDispatchableDataLoader
         {
             if (loaderKey == null)
                 throw new ArgumentNullException(nameof(loaderKey));
@@ -29,20 +31,7 @@ namespace GraphQL.DataLoader
             if (dataLoaderFactory == null)
                 throw new ArgumentNullException(nameof(dataLoaderFactory));
 
-            IDataLoader loader;
-
-            lock (_loaders)
-            {
-                if (!_loaders.TryGetValue(loaderKey, out loader))
-                {
-                    loader = dataLoaderFactory();
-
-                    _loaders.Add(loaderKey, loader);
-                    _queue.Enqueue(loader);
-                }
-            }
-
-            return (TDataLoader)loader;
+            return (TDataLoader)_loaders.GetOrAdd(loaderKey, _ => dataLoaderFactory(loader => _queue.Enqueue(loader)));
         }
 
         /// <summary>
@@ -51,34 +40,17 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public async Task DispatchAllAsync(CancellationToken cancellationToken = default)
         {
-            Task task;
-
-            lock (_loaders)
+            var tasks = new List<Task>();
+            while (tasks.Any() || _queue.Any())
             {
-                if (_queue.Count == 0)
+                if (_queue.Any())
                 {
-                    return;
+                    var queue = Interlocked.Exchange(ref _queue, new Queue<IDispatchableDataLoader>());
+                    while (queue.Any()) tasks.Add(await queue.Dequeue().DispatchAsync(cancellationToken).ConfigureAwait(false));
                 }
-                else if (_queue.Count == 1)
-                {
-                    var loader = _queue.Peek();
-                    task = loader.DispatchAsync(cancellationToken);
-                }
-                else
-                {
-                    var tasks = new List<Task>(_queue.Count);
 
-                    // We don't want to pop any loaders off the queue because they may get more work later
-                    foreach (var loader in _queue)
-                    {
-                        tasks.Add(loader.DispatchAsync(cancellationToken));
-                    }
-
-                    task = Task.WhenAll(tasks);
-                }
+                tasks.Remove(await Task.WhenAny(tasks).ConfigureAwait(false));
             }
-
-            await task.ConfigureAwait(false);
         }
     }
 }
