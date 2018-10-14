@@ -6,13 +6,13 @@ namespace GraphQL.DataLoader
     /// <summary>
     /// Provides a method to dispatch pending a operation to load data.
     /// </summary>
-    public interface IDataLoader
+    internal interface IDispatchableDataLoader
     {
         /// <summary>
         /// Dispatch any pending operations
         /// </summary>
-        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        Task DispatchAsync(CancellationToken cancellationToken = default);
+        /// <param name="cancellationToken"><seealso cref="CancellationToken"/> to pass to fetch delegate</param>
+        Task<Task> DispatchAsync(CancellationToken cancellationToken);
     }
 
     /// <summary>

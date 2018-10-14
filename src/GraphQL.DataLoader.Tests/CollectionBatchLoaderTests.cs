@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
@@ -24,14 +25,14 @@ namespace GraphQL.DataLoader.Tests
 
             var ordersStore = mock.Object;
 
-            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
+            var loader = new CollectionBatchDataLoader<int, Order>(_ => { }, ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -62,14 +63,14 @@ namespace GraphQL.DataLoader.Tests
 
             var ordersStore = mock.Object;
 
-            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
+            var loader = new CollectionBatchDataLoader<int, Order>(_ => { }, ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -92,7 +93,7 @@ namespace GraphQL.DataLoader.Tests
             task3.Status.ShouldNotBe(TaskStatus.RanToCompletion, "Result should already be cached");
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             var user1bOrders = await task1b;
             var user2bOrders = await task2b;
@@ -125,14 +126,14 @@ namespace GraphQL.DataLoader.Tests
 
             var ordersStore = mock.Object;
 
-            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
+            var loader = new CollectionBatchDataLoader<int, Order>(_ => { }, ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load duplicate keys
             var task1 = loader.LoadAsync(1);
             var task2 = loader.LoadAsync(1);
 
             // Dispatch loading
-            await loader.DispatchAsync();
+            await await ((IDispatchableDataLoader)loader).DispatchAsync(CancellationToken.None);
 
             // Now await tasks
             var user1Orders = await task1;

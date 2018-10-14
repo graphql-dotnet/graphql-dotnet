@@ -4,48 +4,62 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class SimpleDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
+    public class SimpleDataLoader<T> : IDataLoader<T>, IDispatchableDataLoader
     {
-        private readonly object _lock = new object();
+        private readonly Action<IDispatchableDataLoader> _queueFunc;
         private readonly Func<CancellationToken, Task<T>> _loader;
+        private readonly object _lock = new object();
+        private TaskCompletionSource<T> _taskCompletionSource = null;
 
-        private Task<T> _cachedTask;
-
-        public SimpleDataLoader(Func<CancellationToken, Task<T>> loader)
+        internal SimpleDataLoader(Action<IDispatchableDataLoader> queueFunc, Func<CancellationToken, Task<T>> loader)
         {
+            _queueFunc = queueFunc ?? throw new ArgumentNullException(nameof(queueFunc));
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
         }
 
         public Task<T> LoadAsync()
         {
-            // Return the cached task if we have one
-            if (_cachedTask != null)
-                return _cachedTask;
+            if (_taskCompletionSource != null)
+                return _taskCompletionSource.Task;
 
             lock (_lock)
             {
-                return _cachedTask ?? DataLoaded;
+                if (_taskCompletionSource == null)
+                {
+                    _taskCompletionSource = new TaskCompletionSource<T>();
+                    _queueFunc(this);
+                }
+
+                return _taskCompletionSource.Task;
             }
         }
 
-        protected override bool IsFetchNeeded()
+        async Task<Task> IDispatchableDataLoader.DispatchAsync(CancellationToken cancellationToken)
         {
-            lock (_lock)
-            {
-                // No need to re-fetch if we have a cached task
-                return _cachedTask == null;
-            }
-        }
+            if (_taskCompletionSource == null)
+                return Task.FromResult(0);
 
-        protected override Task<T> FetchAsync(CancellationToken cancellationToken)
-        {
-            lock (_lock)
+            if (cancellationToken.IsCancellationRequested)
             {
-                // Cache the task
-                _cachedTask = _loader(cancellationToken);
+                _taskCompletionSource.TrySetCanceled();
+                return Task.FromResult(0);
             }
 
-            return _cachedTask;
+            try
+            {
+                var result = await _loader(cancellationToken).ConfigureAwait(false);
+                return Task.Run(() => _taskCompletionSource.SetResult(result), cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _taskCompletionSource.TrySetCanceled();
+            }
+            catch (Exception ex)
+            {
+                _taskCompletionSource.TrySetException(ex);
+            }
+
+            return Task.FromResult(0);
         }
     }
 }
