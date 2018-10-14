@@ -13,11 +13,11 @@ namespace GraphQL.DataLoader
 
         protected abstract bool IsFetchNeeded();
 
-        public async Task DispatchAsync(CancellationToken cancellationToken = default)
+        public async Task<Task> DispatchAsync(CancellationToken cancellationToken = default)
         {
             if (!IsFetchNeeded())
             {
-                return;
+                return Task.FromResult(0);
             }
 
             var tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<T>());
@@ -27,7 +27,7 @@ namespace GraphQL.DataLoader
                 // If cancellation has been requested already,
                 // set the task to cancelled without calling FetchAsync()
                 tcs.TrySetCanceled();
-                return;
+                return Task.FromResult(0);
             }
 
             try
@@ -35,7 +35,7 @@ namespace GraphQL.DataLoader
                 var result = await FetchAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                tcs.SetResult(result);
+                return Task.Run(() => tcs.SetResult(result), cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -45,6 +45,8 @@ namespace GraphQL.DataLoader
             {
                 tcs.SetException(ex);
             }
+
+            return Task.FromResult(0);
         }
     }
 }

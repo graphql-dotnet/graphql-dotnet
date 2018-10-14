@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,8 +12,8 @@ namespace GraphQL.DataLoader
     /// </summary>
     public class DataLoaderContext
     {
-        private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
-        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+        private readonly ConcurrentDictionary<string, IDataLoader> _loaders = new ConcurrentDictionary<string, IDataLoader>();
+        private Queue<IDataLoader> _queue = new Queue<IDataLoader>();
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
@@ -29,18 +31,12 @@ namespace GraphQL.DataLoader
             if (dataLoaderFactory == null)
                 throw new ArgumentNullException(nameof(dataLoaderFactory));
 
-            IDataLoader loader;
-
-            lock (_loaders)
+            var loader = _loaders.GetOrAdd(loaderKey, key =>
             {
-                if (!_loaders.TryGetValue(loaderKey, out loader))
-                {
-                    loader = dataLoaderFactory();
-
-                    _loaders.Add(loaderKey, loader);
-                    _queue.Enqueue(loader);
-                }
-            }
+                var newLoader = dataLoaderFactory();
+                _queue.Enqueue(newLoader);
+                return newLoader;
+            });
 
             return (TDataLoader)loader;
         }
@@ -51,34 +47,17 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public async Task DispatchAllAsync(CancellationToken cancellationToken = default)
         {
-            Task task;
-
-            lock (_loaders)
+            var tasks = new List<Task>();
+            while (tasks.Any() || _queue.Any())
             {
-                if (_queue.Count == 0)
+                if (_queue.Any())
                 {
-                    return;
+                    var queue = Interlocked.Exchange(ref _queue, new Queue<IDataLoader>());
+                    while (queue.Any()) tasks.Add(await queue.Dequeue().DispatchAsync(cancellationToken).ConfigureAwait(false));
                 }
-                else if (_queue.Count == 1)
-                {
-                    var loader = _queue.Peek();
-                    task = loader.DispatchAsync(cancellationToken);
-                }
-                else
-                {
-                    var tasks = new List<Task>(_queue.Count);
 
-                    // We don't want to pop any loaders off the queue because they may get more work later
-                    foreach (var loader in _queue)
-                    {
-                        tasks.Add(loader.DispatchAsync(cancellationToken));
-                    }
-
-                    task = Task.WhenAll(tasks);
-                }
+                tasks.Remove(await Task.WhenAny(tasks).ConfigureAwait(false));
             }
-
-            await task.ConfigureAwait(false);
         }
     }
 }
