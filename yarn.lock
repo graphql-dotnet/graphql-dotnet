@@ -2082,9 +2082,9 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-simple-make@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/simple-make/-/simple-make-2.0.0.tgz#62a2b954518ebb8897c424ac143a449e01edc342"
+simple-make@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/simple-make/-/simple-make-2.1.0.tgz#b5b9e31c5cb3d916254cb30ec3ba1362a707509d"
   dependencies:
     chalk "^1.1.3"
     moment "^2.17.1"

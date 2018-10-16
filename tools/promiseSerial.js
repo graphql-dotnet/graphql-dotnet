@@ -1,8 +1,6 @@
-import promiseTimeout from 'simple-make/lib/promiseTimeout'
-
-const promiseSerial = ({ tasks, params, taskTimeout }) =>{
+const promiseSerial = ({ tasks, params }) =>{
   return tasks.reduce((promise, func) =>
-    promise.then(result => promiseTimeout(taskTimeout || 5000, func(params)).then(Array.prototype.concat.bind(result))),
+    promise.then(result => func(params).then(Array.prototype.concat.bind(result))),
     Promise.resolve([]))
 }
 
