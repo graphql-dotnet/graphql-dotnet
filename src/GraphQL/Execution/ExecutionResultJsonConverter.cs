@@ -117,7 +117,7 @@ namespace GraphQL
 
         private void WriteExtensions(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            if (result.Data == null || result.Extensions == null || !result.Extensions.Any())
+            if (result.Extensions == null || !result.Extensions.Any())
             {
                 return;
             }

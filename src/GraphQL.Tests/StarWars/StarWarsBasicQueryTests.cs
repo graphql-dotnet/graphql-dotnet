@@ -152,7 +152,7 @@ namespace GraphQL.Tests.StarWars
         public void create_generic_query_that_fetches_luke()
         {
             var query = @"
-                query humanQuery($id: String!) {
+                query humanQuery($id: ID!) {
                   human(id: $id) {
                     name
                   }

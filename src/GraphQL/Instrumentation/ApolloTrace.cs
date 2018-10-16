@@ -29,7 +29,7 @@ namespace GraphQL.Instrumentation
 
         public ExecutionTrace Execution { get; } = new ExecutionTrace();
 
-        public static long ConvertTime(double ms) => (int)(ms * 1000 * 1000);
+        public static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
 
         [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
         public class OperationTrace
