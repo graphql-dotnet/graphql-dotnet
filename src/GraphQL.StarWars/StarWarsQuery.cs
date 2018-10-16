@@ -14,7 +14,7 @@ namespace GraphQL.StarWars
             Field<HumanType>(
                 "human",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id", Description = "id of the human" }
                 ),
                 resolve: context => data.GetHumanByIdAsync(context.GetArgument<string>("id"))
             );
@@ -24,7 +24,7 @@ namespace GraphQL.StarWars
             FieldDelegate<DroidType>(
                 "droid",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+                    new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id", Description = "id of the droid" }
                 ),
                 resolve: func
             );

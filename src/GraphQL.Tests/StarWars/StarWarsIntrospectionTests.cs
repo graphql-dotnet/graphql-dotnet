@@ -377,7 +377,7 @@ namespace GraphQL.Tests.StarWars
                           'name': null,
                           'kind': 'NON_NULL',
                           'ofType': {
-                            'name': 'String',
+                            'name': 'ID',
                             'kind': 'SCALAR'
                           }
                         },
@@ -399,7 +399,7 @@ namespace GraphQL.Tests.StarWars
                           'name': null,
                           'kind': 'NON_NULL',
                           'ofType': {
-                            'name': 'String',
+                            'name': 'ID',
                             'kind': 'SCALAR'
                           }
                         },

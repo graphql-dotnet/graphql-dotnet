@@ -8,7 +8,7 @@ namespace GraphQL.StarWars.Types
         {
             Name = "Human";
 
-            Field(h => h.Id).Description("The id of the human.");
+            Field(h => h.Id, type: typeof(NonNullGraphType<IdGraphType>)).Description("The id of the human.");
             Field(h => h.Name, nullable: true).Description("The name of the human.");
 
             Field<ListGraphType<CharacterInterface>>(

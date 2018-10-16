@@ -21,7 +21,6 @@ namespace GraphQL.Harness
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
@@ -42,7 +41,6 @@ namespace GraphQL.Harness
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
@@ -53,7 +51,8 @@ namespace GraphQL.Harness
                 BuildUserContext = ctx => new GraphQLUserContext
                 {
                     User = ctx.User
-                }
+                },
+                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics")
             });
 
             app.UseDefaultFiles();
