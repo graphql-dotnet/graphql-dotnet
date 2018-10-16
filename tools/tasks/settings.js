@@ -36,6 +36,6 @@ export default {
   revision,
   includeRevision,
   assemblyVersion,
-  taskTimeout: 120000,
+  taskTimeout: 1200000,
   versionSuffix
 }
