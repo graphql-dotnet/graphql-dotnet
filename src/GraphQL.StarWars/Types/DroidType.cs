@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.StarWars.Types
@@ -14,7 +15,8 @@ namespace GraphQL.StarWars.Types
 
             FieldAsync<ListGraphType<CharacterInterface>>(
                 "friends",
-                resolve: context => {
+                resolve: async context => {
+                    // simulate loading
                     await Task.Delay(1000);
                     return data.GetFriends(context.Source);
                 }
