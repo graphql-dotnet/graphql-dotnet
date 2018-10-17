@@ -40,8 +40,8 @@ namespace GraphQL.Tests
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
 
 //#if DEBUG
 //            Console.WriteLine(writtenResult);
@@ -82,8 +82,8 @@ namespace GraphQL.Tests
                 _.ValidationRules = rules;
             }).GetAwaiter().GetResult();
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
 //#if DEBUG
 //            Console.WriteLine(writtenResult);

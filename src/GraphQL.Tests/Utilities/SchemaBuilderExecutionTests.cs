@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.Http;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -131,7 +133,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void minimal_schema()
+        public async Task minimal_schema()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -147,13 +149,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'hello': 'Hello World!' }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_source_without_params()
+        public async Task can_use_source_without_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -171,13 +173,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'source': true }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_resolvefieldcontext_without_params()
+        public async Task can_use_resolvefieldcontext_without_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -195,13 +197,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'resolve': 'Resolved' }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_resolvefieldcontext_with_params()
+        public async Task can_use_resolvefieldcontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -218,13 +220,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_usercontext()
+        public async Task can_use_usercontext()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -242,13 +244,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_usercontext_with_params()
+        public async Task can_use_usercontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -266,13 +268,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'userContextWithParam': 'Quinn abcd' }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_context_source_usercontext()
+        public async Task can_use_context_source_usercontext()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -291,13 +293,13 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'three': true }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Fact]
-        public void can_use_context_source_usercontext_with_params()
+        public async Task can_use_context_source_usercontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -316,7 +318,7 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'four': true }");
-            var serializedExpectedResult = Writer.Write(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }

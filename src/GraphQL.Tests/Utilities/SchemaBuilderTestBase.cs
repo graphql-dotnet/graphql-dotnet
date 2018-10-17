@@ -43,8 +43,8 @@ namespace GraphQL.Tests.Utilities
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
 
             string additionalInfo = null;
 
