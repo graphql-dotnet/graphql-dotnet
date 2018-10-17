@@ -13,11 +13,11 @@ namespace GraphQL.StarWars.Types
             Field(d => d.Id).Description("The id of the droid.");
             Field(d => d.Name, nullable: true).Description("The name of the droid.");
 
-            FieldAsync<ListGraphType<CharacterInterface>>(
+            Field<ListGraphType<CharacterInterface>>(
                 "friends",
-                resolve: async context => {
+                resolve: context => {
                     // simulate loading
-                    await Task.Delay(1000);
+                    // await Task.Delay(1000);
                     return data.GetFriends(context.Source);
                 }
             );
