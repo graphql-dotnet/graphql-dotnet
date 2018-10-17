@@ -8,7 +8,8 @@ export default async function compile(settings) {
   let versions = []
 
   if (branch !== 'master' && branch.length > 0) {
-    versions.push(branch)
+    let safeBranch = branch.replace(/[^a-zA-Z0-9]/gi, '')
+    versions.push(safeBranch)
   }
 
   if (settings.includeRevision && settings.versionSuffix.length > 0) {

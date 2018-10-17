@@ -172,7 +172,9 @@ namespace GraphQL
                 {
                     return new ExecutionResult
                     {
-                        Errors = validationResult.Errors
+                        Errors = validationResult.Errors,
+                        ExposeExceptions = options.ExposeExceptions,
+                        Perf = metrics.Finish()?.ToArray()
                     };
                 }
 
@@ -192,7 +194,9 @@ namespace GraphQL
                 {
                     return new ExecutionResult
                     {
-                        Errors = context.Errors
+                        Errors = context.Errors,
+                        ExposeExceptions = options.ExposeExceptions,
+                        Perf = metrics.Finish()?.ToArray()
                     };
                 }
 

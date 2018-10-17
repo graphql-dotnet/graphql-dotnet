@@ -134,7 +134,7 @@ var schema = Schema.For(@"
 
 var json = schema.Execute(_ =>
 {
-  _.Query = $"{{ hero(id: \"123\") {{ id name }} }}";
+  _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 });
 ```
 
