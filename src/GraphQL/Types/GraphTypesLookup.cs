@@ -17,7 +17,11 @@ namespace GraphQL.Types
             AddType<StringGraphType>();
             AddType<BooleanGraphType>();
             AddType<FloatGraphType>();
+            AddType<ShortGraphType>();
+            AddType<UShortGraphType>();
             AddType<IntGraphType>();
+            AddType<UIntGraphType>();
+            AddType<ULongGraphType>();
             AddType<IdGraphType>();
             AddType<DateGraphType>();
             AddType<DateTimeGraphType>();
