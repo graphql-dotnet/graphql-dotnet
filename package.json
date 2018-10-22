@@ -16,7 +16,8 @@
     "release": "set CONFIGURATION=Release&& babel-node tools/build.js ci",
     "restore": "babel-node tools/build.js restore",
     "setVersion": "babel-node tools/build.js setVersion",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "apollo-engine": "node apollo-engine.js"
   },
   "repository": "https://github.com/graphql-dotnet/graphql-dotnet.git",
   "author": "Joe McBride",
@@ -33,6 +34,7 @@
     "react-dom": "^16.2.0"
   },
   "devDependencies": {
+    "apollo-engine": "^1.1.2",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
