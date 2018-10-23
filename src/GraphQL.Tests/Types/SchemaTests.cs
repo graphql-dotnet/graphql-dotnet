@@ -44,6 +44,18 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void registers_argument_input_objects_when_argument_resolved_type_is_set()
+        {
+            var schema = new ARootSchema();
+            schema.FindType("a");
+
+            ContainsTypeNames(
+                schema,
+                "DInputType",
+                "DInputType2");
+        }
+
+        [Fact]
         public void registers_type_when_list()
         {
             var schema = new ARootSchema();
@@ -263,7 +275,7 @@ namespace GraphQL.Tests.Types
             Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new [] { new QueryArgument<DInputType> {Name = "input"} }),
+                arguments: new QueryArguments(new QueryArgument[] { new QueryArgument<DInputType> {Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()} }),
                 resolve: ctx => new {id = "id"});
             Field<ListGraphType<DListType>>("alist");
         }
@@ -273,7 +285,17 @@ namespace GraphQL.Tests.Types
     {
         public DInputType()
         {
+            Name = "DInputType";
             Field<StringGraphType>("one");
+        }
+    }
+
+    public class DInputType2 : InputObjectGraphType
+    {
+        public DInputType2()
+        {
+            Name = "DInputType2";
+            Field<StringGraphType>("two");
         }
     }
 
