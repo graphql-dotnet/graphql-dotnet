@@ -10,10 +10,14 @@ using GraphQL.Http;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
+using Serilog;
+using Serilog.AspNetCore;
+using System.IO;
 
 namespace GraphQL.DataLoader.Tests
 {
@@ -26,6 +30,13 @@ namespace GraphQL.DataLoader.Tests
 
         public QueryTestBase()
         {
+            var filePath = Directory.GetCurrentDirectory() + "/log.txt";
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File(filePath, rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
             var services = new ServiceCollection();
             ConfigureServices(services);
 
@@ -34,6 +45,8 @@ namespace GraphQL.DataLoader.Tests
 
         protected virtual void ConfigureServices(ServiceCollection services)
         {
+            services.AddSingleton<ILoggerFactory>(new SerilogLoggerFactory(Log.Logger, true));
+
             services.AddSingleton<DataLoaderTestSchema>();
             services.AddSingleton<SubscriptionType>();
             services.AddSingleton<QueryType>();
@@ -116,6 +129,8 @@ namespace GraphQL.DataLoader.Tests
                 opts.Schema = schema;
                 opts.ExposeExceptions = true;
                 opts.Query = query;
+                opts.EnableMetrics = false;
+                opts.SetFieldMiddleware = false;
                 foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
                 {
                     opts.Listeners.Add(listener);

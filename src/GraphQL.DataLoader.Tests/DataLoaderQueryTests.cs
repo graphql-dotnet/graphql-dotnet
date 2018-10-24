@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -91,7 +92,7 @@ namespace GraphQL.DataLoader.Tests
         public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
             var users = Fake.Users.Generate(2);
-            var orders = Fake.GenerateOrdersForUsers(users, 1);
+            var orders = Fake.GenerateOrdersForUsers(users, 3);
 
             var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
             var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
@@ -148,6 +149,13 @@ namespace GraphQL.DataLoader.Tests
             var orders = Fake.GenerateOrdersForUsers(users, 10);
             var orderItems = Fake.GetItemsForOrders(orders, 5);
 
+            Serilog.Log.Information($"Users: {users.Count}");
+            Serilog.Log.Information($"Products: {products.Count}");
+            Serilog.Log.Information($"Orders: {orders.Count}");
+            Serilog.Log.Information($"Order Items: {orderItems.Count}");
+
+            var start = DateTime.UtcNow;
+
             var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
             var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
             var productsMock = Services.GetRequiredService<Mock<IProductsStore>>();
@@ -189,6 +197,10 @@ namespace GraphQL.DataLoader.Tests
         }
     }
 }");
+
+            var end = DateTime.UtcNow - start;
+
+            Serilog.Log.Information($"Large Query Complete: {end}");
 
             result.Errors.ShouldBeNull();
         }
