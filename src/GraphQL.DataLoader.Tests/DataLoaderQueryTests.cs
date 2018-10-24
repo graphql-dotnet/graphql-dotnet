@@ -92,7 +92,7 @@ namespace GraphQL.DataLoader.Tests
         public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
             var users = Fake.Users.Generate(2);
-            var orders = Fake.GenerateOrdersForUsers(users, 3);
+            var orders = Fake.GenerateOrdersForUsers(users, 1);
 
             var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
             var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
