@@ -23,6 +23,7 @@ namespace GraphQL.Http
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly int _maxArrayLength = 1048576;
         private readonly JsonSerializer _serializer;
+        private readonly JsonSerializerSettings _settings;
         private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 
         public DocumentWriter()
@@ -39,6 +40,7 @@ namespace GraphQL.Http
 
         public DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
         {
+            _settings = settings;
             _serializer = JsonSerializer.CreateDefault(settings);
             _serializer.Formatting = formatting;
         }
@@ -77,7 +79,7 @@ namespace GraphQL.Http
 
         public string Write(object value)
         {
-            return this.WriteToStringAsync((ExecutionResult) value).GetAwaiter().GetResult();
+            return JsonConvert.SerializeObject(value, _serializer.Formatting, _settings);
         }
     }
 
