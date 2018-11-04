@@ -1,26 +1,29 @@
-using GraphQL.Execution;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL.Execution
 {
 
+    //TODO: Add unit tests.
+    //TODO: Validate performance overhead of creating data flow blocks on each request.
+    //TODO: Check for SynchronizationContext issues.
+    //TODO: Validate DataLoader can work with this strategy.
+    //TODO: Store maxDegreesOfParallelism in settings.
+    //TODO: Ensure ConfigureAwait is correct.
+    //TODO: This is needed to prevent the DataLoader from deadlocking... not sure exactly where this
+    //      needs to go...
+    //      await OnBeforeExecutionStepAwaitedAsync(context).ConfigureAwait(false);
     public class DataflowBlocksParallelExecutionStrategy : ExecutionStrategy
     {
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
-            //TODO: This is needed to prevent the DataLoader from deadlocking... not sure exactly where this
-            //      needs to go...
-            //await OnBeforeExecutionStepAwaitedAsync(context)
-            //    .ConfigureAwait(false);
             //Options
             var blockOptions = new ExecutionDataflowBlockOptions
             {
                 CancellationToken = context.CancellationToken,
-                MaxDegreeOfParallelism = 1024 //TODO: Store maxDegreesOfParallelism in settings. 
+                MaxDegreeOfParallelism = 1024
             };
             //Execute Block
             var block = new TransformManyBlock<Job, Job>(
