@@ -10,67 +10,93 @@ namespace GraphQL.Execution
 
     public class DataflowBlocksParallelExecutionStrategy : ExecutionStrategy
     {
-
-        //TO DO: I have to believe there is a better way to do this...
-        private static int _refCount = 0;
-
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
-            var cancellationSource = new CancellationTokenSource();
-            await ExecuteDataBlocksPipeline(context, rootNode, cancellationSource, 1024);
+            //TODO: This is needed to prevent the DataLoader from deadlocking... not sure exactly where this
+            //      needs to go...
             //await OnBeforeExecutionStepAwaitedAsync(context)
             //    .ConfigureAwait(false);
-        }
-
-        private async Task ExecuteDataBlocksPipeline(
-            ExecutionContext context, ObjectExecutionNode rootNode,
-            CancellationTokenSource cancellationSource, int maxDegreesOfParallelism)
-        {
             //Options
             var blockOptions = new ExecutionDataflowBlockOptions
             {
-                CancellationToken = cancellationSource.Token,
-                MaxDegreeOfParallelism = maxDegreesOfParallelism
+                CancellationToken = context.CancellationToken,
+                MaxDegreeOfParallelism = 1024 //TODO: Store maxDegreesOfParallelism in settings. 
             };
-            //NavigateChildren Block
-            var navigateChildren = new TransformManyBlock<Job, Job>(
-                job =>
+            //Execute Block
+            var block = new TransformManyBlock<Job, Job>(
+                async job =>
                 {
+                    var node = await ExecuteNodeAsync(job.Context, job.Node).ConfigureAwait(false);
                     var childJobs = (job.Node as IParentExecutionNode)?
                         .GetChildNodes()
-                        .Select(child => new Job(job.Context, child))
+                        .Select(child => job.CreateChildJob(job.Context, child))
                         .ToArray();
+                    job.Complete();
                     return childJobs;
-                }, blockOptions);
-            //Execute Block
-            var executeBlock = new TransformBlock<Job, Job>(
-                async job => {
-                    var node = await ExecuteNodeAsync(job.Context, job.Node).ConfigureAwait(false);
-                    Interlocked.Add(ref _refCount, (node as IParentExecutionNode)?.GetChildNodes().Count() ?? 0);
-                    Interlocked.Decrement(ref _refCount);
-                    if (_refCount == 0)
-                        navigateChildren.Complete();
-                    return new Job(job.Context, node);
                 },
                 blockOptions);
-            //Pipeline
-            var linkOptions = new DataflowLinkOptions { PropagateCompletion = false };
-            executeBlock.LinkTo(navigateChildren, linkOptions);
-            navigateChildren.LinkTo(executeBlock, linkOptions);
-            _refCount = 1;
-            await executeBlock.SendAsync(new Job(context, rootNode));
-            await navigateChildren.Completion;
+            //Link to self
+            block.LinkTo(block);
+            //Start
+            var rootJob = new Job(context, rootNode);
+            await block.SendAsync(rootJob);
+            //Wait until done
+            await rootJob.Completion;
         }
 
         private class Job
         {
+            private JobsCounter _counter;
+
             public Job(ExecutionContext context, ExecutionNode node)
+                : this(new JobsCounter(), context, node) { }
+
+            private Job(JobsCounter counter, ExecutionContext context, ExecutionNode node)
             {
+                _counter = counter;
+                _counter.Increment();
                 Context = context;
                 Node = node;
             }
+
             public ExecutionContext Context { get; private set; }
             public ExecutionNode Node { get; private set; }
+
+            public Job CreateChildJob(ExecutionContext context, ExecutionNode node)
+            {
+                return new Job(_counter, context, node);
+            }
+
+            public int Complete()
+            {
+                return _counter.Decrement();
+            }
+
+            public Task Completion
+            {
+                get { return _counter.Completion.Task; }
+            }
+
+            private class JobsCounter
+            {
+                private int _counter;
+
+                public int Increment()
+                {
+                    return Interlocked.Increment(ref _counter);
+                }
+
+                public int Decrement()
+                {
+                    var counter = Interlocked.Decrement(ref _counter);
+                    if (counter == 0)
+                        Completion.TrySetResult(counter);
+                    return counter;
+                }
+
+                public TaskCompletionSource<int> Completion { get; } = new TaskCompletionSource<int>();
+            }
+
         }
 
     }
