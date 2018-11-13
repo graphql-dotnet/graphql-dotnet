@@ -25,10 +25,21 @@ namespace GraphQL.Utilities
             };
         }
 
+        public static void Register<T, TGraph>()  where TGraph : GraphType
+        {
+            Register(typeof(T), typeof(TGraph));
+        }
+
         public static void Register(Type clrType, Type graphType)
         {
             _entries[clrType] = graphType;
         }
+
+        public static Type Get<TClr>() 
+        {
+            return Get(typeof(TClr));
+        }
+
 
         public static Type Get(Type clrType)
         {
