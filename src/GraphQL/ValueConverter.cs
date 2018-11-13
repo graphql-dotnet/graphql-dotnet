@@ -45,7 +45,12 @@ namespace GraphQL
             Register(typeof(long), typeof(int), LongToInt);
             Register(typeof(long), typeof(uint), LongToUInt);
             Register(typeof(long), typeof(ulong), LongToULong);
+            Register(typeof(long), typeof(double), LongToDouble);
+            Register(typeof(long), typeof(decimal), LongToDecimal);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
+
+            Register(typeof(float), typeof(double), FloatToDouble);
+            Register(typeof(float), typeof(decimal), FloatToDecimal);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
 
@@ -64,10 +69,34 @@ namespace GraphQL
             return Convert.ToDecimal(intValue, NumberFormatInfo.InvariantInfo);
         }
 
+        private static object FloatToDouble(object value)
+        {
+            var floatValue = (float)value;
+            return (double)floatValue;
+        }
+
+        private static object FloatToDecimal(object value)
+        {
+            var floatValue = (float)value;
+            return Convert.ToDecimal(floatValue, NumberFormatInfo.InvariantInfo);
+        }
+
         private static object DoubleToDecimal(object value)
         {
             var doubleValue = (double)value;
             return Convert.ToDecimal(doubleValue, NumberFormatInfo.InvariantInfo);
+        }
+
+        private static object LongToDouble(object value)
+        {
+            var longValue = (long)value;
+            return (double)longValue;
+        }
+
+        private static object LongToDecimal(object value)
+        {
+            var longValue = (long)value;
+            return (decimal)longValue;
         }
 
         private static object LongToInt(object value)
@@ -209,8 +238,6 @@ namespace GraphQL
 
         private static object convertToUInt64<T>(T value) =>
             Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo);
-
-
 
         public static object ConvertTo(object value, Type targetType)
         {
