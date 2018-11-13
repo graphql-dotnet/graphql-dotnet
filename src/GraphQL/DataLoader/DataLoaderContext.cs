@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.DataLoader
 {
@@ -12,6 +13,15 @@ namespace GraphQL.DataLoader
     {
         private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+
+        public DataLoaderContext(ILoggerFactory loggerFactory)
+        {
+            Logger = loggerFactory.CreateLogger<DataLoaderContext>();
+            LoggerFactory = loggerFactory;
+        }
+
+        public ILogger Logger { get; }
+        public ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key

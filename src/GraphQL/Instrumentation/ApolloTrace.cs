@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -54,6 +55,14 @@ namespace GraphQL.Instrumentation
             public string FieldName { get; set; }
 
             public string ReturnType { get; set; }
+
+            public string Print()
+            {
+                var path = string.Join(".", Path.Select(x => x.ToString()));
+                var milliseconds = this.Duration / 1000;
+                var seconds = milliseconds / 1000;
+                return $"{path}: {this.Duration} {milliseconds} {seconds}";
+            }
         }
     }
 }

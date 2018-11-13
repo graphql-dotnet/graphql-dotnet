@@ -28,7 +28,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new SimpleDataLoader<T>(fetchFunc));
+            return context.GetOrAdd(loaderKey, () => new SimpleDataLoader<T>(fetchFunc, context.LoggerFactory.CreateLogger("SimpleDataLoader")));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new SimpleDataLoader<T>(WrapNonCancellableFunc(fetchFunc)));
+            return context.GetOrAdd(loaderKey, () => new SimpleDataLoader<T>(WrapNonCancellableFunc(fetchFunc), context.LoggerFactory.CreateLogger("SimpleDataLoader")));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer, defaultValue, context.LoggerFactory.CreateLogger("BatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, defaultValue, context.LoggerFactory.CreateLogger("BatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, defaultValue, context.LoggerFactory.CreateLogger("BatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, defaultValue, context.LoggerFactory.CreateLogger("BatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keyComparer, context.LoggerFactory.CreateLogger("CollectionBatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, context.LoggerFactory.CreateLogger("CollectionBatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, context.LoggerFactory.CreateLogger("CollectionBatchDataLoader"), loaderKey));
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, context.LoggerFactory.CreateLogger("CollectionBatchDataLoader"), loaderKey));
         }
     }
 }

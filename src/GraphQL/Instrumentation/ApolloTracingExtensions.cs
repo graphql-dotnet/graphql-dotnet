@@ -45,16 +45,16 @@ namespace GraphQL.Instrumentation
             foreach (var fieldStat in fieldStats)
             {
                 var stringPath = fieldStat.MetaField<IEnumerable<string>>("path");
-                trace.Execution.Resolvers.Add(
-                    new ApolloTrace.ResolverTrace
-                    {
-                        FieldName = fieldStat.MetaField<string>("fieldName"),
-                        Path = ConvertPath(stringPath).ToList(),
-                        ParentType = fieldStat.MetaField<string>("typeName"),
-                        ReturnType = fieldStat.MetaField<string>("returnTypeName"),
-                        StartOffset = ApolloTrace.ConvertTime(fieldStat.Start),
-                        Duration = ApolloTrace.ConvertTime(fieldStat.Duration),
-                    });
+
+                trace.Execution.Resolvers.Add(new ApolloTrace.ResolverTrace
+                {
+                    FieldName = fieldStat.MetaField<string>("fieldName"),
+                    Path = ConvertPath(stringPath).ToList(),
+                    ParentType = fieldStat.MetaField<string>("typeName"),
+                    ReturnType = fieldStat.MetaField<string>("returnTypeName"),
+                    StartOffset = ApolloTrace.ConvertTime(fieldStat.Start),
+                    Duration = ApolloTrace.ConvertTime(fieldStat.Duration),
+                });
             }
 
             return trace;

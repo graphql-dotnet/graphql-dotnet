@@ -1,11 +1,15 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.DataLoader
 {
     public abstract class DataLoaderBase<T> : IDataLoader
     {
+        public string LoaderKey { get; set; }
+        protected ILogger Log { get; set; }
+
         protected abstract Task<T> FetchAsync(CancellationToken cancellationToken);
 
         protected Task<T> DataLoaded => _completionSource.Task;

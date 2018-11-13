@@ -12,6 +12,9 @@
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
       <PackageReference Include="Moq" Version="4.9.0" />
       <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0-pre-05" />
+      <PackageReference Include="Serilog.AspNetCore" Version="2.1.2-dev-00028" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+      <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
       <PackageReference Include="Shouldly" Version="2.8.3" />
       <PackageReference Include="xunit" Version="2.3.1" />
       <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />

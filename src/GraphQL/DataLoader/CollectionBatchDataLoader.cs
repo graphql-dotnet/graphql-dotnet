@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.DataLoader
 {
@@ -12,17 +13,27 @@ namespace GraphQL.DataLoader
         private readonly Dictionary<TKey, IEnumerable<T>> _cache;
         private readonly HashSet<TKey> _pendingKeys;
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null)
+        public CollectionBatchDataLoader(
+            Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader,
+            IEqualityComparer<TKey> keyComparer = null,
+            ILogger logger = null,
+            string loaderKey = null)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
             _pendingKeys = new HashSet<TKey>(keyComparer);
+            Log = logger;
+            LoaderKey = loaderKey;
         }
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader, Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null)
+        public CollectionBatchDataLoader(
+            Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
+            Func<T, TKey> keySelector,
+            IEqualityComparer<TKey> keyComparer = null,
+            ILogger logger = null,
+            string loaderKey = null)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
@@ -34,13 +45,19 @@ namespace GraphQL.DataLoader
 
             async Task<ILookup<TKey, T>> LoadAndMapToLookup(IEnumerable<TKey> keys, CancellationToken cancellationToken)
             {
+                logger?.LogInformation($"CollectionBatchDataLoader - before '{LoaderKey}' map awaited");
                 var values = await loader(keys, cancellationToken).ConfigureAwait(false);
-                return values.ToLookup(keySelector, keyComparer);
+                logger?.LogInformation($"CollectionBatchDataLoader - after '{LoaderKey}' map awaited");
+                var lookup = values.ToLookup(keySelector, keyComparer);
+                logger?.LogInformation($"CollectionBatchDataLoader - '{LoaderKey}' lookup created");
+                return lookup;
             }
 
             _loader = LoadAndMapToLookup;
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
             _pendingKeys = new HashSet<TKey>(keyComparer);
+            Log = logger;
+            LoaderKey = loaderKey;
         }
 
         public async Task<IEnumerable<T>> LoadAsync(TKey key)
@@ -84,7 +101,11 @@ namespace GraphQL.DataLoader
                 _pendingKeys.Clear();
             }
 
+            Log?.LogInformation($"CollectionBatchDataLoader - FetchAsync '{LoaderKey}'");
+
             var lookup = await _loader(keys, cancellationToken).ConfigureAwait(false);
+
+            Log?.LogInformation($"CollectionBatchDataLoader - FetchAsync '{LoaderKey}' awaited");
 
             // Populate cache
             lock (_cache)
@@ -94,6 +115,8 @@ namespace GraphQL.DataLoader
                     _cache[key] = lookup[key].ToArray();
                 }
             }
+
+            Log?.LogInformation($"CollectionBatchDataLoader - '{LoaderKey}' cache populated");
 
             return lookup;
         }

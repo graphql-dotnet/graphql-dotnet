@@ -44,12 +44,12 @@ namespace GraphQL.Instrumentation
 
         public T MetaField<T>(string key)
         {
-            if (Metadata.TryGetValue(key, out var value))
+            if (Metadata == null || !Metadata.TryGetValue(key, out var value))
             {
-                return (T)value;
+                return default(T);
             }
 
-            return default(T);
+            return (T)value;
         }
     }
 

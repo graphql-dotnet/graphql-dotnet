@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Validation;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.DataLoader
 {
@@ -12,10 +13,14 @@ namespace GraphQL.DataLoader
     public class DataLoaderDocumentListener : IDocumentExecutionListener
     {
         private readonly IDataLoaderContextAccessor _accessor;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public DataLoaderDocumentListener(IDataLoaderContextAccessor accessor)
+        public DataLoaderDocumentListener(
+            IDataLoaderContextAccessor accessor,
+            ILoggerFactory logFactory)
         {
             _accessor = accessor;
+            _loggerFactory = logFactory;
         }
 
         public Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token)
@@ -26,7 +31,7 @@ namespace GraphQL.DataLoader
         public Task BeforeExecutionAsync(object userContext, CancellationToken token)
         {
             if (_accessor.Context == null)
-                _accessor.Context = new DataLoaderContext();
+                _accessor.Context = new DataLoaderContext(_loggerFactory);
 
             return TaskExtensions.CompletedTask;
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.DataLoader
 {
@@ -11,9 +12,10 @@ namespace GraphQL.DataLoader
 
         private Task<T> _cachedTask;
 
-        public SimpleDataLoader(Func<CancellationToken, Task<T>> loader)
+        public SimpleDataLoader(Func<CancellationToken, Task<T>> loader, ILogger logger = null)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            Log = logger;
         }
 
         public Task<T> LoadAsync()
