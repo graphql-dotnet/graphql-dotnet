@@ -60,7 +60,7 @@ namespace GraphQL.Http
             }
             if (!_stream.CanWrite)
             {
-                throw new ArgumentException("Stream is now writable", nameof(stream));
+                throw new ArgumentException("Stream is not writable", nameof(stream));
             }
 
             _charBufferSize = bufferSize;

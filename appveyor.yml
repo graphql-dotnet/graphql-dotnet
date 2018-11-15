@@ -1,9 +1,11 @@
-version: 2.3.0.{build}
+version: 2.4.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-skip_branch_with_pr: true
+skip_branch_with_pr: false
 test: off
+
+os: Visual Studio 2017
 
 environment:
   CI: true
@@ -15,6 +17,7 @@ nuget:
 
 install:
   - ps: Install-Product node LTS
+  - ps: choco install dotnetcore-sdk --no-progress --confirm --version 2.1.403
   - node --version
   - npm --version
   - dotnet --version
@@ -38,4 +41,3 @@ deploy:
     branch:
       - master
       - dev
-      - instance

@@ -13,7 +13,7 @@ namespace GraphQL.Http
 
         Task<IByteResult> WriteAsync<T>(T value);
 
-        [Obsolete("This method is obsolete and will be removed in the next major version.  Use WriteAsync instead.")]
+        [Obsolete("This method is obsolete and will be removed in the next major version.  Use WriteAsync<T>(Stream, T) instead.")]
         string Write(object value);
     }
 
@@ -23,7 +23,7 @@ namespace GraphQL.Http
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly int _maxArrayLength = 1048576;
         private readonly JsonSerializer _serializer;
-        private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
+        internal static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 
         public DocumentWriter()
             : this(indent: false)
@@ -77,6 +77,13 @@ namespace GraphQL.Http
 
         public string Write(object value)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            if (!(value is ExecutionResult))
+            {
+                throw new ArgumentOutOfRangeException($"Expected {nameof(value)} to be a GraphQL.ExecutionResult, got {value.GetType().FullName}");
+            }
+
             return this.WriteToStringAsync((ExecutionResult) value).GetAwaiter().GetResult();
         }
     }
@@ -88,19 +95,19 @@ namespace GraphQL.Http
         /// </summary>
         /// <param name="writer"></param>
         /// <param name="value"></param>
-        /// <param name="encoding"></param>
         /// <returns></returns>
-        public static async Task<string> WriteToStringAsync(this IDocumentWriter writer,
-            ExecutionResult value,
-            Encoding encoding = null)
+        public static async Task<string> WriteToStringAsync(
+            this IDocumentWriter writer,
+            ExecutionResult value)
         {
-            var resolvedEncoding = encoding ?? Encoding.UTF8;
-            using (var buffer = await writer.WriteAsync(value).ConfigureAwait(false))
+            using(var stream = new MemoryStream())
             {
-                return buffer.Result.Array != null
-                    ? resolvedEncoding.GetString(buffer.Result.Array, buffer.Result.Offset,
-                        buffer.Result.Count)
-                    : null;
+                await writer.WriteAsync(stream, value);
+                stream.Position = 0;
+                using (var reader = new StreamReader(stream, DocumentWriter.Utf8Encoding))
+                {
+                    return await reader.ReadToEndAsync();
+                }
             }
         }
     }
