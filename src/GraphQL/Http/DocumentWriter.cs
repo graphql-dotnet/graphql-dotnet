@@ -77,6 +77,13 @@ namespace GraphQL.Http
 
         public string Write(object value)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            if (!(value is ExecutionResult))
+            {
+                throw new ArgumentOutOfRangeException($"Expected {nameof(value)} to be a GraphQL.ExecutionResult, got {value.GetType().FullName}");
+            }
+
             return this.WriteToStringAsync((ExecutionResult) value).GetAwaiter().GetResult();
         }
     }
