@@ -53,10 +53,10 @@ namespace GraphQL.Types
         {
             NameValidator.ValidateName(fieldType.Name);
 
-            if (HasField(fieldType.Name))
+            FieldType field = GetField(fieldType.Name);
+            if(field != null)
             {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
-                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
+                _fields.Remove(field);
             }
 
             if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
@@ -69,6 +69,8 @@ namespace GraphQL.Types
 
             return fieldType;
         }
+
+        
 
         public FieldType Field(
             Type type,
@@ -310,3 +312,4 @@ namespace GraphQL.Types
         }
     }
 }
+
