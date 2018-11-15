@@ -37,7 +37,7 @@ namespace GraphQL.Types
             }
         }
 
-        public void FieldRemove(string name)
+        public void RemoveField(string name)
         {
             var field = GetField(name);
             if (field != null)
@@ -46,12 +46,12 @@ namespace GraphQL.Types
             }
         }
 
-        public void FieldRemove<TProperty>(Expression<Func<TSourceType, TProperty>> expression)
+        public void RemoveField<TProperty>(Expression<Func<TSourceType, TProperty>> expression)
         {
             string name = expression.NameOf();
             try
             {
-                FieldRemove(name);
+                RemoveField(name);
             }
             catch
             {

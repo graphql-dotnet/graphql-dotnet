@@ -56,7 +56,20 @@ namespace GraphQL.Types
             FieldType field = GetField(fieldType.Name);
             if(field != null)
             {
-                _fields.Remove(field);
+                var t = this.GetType();
+
+                //var isAssignableFrom = t.IsAssignableFrom(typeof(AutoRegisteringObjectGraphType<TSourceType>));
+                bool isAutoRegisteringType = this is AutoRegisteringObjectGraphType<TSourceType>;
+
+                
+
+                if (isAutoRegisteringType)
+                    _fields.Remove(field);
+                else
+                    throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
+                        $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
+
+
             }
 
             if (fieldType.ResolvedType == null && !fieldType.Type.IsGraphType())
