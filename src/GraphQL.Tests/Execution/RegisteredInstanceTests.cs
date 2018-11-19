@@ -138,6 +138,8 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -151,6 +153,14 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ");
         }
 
@@ -177,6 +187,8 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -190,6 +202,14 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ");
         }
 
@@ -216,6 +236,8 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -229,6 +251,14 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ");
         }
 

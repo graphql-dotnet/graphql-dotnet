@@ -47,6 +47,26 @@ scalar Milliseconds"
 @"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds"
             },
+            {
+                "Guid",
+                @"scalar Guid"
+            },
+            {
+                "Short",
+                @"scalar Short"
+            },
+            {
+                "UShort",
+                @"scalar UShort"
+            },
+            {
+                "UInt",
+                @"scalar UInt"
+            },
+            {
+                "ULong",
+                @"scalar ULong"
+            }
         };
 
         private string printSingleFieldSchema<T>(
@@ -365,6 +385,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -374,6 +396,14 @@ type Root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -386,12 +416,12 @@ scalar Seconds
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), "", @"
-interface Baaz {
-  int: Int
-}
-
 type Bar implements Foo, Baaz {
   str: String
+}
+
+interface Baaz {
+  int: Int
 }
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -414,6 +444,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -423,6 +455,14 @@ type Query {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -460,6 +500,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -473,7 +515,15 @@ type Query {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
 union SingleUnion = Foo
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
 ", excludeScalars: true);
         }
 
