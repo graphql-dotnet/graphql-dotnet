@@ -5,6 +5,11 @@ namespace GraphQL.Types
 {
     public class GuidGraphType : ScalarGraphType
     {
+        public GuidGraphType()
+        {
+            this.Name = "Guid";
+        }
+
         public override object ParseLiteral(IValue value)
         {
             var guidValue = value as GuidValue;
