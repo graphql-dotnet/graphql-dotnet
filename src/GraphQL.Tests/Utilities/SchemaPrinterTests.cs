@@ -416,12 +416,12 @@ scalar UShort
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), "", @"
-type Bar implements Foo, Baaz {
-  str: String
-}
-
 interface Baaz {
   int: Int
+}
+
+type Bar implements Foo, Baaz {
+  str: String
 }
 
 # The `Date` scalar type represents a year, month and day in accordance with the
