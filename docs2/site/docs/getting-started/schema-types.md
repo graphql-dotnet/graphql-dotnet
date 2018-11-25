@@ -72,7 +72,11 @@ public class Droid
 
 ## Enumerations
 
+Enumerations, or enums, define a finite set of discrete values. Like scalars, they represent a leaf in the query.
+
 **GraphQL**
+
+This enum defines the first three Star Wars films using GraphQL schema language:
 
 ```graphql
 enum Episode {
@@ -82,9 +86,32 @@ enum Episode {
 }
 ```
 
+**.NET**
+
+
+Consider the equivalent `enum` in .NET:
+
+```csharp
+public enum Episodes
+{
+    NEWHOPE  = 4,
+    EMPIRE  = 5,
+    JEDI  = 6
+}
+```
+
+Compare the two implementations. GraphQL does not specify backing values for members of its enums. The name of each member _is_ the value.
+
 **GraphQL .NET**
 
-You can manually create the `EnumerationGraphType`.
+GraphQL.NET provides two methods of defining GraphQL enums.
+
+You can manually create the `EnumerationGraphType`. Advantages of this method:
+
+- The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties
+- Allows descriptions of enum members
+- Allows deprecation of enum members
+- Backing values may be any primitive type or string
 
 ```csharp
 public class EpisodeEnum : EnumerationGraphType
@@ -100,7 +127,7 @@ public class EpisodeEnum : EnumerationGraphType
 }
 ```
 
-Or you can use the generic version passing it a .NET `enum` which will populate the values for you (excluding description).  The `Name` will default to the .NET Type name, which you can override in the constructor.
+You can also use the generic version by passing it a .NET `enum` which will populate the values for you (excluding description).  The `Name` will default to the .NET Type name, which you can override in the constructor. By default, the name of each enum member will be converted to upper case. This behavior can be changed by overriding `ChangeEnumCase`.
 
 ```csharp
 public class EpisodeEnum : EnumerationGraphType<Episodes>
@@ -108,13 +135,92 @@ public class EpisodeEnum : EnumerationGraphType<Episodes>
 }
 ```
 
-**.NET**
+Note that although GraphQL has no use for backing values for enum members, GraphQL.NET uses them anyway. This allows for a more natural mapping to .NET `enum`s or other collections of constants, and avoids coupling your business logic to GraphQL semantics. The backing values are strictly for use on the back end - the client will never see them.
+
+**Resolving Enumerations**
+
+Fields typed as enumerations are resolved by returning either the name or backing value of one or more of the enum members. In the below examples, notice the identical implementations of the `appearsIn` field for both human graph types. In both implementations, the client receives the enum member names in response to queries on the `appearsIn` field.
+
+If the field resolves a value which cannot be mapped to one of the enum's legal values, GraphQL.NET will return `null` to the client in the data for the field.
 
 ```csharp
-public enum Episodes
+public class HumanString
 {
-    NEWHOPE  = 4,
-    EMPIRE  = 5,
-    JEDI  = 6
+    //i.e. "NEWHOPE", "EMPIRE", "JEDI"
+    public string[] AppearsIn { get; set; }
 }
+
+public class HumanStringType: ObjectGraphType<HumanString>
+{
+    public HumanStringType()
+    {
+        Name = "HumanString";
+        Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+    }
+}
+
+public class HumanInt
+{
+    //i.e. 4, 5, 6
+    public int AppearsIn { get; set; }
+}
+
+public class HumanIntType: ObjectGraphType<HumanInt>
+{
+    public HumanIntType()
+    {
+        Name = "HumanInt";
+        Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+    }
+}
+```
+
+**Enumeration Arguments**
+
+Enumerations can be used as arguments in GraphQL queries. Consider a query which gets the humans appearing in a specific film:
+
+```graphql
+query HumansAppearingIn($episode: Episode){
+    humans(appearsIn: $episode){
+        id
+        name
+        appearsIn
+    }
+}
+
+# example query variables:
+# {
+#   "episode":"NEWHOPE"
+# }
+```
+
+When GraphQL.NET receives an enum member name as a query argument, the queried field's `ResolveFieldContext` stores the backing value associated with the enum member name in its arguments list. The GraphQL.NET query type which handles the example query may be implemented as:
+
+```csharp
+    public class StarWarsQuery : ObjectGraphType<object>
+    {
+        public StarWarsQuery()
+        {
+            Name = "Query";
+
+            Field<ListGraphType<HumanType>>(
+                "humans",
+                arguments: new QueryArguments(
+                    new QueryArgument<EpisodeEnum> 
+                        { 
+                            Name = "appearsIn", 
+                            Description = "An episode the human appears in." 
+                        }
+                ),
+                resolve: context => 
+                {
+                    //episode = 4
+                    var episode = context.GetArgument<int>("appearsIn");
+
+                    //full implementation would access data store to get humans by episode.
+                    return default(Human);                
+                }
+            );
+        }
+    }
 ```
