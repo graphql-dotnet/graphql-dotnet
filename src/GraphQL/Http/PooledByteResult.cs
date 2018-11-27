@@ -4,11 +4,13 @@ using System.IO;
 
 namespace GraphQL.Http
 {
+    [Obsolete("This interface is obsolete and will be removed in next major version")]
     public interface IByteResult : IDisposable
     {
         ArraySegment<byte> Result { get; }
     }
 
+    [Obsolete("This class is obsolete and will be removed in next major version")]
     public class PooledByteResult : IByteResult
     {
         private readonly byte[] _buffer;
