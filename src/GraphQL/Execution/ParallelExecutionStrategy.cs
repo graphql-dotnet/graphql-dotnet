@@ -17,9 +17,11 @@ namespace GraphQL.Execution
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                var currentTasks = pendingNodes
-                    .Select(p => ExecuteNodeAsync(context, p))
-                    .ToArray();
+                var currentTasks = new Task<ExecutionNode>[pendingNodes.Count];
+                for(var i = 0; i < pendingNodes.Count; i++)
+                {
+                    currentTasks[i] = ExecuteNodeAsync(context, pendingNodes[i]);
+                }
 
                 pendingNodes.Clear();
 

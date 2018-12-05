@@ -109,13 +109,17 @@ namespace GraphQL.Execution
                 throw error;
             }
 
-            parent.Items = GetChildNodes(context, parent, itemType, data).ToList();
+            parent.Items = BuildChildNodes(context, parent, itemType, data);
         }
 
-        private static IEnumerable<ExecutionNode> GetChildNodes(ExecutionContext context, ArrayExecutionNode parent, IGraphType itemType, IEnumerable data)
+        private static IList<ExecutionNode> BuildChildNodes(ExecutionContext context, ArrayExecutionNode parent, IGraphType itemType, IEnumerable data)
         {
-            var rootDefinition = BuildExecutionNodeDefinition(itemType, parent.Field, parent.FieldDefinition);
+            var childNodes = (data is ICollection collection)
+                ? new List<ExecutionNode>(collection.Count)
+                : new List<ExecutionNode>();
+
             var subFieldsDefinitionsCache = new Dictionary<string, Dictionary<string, ExecutionNodeDefinition>>();
+            var rootDefinition = BuildExecutionNodeDefinition(itemType, parent.Field, parent.FieldDefinition);
 
             var index = 0;
             foreach (var d in data)
@@ -123,18 +127,20 @@ namespace GraphQL.Execution
                 var path = AppendPath(parent.Path, (index++).ToString());
                 if (d == null)
                 {
-                    yield return new ValueExecutionNode(rootDefinition, parent, path)
+                    var value = new ValueExecutionNode(rootDefinition, parent, path)
                     {
                         Result = null
                     };
+                    childNodes.Add(value);
                     continue;
                 }
 
                 var node = BuildExecutionNode(rootDefinition, parent, path);
                 node.Result = d;
                 SetSubfieldsIfNeeded(context, node, subFieldsDefinitionsCache);
-                yield return node;
+                childNodes.Add(node);
             }
+            return childNodes;
         }
 
         private static void SetSubfieldsIfNeeded(ExecutionContext context, ExecutionNode parent, Dictionary<string, Dictionary<string, ExecutionNodeDefinition>> subFieldsDefinitionsCache)
