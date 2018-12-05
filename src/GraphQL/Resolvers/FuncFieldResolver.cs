@@ -1,5 +1,7 @@
 using System;
+using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
 {
@@ -17,9 +19,20 @@ namespace GraphQL.Resolvers
             return _resolver(context);
         }
 
+        public TReturnType Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            var resolveContext = context.CreateResolveFieldContext(node);
+            return Resolve(resolveContext);
+        }
+
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
+        }
+
+        object IFieldResolver.Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            return Resolve(context, node);
         }
     }
 
@@ -41,9 +54,20 @@ namespace GraphQL.Resolvers
             return _resolver(context.As<TSourceType>());
         }
 
+        public TReturnType Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            var resolveContext = context.CreateResolveFieldContext(node);
+            return Resolve(resolveContext);
+        }
+
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
+        }
+
+        object IFieldResolver.Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            return Resolve(context, node);
         }
     }
 }

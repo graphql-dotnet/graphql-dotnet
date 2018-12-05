@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation
 {
@@ -28,9 +30,20 @@ namespace GraphQL.Instrumentation
             }
         }
 
+        public Task<object> Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            var resolveContext = context.CreateResolveFieldContext(node);
+            return Resolve(resolveContext);
+        }
+
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
+        }
+
+        object IFieldResolver.Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            return Resolve(context, node);
         }
     }
 }

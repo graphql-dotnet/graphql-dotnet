@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using GraphQL.Execution;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
@@ -12,6 +13,11 @@ namespace GraphQL.Resolvers
         public object Resolve(ResolveFieldContext context)
         {
             return Resolve(context?.Source, context?.FieldAst?.Name);
+        }
+
+        public object Resolve(ExecutionContext context, ExecutionNode node)
+        {
+            return Resolve(node.Source, node.Field.Name);
         }
 
 #if NETSTANDARD1_3
@@ -82,6 +88,7 @@ namespace GraphQL.Resolvers
             // Now create a more weakly typed delegate which will call the strongly typed one
             return (object target) => func((TTarget)target);
         }
+
 #endif
     }
 }
