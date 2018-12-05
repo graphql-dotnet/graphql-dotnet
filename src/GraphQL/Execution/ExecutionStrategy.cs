@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
@@ -54,12 +55,28 @@ namespace GraphQL.Execution
             SetSubFieldNodes(context, parent, fields);
         }
 
+        public static Dictionary<string, ExecutionNodeDefinition> GetDefinitionsForSubFields(ExecutionContext context, ObjectExecutionNode parent)
+        {
+            var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
+            var parentType = parent.GetObjectGraphType(context.Schema);
+            return GetDefinitionsForSubFields(context, parentType, fields);
+        }
+
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
+            var fieldsDefinition = GetDefinitionsForSubFields(context, parentType, fields);
+            SetSubFieldNodes(parent, fieldsDefinition);
+        }
 
-            var subFields = new Dictionary<string, ExecutionNode>(fields.Count);
+        public static void SetSubFieldNodes(ObjectExecutionNode parent, Dictionary<string, ExecutionNodeDefinition> fieldsDefinition)
+        {
+            parent.SubFields = fieldsDefinition.ToDictionary(kvp => kvp.Key, kvp => BuildExecutionNode(kvp.Value, parent));
+        }
 
+        private static Dictionary<string, ExecutionNodeDefinition> GetDefinitionsForSubFields(ExecutionContext context, IObjectGraphType parentType, Dictionary<string, Field> fields)
+        {
+            var subFields = new Dictionary<string, ExecutionNodeDefinition>(fields.Count);
             foreach (var kvp in fields)
             {
                 var name = kvp.Key;
@@ -73,15 +90,9 @@ namespace GraphQL.Execution
                 if (fieldDefinition == null)
                     continue;
 
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
-
-                if (node == null)
-                    continue;
-
-                subFields[kvp.Key] = node;
+                subFields[kvp.Key] = BuildExecutionNodeDefinition(fieldDefinition.ResolvedType, field, fieldDefinition);
             }
-
-            parent.SubFields = subFields;
+            return subFields;
         }
 
         public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
@@ -98,64 +109,76 @@ namespace GraphQL.Execution
                 throw error;
             }
 
-            var index = 0;
-            var arrayItems = (data is ICollection collection)
-                ? new List<ExecutionNode>(collection.Count)
-                : new List<ExecutionNode>();
+            parent.Items = GetChildNodes(context, parent, itemType, data).ToList();
+        }
 
+        private static IEnumerable<ExecutionNode> GetChildNodes(ExecutionContext context, ArrayExecutionNode parent, IGraphType itemType, IEnumerable data)
+        {
+            var rootDefinition = BuildExecutionNodeDefinition(itemType, parent.Field, parent.FieldDefinition);
+            var subFieldsDefinitionsCache = new Dictionary<string, Dictionary<string, ExecutionNodeDefinition>>();
+
+            var index = 0;
             foreach (var d in data)
             {
                 var path = AppendPath(parent.Path, (index++).ToString());
-
-                if (d != null)
+                if (d == null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
-                    node.Result = d;
-
-                    if (node is ObjectExecutionNode objectNode)
-                    {
-                        SetSubFieldNodes(context, objectNode);
-                    }
-
-                    arrayItems.Add(node);
-                }
-                else
-                {
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
+                    yield return new ValueExecutionNode(rootDefinition, parent, path)
                     {
                         Result = null
                     };
-                    arrayItems.Add(valueExecutionNode);
+                    continue;
                 }
-            }
 
-            parent.Items = arrayItems;
+                var node = BuildExecutionNode(rootDefinition, parent, path);
+                node.Result = d;
+                SetSubfieldsIfNeeded(context, node, subFieldsDefinitionsCache);
+                yield return node;
+            }
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
+        private static void SetSubfieldsIfNeeded(ExecutionContext context, ExecutionNode parent, Dictionary<string, Dictionary<string, ExecutionNodeDefinition>> subFieldsDefinitionsCache)
         {
-            path = path ?? AppendPath(parent.Path, field.Name);
+            if (parent is ObjectExecutionNode objectNode)
+            {
+                var objectType = objectNode.GetObjectGraphType(context.Schema);
+                if (!subFieldsDefinitionsCache.TryGetValue(objectType.Name, out var definitions))
+                {
+                    definitions = GetDefinitionsForSubFields(context, objectNode);
+                    subFieldsDefinitionsCache.Add(objectType.Name, definitions);
+                }
+                SetSubFieldNodes(objectNode, definitions);
+            }
+        }
 
-            if (graphType is NonNullGraphType nonNullFieldType)
-                graphType = nonNullFieldType.ResolvedType;
-
-            switch (graphType)
+        public static ExecutionNode BuildExecutionNode(ExecutionNodeDefinition definition, ExecutionNode parent, string[] path = null)
+        {
+            path = path ?? AppendPath(parent.Path, definition.Field.Name);
+            switch (definition.GraphType)
             {
                 case ListGraphType listGraphType:
-                    return new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path);
+                    return new ArrayExecutionNode(definition, parent, path);
 
                 case IObjectGraphType objectGraphType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
                 case IAbstractGraphType abstractType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
+                    return new ObjectExecutionNode(definition, parent, path);
 
                 case ScalarGraphType scalarType:
-                    return new ValueExecutionNode(parent, graphType, field, fieldDefinition, path);
+                    return new ValueExecutionNode(definition, parent, path);
 
                 default:
-                    throw new InvalidOperationException($"Unexpected type: {graphType}");
+                    throw new InvalidOperationException($"Unexpected type: {definition.GraphType}");
             }
+        }
+
+        public static ExecutionNodeDefinition BuildExecutionNodeDefinition(IGraphType graphType, Field field, FieldType fieldDefinition)
+        {
+            if (graphType is NonNullGraphType nonNullFieldType)
+            {
+                graphType = nonNullFieldType.ResolvedType;
+            }
+
+            return new ExecutionNodeDefinition(graphType, field, fieldDefinition);
         }
 
         /// <summary>

@@ -5,15 +5,33 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public abstract class ExecutionNode
+    public class ExecutionNodeDefinition
     {
-        public ExecutionNode Parent { get; }
         public IGraphType GraphType { get; }
         public Field Field { get; }
         public FieldType FieldDefinition { get; }
-        public string[] Path { get; protected set; }
 
         public string Name => Field?.Alias ?? Field?.Name;
+
+        public ExecutionNodeDefinition(IGraphType graphType, Field field, FieldType fieldDefinition)
+        {
+            GraphType = graphType;
+            Field = field;
+            FieldDefinition = fieldDefinition;
+        }
+    }
+
+    public abstract class ExecutionNode
+    {
+        private readonly ExecutionNodeDefinition _definition;
+        public IGraphType GraphType => _definition.GraphType;
+        public Field Field => _definition.Field;
+        public FieldType FieldDefinition => _definition.FieldDefinition;
+        public string Name => _definition.Name;
+
+        public ExecutionNode Parent { get; }
+
+        public string[] Path { get; protected set; }
 
         public bool IsResultSet { get; private set; }
 
@@ -36,11 +54,13 @@ namespace GraphQL.Execution
         }
 
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
+            :this(new ExecutionNodeDefinition(graphType, field, fieldDefinition), parent, path)
+        { }
+
+        protected ExecutionNode(ExecutionNodeDefinition definition, ExecutionNode parent, string[] path)
         {
+            _definition = definition;
             Parent = parent;
-            GraphType = graphType;
-            Field = field;
-            FieldDefinition = fieldDefinition;
             Path = path;
         }
 
@@ -71,8 +91,11 @@ namespace GraphQL.Execution
 
         public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
             : base(parent, graphType, field, fieldDefinition, path)
-        {
-        }
+        { }
+
+        public ObjectExecutionNode(ExecutionNodeDefinition definition, ExecutionNode parent, string[] path)
+            : base(definition, parent, path)
+        { }
 
         public IObjectGraphType GetObjectGraphType(ISchema schema)
         {
@@ -120,9 +143,11 @@ namespace GraphQL.Execution
 
         public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
             : base(parent, graphType, field, fieldDefinition, path)
-        {
+        { }
 
-        }
+        public ArrayExecutionNode(ExecutionNodeDefinition definition, ExecutionNode parent, string[] path)
+            : base(definition, parent, path)
+        { }
 
         public override object ToValue()
         {
@@ -144,9 +169,11 @@ namespace GraphQL.Execution
     {
         public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
             : base(parent, graphType, field, fieldDefinition, path)
-        {
+        { }
 
-        }
+        public ValueExecutionNode(ExecutionNodeDefinition definition, ExecutionNode parent, string[] path)
+            : base(definition, parent, path)
+        { }
 
         public override object ToValue()
         {
