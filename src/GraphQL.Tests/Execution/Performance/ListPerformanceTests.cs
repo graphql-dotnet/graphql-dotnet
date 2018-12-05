@@ -71,7 +71,8 @@ namespace GraphQL.Tests.Execution.Performance
             people = _people
         };
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        //[Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact]
         public async Task Executes_MultipleProperties_Are_Performant()
         {
             var query = @"
@@ -122,13 +123,13 @@ namespace GraphQL.Tests.Execution.Performance
             smallListTimer.Stop();
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
-
+            _output.WriteLine($"Ticks: {smallListTimer.ElapsedTicks}");
             Assert.Null(runResult2.Errors);
             Assert.True(smallListTimer.ElapsedMilliseconds < 6000 * 2); //machine specific data with a buffer
         }
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        // [Fact]
+        //[Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact]
         public async Task Executes_SimpleLists_Are_Performant()
         {
             var query = @"
@@ -160,7 +161,7 @@ namespace GraphQL.Tests.Execution.Performance
             smallListTimer.Stop();
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
-
+            _output.WriteLine($"Ticks: {smallListTimer.ElapsedTicks}");
             Assert.Null(runResult2.Errors);
             Assert.True(smallListTimer.ElapsedMilliseconds < 700 * 2); //machine specific data with a buffer
         }
@@ -191,27 +192,27 @@ namespace GraphQL.Tests.Execution.Performance
 
             var smallListTimer = new Stopwatch();
 
-            smallListTimer.Start();
-
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var test = 30;
+            for(var i = 0; i < test; i++)
             {
-                _.SetFieldMiddleware = false;
-                _.EnableMetrics = false;
-                _.Schema = Schema;
-                _.Query = query;
-                _.Root = PeopleList;
-                _.Inputs = null;
-                _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
-                _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
-            });
-
-            smallListTimer.Stop();
-
+                smallListTimer.Start();
+                var runResult2 = await Executer.ExecuteAsync(_ =>
+                {
+                    _.SetFieldMiddleware = false;
+                    _.EnableMetrics = false;
+                    _.Schema = Schema;
+                    _.Query = query;
+                    _.Root = PeopleList;
+                    _.Inputs = null;
+                    _.UserContext = null;
+                    _.CancellationToken = default(CancellationToken);
+                    _.ValidationRules = null;
+                    _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                });
+                smallListTimer.Stop();
+                Assert.Null(runResult2.Errors);
+            }
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
-
-            Assert.Null(runResult2.Errors);
             Assert.True(smallListTimer.ElapsedMilliseconds < 5600 * 2); //machine specific data with a buffer
         }
     }
