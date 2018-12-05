@@ -1,9 +1,7 @@
 using System;
 using System.Reflection;
-using GraphQL.Execution;
 using GraphQL.Reflection;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
 {
@@ -22,12 +20,6 @@ namespace GraphQL.Resolvers
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             return _resolver.DynamicInvoke(arguments);
-        }
-
-        public object Resolve(ExecutionContext context, ExecutionNode node)
-        {
-            var resolveContext = context.CreateResolveFieldContext(node);
-            return Resolve(resolveContext);
         }
     }
 }

@@ -1,9 +1,7 @@
 using System;
 using System.Reflection;
-using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Reflection
 {
@@ -33,12 +31,6 @@ namespace GraphQL.Reflection
             }
 
             return _accessor.GetValue(target, arguments);
-        }
-
-        public object Resolve(ExecutionContext context, ExecutionNode node)
-        {
-            var resolveContext = context.CreateResolveFieldContext(node);
-            return Resolve(resolveContext);
         }
     }
 }

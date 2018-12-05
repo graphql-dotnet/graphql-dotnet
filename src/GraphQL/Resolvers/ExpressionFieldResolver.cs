@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using GraphQL.Execution;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
@@ -19,19 +18,9 @@ namespace GraphQL.Resolvers
             return _property((TSourceType)context.Source);
         }
 
-        public TProperty Resolve(ExecutionContext context, ExecutionNode node)
-        {
-            return _property((TSourceType)node.Source);
-        }
-
         object IFieldResolver.Resolve(ResolveFieldContext context)
         {
             return Resolve(context);
-        }
-
-        object IFieldResolver.Resolve(ExecutionContext context, ExecutionNode node)
-        {
-            return Resolve(context, node);
         }
     }
 }
