@@ -309,5 +309,14 @@ namespace GraphQL.Execution
                     .ConfigureAwait(false);
             }
         }
+
+        protected virtual async Task OnAfterExecutionStepAwaitedAsync(ExecutionContext context)
+        {
+            foreach (var listener in context.Listeners)
+            {
+                await listener.AfterExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                    .ConfigureAwait(false);
+            }
+        }
     }
 }

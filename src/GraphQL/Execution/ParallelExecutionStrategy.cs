@@ -33,6 +33,9 @@ namespace GraphQL.Execution
                 var completedNodes = await Task.WhenAll(currentTasks)
                     .ConfigureAwait(false);
 
+                await OnAfterExecutionStepAwaitedAsync(context)
+                    .ConfigureAwait(false);
+
                 // Add child nodes to pending nodes to execute the next level in parallel
                 var childNodes = completedNodes
                     .OfType<IParentExecutionNode>()

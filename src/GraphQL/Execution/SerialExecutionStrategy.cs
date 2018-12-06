@@ -23,6 +23,9 @@ namespace GraphQL.Execution
 
                 await task.ConfigureAwait(false);
 
+                await OnAfterExecutionStepAwaitedAsync(context)
+                    .ConfigureAwait(false);
+
                 // Push any child nodes on top of the stack
                 if (node is IParentExecutionNode parentNode)
                 {

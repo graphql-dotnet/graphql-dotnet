@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Types;
@@ -44,6 +45,18 @@ namespace GraphQL.DataLoader.Tests.Types
                         orders.GetAllOrdersAsync);
 
                     return loader.LoadAsync();
+                });
+
+            Field<BooleanGraphType, bool>()
+                .Name("True")
+                .ResolveAsync(async ctx =>
+                {
+                    await Task.Delay(1);
+
+                    var loader = accessor.Context.GetOrAddLoader("GetTrue",
+                        () => Task.FromResult(true));
+
+                    return await loader.LoadAsync();
                 });
         }
     }

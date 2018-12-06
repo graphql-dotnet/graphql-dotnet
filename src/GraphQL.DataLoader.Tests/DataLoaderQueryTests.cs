@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shouldly;
 using Xunit;
+using Xunit.Sdk;
 
 namespace GraphQL.DataLoader.Tests
 {
@@ -19,7 +21,7 @@ namespace GraphQL.DataLoader.Tests
 
             var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
 
-            usersMock.Setup(store => store.GetAllUsersAsync(default))
+            usersMock.Setup(store => store.GetAllUsersAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(users);
 
             AssertQuerySuccess<DataLoaderTestSchema>(
@@ -37,7 +39,17 @@ namespace GraphQL.DataLoader.Tests
 ] }
 ");
 
-            usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
+            usersMock.Verify(x => x.GetAllUsersAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact(Skip = "BUG")]
+        public void MultiWaitField_Works()
+        {
+            AssertQuerySuccess<DataLoaderTestSchema>(
+                query: "{ true }",
+                expected: @"
+{ true: true }
+");
         }
 
         [Fact]
@@ -54,7 +66,7 @@ namespace GraphQL.DataLoader.Tests
             ordersMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(new[] { order });
 
-            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
             AssertQuerySuccess<DataLoaderTestSchema>(
@@ -83,7 +95,7 @@ namespace GraphQL.DataLoader.Tests
             ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
             ordersMock.VerifyNoOtherCalls();
 
-            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Once);
+            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, It.IsAny<CancellationToken>()), Times.Once);
             usersMock.VerifyNoOtherCalls();
         }
 
@@ -99,7 +111,7 @@ namespace GraphQL.DataLoader.Tests
             ordersMock.Setup(x => x.GetAllOrdersAsync())
                 .ReturnsAsync(orders);
 
-            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
             AssertQuerySuccess<DataLoaderTestSchema>(
@@ -136,7 +148,7 @@ namespace GraphQL.DataLoader.Tests
             ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
             ordersMock.VerifyNoOtherCalls();
 
-            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
+            usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, It.IsAny<CancellationToken>()), Times.Once);
             usersMock.VerifyNoOtherCalls();
         }
 
@@ -158,7 +170,7 @@ namespace GraphQL.DataLoader.Tests
             ordersMock.Setup(x => x.GetItemsByOrderIdAsync(It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(orderItems.ToLookup(x => x.OrderId));
 
-            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
             productsMock.Setup(x => x.GetProductsByIdAsync(It.IsAny<IEnumerable<int>>()))

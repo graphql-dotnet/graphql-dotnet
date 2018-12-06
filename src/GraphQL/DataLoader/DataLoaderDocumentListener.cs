@@ -39,7 +39,6 @@ namespace GraphQL.DataLoader
         public Task AfterExecutionAsync(object userContext, CancellationToken token)
         {
             _accessor.Context = null;
-
             return TaskExtensions.CompletedTask;
         }
 
@@ -47,6 +46,12 @@ namespace GraphQL.DataLoader
         {
             var context = _accessor.Context;
             return context.DispatchAllAsync(token);
+        }
+
+        public Task AfterExecutionStepAwaitedAsync(object userContext, CancellationToken token)
+        {
+            var context = _accessor.Context;
+            return TaskExtensions.CompletedTask;
         }
     }
 }
