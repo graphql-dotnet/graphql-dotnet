@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +12,8 @@ namespace GraphQL.DataLoader
     public class DataLoaderContext
     {
         private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
-        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+        private TaskCompletionSource<bool> _dispatchingFinishedEvent = new TaskCompletionSource<bool>(false);
+        private CancellationTokenSource _dispatchingCancelationTokenSource;
 
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
@@ -38,7 +40,6 @@ namespace GraphQL.DataLoader
                     loader = dataLoaderFactory();
 
                     _loaders.Add(loaderKey, loader);
-                    _queue.Enqueue(loader);
                 }
             }
 
@@ -46,36 +47,49 @@ namespace GraphQL.DataLoader
         }
 
         /// <summary>
-        /// Dispatch all registered data loaders
+        /// Starts dispatching all registered data loaders
         /// </summary>
-        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        public async Task DispatchAllAsync(CancellationToken cancellationToken = default)
+        public async void StartDispatching()
+        {
+            _dispatchingCancelationTokenSource = new CancellationTokenSource();
+            try
+            {
+                while (!_dispatchingCancelationTokenSource.IsCancellationRequested)
+                {
+                    // This busy wait should probably be changed to wait for enqueued load requests (requires refactoring)
+                    await Task.Delay(1, _dispatchingCancelationTokenSource.Token);
+                    await DispatchAllAsync(_dispatchingCancelationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException ex) when (ex.CancellationToken == _dispatchingCancelationTokenSource.Token)
+            {
+            }
+            catch (Exception ex)
+            {
+                _dispatchingFinishedEvent.SetException(ex);
+                return;
+            }
+
+            _dispatchingFinishedEvent.SetResult(true);
+        }
+
+        /// <summary>
+        /// Stops dispatching all registered data loaders
+        /// </summary>
+        /// <returns></returns>
+        public Task StopDispatching()
+        {
+            _dispatchingFinishedEvent = new TaskCompletionSource<bool>();
+            _dispatchingCancelationTokenSource.Cancel();
+            return _dispatchingFinishedEvent.Task;
+        }
+
+        private async Task DispatchAllAsync(CancellationToken cancellationToken)
         {
             Task task;
-
             lock (_loaders)
             {
-                if (_queue.Count == 0)
-                {
-                    return;
-                }
-                else if (_queue.Count == 1)
-                {
-                    var loader = _queue.Peek();
-                    task = loader.DispatchAsync(cancellationToken);
-                }
-                else
-                {
-                    var tasks = new List<Task>(_queue.Count);
-
-                    // We don't want to pop any loaders off the queue because they may get more work later
-                    foreach (var loader in _queue)
-                    {
-                        tasks.Add(loader.DispatchAsync(cancellationToken));
-                    }
-
-                    task = Task.WhenAll(tasks);
-                }
+                task = Task.WhenAll(_loaders.Values.Select(x => x.DispatchAsync(cancellationToken)));
             }
 
             await task.ConfigureAwait(false);

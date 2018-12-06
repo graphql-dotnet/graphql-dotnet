@@ -45,13 +45,14 @@ namespace GraphQL.DataLoader
         public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
         {
             var context = _accessor.Context;
-            return context.DispatchAllAsync(token);
+            context.StartDispatching();
+            return TaskExtensions.CompletedTask;
         }
 
         public Task AfterExecutionStepAwaitedAsync(object userContext, CancellationToken token)
         {
             var context = _accessor.Context;
-            return TaskExtensions.CompletedTask;
+            return context.StopDispatching();
         }
     }
 }

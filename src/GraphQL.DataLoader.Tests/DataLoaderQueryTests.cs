@@ -42,7 +42,7 @@ namespace GraphQL.DataLoader.Tests
             usersMock.Verify(x => x.GetAllUsersAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        [Fact(Skip = "BUG")]
+        [Fact]
         public void MultiWaitField_Works()
         {
             AssertQuerySuccess<DataLoaderTestSchema>(
