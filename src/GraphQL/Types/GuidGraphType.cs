@@ -7,9 +7,9 @@ namespace GraphQL.Types
     {
         public override object ParseLiteral(IValue value)
         {
-            if (value is GuidValue timeValue)
+            if (value is GuidValue guidValue)
             {
-                return ParseValue(timeValue.Value);
+                return guidValue.Value;
             }
 
             if (value is StringValue stringValue)
