@@ -141,5 +141,56 @@ namespace GraphQL.DataLoader.Tests
             mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Once,
                 "The keys passed to the fetch delegate should be de-duplicated");
         }
+
+        [Fact]
+        public async Task Multiple_Calls_When_Max_Batch_Size_Is_Used()
+        {
+            var mock = new Mock<IOrdersStore>();
+
+            var orders = Fake.Orders.Generate(2);
+            orders.ForEach(o => o.UserId = 1);
+
+            mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync((IEnumerable<int> ints, System.Threading.CancellationToken ct) =>
+                {
+                    return ints.SelectMany(x => orders.Where(y => y.UserId == x)).Where(x => x != null).ToLookup(o => o.UserId);
+                });
+
+            var ordersStore = mock.Object;
+
+            var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync, maxBatchSize: 2);
+
+            // Start async tasks to load by User ID
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(2);
+            var task3 = loader.LoadAsync(3);
+            var task4 = loader.LoadAsync(4);
+
+            // Dispatch loading
+            await loader.DispatchAsync();
+
+            var user1Orders = await task1;
+            var user2Orders = await task2;
+            var user3Orders = await task3;
+            var user4Orders = await task4;
+
+            user1Orders.ShouldNotBeNull();
+            user2Orders.ShouldNotBeNull();
+            user3Orders.ShouldNotBeNull();
+            user4Orders.ShouldNotBeNull();
+
+            user1Orders.Count().ShouldBe(2);
+            user2Orders.Count().ShouldBe(0);
+            user3Orders.Count().ShouldBe(0);
+            user4Orders.Count().ShouldBe(0);
+
+            // This should have been called only once to load in a single batch
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1, 2 }, default), Times.Once,
+                "Operations should be batched");
+            mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 3, 4 }, default), Times.Once,
+                "Operations should be batched");
+
+            mock.VerifyNoOtherCalls();
+        }
     }
 }

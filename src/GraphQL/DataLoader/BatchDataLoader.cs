@@ -12,10 +12,12 @@ namespace GraphQL.DataLoader
         private readonly HashSet<TKey> _pendingKeys;
         private readonly Dictionary<TKey, T> _cache;
         private readonly T _defaultValue;
+        private readonly int? _maxBatchSize;
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default(T),
+            int? maxBatchSize = null)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
@@ -24,12 +26,18 @@ namespace GraphQL.DataLoader
             _pendingKeys = new HashSet<TKey>(keyComparer);
             _cache = new Dictionary<TKey, T>(keyComparer);
             _defaultValue = defaultValue;
+
+            if(maxBatchSize.HasValue && maxBatchSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxBatchSize), "Has to be greater than zero.");
+
+            _maxBatchSize = maxBatchSize;
         }
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default(T),
+            int? maxBatchSize = null)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
@@ -37,18 +45,21 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
+            if (maxBatchSize.HasValue && maxBatchSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxBatchSize), "Has to be greater than zero.");
+
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
 
             async Task<IDictionary<TKey, T>> LoadAndMapToDictionary(IEnumerable<TKey> keys, CancellationToken cancellationToken)
             {
-                var values = await loader(keys, cancellationToken).ConfigureAwait(false);
-                return values.ToDictionary(keySelector, keyComparer);
+               return (await loader(keys, cancellationToken).ConfigureAwait(false)).ToDictionary(keySelector, keyComparer);
             }
 
             _loader = LoadAndMapToDictionary;
             _pendingKeys = new HashSet<TKey>(keyComparer);
             _cache = new Dictionary<TKey, T>(keyComparer);
             _defaultValue = defaultValue;
+            _maxBatchSize = maxBatchSize;
         }
 
         public async Task<T> LoadAsync(TKey key)
@@ -99,7 +110,20 @@ namespace GraphQL.DataLoader
                 _pendingKeys.Clear();
             }
 
-            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            IDictionary<TKey, T> dictionary;
+
+            if (!_maxBatchSize.HasValue || _maxBatchSize.Value >= keys.Count)
+                dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            else
+            {
+                dictionary = new Dictionary<TKey, T>();
+
+                foreach (var batch in Batch(keys, _maxBatchSize.Value))
+                {
+                    dictionary = dictionary.Concat(await _loader(batch, cancellationToken).ConfigureAwait(false)).ToDictionary(x => x.Key, x => x.Value);
+                }
+            }
+            
 
             // Populate cache
             lock (_cache)
@@ -119,5 +143,7 @@ namespace GraphQL.DataLoader
 
             return dictionary;
         }
+
+        
     }
 }

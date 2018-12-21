@@ -192,5 +192,51 @@ namespace GraphQL.DataLoader.Tests
 
             result.Errors.ShouldBeNull();
         }
+
+        [Fact]
+        public async Task Query_Field_With_Max_Batch_Size()
+        {
+            var users = Fake.Users.Generate(1000);
+            var orders = Fake.GenerateOrdersForUsers(users, 10);
+            var orderItems = Fake.GetItemsForOrders(orders, 5);
+
+            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+
+            ordersMock.Setup(x => x.GetAllOrdersAsync())
+                .ReturnsAsync(orders);
+
+            ordersMock.Setup(x => x.GetItemsByOrderIdAsync(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync((IEnumerable<int> ints) => ints.SelectMany(x => orderItems.Where(y => y.OrderId == x)).Where(x => x != null).ToLookup(x => x.OrderId));
+
+
+            var result = await ExecuteQueryAsync<DataLoaderTestSchema>(
+                query: @"
+{
+    orders {
+        orderId
+        orderedOn
+        batchedItems {
+            orderItemId
+            quantity
+            unitPrice
+        }
+    }
+}");
+
+            result.Errors.ShouldBeNull();
+
+            IEnumerable<int> batch;
+            const int batchSize = 2000;
+            var batchNr = 0;
+
+            var keys = Enumerable.Range(1, 10000).ToList();
+
+            while ((batch = keys.Skip(batchNr * batchSize).Take(batchSize)).Any())
+            {
+                ordersMock.Verify(x => x.GetItemsByOrderIdAsync(batch), Times.Once, "Results should have been cached from first batch");
+                batchNr++;
+            }
+
+        }
     }
 }

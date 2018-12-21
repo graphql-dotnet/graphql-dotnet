@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
@@ -31,6 +30,17 @@ namespace GraphQL.DataLoader.Tests.Types
                 {
                     var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
                         orders.GetItemsByOrderIdAsync);
+
+                    return loader.LoadAsync(ctx.Source.OrderId);
+                });
+
+            Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
+                .Name("BatchedItems")
+                .Description("Get all items for order by batch-loading them")
+                .ResolveAsync(ctx =>
+                {
+                    var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
+                        orders.GetItemsByOrderIdAsync, maxBatchSize: 2000);
 
                     return loader.LoadAsync(ctx.Source.OrderId);
                 });

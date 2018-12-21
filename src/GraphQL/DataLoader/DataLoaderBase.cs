@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,6 +46,21 @@ namespace GraphQL.DataLoader
             {
                 tcs.SetException(ex);
             }
+        }
+        protected static IEnumerable<IEnumerable<TKey>> Batch<TKey>(IEnumerable<TKey> collection, int batchSize)
+        {
+            var nextbatch = new List<TKey>(batchSize);
+            foreach (var item in collection)
+            {
+                nextbatch.Add(item);
+                if (nextbatch.Count == batchSize)
+                {
+                    yield return nextbatch;
+                    nextbatch = new List<TKey>(batchSize);
+                }
+            }
+            if (nextbatch.Count > 0)
+                yield return nextbatch;
         }
     }
 }

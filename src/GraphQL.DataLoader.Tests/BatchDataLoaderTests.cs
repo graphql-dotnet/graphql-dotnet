@@ -261,5 +261,61 @@ namespace GraphQL.DataLoader.Tests
             mock.Verify(x => x.GetUsersByIdAsync(new[] { 1 }, default), Times.Once,
                 "The keys passed to the fetch delegate should be de-duplicated");
         }
+
+        [Fact]
+        public async Task All_Requested_Keys_Should_Be_Cached_When_Using_Max_Batch_Size()
+        {
+            var mock = new Mock<IUsersStore>();
+            var users = Fake.Users.Generate(2);
+
+            mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync((IEnumerable<int> ints, System.Threading.CancellationToken ct) =>
+                {
+                    return ints.SelectMany(x => users.Where(y => y.UserId == x)).Where(x => x != null).ToDictionary(o => o.UserId);
+                });
+
+            var usersStore = mock.Object;
+
+            var nullObjectUser = new User();
+
+            User user1 = null;
+            User user2 = null;
+            User user3 = null;
+
+            // There is no user with the ID of 3
+            // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
+            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser, maxBatchSize: 2);
+
+            // Start async tasks to load by ID
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(2);
+            var task3 = loader.LoadAsync(3);
+
+            // Dispatch loading
+            await loader.DispatchAsync();
+
+            // Now await tasks
+            user1 = await task1;
+            user2 = await task2;
+            user3 = await task3;
+
+            // Load key 3 again.
+            var task3b = loader.LoadAsync(3);
+
+            task3b.Status.ShouldBe(TaskStatus.RanToCompletion,
+                "Should be cached because it was requested in the first batch even though it wasn't in the result dictionary");
+
+            await loader.DispatchAsync();
+
+            var user3b = await task3b;
+
+            user3.ShouldBeSameAs(nullObjectUser, "The DataLoader should use the supplied default value");
+
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once,
+                "Results should have been cached from first batch");
+
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 3 }, default), Times.Once,
+                "Results should have been cached from first batch");
+        }
     }
 }

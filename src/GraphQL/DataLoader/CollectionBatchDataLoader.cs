@@ -11,18 +11,23 @@ namespace GraphQL.DataLoader
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
         private readonly Dictionary<TKey, IEnumerable<T>> _cache;
         private readonly HashSet<TKey> _pendingKeys;
+        private readonly int? _maxBatchSize;
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null)
+        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null, int? maxBatchSize = null)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
             _pendingKeys = new HashSet<TKey>(keyComparer);
+
+            if (maxBatchSize.HasValue && maxBatchSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxBatchSize), "Has to be greater than zero.");
+            _maxBatchSize = maxBatchSize;
         }
 
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader, Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null)
+            IEqualityComparer<TKey> keyComparer = null, int? maxBatchSize = null)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
@@ -30,7 +35,12 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
+            if (maxBatchSize.HasValue && maxBatchSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxBatchSize), "Has to be greater than zero.");
+
             keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
+
+            _maxBatchSize = maxBatchSize;
 
             async Task<ILookup<TKey, T>> LoadAndMapToLookup(IEnumerable<TKey> keys, CancellationToken cancellationToken)
             {
@@ -84,7 +94,20 @@ namespace GraphQL.DataLoader
                 _pendingKeys.Clear();
             }
 
-            var lookup = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            ILookup<TKey, T> lookup;
+
+            if(!_maxBatchSize.HasValue || _maxBatchSize.Value >= keys.Count)
+                lookup = await _loader(keys, cancellationToken).ConfigureAwait(false);
+            else
+            {
+                lookup = Enumerable.Empty<T>().ToLookup(x => default(TKey));
+
+                foreach (var batch in Batch(keys, _maxBatchSize.Value))
+                {
+                    var batchLookup = await _loader(batch, cancellationToken).ConfigureAwait(false);
+                    lookup = lookup.Concat(batchLookup).SelectMany(x => x.Select(value => new {x.Key, value})).ToLookup(x => x.Key, x => x.value);
+                }
+            }
 
             // Populate cache
             lock (_cache)
