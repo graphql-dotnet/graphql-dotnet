@@ -12,7 +12,12 @@ This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) orig
 
 You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 
-`PM> Install-Package GraphQL`
+```
+PM> Install-Package GraphQL
+```
+
+Or you can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json).
+
 
 ## Documentation
 
