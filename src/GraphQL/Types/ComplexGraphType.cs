@@ -69,7 +69,7 @@ namespace GraphQL.Types
                 else if (!fieldType.Type.IsGraphType())
                 {
                     throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
-                        $"The declared Field type: {fieldType.Type.Name} should derive from GraphType, but doesn't.");
+                        $"The declared Field type: {fieldType.Type.Name} should derive from GraphType.");
                 }
             }
 
