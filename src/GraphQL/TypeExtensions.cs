@@ -160,6 +160,36 @@ namespace GraphQL
             return graphType;
         }
 
+        /// <summary>
+        /// Returns the friendly name of a type, using C# angle-bracket syntax for generics.
+        /// </summary>
+        /// <param name="type">The type of which you are inquiring.</param>
+        /// <returns>A string representing the friendly name.</returns>
+        internal static string GetFriendlyName(this Type type)
+        {
+            string friendlyName = type.Name;
+
+            var genericArgs = type.GetGenericArguments();
+
+            if (genericArgs.Any())
+            {
+                int iBacktick = friendlyName.IndexOf('`');
+                if (iBacktick > 0)
+                {
+                    friendlyName = friendlyName.Remove(iBacktick);
+                }
+                friendlyName += "<";
+                Type[] typeParameters = genericArgs;
+                for (int i = 0; i < typeParameters.Length; ++i)
+                {
+                    string typeParamName = GetFriendlyName(typeParameters[i]);
+                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                }
+                friendlyName += ">";
+            }
+
+            return friendlyName;
+        }
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
     }
