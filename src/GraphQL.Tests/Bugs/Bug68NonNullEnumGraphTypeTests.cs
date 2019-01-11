@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -144,7 +144,7 @@ namespace GraphQL.Tests.Bugs
         static string DeriveEnumValueName(string name)
         {
             return Regex
-              .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
+              .Replace(name, "([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
               .ToUpperInvariant();
         }
     }

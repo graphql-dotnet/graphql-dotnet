@@ -49,7 +49,7 @@ namespace GraphQL.Tests.Errors
             var result = await Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
-                _.Query = @"{ secondSync }";
+                _.Query = "{ secondSync }";
             });
 
             result.Errors.Count.ShouldBe(1);

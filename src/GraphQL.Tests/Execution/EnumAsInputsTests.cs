@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void mutation_input_from_variables()
         {
-            var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
+            var inputs = "{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
 
             AssertQuerySuccess(
                 @"
@@ -58,7 +58,7 @@ namespace GraphQL.Tests.Execution
         public void query_can_get_enum_argument()
         {
             AssertQuerySuccess(
-                @"{ user { id, gender, printGender(g: Male) }}",
+                "{ user { id, gender, printGender(g: Male) }}",
                 @"{
                   'user': {
                     'id': 1,
@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Execution
             var inputs = "{ 'userId': 1000000000000000001 }".ToInputs();
 
             AssertQuerySuccess(
-                @"query aQuery($userId: Int!) { getLongUser(userId: $userId) { idLong }}",
+                "query aQuery($userId: Int!) { getLongUser(userId: $userId) { idLong }}",
                 @"{
                   'getLongUser': {
                     'idLong': 1000000000000000001
@@ -86,7 +86,7 @@ namespace GraphQL.Tests.Execution
         public void query_can_get_long_inline()
         {
             AssertQuerySuccess(
-                @"query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
+                "query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
                 @"{
                   'getLongUser': {
                     'idLong': 1000000000000000001
@@ -100,7 +100,7 @@ namespace GraphQL.Tests.Execution
             var inputs = "{ 'userId': 3 }".ToInputs();
 
             AssertQuerySuccess(
-                @"query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
+                "query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
                 @"{
                   'getIntUser': {
                     'id': 3

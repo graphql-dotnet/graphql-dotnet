@@ -6,7 +6,7 @@ namespace GraphQL.Utilities
     public class NameValidator
     {
         private static readonly string RESERVED_PREFIX = "__";
-        private static readonly string NAME_RX = @"^[_A-Za-z][_0-9A-Za-z]*$";
+        private static readonly string NAME_RX = "^[_A-Za-z][_0-9A-Za-z]*$";
 
         public static void ValidateName(string name, string type = "field")
         {

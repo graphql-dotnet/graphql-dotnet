@@ -91,7 +91,7 @@ namespace GraphQL
         private static string GetAllCapsRepresentation(string str)
         {
             return Regex
-                .Replace(NormalizeString(str), @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
+                .Replace(NormalizeString(str), "([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
                 .ToUpperInvariant();
         }
 

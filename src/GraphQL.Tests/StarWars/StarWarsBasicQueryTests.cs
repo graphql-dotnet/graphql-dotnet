@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.StarWars
@@ -201,7 +201,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void can_add_new_human()
         {
-            var mutation = @"mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
+            var mutation = "mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
 
             var expected = @"{
               'createHuman': {

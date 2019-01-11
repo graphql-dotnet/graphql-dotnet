@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
@@ -69,7 +69,7 @@ namespace GraphQL.Tests.Errors
             var result = await Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
-                _.Query = @"{ testSubList { one two } }";
+                _.Query = "{ testSubList { one two } }";
             });
 
             result.Errors.Count.ShouldBe(1);
