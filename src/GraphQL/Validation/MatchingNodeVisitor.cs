@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation

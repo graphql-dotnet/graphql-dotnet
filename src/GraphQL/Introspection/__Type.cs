@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
