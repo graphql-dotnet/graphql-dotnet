@@ -75,7 +75,7 @@ namespace GraphQL.Types
             SubFields = context.SubFields;
         }
 
-        public TType GetArgument<TType>(string name, TType defaultValue = default(TType))
+        public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
             return (TType) GetArgument(typeof(TType), name, defaultValue);
         }
@@ -127,12 +127,12 @@ namespace GraphQL.Types
                     er.AddLocation(FieldAst, Document);
                     er.Path = Path;
                     Errors.Add(er);
-                    return default(TResult);
+                    return default;
                 }
                 else
                 {
                     var result = error(Errors);
-                    return result == null ? default(TResult) : await result;
+                    return result == null ? default : await result;
                 }
             }
         }

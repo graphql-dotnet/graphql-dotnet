@@ -94,7 +94,7 @@ namespace GraphQL
                     return pair.Value;
                 }
 
-                return default(TValue);
+                return default;
             }
         }
 
@@ -187,7 +187,7 @@ namespace GraphQL
         /// <param name="value">The value for the associated key or <c>default(TValue)</c>.</param>
         public bool TryRetrieve(TKey key, out TValue value)
         {
-            value = default(TValue);
+            value = default;
 
             if (_values.ContainsKey(key))
             {
@@ -261,7 +261,7 @@ namespace GraphQL
                 }
             }
 
-            return default(TValue);
+            return default;
         }
 
         /// <summary>
