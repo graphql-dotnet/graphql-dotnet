@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace GraphQL.Types
 {
@@ -11,7 +11,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class ListGraphType : GraphType
+    public class ListGraphType : ObjectGraphType
     {
         public ListGraphType(IGraphType type)
         {

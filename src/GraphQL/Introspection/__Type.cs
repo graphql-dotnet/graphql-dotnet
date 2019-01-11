@@ -120,10 +120,6 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.SCALAR;
             }
-            if (type is IObjectGraphType)
-            {
-                return TypeKind.OBJECT;
-            }
             if (type is IInterfaceGraphType)
             {
                 return TypeKind.INTERFACE;
@@ -144,6 +140,10 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.NON_NULL;
             }
+            if (type is IObjectGraphType)
+            {
+                return TypeKind.OBJECT;
+            }
 
             throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
@@ -157,10 +157,6 @@ namespace GraphQL.Introspection
             if (typeof(ScalarGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.SCALAR;
-            }
-            if (typeof(IObjectGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.OBJECT;
             }
             if (typeof(IInterfaceGraphType).IsAssignableFrom(type))
             {
@@ -181,6 +177,10 @@ namespace GraphQL.Introspection
             if (typeof(NonNullGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.NON_NULL;
+            }
+            if (typeof(IObjectGraphType).IsAssignableFrom(type))
+            {
+                return TypeKind.OBJECT;
             }
 
             throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
