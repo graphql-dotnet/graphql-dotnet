@@ -12,8 +12,12 @@ namespace GraphQL
 
         static ValueConverter()
         {
+            Register(typeof(string), typeof(short), ParseShort);
+            Register(typeof(string), typeof(ushort), ParseUShort);
             Register(typeof(string), typeof(int), ParseInt);
+            Register(typeof(string), typeof(uint), ParseUInt);
             Register(typeof(string), typeof(long), ParseLong);
+            Register(typeof(string), typeof(ulong), ParseULong);
             Register(typeof(string), typeof(float), ParseFloat);
             Register(typeof(string), typeof(double), ParseDouble);
             Register(typeof(string), typeof(decimal), ParseDecimal);
@@ -26,14 +30,27 @@ namespace GraphQL
             Register(typeof(DateTimeOffset), typeof(DateTime), DateTimeOffsetToDateTime);
             Register(typeof(TimeSpan), typeof(long), TimeSpanToLong);
 
+            Register(typeof(int), typeof(short), IntToShort);
+            Register(typeof(int), typeof(ushort), IntToUShort);
             Register(typeof(int), typeof(bool), IntToBool);
+            Register(typeof(int), typeof(uint), IntToUInt);
             Register(typeof(int), typeof(long), IntToLong);
+            Register(typeof(int), typeof(ulong), IntToULong); 
             Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
             Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
 
+            Register(typeof(long), typeof(short), LongToShort);
+            Register(typeof(long), typeof(ushort), LongToUShort);
             Register(typeof(long), typeof(int), LongToInt);
+            Register(typeof(long), typeof(uint), LongToUInt);
+            Register(typeof(long), typeof(ulong), LongToULong);
+            Register(typeof(long), typeof(double), LongToDouble);
+            Register(typeof(long), typeof(decimal), LongToDecimal);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
+
+            Register(typeof(float), typeof(double), FloatToDouble);
+            Register(typeof(float), typeof(decimal), FloatToDecimal);
 
             Register(typeof(double), typeof(decimal), DoubleToDecimal);
 
@@ -52,10 +69,34 @@ namespace GraphQL
             return Convert.ToDecimal(intValue, NumberFormatInfo.InvariantInfo);
         }
 
+        private static object FloatToDouble(object value)
+        {
+            var floatValue = (float)value;
+            return (double)floatValue;
+        }
+
+        private static object FloatToDecimal(object value)
+        {
+            var floatValue = (float)value;
+            return Convert.ToDecimal(floatValue, NumberFormatInfo.InvariantInfo);
+        }
+
         private static object DoubleToDecimal(object value)
         {
             var doubleValue = (double)value;
             return Convert.ToDecimal(doubleValue, NumberFormatInfo.InvariantInfo);
+        }
+
+        private static object LongToDouble(object value)
+        {
+            var longValue = (long)value;
+            return (double)longValue;
+        }
+
+        private static object LongToDecimal(object value)
+        {
+            var longValue = (long)value;
+            return (decimal)longValue;
         }
 
         private static object LongToInt(object value)
@@ -167,6 +208,36 @@ namespace GraphQL
             value is string s
                 ? new Uri(s)
                 : (Uri) value;
+
+        private static object ParseShort(object value) => convertToInt16((string)value);
+        private static object IntToShort(object value) => convertToInt16((int) value);
+        private static object LongToShort(object value) => convertToInt16((long) value);
+
+        private static object convertToInt16<T>(T value) =>
+            Convert.ToInt16(value, NumberFormatInfo.InvariantInfo);
+
+        private static object ParseUShort(object value) => convertToUInt16(value);
+        private static object IntToUShort(object value) => convertToUInt16((int)value);
+        private static object LongToUShort(object value) => convertToUInt16((long)value);
+
+        private static object convertToUInt16<T>(T value) =>
+            Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo);
+
+
+        private static object ParseUInt(object value) => convertToUInt32(value);
+        private static object IntToUInt(object value) => convertToUInt32((int)value);
+        private static object LongToUInt(object value) => convertToUInt32((long)value);
+
+        private static object convertToUInt32<T>(T value) =>
+            Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo);
+
+
+        private static object ParseULong(object value) => convertToUInt64(value);
+        private static object IntToULong(object value) => convertToUInt64((int)value);
+        private static object LongToULong(object value) => convertToUInt64((long)value);
+
+        private static object convertToUInt64<T>(T value) =>
+            Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo);
 
         public static object ConvertTo(object value, Type targetType)
         {

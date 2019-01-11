@@ -9,7 +9,7 @@
   <ItemGroup>
       <PackageReference Include="Bogus" Version="23.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
       <PackageReference Include="Moq" Version="4.9.0" />
       <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0-pre-05" />
       <PackageReference Include="Shouldly" Version="2.8.3" />

@@ -35,17 +35,20 @@ namespace GraphQL.DataLoader.Tests
         protected virtual void ConfigureServices(ServiceCollection services)
         {
             services.AddSingleton<DataLoaderTestSchema>();
+            services.AddSingleton<SubscriptionType>();
             services.AddSingleton<QueryType>();
             services.AddSingleton<OrderType>();
             services.AddSingleton<UserType>();
             services.AddSingleton<OrderItemType>();
             services.AddSingleton<ProductType>();
+            services.AddSingleton<ProductReviewType>();
             services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
             services.AddSingleton<IDocumentExecutionListener, DataLoaderDocumentListener>();
 
             var ordersMock = new Mock<IOrdersStore>();
             var usersMock = new Mock<IUsersStore>();
             var productsMock = new Mock<IProductsStore>();
+            var reviewsMock = new Mock<IProductReviewsStore>();
 
             services.AddSingleton(ordersMock);
             services.AddSingleton(ordersMock.Object);
@@ -53,6 +56,8 @@ namespace GraphQL.DataLoader.Tests
             services.AddSingleton(usersMock.Object);
             services.AddSingleton(productsMock);
             services.AddSingleton(productsMock.Object);
+            services.AddSingleton(reviewsMock);
+            services.AddSingleton(reviewsMock.Object);
         }
 
         public ExecutionResult AssertQuerySuccess<TSchema>(
@@ -87,8 +92,8 @@ namespace GraphQL.DataLoader.Tests
                 opts.ExposeExceptions = true;
             }));
 
-            var writtenResult = writer.Write(runResult);
-            var expectedResult = writer.Write(expectedExecutionResult);
+            var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
+            var expectedResult = AsyncContext.Run(() => writer.WriteToStringAsync(expectedExecutionResult));
 
             string additionalInfo = null;
 

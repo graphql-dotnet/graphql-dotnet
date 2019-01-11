@@ -53,7 +53,8 @@ namespace GraphQL.Harness
                 BuildUserContext = ctx => new GraphQLUserContext
                 {
                     User = ctx.User
-                }
+                },
+                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics")
             });
 
             app.UseDefaultFiles();

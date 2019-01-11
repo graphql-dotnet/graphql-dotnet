@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,5 +13,6 @@ namespace GraphQL.DataLoader.Tests.Stores
         Task<IEnumerable<Order>> GetOrderByIdAsync(IEnumerable<int> orderIds);
         Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
         Task<ILookup<int, OrderItem>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds);
+        IObservable<Order> GetOrderObservable();
     }
 }

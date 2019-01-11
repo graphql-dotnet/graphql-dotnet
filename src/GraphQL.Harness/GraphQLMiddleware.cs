@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Http;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -49,6 +50,8 @@ namespace Example
 
         private async Task ExecuteAsync(HttpContext context, ISchema schema)
         {
+            var start = DateTime.UtcNow;
+
             var request = Deserialize<GraphQLRequest>(context.Request.Body);
 
             var result = await _executer.ExecuteAsync(_ =>
@@ -58,19 +61,27 @@ namespace Example
                 _.OperationName = request.OperationName;
                 _.Inputs = request.Variables.ToInputs();
                 _.UserContext = _settings.BuildUserContext?.Invoke(context);
+                _.EnableMetrics = _settings.EnableMetrics;
+                if(_settings.EnableMetrics)
+                {
+                    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                }
             });
+
+            if(_settings.EnableMetrics)
+            {
+                result.EnrichWithApolloTracing(start);
+            }
 
             await WriteResponseAsync(context, result);
         }
 
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result)
         {
-            var json = _writer.Write(result);
-
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
 
-            await context.Response.WriteAsync(json);
+            await _writer.WriteAsync(context.Response.Body, result);
         }
 
         public static T Deserialize<T>(Stream s)

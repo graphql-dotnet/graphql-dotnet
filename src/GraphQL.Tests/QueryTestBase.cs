@@ -99,8 +99,8 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult {Data = runResult.Data};
 
-            var writtenResult = Writer.Write(renderResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
 // #if DEBUG
 //             Console.WriteLine(writtenResult);
@@ -136,8 +136,8 @@ namespace GraphQL.Tests
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
             }).GetAwaiter().GetResult();
 
-            var writtenResult = Writer.Write(runResult);
-            var expectedResult = Writer.Write(expectedExecutionResult);
+            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
 // #if DEBUG
 //             Console.WriteLine(writtenResult);

@@ -107,9 +107,21 @@ namespace GraphQL.Execution
                     })
                     .SelectMany(async objectNode =>
                     {
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
+                                .ConfigureAwait(false);
+                        }
+
                         // Execute the whole execution tree and return the result
                         await ExecuteNodeTreeAsync(context, objectNode)
                             .ConfigureAwait(false);
+
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
+                                .ConfigureAwait(false);
+                        }
 
                         return new ExecutionResult
                         {

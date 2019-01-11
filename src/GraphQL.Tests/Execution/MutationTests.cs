@@ -102,6 +102,15 @@ namespace GraphQL.Tests.Execution
         }
     }
 
+    public class GuidHolderType : ObjectGraphType
+    {
+        public GuidHolderType()
+        {
+            Name = "GuidHolder";
+            Field<GuidGraphType>("theGuid", null, null, x => x.Source);
+        }
+    }
+
     public class MutationQuery : ObjectGraphType
     {
         public MutationQuery()
@@ -247,6 +256,21 @@ namespace GraphQL.Tests.Execution
                     var root = context.Source as Root;
                     var change = context.GetArgument<DateTime>("newDateTime");
                     return root.PromiseAndFailToChangeTheDateTimeAsync(change);
+                }
+            );
+
+            Field<GuidHolderType>(
+                "passGuidGraphType",
+                arguments: new QueryArguments(
+                    new QueryArgument<GuidGraphType>
+                    {
+                        Name = "guid"
+                    }
+                ),
+                resolve: context =>
+                {
+                    var guid = context.GetArgument<Guid>("guid");
+                    return guid;
                 }
             );
         }
@@ -442,6 +466,26 @@ namespace GraphQL.Tests.Execution
             result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
             var last = result.Errors.Last();
             last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
+        }
+
+        [Fact]
+        public void successfully_handles_guidgraphtype()
+        {
+            var query = @"
+                mutation M {
+                  passGuidGraphType(guid: ""085A38AD-907B-4625-AFEE-67EFC71217DE"") {
+                    theGuid
+                  }
+                }
+            ";
+
+            var expected = @"{
+                    ""passGuidGraphType"": {
+                        ""theGuid"": ""085a38ad-907b-4625-afee-67efc71217de""
+                    }
+                }";
+
+            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
         }
     }
 }

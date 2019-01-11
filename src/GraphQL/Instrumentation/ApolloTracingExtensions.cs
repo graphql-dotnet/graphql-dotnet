@@ -62,7 +62,7 @@ namespace GraphQL.Instrumentation
 
         private static IEnumerable<object> ConvertPath(IEnumerable<string> stringPath)
         {
-             foreach (var step in stringPath)
+            foreach (var step in stringPath)
             {
                 if (int.TryParse(step, out var arrayIndex))
                 {

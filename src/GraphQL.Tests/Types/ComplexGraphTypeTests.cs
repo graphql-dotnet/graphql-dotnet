@@ -13,9 +13,11 @@ namespace GraphQL.Tests.Types
         internal class ComplexType<T> : ComplexGraphType<T> {
             public ComplexType()
             {
-                Name = typeof(T).Name;
+                Name = typeof(T).GetFriendlyName();
             }
         }
+
+        internal class GenericFieldType<T> : FieldType { }
 
         internal class TestObject
         {
@@ -120,6 +122,42 @@ namespace GraphQL.Tests.Types
             );
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
+        }
+
+        [Fact]
+        public void throws_informative_exception_when_no_types_defined()
+        {
+            var type = new ComplexType<Droid>();
+
+            var fieldType = new FieldType()
+            {
+                Name = "name",
+                ResolvedType = null,
+                Type = null,
+            };
+
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
+
+            exception.ParamName.ShouldBe("Type");
+            exception.Message.ShouldStartWith("The declared field 'name' on 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
+        }
+
+        [Fact]
+        public void throws_informative_exception_when_no_types_defined_on_more_generic_type()
+        {
+            var type = new ComplexType<List<Droid>>();
+
+            var fieldType = new GenericFieldType<List<Droid>>()
+            {
+                Name = "genericname",
+                ResolvedType = null,
+                Type = null,
+            };
+
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
+
+            exception.ParamName.ShouldBe("Type");
+            exception.Message.ShouldStartWith("The declared field 'genericname' on 'List<Droid>' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
         [Theory]

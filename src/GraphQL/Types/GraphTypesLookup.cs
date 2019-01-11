@@ -290,7 +290,7 @@ namespace GraphQL.Types
                 if (arg.ResolvedType != null)
                 {
                     AddTypeIfNotRegistered(arg.ResolvedType, context);
-                    return;
+                    continue;
                 }
 
                 AddTypeIfNotRegistered(arg.Type, context);

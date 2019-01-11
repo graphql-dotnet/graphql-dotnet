@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             }).GetAwaiter().GetResult();
 
-            var json = new DocumentWriter(true).Write(executionResult.Data);
+            var json = new DocumentWriter(true).WriteToStringAsync(executionResult).GetAwaiter().GetResult();
 
             ShouldBe(json, IntrospectionResult.Data);
         }
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = InputObjectBugQuery;
             }).GetAwaiter().GetResult();
 
-            var json = new DocumentWriter(true).Write(executionResult.Data);
+            var json = new DocumentWriter(true).WriteToStringAsync(executionResult).GetAwaiter().GetResult();
             executionResult.Errors.ShouldBeNull();
 
             ShouldBe(json, InputObjectBugResult);
@@ -64,7 +64,7 @@ query test {
     }
 }";
 
-        public static readonly string InputObjectBugResult = "{\r\n  \"__type\": {\r\n    \"inputFields\": [\r\n      {\r\n        \"type\": {\r\n          \"name\": \"String\",\r\n          \"description\": null,\r\n          \"ofType\": null\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}";
+        public static readonly string InputObjectBugResult = "{\r\n \"data\": {\r\n  \"__type\": {\r\n    \"inputFields\": [\r\n      {\r\n        \"type\": {\r\n          \"name\": \"String\",\r\n          \"description\": null,\r\n          \"ofType\": null\r\n        }\r\n      }\r\n    ]\r\n  }\r\n }\r\n}";
 
         public class SomeInputType : InputObjectGraphType
         {
