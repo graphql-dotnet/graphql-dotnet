@@ -12,13 +12,11 @@ namespace GraphQL.DataLoader.Tests.Models
         private int userId;
         private int orderId;
         private int productId;
-        private int productReviewId;
 
         public Faker<Order> Orders { get; }
         public Faker<OrderItem> OrderItems { get; }
         public Faker<Product> Products { get; }
         public Faker<User> Users { get; }
-        public Faker<ProductReview> ProductReviews { get; }
 
         public Fake()
         {
@@ -45,12 +43,6 @@ namespace GraphQL.DataLoader.Tests.Models
                 .RuleFor(x => x.Name, f => f.Commerce.ProductName())
                 .RuleFor(x => x.Price, f => f.Finance.Amount())
                 .RuleFor(x => x.Description, f => f.Lorem.Paragraphs(2));
-
-            ProductReviews = new Faker<ProductReview>()
-                .RuleFor(x => x.ProductReviewId, f => ++productReviewId)
-                .RuleFor(x => x.ProductId, f => (productId > 0) ? f.Random.Number(1, productId) : 0)
-                .RuleFor(x => x.Rating, f => f.PickRandom(1, 2, 3, 4, 4, 5, 5, 5))
-                .RuleFor(x => x.Text, f => f.Lorem.Paragraphs(2));
         }
 
         public List<Order> GenerateOrdersForUsers(IEnumerable<User> users, int each)
@@ -68,23 +60,6 @@ namespace GraphQL.DataLoader.Tests.Models
             }
 
             return orders;
-        }
-
-        public List<ProductReview> GenerateReviewsForUsers(IEnumerable<User> users, int each)
-        {
-            var reviews = new List<ProductReview>();
-
-            foreach (var user in users)
-            {
-                foreach (var review in ProductReviews.Generate(each))
-                {
-                    review.UserId = user.UserId;
-
-                    reviews.Add(review);
-                }
-            }
-
-            return reviews;
         }
 
         public List<OrderItem> GetItemsForOrders(IEnumerable<Order> orders, int each)

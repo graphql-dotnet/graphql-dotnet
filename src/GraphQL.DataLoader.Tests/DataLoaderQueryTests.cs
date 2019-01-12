@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -190,77 +189,6 @@ namespace GraphQL.DataLoader.Tests
         }
     }
 }");
-
-            result.Errors.ShouldBeNull();
-        }
-
-        [Fact]
-        public async Task ParallelExecution_SubNodeExecution()
-        {
-            DateTime usersFetched = default;
-            DateTime ordersFetched = default;
-
-            var users = Fake.Users.Generate(10);
-            var products = Fake.Products.Generate(100);
-            var reviews = Fake.GenerateReviewsForUsers(users, 2);
-            var orders = Fake.GenerateOrdersForUsers(users, 1);
-
-            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
-            var productsMock = Services.GetRequiredService<Mock<IProductsStore>>();
-            var reviewsMock = Services.GetRequiredService<Mock<IProductReviewsStore>>();
-            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
-
-            reviewsMock.Setup(x => x.GetAllProductReviewsAsync())
-                .ReturnsAsync(reviews);
-
-            usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
-                .Returns(async () =>
-                {
-                    usersFetched = DateTime.Now;
-                    await Task.Delay(100);
-
-                    return users.ToDictionary(x => x.UserId);
-                });
-
-            ordersMock.Setup(x => x.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
-                .ReturnsAsync(() =>
-                {
-                    ordersFetched = DateTime.Now;
-                    return orders.ToLookup(x => x.UserId);
-                });
-
-            productsMock.Setup(x => x.GetProductsByIdAsync(It.IsAny<IEnumerable<int>>()))
-                .Returns(async () =>
-                {
-                    await Task.Delay(500);
-                    return products.ToDictionary(x => x.ProductId);
-                });
-
-            // The User nodes should finish executing first after .10 seconds.
-            // The user->orders nodes should be able to start executing then.
-            // The products node will take 1 second to execute
-            // So everything should take around 1 second, not 1.5
-
-            var result = await ExecuteQueryAsync<DataLoaderTestSchema>(
-@"
-{
-    allReviews {
-        user {
-            userId
-            firstName
-            orders {
-                orderId
-                orderedOn
-            }
-        }
-        product {
-            productId
-        }
-    }
-}");
-
-            // Make sure orders were fetched soon after orders were fetched
-            (ordersFetched - usersFetched).ShouldBeLessThan(TimeSpan.FromSeconds(0.2));
 
             result.Errors.ShouldBeNull();
         }
