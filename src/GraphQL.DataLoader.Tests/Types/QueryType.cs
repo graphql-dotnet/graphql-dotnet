@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests.Types
 {
     public class QueryType : ObjectGraphType
     {
-        public QueryType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders, IProductReviewsStore reviews)
+        public QueryType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders)
         {
             Name = "Query";
 
@@ -15,7 +15,7 @@ namespace GraphQL.DataLoader.Tests.Types
                 .Name("Users")
                 .Description("Get all Users")
                 .Returns<IEnumerable<User>>()
-                .ResolveAsync(_ =>
+                .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
                         users.GetAllUsersAsync);
@@ -38,20 +38,12 @@ namespace GraphQL.DataLoader.Tests.Types
             Field<ListGraphType<OrderType>, IEnumerable<Order>>()
                 .Name("Orders")
                 .Description("Get all Orders")
-                .ResolveAsync(_ =>
+                .ResolveAsync(ctx =>
                 {
                     var loader = accessor.Context.GetOrAddLoader("GetAllOrders",
                         orders.GetAllOrdersAsync);
 
                     return loader.LoadAsync();
-                });
-
-            Field<ListGraphType<ProductReviewType>, IEnumerable<ProductReview>>()
-                .Name("AllReviews")
-                .Description("Get all reviews")
-                .ResolveAsync(_ =>
-                {
-                    return reviews.GetAllProductReviewsAsync();
                 });
         }
     }
