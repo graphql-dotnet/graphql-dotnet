@@ -98,7 +98,7 @@ An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the In
 
 ## ResolveType
 
-An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhastive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
+An alternate to using `IsTypeOf` is implementing `ResolveType` on the Interface or Union.  The major difference is `ResolveType` is required to be exhaustive.  If you add another type that implements an Interface you are required to alter the Interface for that new type to be resolved.
 
 > If a type implements `ResolveType` then any `IsTypeOf` implementation is ignored.
 
