@@ -173,7 +173,8 @@ namespace GraphQL.Execution
 
             try
             {
-                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
+                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments,
+                    context.Variables);
                 var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
 
                 var resolveContext = new ResolveFieldContext
@@ -225,6 +226,18 @@ namespace GraphQL.Execution
                     }
                 }
             }
+            catch (NonNullExecutionError error)
+            {
+                error.AddLocation(node.Field, context.Document);
+                error.Path = node.Path;
+                context.Errors.Add(error);
+
+                node.Result = null;
+                if (node.Parent is ObjectExecutionNode objectNode)
+                {
+                    objectNode.SubFields = null;
+                }
+            }
             catch (ExecutionError error)
             {
                 error.AddLocation(node.Field, context.Document);
@@ -264,7 +277,7 @@ namespace GraphQL.Execution
                 {
                     var type = nonNullType.ResolvedType;
 
-                    var error = new ExecutionError($"Cannot return null for non-null type. Field: {node.Name}, Type: {type.Name}!.");
+                    var error = new NonNullExecutionError($"Cannot return null for non-null type. Field: {node.Name}, Type: {type.Name}!.");
                     throw error;
                 }
             }
