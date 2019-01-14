@@ -24,7 +24,7 @@ namespace GraphQL
             string operationName,
             Inputs inputs = null,
             object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null);
 
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
@@ -57,7 +57,7 @@ namespace GraphQL
             string operationName,
             Inputs inputs = null,
             object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             return ExecuteAsync(new ExecutionOptions

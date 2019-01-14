@@ -41,7 +41,6 @@ namespace GraphQL.Utilities
             return Get(typeof(TClr));
         }
 
-
         public static Type Get(Type clrType)
         {
             if (_entries.TryGetValue(clrType, out var graphType))

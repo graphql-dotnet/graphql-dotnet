@@ -61,7 +61,7 @@ namespace GraphQL.DataLoader
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer<T>"/> to compare keys.</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -83,7 +83,7 @@ namespace GraphQL.DataLoader
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer<T>"/> to compare keys.</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IDictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -106,7 +106,7 @@ namespace GraphQL.DataLoader
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer<T>"/> to compare keys.</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -132,7 +132,7 @@ namespace GraphQL.DataLoader
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer<T>"/> to compare keys.</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default(T))
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));

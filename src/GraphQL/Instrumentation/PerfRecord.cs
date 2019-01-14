@@ -49,7 +49,7 @@ namespace GraphQL.Instrumentation
                 return (T)value;
             }
 
-            return default(T);
+            return default;
         }
     }
 

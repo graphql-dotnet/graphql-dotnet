@@ -255,7 +255,7 @@ namespace GraphQL
             var v = ConvertTo(value, typeof(T));
 
             if (v == null)
-                return default(T);
+                return default;
 
             return (T)v;
         }
