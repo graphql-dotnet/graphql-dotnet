@@ -24,7 +24,7 @@ namespace GraphQL.DataLoader.Tests
         [Fact]
         public async Task OneResultOverSubscription_Works()
         {
-            var order = Fake.Orders.Generate();        
+            var order = Fake.Orders.Generate();
             var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
             var orderStream = new ReplaySubject<Order>(1);
 
