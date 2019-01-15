@@ -14,25 +14,6 @@ namespace GraphQL.Resolvers
             return Resolve(context?.Source, context?.FieldAst?.Name);
         }
 
-#if NETSTANDARD1_3
-
-        public static object Resolve(object source, string name)
-        {
-            if (source == null || name == null)
-            {
-                return null;
-            }
-
-            var prop = source.GetType().GetProperty(name, _flags);
-            if (prop == null)
-            {
-                throw new InvalidOperationException($"Expected to find property {name} on {source.GetType().Name} but it does not exist.");
-            }
-
-            return prop.GetValue(source, null);
-        }
-#else
-
         private static readonly ConcurrentDictionary<(Type, string), Func<object, object>> _propertyDelegates
             = new ConcurrentDictionary<(Type, string), Func<object, object>>();
 
@@ -82,6 +63,5 @@ namespace GraphQL.Resolvers
             // Now create a more weakly typed delegate which will call the strongly typed one
             return (object target) => func((TTarget)target);
         }
-#endif
     }
 }
