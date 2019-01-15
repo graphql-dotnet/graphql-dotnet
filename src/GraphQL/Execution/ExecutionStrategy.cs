@@ -233,9 +233,14 @@ namespace GraphQL.Execution
                 context.Errors.Add(error);
 
                 node.Result = null;
+
                 if (node.Parent is ObjectExecutionNode objectNode)
                 {
                     objectNode.SubFields = null;
+                }
+                else if (node.Parent is ArrayExecutionNode arrayNode)
+                {
+                    arrayNode.Items?.Clear();
                 }
             }
             catch (ExecutionError error)
