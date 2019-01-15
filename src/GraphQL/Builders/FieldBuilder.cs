@@ -79,7 +79,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default(TReturnType))
+        public FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default)
         {
             _fieldType.DefaultValue = defaultValue;
             return this;
@@ -117,7 +117,7 @@ namespace GraphQL.Builders
         }
 
         public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default(TArgumentType))
+            TArgumentType defaultValue = default)
         {
             _fieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
             {

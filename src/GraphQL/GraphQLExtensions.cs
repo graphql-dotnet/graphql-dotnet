@@ -13,11 +13,7 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-#if NETSTANDARD1_1
-        private static readonly Regex TrimPattern = new Regex("[\\[!\\]]");
-#else
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
-#endif
 
         public static string TrimGraphQLTypes(this string name)
         {

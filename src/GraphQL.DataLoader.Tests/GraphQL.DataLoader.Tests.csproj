@@ -7,14 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="Bogus" Version="23.0.2" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-      <PackageReference Include="Moq" Version="4.9.0" />
+      <PackageReference Include="Bogus" Version="25.0.3" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+      <PackageReference Include="Moq" Version="4.10.1" />
       <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0-pre-05" />
-      <PackageReference Include="Shouldly" Version="2.8.3" />
-      <PackageReference Include="xunit" Version="2.3.1" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+      <PackageReference Include="Shouldly" Version="3.0.2" />
+      <PackageReference Include="xunit" Version="2.4.1" />
+      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
       <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 

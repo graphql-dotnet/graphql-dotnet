@@ -16,8 +16,7 @@ namespace GraphQL.Types
         {
             if(fieldType.Type == typeof(ObjectGraphType))
             {
-                throw new ArgumentException(nameof(fieldType.Type),
-                    "InputObjectGraphType cannot have fields containing a ObjectGraphType.");
+                throw new ArgumentException("InputObjectGraphType cannot have fields containing a ObjectGraphType.", nameof(fieldType.Type));
             }
 
             return base.AddField(fieldType);

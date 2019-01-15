@@ -36,11 +36,10 @@ namespace GraphQL.Utilities
             _entries[clrType] = graphType;
         }
 
-        public static Type Get<TClr>() 
+        public static Type Get<TClr>()
         {
             return Get(typeof(TClr));
         }
-
 
         public static Type Get(Type clrType)
         {

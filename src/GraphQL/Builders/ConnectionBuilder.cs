@@ -135,7 +135,7 @@ namespace GraphQL.Builders
         }
 
         public ConnectionBuilder<TGraphType, TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default(TArgumentType))
+            TArgumentType defaultValue = default)
             where TArgumentGraphType : IGraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))

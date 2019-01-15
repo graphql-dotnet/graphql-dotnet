@@ -15,7 +15,7 @@ namespace GraphQL.DataLoader
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
@@ -29,7 +29,7 @@ namespace GraphQL.DataLoader
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));

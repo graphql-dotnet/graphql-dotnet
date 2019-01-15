@@ -49,7 +49,7 @@ namespace GraphQL.Tests.Execution
             {
                 userContext.Complete("bar");
 
-                return TaskExtensions.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 

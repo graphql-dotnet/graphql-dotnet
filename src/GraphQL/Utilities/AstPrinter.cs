@@ -118,7 +118,7 @@ namespace GraphQL.Utilities
                 return (TType) Source;
             }
 
-            return default(TType);
+            return default;
         }
     }
 

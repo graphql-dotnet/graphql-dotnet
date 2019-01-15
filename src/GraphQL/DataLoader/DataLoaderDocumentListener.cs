@@ -20,7 +20,7 @@ namespace GraphQL.DataLoader
 
         public Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token)
         {
-            return TaskExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public Task BeforeExecutionAsync(object userContext, CancellationToken token)
@@ -28,19 +28,19 @@ namespace GraphQL.DataLoader
             if (_accessor.Context == null)
                 _accessor.Context = new DataLoaderContext();
 
-            return TaskExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
         {
-            return TaskExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public Task AfterExecutionAsync(object userContext, CancellationToken token)
         {
             _accessor.Context = null;
 
-            return TaskExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)

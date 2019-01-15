@@ -8,15 +8,6 @@ namespace GraphQL
     public static class TaskExtensions
     {
         /// <summary>
-        /// Returns a completed task. Equivalent to Task.CompletedTask.
-        /// </summary>
-#if NETSTANDARD2_0
-        public static Task CompletedTask => Task.CompletedTask;
-#else
-        public static Task CompletedTask { get; } = Task.FromResult(0);
-#endif
-
-        /// <summary>
         /// Gets the result of a completed <see cref="Task&lt;TResult&gt;"/> when TResult is not known
         /// </summary>
         /// <remarks>

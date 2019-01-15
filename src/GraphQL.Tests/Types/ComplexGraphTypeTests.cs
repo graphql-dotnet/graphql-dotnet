@@ -129,7 +129,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<Droid>();
 
-            var fieldType = new FieldType()
+            var fieldType = new FieldType
             {
                 Name = "name",
                 ResolvedType = null,
@@ -147,7 +147,7 @@ namespace GraphQL.Tests.Types
         {
             var type = new ComplexType<List<Droid>>();
 
-            var fieldType = new GenericFieldType<List<Droid>>()
+            var fieldType = new GenericFieldType<List<Droid>>
             {
                 Name = "genericname",
                 ResolvedType = null,
