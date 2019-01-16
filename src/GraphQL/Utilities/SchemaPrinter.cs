@@ -251,8 +251,8 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
-                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
+                    Description = _options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
+                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(
