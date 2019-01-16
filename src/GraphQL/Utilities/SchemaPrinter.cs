@@ -209,7 +209,7 @@ namespace GraphQL.Utilities
 
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
             var implementedInterfaces = interfaces.Any()
-                ? " implements {0}".ToFormat(string.Join(", ", interfaces))
+                ? " implements {0}".ToFormat(string.Join(" & ", interfaces))
                 : "";
 
             return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
