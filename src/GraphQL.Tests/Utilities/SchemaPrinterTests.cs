@@ -390,7 +390,7 @@ interface Baaz {
   int: Int
 }
 
-type Bar implements Foo, Baaz {
+type Bar implements Foo & Baaz {
   str: String
 }
 
