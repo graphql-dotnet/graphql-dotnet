@@ -208,11 +208,16 @@ namespace GraphQL.Utilities
             var description = PrintDescription(type.Description);
 
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            string interfacesString = _options.OldImplementsSyntax
+                ? string.Join(", ", interfaces)
+                : string.Join(" & ", interfaces);
             var implementedInterfaces = interfaces.Any()
-                ? " implements {0}".ToFormat(string.Join(", ", interfaces))
+                ? " implements {0}".ToFormat(interfacesString)
                 : "";
 
-            return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            var result =  description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+
+            return result;
         }
 
         public string PrintInterface(IInterfaceGraphType type)
@@ -251,12 +256,14 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
-                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
+                    Description = _options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
+                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
+            var result = string.Join(Environment.NewLine, fields?.Select(
                 f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
+
+            return result;
         }
 
         public string PrintArgs(FieldType field)
