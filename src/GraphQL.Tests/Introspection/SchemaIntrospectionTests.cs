@@ -14,7 +14,10 @@ namespace GraphQL.Tests.Introspection
             var documentExecuter = new DocumentExecuter();
             var executionResult = documentExecuter.ExecuteAsync(_ =>
             {
-                _.Schema = new TestCoreSchema();
+                _.Schema = new Schema()
+                {
+                    Query = new TestQuery()
+                };
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             }).GetAwaiter().GetResult();
 
@@ -27,12 +30,7 @@ namespace GraphQL.Tests.Introspection
         {
             public TestQuery() => Name = "TestQuery";
         }
-
-        public class TestCoreSchema : Schema
-        {
-            public TestCoreSchema() => Query = new TestQuery();
-        }
-
+        
         [Fact]
         public void validate_non_null_schema()
         {
