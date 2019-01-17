@@ -32,7 +32,7 @@ namespace GraphQL.Introspection
                     return context.Schema.AllTypes;
                 });
 
-            Field<__Type>(
+            Field<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",
                 resolve: context =>

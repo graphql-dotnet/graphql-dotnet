@@ -6,7 +6,9 @@ namespace GraphQL.Tests.Introspection
 @"{
   ""data"": {
     ""__schema"": {
-      ""queryType"": null,
+      ""queryType"": {
+        ""name"": ""TestQuery""
+      },
       ""mutationType"": null,
       ""subscriptionType"": null,
       ""types"": [
@@ -166,9 +168,13 @@ namespace GraphQL.Tests.Introspection
               ""description"": ""The type that query operations will be rooted at."",
               ""args"": [],
               ""type"": {
-                ""kind"": ""OBJECT"",
-                ""name"": ""__Type"",
-                ""ofType"": null
+                ""kind"": ""NON_NULL"",
+                ""name"": null,
+                ""ofType"": {
+                  ""kind"": ""OBJECT"",
+                  ""name"": ""__Type"",
+                  ""ofType"": null
+                }
               },
               ""isDeprecated"": false,
               ""deprecationReason"": null
@@ -952,6 +958,16 @@ namespace GraphQL.Tests.Introspection
               ""deprecationReason"": null
             }
           ],
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""OBJECT"",
+          ""name"": ""TestQuery"",
+          ""description"": null,
+          ""fields"": [],
+          ""inputFields"": null,
+          ""interfaces"": [],
+          ""enumValues"": null,
           ""possibleTypes"": null
         }
       ],
