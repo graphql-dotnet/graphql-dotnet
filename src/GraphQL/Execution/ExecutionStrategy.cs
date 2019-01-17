@@ -196,7 +196,8 @@ namespace GraphQL.Execution
                     Metrics = context.Metrics,
                     Errors = context.Errors,
                     Path = node.Path,
-                    SubFields = subFields
+                    SubFields = subFields,
+                    Extensions = context.Extensions
                 };
 
                 var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
@@ -206,6 +207,11 @@ namespace GraphQL.Execution
                 {
                     await task.ConfigureAwait(false);
                     result = task.GetResult();
+                }
+
+                if (resolveContext.Extensions != null && resolveContext.Extensions.Count > 0)
+                {
+                    context.Extensions = resolveContext.Extensions;
                 }
 
                 node.Result = result;

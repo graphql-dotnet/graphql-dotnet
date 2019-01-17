@@ -79,7 +79,8 @@ namespace GraphQL.Execution
                     CancellationToken = context.CancellationToken,
                     Metrics = context.Metrics,
                     Errors = context.Errors,
-                    Path = node.Path
+                    Path = node.Path,
+                    Extensions = context.Extensions
                 };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
@@ -176,6 +177,7 @@ namespace GraphQL.Execution
             result.Query = context.Document.OriginalQuery;
             result.Document = context.Document;
             result.Operation = context.Operation;
+            result.Extensions = context.Extensions;
             return result;
         }
     }

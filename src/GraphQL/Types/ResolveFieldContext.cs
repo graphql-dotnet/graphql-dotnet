@@ -44,12 +44,15 @@ namespace GraphQL.Types
 
         public ExecutionErrors Errors { get; set; }
 
+
         public IEnumerable<string> Path { get; set; }
 
         /// <summary>
         /// Queried sub fields
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
+
+        public Dictionary<string, object> Extensions { get; set; }
 
         public ResolveFieldContext() { }
 

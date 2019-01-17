@@ -38,5 +38,7 @@ namespace GraphQL.Execution
         public IEnumerable<IDocumentExecutionListener> Listeners { get; set; } = Enumerable.Empty<IDocumentExecutionListener>();
 
         public bool ThrowOnUnhandledException { get; set; }
+
+        public Dictionary<string, object> Extensions { get; set; }
     }
 }
