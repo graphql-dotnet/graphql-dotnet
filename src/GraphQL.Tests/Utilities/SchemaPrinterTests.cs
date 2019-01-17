@@ -661,7 +661,7 @@ type __InputValue {
 # query, mutation, and subscription operations.
 type __Schema {
   types: [__Type!]!
-  queryType: __Type!
+  queryType: __Type
   mutationType: __Type
   subscriptionType: __Type
   directives: [__Directive!]!

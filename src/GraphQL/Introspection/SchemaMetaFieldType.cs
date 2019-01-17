@@ -1,4 +1,4 @@
-﻿using GraphQL.Resolvers;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -32,7 +32,7 @@ namespace GraphQL.Introspection
                     return context.Schema.AllTypes;
                 });
 
-            Field<NonNullGraphType<__Type>>(
+            Field<__Type>(
                 "queryType",
                 "The type that query operations will be rooted at.",
                 resolve: context =>
