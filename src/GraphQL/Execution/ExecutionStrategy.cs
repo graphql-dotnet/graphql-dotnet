@@ -184,8 +184,7 @@ namespace GraphQL.Execution
 
             try
             {
-                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments,
-                    context.Variables);
+                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
                 var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
 
                 var resolveContext = new ResolveFieldContext
