@@ -121,6 +121,17 @@ namespace GraphQL.Execution
                 }
                 else
                 {
+                    if (listType.ResolvedType is NonNullGraphType)
+                    {
+                        var error =
+                            new ExecutionError(
+                                $"Cannot return null for non-null type. Field: {parent.Name}, Type: {itemType.Name}!.");
+                        error.AddLocation(parent.Field, context.Document);
+                        error.Path = parent.Path;
+                        context.Errors.Add(error);
+                        return;
+                    }
+
                     var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
                     {
                         Result = null
