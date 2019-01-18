@@ -61,6 +61,20 @@ namespace GraphQL.Tests.Bugs
                     null,
                     new Data { NonNullableNest = new Data { Nullable = null } },
                     new [] { "Cannot return null for non-null type. Field: nonNullable, Type: String!." }
+                },
+                new object[]
+                {
+                    "{ nonNullableDataGraph { listOfNonNullable } }",
+                    "{ nonNullableDataGraph: { listOfNonNullable: null } }",
+                    new Data { ListOfNonNullable = new List<string> { "text", null, null } },
+                    new [] { "Cannot return null for non-null type. Field: listOfNonNullable, Type: String!." }
+                },
+                new object[]
+                {
+                    "{ nullableDataGraph { nonNullableList } }",
+                    "{ nullableDataGraph: null }",
+                    new Data { ListOfNonNullable = null },
+                    new [] { "Cannot return null for non-null type. Field: nonNullableList, Type: ListGraphType!." }
                 }
             };
     }
