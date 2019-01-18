@@ -236,23 +236,6 @@ namespace GraphQL.Execution
                     }
                 }
             }
-            catch (NonNullExecutionError error)
-            {
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
-
-                if (node.Parent is ObjectExecutionNode objectNode)
-                {
-                    objectNode.SubFields = null;
-                }
-                else if (node.Parent is ArrayExecutionNode arrayNode)
-                {
-                    arrayNode.Items?.Clear();
-                }
-            }
             catch (ExecutionError error)
             {
                 error.AddLocation(node.Field, context.Document);
@@ -292,7 +275,7 @@ namespace GraphQL.Execution
                 {
                     var type = nonNullType.ResolvedType;
 
-                    var error = new NonNullExecutionError($"Cannot return null for non-null type. Field: {node.Name}, Type: {type.Name}!.");
+                    var error = new ExecutionError($"Cannot return null for non-null type. Field: {node.Name}, Type: {type.Name}!.");
                     throw error;
                 }
             }
