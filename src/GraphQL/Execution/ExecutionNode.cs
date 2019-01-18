@@ -93,7 +93,14 @@ namespace GraphQL.Execution
 
             foreach (var kvp in SubFields)
             {
-                fields[kvp.Key] = kvp.Value.ToValue();
+                var value = kvp.Value.ToValue();
+
+                if (value == null && kvp.Value.FieldDefinition.ResolvedType is NonNullGraphType)
+                {
+                    return null;
+                }
+
+                fields[kvp.Key] = value;
             }
 
             return fields;
