@@ -213,9 +213,7 @@ namespace GraphQL.Utilities
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
-            var result =  description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
-
-            return result;
+            return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
         }
 
         public string PrintInterface(IInterfaceGraphType type)
@@ -258,10 +256,8 @@ namespace GraphQL.Utilities
                     Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                 }).ToList();
 
-            var result = string.Join(Environment.NewLine, fields?.Select(
+            return string.Join(Environment.NewLine, fields?.Select(
                 f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
-
-            return result;
         }
 
         public string PrintArgs(FieldType field)
