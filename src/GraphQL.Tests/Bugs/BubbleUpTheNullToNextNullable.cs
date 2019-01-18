@@ -24,6 +24,23 @@ namespace GraphQL.Tests.Bugs
             }
         }
 
+        [Theory]
+        [MemberData(nameof(ListTestData))]
+        public void NullIsNotBubbledInListGraphType(string query, string expected, Data data, string[] errors)
+        {
+            ExecutionResult result = AssertQueryWithErrors(query,
+                expected,
+                root: data,
+                expectedErrorCount: errors.Length);
+
+            ExecutionErrors actualErrors = result.Errors;
+
+            for (var i = 0; i < errors.Length; i++)
+            {
+                actualErrors[i].Message.ShouldBe(errors[i]);
+            }
+        }
+
         public static IEnumerable<object[]> TestData =>
             new List<object[]>()
             {
@@ -77,6 +94,41 @@ namespace GraphQL.Tests.Bugs
                     new [] { "Cannot return null for non-null type. Field: nonNullableList, Type: ListGraphType!." }
                 }
             };
+
+        public static IEnumerable<object[]> ListTestData =>
+            new List<object[]>()
+            {
+                new object[]
+                {
+                    "{ nonNullableDataGraph { listOfNonNullable } }",
+                    "{ nonNullableDataGraph: { listOfNonNullable: null } }",
+                    new Data { ListOfNonNullable = new List<string> { "text", null, null } },
+                    new [] { "Cannot return null for non-null type. Field: listOfNonNullable, Type: String!." }
+                },
+                new object[]
+                {
+                    "{ nullableDataGraph { nonNullableList } }",
+                    "{ nullableDataGraph: null }",
+                    new Data { ListOfNonNullable = null },
+                    // Empty is returned as Type.Name for ListGraphType
+                    new [] { "Cannot return null for non-null type. Field: nonNullableList, Type: !." }
+                },
+                new object[]
+                {
+                    "{ nullableDataGraph { nonNullableListOfNonNullable } }",
+                    "{ nullableDataGraph: null }",
+                    new Data { ListOfNonNullable = new List<string> { "text", null, null } },
+                    new [] { "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: String!." }
+                },
+                new object[]
+                {
+                    "{ nullableDataGraph { nonNullableListOfNonNullable } }",
+                    "{ nullableDataGraph: null }",
+                    new Data { ListOfNonNullable = null },
+                    // Empty is returned as Type.Name for ListGraphType
+                    new [] { "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: !." }
+                }
+            };
     }
 
     public class BubbleNullSchema : Schema
@@ -119,6 +171,10 @@ namespace GraphQL.Tests.Bugs
 
             Field<NonNullGraphType<ListGraphType<StringGraphType>>>(
                 "nonNullableList",
+                resolve: c => c.Source.Data.ListOfNonNullable);
+
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
+                "nonNullableListOfNonNullable",
                 resolve: c => c.Source.Data.ListOfNonNullable);
 
             Field<NonNullGraphType<DataGraphType>>(
