@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -63,6 +64,14 @@ namespace GraphQL.Tests.Subscription
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
                 AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
+            });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "messageGetAll",
+                Type = typeof(ListGraphType<MessageType>),
+                Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
+                Subscriber = new EventStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
             });
         }
 
@@ -193,6 +202,7 @@ namespace GraphQL.Tests.Subscription
         Message AddMessage(Message message);
 
         IObservable<Message> Messages();
+        IObservable<List<Message>> MessagesGetAll();
 
         Message AddMessage(ReceivedMessage message);
 
@@ -202,7 +212,7 @@ namespace GraphQL.Tests.Subscription
     public class Chat : IChat
     {
         private readonly ISubject<Message> _messageStream = new ReplaySubject<Message>(1);
-
+        private readonly ISubject<List<Message>> _allMessageStream = new ReplaySubject<List<Message>>(1);
 
         public Chat()
         {
@@ -244,6 +254,14 @@ namespace GraphQL.Tests.Subscription
             return Messages();
         }
 
+        public List<Message> AddMessageGetAll(Message message)
+        {
+            AllMessages.Push(message);
+            var l = new List<Message>(AllMessages);
+            _allMessageStream.OnNext(l);
+            return l;
+        }
+
         public Message AddMessage(Message message)
         {
             AllMessages.Push(message);
@@ -254,6 +272,11 @@ namespace GraphQL.Tests.Subscription
         public IObservable<Message> Messages()
         {
             return _messageStream.AsObservable();
+        }
+
+        public IObservable<List<Message>> MessagesGetAll()
+        {
+            return _allMessageStream.AsObservable();
         }
 
         public void AddError(Exception exception)

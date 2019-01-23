@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
@@ -25,6 +26,7 @@ namespace GraphQL.Tests.Subscription
                 messageAddedByUser(id: String!) : Message
                 messageAddedAsync : Message
                 messageAddedByUserAsync(id: String!) : Message
+                messageGetAll : [Message]
             }
         ";
 
@@ -55,6 +57,18 @@ namespace GraphQL.Tests.Subscription
         public Message ResolveMessageAdded(ResolveFieldContext context)
         {
             return context.Source as Message;
+        }
+
+        [GraphQLMetadata(Name = "messageGetAll", Type = ResolverType.Subscriber)]
+        public IObservable<List<Message>> SubscribeMessageGetAll(ResolveEventStreamContext context)
+        {
+            return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
+        }
+
+        [GraphQLMetadata(Name = "messageGetAll")]
+        public List<Message> ResolveMessageGetAll(ResolveFieldContext context)
+        {
+            return context.Source as List<Message>;
         }
 
         [GraphQLMetadata(Name = "messageAddedByUser", Type = ResolverType.Subscriber)]
