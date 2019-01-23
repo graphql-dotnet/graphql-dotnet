@@ -73,6 +73,14 @@ namespace GraphQL.Tests.Subscription
                 Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
                 Subscriber = new EventStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
             });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "newMessageContent",
+                Type = typeof(StringGraphType),
+                Resolver = new FuncFieldResolver<string>(context => context.Source as string),
+                Subscriber = new EventStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
+            });
         }
 
         private IObservable<Message> SubscribeById(ResolveEventStreamContext context)

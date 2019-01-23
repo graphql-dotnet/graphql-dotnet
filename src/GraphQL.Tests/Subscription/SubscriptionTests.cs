@@ -60,6 +60,44 @@ namespace GraphQL.Tests.Subscription
         }
 
         [Fact]
+        public async Task SubscribeToContent()
+        {
+            /* Given */
+            var addedMessage = new Message
+            {
+                Content = "test",
+                From = new MessageFrom
+                {
+                    DisplayName = "test",
+                    Id = "1"
+                },
+                SentAt = DateTime.Now
+            };
+
+            var chat = new Chat();
+            var schema = new ChatSchema(chat);
+
+            /* When */
+            var result = await ExecuteSubscribeAsync(new ExecutionOptions
+            {
+                Query = "subscription newMessageContent { newMessageContent }",
+                Schema = schema
+            });
+
+            chat.AddMessage(addedMessage);
+
+            /* Then */
+            var stream = result.Streams.Values.FirstOrDefault();
+            var message = await stream.FirstOrDefaultAsync();
+
+            message.ShouldNotBeNull();
+            var data = ((Dictionary<string, object>)message.Data);
+            data.ShouldNotBeNull();
+            data["newMessageContent"].ShouldNotBeNull();
+            data["newMessageContent"].ToString().ShouldBe("test");
+        }
+
+        [Fact]
         public async Task Subscribe()
         {
             /* Given */
