@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>GraphQL for .NET</Description>
-    <VersionPrefix>2.4.1</VersionPrefix>
+    <VersionPrefix>2.4.0</VersionPrefix>
     <Authors>Joe McBride</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>GraphQL</AssemblyName>
