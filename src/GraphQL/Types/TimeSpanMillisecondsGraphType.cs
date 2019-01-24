@@ -28,9 +28,13 @@ namespace GraphQL.Types
             {
                 return TimeSpan.FromMilliseconds(i);
             }
-            else if (value is long l)
+            if (value is long l)
             {
                 return TimeSpan.FromMilliseconds(l);
+            }
+            if (value is TimeSpan t)
+            {
+                return t;
             }
 
             return null;
@@ -40,7 +44,7 @@ namespace GraphQL.Types
         {
             if (value is TimeSpanValue spanValue)
             {
-                return ParseValue(spanValue.Value);
+                return spanValue.Value;
             }
 
             if (value is LongValue longValue)

@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -26,6 +27,32 @@ namespace GraphQL.Tests.Types
             {
                 var expected = (long)new TimeSpan(1, 2, 3, 4, 5).TotalMilliseconds;
                 var actual = _type.Serialize(new TimeSpan(1, 2, 3, 4, 5));
+                actual.ShouldBe(expected);
+            });
+        }
+
+        [Fact]
+        public void coerces_TimeSpanValue_to_timespan()
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                var expected = new TimeSpan(1, 2, 3, 4, 5);
+
+                var actual = _type.ParseLiteral(new TimeSpanValue(expected));
+
+                actual.ShouldBe(expected);
+            });
+        }
+
+        [Fact]
+        public void coerces_TimeSpan_to_timespan()
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                var expected = new TimeSpan(1, 2, 3, 4, 5);
+
+                var actual = _type.ParseValue(expected);
+
                 actual.ShouldBe(expected);
             });
         }
