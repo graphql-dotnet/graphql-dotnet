@@ -27,7 +27,7 @@ namespace GraphQL.Types
         {
             if (value is DateTimeOffsetValue offsetValue)
             {
-                return ParseValue(offsetValue.Value);
+                return offsetValue.Value;
             }
 
             if (value is StringValue stringValue)

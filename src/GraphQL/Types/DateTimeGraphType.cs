@@ -27,7 +27,7 @@ namespace GraphQL.Types
         {
             if (value is DateTimeValue timeValue)
             {
-                return ParseValue(timeValue.Value);
+                return timeValue.Value;
             }
 
             if (value is StringValue stringValue)

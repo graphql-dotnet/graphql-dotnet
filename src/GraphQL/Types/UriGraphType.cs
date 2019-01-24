@@ -17,11 +17,16 @@ namespace GraphQL.Types
         public override object ParseLiteral(IValue value)
         {
             if (value is UriValue uriValue)
-                return ParseValue(uriValue.Value);
+            {
+                return uriValue.Value;
+            }
 
-            return value is StringValue stringValue
-                ? ParseValue(stringValue.Value)
-                : null;
+            if (value is StringValue stringValue)
+            {
+                return ParseValue(stringValue.Value);
+            }
+
+            return null;
         }
     }
 }
