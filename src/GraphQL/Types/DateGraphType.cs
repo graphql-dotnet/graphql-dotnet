@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
@@ -18,7 +19,7 @@ namespace GraphQL.Types
 
             if (date is DateTime dateTime)
             {
-                return dateTime.ToString("yyyy-MM-dd");
+                return dateTime.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture);
             }
 
             return null;
@@ -26,7 +27,18 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value)
         {
-            return ValueConverter.ConvertTo(value, typeof(DateTime));
+            if (value is DateTime dateTime)
+            {
+                return dateTime;
+            }
+
+            var valueAsString = (string)value;
+            if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo,DateTimeStyles.None, out var date))
+            {
+                return date;
+            }
+
+            throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
         }
 
         public override object ParseLiteral(IValue value)
