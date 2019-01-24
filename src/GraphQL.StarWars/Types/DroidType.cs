@@ -1,3 +1,4 @@
+using GraphQL.StarWars.Extensions;
 using GraphQL.Types;
 
 namespace GraphQL.StarWars.Types
