@@ -142,6 +142,19 @@ namespace GraphQL.Tests.Bugs
                             Path = new [] { "nullableDataGraph", "nonNullableList" }
                         }
                     }
+                },
+                new object[]
+                {
+                    "{ nonNullableDataGraph { nonNullableList } }",
+                    null,
+                    new Data { ListOfNonNullable = null },
+                    new[]
+                    {
+                        new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
+                        {
+                            Path = new [] { "nonNullableDataGraph", "nonNullableList" }
+                        }
+                    }
                 }
             };
     }
