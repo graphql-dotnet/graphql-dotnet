@@ -102,7 +102,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
             const string EXPECTED = "{ nonNullableDataGraph: { listOfNonNullable: null } }";
-            var data = new Data {ListOfNonNullable = new List<string> {"text", null, null}};
+            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
             var errors = new[]
             {
                 new ExecutionError("Cannot return null for non-null type. Field: listOfNonNullable, Type: [String!].")
@@ -119,7 +119,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableList } }";
             const string EXPECTED = "{ nullableDataGraph: null }";
-            var data = new Data {ListOfNonNullable = null};
+            var data = new Data {ListOfStrings = null};
             var errors = new[]
             {
                 new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
@@ -136,7 +136,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { nonNullableList } }";
             const string EXPECTED = null;
-            var data = new Data {ListOfNonNullable = null};
+            var data = new Data {ListOfStrings = null};
             var errors = new[]
             {
                 new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
@@ -153,7 +153,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = "{ nullableDataGraph: null }";
-            var data = new Data {ListOfNonNullable = new List<string> {"text", null, null}};
+            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
             var errors = new[]
             {
                 new ExecutionError(
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = "{ nullableDataGraph: null }";
-            var data = new Data {ListOfNonNullable = null};
+            var data = new Data {ListOfStrings = null};
             var errors = new[]
             {
                 new ExecutionError(
@@ -252,15 +252,15 @@ namespace GraphQL.Tests.Bugs
 
             Field<ListGraphType<NonNullGraphType<StringGraphType>>>(
                 "listOfNonNullable",
-                resolve: c => c.Source.Data.ListOfNonNullable);
+                resolve: c => c.Source.Data.ListOfStrings);
 
             Field<NonNullGraphType<ListGraphType<StringGraphType>>>(
                 "nonNullableList",
-                resolve: c => c.Source.Data.ListOfNonNullable);
+                resolve: c => c.Source.Data.ListOfStrings);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
                 "nonNullableListOfNonNullable",
-                resolve: c => c.Source.Data.ListOfNonNullable);
+                resolve: c => c.Source.Data.ListOfStrings);
 
             Field<NonNullGraphType<DataGraphType>>(
                 "nonNullableNest",
@@ -280,6 +280,6 @@ namespace GraphQL.Tests.Bugs
         public Data NullableNest { get; set; }
         public string NonNullable { get; set; }
         public Data NonNullableNest { get; set; }
-        public List<string> ListOfNonNullable { get; set; }
+        public List<string> ListOfStrings { get; set; }
     }
 }
