@@ -125,7 +125,7 @@ namespace GraphQL.Execution
                     {
                         var error = new ExecutionError(
                             "Cannot return null for non-null type."
-                            + $" Field: {parent.Name}, Type: {listType}.");
+                            + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
                         error.Path = path;
