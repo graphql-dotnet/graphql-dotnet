@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 
 namespace GraphQL
 {
@@ -35,7 +34,7 @@ namespace GraphQL
             Register(typeof(int), typeof(bool), IntToBool);
             Register(typeof(int), typeof(uint), IntToUInt);
             Register(typeof(int), typeof(long), IntToLong);
-            Register(typeof(int), typeof(ulong), IntToULong); 
+            Register(typeof(int), typeof(ulong), IntToULong);
             Register(typeof(int), typeof(double), IntToDouble);
             Register(typeof(int), typeof(decimal), IntToDecimal);
             Register(typeof(int), typeof(TimeSpan), IntToTimeSpan);
@@ -256,7 +255,7 @@ namespace GraphQL
             var v = ConvertTo(value, typeof(T));
 
             if (v == null)
-                return default(T);
+                return default;
 
             return (T)v;
         }

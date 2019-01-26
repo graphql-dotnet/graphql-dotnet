@@ -14,7 +14,7 @@ namespace GraphQL.Types
 
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
             if (!HasMetadata(key))
             {

@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
@@ -27,7 +24,7 @@ namespace GraphQL.DataLoader.Tests
         [Fact]
         public async Task OneResultOverSubscription_Works()
         {
-            var order = Fake.Orders.Generate();        
+            var order = Fake.Orders.Generate();
             var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
             var orderStream = new ReplaySubject<Order>(1);
 

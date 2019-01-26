@@ -95,7 +95,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_provided_default_when_missing()
         {
-            _context.GetArgument<string>("wat", "foo").ShouldBe("foo");
+            _context.GetArgument("wat", "foo").ShouldBe("foo");
         }
 
         [Fact]
@@ -177,7 +177,7 @@ namespace GraphQL.Tests.Execution
         [InlineData(123)]
         public async Task try_resolve_generic_async_invokes_error_handler(int value)
         {
-            var result = await _context.TryAsyncResolve<int>(
+            var result = await _context.TryAsyncResolve(
                 c => throw new InvalidOperationException(),
                 e => {
                     e.Add(new ExecutionError("Test Error"));

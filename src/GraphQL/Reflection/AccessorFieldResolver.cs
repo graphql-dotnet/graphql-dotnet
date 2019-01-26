@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
