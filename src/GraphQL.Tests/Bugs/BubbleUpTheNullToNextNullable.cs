@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void NonNull_field_resolve_to_null_should_bubble_up_the_null_to_first_nullable_parent_in_chain_of_nullables()
+        public void NonNull_field_resolve_to_null_should_bubble_up_the_null_to_first_nullable_parent_in_chain_of_nullable()
         {
             const string QUERY = "{ nullableDataGraph { nullableNest { nonNullable } } }";
             const string EXPECTED = "{ nullableDataGraph: { nullableNest: null } }";
@@ -97,33 +97,113 @@ namespace GraphQL.Tests.Bugs
             AssertResult(QUERY, EXPECTED, data, errors);
         }
 
-        [Theory]
-        [MemberData(nameof(ListTestData))]
-        public void NullIsNotBubbledInListGraphType(string query, string expected, Data data, ExecutionError[] errors)
+        [Fact]
+        public void ListOfNonNull_containing_null_should_bubble_up_the_null()
         {
-            AssertResult(query, expected, data, errors);
+            const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
+            const string EXPECTED = "{ nonNullableDataGraph: { listOfNonNullable: null } }";
+            var data = new Data {ListOfNonNullable = new List<string> {"text", null, null}};
+            var errors = new[]
+            {
+                new ExecutionError("Cannot return null for non-null type. Field: listOfNonNullable, Type: [String!].")
+                {
+                    Path = new[] {"nonNullableDataGraph", "listOfNonNullable", "1"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
         }
 
-        private void AssertResult(string query, string expected, Data data, ExecutionError[] errors)
+        [Fact]
+        public void NonNullList_resolve_to_null_should_bubble_up_the_null()
+        {
+            const string QUERY = "{ nullableDataGraph { nonNullableList } }";
+            const string EXPECTED = "{ nullableDataGraph: null }";
+            var data = new Data {ListOfNonNullable = null};
+            var errors = new[]
+            {
+                new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
+                {
+                    Path = new[] {"nullableDataGraph", "nonNullableList"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
+        }
+
+        [Fact]
+        public void NonNullList_resolve_to_null_should_null_top_level_if_no_nullable_parent_found()
+        {
+            const string QUERY = "{ nonNullableDataGraph { nonNullableList } }";
+            const string EXPECTED = null;
+            var data = new Data {ListOfNonNullable = null};
+            var errors = new[]
+            {
+                new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
+                {
+                    Path = new[] {"nonNullableDataGraph", "nonNullableList"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
+        }
+
+        [Fact]
+        public void NoNullListOfNonNull_contains_null_should_bubble_up_the_null()
+        {
+            const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
+            const string EXPECTED = "{ nullableDataGraph: null }";
+            var data = new Data {ListOfNonNullable = new List<string> {"text", null, null}};
+            var errors = new[]
+            {
+                new ExecutionError(
+                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
+                {
+                    Path = new[] {"nullableDataGraph", "nonNullableListOfNonNullable", "1"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
+        }
+
+        [Fact]
+        public void NonNullListOfNonNull_resolve_to_null_should_bubble_up_the_null()
+        {
+            const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
+            const string EXPECTED = "{ nullableDataGraph: null }";
+            var data = new Data {ListOfNonNullable = null};
+            var errors = new[]
+            {
+                new ExecutionError(
+                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
+                {
+                    Path = new[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
+        }
+
+        private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors)
         {
             ExecutionResult result =
                 AssertQueryWithErrors(
                     query,
                     expected,
                     root: data,
-                    expectedErrorCount: errors.Length);
+                    expectedErrorCount: errors.Count);
 
             ExecutionErrors actualErrors = result.Errors;
 
-            if (errors.Length == 0)
+            if (errors.Count == 0)
             {
                 actualErrors.ShouldBeNull();
             }
             else
             {
-                actualErrors.Count.ShouldBe(errors.Length);
+                actualErrors.Count.ShouldBe(errors.Count);
 
-                for (var i = 0; i < errors.Length; i++)
+                for (var i = 0; i < errors.Count; i++)
                 {
                     ExecutionError actualError = actualErrors[i];
                     ExecutionError expectedError = errors[i];
@@ -134,74 +214,6 @@ namespace GraphQL.Tests.Bugs
             }
         }
 
-        public static IEnumerable<object[]> ListTestData =>
-            new List<object[]>()
-            {
-                new object[]
-                {
-                    "{ nonNullableDataGraph { listOfNonNullable } }",
-                    "{ nonNullableDataGraph: { listOfNonNullable: null } }",
-                    new Data { ListOfNonNullable = new List<string> { "text", null, null } },
-                    new[] {
-                        new ExecutionError("Cannot return null for non-null type. Field: listOfNonNullable, Type: [String!].")
-                        {
-                            Path = new [] { "nonNullableDataGraph", "listOfNonNullable", "1" }
-                        }
-                    }
-                },
-                new object[]
-                {
-                    "{ nullableDataGraph { nonNullableList } }",
-                    "{ nullableDataGraph: null }",
-                    new Data { ListOfNonNullable = null },
-                    new[]
-                    {
-                        new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
-                        {
-                            Path = new [] { "nullableDataGraph", "nonNullableList" }
-                        }
-                    }
-                },
-                new object[]
-                {
-                    "{ nonNullableDataGraph { nonNullableList } }",
-                    null,
-                    new Data { ListOfNonNullable = null },
-                    new[]
-                    {
-                        new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
-                        {
-                            Path = new [] { "nonNullableDataGraph", "nonNullableList" }
-                        }
-                    }
-                },
-                new object[]
-                {
-                    "{ nullableDataGraph { nonNullableListOfNonNullable } }",
-                    "{ nullableDataGraph: null }",
-                    new Data { ListOfNonNullable = new List<string> { "text", null, null } },
-                    new[]
-                    {
-                        new ExecutionError("Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
-                        {
-                            Path = new [] { "nullableDataGraph", "nonNullableListOfNonNullable", "1" }
-                        }
-                    }
-                },
-                new object[]
-                {
-                    "{ nullableDataGraph { nonNullableListOfNonNullable } }",
-                    "{ nullableDataGraph: null }",
-                    new Data { ListOfNonNullable = null },
-                    new[]
-                    {
-                        new ExecutionError("Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
-                        {
-                            Path = new [] { "nullableDataGraph", "nonNullableListOfNonNullable" }
-                        }
-                    }
-                }
-            };
     }
 
     public class BubbleNullSchema : Schema
