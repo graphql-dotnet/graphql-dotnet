@@ -99,5 +99,31 @@ namespace GraphQL.Tests.Validation
                 config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 4, 21);
             });
         }
+
+
+        // TODO: unsure about how to count the children of fragment spread
+        [Fact(Skip="Fails_with_more_than_one_root_field_including_fragment_spead")]
+        public void Fails_with_more_than_one_root_field_including_fragment_spead()
+        {
+            const string subscriptionName = "NamedSubscription";
+            const string query = @"
+                subscription sub {
+                    ...newMessageFields
+                }
+                
+                fragment newMessageFields on Subscription {
+                    newMessage {
+                        body
+                        sender
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
+            });
+        }
     }
 }
