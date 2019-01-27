@@ -32,6 +32,34 @@ namespace GraphQL.Validation.Rules
                                 InvalidNumberOfRootFieldMessaage(operation.Name),
                                 operation.SelectionSet.Selections.Skip(1).ToArray()));
                     }
+
+                    var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
+
+                    if(fragment == null )
+                    {
+                        return;
+                    }
+
+                    if(fragment is FragmentSpread fragmentSpread)
+                    {
+                        var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
+                        rootFields = fragmentDefinition.SelectionSet.Selections.Count;
+                    }
+                    else if(fragment is InlineFragment fragmentSelectionSet)
+                    {
+                        rootFields = fragmentSelectionSet.SelectionSet.Selections.Count;
+                    }
+
+                    if (rootFields != 1)
+                    {
+                        context.ReportError(
+                            new ValidationError(
+                                context.OriginalQuery,
+                                RuleCode,
+                                InvalidNumberOfRootFieldMessaage(operation.Name),
+                                fragment));
+                    }
+
                 });
             });
         }
@@ -44,5 +72,8 @@ namespace GraphQL.Validation.Rules
 
         private static bool IsSubscription(Operation operation) =>
             operation.OperationType == OperationType.Subscription;
+
+        private static bool IsFragment(ISelection selection) =>
+            (selection is FragmentSpread) || (selection is InlineFragment);
     }
 }
