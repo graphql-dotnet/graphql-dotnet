@@ -100,14 +100,59 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-
-        // TODO: unsure about how to count the children of fragment spread
-        [Fact(Skip="Fails_with_more_than_one_root_field_including_fragment_spead")]
-        public void Fails_with_more_than_one_root_field_including_fragment_spead()
+        [Fact]
+        public void Fails_with_more_than_one_root_field_in_fragment_spead()
         {
             const string subscriptionName = "NamedSubscription";
             const string query = @"
-                subscription sub {
+                subscription NamedSubscription {
+                    ...newMessageFields
+                }
+                
+                fragment newMessageFields on Subscription {
+                    newMessage {
+                        body
+                        sender
+                    }
+                    disallowedSecondRootField
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
+            });
+        }
+
+        [Fact]
+        public void Fails_with_more_than_one_root_field_in_inline_fragment()
+        {
+            const string subscriptionName = "NamedSubscription";
+            const string query = @"
+                subscription NamedSubscription {
+                    ...on Subscription {
+                        newMessage {
+                            body
+                            sender
+                        }
+                        disallowedSecondRootField
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
+            });
+        }
+
+        [Fact]
+        public void Pass_with_one_root_field_in_fragment_spead()
+        {
+            const string query = @"
+                subscription NamedSubscription {
                     ...newMessageFields
                 }
                 
@@ -119,11 +164,24 @@ namespace GraphQL.Tests.Validation
                 }
             ";
 
-            ShouldFailRule(config =>
-            {
-                config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
-            });
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Pass_with_one_root_field_in_inline_fragment()
+        {
+            const string query = @"
+                subscription NamedSubscription {
+                    ...on Subscription {
+                        newMessage {
+                            body
+                            sender
+                        }
+                    }
+                }
+            ";
+
+            ShouldPassRule(query);
         }
     }
 }
