@@ -243,5 +243,60 @@ namespace GraphQL.Tests.Validation
                 });
             });
         }
+
+        /// <summary>
+        /// This is valid since no object can be both a "Dog" and a "Cat", thus
+        /// these fields can never overlap.
+        /// </summary>
+        [Fact]
+        public void Allows_different_args_where_no_conflict_is_possible_should_pass()
+        {
+            const string query = @"
+                fragment conflictingArgs on Pet {
+                    ... on Dog {
+                        name(surname: true)
+                    }
+                    ... on Cat {
+                        name
+                    }
+                }
+            ";
+
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Encounters_conflict_in_fragments_should_fail()
+        {
+            const string query = @"
+                {
+                    ...A
+                    ...B
+                }
+                fragment A on Type {
+                    x: a
+                }
+                fragment B on Type {
+                    x: b
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "a and b are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 7, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 10, Column = 21 });
+                });
+            });
+        }
     }
 }

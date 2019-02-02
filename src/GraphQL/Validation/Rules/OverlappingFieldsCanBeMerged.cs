@@ -837,7 +837,8 @@ namespace GraphQL.Validation.Rules
 
             public bool Has(string a, string b, bool areMutuallyExclusive)
             {
-                var first = _data[a];
+                _data.TryGetValue(a, out var first);
+
                 var result = first?[b];
 
                 if (result == null)
@@ -861,7 +862,8 @@ namespace GraphQL.Validation.Rules
 
             private void PairSetAdd(string a, string b, bool areMutuallyExclusive)
             {
-                var map = _data[a];
+                _data.TryGetValue(a, out var map);
+                
                 if (map == null)
                 {
                     map = new ObjMap<bool>();
