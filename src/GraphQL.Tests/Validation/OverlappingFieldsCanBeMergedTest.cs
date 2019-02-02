@@ -159,5 +159,61 @@ namespace GraphQL.Tests.Validation
                 });
             });
         }
+
+        [Fact]
+        public void Different_args_second_adds_an_argument_should_fail()
+        {
+            const string query = @"
+                fragment conflictingArgs on Dog {
+                    doesKnowCommand
+                    doesKnowCommand(dogCommand: HEEL)
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they have differing arguments"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 21 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Different_args_second_missing_an_argument_should_fail()
+        {
+            const string query = @"
+                fragment conflictingArgs on Dog {
+                    doesKnowCommand(dogCommand: SIT)
+                    doesKnowCommand
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they have differing arguments"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 21 });
+                });
+            });
+        }
     }
 }
