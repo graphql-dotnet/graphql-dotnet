@@ -839,12 +839,12 @@ namespace GraphQL.Validation.Rules
             {
                 _data.TryGetValue(a, out var first);
 
-                var result = first?[b];
-
-                if (result == null)
+                if(first == null || !first.ContainsKey(b))
                 {
                     return false;
                 }
+
+                var result = first[b];
 
                 if (areMutuallyExclusive == false)
                 {

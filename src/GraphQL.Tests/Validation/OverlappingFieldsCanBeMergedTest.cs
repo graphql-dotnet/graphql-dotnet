@@ -1,4 +1,7 @@
+using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation.Rules;
+using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -295,6 +298,503 @@ namespace GraphQL.Tests.Validation
                     });
                     e.Locations.Add(new ErrorLocation() { Line = 7, Column = 21 });
                     e.Locations.Add(new ErrorLocation() { Line = 10, Column = 21 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Reports_each_conflict_once_should_fail()
+        {
+            const string query = @"
+                {
+                    f1 {
+                        ...A
+                        ...B
+                    }
+                    f2 {
+                        ...B
+                        ...A
+                    }
+                    f3 {
+                        ...A
+                        ...B
+                        x: c
+                    }
+                }
+                fragment A on Type {
+                    x: a
+                }
+                fragment B on Type {
+                    x: b
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "a and b are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 18, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 21, Column = 21 });
+                });
+
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "c and a are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 14, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 18, Column = 21 });
+                });
+
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "c and b are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 14, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 21, Column = 21 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Deep_conflict()
+        {
+            const string query = @"
+                {
+                    field {
+                        x: a
+                    },
+                    field {
+                        x: b
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "x",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "a and b are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 6, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 7, Column = 25 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Deep_conflict_with_multiple_issues_should_fail()
+        {
+            const string query = @"
+                {
+                    field {
+                        x: a
+                        y: c
+                    },
+                    field {
+                        x: b
+                        y: d
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "x",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "a and b are different fields"
+                                    }
+                                },
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "y",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "c and d are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 7, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 9, Column = 25 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Very_deep_conflict_should_fail()
+        {
+            const string query = @"
+                {
+                    field {
+                        deepField {
+                            x: a
+                        }
+                    },
+                    field {
+                        deepField {
+                            x: b
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "deepField",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                                        {
+                                            new OverlappingFieldsCanBeMerged.ConflictReason
+                                            {
+                                                Name = "x",
+                                                Message = new OverlappingFieldsCanBeMerged.Message
+                                                {
+                                                    Msg = "a and b are different fields"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 9, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 10, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Reports_deep_conflict_to_nearest_common_ancestor_should_fail()
+        {
+            const string query = @"
+                {
+                    field {
+                        deepField {
+                            x: a
+                        }
+                        deepField {
+                            x: b
+                        }
+                    },
+                    field {
+                        deepField {
+                            y
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("deepField", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "x",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "a and b are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 7, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Reports_deep_conflict_to_nearest_common_ancestor_in_fragments()
+        {
+            const string query = @"
+                {
+                    field {
+                        ...F
+                    }
+                    field {
+                        ...F
+                    }
+                }
+                fragment F on T {
+                    deepField {
+                        deeperField {
+                            x: a
+                        }
+                        deeperField {
+                            x: b
+                        }
+                    },
+                    deepField {
+                        deeperField {
+                            y
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("deeperField", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "x",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "a and b are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 12, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 13, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 15, Column = 25 });
+                    e.Locations.Add(new ErrorLocation() { Line = 16, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Reports_deep_conflict_in_nested_fragments()
+        {
+            const string query = @"
+                {
+                    field {
+                        ...F
+                    }
+                    field {
+                        ...I
+                    }
+                }
+                fragment F on T {
+                    x: a
+                    ...G
+                }
+                fragment G on T {
+                    y: c
+                }
+                fragment I on T {
+                    y: d
+                    ...J
+                }
+                fragment J on T {
+                    x: b
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "x",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "a and b are different fields"
+                                    }
+                                },
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "y",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "c and d are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 3, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 11, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 15, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 6, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 22, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 18, Column = 21 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Ignores_unknown_fragments()
+        {
+            const string query = @"
+                {
+                    field
+                    ...Unknown
+                    ...Known
+                }
+                fragment Known on T {
+                    field
+                    ...OtherUnknown
+                }
+            ";
+
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Does_not_infinite_loop_on_recursive_fragment()
+        {
+            const string query = @"
+                fragment fragA on Human {
+                    name,
+                    relatives {
+                        name,
+                        ...fragA
+                    }
+                }
+            ";
+
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Does_not_infinite_loop_on_immediately_recursive_fragment()
+        {
+            const string query = @"
+                fragment fragA on Human {
+                    name,
+                    ...fragA
+                }
+            ";
+
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Does_not_infinite_loop_on_transitively_recursive_fragment()
+        {
+            const string query = @"
+                fragment fragA on Human { name, ...fragB }
+                fragment fragB on Human { name, ...fragC }
+                fragment fragC on Human { name, ...fragA }
+            ";
+
+            ShouldPassRule(query);
+        }
+
+        [Fact]
+        public void Finds_invalid_case_even_with_immediately_recursive_fragment()
+        {
+            const string query = @"
+                fragment sameAliasesWithDifferentFieldTargets on Dog {
+                    ...sameAliasesWithDifferentFieldTargets
+                    fido: name
+                    fido: nickname
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("fido", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "name and nickname are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 4, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 21 });
                 });
             });
         }
