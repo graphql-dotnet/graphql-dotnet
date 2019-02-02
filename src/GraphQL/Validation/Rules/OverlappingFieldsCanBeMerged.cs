@@ -639,7 +639,7 @@ namespace GraphQL.Validation.Rules
         private bool SameValue(Argument arg1, Argument arg2)
         {
             return (arg1.Value == null && arg2.Value == null) ||
-                (AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg1.Value));
+                (AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value));
         }
 
         private CachedField GetFieldsAndFragmentNames(
