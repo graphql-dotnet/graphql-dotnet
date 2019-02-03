@@ -798,5 +798,494 @@ namespace GraphQL.Tests.Validation
                 });
             });
         }
+
+        [Fact]
+        public void Conflicting_return_types_which_potentially_overlap()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ...on IntBox {
+                            scalar
+                        }
+                        ...on NonNullStringBox1 {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they return conflicting types Int and String!"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Compatible_return_shapes_on_different_return_types()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on SomeBox {
+                            deepBox {
+                                unrelatedField
+                            }
+                        }
+                        ... on StringBox {
+                            deepBox {
+                                unrelatedField
+                            }
+                        }
+                    }
+                }
+            ";
+
+            ShouldPassRule(config =>
+            {
+                config.Schema = Schema;
+                config.Query = query;
+            });
+        }
+
+        [Fact]
+        public void Disallows_differing_return_types_despite_no_overlap()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            scalar
+                        }
+                        ... on StringBox {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they return conflicting types Int and String"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Reports_correctly_when_a_non_exclusive_follows_an_exclusive()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            deepBox {
+                                ...X
+                            }
+                        }
+                    }
+                    someBox {
+                        ... on StringBox {
+                            deepBox {
+                                ...Y
+                            }
+                        }
+                    }
+                    memoed: someBox {
+                        ... on IntBox {
+                            deepBox {
+                                ...X
+                            }
+                        }
+                    }
+                    memoed: someBox {
+                        ... on StringBox {
+                            deepBox {
+                                ...Y
+                            }
+                        }
+                    }
+                    other: someBox {
+                        ...X
+                    }
+                    other: someBox {
+                        ...Y
+                    }
+                }
+                fragment X on SomeBox {
+                    scalar
+                }
+                fragment Y on SomeBox {
+                    scalar: unrelatedField
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("other", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "scalar",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "scalar and unrelatedField are different fields"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 31, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 39, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 34, Column = 21 });
+                    e.Locations.Add(new ErrorLocation() { Line = 42, Column = 21 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Disallows_differing_return_type_nullability_despite_no_overlap()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on NonNullStringBox1 {
+                            scalar
+                        }
+                        ... on StringBox {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they return conflicting types String! and String"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 8, Column = 29 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Disallows_differing_return_type_list_despite_no_overlap()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            box: listStringBox {
+                                scalar
+                            }
+                        }
+                        ... on StringBox {
+                            box: stringBox {
+                                scalar
+                            }
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they return conflicting types [StringBox] and StringBox"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 10, Column = 29 });
+                });
+            });
+
+            query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            box: stringBox {
+                                scalar
+                            }
+                        }
+                        ... on StringBox {
+                            box: listStringBox {
+                                scalar
+                            }
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "they return conflicting types StringBox and [StringBox]"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 10, Column = 29 });
+                });
+            });
+
+        }
+
+        [Fact]
+        public void Disallows_differing_subfields()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            box: stringBox {
+                                val: scalar
+                                val: unrelatedField
+                            }
+                        }
+                        ... on StringBox {
+                            box: stringBox {
+                                val: scalar
+                            }
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("val", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msg = "scalar and unrelatedField are different fields"
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 6, Column = 33 });
+                    e.Locations.Add(new ErrorLocation() { Line = 7, Column = 33 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Disallows_differing_deep_return_types_despite_no_overlap()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            box: stringBox {
+                                scalar
+                            }
+                        }
+                        ... on StringBox {
+                            box: intBox {
+                                scalar
+                            }
+                        }
+                    }
+                }
+            ";
+
+            ShouldFailRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+                config.Error(e =>
+                {
+                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    {
+                        Message = new OverlappingFieldsCanBeMerged.Message
+                        {
+                            Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
+                            {
+                                new OverlappingFieldsCanBeMerged.ConflictReason
+                                {
+                                    Name = "scalar",
+                                    Message = new OverlappingFieldsCanBeMerged.Message
+                                    {
+                                        Msg = "they return conflicting types String and Int"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    e.Locations.Add(new ErrorLocation() { Line = 5, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 6, Column = 33 });
+                    e.Locations.Add(new ErrorLocation() { Line = 10, Column = 29 });
+                    e.Locations.Add(new ErrorLocation() { Line = 11, Column = 33 });
+                });
+            });
+        }
+
+        [Fact]
+        public void Allows_non_conflicting_overlapping_types()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ... on IntBox {
+                            scalar: unrelatedField
+                        }
+                        ... on StringBox {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldPassRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+            });
+        }
+
+        [Fact]
+        public void Same_wrapped_scalar_return_types()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ...on NonNullStringBox1 {
+                            scalar
+                        }
+                        ...on NonNullStringBox2 {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldPassRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+            });
+        }
+
+        [Fact]
+        public void Allows_inline_typeless_fragments()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    a
+                    ... {
+                        a
+                    }
+                }
+            ";
+
+            ShouldPassRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+            });
+        }
+
+        [Fact]
+        public void Ignores_unknown_types()
+        {
+            ISchema schema = new ResultTypeValidationSchema();
+
+            const string query = @"
+                {
+                    someBox {
+                        ...on UnknownType {
+                            scalar
+                        }
+                        ...on NonNullStringBox2 {
+                            scalar
+                        }
+                    }
+                }
+            ";
+
+            ShouldPassRule(config =>
+            {
+                config.Schema = schema;
+                config.Query = query;
+            });
+        }
     }
 }

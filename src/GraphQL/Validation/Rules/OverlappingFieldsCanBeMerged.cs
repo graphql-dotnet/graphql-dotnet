@@ -82,7 +82,7 @@ namespace GraphQL.Validation.Rules
                 conflicts,
                 cachedFieldsAndFragmentNames,
                 comparedFragmentPairs,
-                cachedField.NodeAndDef);
+                fieldMap);
 
             if (fragmentNames.Count != 0)
             {
@@ -241,44 +241,44 @@ namespace GraphQL.Validation.Rules
                         FieldsRight = new List<ISelection>() { node2 }
                     };
                 }
+            }
 
-                if (type1 != null && type2 != null && DoTypesConflict(type1, type2))
+            if (type1 != null && type2 != null && DoTypesConflict(type1, type2))
+            {
+                return new Conflict
                 {
-                    return new Conflict
+                    Reason = new ConflictReason
                     {
-                        Reason = new ConflictReason
+                        Name = responseName,
+                        Message = new Message
                         {
-                            Name = responseName,
-                            Message = new Message
-                            {
-                                Msg = $"they return conflicting types {type1} and {type2}"
-                            }
-                        },
-                        FieldsLeft = new List<ISelection>() { node1 },
-                        FieldsRight = new List<ISelection>() { node2 }
-                    };
-                }
+                            Msg = $"they return conflicting types {type1} and {type2}"
+                        }
+                    },
+                    FieldsLeft = new List<ISelection>() { node1 },
+                    FieldsRight = new List<ISelection>() { node2 }
+                };
+            }
 
-                // Collect and compare sub-fields. Use the same "visited fragment names" list
-                // for both collections so fields in a fragment reference are never
-                // compared to themselves.
-                var selectionSet1 = node1.GetSelectionSet();
-                var selectionSet2 = node2.GetSelectionSet();
+            // Collect and compare sub-fields. Use the same "visited fragment names" list
+            // for both collections so fields in a fragment reference are never
+            // compared to themselves.
+            var selectionSet1 = node1.GetSelectionSet();
+            var selectionSet2 = node2.GetSelectionSet();
 
-                if (selectionSet1 != null && selectionSet2 != null)
-                {
-                    var conflicts = FindConflictsBetweenSubSelectionSets(
-                        context,
-                        cachedFieldsAndFragmentNames,
-                        comparedFragmentPairs,
-                        areMutuallyExclusive,
-                        type1.GetNamedType(),
-                        selectionSet1,
-                        type2.GetNamedType(),
-                        selectionSet2);
+            if (selectionSet1 != null && selectionSet2 != null)
+            {
+                var conflicts = FindConflictsBetweenSubSelectionSets(
+                    context,
+                    cachedFieldsAndFragmentNames,
+                    comparedFragmentPairs,
+                    areMutuallyExclusive,
+                    type1.GetNamedType(),
+                    selectionSet1,
+                    type2.GetNamedType(),
+                    selectionSet2);
 
-                    return SubfieldConflicts(conflicts, responseName, node1, node2);
-                }
+                return SubfieldConflicts(conflicts, responseName, node1, node2);
             }
 
             return null;
@@ -720,7 +720,7 @@ namespace GraphQL.Validation.Rules
                     nodeAndDefs[responseName].Add(new FieldDefPair
                     {
                         ParentType = parentType,
-                        Field = field,
+                        Field = selection,
                         FieldDef = fieldDef
                     });
 
@@ -851,7 +851,7 @@ namespace GraphQL.Validation.Rules
                     return result == false;
                 }
 
-                return false;
+                return true;
             }
 
             public void Add(string a, string b, bool areMutuallyExclusive)
