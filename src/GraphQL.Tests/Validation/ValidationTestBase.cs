@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Validation
 
             config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-            var result = Validate(config.Query, Schema, config.Rules);
+            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules);
 
             result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
             result.Errors.Count.ShouldBe(
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Validation
 
             config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
-            var result = Validate(config.Query, Schema, config.Rules);
+            var result = Validate(config.Query, config.Schema ?? Schema, config.Rules);
             var message = "";
             if (result.Errors?.Any() == true)
             {
