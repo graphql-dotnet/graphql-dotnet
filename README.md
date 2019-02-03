@@ -181,7 +181,7 @@ var json = schema.Execute(_ =>
 - [x] No undefined variables
 - [x] No unused fragments
 - [x] No unused variables
-- [ ] Overlapping fields can be merged ([help with this rule](https://github.com/graphql-dotnet/graphql-dotnet/issues/160))
+- [x] Overlapping fields can be merged
 - [x] Possible fragment spreads
 - [x] Provide non-null arguments
 - [x] Scalar leafs
