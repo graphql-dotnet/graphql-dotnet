@@ -50,7 +50,7 @@ namespace GraphQL.Validation.Rules
                     {
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,
-                            "5.3.2.2",
+                            "5.3.2",
                             FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
                             conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray()
                             ));
