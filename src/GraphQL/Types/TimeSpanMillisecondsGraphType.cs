@@ -18,6 +18,14 @@ namespace GraphQL.Types
             {
                 return (long)timeSpan.TotalMilliseconds;
             }
+            else if (value is int i)
+            {
+                return i;
+            }
+            else if (value is long l)
+            {
+                return l;
+            }
 
             return null;
         }
