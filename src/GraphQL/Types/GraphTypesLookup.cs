@@ -137,7 +137,7 @@ namespace GraphQL.Types
             {
                 lock (_lock)
                 {
-                    var result = _types.FirstOrDefault(x => type.IsAssignableFrom(x.Value.GetType()));
+                    var result = _types.SingleOrDefault(x => type.IsAssignableFrom(x.Value.GetType()));
                     return result.Value;
                 }
             }
