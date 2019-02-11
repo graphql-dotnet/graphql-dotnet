@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -117,6 +117,18 @@ namespace GraphQL.Tests.Types
             schema.FindType("abcd");
 
             DoesNotContainTypeNames(schema, "ASchemaType!");
+        }
+
+        [Fact]
+        public void handles_derived_cycles_with_resolver()
+        {
+            var schema = new ACyclingDerivingSchema(new FuncDependencyResolver(resolver));
+            schema.FindType("abcd");
+
+            object resolver(Type t)
+            {
+                return t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null;
+            }
         }
 
         private void ContainsTypeNames(ISchema schema, params string[] typeNames)
@@ -338,6 +350,37 @@ namespace GraphQL.Tests.Types
     public class WithoutIsTypeOf2Type : ObjectGraphType
     {
         public WithoutIsTypeOf2Type()
+        {
+        }
+    }
+
+    public class ACyclingDerivingSchema : Schema
+    {
+        public ACyclingDerivingSchema(IDependencyResolver resolver) : base(resolver)
+        {
+            Query = new CyclingQueryType();
+        }
+    }
+
+    public class CyclingQueryType : ObjectGraphType
+    {
+        public CyclingQueryType()
+        {
+            Field<AbstractGraphType>();
+        }
+    }
+
+    public abstract class AbstractGraphType : ObjectGraphType
+    {
+        public AbstractGraphType()
+        {
+            Field<AbstractGraphType>();
+        }
+    }
+
+    public class ConcreteGraphType : AbstractGraphType
+    {
+        public ConcreteGraphType() : base()
         {
         }
     }

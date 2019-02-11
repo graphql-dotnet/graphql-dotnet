@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 
@@ -136,7 +137,7 @@ namespace GraphQL.Types
             {
                 lock (_lock)
                 {
-                    var result = _types.FirstOrDefault(x => x.Value.GetType() == type);
+                    var result = _types.FirstOrDefault(x => type.IsAssignableFrom(x.Value.GetType()));
                     return result.Value;
                 }
             }

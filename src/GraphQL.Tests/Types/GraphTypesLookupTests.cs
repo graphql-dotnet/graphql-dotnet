@@ -9,6 +9,9 @@ namespace GraphQL.Tests.Types
     {
         private class TestType : GraphType { }
 
+        private class BaseTestType : GraphType { }
+        private class ConcreteTestType : BaseTestType { }
+
         private readonly ManualResetEvent _inIteration = new ManualResetEvent(false);
         private readonly ManualResetEvent _lookupModified = new ManualResetEvent(false);
         private readonly GraphTypesLookup _lookup = new GraphTypesLookup();
@@ -32,6 +35,14 @@ namespace GraphQL.Tests.Types
             _inIteration.WaitOne();
             _lookup["test"] = new TestType();
             _lookupModified.Set();
+        }
+
+        [Fact]
+        public void get_subclass_type()
+        {
+            _lookup["concrete"] = new ConcreteTestType();
+            IGraphType type = _lookup[typeof(BaseTestType)];
+            Assert.IsType<ConcreteTestType>(type);
         }
     }
 }
