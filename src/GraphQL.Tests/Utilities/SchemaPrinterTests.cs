@@ -80,9 +80,9 @@ scalar Seconds"
             return result;
         }
 
-        private string print(ISchema schema)
+        private string print(ISchema schema, SchemaPrinterOptions options = null)
         {
-            var printer = new SchemaPrinter(schema);
+            var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
         }
 
@@ -199,8 +199,10 @@ directive @skip(
             {
                 {
                     "Foo",
-@"type Foo {
+@"# This is a Foo object type
+type Foo {
   str: String
+  int: Int
 }"
                 },
                 {
@@ -211,6 +213,78 @@ directive @skip(
                 },
             };
             AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_object_field_with_field_descriptions()
+        {
+            var root = new ObjectGraphType {Name = "Query"};
+            root.Field<FooType>("foo");
+
+            var schema = new Schema {Query = root};
+            
+            var options = new SchemaPrinterOptions()
+            {
+                IncludeDescriptions = true
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"# This is a Foo object type
+type Foo {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}"
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            AssertEqual(print(schema, options), expected);
+        }
+
+        [Fact]
+        public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
+        {
+            var root = new ObjectGraphType {Name = "Query"};
+            root.Field<FooType>("foo");
+
+            var schema = new Schema {Query = root};
+            
+            var options = new SchemaPrinterOptions()
+            {
+                IncludeDescriptions = true,
+                IncludeDeprecationReasons = true
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"# This is a Foo object type
+type Foo {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            var result = print(schema, options);
+            AssertEqual(result, expected);
         }
 
         [Fact]
@@ -365,6 +439,7 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+# This is a Foo interface type
 interface Foo {
   str: String
 }
@@ -391,7 +466,64 @@ scalar Uri
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), "", @"
+            var result = print(schema);
+
+            AssertEqual(result, "", @"
+interface Baaz {
+  int: Int
+}
+
+type Bar implements Foo & Baaz {
+  str: String
+}
+
+# The `Date` scalar type represents a year, month and day in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
+scalar Decimal
+
+# This is a Foo interface type
+interface Foo {
+  str: String
+}
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
+type Query {
+  bar: Bar
+}
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
+", excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_multiple_interfaces_with_old_implements_syntax()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+            
+            var options = new SchemaPrinterOptions()
+            {
+                OldImplementsSyntax = true
+            };
+
+            AssertEqual(print(schema, options), "", @"
 interface Baaz {
   int: Int
 }
@@ -416,6 +548,7 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+# This is a Foo interface type
 interface Foo {
   str: String
 }
@@ -431,6 +564,66 @@ type Query {
 scalar Seconds
 
 scalar Uri
+", excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_multiple_interfaces_with_field_descriptions()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+            
+            var options = new SchemaPrinterOptions()
+            {
+                IncludeDescriptions = true
+            };
+
+            var result = print(schema, options);
+
+            AssertEqual(result, "", @"
+interface Baaz {
+  # This is of type Integer
+  int: Int
+}
+
+type Bar implements Foo & Baaz {
+  # This is of type String
+  str: String
+}
+
+# The `Date` scalar type represents a year, month and day in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
+scalar Decimal
+
+# This is a Foo interface type
+interface Foo {
+  # This is of type String
+  str: String
+}
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
+type Query {
+  bar: Bar
+}
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
 ", excludeScalars: true);
         }
 
@@ -464,6 +657,7 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+# This is a Foo interface type
 interface Foo {
   str: String
 }
@@ -718,7 +912,14 @@ enum __TypeKind {
             public FooType()
             {
                 Name = "Foo";
-                Field<StringGraphType>("str");
+                Description = "This is a Foo object type";
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
+                Field<IntGraphType>(
+                    name: "int",
+                    description: "This is of type Integer",
+                    deprecationReason: "This field is now deprecated");
             }
         }
 
@@ -727,8 +928,11 @@ enum __TypeKind {
             public FooInterfaceType()
             {
                 Name = "Foo";
+                Description = "This is a Foo interface type";
                 ResolveType = obj => null;
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
             }
         }
 
@@ -738,7 +942,9 @@ enum __TypeKind {
             {
                 Name = "Baaz";
                 ResolveType = obj => null;
-                Field<IntGraphType>("int");
+                Field<IntGraphType>(
+                    name: "int",
+                    description: "This is of type Integer");
             }
         }
 
@@ -747,7 +953,9 @@ enum __TypeKind {
             public BarType()
             {
                 Name = "Bar";
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
                 Interface<FooInterfaceType>();
             }
         }
@@ -757,7 +965,9 @@ enum __TypeKind {
             public BarMultipleType()
             {
                 Name = "Bar";
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
                 Interface<FooInterfaceType>();
                 Interface<BaazInterfaceType>();
             }

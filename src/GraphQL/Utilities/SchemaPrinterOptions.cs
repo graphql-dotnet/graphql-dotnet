@@ -9,5 +9,7 @@ namespace GraphQL.Utilities
         public bool IncludeDescriptions { get; set; } = false;
 
         public bool IncludeDeprecationReasons { get; set; } = false;
+
+        public bool OldImplementsSyntax { get; set; } = false;
     }
 }
