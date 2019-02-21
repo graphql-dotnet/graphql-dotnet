@@ -49,7 +49,7 @@ namespace GraphQL
         public static bool IsNullable(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
-            return typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            return type == typeof(string) || (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
         /// <summary>
