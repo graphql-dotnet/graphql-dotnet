@@ -12,6 +12,7 @@ namespace GraphQL.StarWars.Types
             Field(d => d.Name, nullable: true).Description("The name of the character.");
 
             Field<ListGraphType<CharacterInterface>>("friends");
+            Field<ListGraphType<CharacterInterface>>("friendsConnection");
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
         }
     }

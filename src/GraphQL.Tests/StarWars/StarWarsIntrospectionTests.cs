@@ -125,6 +125,13 @@ namespace GraphQL.Tests.StarWars
                       }
                     },
                     {
+                      name: 'friendsConnection',
+                      type: {
+                        name: 'CharacterInterfaceConnection',
+                        kind: 'OBJECT'
+                      }
+                    },
+                    {
                       name: 'id',
                       type: {
                         name: null,
@@ -285,6 +292,18 @@ namespace GraphQL.Tests.StarWars
                 },
                 {
                   'name': 'Human',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': 'CharacterInterfaceConnection',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': 'PageInfo',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': 'CharacterInterfaceEdge',
                   'kind': 'OBJECT'
                 },
                 {
