@@ -213,7 +213,11 @@ public class DroidType
   }
 }
 
-var schema = Schema.For(@"
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var schema = Schema.For(@"
   type Droid {
     id: String!
     name: String!
@@ -227,15 +231,20 @@ var schema = Schema.For(@"
   type Query {
     hero: Droid
   }
-", _ => {
-    _.Types.Include<DroidType>();
-    _.Types.Include<Query>();
-});
+", _ =>
+        {
+            _.Types.Include<DroidType>();
+            _.Types.Include<Query>();
+        });
 
-var json = schema.Execute(_ =>
-{
-  _.Query = "{ hero { id name friend { name } } }";
-});
+        var json = schema.Execute(_ =>
+        {
+            _.Query = "{ hero { id name friend { name } } }";
+        });
+
+        Console.WriteLine(json);
+    }
+}
 ```
 
 Output
