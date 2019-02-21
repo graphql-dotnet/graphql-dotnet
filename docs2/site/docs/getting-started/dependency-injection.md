@@ -81,3 +81,28 @@ protected override void ConfigureApplicationContainer(TinyIoCContainer container
 var container = new SimpleContainer();
 container.Singleton(new StarWarsSchema(new FuncDependencyResolver(container.Get)));
 ```
+
+## Autofac
+
+```csharp
+protected override void Load(ContainerBuilder builder)
+{
+   builder
+     .Register(c => new FuncDependencyResolver(c.Resolve<IComponentContext>().Resolve))
+     .As<IDependencyResolver>()
+     .InstancePerDependency();
+}
+```
+
+## Castle Windsor
+
+```csharp
+public void Install(IWindsorContainer container, IConfigurationStore store)
+{
+   container.Register(
+     Component
+       .For<IDependencyResolver>()
+       .UsingFactoryMethod(k => k.Resolve)
+   );
+}
+```
