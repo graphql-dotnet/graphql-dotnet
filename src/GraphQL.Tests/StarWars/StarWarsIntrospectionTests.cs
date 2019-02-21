@@ -247,6 +247,10 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR'
                 },
                 {
+                  'name': 'Uri',
+                  'kind': 'SCALAR'
+                },
+                {
                   'name': '__Schema',
                   'kind': 'OBJECT'
                 },

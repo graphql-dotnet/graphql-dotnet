@@ -121,6 +121,16 @@ namespace GraphQL.Tests.Introspection
           ""possibleTypes"": null
         },
         {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Uri"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
           ""kind"": ""OBJECT"",
           ""name"": ""__Schema"",
           ""description"": ""A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations."",

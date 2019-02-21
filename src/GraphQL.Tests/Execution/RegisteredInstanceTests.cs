@@ -151,6 +151,8 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ");
         }
 
@@ -190,6 +192,8 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ");
         }
 
@@ -229,6 +233,8 @@ type root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ");
         }
 

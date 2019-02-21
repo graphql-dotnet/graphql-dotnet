@@ -47,6 +47,10 @@ scalar Milliseconds"
 @"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds"
             },
+            {
+                "Uri",
+                "scalar Uri"
+            },
         };
 
         private string printSingleFieldSchema<T>(
@@ -374,6 +378,8 @@ type Root {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -423,6 +429,8 @@ type Query {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -474,6 +482,8 @@ type Query {
 scalar Seconds
 
 union SingleUnion = Foo
+
+scalar Uri
 ", excludeScalars: true);
         }
 
