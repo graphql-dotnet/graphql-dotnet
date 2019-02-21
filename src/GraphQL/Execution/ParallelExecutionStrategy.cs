@@ -6,7 +6,10 @@ namespace GraphQL.Execution
 {
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
-        protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
+        protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
+            => ExecuteNodeTreeAsync(context, rootNode);
+
+        protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
             var pendingNodes = new List<ExecutionNode>
             {
