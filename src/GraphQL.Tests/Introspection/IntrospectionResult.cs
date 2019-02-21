@@ -6,7 +6,9 @@ namespace GraphQL.Tests.Introspection
 @"{
   ""data"": {
     ""__schema"": {
-      ""queryType"": null,
+      ""queryType"": {
+        ""name"": ""TestQuery""
+      },
       ""mutationType"": null,
       ""subscriptionType"": null,
       ""types"": [
@@ -967,6 +969,16 @@ namespace GraphQL.Tests.Introspection
             }
           ],
           ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""OBJECT"",
+          ""name"": ""TestQuery"",
+          ""description"": null,
+          ""fields"": [],
+          ""inputFields"": null,
+          ""interfaces"": [],
+          ""enumValues"": null,
+          ""possibleTypes"": null
         }
       ],
       ""directives"": [
@@ -1042,22 +1054,7 @@ namespace GraphQL.Tests.Introspection
         }
       ]
     }
-  },
-  ""errors"": [
-    {
-      ""message"": ""Cannot return null for non-null type. Field: queryType, Type: __Type!."",
-      ""locations"": [
-        {
-          ""line"": 4,
-          ""column"": 7
-        }
-      ],
-      ""path"": [
-        ""__schema"",
-        ""queryType""
-      ]
-    }
-  ]
+  }
 }";
     }
 }

@@ -44,6 +44,11 @@ namespace GraphQL.Types
             return Name;
         }
 
+        public override string ToString() =>
+            string.IsNullOrWhiteSpace(Name)
+                ? GetType().Name
+                : Name;
+
         protected bool Equals(IGraphType other)
         {
             return string.Equals(Name, other.Name);

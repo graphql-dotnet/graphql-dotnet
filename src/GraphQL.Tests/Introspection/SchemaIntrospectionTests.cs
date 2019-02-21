@@ -1,4 +1,4 @@
-﻿using GraphQL.Http;
+using GraphQL.Http;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -14,7 +14,10 @@ namespace GraphQL.Tests.Introspection
             var documentExecuter = new DocumentExecuter();
             var executionResult = documentExecuter.ExecuteAsync(_ =>
             {
-                _.Schema = new Schema();
+                _.Schema = new Schema()
+                {
+                    Query = new TestQuery()
+                };
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             }).GetAwaiter().GetResult();
 
@@ -23,6 +26,11 @@ namespace GraphQL.Tests.Introspection
             ShouldBe(json, IntrospectionResult.Data);
         }
 
+        public class TestQuery : ObjectGraphType
+        {
+            public TestQuery() => Name = "TestQuery";
+        }
+        
         [Fact]
         public void validate_non_null_schema()
         {

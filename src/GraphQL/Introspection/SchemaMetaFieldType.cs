@@ -1,4 +1,4 @@
-﻿using GraphQL.Resolvers;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
