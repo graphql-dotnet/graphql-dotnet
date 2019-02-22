@@ -73,6 +73,7 @@ namespace GraphQL.Types
             Metrics = context.Metrics;
             Errors = context.Errors;
             SubFields = context.SubFields;
+            Path = context.Path;
         }
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
