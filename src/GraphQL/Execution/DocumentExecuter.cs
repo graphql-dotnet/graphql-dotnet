@@ -42,7 +42,8 @@ namespace GraphQL
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator,
+            IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
@@ -80,6 +81,7 @@ namespace GraphQL
 
             var options = new ExecutionOptions();
             configure(options);
+
             return ExecuteAsync(options);
         }
 
@@ -120,6 +122,7 @@ namespace GraphQL
                         {
                             options.FieldMiddleware.ApplyTo(options.Schema);
                         }
+
                         options.Schema.Initialize();
                     }
                 }
@@ -209,6 +212,13 @@ namespace GraphQL
                     }
 
                     IExecutionStrategy executionStrategy = SelectExecutionStrategy(context);
+
+                    if (options.EnableSerialExecutionOnQuery && context.Operation.OperationType == OperationType.Query)
+                    {
+                        executionStrategy = new SerialExecutionStrategy();
+                    }
+                    
+
 
                     if (executionStrategy == null)
                         throw new InvalidOperationException("Invalid ExecutionStrategy!");

@@ -25,7 +25,7 @@ namespace GraphQL
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
 
         public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
-
+        public bool EnableSerialExecutionOnQuery { get; set; } = false;
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
         public bool ExposeExceptions { get; set; } = false;
