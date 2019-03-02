@@ -1,5 +1,6 @@
 using Alba;
 using GraphQL.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace GraphQL.Harness.Tests
 {
@@ -12,12 +13,12 @@ namespace GraphQL.Harness.Tests
             _result = result;
         }
 
-        public override void Assert(Scenario scenario, ScenarioAssertionException ex)
+        public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
-            var writer = (IDocumentWriter)scenario.Context.RequestServices.GetService(typeof(IDocumentWriter));
+            var writer = new DocumentWriter();
             var expectedResult = writer.WriteToStringAsync(CreateQueryResult(_result)).GetAwaiter().GetResult();
 
-            var body = ex.ReadBody(scenario);
+            var body = ex.ReadBody(context);
             if (!body.Equals(expectedResult))
             {
                 ex.Add($"Expected '{expectedResult}' but got '{body}'");
