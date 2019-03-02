@@ -439,13 +439,13 @@ namespace GraphQL.Utilities
                     };
 
                     var result = f.Resolver.Resolve(ctx);
-                    if (result is INode)
+                    if (result is INode nodeResult)
                     {
-                        result = ApplyConfig(result as INode);
+                        result = ApplyConfig(nodeResult);
                     }
-                    else if (result is IEnumerable && !(result is string))
+                    else if (!(result is string) && result is IEnumerable enumerable)
                     {
-                        result = GetListResult(result as IEnumerable);
+                        result = GetListResult(enumerable);
                     }
 
                     vals[f.Name] = result;
