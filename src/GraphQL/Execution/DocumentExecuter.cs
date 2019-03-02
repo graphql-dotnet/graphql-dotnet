@@ -16,17 +16,6 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
-        Task<ExecutionResult> ExecuteAsync(
-            ISchema schema,
-            object root,
-            string query,
-            string operationName,
-            Inputs inputs = null,
-            object userContext = null,
-            CancellationToken cancellationToken = default,
-            IEnumerable<IValidationRule> rules = null);
-
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
         Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
     }
