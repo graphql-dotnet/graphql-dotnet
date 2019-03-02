@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
                             new ValidationError(
                                 context.OriginalQuery,
                                 RuleCode,
-                                InvalidNumberOfRootFieldMessaage(operation.Name),
+                                InvalidNumberOfRootFieldMessage(operation.Name),
                                 operation.SelectionSet.Selections.Skip(1).ToArray()));
                     }
 
@@ -56,7 +56,7 @@ namespace GraphQL.Validation.Rules
                             new ValidationError(
                                 context.OriginalQuery,
                                 RuleCode,
-                                InvalidNumberOfRootFieldMessaage(operation.Name),
+                                InvalidNumberOfRootFieldMessage(operation.Name),
                                 fragment));
                     }
 
@@ -64,7 +64,7 @@ namespace GraphQL.Validation.Rules
             });
         }
 
-        public static string InvalidNumberOfRootFieldMessaage(string name)
+        public static string InvalidNumberOfRootFieldMessage(string name)
         {
             string prefix = name != null ? $"Subscription '{name}'" : "Anonymous Subscription";
             return $"{prefix} must select only one top level field.";
