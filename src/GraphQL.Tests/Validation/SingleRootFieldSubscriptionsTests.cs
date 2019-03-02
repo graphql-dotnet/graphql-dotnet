@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(null), 4, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(null), 4, 21);
             });
         }
 
@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(null), 4, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(null), 4, 21);
             });
         }
 
@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 4, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(subscriptionName), 4, 21);
             });
         }
 
@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 4, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(subscriptionName), 4, 21);
             });
         }
 
@@ -121,7 +121,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(subscriptionName), 3, 21);
             });
         }
 
@@ -144,7 +144,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(config =>
             {
                 config.Query = query;
-                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessaage(subscriptionName), 3, 21);
+                config.Error(SingleRootFieldSubscriptions.InvalidNumberOfRootFieldMessage(subscriptionName), 3, 21);
             });
         }
 
