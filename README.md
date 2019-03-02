@@ -193,6 +193,7 @@ var json = schema.Execute(_ =>
 - [x] Unique variable names
 - [x] Variables are input types
 - [x] Variables in allowed position
+- [x] Single root field
 
 ### Schema Introspection
 - [x] __typename
