@@ -10,7 +10,7 @@ namespace GraphQL.Harness.Tests
         {
             using (var system = SystemUnderTest.ForStartup<T>())
             {
-                system.Environment.EnvironmentName = "Testing";
+                // system.Environment.EnvironmentName = "Testing";
                 systemConfigure?.Invoke(system);
                 return system.Scenario(configuration);
             }

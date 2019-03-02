@@ -222,7 +222,7 @@ type Foo {
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
-            
+
             var options = new SchemaPrinterOptions()
             {
                 IncludeDescriptions = true
@@ -257,7 +257,7 @@ type Foo {
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
-            
+
             var options = new SchemaPrinterOptions()
             {
                 IncludeDescriptions = true,
@@ -507,6 +507,8 @@ type Query {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -517,7 +519,7 @@ scalar Seconds
             root.Field<BarMultipleType>("bar");
 
             var schema = new Schema { Query = root };
-            
+
             var options = new SchemaPrinterOptions()
             {
                 OldImplementsSyntax = true
@@ -574,7 +576,7 @@ scalar Uri
             root.Field<BarMultipleType>("bar");
 
             var schema = new Schema { Query = root };
-            
+
             var options = new SchemaPrinterOptions()
             {
                 IncludeDescriptions = true
@@ -624,6 +626,8 @@ type Query {
 
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
+
+scalar Uri
 ", excludeScalars: true);
         }
 
