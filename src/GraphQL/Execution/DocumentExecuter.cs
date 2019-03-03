@@ -38,30 +38,6 @@ namespace GraphQL
             _complexityAnalyzer = complexityAnalyzer;
         }
 
-        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
-        public Task<ExecutionResult> ExecuteAsync(
-            ISchema schema,
-            object root,
-            string query,
-            string operationName,
-            Inputs inputs = null,
-            object userContext = null,
-            CancellationToken cancellationToken = default,
-            IEnumerable<IValidationRule> rules = null)
-        {
-            return ExecuteAsync(new ExecutionOptions
-            {
-                Schema = schema,
-                Root = root,
-                Query = query,
-                OperationName = operationName,
-                Inputs = inputs,
-                UserContext = userContext,
-                CancellationToken = cancellationToken,
-                ValidationRules = rules
-            });
-        }
-
         public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure)
         {
             if (configure == null)
