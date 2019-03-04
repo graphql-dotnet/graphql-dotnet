@@ -153,7 +153,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.ContextBag);
 
                 if (context.Errors.Any())
                 {
@@ -234,14 +235,15 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            Dictionary<string, object> contextBag)
         {
             var context = new ExecutionContext();
             context.Document = document;
             context.Schema = schema;
             context.RootValue = root;
             context.UserContext = userContext;
-
+            context.ContextBag = contextBag;
             context.Operation = operation;
             context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs);
             context.Fragments = document.Fragments;

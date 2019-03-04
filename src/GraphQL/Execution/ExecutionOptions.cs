@@ -37,5 +37,7 @@ namespace GraphQL
         public bool SetFieldMiddleware { get; set; } = true;
 
         public bool ThrowOnUnhandledException { get; set; } = false;
+        
+        public Dictionary<string, object> ContextBag { get; set; } = new Dictionary<string, object>();
     }
 }

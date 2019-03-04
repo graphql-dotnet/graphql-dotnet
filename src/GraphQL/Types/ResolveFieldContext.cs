@@ -26,6 +26,8 @@ namespace GraphQL.Types
 
         public object UserContext { get; set; }
 
+        public Dictionary<string, object> ContextBag { get; set; }
+
         public TSource Source { get; set; }
 
         public ISchema Schema { get; set; }
@@ -67,6 +69,7 @@ namespace GraphQL.Types
             Fragments = context.Fragments;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
+            ContextBag = context.ContextBag;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
@@ -167,6 +170,7 @@ namespace GraphQL.Types
             Fragments = context.Fragments;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
+            ContextBag = context.ContextBag;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
