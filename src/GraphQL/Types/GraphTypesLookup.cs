@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
+using GraphQL.Types.Relay;
 
 namespace GraphQL.Types
 {
@@ -305,6 +306,25 @@ namespace GraphQL.Types
             var foundType = this[namedType];
             if (foundType == null)
             {
+                if (namedType == typeof(PageInfoType))
+                {
+                    AddType(new PageInfoType(), context);
+                    return;
+                }
+                if (namedType.IsGenericType)
+                {
+                    var genericDefinition = namedType.GetGenericTypeDefinition();
+                    if (genericDefinition == typeof(EdgeType<>))
+                    {
+                        AddType((IGraphType) Activator.CreateInstance(namedType), context);
+                        return;
+                    }
+                    if (genericDefinition == typeof(ConnectionType<>))
+                    {
+                        AddType((IGraphType) Activator.CreateInstance(namedType), context);
+                        return;
+                    }
+                }
                 AddType(context.ResolveType(namedType), context);
             }
         }

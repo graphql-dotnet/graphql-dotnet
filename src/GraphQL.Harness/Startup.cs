@@ -38,9 +38,6 @@ namespace GraphQL.Harness
             services.AddSingleton<DroidType>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<EpisodeEnum>();
-            services.AddTransient(typeof(ConnectionType<>));
-            services.AddTransient(typeof(EdgeType<>));
-            services.AddTransient<PageInfoType>();
             services.AddSingleton<ISchema, StarWarsSchema>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
