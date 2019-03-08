@@ -11,43 +11,49 @@ namespace GraphQL.Types
             TypeName = typeName;
         }
 
-        public Type SourceType => throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
+        public Type SourceType => throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
 
         public string TypeName { get; private set; }
 
         public Func<object, bool> IsTypeOf
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+            get
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
+            set
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
         }
 
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
-            throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
+            throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
         }
 
         public IEnumerable<Type> Interfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+            get
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
+            set
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+            get
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
+            set
+            {
+                throw new InvalidOperationException("This is just a reference. Resolve the real type first.");
+            }
         }
 
         public override bool Equals(object obj)
