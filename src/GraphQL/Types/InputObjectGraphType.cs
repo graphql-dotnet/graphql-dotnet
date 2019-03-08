@@ -14,7 +14,7 @@ namespace GraphQL.Types
     {
         public override FieldType AddField(FieldType fieldType)
         {
-            if(fieldType.Type == typeof(ObjectGraphType))
+            if (fieldType.Type == typeof(ObjectGraphType))
             {
                 throw new ArgumentException("InputObjectGraphType cannot have fields containing a ObjectGraphType.", nameof(fieldType.Type));
             }

@@ -5,7 +5,7 @@ namespace GraphQL.Tests.Language
 {
     public class ShowDownTests
     {
-        private string _query = @"
+        private const string _query = @"
        query SomeDroids {
           r2d2: droid(id: ""3"") {
             ...DroidFragment

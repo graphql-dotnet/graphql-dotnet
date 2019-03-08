@@ -48,9 +48,9 @@ namespace GraphQL.Resolvers
 
     public class EventStreamResolver : IEventStreamResolver
     {
-        private IAccessor _accessor;
-        private IDependencyResolver _dependencyResolver;
-        private object _target;
+        private readonly IAccessor _accessor;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly object _target;
 
         public EventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
         {

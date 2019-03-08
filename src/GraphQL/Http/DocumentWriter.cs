@@ -14,9 +14,7 @@ namespace GraphQL.Http
 
     public class DocumentWriter : IDocumentWriter
     {
-        private readonly ArrayPool<byte> _pool = ArrayPool<byte>.Shared;
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
-        private readonly int _maxArrayLength = 1048576;
         private readonly JsonSerializer _serializer;
         internal static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 

@@ -26,8 +26,8 @@ namespace GraphQL.Http
         private readonly ArrayPool<char> _charPool;
         private readonly int _charBufferSize;
 
-        private byte[] _byteBuffer;
-        private char[] _charBuffer;
+        private readonly byte[] _byteBuffer;
+        private readonly char[] _charBuffer;
 
         private int _charBufferCount;
         private bool _disposed;

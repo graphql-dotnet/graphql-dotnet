@@ -41,7 +41,7 @@ namespace GraphQL.Validation.Rules
                     context.ReportError(error);
                 }
             }
-            else if(field.SelectionSet == null || field.SelectionSet.Selections.Count == 0)
+            else if (field.SelectionSet == null || field.SelectionSet.Selections.Count == 0)
             {
                 var error = new ValidationError(context.OriginalQuery, "5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
                 context.ReportError(error);

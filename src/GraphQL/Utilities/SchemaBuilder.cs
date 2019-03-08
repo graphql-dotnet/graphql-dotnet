@@ -218,11 +218,13 @@ namespace GraphQL.Utilities
             var typeConfig = Types.For(parentTypeName);
             var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, DependencyResolver);
 
-            var field = new FieldType();
-            field.Name = fieldDef.Name.Value;
-            field.Description = fieldConfig.Description;
-            field.ResolvedType = ToGraphType(fieldDef.Type);
-            field.Resolver = fieldConfig.Resolver;
+            var field = new FieldType
+            {
+                Name = fieldDef.Name.Value,
+                Description = fieldConfig.Description,
+                ResolvedType = ToGraphType(fieldDef.Type),
+                Resolver = fieldConfig.Resolver
+            };
 
             CopyMetadata(field, fieldConfig);
 
@@ -242,13 +244,15 @@ namespace GraphQL.Utilities
             var typeConfig = Types.For(parentTypeName);
             var fieldConfig = typeConfig.SubscriptionFieldFor(fieldDef.Name.Value, DependencyResolver);
 
-            var field = new EventStreamFieldType();
-            field.Name = fieldDef.Name.Value;
-            field.Description = fieldConfig.Description;
-            field.ResolvedType = ToGraphType(fieldDef.Type);
-            field.Resolver = fieldConfig.Resolver;
-            field.Subscriber = fieldConfig.Subscriber;
-            field.AsyncSubscriber = fieldConfig.AsyncSubscriber;
+            var field = new EventStreamFieldType
+            {
+                Name = fieldDef.Name.Value,
+                Description = fieldConfig.Description,
+                ResolvedType = ToGraphType(fieldDef.Type),
+                Resolver = fieldConfig.Resolver,
+                Subscriber = fieldConfig.Subscriber,
+                AsyncSubscriber = fieldConfig.AsyncSubscriber
+            };
 
             CopyMetadata(field, fieldConfig);
 
@@ -263,22 +267,22 @@ namespace GraphQL.Utilities
             return field;
         }
 
-        private static string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
+        private static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
         private void ApplyDeprecatedDirective(IEnumerable<GraphQLDirective> directives, Action<string> apply)
         {
             var deprecated = directives.Directive("deprecated");
 
-            if(deprecated != null)
+            if (deprecated != null)
             {
                 var arg = deprecated.Arguments.Argument("reason");
                 var value = "";
 
-                if(arg != null)
+                if (arg != null)
                 {
                     value = ToValue(arg.Value).ToString();
                 }
 
-                if(string.IsNullOrWhiteSpace(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     value = DeprecatedDefaultValue;
                 }
@@ -289,10 +293,12 @@ namespace GraphQL.Utilities
 
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
-            var field = new FieldType();
-            field.Name = inputDef.Name.Value;
-            field.ResolvedType = ToGraphType(inputDef.Type);
-            field.DefaultValue = ToValue(inputDef.DefaultValue);
+            var field = new FieldType
+            {
+                Name = inputDef.Name.Value,
+                ResolvedType = ToGraphType(inputDef.Type),
+                DefaultValue = ToValue(inputDef.DefaultValue)
+            };
 
             ApplyDeprecatedDirective(inputDef.Directives, reason =>
             {
@@ -306,10 +312,12 @@ namespace GraphQL.Utilities
         {
             var typeConfig = Types.For(interfaceDef.Name.Value);
 
-            var type = new InterfaceGraphType();
-            type.Name = interfaceDef.Name.Value;
-            type.Description = typeConfig.Description;
-            type.ResolveType = typeConfig.ResolveType;
+            var type = new InterfaceGraphType
+            {
+                Name = interfaceDef.Name.Value,
+                Description = typeConfig.Description,
+                ResolveType = typeConfig.ResolveType
+            };
 
             ApplyDeprecatedDirective(interfaceDef.Directives, reason =>
             {
@@ -328,10 +336,12 @@ namespace GraphQL.Utilities
         {
             var typeConfig = Types.For(unionDef.Name.Value);
 
-            var type = new UnionGraphType();
-            type.Name = unionDef.Name.Value;
-            type.Description = typeConfig.Description;
-            type.ResolveType = typeConfig.ResolveType;
+            var type = new UnionGraphType
+            {
+                Name = unionDef.Name.Value,
+                Description = typeConfig.Description,
+                ResolveType = typeConfig.ResolveType
+            };
 
             ApplyDeprecatedDirective(unionDef.Directives, reason =>
             {
@@ -347,8 +357,10 @@ namespace GraphQL.Utilities
 
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
-            var type = new InputObjectGraphType();
-            type.Name = inputDef.Name.Value;
+            var type = new InputObjectGraphType
+            {
+                Name = inputDef.Name.Value
+            };
 
             ApplyDeprecatedDirective(inputDef.Directives, reason =>
             {
@@ -363,8 +375,10 @@ namespace GraphQL.Utilities
 
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
-            var type = new EnumerationGraphType();
-            type.Name = enumDef.Name.Value;
+            var type = new EnumerationGraphType
+            {
+                Name = enumDef.Name.Value
+            };
 
             ApplyDeprecatedDirective(enumDef.Directives, reason =>
             {
@@ -401,9 +415,11 @@ namespace GraphQL.Utilities
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
         {
-            var val = new EnumValueDefinition();
-            val.Value = valDef.Name.Value;
-            val.Name = valDef.Name.Value;
+            var val = new EnumValueDefinition
+            {
+                Value = valDef.Name.Value,
+                Name = valDef.Name.Value
+            };
 
             ApplyDeprecatedDirective(valDef.Directives, reason =>
             {
@@ -417,10 +433,12 @@ namespace GraphQL.Utilities
         {
             var type = ToGraphType(inputDef.Type);
 
-            var arg = new QueryArgument(type);
-            arg.Name = inputDef.Name.Value;
-            arg.DefaultValue = ToValue(inputDef.DefaultValue);
-            arg.ResolvedType = ToGraphType(inputDef.Type);
+            var arg = new QueryArgument(type)
+            {
+                Name = inputDef.Name.Value,
+                DefaultValue = ToValue(inputDef.DefaultValue),
+                ResolvedType = ToGraphType(inputDef.Type)
+            };
 
             return arg;
         }
@@ -461,6 +479,10 @@ namespace GraphQL.Utilities
 
             switch (source.Kind)
             {
+                case ASTNodeKind.NullValue:
+                {
+                    return null;
+                }
                 case ASTNodeKind.StringValue:
                 {
                     var str = source as GraphQLScalarValue;

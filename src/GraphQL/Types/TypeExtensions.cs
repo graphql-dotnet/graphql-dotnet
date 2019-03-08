@@ -12,7 +12,7 @@ namespace GraphQL.Types
             if (type is NonNullType nonnull)
             {
                 var ofType = GraphTypeFromType(nonnull.Type, schema);
-                if(ofType == null)
+                if (ofType == null)
                 {
                     return null;
                 }
@@ -25,7 +25,7 @@ namespace GraphQL.Types
             if (type is ListType list)
             {
                 var ofType = GraphTypeFromType(list.Type, schema);
-                if(ofType == null)
+                if (ofType == null)
                 {
                     return null;
                 }

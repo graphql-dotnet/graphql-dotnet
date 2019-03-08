@@ -43,8 +43,10 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             IFieldNameConverter fieldNameConverter)
         {
-            var lookup = new GraphTypesLookup();
-            lookup.FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter();
+            var lookup = new GraphTypesLookup
+            {
+                FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter()
+            };
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
@@ -241,8 +243,8 @@ namespace GraphQL.Types
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)
                     {
                         throw new ExecutionError((
-                            "Union type {0} does not provide a \"resolveType\" function" +
-                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                            "Union type {0} does not provide a \"resolveType\" function " +
+                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                             "There is no way to resolve this possible type during execution.")
                             .ToFormat(union.Name, unionedType.Name));
                     }
@@ -257,8 +259,8 @@ namespace GraphQL.Types
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
                         throw new ExecutionError((
-                            "Union type {0} does not provide a \"resolveType\" function" +
-                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                            "Union type {0} does not provide a \"resolveType\" function " +
+                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                             "There is no way to resolve this possible type during execution.")
                             .ToFormat(union.Name, objType.Name));
                     }
@@ -333,7 +335,7 @@ namespace GraphQL.Types
         {
             var namedType = type.GetNamedType();
             var foundType = this[namedType.Name];
-            if(foundType == null)
+            if (foundType == null)
             {
                 AddType(namedType, context);
             }
@@ -400,8 +402,8 @@ namespace GraphQL.Types
                         if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                         {
                             throw new ExecutionError((
-                                "Union type {0} does not provide a \"resolveType\" function" +
-                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                "Union type {0} does not provide a \"resolveType\" function " +
+                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                 "There is no way to resolve this possible type during execution.")
                                 .ToFormat(union.Name, unionType.Name));
                         }

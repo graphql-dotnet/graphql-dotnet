@@ -41,12 +41,13 @@ namespace GraphQL.Harness
             services.AddSingleton<ISchema, StarWarsSchema>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddLogging(builder => builder.AddConsole());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggingBuilder loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole();
             app.UseDeveloperExceptionPage();
 
             app.UseMiddleware<GraphQLMiddleware>(new GraphQLSettings

@@ -51,9 +51,9 @@ namespace GraphQL.Resolvers
 
     public class AsyncEventStreamResolver : IAsyncEventStreamResolver
     {
-        private IAccessor _accessor;
-        private IDependencyResolver _dependencyResolver;
-        private object _target;
+        private readonly IAccessor _accessor;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly object _target;
 
         public AsyncEventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
         {
@@ -78,6 +78,4 @@ namespace GraphQL.Resolvers
             return ((dynamic)task).Result;
         }
     }
-
-
 }

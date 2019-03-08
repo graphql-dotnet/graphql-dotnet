@@ -11,9 +11,9 @@ namespace GraphQL.Harness.Tests
             _scenario = scenario;
         }
 
-        public GraphQLExpectations ShouldBeSuccess(string result)
+        public GraphQLExpectations ShouldBeSuccess(string result, bool ignoreExtensions = true)
         {
-            _scenario.AssertThat(new SuccessResultAssertion(result));
+            _scenario.AssertThat(new SuccessResultAssertion(result, ignoreExtensions));
             return this;
         }
     }
