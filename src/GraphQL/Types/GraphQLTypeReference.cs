@@ -11,6 +11,8 @@ namespace GraphQL.Types
             TypeName = typeName;
         }
 
+        public Type SourceType => throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
+
         public string TypeName { get; private set; }
 
         public Func<object, bool> IsTypeOf

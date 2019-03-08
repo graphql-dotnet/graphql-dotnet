@@ -7,6 +7,7 @@ namespace GraphQL.Types
 {
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
+        Type SourceType { get; }
         Func<object, bool> IsTypeOf { get; set; }
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
@@ -17,6 +18,8 @@ namespace GraphQL.Types
         private readonly List<IInterfaceGraphType> _resolvedInterfaces = new List<IInterfaceGraphType>();
 
         public Func<object, bool> IsTypeOf { get; set; }
+
+        public Type SourceType { get; } = typeof(TSourceType);
 
         public ObjectGraphType()
         {
