@@ -306,7 +306,7 @@ namespace GraphQL.Execution
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                var error = new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
+                var error = new ExecutionError($"Expected value of type \"{objectType.SourceType}\" for \"{objectType.Name}\" but got: \"{result}\".");
                 throw error;
             }
         }

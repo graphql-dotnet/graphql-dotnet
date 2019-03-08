@@ -80,7 +80,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs= null,
+            Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
@@ -97,7 +97,7 @@ namespace GraphQL.Tests
                 _.CancellationToken = cancellationToken;
             }).GetAwaiter().GetResult();
 
-            var renderResult = renderErrors ? runResult : new ExecutionResult {Data = runResult.Data};
+            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
 
             var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
@@ -157,6 +157,41 @@ namespace GraphQL.Tests
             return runResult;
         }
 
+        public ExecutionResult AssertQueryErrors(
+            string query,
+            ExecutionErrors expectedErrors,
+            Inputs inputs = null,
+            object root = null,
+            object userContext = null,
+            CancellationToken cancellationToken = default(CancellationToken),
+            IEnumerable<IValidationRule> rules = null)
+        {
+            var runResult = Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Schema;
+                _.Query = query;
+                _.Root = root;
+                _.Inputs = inputs;
+                _.UserContext = userContext;
+                _.CancellationToken = cancellationToken;
+                _.ValidationRules = rules;
+                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+            }).GetAwaiter().GetResult();
+
+            var errors = runResult.Errors ?? new ExecutionErrors();
+            errors.Count().ShouldBe(expectedErrors.Count);
+
+            var actualErrorMessages = errors.Select(e => e.Message);
+            var expectedErrorMessages = expectedErrors.Select(e => e.Message);
+
+            foreach (var expectedMessage in expectedErrorMessages)
+            {
+                actualErrorMessages.ShouldContain(expectedMessage);
+            }
+
+            return runResult;
+        }
+
         public ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
         {
             object data = null;
@@ -165,7 +200,7 @@ namespace GraphQL.Tests
                 data = JObject.Parse(result);
             }
 
-            return new ExecutionResult { Data = data, Errors = errors};
+            return new ExecutionResult { Data = data, Errors = errors };
         }
     }
 }
