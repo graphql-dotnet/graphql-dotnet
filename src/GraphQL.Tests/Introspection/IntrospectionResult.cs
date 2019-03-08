@@ -450,7 +450,7 @@ namespace GraphQL.Tests.Introspection
             },
             {
               ""name"": ""ENUM"",
-              ""description"": ""Indicates this type is an num.  `enumValues` is a valid field."",
+              ""description"": ""Indicates this type is an enum.  `enumValues` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
