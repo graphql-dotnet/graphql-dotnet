@@ -86,7 +86,7 @@ namespace GraphQL
 
         private void WriteErrorExtensions(ExecutionError error, JsonWriter writer, JsonSerializer serializer)
         {
-            if(string.IsNullOrWhiteSpace(error.Code) && error.Data?.Count == 0)
+            if (string.IsNullOrWhiteSpace(error.Code) && error.Data?.Count == 0)
             {
                 return;
             }

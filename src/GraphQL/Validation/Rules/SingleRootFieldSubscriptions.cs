@@ -35,17 +35,17 @@ namespace GraphQL.Validation.Rules
 
                     var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
 
-                    if(fragment == null )
+                    if (fragment == null )
                     {
                         return;
                     }
 
-                    if(fragment is FragmentSpread fragmentSpread)
+                    if (fragment is FragmentSpread fragmentSpread)
                     {
                         var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
                         rootFields = fragmentDefinition.SelectionSet.Selections.Count;
                     }
-                    else if(fragment is InlineFragment fragmentSelectionSet)
+                    else if (fragment is InlineFragment fragmentSelectionSet)
                     {
                         rootFields = fragmentSelectionSet.SelectionSet.Selections.Count;
                     }

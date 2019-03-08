@@ -236,20 +236,22 @@ namespace GraphQL
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException)
         {
-            var context = new ExecutionContext();
-            context.Document = document;
-            context.Schema = schema;
-            context.RootValue = root;
-            context.UserContext = userContext;
+            var context = new ExecutionContext
+            {
+                Document = document,
+                Schema = schema,
+                RootValue = root,
+                UserContext = userContext,
 
-            context.Operation = operation;
-            context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs);
-            context.Fragments = document.Fragments;
-            context.CancellationToken = cancellationToken;
+                Operation = operation,
+                Variables = GetVariableValues(document, schema, operation?.Variables, inputs),
+                Fragments = document.Fragments,
+                CancellationToken = cancellationToken,
 
-            context.Metrics = metrics;
-            context.Listeners = listeners;
-            context.ThrowOnUnhandledException = throwOnUnhandledException;
+                Metrics = metrics,
+                Listeners = listeners,
+                ThrowOnUnhandledException = throwOnUnhandledException
+            };
 
             return context;
         }

@@ -42,8 +42,10 @@ namespace GraphQL.Types
             Func<Type, IGraphType> resolveType,
             IFieldNameConverter fieldNameConverter)
         {
-            var lookup = new GraphTypesLookup();
-            lookup.FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter();
+            var lookup = new GraphTypesLookup
+            {
+                FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter()
+            };
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
@@ -313,7 +315,7 @@ namespace GraphQL.Types
         {
             var namedType = type.GetNamedType();
             var foundType = this[namedType.Name];
-            if(foundType == null)
+            if (foundType == null)
             {
                 AddType(namedType, context);
             }

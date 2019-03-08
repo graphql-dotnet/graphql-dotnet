@@ -29,11 +29,7 @@ namespace GraphQL.Resolvers
 
         public FuncFieldResolver(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
-            if (resolver == null)
-            {
-                throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
-            }
-            _resolver = resolver;
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
         public TReturnType Resolve(ResolveFieldContext context)
