@@ -16,8 +16,7 @@ export default function testDotnet(settings) {
     tasks: [
       test(settings, './src/GraphQL.Tests'),
       test(settings, './src/GraphQL.DataLoader.Tests'),
-      // excluding for now, need to fix Alba integration tests
-      // test(settings, './src/GraphQL.Harness.Tests')
+      test(settings, './src/GraphQL.Harness.Tests')
     ],
     settings,
     taskTimeout: settings.taskTimeout
