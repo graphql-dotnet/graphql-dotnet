@@ -461,6 +461,10 @@ namespace GraphQL.Utilities
 
             switch (source.Kind)
             {
+                case ASTNodeKind.NullValue:
+                {
+                    return null;
+                }
                 case ASTNodeKind.StringValue:
                 {
                     var str = source as GraphQLScalarValue;
