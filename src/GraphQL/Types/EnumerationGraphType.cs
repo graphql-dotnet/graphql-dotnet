@@ -71,12 +71,14 @@ namespace GraphQL.Types
         public EnumerationGraphType()
         {
             var type = typeof(TEnum);
-            var values = (TEnum[])Enum.GetValues(typeof(TEnum));
-            var enumFields = values.Select(v => (value: v, field: v.GetType().GetField(v.ToString())));
-            var enumGraphData = enumFields.Select(e => (
-                name: Enum.GetName(typeof(TEnum), e.value),
-                e.value,
-                description: (e.field.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+            var names = Enum.GetNames(type);
+            var enumMembers = names.Select(n => (name: n, memeber: type
+                    .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .First()));
+            var enumGraphData = enumMembers.Select(e => (
+                name: ChangeEnumCase(e.name),
+                value: Enum.Parse(type, e.name),
+                description: (e.memeber.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
             ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
