@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using Shouldly;
+using System.ComponentModel;
 using System.Linq;
 using Xunit;
 
@@ -12,6 +13,8 @@ namespace GraphQL.Tests.Types
             Blue,
             Green,
             Yellow,
+
+            [Description("A pale purple color named after the mallow flower.")]
             Mauve
         }
 
@@ -43,6 +46,21 @@ namespace GraphQL.Tests.Types
         {
             type.Values.Count().ShouldBe(5);
             type.Values.First().Name.ShouldBe("RED");
+        }
+
+        [Fact]
+        public void adds_values_from_enum_no_description_attribute()
+        {
+            type.Values.Count().ShouldBe(5);
+            type.Values.First().Description.ShouldBeNull();
+        }
+
+
+        [Fact]
+        public void adds_values_from_enum_with_description_attribute()
+        {
+            type.Values.Count().ShouldBe(5);
+            type.Values.Last().Description.ShouldBe("A pale purple color named after the mallow flower.");
         }
 
         [Fact]
