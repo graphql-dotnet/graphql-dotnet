@@ -230,7 +230,7 @@ namespace GraphQL
             Document document,
             Operation operation,
             Inputs inputs,
-            object userContext,
+            IDictionary<string, object> userContext,
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,

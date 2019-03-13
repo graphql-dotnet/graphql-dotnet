@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -53,7 +54,7 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestContext
+        public class TestContext: Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 

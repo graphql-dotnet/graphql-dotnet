@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Example
 {
-    public class GraphQLUserContext
+    public class GraphQLUserContext: Dictionary<string, object>
     {
         public ClaimsPrincipal User { get; set; }
     }

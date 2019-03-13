@@ -21,7 +21,7 @@ namespace GraphQL.Execution
 
         public object RootValue { get; set; }
 
-        public object UserContext { get; set; }
+        public IDictionary<string, object> UserContext { get; set; }
 
         public Operation Operation { get; set; }
 
