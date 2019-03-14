@@ -85,6 +85,12 @@ namespace GraphQL.Builders
             return this;
         }
 
+        internal FieldBuilder<TSourceType, TReturnType> DefaultValue(object defaultValue)
+        {
+            _fieldType.DefaultValue = defaultValue;
+            return this;
+        }
+
         public FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
         {
             _fieldType.Resolver = resolver;

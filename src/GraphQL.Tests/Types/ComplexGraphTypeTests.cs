@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
 using Xunit;
+using System.ComponentModel;
 
 namespace GraphQL.Tests.Types
 {
@@ -24,6 +25,12 @@ namespace GraphQL.Tests.Types
             public int? someInt { get; set; }
             public KeyValuePair<int, string> valuePair { get; set; }
             public List<int> someList { get; set; }
+            [Description("Super secret")]
+            public string someString { get; set; }
+            [Obsolete("Use someInt")]
+            public bool someBoolean { get; set; }
+            [DefaultValue(typeof(DateTime), "2019/03/14")]
+            public DateTime someDate { get; set; }
         }
 
         [Fact]
@@ -74,6 +81,33 @@ namespace GraphQL.Tests.Types
             type.Field(d => d.someList, nullable: true);
 
             type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
+        }
+
+        [Fact]
+        public void infers_field_description_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someString);
+
+            type.Fields.Last().Description.ShouldBe("Super secret");
+        }
+
+        [Fact]
+        public void infers_field_deprecation_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someBoolean);
+
+            type.Fields.Last().DeprecationReason.ShouldBe("Use someInt");
+        }
+
+        [Fact]
+        public void infers_field_default_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someDate);
+
+            type.Fields.Last().DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
         }
 
         [Fact]

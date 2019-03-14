@@ -286,6 +286,9 @@ namespace GraphQL.Types
 
             var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
                 .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
+                .Description(expression.DescriptionOf())
+                .DeprecationReason(expression.DeprecationReasonOf())
+                .DefaultValue(expression.DefaultValueOf())
                 .Name(name);
 
             AddField(builder.FieldType);
