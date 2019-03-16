@@ -1,13 +1,14 @@
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -199,10 +200,31 @@ namespace GraphQL
             return EmptyStringArray;
         }
 
-        public static string NameOf<T, P>(this Expression<Func<T, P>> expression)
+        public static string NameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
-            var member = (MemberExpression) expression.Body;
+            var member = (MemberExpression)expression.Body;
             return member.Member.Name;
+        }
+
+        public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        {
+            return expression.Body is MemberExpression expr
+                ? (expr.Member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                : null;
+        }
+
+        public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        {
+            return expression.Body is MemberExpression expr
+                ? (expr.Member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                : null;
+        }
+
+        public static object DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        {
+            return expression.Body is MemberExpression expr
+                ? (expr.Member.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
+                : null;
         }
 
         /// <summary>
