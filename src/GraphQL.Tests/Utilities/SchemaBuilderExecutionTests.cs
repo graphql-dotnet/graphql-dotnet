@@ -501,7 +501,7 @@ type Mutation {
         }
     }
 
-    class MyUserContext
+    class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
     }

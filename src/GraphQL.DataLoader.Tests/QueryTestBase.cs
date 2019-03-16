@@ -60,7 +60,7 @@ namespace GraphQL.DataLoader.Tests
             string query,
             string expected,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
@@ -127,7 +127,7 @@ namespace GraphQL.DataLoader.Tests
             string query,
             ExecutionResult expectedExecutionResult,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
