@@ -162,7 +162,7 @@ namespace GraphQL.Tests
             ExecutionErrors expectedErrors,
             Inputs inputs = null,
             object root = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {

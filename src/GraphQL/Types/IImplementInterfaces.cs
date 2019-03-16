@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
@@ -7,5 +7,6 @@ namespace GraphQL.Types
     {
         IEnumerable<Type> Interfaces { get; set; }
         IEnumerable<IInterfaceGraphType> ResolvedInterfaces { get; set; }
+        void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 }

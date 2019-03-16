@@ -7,9 +7,9 @@ namespace GraphQL.Types
 {
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
-        Type SourceType { get; }
-        Func<object, bool> IsTypeOf { get; set; }
-        void AddResolvedInterface(IInterfaceGraphType graphType);
+        Func<object, bool> IsTypeOf { get; }
+
+        void AssertResultType(object result);
     }
 
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
@@ -17,9 +17,13 @@ namespace GraphQL.Types
         private readonly List<Type> _interfaces = new List<Type>();
         private readonly List<IInterfaceGraphType> _resolvedInterfaces = new List<IInterfaceGraphType>();
 
-        public Func<object, bool> IsTypeOf { get; set; }
+        public Func<object, bool> IsTypeOf { get; internal set; }
 
-        public Type SourceType { get; } = typeof(TSourceType);
+        public void AssertResultType(object result)
+        {
+            if (IsTypeOf == null || IsTypeOf(result)) return;
+            throw new ExecutionError($"Expected value of type \"{typeof(TSourceType)}\" for \"{Name}\" but got: \"{result.GetType()}\".");
+        }
 
         public ObjectGraphType()
         {

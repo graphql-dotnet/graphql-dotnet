@@ -304,11 +304,7 @@ namespace GraphQL.Execution
                 }
             }
 
-            if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
-            {
-                var error = new ExecutionError($"Expected value of type \"{objectType.SourceType}\" for \"{objectType.Name}\" but got: \"{result}\".");
-                throw error;
-            }
+            objectType?.AssertResultType(result);
         }
 
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
