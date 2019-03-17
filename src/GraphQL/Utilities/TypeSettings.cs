@@ -10,8 +10,7 @@ namespace GraphQL.Utilities
 
         public TypeSettings()
         {
-            _typeConfigurations =
-                new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
+            _typeConfigurations = new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
             _forAllTypesConfigurationDelegates = new List<Action<TypeConfig>>();
         }
 
