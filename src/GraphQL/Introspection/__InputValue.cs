@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     {
         public __InputValue()
         {
-            Name = "__InputValue";
+            Name = nameof(__InputValue);
             Description =
                 "Arguments provided to Fields or Directives and the input fields of an " +
                 "InputObject are represented as Input Values which describe their type " +
