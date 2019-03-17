@@ -350,7 +350,7 @@ namespace GraphQL.Utilities
 
             CopyMetadata(type, typeConfig);
 
-            var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value));
+            var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value) ?? new GraphQLTypeReference(x.Name.Value));
             possibleTypes.Apply(x => type.AddPossibleType(x as IObjectGraphType));
             return type;
         }
