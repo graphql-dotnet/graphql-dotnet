@@ -312,7 +312,7 @@ namespace GraphQL.Types
             return Field(name, expression, nullable, type);
         }
 
-        public ConnectionBuilder<TNodeType, TSourceType> Connection<TNodeType>()
+        public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
