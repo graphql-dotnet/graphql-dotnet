@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
 using Xunit;
+using System.ComponentModel;
 
 namespace GraphQL.Tests.Types
 {
@@ -13,15 +14,23 @@ namespace GraphQL.Tests.Types
         internal class ComplexType<T> : ComplexGraphType<T> {
             public ComplexType()
             {
-                Name = typeof(T).Name;
+                Name = typeof(T).GetFriendlyName();
             }
         }
+
+        internal class GenericFieldType<T> : FieldType { }
 
         internal class TestObject
         {
             public int? someInt { get; set; }
             public KeyValuePair<int, string> valuePair { get; set; }
             public List<int> someList { get; set; }
+            [Description("Super secret")]
+            public string someString { get; set; }
+            [Obsolete("Use someInt")]
+            public bool someBoolean { get; set; }
+            [DefaultValue(typeof(DateTime), "2019/03/14")]
+            public DateTime someDate { get; set; }
         }
 
         [Fact]
@@ -75,6 +84,33 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void infers_field_description_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someString);
+
+            type.Fields.Last().Description.ShouldBe("Super secret");
+        }
+
+        [Fact]
+        public void infers_field_deprecation_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someBoolean);
+
+            type.Fields.Last().DeprecationReason.ShouldBe("Use someInt");
+        }
+
+        [Fact]
+        public void infers_field_default_from_expression()
+        {
+            var type = new ComplexType<TestObject>();
+            var field = type.Field(d => d.someDate);
+
+            type.Fields.Last().DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+        }
+
+        [Fact]
         public void throws_when_name_is_not_inferable()
         {
             var type = new ComplexType<Droid>();
@@ -120,6 +156,42 @@ namespace GraphQL.Tests.Types
             );
 
             type.Fields.Last().Type.ShouldBe(typeof(StringGraphType));
+        }
+
+        [Fact]
+        public void throws_informative_exception_when_no_types_defined()
+        {
+            var type = new ComplexType<Droid>();
+
+            var fieldType = new FieldType
+            {
+                Name = "name",
+                ResolvedType = null,
+                Type = null,
+            };
+
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
+
+            exception.ParamName.ShouldBe("Type");
+            exception.Message.ShouldStartWith("The declared field 'name' on 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
+        }
+
+        [Fact]
+        public void throws_informative_exception_when_no_types_defined_on_more_generic_type()
+        {
+            var type = new ComplexType<List<Droid>>();
+
+            var fieldType = new GenericFieldType<List<Droid>>
+            {
+                Name = "genericname",
+                ResolvedType = null,
+                Type = null,
+            };
+
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
+
+            exception.ParamName.ShouldBe("Type");
+            exception.Message.ShouldStartWith("The declared field 'genericname' on 'List<Droid>' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
         [Theory]

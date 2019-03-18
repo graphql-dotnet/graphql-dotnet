@@ -18,9 +18,9 @@ namespace GraphQL
         public string OperationName { get; set; }
         public Document Document { get; set; }
         public Inputs Inputs { get; set; }
-        public CancellationToken CancellationToken { get; set; } = default(CancellationToken);
+        public CancellationToken CancellationToken { get; set; } = default;
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
-        public object UserContext { get; set; }
+        public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
 

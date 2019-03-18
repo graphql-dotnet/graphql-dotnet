@@ -43,7 +43,7 @@ namespace GraphQL.Types
 
             if (value is DecimalValue decimalValue)
             {
-                return ParseValue(decimalValue.Value);
+                return decimalValue.Value;
             }
 
             return null;

@@ -45,9 +45,9 @@ namespace GraphQL.Utilities
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
 
-            if(Type != null)
+            if (Type != null)
             {
-                if(config.ResolverAccessor == null)
+                if (config.ResolverAccessor == null)
                 {
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }

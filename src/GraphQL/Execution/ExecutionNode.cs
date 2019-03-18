@@ -93,7 +93,14 @@ namespace GraphQL.Execution
 
             foreach (var kvp in SubFields)
             {
-                fields[kvp.Key] = kvp.Value.ToValue();
+                var value = kvp.Value.ToValue();
+
+                if (value == null && kvp.Value.FieldDefinition.ResolvedType is NonNullGraphType)
+                {
+                    return null;
+                }
+
+                fields[kvp.Key] = value;
             }
 
             return fields;
@@ -129,9 +136,20 @@ namespace GraphQL.Execution
             if (Items == null)
                 return null;
 
-            return Items
-                .Select(x => x.ToValue())
-                .ToList();
+            var items = new List<object>(Items.Count);
+            foreach (ExecutionNode item in Items)
+            {
+                var value = item.ToValue();
+
+                if (value == null && ((ListGraphType)item.FieldDefinition.ResolvedType).ResolvedType is NonNullGraphType)
+                {
+                    return null;
+                }
+
+                items.Add(value);
+            }
+
+            return items;
         }
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes()

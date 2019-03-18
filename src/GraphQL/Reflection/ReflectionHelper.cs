@@ -15,10 +15,10 @@ namespace GraphQL.Reflection
         /// <param name="resolverType">defaults to Resolver</param>
         public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
         {
-            if(type == null) return null;
+            if (type == null) return null;
 
             var methodInfo = type.MethodForField(field, resolverType);
-            if(methodInfo != null)
+            if (methodInfo != null)
             {
                 return new SingleMethodAccessor(methodInfo);
             }
@@ -29,7 +29,7 @@ namespace GraphQL.Reflection
             }
 
             var propertyInfo = type.PropertyForField(field);
-            if(propertyInfo != null)
+            if (propertyInfo != null)
             {
                 return new SinglePropertyAccessor(propertyInfo);
             }

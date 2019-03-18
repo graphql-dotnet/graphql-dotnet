@@ -228,7 +228,7 @@ namespace GraphQL.Tests.Execution
 
     public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
-        private string _query = @"
+        private const string _query = @"
             query q($input: TestInputObject) {
               fieldWithObjectInput(input: $input)
             }

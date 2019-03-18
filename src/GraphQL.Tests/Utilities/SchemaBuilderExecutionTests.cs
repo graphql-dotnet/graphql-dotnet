@@ -250,6 +250,21 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void can_use_null_as_default_value()
+        {
+            var schema = Schema.For(@"
+input HumanInput {
+  name: String!
+  homePlanet: String = null
+}
+ 
+type Mutation {
+  createHuman(human: HumanInput!): Human
+}
+            ");
+        }
+
+        [Fact]
         public async Task can_use_usercontext_with_params()
         {
             var schema = Schema.For(@"
@@ -486,7 +501,7 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    class MyUserContext
+    class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
     }

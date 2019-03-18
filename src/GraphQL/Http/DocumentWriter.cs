@@ -10,18 +10,11 @@ namespace GraphQL.Http
     public interface IDocumentWriter
     {
         Task WriteAsync<T>(Stream stream, T value);
-
-        Task<IByteResult> WriteAsync<T>(T value);
-
-        [Obsolete("This method is obsolete and will be removed in the next major version.  Use WriteAsync<T>(Stream, T) instead.")]
-        string Write(object value);
-    }
+    }   
 
     public class DocumentWriter : IDocumentWriter
     {
-        private readonly ArrayPool<byte> _pool = ArrayPool<byte>.Shared;
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
-        private readonly int _maxArrayLength = 1048576;
         private readonly JsonSerializer _serializer;
         internal static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 
@@ -55,23 +48,6 @@ namespace GraphQL.Http
             {
                 _serializer.Serialize(jsonWriter, value);
                 await jsonWriter.FlushAsync().ConfigureAwait(false);
-            }
-        }
-
-        public async Task<IByteResult> WriteAsync<T>(T value)
-        {
-            var pooledDocumentResult = new PooledByteResult(_pool, _maxArrayLength);
-            var stream = pooledDocumentResult.Stream;
-            try
-            {
-                await WriteAsync(stream, value).ConfigureAwait(false);
-                pooledDocumentResult.InitResponseFromCurrentStreamPosition();
-                return pooledDocumentResult;
-            }
-            catch (Exception)
-            {
-                pooledDocumentResult.Dispose();
-                throw;
             }
         }
 

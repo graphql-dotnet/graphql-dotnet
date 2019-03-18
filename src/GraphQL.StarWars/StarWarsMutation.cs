@@ -1,5 +1,10 @@
-﻿using GraphQL.StarWars.Types;
+﻿using GraphQL.Builders;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay.DataObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.StarWars
 {
@@ -28,7 +33,7 @@ namespace GraphQL.StarWars
                 resolve: context =>
                 {
                     var human = context.GetArgument<Human>("human");
-                    return data.AddHuman(human);
+                    return data.AddCharacter(human);
                 });
         }
     }

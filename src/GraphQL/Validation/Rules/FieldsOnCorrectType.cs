@@ -22,14 +22,24 @@ namespace GraphQL.Validation.Rules
         {
             var message = $"Cannot query field \"{fieldName}\" on type \"{type}\".";
 
-            if (suggestedTypeNames != null && suggestedTypeNames.Any())
+            if (suggestedTypeNames != null)
             {
-                var suggestions = StringUtils.QuotedOrList(suggestedTypeNames);
-                message += $" Did you mean to use an inline fragment on {suggestions}?";
+                var suggestedTypeNamesList = suggestedTypeNames.ToList();
+                if (suggestedTypeNamesList.Any())
+                {
+                    var suggestions = StringUtils.QuotedOrList(suggestedTypeNamesList);
+                    message += $" Did you mean to use an inline fragment on {suggestions}?";
+                    return message;
+                }
             }
-            else if (suggestedFieldNames != null && suggestedFieldNames.Any())
+
+            if (suggestedFieldNames != null)
             {
-                message += $" Did you mean {StringUtils.QuotedOrList(suggestedFieldNames)}?";
+                var suggestedFieldNamesList = suggestedFieldNames.ToList();
+                if (suggestedFieldNamesList.Any())
+                {
+                    message += $" Did you mean {StringUtils.QuotedOrList(suggestedFieldNamesList)}?";
+                }
             }
 
             return message;

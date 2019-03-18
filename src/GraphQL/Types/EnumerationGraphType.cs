@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Language.AST;
@@ -70,16 +71,21 @@ namespace GraphQL.Types
         public EnumerationGraphType()
         {
             var type = typeof(TEnum);
+            var names = Enum.GetNames(type);
+            var enumMembers = names.Select(n => (name: n, member: type
+                    .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .First()));
+            var enumGraphData = enumMembers.Select(e => (
+                name: ChangeEnumCase(e.name),
+                value: Enum.Parse(type, e.name),
+                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+            ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
 
-            foreach (var enumName in Enum.GetNames(type))
+            foreach (var (name, value, description) in enumGraphData)
             {
-                var enumMember = type
-                    .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                    .First();
-
-                AddValue(ChangeEnumCase(enumMember.Name), null, Enum.Parse(type, enumName));
+                AddValue(name, description, value);
             }
         }
 

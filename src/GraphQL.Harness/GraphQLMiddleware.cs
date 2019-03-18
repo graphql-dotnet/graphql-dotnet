@@ -62,13 +62,13 @@ namespace Example
                 _.Inputs = request.Variables.ToInputs();
                 _.UserContext = _settings.BuildUserContext?.Invoke(context);
                 _.EnableMetrics = _settings.EnableMetrics;
-                if(_settings.EnableMetrics)
+                if (_settings.EnableMetrics)
                 {
                     _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                 }
             });
 
-            if(_settings.EnableMetrics)
+            if (_settings.EnableMetrics)
             {
                 result.EnrichWithApolloTracing(start);
             }

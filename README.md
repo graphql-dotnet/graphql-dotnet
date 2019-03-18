@@ -12,7 +12,12 @@ This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) orig
 
 You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 
-`PM> Install-Package GraphQL`
+```
+PM> Install-Package GraphQL
+```
+
+Or you can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json).
+
 
 ## Documentation
 
@@ -176,7 +181,7 @@ var json = schema.Execute(_ =>
 - [x] No undefined variables
 - [x] No unused fragments
 - [x] No unused variables
-- [ ] Overlapping fields can be merged ([help with this rule](https://github.com/graphql-dotnet/graphql-dotnet/issues/160))
+- [x] Overlapping fields can be merged
 - [x] Possible fragment spreads
 - [x] Provide non-null arguments
 - [x] Scalar leafs
@@ -188,6 +193,7 @@ var json = schema.Execute(_ =>
 - [x] Unique variable names
 - [x] Variables are input types
 - [x] Variables in allowed position
+- [x] Single root field
 
 ### Schema Introspection
 - [x] __typename

@@ -14,7 +14,7 @@ namespace GraphQL.Types
 
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
             if (!HasMetadata(key))
             {
@@ -43,6 +43,11 @@ namespace GraphQL.Types
 
             return Name;
         }
+
+        public override string ToString() =>
+            string.IsNullOrWhiteSpace(Name)
+                ? GetType().Name
+                : Name;
 
         protected bool Equals(IGraphType other)
         {

@@ -20,6 +20,28 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void serialize_long()
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                long input = 1;
+                var actual = _type.Serialize(input);
+                actual.ShouldBe(input);
+            });
+        }
+
+        [Fact]
+        public void serialize_int()
+        {
+            CultureTestHelper.UseCultures(() =>
+            {
+                int input = 1;
+                var actual = _type.Serialize(input);
+                actual.ShouldBe(input);
+            });
+        }
+
+        [Fact]
         public void serialize_timespan_returns_total_seconds_as_long()
         {
             CultureTestHelper.UseCultures(() =>

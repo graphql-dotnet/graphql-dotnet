@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -49,11 +50,11 @@ namespace GraphQL.Tests.Execution
             {
                 userContext.Complete("bar");
 
-                return TaskExtensions.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 
-        public class TestContext
+        public class TestContext: Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 

@@ -129,6 +129,71 @@ namespace GraphQL.Tests.StarWars
         }
 
         [Fact]
+        public void can_query_for_connected_friends_of_humans()
+        {
+            var query = @"
+               {
+                  human(id: ""1"") {
+                    name
+                    friendsConnection {
+                      totalCount
+                      edges {
+                        node {
+                          name
+                          appearsIn
+                        }
+                        cursor
+                      },
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+                human: {
+                  name: 'Luke',
+                  friendsConnection: {
+                    totalCount: 2,
+                    edges: [
+                      {
+                        node: {
+                          name: 'R2-D2',
+                          appearsIn: [
+                            'NEWHOPE',
+                            'EMPIRE',
+                            'JEDI'
+                          ]
+                        },
+                        cursor: 'Mw=='
+                      },
+                      {
+                        node: {
+                          name: 'C-3PO',
+                          appearsIn: [
+                            'NEWHOPE',
+                            'EMPIRE',
+                            'JEDI'
+                          ]
+                        },
+                        cursor: 'NA=='
+                      }
+                    ],
+                    pageInfo: {
+                      endCursor: 'NA==',
+                      hasNextPage: false
+                    }
+                  }
+                }
+              }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
         public void can_query_for_droids()
         {
             var query = @"
@@ -144,6 +209,60 @@ namespace GraphQL.Tests.StarWars
                 name: 'C-3PO'
               }
             }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void can_query_for_connected_friends_of_droids_second_page()
+        {
+            var query = @"
+               {
+                  droid(id: ""3"") {
+                    name
+                    friendsConnection(first: 1, after: ""NA=="") {
+                      totalCount
+                      edges {
+                        node {
+                          name
+                          appearsIn
+                        }
+                        cursor
+                      }
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+                droid: {
+                  name: 'R2-D2',
+                  friendsConnection: {
+                    totalCount: 1,
+                    edges: [
+                      {
+                        node: {
+                          name: 'C-3PO',
+                          appearsIn: [
+                            'NEWHOPE',
+                            'EMPIRE',
+                            'JEDI'
+                          ]
+                        },
+                        cursor: 'NA=='
+                      }
+                    ],
+                    pageInfo: {
+                      endCursor: 'NA==',
+                      hasNextPage: false
+                    }
+                  }
+                }
+              }";
 
             AssertQuerySuccess(query, expected);
         }

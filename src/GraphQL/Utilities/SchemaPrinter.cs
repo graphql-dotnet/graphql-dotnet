@@ -208,8 +208,9 @@ namespace GraphQL.Utilities
             var description = PrintDescription(type.Description);
 
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            var delimiter = _options.OldImplementsSyntax ? ", " : " & ";
             var implementedInterfaces = interfaces.Any()
-                ? " implements {0}".ToFormat(string.Join(", ", interfaces))
+                ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
             return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
@@ -251,8 +252,8 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
-                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
+                    Description = _options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
+                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(

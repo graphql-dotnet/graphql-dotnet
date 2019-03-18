@@ -21,7 +21,8 @@ namespace GraphQL.Utilities
                 [typeof(bool)] = typeof(BooleanGraphType),
                 [typeof(DateTime)] = typeof(DateGraphType),
                 [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
-                [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType)
+                [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
+                [typeof(Guid)] = typeof(IdGraphType)
             };
         }
 
@@ -35,11 +36,10 @@ namespace GraphQL.Utilities
             _entries[clrType] = graphType;
         }
 
-        public static Type Get<TClr>() 
+        public static Type Get<TClr>()
         {
             return Get(typeof(TClr));
         }
-
 
         public static Type Get(Type clrType)
         {

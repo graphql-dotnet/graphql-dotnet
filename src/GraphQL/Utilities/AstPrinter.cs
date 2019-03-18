@@ -118,7 +118,7 @@ namespace GraphQL.Utilities
                 return (TType) Source;
             }
 
-            return default(TType);
+            return default;
         }
     }
 
@@ -164,10 +164,10 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Fragments);
                 c.Print(p =>
                 {
-                    var ops = join(p.ArgArray(x => x.Operations), "\n\n");
-                    var frags = join(p.ArgArray(x => x.Fragments), "\n\n");
+                    var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
+                    var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
 
-                    var result = join(new[] {ops, frags}, "\n\n") + "\n";
+                    var result = Join(new[] {ops, frags}, "\n\n") + "\n";
                     return result;
                 });
             });
@@ -183,15 +183,15 @@ namespace GraphQL.Utilities
                 {
                     var op = p.Arg(x => x.OperationType).ToString().ToLower();
                     var name = p.Arg(x => x.Name)?.ToString();
-                    var variables = wrap("(", join(p.ArgArray(x => x.Variables), ", "), ")");
-                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
+                    var directives = Join(p.ArgArray(x => x.Directives), " ");
                     var selectionSet = p.Arg(x => x.SelectionSet);
 
                     return string.IsNullOrWhiteSpace(name)
                            && string.IsNullOrWhiteSpace(directives)
                            && string.IsNullOrWhiteSpace(variables)
                         ? selectionSet
-                        : join(new[] {op, join(new[] {name, variables}, ""), directives, selectionSet}, " ");
+                        : Join(new[] {op, Join(new[] {name, variables}, ""), directives, selectionSet}, " ");
                 });
             });
 
@@ -202,12 +202,12 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Type);
                 c.Print(p =>
                 {
-                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var directives = Join(p.ArgArray(x => x.Directives), " ");
                     var selectionSet = p.Arg(x => x.SelectionSet);
                     var typename = p.Arg(x => x.Type);
                     var body = string.IsNullOrWhiteSpace(directives)
                         ? selectionSet
-                        : join(new[] { directives, selectionSet }, " ");
+                        : Join(new[] { directives, selectionSet }, " ");
 
                     return $"... on {typename} {body}";
 
@@ -231,7 +231,7 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Selections);
                 c.Print(p =>
                 {
-                    return block(p.ArgArray(x => x.Selections));
+                    return Block(p.ArgArray(x => x.Selections));
                 });
             });
 
@@ -263,13 +263,13 @@ namespace GraphQL.Utilities
                 {
                     var alias = n.Arg(x => x.Alias);
                     var name = n.Arg(x => x.Name);
-                    var args = join(n.ArgArray(x => x.Arguments), ", ");
-                    var directives = join(n.ArgArray(x => x.Directives), " ");
+                    var args = Join(n.ArgArray(x => x.Arguments), ", ");
+                    var directives = Join(n.ArgArray(x => x.Directives), " ");
                     var selectionSet = n.Arg(x => x.SelectionSet);
 
-                    var result = join(new []
+                    var result = Join(new []
                     {
-                        wrap("", alias, ": ") + name + wrap("(", args, ")"),
+                        Wrap("", alias, ": ") + name + Wrap("(", args, ")"),
                         directives,
                         selectionSet
                     }, " ");
@@ -336,12 +336,12 @@ namespace GraphQL.Utilities
             Config<ListValue>(c =>
             {
                 c.Field(x => x.Values);
-                c.Print(p => $"[{join(p.ArgArray(x => x.Values), ", ")}]");
+                c.Print(p => $"[{Join(p.ArgArray(x => x.Values), ", ")}]");
             });
             Config<ObjectValue>(c =>
             {
                 c.Field(x => x.ObjectFields);
-                c.Print(p => $"{{{join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
+                c.Print(p => $"{{{Join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
             });
             Config<ObjectField>(c =>
             {
@@ -380,13 +380,15 @@ namespace GraphQL.Utilities
         public void Config<T>(Action<AstPrintConfig<T>> configure)
             where T : INode
         {
-            var config = new AstPrintConfig<T>();
-            config.Matches = n => n is T;
+            var config = new AstPrintConfig<T>
+            {
+                Matches = n => n is T
+            };
             configure(config);
             _configs.Add(config);
         }
 
-        private string join(IEnumerable<object> nodes, string separator)
+        private string Join(IEnumerable<object> nodes, string separator)
         {
             return nodes != null
                 ? string.Join(
@@ -397,15 +399,15 @@ namespace GraphQL.Utilities
                 : "";
         }
 
-        private string block(IEnumerable<object> nodes)
+        private string Block(IEnumerable<object> nodes)
         {
             var list = nodes.ToList();
             return list.Any()
-                ? indent($"{{\n{join(list, "\n")}") + "\n}"
+                ? Indent($"{{\n{Join(list, "\n")}") + "\n}"
                 : "";
         }
 
-        private string wrap(string start, object middle, string end)
+        private string Wrap(string start, object middle, string end)
         {
             var m = middle?.ToString() ?? "";
             return !string.IsNullOrWhiteSpace(m)
@@ -413,7 +415,7 @@ namespace GraphQL.Utilities
                 : "";
         }
 
-        private string indent(string str)
+        private string Indent(string str)
         {
             return Regex.Replace(str, "\n", "\n  ");
         }
@@ -439,13 +441,13 @@ namespace GraphQL.Utilities
                     };
 
                     var result = f.Resolver.Resolve(ctx);
-                    if (result is INode)
+                    if (result is INode nodeResult)
                     {
-                        result = ApplyConfig(result as INode);
+                        result = ApplyConfig(nodeResult);
                     }
-                    else if (result is IEnumerable && !(result is string))
+                    else if (!(result is string) && result is IEnumerable enumerable)
                     {
-                        result = GetListResult(result as IEnumerable);
+                        result = GetListResult(enumerable);
                     }
 
                     vals[f.Name] = result;

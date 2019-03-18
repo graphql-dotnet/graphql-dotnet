@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;net45</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>GraphQL.StarWars</AssemblyName>
     <PackageId>GraphQL.StarWars</PackageId>
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>

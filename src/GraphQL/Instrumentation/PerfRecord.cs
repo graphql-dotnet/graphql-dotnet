@@ -49,7 +49,7 @@ namespace GraphQL.Instrumentation
                 return (T)value;
             }
 
-            return default(T);
+            return default;
         }
     }
 
@@ -126,11 +126,13 @@ namespace GraphQL.Instrumentation
         {
             var operationStat = records.Single(x => string.Equals(x.Category, "operation"));
 
-            var report = new StatsReport();
-            report.Start = start;
-            report.End = start.AddMilliseconds(operationStat.Duration);
-            report.Duration = operationStat.Duration;
-            report.Types = TypesFromSchema(schema);
+            var report = new StatsReport
+            {
+                Start = start,
+                End = start.AddMilliseconds(operationStat.Duration),
+                Duration = operationStat.Duration,
+                Types = TypesFromSchema(schema)
+            };
 
             var perField = new LightweightCache<string, TypeStat>(type => new TypeStat {Name = type});
 

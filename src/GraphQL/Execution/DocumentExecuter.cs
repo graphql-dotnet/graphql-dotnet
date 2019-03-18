@@ -16,17 +16,6 @@ namespace GraphQL
 {
     public interface IDocumentExecuter
     {
-        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
-        Task<ExecutionResult> ExecuteAsync(
-            ISchema schema,
-            object root,
-            string query,
-            string operationName,
-            Inputs inputs = null,
-            object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
-            IEnumerable<IValidationRule> rules = null);
-
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
         Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
     }
@@ -47,30 +36,6 @@ namespace GraphQL
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
             _complexityAnalyzer = complexityAnalyzer;
-        }
-
-        [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
-        public Task<ExecutionResult> ExecuteAsync(
-            ISchema schema,
-            object root,
-            string query,
-            string operationName,
-            Inputs inputs = null,
-            object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
-            IEnumerable<IValidationRule> rules = null)
-        {
-            return ExecuteAsync(new ExecutionOptions
-            {
-                Schema = schema,
-                Root = root,
-                Query = query,
-                OperationName = operationName,
-                Inputs = inputs,
-                UserContext = userContext,
-                CancellationToken = cancellationToken,
-                ValidationRules = rules
-            });
         }
 
         public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure)
@@ -265,26 +230,28 @@ namespace GraphQL
             Document document,
             Operation operation,
             Inputs inputs,
-            object userContext,
+            IDictionary<string, object> userContext,
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException)
         {
-            var context = new ExecutionContext();
-            context.Document = document;
-            context.Schema = schema;
-            context.RootValue = root;
-            context.UserContext = userContext;
+            var context = new ExecutionContext
+            {
+                Document = document,
+                Schema = schema,
+                RootValue = root,
+                UserContext = userContext,
 
-            context.Operation = operation;
-            context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs);
-            context.Fragments = document.Fragments;
-            context.CancellationToken = cancellationToken;
+                Operation = operation,
+                Variables = GetVariableValues(document, schema, operation?.Variables, inputs),
+                Fragments = document.Fragments,
+                CancellationToken = cancellationToken,
 
-            context.Metrics = metrics;
-            context.Listeners = listeners;
-            context.ThrowOnUnhandledException = throwOnUnhandledException;
+                Metrics = metrics,
+                Listeners = listeners,
+                ThrowOnUnhandledException = throwOnUnhandledException
+            };
 
             return context;
         }

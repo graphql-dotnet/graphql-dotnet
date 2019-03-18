@@ -66,7 +66,7 @@ namespace GraphQL.Execution
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
                     ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GraphType as IObjectGraphType,
+                    ParentType = node.GetParentType(context.Schema),
                     Arguments = arguments,
                     Source = source,
                     Schema = context.Schema,
@@ -101,11 +101,13 @@ namespace GraphQL.Execution
                 }
 
                 return subscription
-                    .Select(value => new ObjectExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.Path)
+                    .Select(value =>
                     {
-                        Source = value
+                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.Path);
+                        executionNode.Source = value;
+                        return executionNode;
                     })
-                    .SelectMany(async objectNode =>
+                    .SelectMany(async executionNode =>
                     {
                         foreach (var listener in context.Listeners)
                         {
@@ -114,8 +116,7 @@ namespace GraphQL.Execution
                         }
 
                         // Execute the whole execution tree and return the result
-                        await ExecuteNodeTreeAsync(context, objectNode)
-                            .ConfigureAwait(false);
+                        await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
                         foreach (var listener in context.Listeners)
                         {
@@ -127,7 +128,7 @@ namespace GraphQL.Execution
                         {
                             Data = new Dictionary<string, object>
                             {
-                                { objectNode.Name, objectNode.ToValue() }
+                                { executionNode.Name, executionNode.ToValue() }
                             }
                         }.With(context);
                     })

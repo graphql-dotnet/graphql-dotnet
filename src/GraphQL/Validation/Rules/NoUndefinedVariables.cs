@@ -32,8 +32,7 @@ namespace GraphQL.Validation.Rules
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;
-                            bool found;
-                            if (!variableNameDefined.TryGetValue(varName, out found))
+                            if (!variableNameDefined.TryGetValue(varName, out bool found))
                             {
                                 var error = new ValidationError(
                                     context.OriginalQuery,

@@ -1,5 +1,3 @@
-﻿using System;
-using GraphQL;
 using GraphQL.Types;
 using Xunit;
 

@@ -59,7 +59,7 @@ namespace GraphQL.DataLoader.Tests
             mock.Setup(store => store.GetAllUsersAsync(cts.Token))
                 .Returns(async (CancellationToken ct) =>
                 {
-                    await Task.Delay(30);
+                    await Task.Delay(50);
                     ct.ThrowIfCancellationRequested();
 
                     return users;
@@ -71,7 +71,7 @@ namespace GraphQL.DataLoader.Tests
 
             var task = loader.LoadAsync();
 
-            cts.CancelAfter(TimeSpan.FromMilliseconds(10));
+            cts.CancelAfter(TimeSpan.FromMilliseconds(5));
 
             await loader.DispatchAsync(cts.Token);
 
