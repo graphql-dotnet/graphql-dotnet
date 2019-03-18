@@ -34,6 +34,17 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void auto_register()
+        {
+            var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair);
+
+            type.Fields.Count().ShouldBe(4);
+            type.Fields.First(f => f.Name == "someString").Description.ShouldBe("Super secret");
+            type.Fields.First(f => f.Name == "someBoolean").DeprecationReason.ShouldBe("Use someInt");
+            type.Fields.First(f => f.Name == "someDate").DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+        }
+
+        [Fact]
         public void accepts_property_expressions()
         {
             var type = new ComplexType<Droid>();
