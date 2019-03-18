@@ -133,6 +133,56 @@ namespace GraphQL.Tests.Introspection
           ""possibleTypes"": null
         },
         {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Guid"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Short"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""UShort"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""UInt"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""ULong"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
           ""kind"": ""OBJECT"",
           ""name"": ""__Schema"",
           ""description"": ""A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations."",

@@ -4,6 +4,11 @@ namespace GraphQL.Types
 {
     public class UIntGraphType : ScalarGraphType
     {
+        public UIntGraphType()
+        {
+            this.Name = "UInt";
+        }
+
         public override object ParseLiteral(IValue value)
         {
             var uintValue = value as UIntValue;

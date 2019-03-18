@@ -51,6 +51,26 @@ scalar Seconds"
                 "Uri",
                 "scalar Uri"
             },
+            {
+                "Guid",
+                @"scalar Guid"
+            },
+            {
+                "Short",
+                @"scalar Short"
+            },
+            {
+                "UShort",
+                @"scalar UShort"
+            },
+            {
+                "UInt",
+                @"scalar UInt"
+            },
+            {
+                "ULong",
+                @"scalar ULong"
+            }
         };
 
         private string printSingleFieldSchema<T>(
@@ -444,6 +464,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -454,7 +476,15 @@ type Root {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -498,6 +528,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -508,7 +540,15 @@ type Query {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -555,6 +595,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -565,7 +607,15 @@ type Query {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -617,6 +667,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -627,7 +679,15 @@ type Query {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -666,6 +726,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -679,9 +741,17 @@ type Query {
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
 union SingleUnion = Foo
 
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 

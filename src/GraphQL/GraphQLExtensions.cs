@@ -428,6 +428,31 @@ namespace GraphQL
                 return new TimeSpanValue(span);
             }
 
+            if (serialized is Guid guid)
+            {
+                return new GuidValue(guid);
+            }
+
+            if(serialized is short int16)
+            {
+                return new ShortValue(int16);
+            }
+
+            if (serialized is ushort uint16)
+            {
+                return new UShortValue(uint16);
+            }
+
+            if (serialized is uint uint32)
+            {
+                return new UIntValue(uint32);
+            }
+
+            if (serialized is ulong uint64)
+            {
+                return new ULongValue(uint64);
+            }
+
             if (serialized is string)
             {
                 if (type is EnumerationGraphType)

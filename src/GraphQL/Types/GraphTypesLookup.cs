@@ -27,6 +27,11 @@ namespace GraphQL.Types
             AddType<TimeSpanMillisecondsGraphType>();
             AddType<DecimalGraphType>();
             AddType<UriGraphType>();
+            AddType<GuidGraphType>();
+            AddType<ShortGraphType>();
+            AddType<UShortGraphType>();
+            AddType<UIntGraphType>();
+            AddType<ULongGraphType>();
 
             AddType<__Schema>();
             AddType<__Type>();
