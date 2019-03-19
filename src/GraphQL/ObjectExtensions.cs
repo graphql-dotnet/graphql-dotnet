@@ -121,7 +121,7 @@ namespace GraphQL
                 return ToObject(objects, fieldType);
             }
 
-            if (fieldType.GetTypeInfo().IsEnum)
+            if (fieldType.IsEnum)
             {
                 if (value == null)
                 {
