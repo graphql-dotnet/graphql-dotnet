@@ -1,11 +1,14 @@
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using GraphQL.Utilities;
 using Shouldly;
-using Xunit;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -31,17 +34,61 @@ namespace GraphQL.Tests.Types
             public bool someBoolean { get; set; }
             [DefaultValue(typeof(DateTime), "2019/03/14")]
             public DateTime someDate { get; set; }
+            public short someShort { get; set; }
+            public ushort someUShort { get; set; }
+            public ulong someULong { get; set; }
+            public uint someUInt { get; set; }
+            public IEnumerable someEnumerable { get; set; }
+            public IEnumerable<string> someEnumerableOfString { get; set; }
+            [Required]
+            public string someRequiredString { get; set; }
+            public Direction someEnum { get; set; }
+            public Direction? someNullableEnum { get; set; }
+            public List<int?> someListWithNullable { get; set; }
+            [Required]
+            public List<int> someRequiredList { get; set; }
+            [Required]
+            public List<int?> someRequiredListWithNullable { get; set; }
+            public int someNotNullInt { get; set; }
+            public Money someMoney { get; set; }
+        }
+
+        internal class Money
+        {
+            public decimal Amount { get; set; }
+            public string Currency { get; set; }
+        }
+
+        internal enum Direction
+        {
+            Asc,
+            Desc
         }
 
         [Fact]
         public void auto_register()
         {
-            var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair);
+            GraphTypeTypeRegistry.Register<Direction, EnumerationGraphType<Direction>>();
+            GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
-            type.Fields.Count().ShouldBe(4);
-            type.Fields.First(f => f.Name == "someString").Description.ShouldBe("Super secret");
-            type.Fields.First(f => f.Name == "someBoolean").DeprecationReason.ShouldBe("Use someInt");
-            type.Fields.First(f => f.Name == "someDate").DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+            var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+
+            type.Fields.Count().ShouldBe(18);
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(IntGraphType));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
+            type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
         }
 
         [Fact]
@@ -91,7 +138,7 @@ namespace GraphQL.Tests.Types
 
             type.Field(d => d.someList, nullable: true);
 
-            type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
+            type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
         }
 
         [Fact]
