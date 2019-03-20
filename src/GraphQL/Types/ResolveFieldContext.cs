@@ -5,6 +5,7 @@ using GraphQL.Language.AST;
 using Field = GraphQL.Language.AST.Field;
 using System.Threading.Tasks;
 using System;
+using GraphQL.Conversion;
 
 namespace GraphQL.Types
 {
@@ -46,6 +47,8 @@ namespace GraphQL.Types
 
         public IEnumerable<string> Path { get; set; }
 
+        public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
+
         /// <summary>
         /// Queried sub fields
         /// </summary>
@@ -78,17 +81,19 @@ namespace GraphQL.Types
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
-            return (TType) GetArgument(typeof(TType), name, defaultValue);
+            return (TType)GetArgument(typeof(TType), name, defaultValue);
         }
 
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
         {
-            if (!HasArgument(name))
+            var argumentName = (Schema?.FieldNameConverter ?? FieldNameConverter).NameFor(name, null);
+             
+            if (!HasArgument(argumentName))
             {
                 return defaultValue;
             }
 
-            var arg = Arguments[name];
+            var arg = Arguments[argumentName];
             if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;
