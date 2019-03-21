@@ -21,8 +21,8 @@ namespace GraphQL.Tests.Bugs
             var ctx = new ResolveFieldContext();
             ctx.Arguments = new Dictionary<string, object> { { "argumentValue", "42" } };
 
-            var result = ctx.GetArgument<string>("ArgumentValue");
-            result.ShouldBe("42");
+            var result = ctx.GetArgument<string>("ArgumentValue", "defaultValue");
+            result.ShouldBe("defaultValue");
         }
     }
 

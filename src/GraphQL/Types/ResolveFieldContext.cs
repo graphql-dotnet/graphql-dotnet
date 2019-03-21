@@ -47,8 +47,6 @@ namespace GraphQL.Types
 
         public IEnumerable<string> Path { get; set; }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
-
         /// <summary>
         /// Queried sub fields
         /// </summary>
@@ -86,7 +84,7 @@ namespace GraphQL.Types
 
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
         {
-            var argumentName = (Schema?.FieldNameConverter ?? FieldNameConverter).NameFor(name, null);
+            var argumentName = Schema?.FieldNameConverter.NameFor(name, null) ?? name;
              
             if (!HasArgument(argumentName))
             {
