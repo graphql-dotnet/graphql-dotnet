@@ -1,0 +1,13 @@
+type Query {
+    animal: Pet
+}
+
+type Cat {
+  name: String!
+}
+
+type Dog {
+  age: Int!
+}
+
+union Pet = Cat | Dog
