@@ -1,9 +1,9 @@
 using GraphQL.Types;
+using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -34,9 +34,7 @@ namespace GraphQL
         {
             if (type == null) return false;
 
-            var typeInfo = type.GetTypeInfo();
-
-            return !typeInfo.IsAbstract && !typeInfo.IsInterface;
+            return !type.IsAbstract && !type.IsInterface;
         }
 
         /// <summary>
@@ -48,8 +46,7 @@ namespace GraphQL
         /// </returns>
         public static bool IsNullable(this Type type)
         {
-            var typeInfo = type.GetTypeInfo();
-            return type == typeof(string) || (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+            return type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
         /// <summary>
@@ -87,7 +84,7 @@ namespace GraphQL
         /// <returns>A string containing a GraphQL compatible type name.</returns>
         public static string GraphQLName(this Type type)
         {
-            var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
+            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
@@ -96,7 +93,7 @@ namespace GraphQL
 
             var typeName = type.Name;
 
-            if (type.GetTypeInfo().IsGenericType)
+            if (type.IsGenericType)
             {
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
@@ -117,9 +114,7 @@ namespace GraphQL
         /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
-            TypeInfo info = type.GetTypeInfo();
-
-            if (info.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
                 if (isNullable == false)
