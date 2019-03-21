@@ -29,10 +29,7 @@ namespace GraphQL.Types
             return defaultValue;
         }
 
-        public bool HasMetadata(string key)
-        {
-            return Metadata?.ContainsKey(key) ?? false;
-        }
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
@@ -49,10 +46,7 @@ namespace GraphQL.Types
                 ? GetType().Name
                 : Name;
 
-        protected bool Equals(IGraphType other)
-        {
-            return string.Equals(Name, other.Name);
-        }
+        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name);
 
         public override bool Equals(object obj)
         {
@@ -63,10 +57,7 @@ namespace GraphQL.Types
             return Equals((IGraphType)obj);
         }
 
-        public override int GetHashCode()
-        {
-            return Name?.GetHashCode() ?? 0;
-        }
+        public override int GetHashCode() => Name?.GetHashCode() ?? 0;
     }
 
     /// <summary>

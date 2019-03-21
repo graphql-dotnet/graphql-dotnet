@@ -6,10 +6,7 @@ namespace GraphQL.Language.AST
 
         object IValue.Value => Value;
 
-        public override string ToString()
-        {
-            return $"{GetType().Name}{{value={Value}}}";
-        }
+        public override string ToString() => $"{GetType().Name}{{value={Value}}}";
 
         public override bool IsEqualTo(INode obj)
         {

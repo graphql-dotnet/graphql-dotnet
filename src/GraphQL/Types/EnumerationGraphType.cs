@@ -1,11 +1,11 @@
+using GraphQL.Language.AST;
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -66,7 +66,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class EnumerationGraphType<TEnum> : EnumerationGraphType
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
         public EnumerationGraphType()
         {
@@ -89,30 +89,18 @@ namespace GraphQL.Types
             }
         }
 
-        protected virtual string ChangeEnumCase(string val)
-        {
-            return StringUtils.ToConstantCase(val);
-        }
+        protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
     }
 
     public class EnumValues : IEnumerable<EnumValueDefinition>
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
 
-        public void Add(EnumValueDefinition value)
-        {
-            _values.Add(value);
-        }
+        public void Add(EnumValueDefinition value) => _values.Add(value);
 
-        public IEnumerator<EnumValueDefinition> GetEnumerator()
-        {
-            return _values.GetEnumerator();
-        }
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public class EnumValueDefinition

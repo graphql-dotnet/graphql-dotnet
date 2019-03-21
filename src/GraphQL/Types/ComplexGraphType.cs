@@ -1,12 +1,12 @@
 using GraphQL.Builders;
 using GraphQL.Resolvers;
+using GraphQL.Subscription;
+using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GraphQL.Subscription;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {

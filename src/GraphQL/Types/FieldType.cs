@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using GraphQL.Resolvers;
 
 namespace GraphQL.Types
@@ -13,6 +14,7 @@ namespace GraphQL.Types
         QueryArguments Arguments { get; set; }
     }
 
+    [DebuggerDisplay("{Name,nq}")]
     public class FieldType : IFieldType
     {
         public string Name { get; set; }
@@ -40,9 +42,6 @@ namespace GraphQL.Types
             return defaultValue;
         }
 
-        public bool HasMetadata(string key)
-        {
-            return Metadata?.ContainsKey(key) ?? false;
-        }
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

@@ -111,40 +111,27 @@ namespace GraphQL.Introspection
 
         public TypeKind KindForInstance(GraphType type)
         {
-            if (type is EnumerationGraphType)
+            switch (type)
             {
-                return TypeKind.ENUM;
+                case EnumerationGraphType _:
+                    return TypeKind.ENUM;
+                case ScalarGraphType _:
+                    return TypeKind.SCALAR;
+                case IObjectGraphType _:
+                    return TypeKind.OBJECT;
+                case IInterfaceGraphType _:
+                    return TypeKind.INTERFACE;
+                case UnionGraphType _:
+                    return TypeKind.UNION;
+                case IInputObjectGraphType _:
+                    return TypeKind.INPUT_OBJECT;
+                case ListGraphType _:
+                    return TypeKind.LIST;
+                case NonNullGraphType _:
+                    return TypeKind.NON_NULL;
+                default:
+                    throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
             }
-            if (type is ScalarGraphType)
-            {
-                return TypeKind.SCALAR;
-            }
-            if (type is IObjectGraphType)
-            {
-                return TypeKind.OBJECT;
-            }
-            if (type is IInterfaceGraphType)
-            {
-                return TypeKind.INTERFACE;
-            }
-            if (type is UnionGraphType)
-            {
-                return TypeKind.UNION;
-            }
-            if (type is IInputObjectGraphType)
-            {
-                return TypeKind.INPUT_OBJECT;
-            }
-            if (type is ListGraphType)
-            {
-                return TypeKind.LIST;
-            }
-            if (type is NonNullGraphType)
-            {
-                return TypeKind.NON_NULL;
-            }
-
-            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
 
         public TypeKind KindForType(Type type)
@@ -169,11 +156,11 @@ namespace GraphQL.Introspection
             {
                 return TypeKind.UNION;
             }
-            if (typeof (IInputObjectGraphType).IsAssignableFrom(type))
+            if (typeof(IInputObjectGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.INPUT_OBJECT;
             }
-            if (typeof (ListGraphType).IsAssignableFrom(type))
+            if (typeof(ListGraphType).IsAssignableFrom(type))
             {
                 return TypeKind.LIST;
             }

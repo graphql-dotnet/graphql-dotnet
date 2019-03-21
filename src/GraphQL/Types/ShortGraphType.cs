@@ -6,14 +6,9 @@ namespace GraphQL.Types
     {
         public ShortGraphType() => Name = "Short";
 
-        public override object ParseLiteral(IValue value)
-        {
-            var shortValue = value as ShortValue;
-            return shortValue?.Value;
-        }
+        public override object ParseLiteral(IValue value) => (value as ShortValue)?.Value;
 
-        public override object ParseValue(object value) =>
-            ValueConverter.ConvertTo(value, typeof(short));
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(short));
 
         public override object Serialize(object value) => ParseValue(value);
     }

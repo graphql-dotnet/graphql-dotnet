@@ -161,7 +161,6 @@ namespace GraphQL
             return val;
         }
 
-
         /// <summary>
         /// Returns an interface implemented by the indicated type whose name matches the desired name.
         /// </summary>

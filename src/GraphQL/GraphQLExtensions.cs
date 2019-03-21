@@ -62,7 +62,7 @@ namespace GraphQL
         {
             if (resolve == null)
             {
-                resolve = t => (IGraphType) Activator.CreateInstance(t);
+                resolve = t => (IGraphType)Activator.CreateInstance(t);
             }
 
             if (type.IsGenericType)
