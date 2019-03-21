@@ -124,20 +124,23 @@ namespace GraphQL
                 }
             }
 
-            var graphType = GraphTypeTypeRegistry.Get(type);
+            Type graphType;
 
             if (type.IsArray)
             {
-                var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
-                var listType = typeof(ListGraphType<>);
-                graphType = listType.MakeGenericType(elementType);
+                var clrElementType = type.GetElementType();
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-
-            if (IsAnIEnumerable(type))
+            else if (IsAnIEnumerable(type))
             {
-                var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
-                var listType = typeof(ListGraphType<>);
-                graphType = listType.MakeGenericType(elementType);
+                var clrElementType = GetEnumerableElementType(type);
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            }
+            else
+            {
+                graphType = GraphTypeTypeRegistry.Get(type);
             }
 
             if (graphType == null)
@@ -148,8 +151,7 @@ namespace GraphQL
 
             if (!isNullable)
             {
-                var nullType = typeof(NonNullGraphType<>);
-                graphType = nullType.MakeGenericType(graphType);
+                graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType);
             }
 
             return graphType;
@@ -185,7 +187,28 @@ namespace GraphQL
 
             return friendlyName;
         }
+
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
+
+        public static Type GetEnumerableElementType(this Type type)
+        {
+            if (_untypedContainers.Contains(type)) return typeof(object);
+
+            if (type.IsConstructedGenericType)
+            {
+                var definition = type.GetGenericTypeDefinition();
+                if (_typedContainers.Contains(definition))
+                {
+                    return type.GenericTypeArguments[0];
+                }
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
+        }
+
+        private static readonly Type[] _untypedContainers = new[] { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
+
+        private static readonly Type[] _typedContainers = new [] { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
     }
 }
