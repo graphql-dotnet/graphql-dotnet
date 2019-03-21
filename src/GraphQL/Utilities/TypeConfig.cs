@@ -1,9 +1,9 @@
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace GraphQL.Utilities
 {
@@ -95,7 +95,7 @@ namespace GraphQL.Utilities
 
         private void ApplyMetadata(Type type)
         {
-            var attributes = type?.GetTypeInfo().GetCustomAttributes<GraphQLAttribute>();
+            var attributes = type?.GetCustomAttributes<GraphQLAttribute>();
 
             if (attributes == null)
                 return;

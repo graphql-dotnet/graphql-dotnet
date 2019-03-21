@@ -218,7 +218,7 @@ namespace GraphQL.Types
 
         private void RegisterType(Type type)
         {
-            if (!typeof (IGraphType).IsAssignableFrom(type))
+            if (!typeof(IGraphType).IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
             }
@@ -235,14 +235,14 @@ namespace GraphQL.Types
                 .Select(t => DependencyResolver.Resolve(t.GetNamedType()) as IGraphType)
                 .ToList();
 
-            var types = _additionalInstances.Concat(
+            var types = _additionalInstances.Union(
                     new IGraphType[]
                     {
                         Query,
                         Mutation,
                         Subscription
                     })
-                .Concat(resolvedTypes)
+                .Union(resolvedTypes)
                 .Where(x => x != null)
                 .ToList();
 

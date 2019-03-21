@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -106,7 +106,16 @@ namespace GraphQL.Tests.Types
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
             schema.FindType("abcd");
+            
+            ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
+        }
 
+        [Fact]
+        public void registers_additional_duplicated_types()
+        {
+            var schema = new SchemaWithDuplicates();
+            schema.FindType("abcd");
+            
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -149,6 +158,23 @@ namespace GraphQL.Tests.Types
             Query = new SomeQuery();
 
             RegisterType<SomeObject>();
+        }
+    }
+
+    public class SchemaWithDuplicates : Schema
+    {
+        public SchemaWithDuplicates()
+        {
+            Query = new SomeQuery();
+
+            RegisterType<SomeObject>();
+            RegisterType<SomeObject>();
+            RegisterType<SomeQuery>();
+            RegisterType<SomeQuery>();
+            RegisterType<SomeInterface>();
+            RegisterType<SomeInterface>();
+            RegisterType<StringGraphType>();
+            RegisterType<StringGraphType>();
         }
     }
 

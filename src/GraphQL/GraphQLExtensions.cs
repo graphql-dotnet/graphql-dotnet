@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace GraphQL
@@ -66,7 +65,7 @@ namespace GraphQL
                 resolve = t => (IGraphType) Activator.CreateInstance(t);
             }
 
-            if (type.GetTypeInfo().IsGenericType)
+            if (type.IsGenericType)
             {
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
@@ -90,7 +89,7 @@ namespace GraphQL
 
         public static Type GetNamedType(this Type type)
         {
-            if (type.GetTypeInfo().IsGenericType
+            if (type.IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>) ||
                     type.GetGenericTypeDefinition() == typeof(ListGraphType<>)))
             {

@@ -1,15 +1,28 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
 using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
+        [Theory]
+        [InlineData("PetAfterAll.graphql", 24)]
+        [InlineData("PetBeforeAll.graphql", 24)]
+        public void can_read_schema(string fileName, int expectedCount)
+        {
+            var schema = Schema.For(
+                ReadSchema(fileName),
+                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+            );
+
+            schema.AllTypes.Count().ShouldBe(expectedCount);
+        }
+
         [Fact]
         public void can_execute_resolver()
         {
