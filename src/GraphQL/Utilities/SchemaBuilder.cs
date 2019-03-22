@@ -44,8 +44,7 @@ namespace GraphQL.Utilities
         {
             var lexer = new Lexer();
             var parser = new Parser(lexer);
-            var ast = parser.Parse(new Source(document));
-            return ast;
+            return parser.Parse(new Source(document));
         }
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
@@ -61,8 +60,10 @@ namespace GraphQL.Utilities
                 switch (def.Kind)
                 {
                     case ASTNodeKind.SchemaDefinition:
+                    {
                         schemaDef = def as GraphQLSchemaDefinition;
                         break;
+                    }
 
                     case ASTNodeKind.ObjectTypeDefinition:
                     {
@@ -117,12 +118,12 @@ namespace GraphQL.Utilities
 
             if (schemaDef != null)
             {
-                foreach (var op in schemaDef.OperationTypes)
+                foreach (var operationTypeDef in schemaDef.OperationTypes)
                 {
-                    var typeName = op.Type.Name.Value;
+                    var typeName = operationTypeDef.Type.Name.Value;
                     var type = GetType(typeName) as IObjectGraphType;
 
-                    switch (op.Operation)
+                    switch (operationTypeDef.Operation)
                     {
                         case OperationType.Query:
                             schema.Query = type;
@@ -137,7 +138,7 @@ namespace GraphQL.Utilities
                             break;
 
                         default:
-                            throw new ArgumentOutOfRangeException($"Unknown operation type {op.Operation}");
+                            throw new ArgumentOutOfRangeException($"Unknown operation type {operationTypeDef.Operation}");
                     }
                 }
             }
@@ -150,7 +151,7 @@ namespace GraphQL.Utilities
 
             var typeList = _types.Values.ToArray();
             typeList.Apply(schema.RegisterType);
-            schema.RegisterDirectives(directives.ToArray());
+            schema.RegisterDirectives(directives);
 
             return schema;
         }
@@ -168,7 +169,7 @@ namespace GraphQL.Utilities
             ObjectGraphType type;
             if (!_types.ContainsKey(astType.Name.Value))
             {
-                type = new ObjectGraphType {Name = astType.Name.Value};
+                type = new ObjectGraphType { Name = astType.Name.Value };
             }
             else
             {
@@ -177,13 +178,10 @@ namespace GraphQL.Utilities
 
             if (!isExtensionType)
             {
-                type.Description = typeConfig.Description;
+                type.Description = typeConfig.Description ?? astType.Comment?.Text;
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
 
-                ApplyDeprecatedDirective(astType.Directives, reason =>
-                {
-                    type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
-                });
+                ApplyDeprecatedDirective(astType.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
             }
 
             CopyMetadata(type, typeConfig);
@@ -199,10 +197,7 @@ namespace GraphQL.Utilities
             }
 
             var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
-            fields.Apply(f =>
-            {
-                type.AddField(f);
-            });
+            fields.Apply(f => type.AddField(f));
 
             var interfaces = astType
                 .Interfaces
@@ -221,7 +216,7 @@ namespace GraphQL.Utilities
             var field = new FieldType
             {
                 Name = fieldDef.Name.Value,
-                Description = fieldConfig.Description,
+                Description = fieldConfig.Description ?? fieldDef.Comment?.Text,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver
             };
@@ -231,10 +226,7 @@ namespace GraphQL.Utilities
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
 
-            ApplyDeprecatedDirective(fieldDef.Directives, reason =>
-            {
-                field.DeprecationReason = fieldConfig.DeprecationReason ?? reason;
-            });
+            ApplyDeprecatedDirective(fieldDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
 
             return field;
         }
@@ -247,7 +239,7 @@ namespace GraphQL.Utilities
             var field = new EventStreamFieldType
             {
                 Name = fieldDef.Name.Value,
-                Description = fieldConfig.Description,
+                Description = fieldConfig.Description ?? fieldDef.Comment?.Text,
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -259,10 +251,7 @@ namespace GraphQL.Utilities
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
 
-            ApplyDeprecatedDirective(fieldDef.Directives, reason =>
-            {
-                field.DeprecationReason = fieldConfig.DeprecationReason ?? reason;
-            });
+            ApplyDeprecatedDirective(fieldDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
 
             return field;
         }
@@ -293,17 +282,18 @@ namespace GraphQL.Utilities
 
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
+            var typeConfig = Types.For(parentTypeName);
+            var fieldConfig = typeConfig.FieldFor(inputDef.Name.Value, DependencyResolver);
+
             var field = new FieldType
             {
                 Name = inputDef.Name.Value,
+                Description = fieldConfig.Description ?? inputDef.Comment?.Text,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = ToValue(inputDef.DefaultValue)
             };
 
-            ApplyDeprecatedDirective(inputDef.Directives, reason =>
-            {
-                field.DeprecationReason = reason;
-            });
+            ApplyDeprecatedDirective(inputDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
 
             return field;
         }
@@ -315,14 +305,11 @@ namespace GraphQL.Utilities
             var type = new InterfaceGraphType
             {
                 Name = interfaceDef.Name.Value,
-                Description = typeConfig.Description,
+                Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
 
-            ApplyDeprecatedDirective(interfaceDef.Directives, reason =>
-            {
-                type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
-            });
+            ApplyDeprecatedDirective(interfaceDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             CopyMetadata(type, typeConfig);
 
@@ -339,14 +326,11 @@ namespace GraphQL.Utilities
             var type = new UnionGraphType
             {
                 Name = unionDef.Name.Value,
-                Description = typeConfig.Description,
+                Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
 
-            ApplyDeprecatedDirective(unionDef.Directives, reason =>
-            {
-                type.DeprecationReason = typeConfig.DeprecationReason ?? reason;
-            });
+            ApplyDeprecatedDirective(unionDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             CopyMetadata(type, typeConfig);
 
@@ -357,15 +341,17 @@ namespace GraphQL.Utilities
 
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
+            var typeConfig = Types.For(inputDef.Name.Value);
+
             var type = new InputObjectGraphType
             {
-                Name = inputDef.Name.Value
+                Name = inputDef.Name.Value,
+                Description = typeConfig.Description ?? inputDef.Comment?.Text
             };
 
-            ApplyDeprecatedDirective(inputDef.Directives, reason =>
-            {
-                type.DeprecationReason = reason;
-            });
+            ApplyDeprecatedDirective(inputDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
+
+            CopyMetadata(type, typeConfig);
 
             var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
             fields.Apply(f => type.AddField(f));
@@ -375,15 +361,15 @@ namespace GraphQL.Utilities
 
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
+            var typeConfig = Types.For(enumDef.Name.Value);
+
             var type = new EnumerationGraphType
             {
-                Name = enumDef.Name.Value
+                Name = enumDef.Name.Value,
+                Description = typeConfig.Description ?? enumDef.Comment?.Text
             };
 
-            ApplyDeprecatedDirective(enumDef.Directives, reason =>
-            {
-                type.DeprecationReason = reason;
-            });
+            ApplyDeprecatedDirective(enumDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -393,7 +379,10 @@ namespace GraphQL.Utilities
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
             var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
-            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations);
+            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations)
+            {
+                Description = directiveDef.Comment?.Text
+            };
 
             var arguments = directiveDef.Arguments.Select(ToArguments);
             directive.Arguments = new QueryArguments(arguments);
@@ -407,7 +396,7 @@ namespace GraphQL.Utilities
             var result = enums.ParseValue(name);
             if (result != null)
             {
-                return (DirectiveLocation) result;
+                return (DirectiveLocation)result;
             }
 
             throw new ExecutionError($"{name} is an unknown directive location");
@@ -418,13 +407,11 @@ namespace GraphQL.Utilities
             var val = new EnumValueDefinition
             {
                 Value = valDef.Name.Value,
-                Name = valDef.Name.Value
+                Name = valDef.Name.Value,
+                Description = valDef.Comment?.Text
             };
 
-            ApplyDeprecatedDirective(valDef.Directives, reason =>
-            {
-                val.DeprecationReason = reason;
-            });
+            ApplyDeprecatedDirective(valDef.Directives, reason => val.DeprecationReason = reason);
 
             return val;
         }
@@ -433,14 +420,13 @@ namespace GraphQL.Utilities
         {
             var type = ToGraphType(inputDef.Type);
 
-            var arg = new QueryArgument(type)
+            return new QueryArgument(type)
             {
                 Name = inputDef.Name.Value,
                 DefaultValue = ToValue(inputDef.DefaultValue),
-                ResolvedType = ToGraphType(inputDef.Type)
+                ResolvedType = ToGraphType(inputDef.Type),
+                Description = inputDef.Comment?.Text
             };
-
-            return arg;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)
@@ -465,9 +451,10 @@ namespace GraphQL.Utilities
                     var type = GetType(namedType.Name.Value);
                     return type ?? new GraphQLTypeReference(namedType.Name.Value);
                 }
-            }
 
-            throw new ArgumentOutOfRangeException($"Unknown GraphQL type {astType.Kind}");
+                default:
+                    throw new ArgumentOutOfRangeException($"Unknown GraphQL type {astType.Kind}");
+            }
         }
 
         private object ToValue(GraphQLValue source)
@@ -531,11 +518,7 @@ namespace GraphQL.Utilities
                     var values = new Dictionary<string, object>();
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
-                    obj.Fields.Apply(f =>
-                    {
-                        values[f.Name.Value] = ToValue(f.Value);
-                    });
-
+                    obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
                     return values;
                 }
                 case ASTNodeKind.ListValue:
@@ -545,17 +528,14 @@ namespace GraphQL.Utilities
                     var values = list.Values.Select(ToValue).ToArray();
                     return values;
                 }
+                default:
+                    throw new ExecutionError($"Unsupported value type {source.Kind}");
             }
-
-            throw new ExecutionError($"Unsupported value type {source.Kind}");
         }
 
         protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
         {
-            source.Metadata.Apply(kv =>
-            {
-                target.Metadata[kv.Key] = kv.Value;
-            });
+            source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
         }
     }
 
@@ -563,14 +543,12 @@ namespace GraphQL.Utilities
     {
         public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
         {
-            return directives?.FirstOrDefault(
-                x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+            return directives?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
         }
 
         public static GraphQLArgument Argument(this IEnumerable<GraphQLArgument> arguments, string name)
         {
-            return arguments?.FirstOrDefault(
-                x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+            return arguments?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

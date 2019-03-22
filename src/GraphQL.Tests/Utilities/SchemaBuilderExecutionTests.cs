@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Utilities
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         [Theory]
-        [InlineData("PetAfterAll.graphql", 24)]
-        [InlineData("PetBeforeAll.graphql", 24)]
+        [InlineData("PetAfterAll.graphql", 29)]
+        [InlineData("PetBeforeAll.graphql", 29)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
@@ -21,6 +21,35 @@ namespace GraphQL.Tests.Utilities
             );
 
             schema.AllTypes.Count().ShouldBe(expectedCount);
+        }
+
+        [Fact]
+        public void can_read_complex_schema()
+        {
+            var schema = Schema.For(
+                ReadSchema("PetComplex.graphql"),
+                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+            );
+
+            schema.AllTypes.Count().ShouldBe(29);
+
+            var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
+            cat.Description.ShouldBe(" A cat");
+            cat.GetField("name").Description.ShouldBe(" cat's name");
+            cat.GetField("weight").Arguments[0].Name.ShouldBe("inPounds");
+            cat.GetField("weight").Arguments[0].ResolvedType.GetType().ShouldBe(typeof(BooleanGraphType));
+            cat.GetField("weight").Arguments[0].Description.ShouldBe("comment on argument");
+            var dog = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Dog");
+            dog.Description.ShouldBe(" A dog");
+            dog.GetField("age").Description.ShouldBe(" dog's age");
+
+            var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
+            pet.Description.ShouldBe("Cats with dogs");
+            pet.PossibleTypes.Count().ShouldBe(2);
+
+            var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
+            query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
+            query.GetField("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
         }
 
         [Fact]
