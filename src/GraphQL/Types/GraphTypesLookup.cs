@@ -32,6 +32,8 @@ namespace GraphQL.Types
             AddType<UShortGraphType>();
             AddType<UIntGraphType>();
             AddType<ULongGraphType>();
+            AddType<ByteGraphType>();
+            AddType<SByteGraphType>();
 
             AddType<__Schema>();
             AddType<__Type>();
