@@ -363,7 +363,7 @@ namespace GraphQL.Tests.Builders
             {
                 Field<NonNullGraphType<IntGraphType>>()
                     .Name("highestField2")
-                    .Description("The highest value of all Child's Field2 values in current page.");
+                    .Description("The highest value of all Child's Field2 values in current page of the connection.");
 
                 Field<NonNullGraphType<IntGraphType>>()
                     .Name("connectionField1")
