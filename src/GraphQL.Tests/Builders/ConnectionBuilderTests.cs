@@ -143,7 +143,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType>));
+            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
             var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
 
@@ -195,7 +195,7 @@ namespace GraphQL.Tests.Builders
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
-            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType>));
+            field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
             var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
             var result = boxedResult as Connection<Child>;
@@ -215,6 +215,179 @@ namespace GraphQL.Tests.Builders
                 result.Items.First().Field1.ShouldBe("abcd");
             }
         }
+
+        [Fact]
+        public async Task can_define_simple_connection_with__custom_edge_type()
+        {
+            var type = new ObjectGraphType();
+            var connection = new Connection<Child, ParentChildrenEdge>
+            {
+                TotalCount = 1,
+                PageInfo = new PageInfo
+                {
+                    HasNextPage = true,
+                    HasPreviousPage = false,
+                    StartCursor = "01",
+                    EndCursor = "01",
+                },
+                Edges = new List<ParentChildrenEdge>
+                {
+                    new ParentChildrenEdge
+                    {
+                        Cursor = "01",
+                        Node = new Child
+                        {
+                            Field1 = "abcd",
+                        },
+                        FriendedAt = FriendedAt
+                    },
+                },
+            };
+            type.Connection<ChildType, ParentChildrenEdgeType>()
+                .Name("testConnection")
+                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+
+            var field = type.Fields.Single();
+            field.Name.ShouldBe("testConnection");
+            field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
+
+            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var result = boxedResult as Connection<Child, ParentChildrenEdge>;
+
+            result.ShouldNotBeNull();
+            if (result != null)
+            {
+                result.TotalCount.ShouldBe(1);
+                result.PageInfo.HasNextPage.ShouldBe(true);
+                result.PageInfo.HasPreviousPage.ShouldBe(false);
+                result.PageInfo.StartCursor.ShouldBe("01");
+                result.PageInfo.EndCursor.ShouldBe("01");
+                result.Edges.Count.ShouldBe(1);
+                result.Edges.First().Cursor.ShouldBe("01");
+                result.Edges.First().Node.Field1.ShouldBe("abcd");
+                result.Items.Count.ShouldBe(1);
+                result.Items.First().Field1.ShouldBe("abcd");
+                result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
+            }
+        }
+
+        [Fact]
+        public async Task can_define_simple_connection_with__custom_edge_and_connection_types()
+        {
+            var type = new ObjectGraphType();
+            var connection = new ParentChildrenConnection
+            {
+                TotalCount = 1,
+                PageInfo = new PageInfo
+                {
+                    HasNextPage = true,
+                    HasPreviousPage = false,
+                    StartCursor = "01",
+                    EndCursor = "01",
+                },
+                Edges = new List<ParentChildrenEdge>
+                {
+                    new ParentChildrenEdge
+                    {
+                        Cursor = "01",
+                        Node = new Child
+                        {
+                            Field1 = "abcd",
+                            Field2 = 1
+                        },
+                        FriendedAt = FriendedAt
+                    },
+                    new ParentChildrenEdge
+                    {
+                        Cursor = "01",
+                        Node = new Child
+                        {
+                            Field1 = "abcd",
+                            Field2 = 10
+                        },
+                        FriendedAt = FriendedAt
+                    },
+                    new ParentChildrenEdge
+                    {
+                        Cursor = "01",
+                        Node = new Child
+                        {
+                            Field1 = "abcd",
+                            Field2 = 7
+                        },
+                        FriendedAt = FriendedAt
+                    },
+                },
+                ConnectionField1 = ConnectionField1Value
+            };
+            type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>()
+                .Name("testConnection")
+                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+
+            var field = type.Fields.Single();
+            field.Name.ShouldBe("testConnection");
+            field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
+
+            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var result = boxedResult as ParentChildrenConnection;
+
+            result.ShouldNotBeNull();
+            if (result != null)
+            {
+                result.TotalCount.ShouldBe(1);
+                result.PageInfo.HasNextPage.ShouldBe(true);
+                result.PageInfo.HasPreviousPage.ShouldBe(false);
+                result.PageInfo.StartCursor.ShouldBe("01");
+                result.PageInfo.EndCursor.ShouldBe("01");
+                result.Edges.Count.ShouldBe(3);
+                result.Edges.First().Cursor.ShouldBe("01");
+                result.Edges.First().Node.Field1.ShouldBe("abcd");
+                result.Items.Count.ShouldBe(3);
+                result.Items.First().Field1.ShouldBe("abcd");
+                result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
+                result.HighestField2.ShouldBe(10);
+                result.ConnectionField1.ShouldBe(ConnectionField1Value);
+            }
+        }
+
+        public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
+        {
+            public int? HighestField2 => Edges?.Max(e => e.Node?.Field2);
+
+            public int ConnectionField1 { get; set; }
+        }
+
+        public class ParentChildrenConnectionType : ConnectionType<ChildType, ParentChildrenEdgeType>
+        {
+            public ParentChildrenConnectionType()
+            {
+                Field<NonNullGraphType<IntGraphType>>()
+                    .Name("highestField2")
+                    .Description("The highest value of all Child's Field2 values in current page.");
+
+                Field<NonNullGraphType<IntGraphType>>()
+                    .Name("connectionField1")
+                    .Description("An example of a manually set field on the connection.");
+            }
+        }
+
+        public class ParentChildrenEdge : Edge<Child>
+        {
+            public DateTime FriendedAt { get; set; }
+        }
+
+        public class ParentChildrenEdgeType : EdgeType<ChildType>
+        {
+            public ParentChildrenEdgeType()
+            {
+                Field<NonNullGraphType<DateTimeGraphType>>()
+                    .Name("friendedAd")
+                    .Description("When parent became friend with child.");
+            }
+        }
+
+        private static readonly int ConnectionField1Value = 123;
+        private static readonly DateTime FriendedAt = new DateTime(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public class ParentType : ObjectGraphType<Parent>
         {
