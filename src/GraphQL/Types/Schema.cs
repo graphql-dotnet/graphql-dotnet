@@ -140,12 +140,13 @@ namespace GraphQL.Types
 
         public void RegisterType(IGraphType type)
         {
-            _additionalInstances.Add(type);
+            _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         public void RegisterTypes(params IGraphType[] types)
         {
-            _additionalInstances.AddRange(types);
+            foreach (var type in types)
+                RegisterType(type);
         }
 
         public void RegisterTypes(params Type[] types)
@@ -168,12 +169,13 @@ namespace GraphQL.Types
 
         public void RegisterDirective(DirectiveGraphType directive)
         {
-            _directives.Add(directive);
+            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
-            _directives.AddRange(directives);
+            foreach (var directive in directives)
+                RegisterDirective(directive);
         }
 
         public DirectiveGraphType FindDirective(string name)
@@ -183,7 +185,7 @@ namespace GraphQL.Types
 
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
-            _converters.Add(converter);
+            _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
         }
 
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
@@ -218,6 +220,9 @@ namespace GraphQL.Types
 
         private void RegisterType(Type type)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             if (!typeof(IGraphType).IsAssignableFrom(type))
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,7 +23,7 @@ namespace GraphQL.Language.AST
 
         public void Add(ISelection selection)
         {
-            _selections.Add(selection);
+            _selections.Add(selection ?? throw new ArgumentNullException(nameof(selection)));
         }
 
         public SelectionSet Merge(SelectionSet otherSelection)

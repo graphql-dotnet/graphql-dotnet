@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace GraphQL.Language.AST
 
         public void Add(Variable variable)
         {
-            _variables.Add(variable);
+            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
         }
 
         public object ValueFor(string name)
@@ -36,7 +37,7 @@ namespace GraphQL.Language.AST
 
         public void Add(VariableDefinition variable)
         {
-            _variables.Add(variable);
+            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
         }
 
         public IEnumerator<VariableDefinition> GetEnumerator()

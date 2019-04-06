@@ -62,7 +62,7 @@ namespace GraphQL.Utilities
 
         public void Include(Type type, Type typeOfType)
         {
-            var name = type.GraphQLName();
+            var name = (type ?? throw new ArgumentNullException(nameof(type))).GraphQLName();
             Include(name, type, typeOfType);
         }
 

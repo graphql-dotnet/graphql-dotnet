@@ -29,6 +29,9 @@ namespace GraphQL.Types
 
         public void AddValue(EnumValueDefinition value)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
             NameValidator.ValidateName(value.Name, "enum");
             Values.Add(value);
         }
@@ -101,7 +104,7 @@ namespace GraphQL.Types
 
         public void Add(EnumValueDefinition value)
         {
-            _values.Add(value);
+            _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
         }
 
         public IEnumerator<EnumValueDefinition> GetEnumerator()
