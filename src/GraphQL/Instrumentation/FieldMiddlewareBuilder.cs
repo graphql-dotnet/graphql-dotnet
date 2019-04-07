@@ -20,7 +20,7 @@ namespace GraphQL.Instrumentation
 
         public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
-            _components.Add(middleware);
+            _components.Add(middleware ?? throw new ArgumentNullException(nameof(middleware)));
             return this;
         }
 
