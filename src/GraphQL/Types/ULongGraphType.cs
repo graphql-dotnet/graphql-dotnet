@@ -18,6 +18,11 @@ namespace GraphQL.Types
                         return (ulong)intValue.Value;
                     return null;
 
+                case LongValue longValue:
+                    if (longValue.Value >= 0)
+                        return (ulong)longValue.Value;
+                    return null;
+
                 default:
                     return null;
             }

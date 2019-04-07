@@ -18,6 +18,11 @@ namespace GraphQL.Types
                         return (uint)intValue.Value;
                     return null;
 
+                case LongValue longValue:
+                    if (uint.MinValue <= longValue.Value && longValue.Value <= uint.MaxValue)
+                        return (uint)longValue.Value;
+                    return null;
+
                 default:
                     return null;
             }

@@ -187,7 +187,7 @@ namespace GraphQL
                 return errors;
             }
 
-            var scalar = (ScalarGraphType) type;
+            var scalar = (ScalarGraphType)type;
 
             var parseResult = scalar.ParseLiteral(valueAst);
 

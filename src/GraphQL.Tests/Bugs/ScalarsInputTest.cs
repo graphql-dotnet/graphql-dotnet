@@ -11,16 +11,28 @@ namespace GraphQL.Tests.Bugs
         {
             var query = @"
 mutation {
-  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 10, short: -20, ushort: 30, ulong: 40, byte: 50, sbyte: -60 })
+  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3] })
   {
     id1
     id2
+
     uint
+    uintArray
+
     short
+    shortArray
+
     ushort
+    ushortArray
+
     ulong
+    ulongArray
+
     byte
+    byteArray
+
     sbyte
+    sbyteArray
   }
 }
 ";
@@ -28,12 +40,18 @@ mutation {
   ""create"": {
     ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
     ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
-    ""uint"": 10,
-    ""short"": -20,
-    ""ushort"": 30,
-    ""ulong"": 40,
+    ""uint"": 3147483647,
+    ""uintArray"": [3147483640],
+    ""short"": -21000,
+    ""shortArray"": [20000],
+    ""ushort"": 61000,
+    ""ushortArray"": [65000],
+    ""ulong"": 4000000000000,
+    ""ulongArray"": [1234567890123456789],
     ""byte"": 50,
-    ""sbyte"": -60
+    ""byteArray"": [1,2,3],
+    ""sbyte"": -60,
+    ""sbyteArray"": [-1,2,-3]
   }
 }";
             AssertQuerySuccess(query, expected, null);
@@ -55,16 +73,22 @@ mutation {
         public Guid Id2 { get; set; }
 
         public uint uInt { get; set; }
+        public uint[] uintArray { get; set; }
 
         public short sHort { get; set; }
+        public short[] shortArray { get; set; }
 
         public ushort uShort { get; set; }
+        public ushort[] ushortArray { get; set; }
 
         public ulong uLong { get; set; }
+        public ulong[] ulongArray { get; set; }
 
         public byte bYte { get; set; }
+        public byte[] byteArray { get; set; }
 
         public sbyte sByte { get; set; }
+        public sbyte[] sbyteArray { get; set; }
     }
 
     public class ScalarsInput : InputObjectGraphType<ScalarsModel>
@@ -80,6 +104,13 @@ mutation {
             Field("ulong", o => o.uLong, type: typeof(ULongGraphType));
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
+
+            Field(o => o.byteArray);
+            Field(o => o.sbyteArray);
+            Field(o => o.ulongArray);
+            Field(o => o.uintArray);
+            Field(o => o.shortArray);
+            Field(o => o.ushortArray);
         }
     }
 
@@ -96,6 +127,13 @@ mutation {
             Field("ulong", o => o.uLong, type: typeof(ULongGraphType));
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
+
+            Field(o => o.byteArray);
+            Field(o => o.sbyteArray);
+            Field(o => o.ulongArray);
+            Field(o => o.uintArray);
+            Field(o => o.shortArray);
+            Field(o => o.ushortArray);
         }
     }
 
