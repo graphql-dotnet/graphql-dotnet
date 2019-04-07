@@ -78,14 +78,15 @@ namespace GraphQL.Types
             var enumGraphData = enumMembers.Select(e => (
                 name: ChangeEnumCase(e.name),
                 value: Enum.Parse(type, e.name),
-                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description,
+                deprecation: (e.member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
             ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
 
-            foreach (var (name, value, description) in enumGraphData)
+            foreach (var (name, value, description, deprecation) in enumGraphData)
             {
-                AddValue(name, description, value);
+                AddValue(name, description, value, deprecation);
             }
         }
 
@@ -98,6 +99,8 @@ namespace GraphQL.Types
     public class EnumValues : IEnumerable<EnumValueDefinition>
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
+
+        public EnumValueDefinition this[string name] => _values.FirstOrDefault(enumDef => enumDef.Name == name);
 
         public void Add(EnumValueDefinition value)
         {
