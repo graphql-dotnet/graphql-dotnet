@@ -27,6 +27,8 @@ namespace GraphQL.Utilities
                 [typeof(ushort)] = typeof(UShortGraphType),
                 [typeof(ulong)] = typeof(ULongGraphType),
                 [typeof(uint)] = typeof(UIntGraphType),
+                [typeof(byte)] = typeof(ByteGraphType),
+                [typeof(sbyte)] = typeof(SByteGraphType),
             };
         }
 

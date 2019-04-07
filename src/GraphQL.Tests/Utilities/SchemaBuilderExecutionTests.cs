@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Utilities
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         [Theory]
-        [InlineData("PetAfterAll.graphql", 29)]
-        [InlineData("PetBeforeAll.graphql", 29)]
+        [InlineData("PetAfterAll.graphql", 31)]
+        [InlineData("PetBeforeAll.graphql", 31)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
