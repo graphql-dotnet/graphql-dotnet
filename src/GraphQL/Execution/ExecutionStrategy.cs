@@ -116,6 +116,10 @@ namespace GraphQL.Execution
                     {
                         SetSubFieldNodes(context, objectNode);
                     }
+                    else if (node is ArrayExecutionNode arrayNode)
+                    {
+                        SetArrayItemNodes(context, arrayNode);
+                    }
 
                     arrayItems.Add(node);
                 }
