@@ -62,7 +62,9 @@ namespace GraphQL.Tests.Types
         internal enum Direction
         {
             Asc,
-            Desc
+            Desc,
+            [Obsolete("Do not use Random. This makes no sense!")]
+            Random
         }
 
         [Fact]
@@ -89,6 +91,9 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
+
+            var enumType = new EnumerationGraphType<Direction>();
+            enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
         }
 
         [Fact]

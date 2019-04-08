@@ -19,7 +19,7 @@ namespace GraphQL.Types
         {
             if (!_possibleTypes.Contains(type))
             {
-                _possibleTypes.Add(type);
+                _possibleTypes.Add(type ?? throw new ArgumentNullException(nameof(type)));
             }
         }
     }

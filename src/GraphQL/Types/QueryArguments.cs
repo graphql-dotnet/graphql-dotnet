@@ -1,4 +1,5 @@
 using GraphQL.Utilities;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,9 @@ namespace GraphQL.Types
 
         public void Add(QueryArgument argument)
         {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
             NameValidator.ValidateName(argument.Name, "argument");
             _arguments.Add(argument);
         }

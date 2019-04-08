@@ -29,6 +29,9 @@ namespace GraphQL.Types
 
         public void AddValue(EnumValueDefinition value)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
             NameValidator.ValidateName(value.Name, "enum");
             Values.Add(value);
         }
@@ -78,14 +81,15 @@ namespace GraphQL.Types
             var enumGraphData = enumMembers.Select(e => (
                 name: ChangeEnumCase(e.name),
                 value: Enum.Parse(type, e.name),
-                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description,
+                deprecation: (e.member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
             ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
 
-            foreach (var (name, value, description) in enumGraphData)
+            foreach (var (name, value, description, deprecation) in enumGraphData)
             {
-                AddValue(name, description, value);
+                AddValue(name, description, value, deprecation);
             }
         }
 
@@ -96,7 +100,12 @@ namespace GraphQL.Types
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
 
-        public void Add(EnumValueDefinition value) => _values.Add(value);
+        public EnumValueDefinition this[string name] => _values.FirstOrDefault(enumDef => enumDef.Name == name);
+
+        public void Add(EnumValueDefinition value)
+        {
+            _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
+        }
 
         public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 

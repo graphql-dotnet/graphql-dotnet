@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,12 +10,13 @@ namespace GraphQL
 
         public void Add(ExecutionError error)
         {
-            _errors.Add(error);
+            _errors.Add(error ?? throw new ArgumentNullException(nameof(error)));
         }
 
         public void AddRange(IEnumerable<ExecutionError> errors)
         {
-            _errors.AddRange(errors);
+            foreach (var error in errors)
+                Add(error);
         }
 
         public int Count => _errors.Count;

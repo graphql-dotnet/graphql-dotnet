@@ -48,6 +48,24 @@ namespace GraphQL
             Register(typeof(long), typeof(decimal), LongToDecimal);
             Register(typeof(long), typeof(TimeSpan), LongToTimeSpan);
 
+            Register(typeof(uint), typeof(int), UInt32ToInt32);
+            Register(typeof(uint), typeof(long), UInt32ToLong);
+            Register(typeof(uint), typeof(ulong), UInt32ToULong);
+            Register(typeof(uint), typeof(short), UInt32ToShort);
+            Register(typeof(uint), typeof(ushort), UInt32ToUShort);
+
+            Register(typeof(byte), typeof(int), ByteToInt32);
+            Register(typeof(byte), typeof(long), ByteToLong);
+            Register(typeof(byte), typeof(ulong), ByteToULong);
+            Register(typeof(byte), typeof(short), ByteToShort);
+            Register(typeof(byte), typeof(ushort), ByteToUShort);
+
+            Register(typeof(sbyte), typeof(int), SByteToInt32);
+            Register(typeof(sbyte), typeof(long), SByteToLong);
+            Register(typeof(sbyte), typeof(ulong), SByteToULong);
+            Register(typeof(sbyte), typeof(short), SByteToShort);
+            Register(typeof(sbyte), typeof(ushort), SByteToUShort);
+
             Register(typeof(float), typeof(double), FloatToDouble);
             Register(typeof(float), typeof(decimal), FloatToDecimal);
 
@@ -55,6 +73,36 @@ namespace GraphQL
 
             Register(typeof(string), typeof(Uri), ParseUri);
         }
+
+        private static object SByteToInt32(object value) => (int)(sbyte)value;
+
+        private static object SByteToLong(object value) => (long)(sbyte)value;
+
+        private static object SByteToULong(object value) => (ulong)(sbyte)value;
+
+        private static object SByteToShort(object value) => (short)(sbyte)value;
+
+        private static object SByteToUShort(object value) => (ushort)(sbyte)value;
+
+        private static object ByteToInt32(object value) => (int)(byte)value;
+
+        private static object ByteToLong(object value) => (long)(byte)value;
+
+        private static object ByteToULong(object value) => (ulong)(byte)value;
+
+        private static object ByteToShort(object value) => (short)(byte)value;
+
+        private static object ByteToUShort(object value) => (ushort)(byte)value;
+
+        private static object UInt32ToInt32(object value) => (int)(uint)value;
+
+        private static object UInt32ToLong(object value) => (long)(uint)value;
+
+        private static object UInt32ToULong(object value) => (ulong)(uint)value;
+
+        private static object UInt32ToShort(object value) => (short)(uint)value;
+
+        private static object UInt32ToUShort(object value) => (ushort)(uint)value;
 
         private static object IntToDouble(object value)
         {
@@ -68,11 +116,7 @@ namespace GraphQL
             return Convert.ToDecimal(intValue, NumberFormatInfo.InvariantInfo);
         }
 
-        private static object FloatToDouble(object value)
-        {
-            var floatValue = (float)value;
-            return (double)floatValue;
-        }
+        private static object FloatToDouble(object value) => (double)(float)value;
 
         private static object FloatToDecimal(object value)
         {
@@ -86,17 +130,9 @@ namespace GraphQL
             return Convert.ToDecimal(doubleValue, NumberFormatInfo.InvariantInfo);
         }
 
-        private static object LongToDouble(object value)
-        {
-            var longValue = (long)value;
-            return (double)longValue;
-        }
+        private static object LongToDouble(object value) => (double)(long)value;
 
-        private static object LongToDecimal(object value)
-        {
-            var longValue = (long)value;
-            return (decimal)longValue;
-        }
+        private static object LongToDecimal(object value) => (decimal)(long)value;
 
         private static object LongToInt(object value)
         {
@@ -104,17 +140,9 @@ namespace GraphQL
             return Convert.ToInt32(longValue, NumberFormatInfo.InvariantInfo);
         }
 
-        private static object IntToLong(object value)
-        {
-            var intValue = (int)value;
-            return (long)intValue;
-        }
+        private static object IntToLong(object value) => (long)(int)value;
 
-        private static object ParseGuid(object value)
-        {
-            var stringValue = (string)value;
-            return Guid.Parse(stringValue);
-        }
+        private static object ParseGuid(object value) => Guid.Parse((string)value);
 
         private static object ParseBool(object value)
         {
@@ -206,11 +234,11 @@ namespace GraphQL
         private static object ParseUri(object value) =>
             value is string s
                 ? new Uri(s)
-                : (Uri) value;
+                : (Uri)value;
 
         private static object ParseShort(object value) => convertToInt16((string)value);
-        private static object IntToShort(object value) => convertToInt16((int) value);
-        private static object LongToShort(object value) => convertToInt16((long) value);
+        private static object IntToShort(object value) => convertToInt16((int)value);
+        private static object LongToShort(object value) => convertToInt16((long)value);
 
         private static object convertToInt16<T>(T value) =>
             Convert.ToInt16(value, NumberFormatInfo.InvariantInfo);
@@ -222,14 +250,12 @@ namespace GraphQL
         private static object convertToUInt16<T>(T value) =>
             Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo);
 
-
         private static object ParseUInt(object value) => convertToUInt32(value);
         private static object IntToUInt(object value) => convertToUInt32((int)value);
         private static object LongToUInt(object value) => convertToUInt32((long)value);
 
         private static object convertToUInt32<T>(T value) =>
             Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo);
-
 
         private static object ParseULong(object value) => convertToUInt64(value);
         private static object IntToULong(object value) => convertToUInt64((int)value);
@@ -254,28 +280,22 @@ namespace GraphQL
         {
             var v = ConvertTo(value, typeof(T));
 
-            if (v == null)
-                return default;
-
-            return (T)v;
+            return v == null ? default : (T)v;
         }
 
         private static Func<object, object> GetConversion(Type valueType, Type targetType)
         {
-            if (ValueConversions.TryGetValue(valueType, out var conversions))
-                if (conversions.TryGetValue(targetType, out var conversion))
-                    return conversion;
+            if (ValueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
+                return conversion;
 
-            throw new InvalidOperationException(
-                $"Could not find conversion from {valueType.FullName} to {targetType.FullName}");
+            throw new InvalidOperationException($"Could not find conversion from {valueType.FullName} to {targetType.FullName}");
         }
 
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
-            if (!ValueConversions.ContainsKey(valueType))
-                ValueConversions.Add(valueType, new Dictionary<Type, Func<object, object>>());
+            if (!ValueConversions.TryGetValue(valueType, out var conversions))
+                ValueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
 
-            var conversions = ValueConversions[valueType];
             conversions[targetType] = conversion;
         }
     }

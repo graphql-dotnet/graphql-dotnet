@@ -13,7 +13,7 @@ namespace GraphQL.Language.AST
 
         public void Add(Directive directive)
         {
-            _directives.Add(directive);
+            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
 
             if (!_unique.ContainsKey(directive.Name))
             {
