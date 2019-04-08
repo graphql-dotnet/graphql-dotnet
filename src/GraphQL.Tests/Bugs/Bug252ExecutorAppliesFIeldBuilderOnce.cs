@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void apply_to_not_called_without_execute()
         {
-            var docExec = new DocumentExecuter();
+            var docExec = new DocumentExecutor();
             var execOptions = new ExecutionOptions();
             execOptions.Schema = new Schema();
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void apply_to_called_once()
         {
-            var docExec = new DocumentExecuter();
+            var docExec = new DocumentExecutor();
             var execOptions = new ExecutionOptions();
             execOptions.Schema = new Schema();
             execOptions.Query = "{ abcd }";
@@ -62,7 +62,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void apply_to_called_once_with_multiple_execute()
         {
-            var docExec = new DocumentExecuter();
+            var docExec = new DocumentExecutor();
             var execOptions = new ExecutionOptions();
             execOptions.Schema = new Schema();
             execOptions.Query = "{ abcd }";

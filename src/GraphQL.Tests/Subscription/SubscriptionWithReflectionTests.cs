@@ -20,9 +20,9 @@ namespace GraphQL.Tests.Subscription
 
         protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
         {
-            var executer = new DocumentExecuter();
+            var executor = new DocumentExecutor();
 
-            var result = await executer.ExecuteAsync(options);
+            var result = await executor.ExecuteAsync(options);
 
             result.ShouldBeOfType<SubscriptionExecutionResult>();
 

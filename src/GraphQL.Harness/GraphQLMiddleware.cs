@@ -16,18 +16,18 @@ namespace Example
     {
         private readonly RequestDelegate _next;
         private readonly GraphQLSettings _settings;
-        private readonly IDocumentExecuter _executer;
+        private readonly IDocumentExecutor _executor;
         private readonly IDocumentWriter _writer;
 
         public GraphQLMiddleware(
             RequestDelegate next,
             GraphQLSettings settings,
-            IDocumentExecuter executer,
+            IDocumentExecutor executor,
             IDocumentWriter writer)
         {
             _next = next;
             _settings = settings;
-            _executer = executer;
+            _executor = executor;
             _writer = writer;
         }
 
@@ -54,7 +54,7 @@ namespace Example
 
             var request = Deserialize<GraphQLRequest>(context.Request.Body);
 
-            var result = await _executer.ExecuteAsync(_ =>
+            var result = await _executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;
                 _.Query = request.Query;

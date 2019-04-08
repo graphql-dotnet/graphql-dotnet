@@ -105,7 +105,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executor.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
@@ -143,7 +143,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executor.ExecuteAsync(_ =>
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
@@ -193,7 +193,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             smallListTimer.Start();
 
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executor.ExecuteAsync(_ =>
             {
                 _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;

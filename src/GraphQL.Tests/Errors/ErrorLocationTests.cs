@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Errors
         [InlineData("{\n    test\n  cat\n}", 3, 3)]
         public async Task should_show_location_when_exception_thrown(string query, int line, int column)
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Errors
         [InlineData("{\n    testasync\n  cat\n}", 3, 3)]
         public async Task should_show_location_when_exception_thrown_with_async_field(string query, int line, int column)
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Errors
         [Fact]
         public async Task should_include_path()
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = @"{ testSub { one two } }";
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Errors
         [Fact]
         public async Task should_include_path_with_list_index()
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = @"{ testSubList { one two } }";

@@ -26,7 +26,7 @@ namespace GraphQL.Harness
         {
             services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
 
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddSingleton<IDocumentExecutor, DocumentExecutor>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
             services.AddSingleton<StarWarsData>();

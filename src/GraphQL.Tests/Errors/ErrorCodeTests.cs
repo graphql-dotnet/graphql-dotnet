@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Errors
         [InlineData("{ uncodedSync }", "")]
         public async Task should_show_code_when_exception_is_thrown_with_sync_field(string query, string code)
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Errors
         [InlineData("{ uncodedAsync }", "")]
         public async Task should_show_code_when_exception_thrown_with_async_field(string query, string code)
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Errors
         [Fact]
         public async Task should_propagate_exception_data_when_exception_is_thrown_in_field_resolver()
         {
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = @"{ secondSync }";

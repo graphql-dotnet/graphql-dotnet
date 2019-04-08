@@ -1,4 +1,4 @@
-﻿using GraphQL.Http;
+using GraphQL.Http;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Introspection
         [Fact]
         public void validate_core_schema()
         {
-            var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            var documentExecutor = new DocumentExecutor();
+            var executionResult = documentExecutor.ExecuteAsync(_ =>
             {
                 _.Schema = new Schema();
                 _.Query = SchemaIntrospection.IntrospectionQuery;
@@ -26,8 +26,8 @@ namespace GraphQL.Tests.Introspection
         [Fact]
         public void validate_non_null_schema()
         {
-            var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            var documentExecutor = new DocumentExecutor();
+            var executionResult = documentExecutor.ExecuteAsync(_ =>
             {
                 _.Schema = new TestSchema();
                 _.Query = InputObjectBugQuery;

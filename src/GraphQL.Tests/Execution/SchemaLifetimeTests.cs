@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -18,10 +18,10 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public async Task ExecutingThenDisposing_DoesNotThrowException()
         {
-            var executer = new DocumentExecuter();
+            var executor = new DocumentExecutor();
             var schema = new Schema();
 
-            await executer.ExecuteAsync(_ =>
+            await executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;
                 _.Query = "{noop}";

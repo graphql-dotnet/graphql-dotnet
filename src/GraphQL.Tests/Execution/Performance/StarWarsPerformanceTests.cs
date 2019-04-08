@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Execution.Performance
             //Note: Implementing a custom IDocumentValidator would increase speeds 600%
             for (var x = 0; x < 10000; x++)
             {
-                runResult2 = Executer.ExecuteAsync(_ =>
+                runResult2 = Executor.ExecuteAsync(_ =>
                 {
                     _.SetFieldMiddleware = false;
                     _.EnableMetrics = false;

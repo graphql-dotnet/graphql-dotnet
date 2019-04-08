@@ -27,7 +27,7 @@ namespace GraphQL.Tests
         public QueryTestBase()
         {
             Services = new SimpleContainer();
-            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+            Executor = new DocumentExecutor(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
             Writer = new DocumentWriter(indent: true);
         }
 
@@ -38,7 +38,7 @@ namespace GraphQL.Tests
             get { return Services.Get<TSchema>(); }
         }
 
-        public IDocumentExecuter Executer { get; private set; }
+        public IDocumentExecutor Executor { get; private set; }
 
         public IDocumentWriter Writer { get; private set; }
 
@@ -87,7 +87,7 @@ namespace GraphQL.Tests
             int expectedErrorCount = 0,
             bool renderErrors = false)
         {
-            var runResult = Executer.ExecuteAsync(_ =>
+            var runResult = Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -124,7 +124,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var runResult = Executer.ExecuteAsync(_ =>
+            var runResult = Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;

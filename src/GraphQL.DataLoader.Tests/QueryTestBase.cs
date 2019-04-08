@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests
 {
     public abstract class QueryTestBase : DataLoaderTestBase
     {
-        private readonly IDocumentExecuter executer = new DocumentExecuter();
+        private readonly IDocumentExecutor _executor = new DocumentExecutor();
         private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
 
         protected IServiceProvider Services { get; }
@@ -80,8 +80,8 @@ namespace GraphQL.DataLoader.Tests
         {
             var schema = Services.GetRequiredService<TSchema>();
 
-            // Run the executer within an async context to make sure there are no deadlock issues
-            var runResult = AsyncContext.Run(() => executer.ExecuteAsync((opts) =>
+            // Run the _executor within an async context to make sure there are no deadlock issues
+            var runResult = AsyncContext.Run(() => _executor.ExecuteAsync((opts) =>
             {
                 options(opts);
                 opts.Schema = schema;
@@ -110,8 +110,8 @@ namespace GraphQL.DataLoader.Tests
         {
             var schema = Services.GetRequiredService<TSchema>();
 
-            // Run the executer within an async context to make sure there are no deadlock issues
-            return executer.ExecuteAsync((opts) =>
+            // Run the _executor within an async context to make sure there are no deadlock issues
+            return _executor.ExecuteAsync((opts) =>
             {
                 opts.Schema = schema;
                 opts.ExposeExceptions = true;

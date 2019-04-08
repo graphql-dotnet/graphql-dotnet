@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Bugs
 {
     public class Bug68NonNullEnumGraphTypeTests
     {
-        private readonly IDocumentExecuter _executer = new DocumentExecuter();
+        private readonly IDocumentExecutor _executor = new DocumentExecutor();
 
         [Fact]
         public void only_nullable_is_happy()
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Bugs
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query)
         {
-            return _executer.ExecuteAsync(_ =>
+            return _executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;
                 _.Query = query;

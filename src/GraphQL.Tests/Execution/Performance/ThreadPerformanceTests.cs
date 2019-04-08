@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Execution.Performance
             var smallListTimer = new Stopwatch();
             smallListTimer.Start();
 
-            var runResult2 = Executer.ExecuteAsync(_ =>
+            var runResult2 = Executor.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
                 _.SetFieldMiddleware = false;
@@ -117,7 +117,7 @@ namespace GraphQL.Tests.Execution.Performance
                 }
             ";
 
-            var runResult2 = await Executer.ExecuteAsync(_ =>
+            var runResult2 = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;

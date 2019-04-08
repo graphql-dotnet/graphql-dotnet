@@ -9,7 +9,7 @@ namespace GraphQL
     {
         public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
         {
-            var executor = new DocumentExecuter();
+            var executor = new DocumentExecutor();
             var result = executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;
@@ -20,7 +20,7 @@ namespace GraphQL
 
         public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
         {
-            var executor = new DocumentExecuter();
+            var executor = new DocumentExecutor();
             var result = await executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;

@@ -6,14 +6,14 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL.Subscription
 {
-    [Obsolete("The DocumentExecuter can be used directly to execute subscriptions")]
-    public class SubscriptionExecuter : DocumentExecuter, ISubscriptionExecuter
+    [Obsolete("The DocumentExecutor can be used directly to execute subscriptions")]
+    public class SubscriptionExecutor : DocumentExecutor, ISubscriptionExecutor
     {
-        public SubscriptionExecuter()
+        public SubscriptionExecutor()
         {
         }
 
-        public SubscriptionExecuter(
+        public SubscriptionExecutor(
             IDocumentBuilder documentBuilder,
             IDocumentValidator documentValidator,
             IComplexityAnalyzer complexityAnalyzer)

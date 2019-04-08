@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Utilities
             Builder = new SchemaBuilder();
         }
 
-        protected readonly IDocumentExecuter Executer = new DocumentExecuter();
+        protected readonly IDocumentExecutor Executor = new DocumentExecutor();
         protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
         protected SchemaBuilder Builder { get; set; }
 
@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Utilities
 
         public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
         {
-            var runResult = Executer.ExecuteAsync(options).Result;
+            var runResult = Executor.ExecuteAsync(options).Result;
 
             var writtenResult = Writer.WriteToStringAsync(runResult).Result;
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;

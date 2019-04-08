@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Errors
             string query = "{ firstSync }";
             string code = "FIRST";
 
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Errors
         {
             string query = "{ uncodedSync }";
 
-            var result = await Executer.ExecuteAsync(_ =>
+            var result = await Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;

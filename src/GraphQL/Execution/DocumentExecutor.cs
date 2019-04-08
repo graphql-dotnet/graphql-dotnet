@@ -14,7 +14,7 @@ using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
-    public interface IDocumentExecuter
+    public interface IDocumentExecutor
     {
         [Obsolete("This method will be removed in a future version.  Use ExecutionOptions parameter.")]
         Task<ExecutionResult> ExecuteAsync(
@@ -31,18 +31,18 @@ namespace GraphQL
         Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
     }
 
-    public class DocumentExecuter : IDocumentExecuter
+    public class DocumentExecutor : IDocumentExecutor
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
 
-        public DocumentExecuter()
+        public DocumentExecutor()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
+        public DocumentExecutor(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;

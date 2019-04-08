@@ -29,7 +29,7 @@ query {
 }";
 
             var start = DateTime.UtcNow;
-            var result = Executer.ExecuteAsync(_ =>
+            var result = Executor.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;

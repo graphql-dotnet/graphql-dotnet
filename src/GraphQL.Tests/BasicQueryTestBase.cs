@@ -13,7 +13,7 @@ namespace GraphQL.Tests
 {
     public class BasicQueryTestBase
     {
-        protected readonly IDocumentExecuter Executer = new DocumentExecuter();
+        protected readonly IDocumentExecutor Executor = new DocumentExecutor();
         protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
 
         public ExecutionResult AssertQuerySuccess(
@@ -38,7 +38,7 @@ namespace GraphQL.Tests
 
         public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
         {
-            var runResult = Executer.ExecuteAsync(options).Result;
+            var runResult = Executor.ExecuteAsync(options).Result;
 
             var writtenResult = Writer.WriteToStringAsync(runResult).Result;
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
@@ -71,7 +71,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default(CancellationToken),
             IEnumerable<IValidationRule> rules = null)
         {
-            var runResult = Executer.ExecuteAsync(_ =>
+            var runResult = Executor.ExecuteAsync(_ =>
             {
                 _.Schema = schema;
                 _.Query = query;
