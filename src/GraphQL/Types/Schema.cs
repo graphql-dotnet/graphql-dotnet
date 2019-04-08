@@ -174,7 +174,8 @@ namespace GraphQL.Types
 
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
         {
-            _directives.AddRange(directives);
+            foreach (var directive in directives)
+                RegisterDirective(directive);
         }
 
         public void RegisterDirectives(params DirectiveGraphType[] directives)
