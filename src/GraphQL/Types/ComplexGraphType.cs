@@ -289,6 +289,7 @@ namespace GraphQL.Types
 
             var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
                 .Name(name)
+                .Metadata(FieldType.ClrPropertyName, expression.TryNameOf(), ignoreNull: true)
                 .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())

@@ -205,6 +205,13 @@ namespace GraphQL
             return member.Member.Name;
         }
 
+        public static string TryNameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
+        {
+            if (expression.Body is MemberExpression expr)
+                return expr.Member.Name;
+            return null;
+        }
+
         public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr

@@ -1,3 +1,4 @@
+using GraphQL.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,22 +21,27 @@ namespace GraphQL
             return (T)ToObject(source, typeof(T));
         }
 
+        private static IGraphType Unwrap(IGraphType type) => type is NonNullGraphType nonNull ? nonNull.ResolvedType : type;
+
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
-        public static object ToObject(this IDictionary<string, object> source, Type type)
+        /// <param name="graphType">Optional type from schema mapped to <paramref name="type"/> for proper property definition.</param>
+        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType graphType = null)
         {
             var obj = Activator.CreateInstance(type);
 
             foreach (var item in source)
             {
-                var propertyType = type.GetProperty(item.Key,
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                var mappedField = (Unwrap(graphType) as IInputObjectGraphType)?.GetField(item.Key);
+                var propertyName = mappedField?.GetMetadata(FieldType.ClrPropertyName, item.Key) ?? item.Key;
+
+                var propertyType = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyType != null)
                 {
-                    var value = GetPropertyValue(item.Value, propertyType.PropertyType);
+                    var value = GetPropertyValue(item.Value, propertyType.PropertyType, mappedField?.ResolvedType);
                     propertyType.SetValue(obj, value, null);
                 }
             }
@@ -48,8 +54,9 @@ namespace GraphQL
         /// </summary>
         /// <param name="propertyValue">The value to be converted.</param>
         /// <param name="fieldType">The desired type.</param>
+        /// <param name="graphType">Optional type from schema mapped to <paramref name="fieldType"/> for proper property definition.</param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object GetPropertyValue(this object propertyValue, Type fieldType)
+        public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType graphType = null)
         {
             // Short-circuit conversion if the property value already
             if (fieldType.IsInstanceOfType(propertyValue))
@@ -88,7 +95,7 @@ namespace GraphQL
 
                 foreach (var listItem in valueList)
                 {
-                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, (Unwrap(graphType) as ListGraphType)?.ResolvedType));
                 }
 
                 if (fieldType.IsArray)
@@ -118,7 +125,7 @@ namespace GraphQL
 
             if (propertyValue is Dictionary<string, object> objects)
             {
-                return ToObject(objects, fieldType);
+                return ToObject(objects, fieldType, Unwrap(graphType));
             }
 
             if (fieldType.IsEnum)
@@ -160,7 +167,6 @@ namespace GraphQL
 
             return val;
         }
-
 
         /// <summary>
         /// Returns an interface implemented by the indicated type whose name matches the desired name.

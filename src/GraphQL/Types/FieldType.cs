@@ -15,6 +15,7 @@ namespace GraphQL.Types
 
     public class FieldType : IFieldType
     {
+        internal const string ClrPropertyName = nameof(ClrPropertyName);
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
