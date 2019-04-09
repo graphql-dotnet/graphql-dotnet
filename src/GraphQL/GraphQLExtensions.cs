@@ -226,6 +226,13 @@ namespace GraphQL
                 : null;
         }
 
+        public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
+            where TMetadataProvider : IProvideMetadata
+        {
+            provider.Metadata[key] = value;
+            return provider;
+        }
+
         /// <summary>
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
