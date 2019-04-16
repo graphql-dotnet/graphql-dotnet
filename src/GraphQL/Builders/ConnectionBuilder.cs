@@ -8,10 +8,25 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
-        public static ConnectionBuilder<TSourceType> Create<TGraphType, TSourceType>()
-            where TGraphType : IGraphType
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
+            where TNodeType : IGraphType
         {
-            return ConnectionBuilder<TSourceType>.Create<TGraphType>();
+            return ConnectionBuilder<TSourceType>.Create<TNodeType>();
+        }
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+        {
+            return ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
+        }
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+        {
+            return ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
         }
     }
 
@@ -41,13 +56,28 @@ namespace GraphQL.Builders
             FieldType = fieldType;
         }
 
-        public static ConnectionBuilder<TSourceType> Create<TGraphType>(string name = "default")
-            where TGraphType : IGraphType
+        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
+            where TNodeType : IGraphType
+        {
+            return Create<TNodeType, EdgeType<TNodeType>>(name);
+        }
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+        {
+            return Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
+        }
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
             var fieldType = new FieldType
             {
                 Name = name,
-                Type = typeof(ConnectionType<TGraphType>),
+                Type = typeof(TConnectionType),
                 Arguments = new QueryArguments(new QueryArgument[0]),
             };
             return new ConnectionBuilder<TSourceType>(fieldType, null, false, false, null)
