@@ -32,8 +32,6 @@ namespace GraphQL.Builders
 
     public class ConnectionBuilder<TSourceType>
     {
-        private readonly Func<object, TSourceType> _objectResolver;
-
         private bool _isUnidirectional;
 
         private bool _isBidirectional;
@@ -44,12 +42,10 @@ namespace GraphQL.Builders
 
         private ConnectionBuilder(
             FieldType fieldType,
-            Func<object, TSourceType> objectResolver,
             bool isUnidirectional,
             bool isBidirectional,
             int? pageSize)
         {
-            _objectResolver = objectResolver;
             _isUnidirectional = isUnidirectional;
             _isBidirectional = isBidirectional;
             _pageSize = pageSize;
@@ -80,7 +76,7 @@ namespace GraphQL.Builders
                 Type = typeof(TConnectionType),
                 Arguments = new QueryArguments(new QueryArgument[0]),
             };
-            return new ConnectionBuilder<TSourceType>(fieldType, null, false, false, null)
+            return new ConnectionBuilder<TSourceType>(fieldType, false, false, null)
                 .Unidirectional();
         }
 

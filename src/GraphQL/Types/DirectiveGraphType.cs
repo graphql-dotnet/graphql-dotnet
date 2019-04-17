@@ -1,28 +1,47 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace GraphQL.Types
 {
     public enum DirectiveLocation
     {
         // Operations
+        [Description("Location adjacent to a query operation.")]
         Query,
+        [Description("Location adjacent to a mutation operation.")]
         Mutation,
+        [Description("Location adjacent to a subscription operation.")]
         Subscription,
+        [Description("Location adjacent to a field.")]
         Field,
+        [Description("Location adjacent to a fragment definition.")]
         FragmentDefinition,
+        [Description("Location adjacent to a fragment spread.")]
         FragmentSpread,
+        [Description("Location adjacent to an inline fragment.")]
         InlineFragment,
         // Schema Definitions
+        [Description("Location adjacent to a schema definition.")]
         Schema,
+        [Description("Location adjacent to a scalar definition.")]
         Scalar,
+        [Description("Location adjacent to an object type definition.")]
         Object,
+        [Description("Location adjacent to a field definition.")]
         FieldDefinition,
+        [Description("Location adjacent to an argument definition.")]
         ArgumentDefinition,
+        [Description("Location adjacent to an interface definition.")]
         Interface,
+        [Description("Location adjacent to a union definition.")]
         Union,
+        [Description("Location adjacent to an enum definition")]
         Enum,
+        [Description("Location adjacent to an enum value definition")]
         EnumValue,
+        [Description("Location adjacent to an input object type definition.")]
         InputObject,
+        [Description("Location adjacent to an input object field definition.")]
         InputFieldDefinition
     }
 

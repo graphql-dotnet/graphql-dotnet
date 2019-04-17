@@ -1,9 +1,9 @@
 using GraphQL.Types;
+using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -34,9 +34,7 @@ namespace GraphQL
         {
             if (type == null) return false;
 
-            var typeInfo = type.GetTypeInfo();
-
-            return !typeInfo.IsAbstract && !typeInfo.IsInterface;
+            return !type.IsAbstract && !type.IsInterface;
         }
 
         /// <summary>
@@ -48,8 +46,7 @@ namespace GraphQL
         /// </returns>
         public static bool IsNullable(this Type type)
         {
-            var typeInfo = type.GetTypeInfo();
-            return type == typeof(string) || (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
+            return type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
         /// <summary>
@@ -87,7 +84,7 @@ namespace GraphQL
         /// <returns>A string containing a GraphQL compatible type name.</returns>
         public static string GraphQLName(this Type type)
         {
-            var attr = type.GetTypeInfo().GetCustomAttribute<GraphQLMetadataAttribute>();
+            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
 
             if (!string.IsNullOrEmpty(attr?.Name))
             {
@@ -96,7 +93,7 @@ namespace GraphQL
 
             var typeName = type.Name;
 
-            if (type.GetTypeInfo().IsGenericType)
+            if (type.IsGenericType)
             {
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
@@ -117,9 +114,7 @@ namespace GraphQL
         /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
-            TypeInfo info = type.GetTypeInfo();
-
-            if (info.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];
                 if (isNullable == false)
@@ -129,20 +124,23 @@ namespace GraphQL
                 }
             }
 
-            var graphType = GraphTypeTypeRegistry.Get(type);
+            Type graphType;
 
             if (type.IsArray)
             {
-                var elementType = GetGraphTypeFromType(type.GetElementType(), isNullable);
-                var listType = typeof(ListGraphType<>);
-                graphType = listType.MakeGenericType(elementType);
+                var clrElementType = type.GetElementType();
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent array
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
             }
-
-            if (IsAnIEnumerable(type))
+            else if (IsAnIEnumerable(type))
             {
-                var elementType = GetGraphTypeFromType(type.GenericTypeArguments.First(), isNullable);
-                var listType = typeof(ListGraphType<>);
-                graphType = listType.MakeGenericType(elementType);
+                var clrElementType = GetEnumerableElementType(type);
+                var elementType = GetGraphTypeFromType(clrElementType, clrElementType.IsNullable()); // isNullable from elementType, not from parent container
+                graphType = typeof(ListGraphType<>).MakeGenericType(elementType);
+            }
+            else
+            {
+                graphType = GraphTypeTypeRegistry.Get(type);
             }
 
             if (graphType == null)
@@ -153,8 +151,7 @@ namespace GraphQL
 
             if (!isNullable)
             {
-                var nullType = typeof(NonNullGraphType<>);
-                graphType = nullType.MakeGenericType(graphType);
+                graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType);
             }
 
             return graphType;
@@ -190,8 +187,29 @@ namespace GraphQL
 
             return friendlyName;
         }
+
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
+
+        public static Type GetEnumerableElementType(this Type type)
+        {
+            if (_untypedContainers.Contains(type)) return typeof(object);
+
+            if (type.IsConstructedGenericType)
+            {
+                var definition = type.GetGenericTypeDefinition();
+                if (_typedContainers.Contains(definition))
+                {
+                    return type.GenericTypeArguments[0];
+                }
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
+        }
+
+        private static readonly Type[] _untypedContainers = new[] { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
+
+        private static readonly Type[] _typedContainers = new [] { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
 
         /// <summary>
         /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
@@ -204,14 +222,12 @@ namespace GraphQL
         /// </returns>
         public static bool ImplementsGenericType(this Type type, Type genericType)
         {
-
             if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
             {
                 return true;
             }
 
             var interfaceTypes = type.GetInterfaces();
-
             foreach (var it in interfaceTypes)
             {
                 if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)

@@ -1,5 +1,5 @@
-using System.Linq;
 using GraphQL.Types;
+using System.Linq;
 
 namespace GraphQL.Introspection
 {
@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     {
         public __Field()
         {
-            Name = "__Field";
+            Name = nameof(__Field);
             Description =
                 "Object and Interface types are described by a list of Fields, each of " +
                 "which has a name, potentially a list of arguments, and a return type.";

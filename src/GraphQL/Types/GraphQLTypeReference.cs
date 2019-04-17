@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Types
@@ -15,38 +15,25 @@ namespace GraphQL.Types
 
         public Func<object, bool> IsTypeOf
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+             get => throw Invalid();
+             set => throw Invalid();
         }
 
-        public void AddResolvedInterface(IInterfaceGraphType graphType)
-        {
-            throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-        }
+        public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
         public IEnumerable<Type> Interfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+             get => throw Invalid();
+             set => throw Invalid();
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+            get => throw Invalid();
+            set => throw Invalid();
         }
+
+        private Exception Invalid() => new InvalidOperationException("This is just a reference. Resolve the real type first.");
 
         public override bool Equals(object obj)
         {

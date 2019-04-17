@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -103,16 +104,17 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_have_arguments_with_and_without_default_values()
+        public void can_have_arguments_with_and_without_default_values_and_with_metadata()
         {
             var objectType = new ObjectGraphType();
             objectType.Field<IntGraphType>()
                 .Argument<StringGraphType, string>("arg1", "desc1", "12345")
                 .Argument<IntGraphType, int>("arg2", "desc2", 9)
-                .Argument<IntGraphType>("arg3", "desc3");
+                .Argument<IntGraphType>("arg3", "desc3", cfg => cfg.WithMetadata("secure", true))
+                .Argument<BooleanGraphType>("arg4", cfg => cfg.WithMetadata("useBefore", new DateTime(2030, 1, 2)).DefaultValue = true);
 
             var field = objectType.Fields.First();
-            field.Arguments.Count.ShouldBe(3);
+            field.Arguments.Count.ShouldBe(4);
 
             field.Arguments[0].Name.ShouldBe("arg1");
             field.Arguments[0].Description.ShouldBe("desc1");
@@ -128,6 +130,13 @@ namespace GraphQL.Tests.Builders
             field.Arguments[2].Description.ShouldBe("desc3");
             field.Arguments[2].Type.ShouldBe(typeof(IntGraphType));
             field.Arguments[2].DefaultValue.ShouldBe(null);
+            field.Arguments[2].Metadata["secure"].ShouldBe(true);
+
+            field.Arguments[3].Name.ShouldBe("arg4");
+            field.Arguments[3].Description.ShouldBeNull();
+            field.Arguments[3].Type.ShouldBe(typeof(BooleanGraphType));
+            field.Arguments[3].DefaultValue.ShouldBe(true);
+            field.Arguments[3].Metadata["useBefore"].ShouldBe(new DateTime(2030, 1, 2));
         }
 
         [Fact]

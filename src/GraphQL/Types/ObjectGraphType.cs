@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -28,7 +27,7 @@ namespace GraphQL.Types
         {
             if (!_resolvedInterfaces.Contains(graphType))
             {
-                _resolvedInterfaces.Add(graphType);
+                _resolvedInterfaces.Add(graphType ?? throw new ArgumentNullException(nameof(graphType)));
             }
         }
 
@@ -55,7 +54,8 @@ namespace GraphQL.Types
         public void Interface<TInterface>()
             where TInterface : IInterfaceGraphType
         {
-            _interfaces.Add(typeof(TInterface));
+            if (!_interfaces.Contains(typeof(TInterface)))
+                _interfaces.Add(typeof(TInterface));
         }
 
         public void Interface(Type type)
@@ -64,11 +64,12 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
-            if (!type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IInterfaceGraphType)))
+            if (!type.GetInterfaces().Contains(typeof(IInterfaceGraphType)))
             {
                 throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
             }
-            _interfaces.Add(type);
+            if (!_interfaces.Contains(type))
+                _interfaces.Add(type);
         }
     }
 

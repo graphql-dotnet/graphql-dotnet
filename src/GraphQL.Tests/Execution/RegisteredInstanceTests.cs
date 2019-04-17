@@ -122,6 +122,8 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
+scalar Byte
+
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
@@ -137,6 +139,8 @@ scalar DateTime
 scalar DateTimeOffset
 
 scalar Decimal
+
+scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -149,10 +153,20 @@ type root {
   listOfObjField: [NestedObjType]
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ");
         }
 
@@ -162,6 +176,8 @@ scalar Uri
             build_schema("non-null").ShouldBeCrossPlat(@"schema {
   query: root
 }
+
+scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
@@ -178,6 +194,8 @@ scalar DateTime
 scalar DateTimeOffset
 
 scalar Decimal
+
+scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -190,10 +208,20 @@ type root {
   listOfObjField: NestedObjType!
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ");
         }
 
@@ -203,6 +231,8 @@ scalar Uri
             build_schema("none").ShouldBeCrossPlat(@"schema {
   query: root
 }
+
+scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
@@ -220,6 +250,8 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -231,10 +263,20 @@ type root {
   listOfObjField: NestedObjType
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ");
         }
 

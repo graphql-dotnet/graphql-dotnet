@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace GraphQL.Language.AST
 
         public void Add(Argument arg)
         {
-            _arguments.Add(arg);
+            _arguments.Add(arg ?? throw new ArgumentNullException(nameof(arg)));
         }
 
         public IValue ValueFor(string name)

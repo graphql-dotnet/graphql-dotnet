@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace GraphQL.Language.AST
 
         public void Add(FragmentDefinition fragment)
         {
-            _fragments.Add(fragment);
+            _fragments.Add(fragment ?? throw new ArgumentNullException(nameof(fragment)));
         }
 
         public FragmentDefinition FindDefinition(string name)

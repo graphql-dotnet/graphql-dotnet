@@ -8,7 +8,7 @@ namespace GraphQL.Introspection
     {
         public __Type()
         {
-            Name = "__Type";
+            Name = nameof(__Type);
             Description =
                 "The fundamental unit of any GraphQL Schema is the type. There are " +
                 "many kinds of types in GraphQL as represented by the `__TypeKind` enum." +
@@ -29,7 +29,7 @@ namespace GraphQL.Introspection
             });
             Field<StringGraphType>("name", resolve: context =>
             {
-                return ((IGraphType) context.Source).Name;
+                return ((IGraphType)context.Source).Name;
             });
             Field<StringGraphType>("description");
             Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,

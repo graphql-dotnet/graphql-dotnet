@@ -119,6 +119,8 @@ namespace GraphQL
         /// <summary>
         /// Returns a camel case version of the string.
         /// </summary>
+        /// <param name="s">The source string.</param>
+        /// <returns>System.String.</returns>
         public static string ToCamelCase(this string s)
         {
             if (string.IsNullOrWhiteSpace(s))
@@ -126,13 +128,17 @@ namespace GraphQL
                 return string.Empty;
             }
 
-            return $"{char.ToLowerInvariant(s[0])}{s.Substring(1)}";
+            var newFirstLetter = char.ToLowerInvariant(s[0]);
+            if (newFirstLetter == s[0])
+                return s;
+
+            return newFirstLetter + s.Substring(1);
         }
 
         /// <summary>
         /// Returns a pascal case version of the string.
         /// </summary>
-        /// <param name="s">The s.</param>
+        /// <param name="s">The source string.</param>
         /// <returns>System.String.</returns>
         public static string ToPascalCase(this string s)
         {
@@ -141,7 +147,11 @@ namespace GraphQL
                 return string.Empty;
             }
 
-            return $"{char.ToUpperInvariant(s[0])}{s.Substring(1)}";
+            var newFirstLetter = char.ToUpperInvariant(s[0]);
+            if (newFirstLetter == s[0])
+                return s;
+
+            return newFirstLetter + s.Substring(1);
         }
 
         /// <summary>

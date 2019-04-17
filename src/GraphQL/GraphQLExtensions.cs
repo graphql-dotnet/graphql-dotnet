@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace GraphQL
@@ -66,7 +65,7 @@ namespace GraphQL
                 resolve = t => (IGraphType) Activator.CreateInstance(t);
             }
 
-            if (type.GetTypeInfo().IsGenericType)
+            if (type.IsGenericType)
             {
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
@@ -90,7 +89,7 @@ namespace GraphQL
 
         public static Type GetNamedType(this Type type)
         {
-            if (type.GetTypeInfo().IsGenericType
+            if (type.IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>) ||
                     type.GetGenericTypeDefinition() == typeof(ListGraphType<>)))
             {
@@ -188,7 +187,7 @@ namespace GraphQL
                 return errors;
             }
 
-            var scalar = (ScalarGraphType) type;
+            var scalar = (ScalarGraphType)type;
 
             var parseResult = scalar.ParseLiteral(valueAst);
 
@@ -225,6 +224,13 @@ namespace GraphQL
             return expression.Body is MemberExpression expr
                 ? (expr.Member.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value
                 : null;
+        }
+
+        public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
+            where TMetadataProvider : IProvideMetadata
+        {
+            provider.Metadata[key] = value;
+            return provider;
         }
 
         /// <summary>
@@ -426,6 +432,31 @@ namespace GraphQL
             if (serialized is TimeSpan span)
             {
                 return new TimeSpanValue(span);
+            }
+
+            if (serialized is Guid guid)
+            {
+                return new GuidValue(guid);
+            }
+
+            if(serialized is short int16)
+            {
+                return new ShortValue(int16);
+            }
+
+            if (serialized is ushort uint16)
+            {
+                return new UShortValue(uint16);
+            }
+
+            if (serialized is uint uint32)
+            {
+                return new UIntValue(uint32);
+            }
+
+            if (serialized is ulong uint64)
+            {
+                return new ULongValue(uint64);
             }
 
             if (serialized is string)

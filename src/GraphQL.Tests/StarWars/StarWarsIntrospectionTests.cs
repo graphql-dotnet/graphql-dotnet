@@ -251,6 +251,34 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR'
                 },
                 {
+                  'name': 'Guid',
+                  'kind': 'SCALAR',
+                },
+                {
+                  'name': 'Short',
+                  'kind': 'SCALAR',
+                },
+                {
+                  'name': 'UShort',
+                  'kind': 'SCALAR',
+                },
+                {
+                  'name': 'UInt',
+                  'kind': 'SCALAR',
+                },
+                {
+                  'name': 'ULong',
+                  'kind': 'SCALAR',
+                },
+                {
+                  'name': 'Byte',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'SByte',
+                  'kind': 'SCALAR'
+                },
+                {
                   'name': '__Schema',
                   'kind': 'OBJECT'
                 },

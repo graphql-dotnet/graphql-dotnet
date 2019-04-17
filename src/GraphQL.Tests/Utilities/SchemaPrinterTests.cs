@@ -14,6 +14,10 @@ namespace GraphQL.Tests.Utilities
         private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
         {
             {
+                "Byte",
+                "scalar Byte"
+            },
+            {
                 "Date",
 @"# The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
@@ -43,6 +47,10 @@ scalar DateTimeOffset"
 scalar Milliseconds"
             },
             {
+                "SByte",
+                "scalar SByte"
+            },
+            {
                 "Seconds",
 @"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds"
@@ -51,6 +59,26 @@ scalar Seconds"
                 "Uri",
                 "scalar Uri"
             },
+            {
+                "Guid",
+                @"scalar Guid"
+            },
+            {
+                "Short",
+                @"scalar Short"
+            },
+            {
+                "UShort",
+                @"scalar UShort"
+            },
+            {
+                "UInt",
+                @"scalar UInt"
+            },
+            {
+                "ULong",
+                @"scalar ULong"
+            }
         };
 
         private string printSingleFieldSchema<T>(
@@ -423,6 +451,8 @@ type Bar implements Foo {
   str: String
 }
 
+scalar Byte
+
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
@@ -444,6 +474,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -451,10 +483,20 @@ type Root {
   bar: Bar
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -477,6 +519,8 @@ type Bar implements Foo & Baaz {
   str: String
 }
 
+scalar Byte
+
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
@@ -498,6 +542,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -505,10 +551,20 @@ type Query {
   bar: Bar
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -534,6 +590,8 @@ type Bar implements Foo, Baaz {
   str: String
 }
 
+scalar Byte
+
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
@@ -555,6 +613,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -562,10 +622,20 @@ type Query {
   bar: Bar
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -595,6 +665,8 @@ type Bar implements Foo & Baaz {
   str: String
 }
 
+scalar Byte
+
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
@@ -617,6 +689,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -624,10 +698,20 @@ type Query {
   bar: Bar
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 
@@ -644,6 +728,8 @@ scalar Uri
 type Bar implements Foo {
   str: String
 }
+
+scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
 # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
@@ -666,6 +752,8 @@ interface Foo {
   str: String
 }
 
+scalar Guid
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -676,12 +764,22 @@ type Query {
   multiple: MultipleUnion
 }
 
+scalar SByte
+
 # The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
+scalar Short
+
 union SingleUnion = Foo
 
+scalar UInt
+
+scalar ULong
+
 scalar Uri
+
+scalar UShort
 ", excludeScalars: true);
         }
 

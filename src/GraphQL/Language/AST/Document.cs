@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -23,7 +24,7 @@ namespace GraphQL.Language.AST
 
         public void AddDefinition(IDefinition definition)
         {
-            _definitions.Add(definition);
+            _definitions.Add(definition ?? throw new ArgumentNullException(nameof(definition)));
 
             if (definition is FragmentDefinition fragmentDefinition)
             {
