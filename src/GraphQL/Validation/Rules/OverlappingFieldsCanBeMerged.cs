@@ -32,7 +32,7 @@ namespace GraphQL.Validation.Rules
 
         public INodeVisitor Validate(ValidationContext context)
         {
-            PairSet camparedFragmentPairs = new PairSet();
+            var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 
             return new EnterLeaveListener(config =>
@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Rules
                     List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                          context,
                          cachedFieldsAndFragmentNames,
-                         camparedFragmentPairs,
+                         comparedFragmentPairs,
                          context.TypeInfo.GetParentType(),
                          selectionSet);
 
@@ -863,7 +863,7 @@ namespace GraphQL.Validation.Rules
             private void PairSetAdd(string a, string b, bool areMutuallyExclusive)
             {
                 _data.TryGetValue(a, out var map);
-                
+
                 if (map == null)
                 {
                     map = new ObjMap<bool>();
