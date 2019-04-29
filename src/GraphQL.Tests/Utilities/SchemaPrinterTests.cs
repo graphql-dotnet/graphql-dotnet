@@ -251,7 +251,7 @@ type Foo {
 
             var schema = new Schema {Query = root};
 
-            var options = new SchemaPrinterOptions()
+            var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true
             };
@@ -286,7 +286,7 @@ type Foo {
 
             var schema = new Schema {Query = root};
 
-            var options = new SchemaPrinterOptions()
+            var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true,
                 IncludeDeprecationReasons = true
@@ -576,7 +576,7 @@ scalar UShort
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions()
+            var options = new SchemaPrinterOptions
             {
                 OldImplementsSyntax = true
             };
@@ -647,7 +647,7 @@ scalar UShort
 
             var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions()
+            var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true
             };

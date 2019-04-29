@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace GraphQL.StarWars
             {
                 Id = "1",
                 Name = "Luke",
-                Friends = new List<string>() { "3", "4" },
+                Friends = new List<string> { "3", "4" },
                 AppearsIn = new[] { 4, 5, 6 },
                 HomePlanet = "Tatooine",
                 Cursor = "MQ=="
@@ -34,7 +34,7 @@ namespace GraphQL.StarWars
             {
                 Id = "3",
                 Name = "R2-D2",
-                Friends = new List<string>() { "1", "4" },
+                Friends = new List<string> { "1", "4" },
                 AppearsIn = new[] { 4, 5, 6 },
                 PrimaryFunction = "Astromech",
                 Cursor = "Mw=="

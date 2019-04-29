@@ -219,8 +219,8 @@ namespace GraphQL.Validation.Rules
                                 Msg = $"{name1} and {name2} are different fields"
                             }
                         },
-                        FieldsLeft = new List<ISelection>() { node1 },
-                        FieldsRight = new List<ISelection>() { node2 }
+                        FieldsLeft = new List<ISelection> { node1 },
+                        FieldsRight = new List<ISelection> { node2 }
                     };
                 }
 
@@ -237,8 +237,8 @@ namespace GraphQL.Validation.Rules
                                 Msg = "they have differing arguments"
                             }
                         },
-                        FieldsLeft = new List<ISelection>() { node1 },
-                        FieldsRight = new List<ISelection>() { node2 }
+                        FieldsLeft = new List<ISelection> { node1 },
+                        FieldsRight = new List<ISelection> { node2 }
                     };
                 }
             }
@@ -255,8 +255,8 @@ namespace GraphQL.Validation.Rules
                             Msg = $"they return conflicting types {type1} and {type2}"
                         }
                     },
-                    FieldsLeft = new List<ISelection>() { node1 },
-                    FieldsRight = new List<ISelection>() { node2 }
+                    FieldsLeft = new List<ISelection> { node1 },
+                    FieldsRight = new List<ISelection> { node2 }
                 };
             }
 
@@ -785,7 +785,7 @@ namespace GraphQL.Validation.Rules
                             Msgs = conflicts.Select(c => c.Reason).ToList()
                         }
                     },
-                    FieldsLeft = conflicts.Aggregate(new List<ISelection>() { node1 }, (allfields, conflict) =>
+                    FieldsLeft = conflicts.Aggregate(new List<ISelection> { node1 }, (allfields, conflict) =>
                     {
                         allfields.AddRange(conflict.FieldsLeft);
                         return allfields;
