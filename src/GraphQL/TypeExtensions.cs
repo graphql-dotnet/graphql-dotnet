@@ -207,8 +207,8 @@ namespace GraphQL
             throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
         }
 
-        private static readonly Type[] _untypedContainers = new[] { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
+        private static readonly Type[] _untypedContainers = { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
 
-        private static readonly Type[] _typedContainers = new [] { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
+        private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
     }
 }
