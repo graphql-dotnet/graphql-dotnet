@@ -5,7 +5,6 @@ using GraphQL.Language.AST;
 using Field = GraphQL.Language.AST.Field;
 using System.Threading.Tasks;
 using System;
-using GraphQL.Conversion;
 
 namespace GraphQL.Types
 {

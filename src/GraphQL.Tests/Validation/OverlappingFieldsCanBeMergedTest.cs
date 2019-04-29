@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation.Rules;
 using System.Collections.Generic;
 using Xunit;
