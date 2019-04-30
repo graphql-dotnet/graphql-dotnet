@@ -18,16 +18,14 @@ namespace GraphQL.Tests.Instrumentation
         public FieldMiddlewareBuilderTests()
         {
             _builder = new FieldMiddlewareBuilder();
-            _context = new ResolveFieldContext();
-            _context.FieldName = "Name";
-            _context.FieldAst = new Field(null, new NameNode("Name"));
-            _context.Source = new Person
+            _context = new ResolveFieldContext
             {
-                Name = "Quinn"
+                FieldName = "Name",
+                FieldAst = new Field(null, new NameNode("Name")),
+                Source = new Person {Name = "Quinn"},
+                Errors = new ExecutionErrors(),
+                Metrics = new Metrics()
             };
-            _context.Errors = new ExecutionErrors();
-
-            _context.Metrics = new Metrics();
         }
 
         [Fact]
