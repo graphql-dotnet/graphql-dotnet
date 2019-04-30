@@ -210,5 +210,34 @@ namespace GraphQL
         private static readonly Type[] _untypedContainers = new[] { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
 
         private static readonly Type[] _typedContainers = new [] { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
+
+        /// <summary>
+        /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
+        /// by testing itself, and then recursively up it's base types hierarchy.
+        /// </summary>
+        /// <param name="type">Type to test.</param>
+        /// <param name="genericType">Type to test for.</param>
+        /// <returns>
+        ///   <c>true</c> if the indicated type implements <paramref name="genericType"/>; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool ImplementsGenericType(this Type type, Type genericType)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+            {
+                return true;
+            }
+
+            var interfaceTypes = type.GetInterfaces();
+            foreach (var it in interfaceTypes)
+            {
+                if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
+                {
+                    return true;
+                }
+            }
+
+            var baseType = type.BaseType;
+            return baseType == null ? false : ImplementsGenericType(baseType, genericType);
+        }
     }
 }
