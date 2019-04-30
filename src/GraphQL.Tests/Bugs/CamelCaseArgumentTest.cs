@@ -18,8 +18,10 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void get_argument_directly_without_schema()
         {
-            var ctx = new ResolveFieldContext();
-            ctx.Arguments = new Dictionary<string, object> { { "argumentValue", "42" } };
+            var ctx = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> {{"argumentValue", "42"}}
+            };
 
             var result = ctx.GetArgument<string>("ArgumentValue", "defaultValue");
             result.ShouldBe("defaultValue");
