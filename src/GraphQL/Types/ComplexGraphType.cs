@@ -1,6 +1,7 @@
 using GraphQL.Builders;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
+using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
