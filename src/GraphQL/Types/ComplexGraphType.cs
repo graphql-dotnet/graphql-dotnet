@@ -315,10 +315,29 @@ namespace GraphQL.Types
             return Field(name, expression, nullable, type);
         }
 
-        public ConnectionBuilder<TNodeType, TSourceType> Connection<TNodeType>()
+        public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
+            AddField(builder.FieldType);
+            return builder;
+        }
+
+        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+        {
+            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>();
+            AddField(builder.FieldType);
+            return builder;
+        }
+
+        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+        {
+            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TConnectionType, TSourceType>();
             AddField(builder.FieldType);
             return builder;
         }

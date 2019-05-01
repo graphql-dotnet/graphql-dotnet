@@ -329,12 +329,17 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            var data = new Dictionary<string, object>();
-            data.Add("human", new Dictionary<string, object>
+            var data = new Dictionary<string, object>
             {
-                {"name", "Boba Fett"},
-                {"homePlanet", "Kamino"}
-            });
+                {
+                    "human",
+                    new Dictionary<string, object>
+                    {
+                        {"name", "Boba Fett"},
+                        {"homePlanet", "Kamino"}
+                    }
+                }
+            };
 
             var variables = new Inputs(data);
 
