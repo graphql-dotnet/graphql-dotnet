@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Execution
             var exception = new Exception("Test");
             var result = await _context.TryAsyncResolve<int>(
                 c => throw exception);
-            result.ShouldBe(default(int));
+            result.ShouldBe(default);
             _context.Errors.First().InnerException.ShouldBe(exception);
         }
 
