@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GraphQL.Types
 {
@@ -13,6 +14,7 @@ namespace GraphQL.Types
         }
     }
 
+    [DebuggerDisplay("{Name,nq}: {ResolvedType?.Name,nq}")]
     public class QueryArgument : IHaveDefaultValue, IProvideMetadata
     {
         public QueryArgument(IGraphType type)
