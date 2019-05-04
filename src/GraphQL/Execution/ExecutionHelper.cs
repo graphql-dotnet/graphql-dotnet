@@ -286,10 +286,11 @@ namespace GraphQL.Execution
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        var fieldValue = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
-                        fieldValue = fieldValue ?? field.DefaultValue;
-
-                        obj[field.Name] = fieldValue;
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                    }
+                    else if (field.DefaultValue != null)
+                    {
+                        obj[field.Name] = field.DefaultValue;
                     }
                 }
 
