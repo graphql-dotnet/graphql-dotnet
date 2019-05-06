@@ -84,13 +84,12 @@ namespace GraphQL.Types
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
         {
             var argumentName = Schema?.FieldNameConverter.NameFor(name, null) ?? name;
-             
-            if (!HasArgument(argumentName))
+
+            if (Arguments == null || !Arguments.TryGetValue(argumentName, out var arg))
             {
                 return defaultValue;
             }
 
-            var arg = Arguments[argumentName];
             if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;

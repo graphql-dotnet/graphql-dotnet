@@ -119,25 +119,30 @@ namespace GraphQL.Builders
             return new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description)
-        {
-            _fieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
+            => Argument<TArgumentGraphType>(name, arg =>
             {
-                Name = name,
-                Description = description,
+                arg.Description = description;
+                configure?.Invoke(arg);
             });
-            return this;
-        }
 
         public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
-            TArgumentType defaultValue = default)
+            TArgumentType defaultValue = default, Action<QueryArgument> configure = null)
+            => Argument<TArgumentGraphType>(name, arg =>
+            {
+                arg.Description = description;
+                arg.DefaultValue = defaultValue;
+                configure?.Invoke(arg);
+            });
+
+        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
         {
-            _fieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
+            var arg = new QueryArgument(typeof(TArgumentGraphType))
             {
                 Name = name,
-                Description = description,
-                DefaultValue = defaultValue,
-            });
+            };
+            configure?.Invoke(arg);
+            _fieldType.Arguments.Add(arg);
             return this;
         }
 
