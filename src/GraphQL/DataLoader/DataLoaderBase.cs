@@ -9,7 +9,9 @@ namespace GraphQL.DataLoader
         protected abstract Task<T> FetchAsync(CancellationToken cancellationToken);
 
         protected Task<T> DataLoaded => _completionSource.Task;
-        private TaskCompletionSource<T> _completionSource = new TaskCompletionSource<T>();
+        private TaskCompletionSource<T> _completionSource = CreateCompletionsSource();
+
+        private static TaskCompletionSource<T> CreateCompletionsSource() => new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         protected abstract bool IsFetchNeeded();
 
@@ -20,7 +22,7 @@ namespace GraphQL.DataLoader
                 return;
             }
 
-            var tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<T>());
+            var tcs = Interlocked.Exchange(ref _completionSource, CreateCompletionsSource());
 
             if (cancellationToken.IsCancellationRequested)
             {
