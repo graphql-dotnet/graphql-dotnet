@@ -85,6 +85,11 @@ namespace GraphQL.Types
             _converters = new List<IAstFromValueConverter>();
         }
 
+        public Schema(IServiceProvider serviceProvider)
+            : this(new ServiceProviderAdapter(serviceProvider))
+        {
+        }
+
         public static ISchema For(string[] typeDefinitions, Action<SchemaBuilder> configure = null)
         {
             var defs = string.Join("\n", typeDefinitions);
