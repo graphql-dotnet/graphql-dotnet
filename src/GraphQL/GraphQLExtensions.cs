@@ -193,7 +193,7 @@ namespace GraphQL
 
             if (parseResult == null)
             {
-                return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
+                return new[] { $"Expected type \"{type?.Name ?? "null"}\", found {AstPrinter.Print(valueAst)}." };
             }
 
             return EmptyStringArray;
