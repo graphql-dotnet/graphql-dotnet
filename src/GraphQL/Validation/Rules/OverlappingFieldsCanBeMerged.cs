@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Rules
 
         public static string ReasonMessage(Message reasonMessage)
         {
-            if (reasonMessage.Msgs != null && reasonMessage.Msgs.Count() > 0)
+            if (reasonMessage.Msgs?.Count > 0)
             {
                 return string.Join(
                     " and ",
@@ -32,7 +32,7 @@ namespace GraphQL.Validation.Rules
 
         public INodeVisitor Validate(ValidationContext context)
         {
-            PairSet camparedFragmentPairs = new PairSet();
+            var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 
             return new EnterLeaveListener(config =>
@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Rules
                     List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                          context,
                          cachedFieldsAndFragmentNames,
-                         camparedFragmentPairs,
+                         comparedFragmentPairs,
                          context.TypeInfo.GetParentType(),
                          selectionSet);
 
@@ -219,8 +219,8 @@ namespace GraphQL.Validation.Rules
                                 Msg = $"{name1} and {name2} are different fields"
                             }
                         },
-                        FieldsLeft = new List<ISelection>() { node1 },
-                        FieldsRight = new List<ISelection>() { node2 }
+                        FieldsLeft = new List<ISelection> { node1 },
+                        FieldsRight = new List<ISelection> { node2 }
                     };
                 }
 
@@ -237,8 +237,8 @@ namespace GraphQL.Validation.Rules
                                 Msg = "they have differing arguments"
                             }
                         },
-                        FieldsLeft = new List<ISelection>() { node1 },
-                        FieldsRight = new List<ISelection>() { node2 }
+                        FieldsLeft = new List<ISelection> { node1 },
+                        FieldsRight = new List<ISelection> { node2 }
                     };
                 }
             }
@@ -255,8 +255,8 @@ namespace GraphQL.Validation.Rules
                             Msg = $"they return conflicting types {type1} and {type2}"
                         }
                     },
-                    FieldsLeft = new List<ISelection>() { node1 },
-                    FieldsRight = new List<ISelection>() { node2 }
+                    FieldsLeft = new List<ISelection> { node1 },
+                    FieldsRight = new List<ISelection> { node2 }
                 };
             }
 
@@ -785,7 +785,7 @@ namespace GraphQL.Validation.Rules
                             Msgs = conflicts.Select(c => c.Reason).ToList()
                         }
                     },
-                    FieldsLeft = conflicts.Aggregate(new List<ISelection>() { node1 }, (allfields, conflict) =>
+                    FieldsLeft = conflicts.Aggregate(new List<ISelection> { node1 }, (allfields, conflict) =>
                     {
                         allfields.AddRange(conflict.FieldsLeft);
                         return allfields;
@@ -863,7 +863,7 @@ namespace GraphQL.Validation.Rules
             private void PairSetAdd(string a, string b, bool areMutuallyExclusive)
             {
                 _data.TryGetValue(a, out var map);
-                
+
                 if (map == null)
                 {
                     map = new ObjMap<bool>();

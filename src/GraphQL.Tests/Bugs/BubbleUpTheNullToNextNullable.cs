@@ -224,12 +224,12 @@ namespace GraphQL.Tests.Bugs
 
             query.Field<NonNullGraphType<DataGraphType>>(
                 "nonNullableDataGraph",
-                resolve: c => new DataGraphType() { Data = c.Source as Data }
+                resolve: c => new DataGraphType { Data = c.Source as Data }
             );
 
             query.Field<DataGraphType>(
                 "nullableDataGraph",
-                resolve: c => new DataGraphType() { Data = c.Source as Data }
+                resolve: c => new DataGraphType { Data = c.Source as Data }
             );
 
             Query = query;
@@ -264,11 +264,11 @@ namespace GraphQL.Tests.Bugs
 
             Field<NonNullGraphType<DataGraphType>>(
                 "nonNullableNest",
-                resolve: c => new DataGraphType() { Data = c.Source.Data.NonNullableNest });
+                resolve: c => new DataGraphType { Data = c.Source.Data.NonNullableNest });
 
             Field<DataGraphType>(
                  "nullableNest",
-                resolve: c => new DataGraphType() { Data = c.Source.Data.NullableNest });
+                resolve: c => new DataGraphType { Data = c.Source.Data.NullableNest });
         }
 
         public Data Data { get; set; }
