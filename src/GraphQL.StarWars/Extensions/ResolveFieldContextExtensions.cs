@@ -52,9 +52,9 @@ namespace GraphQL.StarWars.Extensions
 
             return new Connection<U>
             {
-                Edges = list.Select(x => new Edge<U>() { Cursor = x.Cursor, Node = x }).ToList(),
+                Edges = list.Select(x => new Edge<U> { Cursor = x.Cursor, Node = x }).ToList(),
                 TotalCount = list.Count,
-                PageInfo = new PageInfo()
+                PageInfo = new PageInfo
                 {
                     EndCursor = endCursor,
                     HasNextPage = endCursor == null ? false : !cursor.Equals(endCursor)
