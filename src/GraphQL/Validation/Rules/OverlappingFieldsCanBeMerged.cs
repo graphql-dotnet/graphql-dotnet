@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Rules
 
         public static string ReasonMessage(Message reasonMessage)
         {
-            if (reasonMessage.Msgs != null && reasonMessage.Msgs.Count > 0)
+            if (reasonMessage.Msgs?.Count > 0)
             {
                 return string.Join(
                     " and ",
