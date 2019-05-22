@@ -15,7 +15,7 @@ You can write a class that has a `Resolve` method or you can register a middlewa
 ```csharp
 public class InstrumentFieldsMiddleware
 {
-  public Task<object> Resolve(
+  public async Task<object> Resolve(
     ResolveFieldContext context,
     FieldMiddlewareDelegate next)
   {
@@ -27,7 +27,7 @@ public class InstrumentFieldsMiddleware
 
     using (context.Metrics.Subject("field", context.FieldName, metadata))
     {
-      return next(context);
+      return await next(context);
     }
   }
 }
