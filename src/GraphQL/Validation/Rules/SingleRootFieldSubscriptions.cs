@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
                         return;
                     }
 
-                    int rootFields = operation.SelectionSet.Selections.Count();
+                    int rootFields = operation.SelectionSet.Selections.Count;
 
                     if (rootFields != 1)
                     {

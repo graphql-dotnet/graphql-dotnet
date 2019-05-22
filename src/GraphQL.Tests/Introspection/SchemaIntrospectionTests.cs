@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Introspection
             var documentExecuter = new DocumentExecuter();
             var executionResult = documentExecuter.ExecuteAsync(_ =>
             {
-                _.Schema = new Schema()
+                _.Schema = new Schema
                 {
                     Query = new TestQuery()
                 };

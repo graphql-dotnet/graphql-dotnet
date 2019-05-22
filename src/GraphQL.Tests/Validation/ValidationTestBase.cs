@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Validation
             result.IsValid.ShouldBeFalse("Expected validation errors though there were none.");
             result.Errors.Count.ShouldBe(
                 config.Assertions.Count,
-                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count()}).");
+                $"The number of errors found ({result.Errors.Count}) does not match the number of errors expected ({config.Assertions.Count}).");
 
             for (int i = 0; i < config.Assertions.Count; i++)
             {

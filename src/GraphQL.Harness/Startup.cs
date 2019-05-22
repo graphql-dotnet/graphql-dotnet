@@ -3,7 +3,6 @@ using GraphQL.Http;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using GraphQL.Types.Relay;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
