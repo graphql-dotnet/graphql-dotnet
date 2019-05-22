@@ -1,9 +1,9 @@
-﻿namespace GraphQL.Types.Relay.DataObjects
+namespace GraphQL.Types.Relay.DataObjects
 {
-    public class Edge<T>
+    public class Edge<TNode>
     {
         public string Cursor { get; set; }
 
-        public T Node { get; set; }
+        public TNode Node { get; set; }
     }
 }

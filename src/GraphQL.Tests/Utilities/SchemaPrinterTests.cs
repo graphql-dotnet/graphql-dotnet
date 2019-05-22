@@ -87,8 +87,7 @@ scalar Seconds"
         {
             var args = arguments != null ? new QueryArguments(arguments) : null;
 
-            var root = new ObjectGraphType();
-            root.Name = "Query";
+            var root = new ObjectGraphType {Name = "Query"};
             root.Field<T>(
                 "singleField",
                 arguments: args);

@@ -322,15 +322,10 @@ namespace GraphQL.Types
                 }
                 if (namedType.IsGenericType)
                 {
-                    var genericDefinition = namedType.GetGenericTypeDefinition();
-                    if (genericDefinition == typeof(EdgeType<>))
+                    if (namedType.ImplementsGenericType(typeof(EdgeType<>)) ||
+                        namedType.ImplementsGenericType(typeof(ConnectionType<,>)))
                     {
-                        AddType((IGraphType) Activator.CreateInstance(namedType), context);
-                        return;
-                    }
-                    if (genericDefinition == typeof(ConnectionType<>))
-                    {
-                        AddType((IGraphType) Activator.CreateInstance(namedType), context);
+                        AddType((IGraphType)Activator.CreateInstance(namedType), context);
                         return;
                     }
                 }

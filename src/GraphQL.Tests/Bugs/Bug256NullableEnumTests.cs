@@ -15,8 +15,10 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nullable_enum_returns_value()
         {
-            var ctx = new ResolveFieldContext();
-            ctx.Arguments = new Dictionary<string, object> { { "value", EnumType.B } };
+            var ctx = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> {{"value", EnumType.B}}
+            };
 
             var result = ctx.GetArgument<EnumType?>("value");
             result.ShouldBe(EnumType.B);
@@ -25,8 +27,10 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nullable_enum_returns_null()
         {
-            var ctx = new ResolveFieldContext();
-            ctx.Arguments = new Dictionary<string, object> { { "value", null } };
+            var ctx = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> {{"value", null}}
+            };
 
             var result = ctx.GetArgument<EnumType?>("value");
             result.ShouldBeNull();
@@ -35,8 +39,10 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void null_enum_returns_default()
         {
-            var ctx = new ResolveFieldContext();
-            ctx.Arguments = new Dictionary<string, object> { { "value", null } };
+            var ctx = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> {{"value", null}}
+            };
 
             var result = ctx.GetArgument<EnumType>("value");
             result.ShouldBe(EnumType.A);
@@ -45,8 +51,10 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void enum_returns_value()
         {
-            var ctx = new ResolveFieldContext();
-            ctx.Arguments = new Dictionary<string, object> { { "value", EnumType.B } };
+            var ctx = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object> {{"value", EnumType.B}}
+            };
 
             var result = ctx.GetArgument<EnumType>("value");
             result.ShouldBe(EnumType.B);

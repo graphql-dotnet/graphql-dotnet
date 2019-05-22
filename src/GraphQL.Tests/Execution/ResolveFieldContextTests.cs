@@ -14,9 +14,11 @@ namespace GraphQL.Tests.Execution
 
         public ResolveFieldContextTests()
         {
-            _context = new ResolveFieldContext();
-            _context.Arguments = new Dictionary<string, object>();
-            _context.Errors = new ExecutionErrors();
+            _context = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>(),
+                Errors = new ExecutionErrors()
+            };
         }
 
         [Fact]
