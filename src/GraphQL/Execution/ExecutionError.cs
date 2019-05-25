@@ -26,7 +26,7 @@ namespace GraphQL
         public ExecutionError(string message, Exception exception)
             : base(message, exception)
         {
-            var ex = exception?.InnerException ?? exception;
+            var ex = GetMostNestedException(exception);
             SetCode(ex);
             SetData(ex);
         }
@@ -49,6 +49,16 @@ namespace GraphQL
             }
 
             _errorLocations.Add(new ErrorLocation { Line = line, Column = column });
+        }
+
+        private Exception GetMostNestedException(Exception ex)
+        {
+            var current = ex;
+
+            while (current?.InnerException != null)
+                current = current.InnerException;
+
+            return current;
         }
 
         private void SetCode(Exception exception)
