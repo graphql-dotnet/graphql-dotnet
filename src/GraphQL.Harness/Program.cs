@@ -19,6 +19,7 @@ namespace GraphQL.Harness
                 .UseContentRoot(directory)
                 .UseWebRoot(Path.Combine(directory, "public"))
                 .UseStartup<Startup>()
+                .UseDefaultServiceProvider(options => options.ValidateScopes = true) // validation disabled by default
                 .Build();
         }
     }

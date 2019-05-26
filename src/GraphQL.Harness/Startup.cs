@@ -31,6 +31,8 @@ namespace GraphQL.Harness
 
             services.AddSingleton<StarWarsData>();
             services.AddSingleton<StarWarsQuery>();
+            services.AddScoped<ScopedDependency>().AddFunc<ScopedDependency>(); // each scoped registration goes in pair with Func<>
+            services.AddScoped<ScopedOtherDependency>().AddFunc<ScopedOtherDependency>(); // each scoped registration goes in pair with Func<>
             services.AddSingleton<StarWarsMutation>();
             services.AddSingleton<HumanType>();
             services.AddSingleton<HumanInputType>();
@@ -39,7 +41,8 @@ namespace GraphQL.Harness
             services.AddSingleton<EpisodeEnum>();
             services.AddSingleton<ISchema, StarWarsSchema>();
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            // services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); no longer required explicitly
+            services.AddHttpScope();
 
             services.AddLogging(builder => builder.AddConsole());
         }
