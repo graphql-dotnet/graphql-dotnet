@@ -457,6 +457,10 @@ namespace GraphQL.Tests.StarWars
                         'defaultValue': 'null'
                       }
                     ]
+                  },
+                  {
+                    'name': 'scopedtest',
+                    'args': []
                   }
                 ]
               }
