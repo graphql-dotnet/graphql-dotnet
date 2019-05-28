@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
@@ -37,5 +38,7 @@ namespace GraphQL
         public bool SetFieldMiddleware { get; set; } = true;
 
         public bool ThrowOnUnhandledException { get; set; } = false;
+
+        public Func<Exception, Exception> UnhandledExceptionDelegate { get; set; } = ex => ex;
     }
 }

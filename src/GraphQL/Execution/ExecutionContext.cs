@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -38,5 +39,7 @@ namespace GraphQL.Execution
         public IEnumerable<IDocumentExecutionListener> Listeners { get; set; } = Enumerable.Empty<IDocumentExecutionListener>();
 
         public bool ThrowOnUnhandledException { get; set; }
+
+        public Func<Exception, Exception> UnhandledExceptionDelegate { get; set; }
     }
 }

@@ -153,7 +153,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.UnhandledExceptionDelegate);
 
                 if (context.Errors.Any())
                 {
@@ -206,6 +207,8 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                ex = options.UnhandledExceptionDelegate(ex);
+
                 result = new ExecutionResult
                 {
                     Errors = new ExecutionErrors
@@ -234,7 +237,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            Func<Exception, Exception> unhandledExceptionDelegate)
         {
             var context = new ExecutionContext
             {
@@ -250,7 +254,8 @@ namespace GraphQL
 
                 Metrics = metrics,
                 Listeners = listeners,
-                ThrowOnUnhandledException = throwOnUnhandledException
+                ThrowOnUnhandledException = throwOnUnhandledException,
+                UnhandledExceptionDelegate = unhandledExceptionDelegate
             };
 
             return context;

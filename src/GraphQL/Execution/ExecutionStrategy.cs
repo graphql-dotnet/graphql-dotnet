@@ -254,6 +254,8 @@ namespace GraphQL.Execution
                 if (context.ThrowOnUnhandledException)
                     throw;
 
+                ex = context.UnhandledExceptionDelegate(ex);
+
                 var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
                 error.Path = node.Path;
