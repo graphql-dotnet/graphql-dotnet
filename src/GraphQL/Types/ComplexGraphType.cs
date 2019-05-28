@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GraphQL.Subscription;
 using GraphQL.Utilities;
 using GraphQL.Types.Relay;
+using System.ComponentModel;
 
 namespace GraphQL.Types
 {
@@ -25,6 +26,12 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         private readonly List<FieldType> _fields = new List<FieldType>();
+
+        protected ComplexGraphType()
+        {
+            Description = (typeof(TSourceType).GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+            DeprecationReason = (typeof(TSourceType).GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
+        }
 
         public IEnumerable<FieldType> Fields
         {
