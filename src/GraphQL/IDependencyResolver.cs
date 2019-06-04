@@ -90,4 +90,18 @@ namespace GraphQL
             return _resolver(type);
         }
     }
+
+    internal sealed class ServiceProviderAdapter : IDependencyResolver
+    {
+        private readonly IServiceProvider _services;
+
+        public ServiceProviderAdapter(IServiceProvider services)
+        {
+            _services = services;
+        }
+
+        public T Resolve<T>() => (T)_services.GetService(typeof(T));
+
+        public object Resolve(Type type) => _services.GetService(type);
+    }
 }

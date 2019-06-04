@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests
     public class DataLoaderTestSchema : Schema
     {
         public DataLoaderTestSchema(IServiceProvider services, QueryType query, SubscriptionType subscriptionType)
-            : base(new DependencyResolver(services))
+            : base(services)
         {
             Query = query;
             Subscription = subscriptionType;
