@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
-using Field = GraphQL.Language.AST.Field;
-using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Types
 {
@@ -104,11 +104,7 @@ namespace GraphQL.Types
             return arg.GetPropertyValue(argumentType);
         }
 
-        public bool HasArgument(string argumentName)
-        {
-            return Arguments?.ContainsKey(argumentName) ?? false;
-        }
-
+        public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;
 
         public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
         {
