@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             Services.Register<PeopleType>();
 
-            Services.Singleton(new ListPerformanceSchema(new FuncDependencyResolver(type => Services.Get(type))));
+            Services.Singleton(new ListPerformanceSchema(new SimpleContainerAdapater(Services)));
 
             _people = new List<Person>();
 
@@ -228,7 +229,7 @@ namespace GraphQL.Tests.Execution.Performance
 
     public class ListPerformanceSchema : Schema
     {
-        public ListPerformanceSchema(IDependencyResolver resolver)
+        public ListPerformanceSchema(IServiceProvider resolver)
             : base(resolver)
         {
             Query = resolver.Resolve<PeopleType>();

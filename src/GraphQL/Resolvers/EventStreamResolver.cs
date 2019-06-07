@@ -49,14 +49,14 @@ namespace GraphQL.Resolvers
     public class EventStreamResolver : IEventStreamResolver
     {
         private readonly IAccessor _accessor;
-        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IServiceProvider _dependencyResolver;
         private readonly object _target;
 
-        public EventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
+        public EventStreamResolver(IAccessor accessor, IServiceProvider dependencyResolver)
         {
             _accessor = accessor;
             _dependencyResolver = dependencyResolver;
-            _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
+            _target = _dependencyResolver.GetService(_accessor.DeclaringType);
         }
 
         public IObservable<object> Subscribe(ResolveEventStreamContext context)

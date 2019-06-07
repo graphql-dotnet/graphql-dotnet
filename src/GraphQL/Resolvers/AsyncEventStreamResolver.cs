@@ -52,14 +52,14 @@ namespace GraphQL.Resolvers
     public class AsyncEventStreamResolver : IAsyncEventStreamResolver
     {
         private readonly IAccessor _accessor;
-        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IServiceProvider _dependencyResolver;
         private readonly object _target;
 
-        public AsyncEventStreamResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
+        public AsyncEventStreamResolver(IAccessor accessor, IServiceProvider dependencyResolver)
         {
             _accessor = accessor;
             _dependencyResolver = dependencyResolver;
-            _target = _dependencyResolver.Resolve(_accessor.DeclaringType);
+            _target = _dependencyResolver.GetService(_accessor.DeclaringType);
         }
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)

@@ -40,7 +40,7 @@ namespace GraphQL.Utilities
             IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeof(T)) ?? false;
         }
 
-        public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
+        public FieldConfig FieldFor(string field, IServiceProvider dependencyResolver)
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
@@ -59,7 +59,7 @@ namespace GraphQL.Utilities
             return config;
         }
 
-        public FieldConfig SubscriptionFieldFor(string field, IDependencyResolver dependencyResolver)
+        public FieldConfig SubscriptionFieldFor(string field, IServiceProvider dependencyResolver)
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);

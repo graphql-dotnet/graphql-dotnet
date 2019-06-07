@@ -14,9 +14,16 @@ namespace GraphQL.Utilities
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
-        public IDependencyResolver DependencyResolver { get; set; } = new DefaultDependencyResolver();
+        public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
         public TypeSettings Types { get; } = new TypeSettings();
+
+        public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
+        {
+            {"deprecated", typeof(DeprecatedDirectiveVisistor)}
+        };
+
+        private List<IVisitorSelector> Visitors { get; } = new List<IVisitorSelector>();
 
         public SchemaBuilder RegisterType(IGraphType type)
         {
@@ -49,7 +56,12 @@ namespace GraphQL.Utilities
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema(DependencyResolver);
+            if (Directives.Any())
+            {
+                Visitors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetService(t)));
+            }
+
+            var schema = new Schema(ServiceProvider);
 
             var directives = new List<DirectiveGraphType>();
 
@@ -151,7 +163,7 @@ namespace GraphQL.Utilities
 
             var typeList = _types.Values.ToArray();
             typeList.Apply(schema.RegisterType);
-            schema.RegisterDirectives(directives);
+            schema.RegisterDirectives(directives.ToArray());
 
             return schema;
         }
@@ -180,8 +192,6 @@ namespace GraphQL.Utilities
             {
                 type.Description = typeConfig.Description ?? astType.Comment?.Text;
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
-
-                ApplyDeprecatedDirective(astType.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
             }
 
             CopyMetadata(type, typeConfig);
@@ -205,13 +215,17 @@ namespace GraphQL.Utilities
                 .ToList();
             interfaces.Apply(type.AddResolvedInterface);
 
+            type.SetAstType(astType);
+
+            VisitNode(type, v => v.VisitObjectGraphType(type));
+
             return type;
         }
 
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, DependencyResolver);
+            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, ServiceProvider);
 
             var field = new FieldType
             {
@@ -225,8 +239,11 @@ namespace GraphQL.Utilities
 
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
+            field.DeprecationReason = fieldConfig.DeprecationReason;
 
-            ApplyDeprecatedDirective(fieldDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
+            field.SetAstType(fieldDef);
+
+            VisitNode(field, v => v.VisitField(field));
 
             return field;
         }
@@ -234,7 +251,7 @@ namespace GraphQL.Utilities
         protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.SubscriptionFieldFor(fieldDef.Name.Value, DependencyResolver);
+            var fieldConfig = typeConfig.SubscriptionFieldFor(fieldDef.Name.Value, ServiceProvider);
 
             var field = new EventStreamFieldType
             {
@@ -251,49 +268,25 @@ namespace GraphQL.Utilities
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
 
-            ApplyDeprecatedDirective(fieldDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
+            field.SetAstType(fieldDef);
+
+            VisitNode(field, v => v.VisitField(field));
 
             return field;
-        }
-
-        private static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
-        private void ApplyDeprecatedDirective(IEnumerable<GraphQLDirective> directives, Action<string> apply)
-        {
-            var deprecated = directives.Directive("deprecated");
-
-            if (deprecated != null)
-            {
-                var arg = deprecated.Arguments.Argument("reason");
-                var value = "";
-
-                if (arg != null)
-                {
-                    value = ToValue(arg.Value).ToString();
-                }
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    value = DeprecatedDefaultValue;
-                }
-
-                apply(value);
-            }
         }
 
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.FieldFor(inputDef.Name.Value, DependencyResolver);
+            var fieldConfig = typeConfig.FieldFor(inputDef.Name.Value, ServiceProvider);
 
             var field = new FieldType
             {
                 Name = inputDef.Name.Value,
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text,
                 ResolvedType = ToGraphType(inputDef.Type),
-                DefaultValue = ToValue(inputDef.DefaultValue)
+                DefaultValue = inputDef.DefaultValue.ToValue()
             };
-
-            ApplyDeprecatedDirective(inputDef.Directives, reason => field.DeprecationReason = fieldConfig.DeprecationReason ?? reason);
 
             return field;
         }
@@ -308,8 +301,6 @@ namespace GraphQL.Utilities
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
-
-            ApplyDeprecatedDirective(interfaceDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             CopyMetadata(type, typeConfig);
 
@@ -330,8 +321,6 @@ namespace GraphQL.Utilities
                 ResolveType = typeConfig.ResolveType
             };
 
-            ApplyDeprecatedDirective(unionDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
-
             CopyMetadata(type, typeConfig);
 
             var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value) ?? new GraphQLTypeReference(x.Name.Value));
@@ -348,8 +337,6 @@ namespace GraphQL.Utilities
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
             };
-
-            ApplyDeprecatedDirective(inputDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             CopyMetadata(type, typeConfig);
 
@@ -368,8 +355,6 @@ namespace GraphQL.Utilities
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
             };
-
-            ApplyDeprecatedDirective(enumDef.Directives, reason => type.DeprecationReason = typeConfig.DeprecationReason ?? reason);
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -411,7 +396,9 @@ namespace GraphQL.Utilities
                 Description = valDef.Comment?.Text
             };
 
-            ApplyDeprecatedDirective(valDef.Directives, reason => val.DeprecationReason = reason);
+            val.SetAstType(valDef);
+
+            VisitNode(val, v => v.VisitEnumValue(val));
 
             return val;
         }
@@ -423,7 +410,7 @@ namespace GraphQL.Utilities
             return new QueryArgument(type)
             {
                 Name = inputDef.Name.Value,
-                DefaultValue = ToValue(inputDef.DefaultValue),
+                DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
             };
@@ -457,7 +444,36 @@ namespace GraphQL.Utilities
             }
         }
 
-        private object ToValue(GraphQLValue source)
+        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
+        {
+            source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
+        }
+
+        protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
+        {
+            foreach(var selector in Visitors)
+            {
+                foreach(var visitor in selector.Select(node))
+                {
+                    action(visitor);
+                }
+            }
+        }
+    }
+
+    internal static class SchemaExtensions
+    {
+        public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
+        {
+            return directives?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static GraphQLArgument Argument(this IEnumerable<GraphQLArgument> arguments, string name)
+        {
+            return arguments?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static object ToValue(this GraphQLValue source)
         {
             if (source == null)
             {
@@ -531,24 +547,6 @@ namespace GraphQL.Utilities
                 default:
                     throw new ExecutionError($"Unsupported value type {source.Kind}");
             }
-        }
-
-        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
-        {
-            source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
-        }
-    }
-
-    internal static class SchemaExtensions
-    {
-        public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
-        {
-            return directives?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static GraphQLArgument Argument(this IEnumerable<GraphQLArgument> arguments, string name)
-        {
-            return arguments?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
