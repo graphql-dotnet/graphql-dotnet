@@ -13,6 +13,7 @@ namespace GraphQL.Utilities
     public class SchemaBuilder
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
@@ -23,7 +24,17 @@ namespace GraphQL.Utilities
             { "deprecated", typeof(DeprecatedDirectiveVisistor) }
         };
 
-        private List<IVisitorSelector> VisitorSelectors { get; } = new List<IVisitorSelector>();
+        public SchemaBuilder RegisterDirectiveVisitor<T>(string name) where T : SchemaDirectiveVisitor
+        {
+            Directives[name] = typeof(T);
+            return this;
+        }
+
+        public SchemaBuilder RegisterVisitorSelector<T>(T selector) where T : IVisitorSelector
+        {
+            _visitorSelectors.Add(selector);
+            return this;
+        }
 
         public SchemaBuilder RegisterType(IGraphType type)
         {
@@ -58,7 +69,7 @@ namespace GraphQL.Utilities
         {
             if (Directives.Any())
             {
-                VisitorSelectors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetRequiredService(t)));
+                _visitorSelectors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetRequiredService(t)));
             }
 
             var schema = new Schema(ServiceProvider);
@@ -452,7 +463,7 @@ namespace GraphQL.Utilities
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
         {
-            foreach(var selector in VisitorSelectors)
+            foreach(var selector in _visitorSelectors)
             {
                 foreach(var visitor in selector.Select(node))
                 {

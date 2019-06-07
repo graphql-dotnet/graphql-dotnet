@@ -7,7 +7,7 @@ namespace GraphQL.Utilities
     {
         private const string __AST_MetaField__ = "__AST_MetaField__";
 
-        public static T GetAstType<T>(this IProvideMetadata type) where T : ASTNode
+        public static T GetAstType<T>(this IProvideMetadata type) where T : class
         {
             if (type.Metadata.TryGetValue(__AST_MetaField__, out object value))
             {

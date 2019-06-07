@@ -15,7 +15,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_basic_custom_directive()
         {
-            Builder.Directives["upper"] = typeof(UppercaseDirectiveVisitor);
+            Builder.RegisterDirectiveVisitor<UppercaseDirectiveVisitor>("upper");
 
             AssertQuery(_ =>
             {
@@ -53,7 +53,7 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void can_create_custom_directive_with_tasks()
         {
-            Builder.Directives["upper"] = typeof(AsyncUppercaseDirectiveVisitor);
+            Builder.RegisterDirectiveVisitor<AsyncUppercaseDirectiveVisitor>("upper");
             Builder.Types.Include<Query>();
 
             AssertQuery(_ =>
