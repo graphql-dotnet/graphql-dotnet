@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using Shouldly;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace GraphQL.Tests.Execution.Performance
         {
             Services.Register<PerfQuery>();
 
-            Services.Singleton(() => new ThreadPerformanceSchema(new SimpleContainerAdapater(Services)));
+            Services.Singleton(() => new ThreadPerformanceSchema(new SimpleContainerAdapter(Services)));
         }
 
         public class PerfQuery : ObjectGraphType<object>
@@ -57,11 +58,11 @@ namespace GraphQL.Tests.Execution.Performance
 
         public class ThreadPerformanceSchema : Schema
         {
-            public ThreadPerformanceSchema(IServiceProvider resolver)
-                : base(resolver)
+            public ThreadPerformanceSchema(IServiceProvider serviceProvider)
+                : base(serviceProvider)
             {
-                Query = resolver.Resolve<PerfQuery>();
-                Mutation = resolver.Resolve<PerfMutation>();
+                Query = serviceProvider.GetRequiredService<PerfQuery>();
+                Mutation = serviceProvider.GetRequiredService<PerfMutation>();
             }
         }
 

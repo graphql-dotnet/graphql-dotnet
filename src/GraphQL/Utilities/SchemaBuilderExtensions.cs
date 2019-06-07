@@ -5,7 +5,7 @@ namespace GraphQL.Utilities
 {
     internal static class SchemaBuilderExtensions
     {
-        public const string __AST_MetaField__ = "__AST_MetaField__";
+        private const string __AST_MetaField__ = "__AST_MetaField__";
 
         public static T GetAstType<T>(this IProvideMetadata type) where T : ASTNode
         {

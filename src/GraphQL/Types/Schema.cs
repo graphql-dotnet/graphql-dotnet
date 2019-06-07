@@ -8,8 +8,6 @@ namespace GraphQL.Types
 {
     public interface ISchema : IDisposable
     {
-        IServiceProvider Services { get; }
-
         bool Initialized { get; }
 
         void Initialize();
@@ -242,7 +240,7 @@ namespace GraphQL.Types
         private GraphTypesLookup CreateTypesLookup()
         {
             var resolvedTypes = _additionalTypes
-                .Select(t => Services.GetService(t.GetNamedType()) as IGraphType)
+                .Select(t => Services.GetRequiredService(t.GetNamedType()) as IGraphType)
                 .ToList();
 
             var types = _additionalInstances.Union(
@@ -259,7 +257,7 @@ namespace GraphQL.Types
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => Services.GetService(type) as IGraphType,
+                type => Services.GetRequiredService(type) as IGraphType,
                 FieldNameConverter);
         }
     }

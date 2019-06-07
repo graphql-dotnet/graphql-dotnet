@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace GraphQL.Tests.Execution
             Services.Register<PetType>();
             Services.Register<PersonType>();
 
-            Services.Singleton(new UnionSchema(new SimpleContainerAdapater(Services)));
+            Services.Singleton(new UnionSchema(new SimpleContainerAdapter(Services)));
 
             var garfield = new Cat
             {
@@ -367,7 +368,7 @@ namespace GraphQL.Tests.Execution
         public UnionSchema(IServiceProvider resolver)
             : base(resolver)
         {
-            Query = resolver.Resolve<PersonType>();
+            Query = resolver.GetRequiredService<PersonType>();
         }
     }
 }

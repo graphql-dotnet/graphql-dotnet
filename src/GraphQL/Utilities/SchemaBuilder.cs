@@ -20,10 +20,10 @@ namespace GraphQL.Utilities
 
         public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
         {
-            {"deprecated", typeof(DeprecatedDirectiveVisistor)}
+            { "deprecated", typeof(DeprecatedDirectiveVisistor) }
         };
 
-        private List<IVisitorSelector> Visitors { get; } = new List<IVisitorSelector>();
+        private List<IVisitorSelector> VisitorSelectors { get; } = new List<IVisitorSelector>();
 
         public SchemaBuilder RegisterType(IGraphType type)
         {
@@ -58,7 +58,7 @@ namespace GraphQL.Utilities
         {
             if (Directives.Any())
             {
-                Visitors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetService(t)));
+                VisitorSelectors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetRequiredService(t)));
             }
 
             var schema = new Schema(ServiceProvider);
@@ -163,7 +163,7 @@ namespace GraphQL.Utilities
 
             var typeList = _types.Values.ToArray();
             typeList.Apply(schema.RegisterType);
-            schema.RegisterDirectives(directives.ToArray());
+            schema.RegisterDirectives(directives);
 
             return schema;
         }
@@ -260,7 +260,8 @@ namespace GraphQL.Utilities
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
-                AsyncSubscriber = fieldConfig.AsyncSubscriber
+                AsyncSubscriber = fieldConfig.AsyncSubscriber,
+                DeprecationReason = fieldConfig.DeprecationReason
             };
 
             CopyMetadata(field, fieldConfig);
@@ -451,7 +452,7 @@ namespace GraphQL.Utilities
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
         {
-            foreach(var selector in Visitors)
+            foreach(var selector in VisitorSelectors)
             {
                 foreach(var visitor in selector.Select(node))
                 {
