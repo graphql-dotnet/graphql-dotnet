@@ -5,6 +5,7 @@ namespace GraphQL
     /// <summary>
     /// Basic DependencyResolver
     /// </summary>
+    [Obsolete("Use IServiceProvider instead")]
     public interface IDependencyResolver
     {
         /// <summary>
@@ -23,45 +24,51 @@ namespace GraphQL
     /// <summary>
     /// Dependency resolver based on Activator.CreateInstance
     /// </summary>
-    /// <seealso cref="GraphQL.IDependencyResolver" />
-    public class DefaultDependencyResolver : IDependencyResolver
+    /// <seealso cref="System.IServiceProvider" />
+    public sealed class DefaultServiceProvider : IServiceProvider
     {
         /// <summary>
-        /// Resolves the specified type.
+        /// Gets the specified service type.
         /// </summary>
-        /// <typeparam name="T">Desired type</typeparam>
-        /// <returns>T.</returns>
-        public T Resolve<T>()
-        {
-            return (T)Resolve(typeof(T));
-        }
-
-        /// <summary>
-        /// Resolves the specified type.
-        /// </summary>
-        /// <param name="type">Desired type</param>
-        /// <returns>An instance of <paramref name="type"/>.</returns>
-        public object Resolve(Type type)
+        /// <param name="serviceType">Desired type</param>
+        /// <returns>An instance of <paramref name="serviceType"/>.</returns>
+        public object GetService(Type serviceType)
         {
             try
             {
-                return Activator.CreateInstance(type);
+                return Activator.CreateInstance(serviceType);
             }
             catch (Exception exception)
             {
-                throw new Exception($"Failed to call Activator.CreateInstance. Type: {type.FullName}", exception);
+                throw new Exception($"Failed to call Activator.CreateInstance. Type: {serviceType.FullName}", exception);
             }
         }
     }
 
-    /// <summary>
-    /// Func based dependency resolver.
-    /// </summary>
-    /// <seealso cref="GraphQL.IDependencyResolver" />
-    /// <remarks>This is mainly used as an adapter for other dependency resolvers such as DI frameworks.</remarks>
-    public class FuncDependencyResolver : IDependencyResolver
+    internal sealed class DependencyResolverToServiceProviderAdapter : IServiceProvider
     {
-        private readonly Func<Type, object> _resolver;
+        private readonly IDependencyResolver _resolver;
+
+        public DependencyResolverToServiceProviderAdapter(IDependencyResolver resolver)
+        {
+            _resolver = resolver;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            return _resolver.Resolve(serviceType);
+        }
+    }
+
+    /// <summary>
+    /// Func based service provider.
+    /// </summary>
+    /// <seealso cref="System.IServiceProvider" />
+    /// <remarks>This is mainly used as an adapter for other dependency resolvers such as DI frameworks.</remarks>
+    [Obsolete("Use GraphQL.FuncServiceProvider instead.")]
+    public sealed class FuncDependencyResolver : IServiceProvider
+    {
+        private readonly FuncServiceProvider _provider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FuncDependencyResolver"/> class.
@@ -69,39 +76,44 @@ namespace GraphQL
         /// <param name="resolver">The resolver function.</param>
         public FuncDependencyResolver(Func<Type, object> resolver)
         {
-            _resolver = resolver;
-        }
-
-        /// <summary>
-        /// Resolves the specified type.
-        /// </summary>
-        /// <typeparam name="T">Desired type</typeparam>
-        public T Resolve<T>()
-        {
-            return (T)Resolve(typeof(T));
+            _provider = new FuncServiceProvider(resolver);
         }
 
         /// <summary>
         /// Resolves the specified type.
         /// </summary>
         /// <param name="type">Desired type</param>
-        public object Resolve(Type type)
+        public object GetService(Type type)
         {
-            return _resolver(type);
+            return _provider.GetService(type);
         }
     }
 
-    internal sealed class ServiceProviderAdapter : IDependencyResolver
+    /// <summary>
+    /// Func based service provider.
+    /// </summary>
+    /// <seealso cref="System.IServiceProvider" />
+    /// <remarks>This is mainly used as an adapter for other service providers such as DI frameworks.</remarks>
+    public sealed class FuncServiceProvider : IServiceProvider
     {
-        private readonly IServiceProvider _services;
+        private readonly Func<Type, object> _resolver;
 
-        public ServiceProviderAdapter(IServiceProvider services)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FuncServiceProvider"/> class.
+        /// </summary>
+        /// <param name="resolver">The resolver function.</param>
+        public FuncServiceProvider(Func<Type, object> resolver)
         {
-            _services = services;
+            _resolver = resolver;
         }
 
-        public T Resolve<T>() => (T)_services.GetService(typeof(T));
-
-        public object Resolve(Type type) => _services.GetService(type);
+        /// <summary>
+        /// Gets an instance of the specified type.
+        /// </summary>
+        /// <param name="type">Desired type</param>
+        public object GetService(Type type)
+        {
+            return _resolver(type);
+        }
     }
 }
