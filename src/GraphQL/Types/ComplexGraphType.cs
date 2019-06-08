@@ -26,6 +26,12 @@ namespace GraphQL.Types
     {
         private readonly List<FieldType> _fields = new List<FieldType>();
 
+        protected ComplexGraphType()
+        {
+            Description = Description ?? typeof(TSourceType).Description();
+            DeprecationReason = DeprecationReason ?? typeof(TSourceType).ObsoleteMessage();
+        }
+
         public IEnumerable<FieldType> Fields
         {
             get => _fields;
