@@ -8,6 +8,7 @@ using System.Reflection;
 namespace GraphQL
 {
     using System.Collections;
+    using System.ComponentModel;
 
     public static class TypeExtensions
     {
@@ -239,5 +240,9 @@ namespace GraphQL
             var baseType = type.BaseType;
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
+
+        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+
+        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }
 }
