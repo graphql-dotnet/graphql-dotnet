@@ -30,36 +30,6 @@ namespace GraphQL.Utilities
                     yield return visitor;
                 }
             }
-
-            // if (node is ObjectGraphType obj)
-            // {
-            //     var ast = obj.GetAstType<GraphQLObjectTypeDefinition>();
-            //     if (ast == null) yield break;
-            //     foreach(var visitor in BuildVisitors(ast.Directives))
-            //     {
-            //         yield return visitor;
-            //     }
-            // }
-
-            // if (node is FieldType field)
-            // {
-            //     var ast = field.GetAstType<GraphQLFieldDefinition>();
-            //     if (ast == null) yield break;
-            //     foreach(var visitor in BuildVisitors(ast.Directives))
-            //     {
-            //         yield return visitor;
-            //     }
-            // }
-
-            // if (node is EnumValueDefinition enumValue)
-            // {
-            //     var ast = enumValue.GetAstType<GraphQLEnumValueDefinition>();
-            //     if (ast == null) yield break;
-            //     foreach(var visitor in BuildVisitors(ast.Directives))
-            //     {
-            //         yield return visitor;
-            //     }
-            // }
         }
 
         private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
