@@ -44,9 +44,6 @@ namespace GraphQL.Types
             return base.Equals(obj);
         }
 
-        public override int GetHashCode()
-        {
-            return TypeName?.GetHashCode() ?? 0;
-        }
+        public override int GetHashCode() => TypeName?.GetHashCode() ?? 0;
     }
 }

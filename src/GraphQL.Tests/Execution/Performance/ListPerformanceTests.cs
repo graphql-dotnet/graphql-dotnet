@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Conversion;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,7 +19,7 @@ namespace GraphQL.Tests.Execution.Performance
 
             Services.Register<PeopleType>();
 
-            Services.Singleton(new ListPerformanceSchema(new FuncDependencyResolver(type => Services.Get(type))));
+            Services.Singleton(new ListPerformanceSchema(new SimpleContainerAdapter(Services)));
 
             _people = new List<Person>();
 
@@ -228,10 +230,10 @@ namespace GraphQL.Tests.Execution.Performance
 
     public class ListPerformanceSchema : Schema
     {
-        public ListPerformanceSchema(IDependencyResolver resolver)
-            : base(resolver)
+        public ListPerformanceSchema(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            Query = resolver.Resolve<PeopleType>();
+            Query = serviceProvider.GetRequiredService<PeopleType>();
         }
     }
 }
