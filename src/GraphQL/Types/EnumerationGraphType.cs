@@ -2,8 +2,8 @@ using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
@@ -75,8 +75,7 @@ namespace GraphQL.Types
     /// Also it can get descriptions for enum fields from the xml comments.
     /// </summary>
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
-    public class EnumerationGraphType<TEnum> : EnumerationGraphType
-        where TEnum : Enum
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
         public EnumerationGraphType()
         {
@@ -88,11 +87,13 @@ namespace GraphQL.Types
             var enumGraphData = enumMembers.Select(e => (
                 name: ChangeEnumCase(e.name),
                 value: Enum.Parse(type, e.name),
-                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? e.member.GetXmlDocumentation(),
-                deprecation: (e.member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                description: e.member.Description(),
+                deprecation: e.member.ObsoleteMessage()
             ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
+            Description = Description ?? typeof(TEnum).Description();
+            DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
 
             foreach (var (name, value, description, deprecation) in enumGraphData)
             {
@@ -116,11 +117,21 @@ namespace GraphQL.Types
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class EnumValueDefinition
+    public class EnumValueDefinition : IProvideMetadata
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
+
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
+        {
+            var local = Metadata;
+            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
+        }
+
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

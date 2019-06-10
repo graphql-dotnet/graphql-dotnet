@@ -4,20 +4,11 @@ namespace GraphQL.Types
 {
     public class DecimalGraphType : ScalarGraphType
     {
-        public DecimalGraphType()
-        {
-            Name = "Decimal";
-        }
+        public DecimalGraphType() => Name = "Decimal";
 
-        public override object Serialize(object value)
-        {
-            return ParseValue(value);
-        }
+        public override object Serialize(object value) => ParseValue(value);
 
-        public override object ParseValue(object value)
-        {
-            return ValueConverter.ConvertTo(value, typeof(decimal));
-        }
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(decimal));
 
         public override object ParseLiteral(IValue value)
         {

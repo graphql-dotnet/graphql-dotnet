@@ -8,6 +8,7 @@ using System.Reflection;
 namespace GraphQL
 {
     using System.Collections;
+    using System.ComponentModel;
 
     public static class TypeExtensions
     {
@@ -207,9 +208,9 @@ namespace GraphQL
             throw new ArgumentOutOfRangeException(nameof(type), $"The element type for {type.Name} cannot be coerced effectively");
         }
 
-        private static readonly Type[] _untypedContainers = new[] { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
+        private static readonly Type[] _untypedContainers = { typeof(IEnumerable), typeof(IList), typeof(ICollection) };
 
-        private static readonly Type[] _typedContainers = new [] { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
+        private static readonly Type[] _typedContainers = { typeof(IEnumerable<>), typeof(List<>), typeof(IList<>), typeof(ICollection<>), typeof(IReadOnlyCollection<>) };
 
         /// <summary>
         /// Returns whether or not the given <paramref name="type"/> implements <paramref name="genericType"/>
@@ -239,5 +240,9 @@ namespace GraphQL
             var baseType = type.BaseType;
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
+
+        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
+
+        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }
 }

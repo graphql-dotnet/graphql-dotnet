@@ -40,7 +40,7 @@ namespace GraphQL.Utilities
             IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeof(T)) ?? false;
         }
 
-        public FieldConfig FieldFor(string field, IDependencyResolver dependencyResolver)
+        public FieldConfig FieldFor(string field, IServiceProvider serviceProvider)
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
@@ -52,14 +52,14 @@ namespace GraphQL.Utilities
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
                 config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
             }
 
             return config;
         }
 
-        public FieldConfig SubscriptionFieldFor(string field, IDependencyResolver dependencyResolver)
+        public FieldConfig SubscriptionFieldFor(string field, IServiceProvider serviceProvider)
         {
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
@@ -72,7 +72,7 @@ namespace GraphQL.Utilities
                     throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
                 }
 
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, dependencyResolver);
+                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
                 config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
 
                 if (config.SubscriberAccessor == null)
@@ -82,11 +82,11 @@ namespace GraphQL.Utilities
 
                 if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
-                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, serviceProvider);
                 }
                 else
                 {
-                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, dependencyResolver);
+                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, serviceProvider);
                 }
             }
 

@@ -32,8 +32,8 @@ namespace GraphQL.Types
                 Field(
                     type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
                     name: propertyInfo.Name,
-                    description: (propertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? propertyInfo.GetXmlDocumentation(),
-                    deprecationReason: (propertyInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                    description: propertyInfo.Description(),
+                    deprecationReason: propertyInfo.ObsoleteMessage()
                 ).DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value;
             }
         }

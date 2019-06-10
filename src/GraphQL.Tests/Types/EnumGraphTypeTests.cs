@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using Shouldly;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using Xunit;
@@ -8,10 +9,14 @@ namespace GraphQL.Tests.Types
 {
     public class EnumGraphTypeTests
     {
+        [Description("The best colors ever!")]
+        [Obsolete("Just some reason")]
         private enum Colors {
             Red = 1,
             Blue,
             Green,
+
+            [Obsolete("No more yellow")]
             Yellow,
 
             [Description("A pale purple color named after the mallow flower.")]
@@ -61,6 +66,20 @@ namespace GraphQL.Tests.Types
         {
             type.Values.Count().ShouldBe(5);
             type.Values.Last().Description.ShouldBe("A pale purple color named after the mallow flower.");
+        }
+
+        [Fact]
+        public void adds_values_from_enum_with_obsolete_attribute()
+        {
+            type.Values.Count().ShouldBe(5);
+            type.Values["YELLOW"].DeprecationReason.ShouldBe("No more yellow");
+        }
+
+        [Fact]
+        public void description_and_obsolete_from_enum()
+        {
+            type.Description.ShouldBe("The best colors ever!");
+            type.DeprecationReason.ShouldBe("Just some reason");
         }
 
         [Fact]

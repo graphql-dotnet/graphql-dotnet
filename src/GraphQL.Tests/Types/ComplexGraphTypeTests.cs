@@ -23,6 +23,8 @@ namespace GraphQL.Tests.Types
 
         internal class GenericFieldType<T> : FieldType { }
 
+        [Description("Object for test")]
+        [Obsolete("Obsolete for test")]
         internal class TestObject
         {
             public int? someInt { get; set; }
@@ -80,7 +82,8 @@ namespace GraphQL.Tests.Types
             GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
-
+            type.Description.ShouldBe("Object for test");
+            type.DeprecationReason.ShouldBe("Obsolete for test");
             type.Fields.Count().ShouldBe(18);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
