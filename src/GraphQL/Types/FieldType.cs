@@ -14,7 +14,7 @@ namespace GraphQL.Types
         QueryArguments Arguments { get; set; }
     }
 
-    [DebuggerDisplay("{Name,nq}")]
+    [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class FieldType : IFieldType
     {
         public string Name { get; set; }

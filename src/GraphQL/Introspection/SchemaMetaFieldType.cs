@@ -1,3 +1,4 @@
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -29,7 +30,7 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: context =>
                 {
-                    return context.Schema.AllTypes;
+                    return context.Schema.AllTypes.Where(x => context.Schema.Filter.Type(x)).ToList();
                 });
 
             Field<NonNullGraphType<__Type>>(
@@ -45,7 +46,11 @@ namespace GraphQL.Introspection
                 "If this server supports mutation, the type that mutation operations will be rooted at.",
                 resolve: context =>
                 {
-                    return context.Schema.Mutation;
+                    if(context.Schema.Filter.Type(context.Schema.Mutation))
+                    {
+                        return context.Schema.Mutation;
+                    }
+                    return null;
                 });
 
             Field<__Type>(
@@ -53,7 +58,11 @@ namespace GraphQL.Introspection
                 "If this server supports subscription, the type that subscription operations will be rooted at.",
                 resolve: context =>
                 {
-                    return context.Schema.Subscription;
+                    if(context.Schema.Filter.Type(context.Schema.Subscription))
+                    {
+                        return context.Schema.Subscription;
+                    }
+                    return null;
                 });
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
@@ -61,7 +70,7 @@ namespace GraphQL.Introspection
                 "A list of all directives supported by this server.",
                 resolve: context =>
                 {
-                    return context.Schema.Directives;
+                    return context.Schema.Directives.Where(d => context.Schema.Filter.Directive(d));
                 });
         }
     }
