@@ -936,7 +936,7 @@ enum __DirectiveLocation {
 type __EnumValue {
   name: String!
   description: String
-  isDeprecated: String!
+  isDeprecated: Boolean!
   deprecationReason: String
 }
 

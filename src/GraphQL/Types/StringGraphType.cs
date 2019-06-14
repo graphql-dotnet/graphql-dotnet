@@ -6,7 +6,7 @@ namespace GraphQL.Types
     {
         public StringGraphType() => Name = "String";
 
-        public override object Serialize(object value) => value;
+        public override object Serialize(object value) => value?.ToString();
 
         public override object ParseValue(object value) => value?.ToString();
 
