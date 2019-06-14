@@ -15,11 +15,11 @@ namespace GraphQL.Introspection
             Field(f => f.Name);
             Field(f => f.Description, nullable: true);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
-                resolve: context =>
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
+                resolve: async context =>
                 {
                     var arguments = context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
-                    return arguments.Where(x => context.Schema.Filter.Argument(context.Source, x));
+                    return await arguments.WhereAsync(x => context.Schema.Filter.AllowArgument(context.Source, x));
                 });
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context =>

@@ -32,14 +32,14 @@ namespace GraphQL.Introspection
                 return ((IGraphType)context.Source).Name;
             });
             Field<StringGraphType>("description");
-            Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
+            FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
                         DefaultValue = false
                     }),
-                context =>
+                async context =>
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
@@ -49,33 +49,35 @@ namespace GraphQL.Introspection
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
 
-                        fields = fields.Where(f => context.Schema.Filter.Field(context.Source as IGraphType, f));
+                        fields = fields ?? Enumerable.Empty<FieldType>();
+                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f));
 
                         return fields.OrderBy(f => f.Name);
                     }
                     return null;
                 });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
             {
                 var type = context.Source as IImplementInterfaces;
-                return type?.ResolvedInterfaces.Where(x => context.Schema.Filter.Type(x));
+                if (type == null) return null;
+                return await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x));
             });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
-                    return type.PossibleTypes.Where(x => context.Schema.Filter.Type(x));
+                    return await type.PossibleTypes.WhereAsync(x => context.Schema.Filter.AllowType(x));
                 }
 
                 return null;
             });
-            Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
+            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
                 new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
                     DefaultValue = false
                 }),
-                context =>
+                async context =>
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
@@ -84,15 +86,16 @@ namespace GraphQL.Introspection
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
 
-                        return values.Where(v => context.Schema.Filter.EnumValue(type, v)).ToList();
+                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v));
                     }
 
                     return null;
                 });
-            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
             {
                 var type = context.Source as IInputObjectGraphType;
-                return type?.Fields.Where(f => context.Schema.Filter.Field(type, f));
+                if (type == null) return null;
+                return await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f));
             });
             Field<__Type>("ofType", resolve: context =>
             {

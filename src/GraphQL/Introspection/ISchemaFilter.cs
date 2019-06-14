@@ -1,41 +1,42 @@
+using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
     public interface ISchemaFilter
     {
-        bool Type(IGraphType type);
-        bool Field(IGraphType parent, IFieldType field);
-        bool Argument(IFieldType field, QueryArgument argument);
-        bool EnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue);
-        bool Directive(DirectiveGraphType directive);
+        Task<bool> AllowType(IGraphType type);
+        Task<bool> AllowField(IGraphType parent, IFieldType field);
+        Task<bool> AllowArgument(IFieldType field, QueryArgument argument);
+        Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue);
+        Task<bool> AllowDirective(DirectiveGraphType directive);
     }
 
     public class DefaultSchemaFilter : ISchemaFilter
     {
-        public bool Type(IGraphType type)
+        public virtual Task<bool> AllowType(IGraphType type)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool Field(IGraphType parent, IFieldType field)
+        public virtual Task<bool> AllowField(IGraphType parent, IFieldType field)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool Argument(IFieldType field, QueryArgument argument)
+        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool EnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue)
+        public virtual Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool Directive(DirectiveGraphType directive)
+        public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
         {
-            return true;
+            return Task.FromResult(true);
         }
     }
 }
