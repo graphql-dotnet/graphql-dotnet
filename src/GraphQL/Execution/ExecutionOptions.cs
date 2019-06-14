@@ -27,6 +27,7 @@ namespace GraphQL
         public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
+        public IFieldValidator FieldValidator { set; get; }
 
         public bool ExposeExceptions { get; set; } = false;
 

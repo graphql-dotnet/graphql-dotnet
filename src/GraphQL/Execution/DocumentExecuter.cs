@@ -153,7 +153,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.FieldValidator);
 
                 if (context.Errors.Any())
                 {
@@ -234,7 +235,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            IFieldValidator fieldValidator)
         {
             var context = new ExecutionContext
             {
@@ -244,7 +246,6 @@ namespace GraphQL
                 UserContext = userContext,
 
                 Operation = operation,
-                Variables = GetVariableValues(document, schema, operation?.Variables, inputs),
                 Fragments = document.Fragments,
                 CancellationToken = cancellationToken,
 
@@ -252,6 +253,8 @@ namespace GraphQL
                 Listeners = listeners,
                 ThrowOnUnhandledException = throwOnUnhandledException
             };
+
+            context.Variables = GetVariableValues(document, schema, operation?.Variables, inputs, fieldValidator ?? new FieldValidator(), context);
 
             return context;
         }

@@ -98,6 +98,8 @@ namespace GraphQL.Tests.Execution
         }
     }
 
+
+
     public class TestType : ObjectGraphType
     {
         public TestType()
@@ -299,8 +301,8 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
+            caughtError?.ShouldNotBeNull();
+            caughtError?.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -315,8 +317,8 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
 
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe(
+            caughtError?.ShouldNotBeNull();
+            caughtError?.Message.ShouldBe(
                 "Variable '$input' is invalid. Unable to parse input as a 'TestInputObject' type. Did you provide a List or Scalar value accidentally?");
         }
 
@@ -331,8 +333,8 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
+            caughtError?.ShouldNotBeNull();
+            caughtError?.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -344,10 +346,39 @@ namespace GraphQL.Tests.Execution
 
             var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
+
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e' for type 'TestInputObject'.");
+            caughtError?.Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e' for type 'TestInputObject'.");
+        }
+
+        [Fact]
+        public void errors_on_addition_of_multiple_unknown_input_field()
+        {
+            const string expected = null;
+
+            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'e': 'dog','f': 'cow'} }".ToInputs();
+
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
+
+            var caughtError = result.Errors.Single();
+            caughtError.ShouldNotBeNull();
+            caughtError.Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e', 'f' for type 'TestInputObject'.");
+        }
+
+        [Fact]
+        public void multiple_errors_can_be_reported()
+        {
+            const string expected = null;
+
+            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'd': 'dog', e:'test'} }".ToInputs();
+
+            var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 2);
+
+            result.Errors[0].ShouldNotBeNull();
+            result.Errors[0].Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e' for type 'TestInputObject'.");
+            result.Errors[1].ShouldNotBeNull();
+            result.Errors[1].Message.ShouldBe("Variable '$input.d' is invalid. Invalid Scalar value for input field.");
         }
 
         [Fact]
@@ -517,8 +548,7 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
+            caughtError.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]
@@ -538,8 +568,7 @@ namespace GraphQL.Tests.Execution
 
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
-            caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
+            caughtError.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
         }
 
         [Fact]

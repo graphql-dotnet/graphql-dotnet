@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
 
 namespace GraphQL.Execution
 {
@@ -75,7 +77,7 @@ namespace GraphQL.Execution
             return parentType.GetField(field.Name);
         }
 
-        public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
+        public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs, IFieldValidator validator, ExecutionContext executionContext)
         {
             var variables = new Variables();
 
@@ -90,7 +92,7 @@ namespace GraphQL.Execution
 
                     object variableValue = null;
                     inputs?.TryGetValue(v.Name, out variableValue);
-                    variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    variable.Value = GetVariableValue(document, schema, v, variableValue, validator, executionContext);
 
                     variables.Add(variable);
                 }
@@ -99,118 +101,28 @@ namespace GraphQL.Execution
             return variables;
         }
 
-        public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
+        public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input, IFieldValidator validator, ExecutionContext executionContext)
         {
             var type = variable.Type.GraphTypeFromType(schema);
 
-            try
-            {
-                AssertValidValue(schema, type, input, variable.Name);
-            }
-            catch (InvalidValueException error)
+            ExecutionErrors errors = validator.Validate(schema,new List<ValidationFrame>() { new ValidationFrame(variable.Name, input, type, null)}); 
+            foreach (var error in errors)
             {
                 error.AddLocation(variable, document);
-                throw;
+                executionContext.Errors.Add(error);
+                if (executionContext.ThrowOnUnhandledException)
+                    throw error;
             }
 
-            if (input == null && variable.DefaultValue != null)
+            if (input == null && variable.DefaultValue != null )
             {
                 return variable.DefaultValue.Value;
+            } else if(errors.Any())
+            {
+                return null;
             }
 
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
-        }
-
-        public static void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
-        {
-            if (type is NonNullGraphType graphType)
-            {
-                var nonNullType = graphType.ResolvedType;
-
-                if (input == null)
-                {
-                    throw new InvalidValueException(fieldName, "Received a null input for a non-null field.");
-                }
-
-                AssertValidValue(schema, nonNullType, input, fieldName);
-                return;
-            }
-
-            if (input == null)
-            {
-                return;
-            }
-
-            if (type is ScalarGraphType scalar)
-            {
-                if (ValueFromScalar(scalar, input) == null)
-                    throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
-
-                return;
-            }
-
-            if (type is ListGraphType listType)
-            {
-                var listItemType = listType.ResolvedType;
-
-                if (input is IEnumerable list && !(input is string))
-                {
-                    var index = -1;
-                    foreach (var item in list)
-                        AssertValidValue(schema, listItemType, item, $"{fieldName}[{++index}]");
-                }
-                else
-                {
-                    AssertValidValue(schema, listItemType, input, fieldName);
-                }
-                return;
-            }
-
-            if (type is IObjectGraphType || type is IInputObjectGraphType)
-            {
-                var complexType = (IComplexGraphType)type;
-
-                if (!(input is Dictionary<string, object> dict))
-                {
-                    throw new InvalidValueException(fieldName,
-                        $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
-                }
-
-                // ensure every provided field is defined
-                IList<string> unknownFields = null;
-
-                if (type is IInputObjectGraphType)
-                {
-                    unknownFields = dict.Keys
-                        .Except(complexType.Fields.Select(f => f.Name))
-                        .ToList();
-                }
-
-                if (unknownFields?.Count > 0)
-                {
-                    throw new InvalidValueException(fieldName,
-                        $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
-                }
-
-                foreach (var field in complexType.Fields)
-                {
-                    dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidValue(schema, field.ResolvedType, fieldValue, $"{fieldName}.{field.Name}");
-                }
-                return;
-            }
-
-            throw new InvalidValueException(fieldName ?? "input", "Invalid input");
-        }
-
-        private static object ValueFromScalar(ScalarGraphType scalar, object input)
-        {
-            if (input is IValue value)
-            {
-                return scalar.ParseLiteral(value);
-            }
-
-            return scalar.ParseValue(input);
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
