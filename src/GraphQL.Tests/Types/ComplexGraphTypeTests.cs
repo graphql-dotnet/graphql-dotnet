@@ -12,6 +12,8 @@ using Xunit;
 
 namespace GraphQL.Tests.Types
 {
+    #pragma warning disable 618
+
     public class ComplexGraphTypeTests
     {
         internal class ComplexType<T> : ComplexGraphType<T> {
@@ -331,4 +333,6 @@ namespace GraphQL.Tests.Types
             type.Fields.Last().Name.ShouldBe(fieldName);
         }
     }
+
+    #pragma warning restore 618
 }
