@@ -146,8 +146,12 @@ namespace GraphQL
 
             if (graphType == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(type),
-                    $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                if (type.IsEnum)
+                {
+                    graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
+                }
+                else
+                    throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
             }
 
             if (!isNullable)

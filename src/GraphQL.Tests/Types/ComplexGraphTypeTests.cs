@@ -74,7 +74,6 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void auto_register()
         {
-            GraphTypeTypeRegistry.Register<Direction, EnumerationGraphType<Direction>>();
             GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
