@@ -110,7 +110,7 @@ public interface IUsersStore
 {
 	// This will be called by the loader for all pending keys
 	// Note that fetch delegates can accept a CancellationToken parameter or not
-	Task<Dictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+	Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
 }
 ```
 
