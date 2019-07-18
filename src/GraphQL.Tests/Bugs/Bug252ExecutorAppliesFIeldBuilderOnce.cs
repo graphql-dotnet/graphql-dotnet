@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
         public void apply_to_not_called_without_execute()
         {
             var docExec = new DocumentExecuter();
-            var execOptions = new ExecutionOptions {Schema = new Schema()};
+            var execOptions = new ExecutionOptions { Schema = new Schema() };
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
             execOptions.FieldMiddleware = mockMiddleware;
 

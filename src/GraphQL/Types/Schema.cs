@@ -56,22 +56,19 @@ namespace GraphQL.Types
         private readonly List<IAstFromValueConverter> _converters;
 
         public Schema()
-            : this(new DefaultDependencyResolver())
+            : this(new DefaultServiceProvider())
         {
         }
 
-        [Obsolete(
-            "The Func<Type, IGraphType> constructor has been deprecated in favor of using IDependencyResolver.  " +
-            "Use FuncDependencyResolver to continue using a Func.  " +
-            "This constructor will be removed in a future version.")]
-        public Schema(Func<Type, IGraphType> resolveType)
-            : this(new FuncDependencyResolver(resolveType))
-        {
-        }
-
+        [Obsolete("Use System.IServiceProvider instead.")]
         public Schema(IDependencyResolver dependencyResolver)
+            : this(new DependencyResolverToServiceProviderAdapter(dependencyResolver))
         {
-            DependencyResolver = dependencyResolver;
+        }
+
+        public Schema(IServiceProvider services)
+        {
+            Services = services;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -113,7 +110,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
-        public IDependencyResolver DependencyResolver { get; set; }
+        public IServiceProvider Services { get; set; }
 
         public IEnumerable<DirectiveGraphType> Directives
         {
@@ -172,6 +169,12 @@ namespace GraphQL.Types
             _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
+        public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
+        {
+            foreach (var directive in directives)
+                RegisterDirective(directive);
+        }
+
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
             foreach (var directive in directives)
@@ -205,7 +208,7 @@ namespace GraphQL.Types
 
         public void Dispose()
         {
-            DependencyResolver = null;
+            Services = null;
             Query = null;
             Mutation = null;
             Subscription = null;
@@ -237,7 +240,7 @@ namespace GraphQL.Types
         private GraphTypesLookup CreateTypesLookup()
         {
             var resolvedTypes = _additionalTypes
-                .Select(t => DependencyResolver.Resolve(t.GetNamedType()) as IGraphType)
+                .Select(t => Services.GetRequiredService(t.GetNamedType()) as IGraphType)
                 .ToList();
 
             var types = _additionalInstances.Union(
@@ -254,7 +257,7 @@ namespace GraphQL.Types
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => DependencyResolver.Resolve(type) as IGraphType,
+                type => Services.GetRequiredService(type) as IGraphType,
                 FieldNameConverter);
         }
     }

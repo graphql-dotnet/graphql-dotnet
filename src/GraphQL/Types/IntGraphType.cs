@@ -4,15 +4,9 @@ namespace GraphQL.Types
 {
     public class IntGraphType : ScalarGraphType
     {
-        public IntGraphType()
-        {
-            Name = "Int";
-        }
+        public IntGraphType() => Name = "Int";
 
-        public override object Serialize(object value)
-        {
-            return ParseValue(value);
-        }
+        public override object Serialize(object value) => ParseValue(value);
 
         public override object ParseValue(object value)
         {

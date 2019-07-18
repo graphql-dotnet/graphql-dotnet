@@ -9,6 +9,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <NoWarn>$(NoWarn);IDE1006</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
