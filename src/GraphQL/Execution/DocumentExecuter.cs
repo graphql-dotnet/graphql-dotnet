@@ -72,6 +72,7 @@ namespace GraphQL
             options.Schema.FieldNameConverter = options.FieldNameConverter;
 
             ExecutionResult result = null;
+            ExecutionContext context = null;
 
             try
             {
@@ -143,7 +144,7 @@ namespace GraphQL
                     };
                 }
 
-                var context = BuildExecutionContext(
+                context = BuildExecutionContext(
                     options.Schema,
                     options.Root,
                     document,
@@ -207,7 +208,7 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
-                ex = options.UnhandledExceptionDelegate(ex);
+                ex = options.UnhandledExceptionDelegate(context, ex);
 
                 result = new ExecutionResult
                 {
@@ -238,7 +239,7 @@ namespace GraphQL
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
-            Func<Exception, Exception> unhandledExceptionDelegate)
+            Func<ExecutionContext, Exception, Exception> unhandledExceptionDelegate)
         {
             var context = new ExecutionContext
             {

@@ -39,6 +39,6 @@ namespace GraphQL
 
         public bool ThrowOnUnhandledException { get; set; } = false;
 
-        public Func<Exception, Exception> UnhandledExceptionDelegate { get; set; } = ex => ex;
+        public Func<Execution.ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; } = (ctx, ex) => ex;
     }
 }

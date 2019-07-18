@@ -40,6 +40,6 @@ namespace GraphQL.Execution
 
         public bool ThrowOnUnhandledException { get; set; }
 
-        public Func<Exception, Exception> UnhandledExceptionDelegate { get; set; }
+        public Func<ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; }
     }
 }
