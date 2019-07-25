@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace GraphQL
@@ -22,8 +23,11 @@ namespace GraphQL
             {
                 // Most performant if available
                 return to.Result;
-            }
-            else
+            } else if (task.GetType().IsGenericType)
+            {
+                Type t = task.GetType();
+                return t.GetProperty("Result").GetValue(task, null);
+            }  else
             {
                 // Using dynamic is over 10x faster than reflection
                 return ((dynamic)task).Result;
