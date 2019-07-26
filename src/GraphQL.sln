@@ -6,6 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		Directory.Build.props = Directory.Build.props
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
@@ -14,13 +16,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader.Tests", "GraphQL.DataLoader.Tests\GraphQL.DataLoader.Tests.csproj", "{21FA4059-CF8D-4A5B-8C1B-D4DB645311B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness", "GraphQL.Harness\GraphQL.Harness.csproj", "{00D40874-DCB7-4D44-B2B0-F88EB1FAA28E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Harness", "GraphQL.Harness\GraphQL.Harness.csproj", "{00D40874-DCB7-4D44-B2B0-F88EB1FAA28E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.StarWars", "GraphQL.StarWars\GraphQL.StarWars.csproj", "{11A414C3-7847-4852-8A62-DCF8A438B938}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC80C071-B8B6-42D2-9CF8-6169C6169B74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness.Tests", "GraphQL.Harness.Tests\GraphQL.Harness.Tests.csproj", "{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Harness.Tests", "GraphQL.Harness.Tests\GraphQL.Harness.Tests.csproj", "{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

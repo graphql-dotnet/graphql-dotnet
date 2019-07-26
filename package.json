@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/graphql-dotnet/graphql-dotnet",
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.18.1",
     "graphiql": "^0.11.11",
     "graphql": "^0.13.2",
     "react": "^16.2.0",

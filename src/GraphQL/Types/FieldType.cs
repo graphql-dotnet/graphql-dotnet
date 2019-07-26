@@ -2,6 +2,7 @@ using GraphQL.Resolvers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GraphQL.Types
 {
@@ -13,6 +14,7 @@ namespace GraphQL.Types
         QueryArguments Arguments { get; set; }
     }
 
+    [DebuggerDisplay("{Name,nq}")]
     public class FieldType : IFieldType
     {
         internal const string ClrPropertyName = nameof(ClrPropertyName);

@@ -8,6 +8,7 @@ using System.Reflection;
 namespace GraphQL
 {
     using System.Collections;
+    using System.ComponentModel;
 
     public static class TypeExtensions
     {
@@ -145,8 +146,12 @@ namespace GraphQL
 
             if (graphType == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(type),
-                    $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
+                if (type.IsEnum)
+                {
+                    graphType = typeof(EnumerationGraphType<>).MakeGenericType(type);
+                }
+                else
+                    throw new ArgumentOutOfRangeException(nameof(type), $"The type: {type.Name} cannot be coerced effectively to a GraphQL type");
             }
 
             if (!isNullable)
@@ -239,5 +244,9 @@ namespace GraphQL
             var baseType = type.BaseType;
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
+
+        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+
+        public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }
 }

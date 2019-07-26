@@ -37,7 +37,23 @@ services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
 services.AddSingleton<DataLoaderDocumentListener>();
 ```
 
-3. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+3. Hook up your GraphQL schema to your IoC container.
+
+``` csharp
+public class MySchema : Schema
+{
+    public MySchema(IServiceProvider services) : base(services)
+    {
+
+    }
+}
+```
+
+``` csharp
+services.AddSingleton<MySchema>();
+```
+
+4. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
 
 ``` csharp
 var listener = Services.GetRequiredService<DataLoaderDocumentListener>();
@@ -94,7 +110,7 @@ public interface IUsersStore
 {
 	// This will be called by the loader for all pending keys
 	// Note that fetch delegates can accept a CancellationToken parameter or not
-	Task<Dictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+	Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
 }
 ```
 
@@ -168,4 +184,4 @@ public interface IUsersStore
 }
 ```
 
-> See this [blog series](http://fiyazhasan.me/graphql-with-asp-net-core-part-x-data-loader-series-finale/) for an in depth example using Entity Framework.
+> See this [blog series](https://github.com/fiyazbinhasan/GraphQLCore/tree/Part_X_DataLoader) for an in depth example using Entity Framework.

@@ -348,24 +348,6 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void default_deprecation_on_interface_field()
-        {
-            var definitions = @"
-                interface Movie {
-                  stars: Int @deprecated
-                }
-            ";
-
-            var schema = Schema.For(definitions);
-            schema.Initialize();
-
-            var type = schema.FindType("Movie") as IInterfaceGraphType;
-            type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
-            type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
-        }
-
-        [Fact]
         public void deprecate_enum_value()
         {
             var definitions = @"
@@ -383,24 +365,6 @@ namespace GraphQL.Tests.Utilities
 
             var cat = type.Values.Single(x => x.Name == "CAT");
             cat.DeprecationReason.ShouldBe("dogs rule");
-        }
-
-        [Fact]
-        public void default_deprecation_on_input_field()
-        {
-            var definitions = @"
-                input MovieInput {
-                  stars: Int @deprecated
-                }
-            ";
-
-            var schema = Schema.For(definitions);
-            schema.Initialize();
-
-            var type = schema.FindType("MovieInput") as IInputObjectGraphType;
-            type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
-            type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
         }
 
         [Fact]
