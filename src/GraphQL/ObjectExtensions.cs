@@ -21,8 +21,6 @@ namespace GraphQL
             return (T)ToObject(source, typeof(T));
         }
 
-        private static IGraphType Unwrap(IGraphType type) => type is NonNullGraphType nonNull ? nonNull.ResolvedType : type;
-
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// </summary>
@@ -35,7 +33,7 @@ namespace GraphQL
 
             foreach (var item in source)
             {
-                var mappedField = (Unwrap(graphType) as IInputObjectGraphType)?.GetField(item.Key);
+                var mappedField = (graphType.GetNamedType() as IInputObjectGraphType)?.GetField(item.Key);
                 var propertyName = mappedField?.GetMetadata(FieldType.ClrPropertyName, item.Key) ?? item.Key;
 
                 var propertyType = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
@@ -95,7 +93,7 @@ namespace GraphQL
 
                 foreach (var listItem in valueList)
                 {
-                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, (Unwrap(graphType) as ListGraphType)?.ResolvedType));
+                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, graphType.GetNamedType()));
                 }
 
                 if (fieldType.IsArray)
@@ -125,7 +123,7 @@ namespace GraphQL
 
             if (propertyValue is Dictionary<string, object> objects)
             {
-                return ToObject(objects, fieldType, Unwrap(graphType));
+                return ToObject(objects, fieldType, graphType.GetNamedType());
             }
 
             if (fieldType.IsEnum)

@@ -5,11 +5,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Field = GraphQL.Language.AST.Field;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Types
 {
