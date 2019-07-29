@@ -1,3 +1,4 @@
+using GraphQL.Dummy;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Shouldly;
@@ -36,6 +37,9 @@ namespace GraphQL.Tests.Extensions
             ILookup<string, EqualityComparer<DateTime>> lookup = new List<EqualityComparer<DateTime>>().ToLookup(i => i.GetHashCode().ToString());
             var task4 = Task.FromResult(lookup);
             task4.GetResult().ShouldBe(lookup);
+
+            var task5 = DataSource.GetSomething();
+            task5.GetResult().ShouldNotBeNull();
         }
     }
 }

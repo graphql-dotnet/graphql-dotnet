@@ -1,3 +1,4 @@
+using Microsoft.CSharp.RuntimeBinder;
 using System.Threading.Tasks;
 
 namespace GraphQL
@@ -25,8 +26,16 @@ namespace GraphQL
             }
             else
             {
-                // Using dynamic is over 10x faster than reflection
-                return ((dynamic)task).Result;
+                // Using dynamic is over 10x faster than reflection but works only for public types (or with InternalsVisibleTo attribute) 
+                try
+                {
+                    return ((dynamic)task).Result;
+                }
+                catch (RuntimeBinderException)
+                {
+                    // it won't be any worse
+                    return task.GetType().GetProperty("Result").GetValue(task, null);
+                }
             }
         }
     }
