@@ -62,6 +62,7 @@ namespace Example
                 _.Inputs = request.Variables.ToInputs();
                 _.UserContext = _settings.BuildUserContext?.Invoke(context);
                 _.EnableMetrics = _settings.EnableMetrics;
+                _.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
                     _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();

@@ -3,6 +3,7 @@ using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -37,5 +38,10 @@ namespace GraphQL
         public bool SetFieldMiddleware { get; set; } = true;
 
         public bool ThrowOnUnhandledException { get; set; } = false;
+
+        /// <summary>
+        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// </summary>
+        public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
     }
 }
