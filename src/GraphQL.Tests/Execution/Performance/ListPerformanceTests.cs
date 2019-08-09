@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Root = PeopleList;
                 _.Inputs = null;
                 _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
+                _.CancellationToken = default;
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
             });
@@ -154,7 +154,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Root = PeopleList;
                 _.Inputs = null;
                 _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
+                _.CancellationToken = default;
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
             });
@@ -204,7 +204,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.Root = PeopleList;
                 _.Inputs = null;
                 _.UserContext = null;
-                _.CancellationToken = default(CancellationToken);
+                _.CancellationToken = default;
                 _.ValidationRules = null;
                 _.FieldNameConverter = new CamelCaseFieldNameConverter();
             });

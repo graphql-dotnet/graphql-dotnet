@@ -38,6 +38,9 @@ namespace GraphQL.Tests.Types
             public bool someBoolean { get; set; }
             [DefaultValue(typeof(DateTime), "2019/03/14")]
             public DateTime someDate { get; set; }
+            /// <summary>
+            /// Description from xml comment
+            /// </summary>
             public short someShort { get; set; }
             public ushort someUShort { get; set; }
             public ulong someULong { get; set; }
@@ -66,6 +69,9 @@ namespace GraphQL.Tests.Types
         internal enum Direction
         {
             Asc,
+            /// <summary>
+            /// Descending Order
+            /// </summary>
             Desc,
             [Obsolete("Do not use Random. This makes no sense!")]
             Random
@@ -87,6 +93,7 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+            type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from xml comment");
             type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
@@ -97,6 +104,7 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
+            enumType.Values["DESC"].Description.ShouldBe("Descending Order");
             enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
         }
 

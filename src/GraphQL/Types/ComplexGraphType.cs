@@ -66,7 +66,7 @@ namespace GraphQL.Types
             if (HasField(fieldType.Name))
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
-                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
+                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? GetType().Name}");
             }
 
             if (fieldType.ResolvedType == null)

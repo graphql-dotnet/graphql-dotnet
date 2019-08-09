@@ -12,8 +12,8 @@ namespace GraphQL.Language.AST
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((T) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((T)obj);
         }
 
         protected abstract bool Equals(ValueNode<T> node);

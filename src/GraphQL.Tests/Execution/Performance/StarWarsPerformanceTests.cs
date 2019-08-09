@@ -50,7 +50,7 @@ namespace GraphQL.Tests.Execution.Performance
                     _.Root = null;
                     _.Inputs = null;
                     _.UserContext = null;
-                    _.CancellationToken = default(CancellationToken);
+                    _.CancellationToken = default;
                     _.ValidationRules = null;
                     _.FieldNameConverter = new CamelCaseFieldNameConverter();
                 }).GetAwaiter().GetResult();
