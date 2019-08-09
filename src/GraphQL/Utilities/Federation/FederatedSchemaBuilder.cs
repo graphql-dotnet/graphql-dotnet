@@ -115,7 +115,7 @@ namespace GraphQL.Utilities.Federation
                 arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations"}),
                 resolve: async context =>
                 {
-                    AddTypeNameToAst(context.FieldAst);
+                    AddTypeNameToSelection(context.FieldAst, context.Document);
 
                     var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
 
