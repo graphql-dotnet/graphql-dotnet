@@ -20,26 +20,26 @@ namespace GraphQL.Introspection
                 "at runtime. List and NonNull types compose other types.";
             Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
-                if (context.Source is GraphType type)
+                if (context.Source is IGraphType type)
                 {
                     return KindForInstance(type);
                 }
 
-                throw new ExecutionError("Unknown kind of type: {0}".ToFormat(context.Source));
+                throw new ExecutionError($"Unknown kind of type: {context.Source}");
             });
             Field<StringGraphType>("name", resolve: context =>
             {
                 return ((IGraphType)context.Source).Name;
             });
             Field<StringGraphType>("description");
-            Field<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
+            FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
                     new QueryArgument<BooleanGraphType>
                     {
                         Name = "includeDeprecated",
                         DefaultValue = false
                     }),
-                context =>
+                async context =>
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
@@ -49,31 +49,35 @@ namespace GraphQL.Introspection
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
 
+                        fields = fields ?? Enumerable.Empty<FieldType>();
+                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f));
+
                         return fields.OrderBy(f => f.Name);
                     }
                     return null;
                 });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
             {
                 var type = context.Source as IImplementInterfaces;
-                return type?.ResolvedInterfaces;
+                if (type == null) return null;
+                return await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x));
             });
-            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
-                    return type.PossibleTypes;
+                    return await type.PossibleTypes.WhereAsync(x => context.Schema.Filter.AllowType(x));
                 }
 
                 return null;
             });
-            Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
+            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
                 new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
                     DefaultValue = false
                 }),
-                context =>
+                async context =>
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
@@ -81,15 +85,17 @@ namespace GraphQL.Introspection
                         var values = !includeDeprecated
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
-                        return values;
+
+                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v));
                     }
 
                     return null;
                 });
-            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: context =>
+            FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
             {
                 var type = context.Source as IInputObjectGraphType;
-                return type?.Fields;
+                if (type == null) return null;
+                return await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f));
             });
             Field<__Type>("ofType", resolve: context =>
             {
@@ -109,7 +115,7 @@ namespace GraphQL.Introspection
             });
         }
 
-        public TypeKind KindForInstance(GraphType type)
+        private TypeKind KindForInstance(IGraphType type)
         {
             switch (type)
             {
@@ -132,44 +138,6 @@ namespace GraphQL.Introspection
                 default:
                     throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
             }
-        }
-
-        public TypeKind KindForType(Type type)
-        {
-            if (typeof(EnumerationGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.ENUM;
-            }
-            if (typeof(ScalarGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.SCALAR;
-            }
-            if (typeof(IObjectGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.OBJECT;
-            }
-            if (typeof(IInterfaceGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.INTERFACE;
-            }
-            if (typeof(UnionGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.UNION;
-            }
-            if (typeof(IInputObjectGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.INPUT_OBJECT;
-            }
-            if (typeof(ListGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.LIST;
-            }
-            if (typeof(NonNullGraphType).IsAssignableFrom(type))
-            {
-                return TypeKind.NON_NULL;
-            }
-
-            throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
         }
     }
 }

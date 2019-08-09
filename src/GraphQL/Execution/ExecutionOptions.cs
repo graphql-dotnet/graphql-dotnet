@@ -4,6 +4,7 @@ using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -19,17 +20,17 @@ namespace GraphQL
         public string OperationName { get; set; }
         public Document Document { get; set; }
         public Inputs Inputs { get; set; }
-        public CancellationToken CancellationToken { get; set; } = default;
+        public CancellationToken CancellationToken { get; set; }
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
-        public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
+        public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
         public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
-        public bool ExposeExceptions { get; set; } = false;
+        public bool ExposeExceptions { get; set; };
 
         //Note disabling will increase performance
         public bool EnableMetrics { get; set; } = true;
@@ -37,8 +38,16 @@ namespace GraphQL
         //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
         public bool SetFieldMiddleware { get; set; } = true;
 
-        public bool ThrowOnUnhandledException { get; set; } = false;
+        public bool ThrowOnUnhandledException { get; set; };
 
+        /// <summary>
+        /// Provides the ability to intercept exceptions to modify/log them.
+        /// </summary>
         public Func<Execution.ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; } = (ctx, ex) => ex;
+
+        /// <summary>
+        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// </summary>
+        public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
     }
 }
