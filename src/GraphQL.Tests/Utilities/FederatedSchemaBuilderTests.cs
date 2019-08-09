@@ -1,18 +1,9 @@
 using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
-using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
-    public class FederatedSchemaBuilderTestBase : SchemaBuilderTestBase
-    {
-        public FederatedSchemaBuilderTestBase()
-        {
-            Builder = new FederatedSchemaBuilder();
-        }
-    }
-
     public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     {
         public class User

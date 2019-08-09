@@ -1,52 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
-    public class FederatedResolveContext
-    {
-        public ResolveFieldContext ParentFieldContext { get; set; }
-        public Dictionary<string, object> Arguments { get; set; }
-    }
-
-    public interface IFederatedResolver
-    {
-        Task<object> Resolve(FederatedResolveContext context);
-    }
-
-    public class FuncFederatedResolver<T> : IFederatedResolver
-    {
-        private readonly Func<FederatedResolveContext, Task<T>> _resolver;
-
-        public FuncFederatedResolver(Func<FederatedResolveContext, Task<T>> func)
-        {
-            _resolver = func;
-        }
-
-        public async Task<object> Resolve(FederatedResolveContext context)
-        {
-            return await _resolver(context);
-        }
-    }
-
-    public static class TypeConfigExtensions
-    {
-        public static void ResolveReferenceAsync<T>(this TypeConfig config, Func<FederatedResolveContext, Task<T>> resolver)
-        {
-            ResolveReferenceAsync(config, new FuncFederatedResolver<T>(resolver));
-        }
-
-        public static void ResolveReferenceAsync(this TypeConfig config, IFederatedResolver resolver)
-        {
-            config.Metadata[FederatedSchemaBuilder.ResolverMetadataField] = resolver;
-        }
-    }
-
     public class FederatedSchemaBuilder : SchemaBuilder
     {
         internal const string ResolverMetadataField = "__FedResolver__";
