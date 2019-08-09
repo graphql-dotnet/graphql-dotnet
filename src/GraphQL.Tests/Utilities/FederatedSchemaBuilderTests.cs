@@ -35,13 +35,56 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = FederatedSchema.For(definitions);
+            var query = "{ _service { sdl } }";
 
-            var result = schema.Execute(_ => {
-                _.Query = "{ _service { sdl } }";
+            var sdl = @"scalar Byte
+
+scalar Date
+
+scalar DateTime
+
+scalar DateTimeOffset
+
+scalar Decimal
+
+scalar Guid
+
+scalar Milliseconds
+
+extend type Query {
+  me: User
+  _service: _Service!
+  _entities(representations: [_Any!]!): [_Entity]!
+}
+
+scalar SByte
+
+scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar Uri
+
+type User @key(fields: ""id"") {
+  id: ID! @external
+  username: String!
+}
+
+scalar UShort
+".Replace("\r", "");
+
+            var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
+
+            AssertQuery(_ =>
+            {
+                _.Definitions = definitions;
+                _.Query = query;
+                _.ExpectedResult = expected;
             });
-
-            result.ShouldNotBeNull();
         }
 
         [Fact]

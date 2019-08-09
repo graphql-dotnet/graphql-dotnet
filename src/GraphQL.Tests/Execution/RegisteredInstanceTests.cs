@@ -112,25 +112,16 @@ namespace GraphQL.Tests.Execution
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -143,7 +134,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
@@ -167,25 +157,16 @@ scalar UShort
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -198,7 +179,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
@@ -222,25 +202,16 @@ scalar UShort
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -253,7 +224,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
