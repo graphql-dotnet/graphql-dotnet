@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -322,28 +321,6 @@ scalar UShort
         public class SomeObject
         {
             public string Name { get; set; }
-        }
-    }
-
-    public static class ObjectGraphTypeExtensions
-    {
-        public static void Field(
-            this IObjectGraphType obj,
-            string name,
-            IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-        {
-            var field = new FieldType
-            {
-                Name = name,
-                Description = description,
-                Arguments = arguments,
-                ResolvedType = type,
-                Resolver = resolve != null ? new FuncFieldResolver<object>(resolve) : null
-            };
-            obj.AddField(field);
         }
     }
 
