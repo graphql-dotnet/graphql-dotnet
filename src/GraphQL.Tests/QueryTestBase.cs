@@ -106,7 +106,7 @@ namespace GraphQL.Tests
 //             Console.WriteLine(writtenResult);
 // #endif
 
-            writtenResult.ShouldBe(expectedResult);
+            writtenResult.ShouldBeCrossPlat(expectedResult);
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
@@ -152,7 +152,7 @@ namespace GraphQL.Tests
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
 
             return runResult;
         }

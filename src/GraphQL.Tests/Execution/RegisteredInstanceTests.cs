@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -291,16 +290,6 @@ scalar UShort
         public class SomeObject
         {
             public string Name { get; set; }
-        }
-    }
-
-    public static class AssertionExtensions
-    {
-        public static void ShouldBeCrossPlat(this string a, string b)
-        {
-            var aa = a?.Replace("\r\n", "\n");
-            var bb = b?.Replace("\r\n", "\n");
-            aa.ShouldBe(bb);
         }
     }
 }

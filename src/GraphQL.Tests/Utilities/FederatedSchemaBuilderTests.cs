@@ -75,7 +75,7 @@ type User @key(fields: ""id"") {
 }
 
 scalar UShort
-".Replace("\r", "");
+";
 
             var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
 
