@@ -5,17 +5,24 @@ using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
-    public class FederatedSchemaBuilderTests
+    public class FederatedSchemaBuilderTestBase : SchemaBuilderTestBase
+    {
+        public FederatedSchemaBuilderTestBase()
+        {
+            Builder = new FederatedSchemaBuilder();
+        }
+    }
+
+    public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     {
         public class User
         {
             public string Id { get; set; }
             public string Username { get; set; }
-            public string Other { get; set; }
         }
 
         [Fact]
-        public void something()
+        public void returns_sdl()
         {
             var definitions = @"
                 extend type Query {
@@ -51,12 +58,9 @@ namespace GraphQL.Tests.Utilities
                 }
             ";
 
-            var schema = FederatedSchema.For(definitions, _ =>
+            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
             {
-                 _.Types.For("User").ResolveReferenceAsync(ctx =>
-                {
-                    return Task.FromResult(new User { Id = "123", Username = "Quinn", Other = "Hrm" });
-                });
+                return Task.FromResult(new User { Id = "123", Username = "Quinn" });
             });
 
             var query = @"
@@ -69,15 +73,16 @@ namespace GraphQL.Tests.Utilities
                     }
                 }";
 
-            var variables = "{ '_representations': [ { '__typename': 'User', 'id': '123' } ] }";
+            var variables = "{ '_representations': [{ '__typename': 'User', 'id': '123' }] }";
+            var expected = @"{ '_entities': [{ '__typename': 'User', 'id' : '123', 'username': 'Quinn' }] }";
 
-            var result = schema.Execute(_ => {
+            AssertQuery(_ =>
+            {
+                _.Definitions = definitions;
                 _.Query = query;
-                _.Inputs = variables.ToInputs();
-                _.ExposeExceptions = true;
+                _.Variables = variables;
+                _.ExpectedResult = expected;
             });
-
-            result.ShouldNotBeNull();
         }
     }
 }

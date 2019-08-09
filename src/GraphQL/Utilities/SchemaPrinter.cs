@@ -231,14 +231,14 @@ namespace GraphQL.Utilities
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var values = string.Join(Environment.NewLine, type.Values.Select(x => "  " + x.Name));
             return description + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var fields = type.Fields.Select(x => "  " + PrintInputValue(x));
             return description + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
@@ -299,7 +299,10 @@ namespace GraphQL.Utilities
         public string PrintDirective(DirectiveGraphType directive)
         {
             var builder = new StringBuilder();
-            builder.Append(PrintDescription(directive.Description));
+            if (Options.IncludeDescriptions)
+            {
+                builder.Append(PrintDescription(directive.Description));
+            }
             builder.AppendLine($"directive @{directive.Name}(");
             builder.AppendLine(formatDirectiveArguments(directive.Arguments));
             builder.Append($") on {formatDirectiveLocationList(directive.Locations)}");
