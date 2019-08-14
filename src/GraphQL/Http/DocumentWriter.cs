@@ -60,7 +60,7 @@ namespace GraphQL.Http
                 throw new ArgumentOutOfRangeException($"Expected {nameof(value)} to be a GraphQL.ExecutionResult, got {value.GetType().FullName}");
             }
 
-            return this.WriteToStringAsync((ExecutionResult) value).GetAwaiter().GetResult();
+            return this.WriteToStringAsync(value).GetAwaiter().GetResult();
         }
     }
 
@@ -69,20 +69,15 @@ namespace GraphQL.Http
         /// <summary>
         /// Writes the <paramref name="value"/> to string.
         /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static async Task<string> WriteToStringAsync(
-            this IDocumentWriter writer,
-            ExecutionResult value)
+        public static async Task<string> WriteToStringAsync<T>(this IDocumentWriter writer, T value)
         {
-            using(var stream = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
                 await writer.WriteAsync(stream, value);
                 stream.Position = 0;
                 using (var reader = new StreamReader(stream, DocumentWriter.Utf8Encoding))
                 {
-                    return await reader.ReadToEndAsync();
+                    return await reader.ReadToEndAsync().ConfigureAwait(false);
                 }
             }
         }
