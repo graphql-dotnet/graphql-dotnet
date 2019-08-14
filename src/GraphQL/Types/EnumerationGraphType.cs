@@ -69,6 +69,12 @@ namespace GraphQL.Types
         }
     }
 
+    /// <summary>
+    /// Allows you to automatically register the necessary enumeration members for the specified enum.
+    /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
+    /// Also it can get descriptions for enum fields from the xml comments.
+    /// </summary>
+    /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
     public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
         public EnumerationGraphType()
@@ -104,10 +110,7 @@ namespace GraphQL.Types
 
         public EnumValueDefinition this[string name] => _values.FirstOrDefault(enumDef => enumDef.Name == name);
 
-        public void Add(EnumValueDefinition value)
-        {
-            _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
-        }
+        public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
         public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 

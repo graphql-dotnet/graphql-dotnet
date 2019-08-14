@@ -13,6 +13,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Allows you to automatically register the necessary fields for the specified type.
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
+    /// Also it can get descriptions for fields from the xml comments.
     /// </summary>
     /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>

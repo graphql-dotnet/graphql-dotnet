@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
+using GraphQL.Introspection;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -45,6 +46,11 @@ namespace GraphQL.Types
         void RegisterValueConverter(IAstFromValueConverter converter);
 
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
+
+        /// <summary>
+        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// </summary>
+        ISchemaFilter Filter { get; set; }
     }
 
     public class Schema : ISchema
@@ -111,6 +117,11 @@ namespace GraphQL.Types
         public IObjectGraphType Subscription { get; set; }
 
         public IServiceProvider Services { get; set; }
+
+        /// <summary>
+        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// </summary>
+        public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         public IEnumerable<DirectiveGraphType> Directives
         {

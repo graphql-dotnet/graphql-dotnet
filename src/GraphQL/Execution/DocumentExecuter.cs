@@ -70,6 +70,7 @@ namespace GraphQL
             metrics.Start(options.OperationName);
 
             options.Schema.FieldNameConverter = options.FieldNameConverter;
+            options.Schema.Filter = options.SchemaFilter;
 
             ExecutionResult result = null;
 

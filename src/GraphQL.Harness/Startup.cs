@@ -53,7 +53,8 @@ namespace GraphQL.Harness
                 {
                     User = ctx.User
                 },
-                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics")
+                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics"),
+                ExposeExceptions = Configuration.GetValue<bool>("ExposeExceptions")
             });
 
             app.UseDefaultFiles();
