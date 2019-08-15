@@ -154,7 +154,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.MaxParallelExecutionLimit);
 
                 if (context.Errors.Any())
                 {
@@ -235,7 +236,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            int? maxParallelExecutionLimit)
         {
             var context = new ExecutionContext
             {
@@ -251,7 +253,8 @@ namespace GraphQL
 
                 Metrics = metrics,
                 Listeners = listeners,
-                ThrowOnUnhandledException = throwOnUnhandledException
+                ThrowOnUnhandledException = throwOnUnhandledException,
+                MaxParallelExecutionLimit = maxParallelExecutionLimit
             };
 
             return context;
