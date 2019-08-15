@@ -92,13 +92,7 @@ namespace GraphQL.Types
 
             if (arg is Dictionary<string, object> inputObject)
             {
-                var type = argumentType;
-                if (type.Namespace?.StartsWith("System") == true)
-                {
-                    return arg;
-                }
-
-                return inputObject.ToObject(type);
+                return argumentType == typeof(object) ? arg : inputObject.ToObject(argumentType);
             }
 
             return arg.GetPropertyValue(argumentType);
