@@ -19,7 +19,7 @@ namespace GraphQL.Tests.ApiApproval
                 //whitelistedNamespacePrefixes: new[] { "Microsoft.Extensions.DependencyInjection" },
                 excludeAttributes: new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
 
-            publicApi.ShouldMatchApproved();
+            publicApi.ShouldMatchApproved(builder => builder.WithDescriminator(type.Assembly.GetName().Name));
         }
     }
 }
