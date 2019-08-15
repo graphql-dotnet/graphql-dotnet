@@ -61,8 +61,8 @@ namespace GraphQL.Language.AST
         {
             if (ReferenceEquals(null, node)) return false;
             if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != this.GetType()) return false;
-            return Equals((Operation) node);
+            if (node.GetType() != GetType()) return false;
+            return Equals((Operation)node);
         }
     }
 }

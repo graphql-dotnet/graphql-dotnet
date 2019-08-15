@@ -30,7 +30,7 @@ namespace GraphQL
 
         public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
 
-        public bool ExposeExceptions { get; set; };
+        public bool ExposeExceptions { get; set; }
 
         //Note disabling will increase performance
         public bool EnableMetrics { get; set; } = true;
@@ -38,7 +38,7 @@ namespace GraphQL
         //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
         public bool SetFieldMiddleware { get; set; } = true;
 
-        public bool ThrowOnUnhandledException { get; set; };
+        public bool ThrowOnUnhandledException { get; set; }
 
         /// <summary>
         /// Provides the ability to intercept exceptions to modify/log them.
