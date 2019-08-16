@@ -92,7 +92,13 @@ namespace GraphQL.Types
 
             if (arg is Dictionary<string, object> inputObject)
             {
-                return argumentType == typeof(object) ? arg : inputObject.ToObject(argumentType);
+                if (argumentType == typeof(object))
+                    return arg;
+
+                if (argumentType.IsPrimitive())
+                    throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
+
+                return inputObject.ToObject(argumentType);
             }
 
             return arg.GetPropertyValue(argumentType);

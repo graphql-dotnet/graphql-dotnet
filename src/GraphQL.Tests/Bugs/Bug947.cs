@@ -28,22 +28,28 @@ namespace GraphQL.Tests.Bugs
                 }
             };
 
+            // int arg
             context.GetArgument("int", 100).ShouldBe(10);
             context.GetArgument<object>("int").ShouldBe(10);
             context.GetArgument("ints", 100).ShouldBe(100);
 
+            // Vector3 arg
             context.GetArgument("vector", Vector3.One).ShouldBe(new Vector3(1.1f, 2.2f, 3.3f));
             context.GetArgument<object>("vector").ShouldBe(new Vector3(1.1f, 2.2f, 3.3f));
             context.GetArgument("vectors", Vector3.One).ShouldBe(Vector3.One);
 
+            // string arg
             context.GetArgument("string", "bye").ShouldBe("hello");
             context.GetArgument<object>("string").ShouldBe("hello");
             context.GetArgument("strong", "bye").ShouldBe("bye");
+            Should.Throw<InvalidOperationException>(() => context.GetArgument<ResolveFieldContext>("string"));
 
+            // object arg
             context.GetArgument<object>("object").ShouldBeOfType<Dictionary<string, object>>();
             context.GetArgument<SomeObject>("object").inner_int.ShouldBe(15);
-
-            Should.Throw<InvalidOperationException>(() => context.GetArgument<ResolveFieldContext>("string"));
+            Should.Throw<InvalidOperationException>(() => context.GetArgument<int>("object"));
+            Should.Throw<InvalidOperationException>(() => context.GetArgument<string>("object"));
+            Should.Throw<InvalidOperationException>(() => context.GetArgument<DateTime>("object"));
 
             var otherObject = context.GetArgument<SomeOtherObject>("object");
             otherObject.unknown.ShouldBe(0);
