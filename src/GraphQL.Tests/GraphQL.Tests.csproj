@@ -11,6 +11,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
     <NoWarn>$(NoWarn);1591;IDE1006</NoWarn>
+    <Configuration>Debug</Configuration>
   </PropertyGroup>
 
   <ItemGroup>

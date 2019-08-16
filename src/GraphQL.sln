@@ -5,6 +5,7 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		Directory.Build.props = Directory.Build.props
 		NuGet.config = NuGet.config
@@ -24,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC80C071
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Harness.Tests", "GraphQL.Harness.Tests\GraphQL.Harness.Tests.csproj", "{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Dummy", "GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Dummy", "GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
