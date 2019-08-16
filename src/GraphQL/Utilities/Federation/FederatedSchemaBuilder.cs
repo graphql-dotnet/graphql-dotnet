@@ -32,7 +32,7 @@ namespace GraphQL.Utilities.Federation
             directive @provides(fields: String!) on FIELD_DEFINITION
             directive @key(fields: String!) on OBJECT | INTERFACE
 
-            # this is an optional directive discussed below
+            # this is an optional directive
             directive @extends on OBJECT | INTERFACE
         ";
 
@@ -99,6 +99,10 @@ namespace GraphQL.Utilities.Federation
                                 var result = await resolver.Resolve(resolveContext);
                                 results.Add(result);
                             }
+                            else
+                            {
+                                results.Add(rep);
+                            }
                         }
                         else
                         {
@@ -134,6 +138,7 @@ namespace GraphQL.Utilities.Federation
         {
             var union = new UnionGraphType();
             union.Name = "_Entity";
+            union.Description = "A union of all types that use the @key directive";
 
             var entities = _types.Values.Where(x => IsEntity(x)).Select(x => x as IObjectGraphType).ToList();
             foreach(var e in entities)
@@ -151,6 +156,7 @@ namespace GraphQL.Utilities.Federation
                     }
                 }
 
+                // TODO: Provide another way to give graph type name, such as an attribute
                 return new GraphQLTypeReference(x.GetType().Name);
             };
 

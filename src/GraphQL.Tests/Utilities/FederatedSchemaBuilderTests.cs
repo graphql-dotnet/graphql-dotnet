@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
 using Xunit;
@@ -44,8 +45,6 @@ scalar Milliseconds
 
 extend type Query {
   me: User
-  _service: _Service!
-  _entities(representations: [_Any!]!): [_Entity]!
 }
 
 scalar SByte

@@ -91,6 +91,7 @@ namespace GraphQL.Utilities.Federation
         public override string PrintFields(IComplexGraphType type)
         {
             var fields = type?.Fields
+                .Where(x => !IsFederatedType(x.ResolvedType.GetNamedType().Name))
                 .Select(x =>
                 new
                 {
