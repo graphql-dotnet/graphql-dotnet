@@ -4,7 +4,7 @@ using Shouldly;
 using System;
 using Xunit;
 
-namespace GraphQL.Tests.ApiApproval
+namespace GraphQL.ApiTests
 {
     /// <see href="https://github.com/JakeGinnivan/ApiApprover"/>
     public class ApiApprovalTests
@@ -19,7 +19,7 @@ namespace GraphQL.Tests.ApiApproval
                 //whitelistedNamespacePrefixes: new[] { "Microsoft.Extensions.DependencyInjection" },
                 excludeAttributes: new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
 
-            publicApi.ShouldMatchApproved(builder => builder.WithDescriminator(type.Assembly.GetName().Name));
+            publicApi.ShouldMatchApproved();
         }
     }
 }
