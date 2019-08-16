@@ -107,7 +107,12 @@ scalar Seconds"
             return result;
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options = null)
+        private string print(ISchema schema)
+        {
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+        }
+
+        private string print(ISchema schema, SchemaPrinterOptions options)
         {
             var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
@@ -146,7 +151,7 @@ scalar Seconds"
         [Fact]
         public void prints_directive()
         {
-            var printer = new SchemaPrinter(null);
+            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
             var arg = DirectiveGraphType.Skip.Arguments.First();
             arg.ResolvedType = arg.Type.BuildNamedType();
 
@@ -228,7 +233,9 @@ directive @skip(
                     "Foo",
 @"# This is a Foo object type
 type Foo {
+  # This is of type String
   str: String
+  # This is of type Integer
   int: Int
 }"
                 },
@@ -447,6 +454,7 @@ schema {
 }
 
 type Bar implements Foo {
+  # This is of type String
   str: String
 }
 
@@ -470,6 +478,7 @@ scalar Decimal
 
 # This is a Foo interface type
 interface Foo {
+  # This is of type String
   str: String
 }
 
@@ -511,10 +520,12 @@ scalar UShort
 
             AssertEqual(result, "", @"
 interface Baaz {
+  # This is of type Integer
   int: Int
 }
 
 type Bar implements Foo & Baaz {
+  # This is of type String
   str: String
 }
 
@@ -538,6 +549,7 @@ scalar Decimal
 
 # This is a Foo interface type
 interface Foo {
+  # This is of type String
   str: String
 }
 
@@ -577,15 +589,18 @@ scalar UShort
 
             var options = new SchemaPrinterOptions
             {
-                OldImplementsSyntax = true
+                OldImplementsSyntax = true,
+                IncludeDescriptions = true
             };
 
             AssertEqual(print(schema, options), "", @"
 interface Baaz {
+  # This is of type Integer
   int: Int
 }
 
 type Bar implements Foo, Baaz {
+  # This is of type String
   str: String
 }
 
@@ -609,6 +624,7 @@ scalar Decimal
 
 # This is a Foo interface type
 interface Foo {
+  # This is of type String
   str: String
 }
 
@@ -725,6 +741,7 @@ scalar UShort
 
             AssertEqual(print(schema), "", @"
 type Bar implements Foo {
+  # This is of type String
   str: String
 }
 
@@ -748,6 +765,7 @@ scalar Decimal
 
 # This is a Foo interface type
 interface Foo {
+  # This is of type String
   str: String
 }
 
@@ -868,7 +886,7 @@ scalar UShort
                     Name = "Root"
                 }
             };
-            var printer = new SchemaPrinter(schema);
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
@@ -958,6 +976,7 @@ type __InputValue {
   name: String!
   description: String
   type: __Type!
+  # A GraphQL-formatted string representing the default value for this input value.
   defaultValue: String
 }
 
@@ -965,10 +984,15 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  # A list of all types supported by this server.
   types: [__Type!]!
+  # The type that query operations will be rooted at.
   queryType: __Type!
+  # If this server supports mutation, the type that mutation operations will be rooted at.
   mutationType: __Type
+  # If this server supports subscription, the type that subscription operations will be rooted at.
   subscriptionType: __Type
+  # A list of all directives supported by this server.
   directives: [__Directive!]!
 }
 

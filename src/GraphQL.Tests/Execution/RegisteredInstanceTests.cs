@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -113,25 +111,16 @@ namespace GraphQL.Tests.Execution
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -144,7 +133,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
@@ -168,25 +156,16 @@ scalar UShort
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -199,7 +178,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
@@ -223,25 +201,16 @@ scalar UShort
 
 scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
 scalar DateTimeOffset
 
 scalar Decimal
 
 scalar Guid
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
 type NestedObjType {
@@ -254,7 +223,6 @@ type root {
 
 scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
 scalar Seconds
 
 scalar Short
@@ -322,38 +290,6 @@ scalar UShort
         public class SomeObject
         {
             public string Name { get; set; }
-        }
-    }
-
-    public static class ObjectGraphTypeExtensions
-    {
-        public static void Field(
-            this IObjectGraphType obj,
-            string name,
-            IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
-        {
-            var field = new FieldType
-            {
-                Name = name,
-                Description = description,
-                Arguments = arguments,
-                ResolvedType = type,
-                Resolver = resolve != null ? new FuncFieldResolver<object>(resolve) : null
-            };
-            obj.AddField(field);
-        }
-    }
-
-    public static class AssertionExtensions
-    {
-        public static void ShouldBeCrossPlat(this string a, string b)
-        {
-            var aa = a?.Replace("\r\n", "\n");
-            var bb = b?.Replace("\r\n", "\n");
-            aa.ShouldBe(bb);
         }
     }
 }
