@@ -40,7 +40,7 @@ namespace GraphQL
         public bool ThrowOnUnhandledException { get; set; } = false;
 
         /// <summary>
-        /// If set, limits the maximum number nodes executed in parallel
+        /// If set, limits the maximum number of nodes executed in parallel
         /// </summary>
         public int? MaxParallelExecutionCount { get; set; } = null;
 
