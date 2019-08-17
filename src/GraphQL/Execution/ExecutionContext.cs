@@ -39,6 +39,6 @@ namespace GraphQL.Execution
 
         public bool ThrowOnUnhandledException { get; set; }
 
-        public int? MaxParallelExecutionLimit { get; set; }
+        public int? MaxParallelExecutionCount { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace GraphQL.Execution
             while (pendingNodes.Count > 0)
             {
                 // Start executing pending nodes, while limiting the maximum number of parallel executed nodes to the set limit
-                while ((context.MaxParallelExecutionLimit == null || currentTasks.Count < context.MaxParallelExecutionLimit)
+                while ((context.MaxParallelExecutionCount == null || currentTasks.Count < context.MaxParallelExecutionCount)
                     && pendingNodes.Count > 0)
                 {
                     context.CancellationToken.ThrowIfCancellationRequested();

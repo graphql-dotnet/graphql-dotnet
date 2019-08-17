@@ -39,7 +39,10 @@ namespace GraphQL
 
         public bool ThrowOnUnhandledException { get; set; } = false;
 
-        public int? MaxParallelExecutionLimit { get; set; } = null;
+        /// <summary>
+        /// If set, limits the maximum number nodes executed in parallel
+        /// </summary>
+        public int? MaxParallelExecutionCount { get; set; } = null;
 
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types.
