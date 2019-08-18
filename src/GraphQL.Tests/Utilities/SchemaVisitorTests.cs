@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser;
-using GraphQLParser.AST;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
