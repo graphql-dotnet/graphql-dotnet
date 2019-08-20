@@ -96,20 +96,22 @@ namespace GraphQL.DataLoader
         {
             get
             {
-                if (_queue.Count > 0)
+                lock (_loaders)
                 {
-                    // Return a task the completes when any of these two conditions are met:
-                    // 1. Any registered DataLoaders at this time is in need of dispatch
-                    // 2. A DataLoader added after this task is retrieved (Using GetOrAdd) is in need of dispatch
-                    var existingLoaders = (_queue.Count == 1) ? _queue.Peek().DispatchNeeded :
-                        Task.WhenAny(_queue.Select(loader => loader.DispatchNeeded));
+                    if (_queue.Count > 0)
+                    {
+                        // Return a task the completes when any of these two conditions are met:
+                        // 1. Any registered DataLoaders at this time is in need of dispatch
+                        // 2. A DataLoader added after this task is retrieved (Using GetOrAdd) is in need of dispatch
+                        var existingLoaders = (_queue.Count == 1) ? _queue.Peek().DispatchNeeded :
+                            Task.WhenAny(_queue.Select(loader => loader.DispatchNeeded));
 
-                    return Task.WhenAny(existingLoaders, _dispatchNeededSource.Task);
+                        return Task.WhenAny(existingLoaders, _dispatchNeededSource.Task);
+                    }
+                    // No dataloaders registered yet, so only return the _dispatchNeededSource which
+                    // is triggered if any dataloaders are added after this point in time is in need of dispatch
+                    return _dispatchNeededSource.Task;
                 }
-                // Now dataloaders registered yet, so only return the _dispatchNeededSource which
-                // is triggered if any dataloaders are added after this point in time is in need of dispatch
-                return _dispatchNeededSource.Task;
-
             }
         }
     }
