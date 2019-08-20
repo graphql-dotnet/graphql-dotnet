@@ -6,7 +6,21 @@ namespace GraphQL.Types
 {
     public abstract class GraphType : IGraphType
     {
-        public string Name { get; set; }
+        private string _name;
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                _name = value;
+            }
+        }
 
         public string Description { get; set; }
 
