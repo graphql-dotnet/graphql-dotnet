@@ -375,7 +375,7 @@ namespace GraphQL.Types
                     .ResolvedInterfaces
                     .Select(i =>
                     {
-                        var interfaceType = ConvertTypeReference(objectType, i) as IInterfaceGraphType;
+                        var interfaceType = (IInterfaceGraphType)ConvertTypeReference(objectType, i);
 
                         if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                         {
