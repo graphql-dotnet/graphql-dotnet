@@ -38,7 +38,7 @@ namespace GraphQL.Tests.Subscription
             Chat = chat;
             Schema = GraphQL.Types.Schema.For(
                 TypeDefs,
-                (config) =>
+                config =>
                 {
                     config.Types.Include<Subscription>();
                 });

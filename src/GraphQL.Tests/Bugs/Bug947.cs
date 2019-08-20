@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void GetArgument_Should_Return_Properly_Converted_Values()
         {
-            var context = new ResolveFieldContext()
+            var context = new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {

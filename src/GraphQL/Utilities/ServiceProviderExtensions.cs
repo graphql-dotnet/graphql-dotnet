@@ -14,7 +14,7 @@ namespace GraphQL.Utilities
             if (provider == null)
                 throw new ArgumentNullException(nameof (provider));
 
-            if (serviceType == (Type) null)
+            if (serviceType == null)
                 throw new ArgumentNullException(nameof (serviceType));
 
             object service = provider.GetService(serviceType);

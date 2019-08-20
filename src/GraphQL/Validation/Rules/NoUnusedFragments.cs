@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
                 _.Match<Document>(leave: document =>
                 {
                     var fragmentNamesUsed = operationDefs
-                        .SelectMany(op => context.GetRecursivelyReferencedFragments(op))
+                        .SelectMany(context.GetRecursivelyReferencedFragments)
                         .Select(fragment => fragment.Name)
                         .ToList();
 
