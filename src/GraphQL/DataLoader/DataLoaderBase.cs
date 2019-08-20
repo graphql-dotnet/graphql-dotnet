@@ -13,16 +13,17 @@ namespace GraphQL.DataLoader
         {
             get
             {
-                if (!_completionSource.Task.IsCompleted && !_awaitedSource.Task.IsCompleted)
+                if (!_completionSource.Task.IsCompleted && !_dispatchNeededSource.Task.IsCompleted)
                 {
-                    // Someone is awaiting this dataloader and data is not loaded,
-                    // so complete the LoaderAwaited task
-                    _awaitedSource.SetResult(true);
+                    // DataLoaded is used by the LoadAsync method of the DataLoader, and if not
+                    // completed it means the dataloader needs dispatch, so complete the
+                    // DispatchNeeded task thru the TaskCompletionSource
+                    _dispatchNeededSource.SetResult(true);
                 }
                 return _completionSource.Task;
             }
         }
-        private TaskCompletionSource<bool> _awaitedSource = CreateAwaitedCompletionsSource();
+        private TaskCompletionSource<bool> _dispatchNeededSource = CreateAwaitedCompletionsSource();
 
         private TaskCompletionSource<T> _completionSource = CreateCompletionsSource();
         private object _tcsLock = new object();
@@ -33,9 +34,9 @@ namespace GraphQL.DataLoader
         protected abstract bool IsFetchNeeded();
 
         /// <summary>
-        /// A task that is completed when this loader is awaited and in need of dispatch
+        /// A task that is completed when this loader is in need of dispatch (I.e. a LoadAsync call is requesting data that is not cached/ready)
         /// </summary>
-        public Task LoaderAwaited => _awaitedSource.Task;
+        public Task DispatchNeeded => _dispatchNeededSource.Task;
 
         public async Task DispatchAsync(CancellationToken cancellationToken = default)
         {
@@ -49,8 +50,8 @@ namespace GraphQL.DataLoader
             {
                 tcs = _completionSource;
                 _completionSource = CreateCompletionsSource();
-                // Here the underlying tcs of DataLoaded is recreated, so recreate the tcs for LoaderAwaited aswell
-                _awaitedSource = CreateAwaitedCompletionsSource();
+                // Here the underlying tcs of DataLoaded is recreated, so recreate the tcs for DispatchNeeded aswell
+                _dispatchNeededSource = CreateAwaitedCompletionsSource();
             }
 
             if (cancellationToken.IsCancellationRequested)

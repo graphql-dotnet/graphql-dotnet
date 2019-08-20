@@ -11,14 +11,14 @@ namespace GraphQL.Execution
         protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
             => ExecuteNodeTreeAsync(context, rootNode);
 
-        private Task AnyLoaderAwaited(ExecutionContext context)
+        private Task DataLoaderDispatchNeeded(ExecutionContext context)
         {
             var dataLoaderDocumentListeners = context.Listeners.OfType<DataLoaderDocumentListener>();
             if (dataLoaderDocumentListeners.Any())
             {
-                // Return a task that completes when any dataloader in the DataLoaderDocumentListener is awaited
-                return (dataLoaderDocumentListeners.Count() == 1) ? dataLoaderDocumentListeners.First().AnyLoaderAwaited :
-                    Task.WhenAny(dataLoaderDocumentListeners.Select(l => l.AnyLoaderAwaited));
+                // Return a task that completes when any dataloader in the DataLoaderDocumentListener is in need of dispatch
+                return (dataLoaderDocumentListeners.Count() == 1) ? dataLoaderDocumentListeners.First().DispatchNeeded :
+                    Task.WhenAny(dataLoaderDocumentListeners.Select(l => l.DispatchNeeded));
             }
             // No DataLoaderDocumentListener registered, so just return a task that never completes
             // since this means no dataloaders will ever be awaited and in need of dispatch.
@@ -56,9 +56,9 @@ namespace GraphQL.Execution
                     await OnBeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
 
-                    // Wait for either all currentTask to complete, or any new awaits on dataloader(s)
+                    // Wait for either all currentTask to complete, or any dataloader(s) in need of dispatching
                     // which will continue the loop and dispatch the waiting dataloader(s)
-                    await Task.WhenAny(commonTask, AnyLoaderAwaited(context))
+                    await Task.WhenAny(commonTask, DataLoaderDispatchNeeded(context))
                         .ConfigureAwait(false);
                 }
                 var completedNodes = await commonTask

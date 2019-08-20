@@ -48,6 +48,7 @@ namespace GraphQL.DataLoader
             var context = _accessor.Context;
             return context.DispatchAllAsync(token);
         }
-        public Task AnyLoaderAwaited => _accessor.Context.AnyLoaderAwaited;
+
+        public Task DispatchNeeded => _accessor.Context.DispatchNeeded;
     }
 }

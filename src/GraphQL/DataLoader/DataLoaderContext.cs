@@ -11,24 +11,10 @@ namespace GraphQL.DataLoader
     /// </summary>
     public class DataLoaderContext
     {
-        private TaskCompletionSource<bool> _loaderAwaitedSource = new TaskCompletionSource<bool>();
+        private TaskCompletionSource<bool> _dispatchNeededSource = new TaskCompletionSource<bool>();
         private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
 
-        private void ListenToLoaderAwaited(IDataLoader loader)
-        {
-            loader.LoaderAwaited.ContinueWith(t =>
-            {
-                // This means the registered dataloader is awaited, complete the AnyLoaderAwaited task
-                // and recreate the TaskCompletionSource
-                _loaderAwaitedSource.TrySetResult(true);
-                _loaderAwaitedSource = new TaskCompletionSource<bool>();
-
-                // Since the LoaderAwaited task on the IDataLoader now is completed, we need to re-register
-                // this dataloader to catch any new awaits on it.
-                ListenToLoaderAwaited(loader);
-            });
-        }
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
         /// </summary>
@@ -55,7 +41,12 @@ namespace GraphQL.DataLoader
 
                     _loaders.Add(loaderKey, loader);
                     _queue.Enqueue(loader);
-                    ListenToLoaderAwaited(loader);
+                    // Listen for DispatchNeeded on the added dataloader
+                    loader.DispatchNeeded.ContinueWith(t =>
+                    {
+                        _dispatchNeededSource.TrySetResult(true);
+                        _dispatchNeededSource = new TaskCompletionSource<bool>();
+                    });
                 }
             }
 
@@ -97,7 +88,29 @@ namespace GraphQL.DataLoader
 
             await task.ConfigureAwait(false);
         }
-        // Returns a task which will be completed when any of the registered dataloaders are awaited
-        public Task AnyLoaderAwaited => _loaderAwaitedSource.Task;
+
+        /// <summary>
+        /// A task that complets when a DataLoader is in need of dispatch.
+        /// </summary>
+        public Task DispatchNeeded
+        {
+            get
+            {
+                if (_queue.Count > 0)
+                {
+                    // Return a task the completes when any of these two conditions are met:
+                    // 1. Any registered DataLoaders at this time is in need of dispatch
+                    // 2. A DataLoader added after this task is retrieved (Using GetOrAdd) is in need of dispatch
+                    var existingLoaders = (_queue.Count == 1) ? _queue.Peek().DispatchNeeded :
+                        Task.WhenAny(_queue.Select(loader => loader.DispatchNeeded));
+
+                    return Task.WhenAny(existingLoaders, _dispatchNeededSource.Task);
+                }
+                // Now dataloaders registered yet, so only return the _dispatchNeededSource which
+                // is triggered if any dataloaders are added after this point in time is in need of dispatch
+                return _dispatchNeededSource.Task;
+
+            }
+        }
     }
 }

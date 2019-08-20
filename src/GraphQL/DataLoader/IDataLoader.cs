@@ -14,9 +14,9 @@ namespace GraphQL.DataLoader
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         Task DispatchAsync(CancellationToken cancellationToken = default);
         /// <summary>
-        /// A task that completes when the dataloader is awaited and without the result ready (Waiting for DispatchAsync)
+        /// A task that is completed when this loader is in need of dispatch (I.e. a LoadAsync call is requesting data that is not cached/ready)
         /// </summary>
-        Task LoaderAwaited { get; }
+        Task DispatchNeeded { get; }
     }
 
     /// <summary>
