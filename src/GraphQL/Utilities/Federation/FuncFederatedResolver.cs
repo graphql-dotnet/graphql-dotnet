@@ -14,7 +14,7 @@ namespace GraphQL.Utilities.Federation
 
         public async Task<object> Resolve(FederatedResolveContext context)
         {
-            return await _resolver(context);
+            return await _resolver(context).ConfigureAwait(false);
         }
     }
 }
