@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,9 +11,24 @@ namespace GraphQL.DataLoader
     /// </summary>
     public class DataLoaderContext
     {
+        private TaskCompletionSource<bool> _loaderAwaitedSource = new TaskCompletionSource<bool>();
         private readonly Dictionary<string, IDataLoader> _loaders = new Dictionary<string, IDataLoader>();
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
 
+        private void ListenToLoaderAwaited(IDataLoader loader)
+        {
+            loader.LoaderAwaited.ContinueWith(t =>
+            {
+                // This means the registered dataloader is awaited, complete the AnyLoaderAwaited task
+                // and recreate the TaskCompletionSource
+                _loaderAwaitedSource.TrySetResult(true);
+                _loaderAwaitedSource = new TaskCompletionSource<bool>();
+
+                // Since the LoaderAwaited task on the IDataLoader now is completed, we need to re-register
+                // this dataloader to catch any new awaits on it.
+                ListenToLoaderAwaited(loader);
+            });
+        }
         /// <summary>
         /// Add a new data loader if one does not already exist with the provided key
         /// </summary>
@@ -39,6 +55,7 @@ namespace GraphQL.DataLoader
 
                     _loaders.Add(loaderKey, loader);
                     _queue.Enqueue(loader);
+                    ListenToLoaderAwaited(loader);
                 }
             }
 
@@ -80,5 +97,7 @@ namespace GraphQL.DataLoader
 
             await task.ConfigureAwait(false);
         }
+        // Returns a task which will be completed when any of the registered dataloaders are awaited
+        public Task AnyLoaderAwaited => _loaderAwaitedSource.Task;
     }
 }

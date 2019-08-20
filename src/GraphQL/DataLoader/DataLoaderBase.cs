@@ -8,12 +8,34 @@ namespace GraphQL.DataLoader
     {
         protected abstract Task<T> FetchAsync(CancellationToken cancellationToken);
 
-        protected Task<T> DataLoaded => _completionSource.Task;
+
+        protected Task<T> DataLoaded
+        {
+            get
+            {
+                if (!_completionSource.Task.IsCompleted && !_awaitedSource.Task.IsCompleted)
+                {
+                    // Someone is awaiting this dataloader and data is not loaded,
+                    // so complete the LoaderAwaited task
+                    _awaitedSource.SetResult(true);
+                }
+                return _completionSource.Task;
+            }
+        }
+        private TaskCompletionSource<bool> _awaitedSource = CreateAwaitedCompletionsSource();
+
         private TaskCompletionSource<T> _completionSource = CreateCompletionsSource();
+        private object _tcsLock = new object();
 
         private static TaskCompletionSource<T> CreateCompletionsSource() => new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+        private static TaskCompletionSource<bool> CreateAwaitedCompletionsSource() => new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         protected abstract bool IsFetchNeeded();
+
+        /// <summary>
+        /// A task that is completed when this loader is awaited and in need of dispatch
+        /// </summary>
+        public Task LoaderAwaited => _awaitedSource.Task;
 
         public async Task DispatchAsync(CancellationToken cancellationToken = default)
         {
@@ -22,7 +44,14 @@ namespace GraphQL.DataLoader
                 return;
             }
 
-            var tcs = Interlocked.Exchange(ref _completionSource, CreateCompletionsSource());
+            var tcs = (TaskCompletionSource<T>)null;
+            lock (_tcsLock)
+            {
+                tcs = _completionSource;
+                _completionSource = CreateCompletionsSource();
+                // Here the underlying tcs of DataLoaded is recreated, so recreate the tcs for LoaderAwaited aswell
+                _awaitedSource = CreateAwaitedCompletionsSource();
+            }
 
             if (cancellationToken.IsCancellationRequested)
             {
