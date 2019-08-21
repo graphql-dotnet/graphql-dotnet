@@ -23,7 +23,26 @@ namespace GraphQL.Execution
                 {
                     context.CancellationToken.ThrowIfCancellationRequested();
                     var pendingNode = pendingNodes.Dequeue();
-                    currentTasks.Add(ExecuteNodeAsync(context, pendingNode));
+                    var pendingNodeTask = ExecuteNodeAsync(context, pendingNode);
+                    if (pendingNodeTask.IsCompleted)
+                    {
+                        // Node completed synchronously, so no need to add it to the list of currently executing nodes
+                        // instead add any child nodes to the pendingNodes queue directly here
+                        var result = await pendingNodeTask;
+                        if (result is IParentExecutionNode parentExecutionNode)
+                        {
+                            foreach (var childNode in parentExecutionNode.GetChildNodes())
+                            {
+                                pendingNodes.Enqueue(childNode);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Node is actually asynchronous, so add it the list of current tasks being executed in parallel
+                        currentTasks.Add(pendingNodeTask);
+                    }
+
                 }
 
                 await OnBeforeExecutionStepAwaitedAsync(context)
