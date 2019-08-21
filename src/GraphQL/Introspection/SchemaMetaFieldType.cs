@@ -29,7 +29,7 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: async context =>
                 {
-                    return await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x));
+                    return await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
                 });
 
             Field<NonNullGraphType<__Type>>(
@@ -45,7 +45,7 @@ namespace GraphQL.Introspection
                 "If this server supports mutation, the type that mutation operations will be rooted at.",
                 resolve: async context =>
                 {
-                    if (await context.Schema.Filter.AllowType(context.Schema.Mutation))
+                    if (await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false))
                     {
                         return context.Schema.Mutation;
                     }
@@ -57,7 +57,7 @@ namespace GraphQL.Introspection
                 "If this server supports subscription, the type that subscription operations will be rooted at.",
                 resolve: async context =>
                 {
-                    if (await context.Schema.Filter.AllowType(context.Schema.Subscription))
+                    if (await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false))
                     {
                         return context.Schema.Subscription;
                     }
@@ -69,7 +69,7 @@ namespace GraphQL.Introspection
                 "A list of all directives supported by this server.",
                 resolve: async context =>
                 {
-                    return await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d));
+                    return await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false);
                 });
         }
     }

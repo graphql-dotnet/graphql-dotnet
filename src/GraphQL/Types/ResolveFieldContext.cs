@@ -115,7 +115,7 @@ namespace GraphQL.Types
         {
             try
             {
-                return await resolve(this);
+                return await resolve(this).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace GraphQL.Types
                 else
                 {
                     var result = error(Errors);
-                    return result == null ? default : await result;
+                    return result == null ? default : await result.ConfigureAwait(false);
                 }
             }
         }

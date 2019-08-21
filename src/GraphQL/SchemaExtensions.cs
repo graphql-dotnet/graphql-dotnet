@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -25,7 +25,7 @@ namespace GraphQL
             {
                 _.Schema = schema;
                 configure(_);
-            });
+            }).ConfigureAwait(false);
             return new DocumentWriter(indent: true).Write(result);
         }
     }

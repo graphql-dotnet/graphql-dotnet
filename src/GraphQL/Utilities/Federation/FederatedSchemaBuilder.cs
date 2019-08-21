@@ -96,7 +96,7 @@ namespace GraphQL.Utilities.Federation
                                     Arguments = rep,
                                     ParentFieldContext = context
                                 };
-                                var result = await resolver.Resolve(resolveContext);
+                                var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
                                 results.Add(result);
                             }
                             else

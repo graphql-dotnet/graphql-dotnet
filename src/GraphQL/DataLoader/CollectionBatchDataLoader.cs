@@ -60,7 +60,7 @@ namespace GraphQL.DataLoader
                 }
             }
 
-            var result = await DataLoaded;
+            var result = await DataLoaded.ConfigureAwait(false);
 
             return result[key];
         }

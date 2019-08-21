@@ -161,7 +161,7 @@ namespace GraphQL.Http
 
             if (_charBufferCount == _charBufferSize)
             {
-                await FlushInternalAsync(flushEncoder: false);
+                await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
             }
 
             _charBuffer[_charBufferCount] = value;
@@ -184,7 +184,7 @@ namespace GraphQL.Http
             {
                 if (_charBufferCount == _charBufferSize)
                 {
-                    await FlushInternalAsync(flushEncoder: false);
+                    await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
                 }
 
                 CopyToCharBuffer(values, ref index, ref count);
@@ -209,7 +209,7 @@ namespace GraphQL.Http
             {
                 if (_charBufferCount == _charBufferSize)
                 {
-                    await FlushInternalAsync(flushEncoder: false);
+                    await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
                 }
 
                 CopyToCharBuffer(value, ref index, ref count);
@@ -304,7 +304,7 @@ namespace GraphQL.Http
 
             if (count > 0)
             {
-                await _stream.WriteAsync(_byteBuffer, 0, count);
+                await _stream.WriteAsync(_byteBuffer, 0, count).ConfigureAwait(false);
             }
         }
 
