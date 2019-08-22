@@ -10,12 +10,6 @@ namespace GraphQL.Execution
 {
     public class ExecutionContext
     {
-        public ExecutionContext()
-        {
-            Fragments = new Fragments();
-            Errors = new ExecutionErrors();
-        }
-
         public Document Document { get; set; }
 
         public ISchema Schema { get; set; }
@@ -26,11 +20,11 @@ namespace GraphQL.Execution
 
         public Operation Operation { get; set; }
 
-        public Fragments Fragments { get; set; }
+        public Fragments Fragments { get; set; } = new Fragments();
 
         public Variables Variables { get; set; }
 
-        public ExecutionErrors Errors { get; set; }
+        public ExecutionErrors Errors { get; set; } = new ExecutionErrors();
 
         public CancellationToken CancellationToken { get; set; }
 
@@ -40,6 +34,10 @@ namespace GraphQL.Execution
 
         public bool ThrowOnUnhandledException { get; set; }
 
+        /// <summary>
+        /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
+        /// This can be useful for hiding error messages that reveal server implementation details.
+        /// </summary>
         public Func<ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; }
     }
 }

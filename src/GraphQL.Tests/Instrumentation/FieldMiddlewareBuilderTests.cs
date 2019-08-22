@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Instrumentation
             {
                 FieldName = "Name",
                 FieldAst = new Field(null, new NameNode("Name")),
-                Source = new Person {Name = "Quinn"},
+                Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
                 Metrics = new Metrics()
             };
@@ -118,8 +118,8 @@ namespace GraphQL.Tests.Instrumentation
         {
             var additionalData = new Dictionary<string, string[]>
             {
-                ["errorCodes"] = new[] {"one", "two"},
-                ["otherErrorCodes"] = new[] {"one", "four"}
+                [ "errorCodes" ] = new[] { "one", "two" },
+                [ "otherErrorCodes" ] = new[] { "one", "four" }
             };
             _builder.Use(next =>
             {

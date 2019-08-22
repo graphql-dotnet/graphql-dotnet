@@ -70,7 +70,7 @@ namespace GraphQL.Instrumentation
     public class TypeStat
     {
         private readonly LightweightCache<string, FieldStat> _fields =
-            new LightweightCache<string, FieldStat>(fieldName => new FieldStat {Name = fieldName});
+            new LightweightCache<string, FieldStat>(fieldName => new FieldStat { Name = fieldName });
 
         public string Name { get; set; }
 
@@ -134,7 +134,7 @@ namespace GraphQL.Instrumentation
                 Types = TypesFromSchema(schema)
             };
 
-            var perField = new LightweightCache<string, TypeStat>(type => new TypeStat {Name = type});
+            var perField = new LightweightCache<string, TypeStat>(type => new TypeStat { Name = type });
 
             var typeInfo = new TypeInfo(schema);
 
@@ -164,7 +164,7 @@ namespace GraphQL.Instrumentation
 
             var operationName = operation.Name ?? "Anonymous";
 
-            report.PerSignature[operationName] = new StatsPerSignature {PerType = perField.GetAll()};
+            report.PerSignature[operationName] = new StatsPerSignature { PerType = perField.GetAll() };
 
             return report;
         }

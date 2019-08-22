@@ -41,7 +41,8 @@ namespace GraphQL
         public bool ThrowOnUnhandledException { get; set; }
 
         /// <summary>
-        /// Provides the ability to intercept exceptions to modify/log them.
+        /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
+        /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
         public Func<Execution.ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; } = (ctx, ex) => ex;
 
