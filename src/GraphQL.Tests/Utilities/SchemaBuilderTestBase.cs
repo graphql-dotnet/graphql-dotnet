@@ -2,7 +2,6 @@ using GraphQL.Http;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
-using Shouldly;
 using System;
 using System.IO;
 using System.Linq;
@@ -57,7 +56,7 @@ namespace GraphQL.Tests.Utilities
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
 
             return runResult;
         }

@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void is_thread_safe()
         {
-            Task.Run(() => AddAType());
+            Task.Run(AddAType);
             var modified = false;
             foreach (var t in _lookup.All())
             {

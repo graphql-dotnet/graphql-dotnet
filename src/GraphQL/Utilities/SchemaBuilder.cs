@@ -12,7 +12,7 @@ namespace GraphQL.Utilities
 {
     public class SchemaBuilder
     {
-        private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+        protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
@@ -54,12 +54,12 @@ namespace GraphQL.Utilities
             types.Apply(t => _types[t.Name] = t);
         }
 
-        public ISchema Build(string[] typeDefinitions)
+        public virtual ISchema Build(string[] typeDefinitions)
         {
             return Build(string.Join(Environment.NewLine, typeDefinitions));
         }
 
-        public ISchema Build(string typeDefinitions)
+        public virtual ISchema Build(string typeDefinitions)
         {
             var document = Parse(typeDefinitions);
             return BuildSchemaFrom(document);
@@ -80,6 +80,8 @@ namespace GraphQL.Utilities
             }
 
             var schema = new Schema(ServiceProvider);
+
+            PreConfigure(schema);
 
             var directives = new List<DirectiveGraphType>();
 
@@ -186,6 +188,10 @@ namespace GraphQL.Utilities
             return schema;
         }
 
+        protected virtual void PreConfigure(Schema schema)
+        {
+        }
+
         protected virtual IGraphType GetType(string name)
         {
             _types.TryGetValue(name, out IGraphType type);
@@ -233,7 +239,14 @@ namespace GraphQL.Utilities
                 .ToList();
             interfaces.Apply(type.AddResolvedInterface);
 
-            type.SetAstType(astType);
+            if (isExtensionType)
+            {
+                type.AddExtensionAstType(astType);
+            }
+            else
+            {
+                type.SetAstType(astType);
+            }
 
             VisitNode(type, v => v.VisitObjectGraphType(type));
 

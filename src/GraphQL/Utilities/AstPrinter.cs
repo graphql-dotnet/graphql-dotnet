@@ -93,7 +93,7 @@ namespace GraphQL.Utilities
 
         public void Print(Func<PrintFormat<T>, object> configure)
         {
-            PrintAst = (args) =>
+            PrintAst = args =>
             {
                 var f = new PrintFormat<T>(args);
                 return configure(f);
@@ -210,8 +210,6 @@ namespace GraphQL.Utilities
                         : Join(new[] { directives, selectionSet }, " ");
 
                     return $"... on {typename} {body}";
-
-
                 });
             });
 
@@ -356,6 +354,17 @@ namespace GraphQL.Utilities
             });
 
             // Directive
+            Config<Directive>(c =>
+            {
+                c.Field(x => x.Name);
+                c.Field(x => x.Arguments);
+                c.Print(n =>
+                {
+                    var name = n.Arg(x => x.Name);
+                    var args = Join(n.ArgArray(x => x.Arguments), ", ");
+                    return $"@{name}" + Wrap("(", args, ")");
+                });
+            });
 
             // Type
             Config<NamedType>(c =>

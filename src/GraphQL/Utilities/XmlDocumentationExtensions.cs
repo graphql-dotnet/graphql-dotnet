@@ -25,7 +25,7 @@ namespace GraphQL.Utilities
             {
                 string baseName = type.GetGenericTypeDefinition().ToString();
                 baseName = baseName.Substring(0, baseName.IndexOf('`'));
-                return $"{baseName}{{{string.Join(",", type.GetGenericArguments().Select(a => GetTypeName(a)))}}}";
+                return $"{baseName}{{{string.Join(",", type.GetGenericArguments().Select(GetTypeName))}}}";
             }
 
             return type.FullName;

@@ -39,8 +39,8 @@ namespace GraphQL.Instrumentation
             trace.Parsing.Duration = ApolloTrace.ConvertTime(parsingStat.Duration);
 
             var validationStat = documentStats.Single(x => x.Subject == "Validating document");
-            trace.Validation.StartOffset = ApolloTrace.ConvertTime(parsingStat.Start);
-            trace.Validation.Duration = ApolloTrace.ConvertTime(parsingStat.Duration);
+            trace.Validation.StartOffset = ApolloTrace.ConvertTime(validationStat.Start);
+            trace.Validation.Duration = ApolloTrace.ConvertTime(validationStat.Duration);
 
             foreach (var fieldStat in fieldStats)
             {

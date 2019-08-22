@@ -23,7 +23,7 @@ namespace GraphQL.Resolvers
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
         {
-            var result = await SubscribeAsync(context);
+            var result = await SubscribeAsync(context).ConfigureAwait(false);
             return (IObservable<object>)result;
         }
     }
@@ -45,7 +45,7 @@ namespace GraphQL.Resolvers
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(ResolveEventStreamContext context)
         {
-            var result = await SubscribeAsync(context);
+            var result = await SubscribeAsync(context).ConfigureAwait(false);
             return (IObservable<object>)result;
         }
     }
@@ -73,7 +73,7 @@ namespace GraphQL.Resolvers
                 throw new ArgumentException($"Return type of {_accessor.FieldName} should be Task<IObservable<T>>, instead of {_accessor.ReturnType}");
             }
 
-            await task;
+            await task.ConfigureAwait(false);
 
             return ((dynamic)task).Result;
         }

@@ -301,7 +301,7 @@ namespace GraphQL.Tests.Types
             Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new QueryArgument[] { new QueryArgument<DInputType> {Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()} }),
+                arguments: new QueryArguments(new QueryArgument<DInputType> {Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()}),
                 resolve: ctx => new {id = "id"});
             Field<ListGraphType<DListType>>("alist");
         }

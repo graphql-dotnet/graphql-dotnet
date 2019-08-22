@@ -57,7 +57,7 @@ namespace GraphQL
                 return propertyValue;
             }
 
-            if (fieldType.FullName == "System.Object")
+            if (fieldType == typeof(object))
             {
                 return propertyValue;
             }
@@ -66,7 +66,7 @@ namespace GraphQL
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (fieldType.Name != "String"
+            if (fieldType != typeof(string)
                 && enumerableInterface != null)
             {
                 IList newArray;

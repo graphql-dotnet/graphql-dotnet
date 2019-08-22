@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
 using Xunit;
@@ -16,7 +15,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output = output;
         }
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependent.")]
         // [Fact]
         public void Executes_StarWarsBasicQuery_Performant()
         {
