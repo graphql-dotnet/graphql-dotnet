@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace GraphQL.Instrumentation
 {
-    public class Metrics : IDisposable
+    public class Metrics
     {
         private readonly bool _enabled;
-        private readonly Stopwatch _stopwatch;
+        private ValueStopwatch _stopwatch;
         private readonly ConcurrentBag<PerfRecord> _records;
         private PerfRecord _main;
 
@@ -18,66 +17,61 @@ namespace GraphQL.Instrumentation
             _enabled = enabled;
 
             if (enabled)
-            {
-                _stopwatch = new Stopwatch();
                 _records = new ConcurrentBag<PerfRecord>();
-            }
         }
 
-        public void Start(string operationName)
+        public Metrics Start(string operationName)
         {
-            if (!_enabled)
+            if (_enabled)
             {
-                return;
+                _main = new PerfRecord("operation", operationName, 0);
+                _records.Add(_main);
+                _stopwatch = ValueStopwatch.StartNew();
             }
 
-            _main = new PerfRecord("operation", operationName, 0);
-            _records.Add(_main);
-            _stopwatch.Start();
+            return this;
         }
 
-        public void SetOperationName(string name)
+        public Metrics SetOperationName(string name)
         {
-            if (!_enabled)
-            {
-                return;
-            }
+            if (_enabled && _main != null)
+                _main.Subject = name;
 
-            _main.Subject = name;
+            return this;
         }
 
-        public IDisposable Subject(string category, string subject, Dictionary<string, object> metadata = null)
+        public Marker Subject(string category, string subject, Dictionary<string, object> metadata = null)
         {
             if (!_enabled)
-            {
-                return null;
-            }
+                return Marker.Empty;
 
-            var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
+            if (_main == null)
+                throw new InvalidOperationException("Metrics.Start should be called before calling Metrics.Subject");
+
+            var record = new PerfRecord(category, subject, _stopwatch.GetElapsedTime().TotalMilliseconds, metadata);
             _records.Add(record);
             return new Marker(record, _stopwatch);
         }
 
-        public IEnumerable<PerfRecord> AllRecords => _records.Where(x => x != null).OrderBy(x => x.Start).ToArray();
+        public IEnumerable<PerfRecord> AllRecords => _records.OrderBy(x => x.Start);
 
         public IEnumerable<PerfRecord> Finish()
         {
             if (!_enabled)
-            {
                 return null;
-            }
 
-            _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
-            _stopwatch.Stop();
+            _main?.MarkEnd(_stopwatch.GetElapsedTime().TotalMilliseconds);
             return AllRecords;
         }
 
-        public class Marker : IDisposable
+        public readonly struct Marker : IDisposable
         {
             private readonly PerfRecord _record;
-            private readonly Stopwatch _stopwatch;
+            private readonly ValueStopwatch _stopwatch;
 
-            public Marker(PerfRecord record, Stopwatch stopwatch)
+            public static readonly Marker Empty;
+
+            public Marker(PerfRecord record, ValueStopwatch stopwatch)
             {
                 _record = record;
                 _stopwatch = stopwatch;
@@ -85,13 +79,9 @@ namespace GraphQL.Instrumentation
 
             public void Dispose()
             {
-                _record.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
+                if (_record != null)
+                    _record.MarkEnd(_stopwatch.GetElapsedTime().TotalMilliseconds);
             }
-        }
-
-        public void Dispose()
-        {
-            if (_stopwatch.IsRunning) _stopwatch.Stop();
         }
     }
 }

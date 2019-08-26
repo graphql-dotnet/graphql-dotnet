@@ -66,8 +66,7 @@ namespace GraphQL
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            var metrics = new Metrics(options.EnableMetrics);
-            metrics.Start(options.OperationName);
+            var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
             options.Schema.FieldNameConverter = options.FieldNameConverter;
             options.Schema.Filter = options.SchemaFilter;
