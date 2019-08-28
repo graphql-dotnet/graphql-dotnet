@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
+using Shouldly;
+using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -59,8 +60,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             _output.WriteLine($"Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 9400 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(9400 * 2); //machine specific data with a buffer
         }
     }
 }

@@ -1,10 +1,11 @@
+using GraphQL.Conversion;
+using GraphQL.Types;
+using GraphQL.Utilities;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using GraphQL.Conversion;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -124,8 +125,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 6000 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(6000 * 2); //machine specific data with a buffer
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
@@ -162,8 +163,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 700 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(700 * 2); //machine specific data with a buffer
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
@@ -212,8 +213,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 5600 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(5600 * 2); //machine specific data with a buffer
         }
     }
 
