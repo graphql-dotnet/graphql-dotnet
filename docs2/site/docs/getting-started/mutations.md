@@ -29,7 +29,7 @@ The JSON request for this mutation would look like:
 }
 ```
 
-C# class would looks like:
+C# class would look like:
 
 ```csharp
 public class Human
