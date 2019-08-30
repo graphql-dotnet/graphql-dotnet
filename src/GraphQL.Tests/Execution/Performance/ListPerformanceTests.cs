@@ -110,7 +110,6 @@ namespace GraphQL.Tests.Execution.Performance
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
-                _.SetFieldMiddleware = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -147,7 +146,6 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
-                _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
                 _.Schema = Schema;
                 _.Query = query;
@@ -197,7 +195,6 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
-                _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
                 _.Schema = Schema;
                 _.Query = query;
