@@ -6,6 +6,8 @@ namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// No fragment cycles
+    ///
+    /// A GraphQL document is only valid if it does not contain fragment cycles.
     /// </summary>
     public class NoFragmentCycles : IValidationRule
     {
@@ -14,6 +16,8 @@ namespace GraphQL.Validation.Rules
             var via = spreadNames.Any() ? " via " + string.Join(", ", spreadNames) : "";
             return $"Cannot spread fragment \"{fragName}\" within itself{via}.";
         }
+
+        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
 
         public INodeVisitor Validate(ValidationContext context)
         {

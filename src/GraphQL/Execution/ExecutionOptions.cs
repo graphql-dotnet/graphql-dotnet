@@ -20,7 +20,12 @@ namespace GraphQL
         public Document Document { get; set; }
         public Inputs Inputs { get; set; }
         public CancellationToken CancellationToken { get; set; } = default;
+
+        /// <summary>
+        /// Note if not set then standard list of validation rules will be used.
+        /// </summary>
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
+
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
         public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;

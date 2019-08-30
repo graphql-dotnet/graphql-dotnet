@@ -22,6 +22,8 @@ namespace GraphQL.Validation.Rules
             return $"Directive \"{directiveName}\" may not be used on {location}.";
         }
 
+        public static readonly KnownDirectives Instance = new KnownDirectives();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

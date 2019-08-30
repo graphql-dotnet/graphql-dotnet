@@ -20,6 +20,8 @@ namespace GraphQL.Validation.Rules
               : $"Variable \"${varName}\" is never used.";
         }
 
+        public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var variableDefs = new List<VariableDefinition>();

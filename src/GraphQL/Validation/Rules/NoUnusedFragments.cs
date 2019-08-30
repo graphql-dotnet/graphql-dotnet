@@ -17,6 +17,8 @@ namespace GraphQL.Validation.Rules
             return $"Fragment \"{fragName}\" is never used.";
         }
 
+        public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var operationDefs = new List<Operation>();
