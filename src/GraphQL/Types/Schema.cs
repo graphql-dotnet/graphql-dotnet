@@ -13,7 +13,7 @@ namespace GraphQL.Types
 
         void Initialize();
 
-        IFieldNameConverter FieldNameConverter { get; set;}
+        IFieldNameConverter FieldNameConverter { get; set; }
 
         IObjectGraphType Query { get; set; }
 
