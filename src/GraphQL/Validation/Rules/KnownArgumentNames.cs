@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Rules
             var message = $"Unknown argument \"{argName}\" on field \"{fieldName}\" of type \"{type}\".";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
-                message += $"Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
+                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
             }
             return message;
         }
@@ -27,7 +27,7 @@ namespace GraphQL.Validation.Rules
             var message = $"Unknown argument \"{argName}\" on directive \"{directiveName}\".";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
-                message += $"Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
+                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
             }
             return message;
         }
