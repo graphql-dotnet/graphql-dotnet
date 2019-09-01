@@ -43,13 +43,11 @@ namespace GraphQL.Validation.Complexity
             Debug.WriteLine($"Sum(Query depth across all subqueries) : {complexityResult.TotalQueryDepth}");
             foreach (var node in complexityResult.ComplexityMap) Debug.WriteLine($"{node.Key} : {node.Value}");
 #endif
-            if (complexityParameters.MaxComplexity.HasValue &&
-                complexityResult.Complexity > complexityParameters.MaxComplexity.Value)
+            if (complexityResult.Complexity > complexityParameters.MaxComplexity)
                 throw new InvalidOperationException(
                     $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key}");
 
-            if (complexityParameters.MaxDepth.HasValue &&
-                complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
+            if (complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
                 throw new InvalidOperationException(
                     $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
         }
