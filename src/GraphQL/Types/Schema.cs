@@ -13,7 +13,7 @@ namespace GraphQL.Types
 
         void Initialize();
 
-        IFieldNameConverter FieldNameConverter { get; set;}
+        IFieldNameConverter FieldNameConverter { get; set; }
 
         IObjectGraphType Query { get; set; }
 
@@ -101,7 +101,7 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set;} = new CamelCaseFieldNameConverter();
+        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
         public bool Initialized => _lookup.IsValueCreated;
 
