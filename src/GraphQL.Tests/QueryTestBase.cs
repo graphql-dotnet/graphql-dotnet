@@ -97,7 +97,7 @@ namespace GraphQL.Tests
                 _.CancellationToken = cancellationToken;
             }).GetAwaiter().GetResult();
 
-            var renderResult = renderErrors ? runResult : new ExecutionResult {Data = runResult.Data};
+            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
 
             var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();

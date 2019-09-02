@@ -12,6 +12,7 @@ namespace GraphQL.Types
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
 
         private readonly object _lock = new object();
+        private bool _sealed;
 
         public GraphTypesLookup()
         {
@@ -44,11 +45,18 @@ namespace GraphQL.Types
             AddType<__TypeKind>();
         }
 
+        private void CheckSealed()
+        {
+            if (_sealed)
+                throw new InvalidOperationException("GraphTypesLookup is sealed for modifications. You attempt to modify schema after it was initialized.");
+        }
+
         public static GraphTypesLookup Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
-            IFieldNameConverter fieldNameConverter)
+            IFieldNameConverter fieldNameConverter,
+            bool seal = false)
         {
             var lookup = new GraphTypesLookup
             {
@@ -94,18 +102,25 @@ namespace GraphQL.Types
 
             lookup.ApplyTypeReferences();
 
+            lookup._sealed = seal;
+
             return lookup;
         }
 
         public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
-        public void Clear()
+        internal void Clear(bool internalCall)
         {
+            if (!internalCall)
+                CheckSealed();
+
             lock (_lock)
             {
                 _types.Clear();
             }
         }
+
+        public void Clear() => Clear(false);
 
         public IEnumerable<IGraphType> All()
         {
@@ -134,9 +149,11 @@ namespace GraphQL.Types
             }
             set
             {
+                CheckSealed();
+
                 lock (_lock)
                 {
-                    _types[typeName.TrimGraphQLTypes()] = value;
+                    SetGraphType(typeName.TrimGraphQLTypes(), value);
                 }
             }
         }
@@ -156,6 +173,8 @@ namespace GraphQL.Types
         public void AddType<TType>()
             where TType : IGraphType, new()
         {
+            CheckSealed();
+
             var context = new TypeCollectionContext(
                 type =>
                 {
@@ -166,7 +185,7 @@ namespace GraphQL.Types
                     var trimmed = name.TrimGraphQLTypes();
                     lock (_lock)
                     {
-                        _types[trimmed] = type;
+                        SetGraphType(trimmed, type);
                     }
                     ctx?.AddType(trimmed, type, null);
                 });
@@ -182,6 +201,8 @@ namespace GraphQL.Types
         public void AddType<TType>(TypeCollectionContext context)
             where TType : IGraphType
         {
+            CheckSealed();
+
             var type = typeof(TType).GetNamedType();
             var instance = context.ResolveType(type);
             AddType(instance, context);
@@ -189,6 +210,8 @@ namespace GraphQL.Types
 
         public void AddType(IGraphType type, TypeCollectionContext context)
         {
+            CheckSealed();
+
             if (type == null || type is GraphQLTypeReference)
             {
                 return;
@@ -202,7 +225,7 @@ namespace GraphQL.Types
             var name = type.CollectTypes(context).TrimGraphQLTypes();
             lock (_lock)
             {
-                _types[name] = type;
+                SetGraphType(name, type);
             }
 
             if (type is IComplexGraphType complexType)
@@ -345,6 +368,8 @@ namespace GraphQL.Types
 
         public void ApplyTypeReferences()
         {
+            CheckSealed();
+
             foreach (var type in _types.Values.ToList())
             {
                 ApplyTypeReference(type);
@@ -353,6 +378,8 @@ namespace GraphQL.Types
 
         public void ApplyTypeReference(IGraphType type)
         {
+            CheckSealed();
+
             if (type is IComplexGraphType complexType)
             {
                 foreach (var field in complexType.Fields)
@@ -439,6 +466,37 @@ namespace GraphQL.Types
             }
 
             return result;
+        }
+
+        private void SetGraphType(string typeName, IGraphType type)
+        {
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
+            }
+
+            if (_types.TryGetValue(typeName, out var existingGraphType))
+            {
+                if (ReferenceEquals(existingGraphType, type))
+                {
+                    // nothing to do
+                }
+                else if (existingGraphType.GetType() == type.GetType())
+                {
+                    _types[typeName] = type; // this case worked before overwriting the old value
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $@"You are trying to register a second GraphType '{type.GetType().FullName}' with the name '{typeName}'.
+A GraphType '{existingGraphType.GetType().FullName}' with the name '{typeName}' already exists. Make sure your schema does not contain
+different graph types with the same name since all schema types must have unique names as per specification.");
+                }
+            }
+            else
+            {
+                _types.Add(typeName, type);
+            }
         }
     }
 }
