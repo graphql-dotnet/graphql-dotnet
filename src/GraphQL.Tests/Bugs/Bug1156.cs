@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Bugs
     public class Bug1156 : QueryTestBase<Bug1156Schema>
     {
         [Fact]
-        public void f()
+        public void duplicated_type_names_should_throw_error()
         {
             var query = @"
 {
