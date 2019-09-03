@@ -22,9 +22,8 @@ namespace GraphQL.Tests.Bugs
     }
 }";
             var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1);
-            result.Errors[0].Message.ShouldBe(@"You are trying to register a second GraphType 'GraphQL.Tests.Bugs.Type2' with the name 'MyType'.
-A GraphType 'GraphQL.Tests.Bugs.Type1' with the name 'MyType' already exists. Make sure your schema does not contain
-different graph types with the same name since all schema types must have unique names as per specification.");
+            result.Errors[0].Message.ShouldBe(@"Unable to register GraphType 'GraphQL.Tests.Bugs.Type2' with the name 'MyType';
+the name 'MyType' is already registered to 'GraphQL.Tests.Bugs.Type1'.");
         }
     }
 

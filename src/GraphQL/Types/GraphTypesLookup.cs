@@ -487,10 +487,8 @@ namespace GraphQL.Types
                 }
                 else
                 {
-                    throw new InvalidOperationException(
-                        $@"You are trying to register a second GraphType '{type.GetType().FullName}' with the name '{typeName}'.
-A GraphType '{existingGraphType.GetType().FullName}' with the name '{typeName}' already exists. Make sure your schema does not contain
-different graph types with the same name since all schema types must have unique names as per specification.");
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetType().FullName}' with the name '{typeName}';
+the name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'.");
                 }
             }
             else
