@@ -48,15 +48,5 @@ namespace GraphQL.DataLoader
         /// or a completed task if the result is already cached.
         /// </returns>
         Task<T> LoadAsync(TKey key);
-
-        /// <summary>
-        /// Asynchronously load data for the provided given keys
-        /// </summary>
-        /// <param name="keys">Keys to use for loading data</param>
-        /// <returns>
-        /// A task that will complete when the DataLoader has been dispatched,
-        /// or a completed task if the result is already cached.
-        /// </returns>
-        Task<T[]> LoadAsync(IEnumerable<TKey> keys);
     }
 }

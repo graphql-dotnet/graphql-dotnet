@@ -80,18 +80,6 @@ namespace GraphQL.DataLoader
             }
         }
 
-        public async Task<T[]> LoadAsync(IEnumerable<TKey> keys)
-        {
-            var tasks = new List<Task<T>>(keys.Count());
-
-            foreach (TKey key in keys)
-            {
-                tasks.Add(LoadAsync(key));
-            }
-
-            return await Task.WhenAll(tasks);
-        }
-
         protected override bool IsFetchNeeded()
         {
             lock (_cache)
