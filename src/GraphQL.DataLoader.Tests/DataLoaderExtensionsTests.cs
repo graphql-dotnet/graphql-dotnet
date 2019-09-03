@@ -12,13 +12,18 @@ namespace GraphQL.DataLoader.Tests
 {
     public class DataLoaderExtensionsTests : DataLoaderTestBase
     {
-        [Fact]
-        public async Task LoadAsync_MultipleKeys_CallsSingularMultipleTimes()
+        private Mock<IDataLoader<int, User>> GetMockDataLoader()
         {
             var mock = new Mock<IDataLoader<int, User>>();
             mock.Setup(dl => dl.LoadAsync(It.IsAny<int>()))
                 .ReturnsAsync((int key) => new User() { UserId = key });
+            return mock;
+        }
 
+        [Fact]
+        public async Task LoadAsync_MultipleKeys_CallsSingularMultipleTimes()
+        {
+            var mock = GetMockDataLoader();
             var keys = new[] { 1, 2 };
             var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys);
 
@@ -32,6 +37,24 @@ namespace GraphQL.DataLoader.Tests
             users[1].UserId.ShouldBe(keys[1]);
 
             mock.Verify(x => x.LoadAsync(It.IsAny<int>()), Times.Exactly(keys.Length));
+        }
+
+        [Fact]
+        public async Task LoadAsync_MultipleKeysAsParams_CallsSingularMultipleTimes()
+        {
+            var mock = GetMockDataLoader();
+            var users = await DataLoaderExtensions.LoadAsync(mock.Object, 1, 2);
+
+            users.ShouldNotBeNull();
+            users.Length.ShouldBe(2, "Should return array of same length as number of keys provided");
+
+            users[0].ShouldNotBeNull();
+            users[1].ShouldNotBeNull();
+
+            users[0].UserId.ShouldBe(1);
+            users[1].UserId.ShouldBe(2);
+
+            mock.Verify(x => x.LoadAsync(It.IsAny<int>()), Times.Exactly(2));
         }
 
         [Fact]

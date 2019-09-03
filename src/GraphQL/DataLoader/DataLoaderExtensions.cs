@@ -26,5 +26,19 @@ namespace GraphQL.DataLoader
 
             return await Task.WhenAll(tasks);
         }
+
+        /// <summary>
+        /// Asynchronously load data for the provided given keys
+        /// </summary>
+        /// <param name="dataLoader">The dataloader to use</param>
+        /// <param name="keys">Keys to use for loading data</param>
+        /// <returns>
+        /// A task that will complete when the DataLoader has been dispatched,
+        /// or a completed task if the result is already cached.
+        /// </returns>
+        public static async Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, params TKey[] keys)
+        {
+            return await dataLoader.LoadAsync(keys.AsEnumerable());
+        }
     }
 }
