@@ -24,6 +24,8 @@ namespace GraphQL.DataLoader.Tests
 
             var usersStore = mock.Object;
 
+            User[] users1 = null;
+            User[] users2 = null;
             User user1 = null;
             User user2 = null;
             User user3 = null;
@@ -41,10 +43,18 @@ namespace GraphQL.DataLoader.Tests
                 await loader.DispatchAsync();
 
                 // Now await tasks
-                user1 = (await task1)[0];
-                user2 = (await task1)[1];
-                user3 = (await task2)[2];
+                users1 = (await task1);
+                users1.ShouldNotBeNull();
+                user1 = users1[0];
+                user2 = users1[1];
+
+                users2 = (await task2);
+                users2.ShouldNotBeNull();
+                user3 = users2[2];
             });
+
+            users1.Count().ShouldBe(2, "First task with two keys should return array of two users");
+            users2.Count().ShouldBe(3, "Second task with three keys should return array of three users");
 
             user1.ShouldNotBeNull();
             user2.ShouldNotBeNull();
