@@ -17,7 +17,7 @@ namespace GraphQL.DataLoader
         /// </returns>
         public static Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, IEnumerable<TKey> keys)
         {
-            var tasks = new List<Task<T>>(keys.Count());
+            var tasks = new List<Task<T>>();
 
             foreach (var key in keys)
             {
