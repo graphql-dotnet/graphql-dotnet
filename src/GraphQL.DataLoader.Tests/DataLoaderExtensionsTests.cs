@@ -7,12 +7,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace GraphQL.DataLoader.Tests
 {
     public class DataLoaderExtensionsTests : DataLoaderTestBase
     {
+        [Fact]
+        public async Task LoadAsync_MultipleKeys_CallsSingularMultipleTimes()
+        {
+            var mock = new Mock<IDataLoader<int, User>>();
+            mock.Setup(dl => dl.LoadAsync(It.IsAny<int>()))
+                .ReturnsAsync((int key) => new User() { UserId = key });
+
+            var keys = new[] { 1, 2 };
+            var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys);
+
+            users.ShouldNotBeNull();
+            users.Length.ShouldBe(keys.Length, "Should return array of same length as number of keys provided");
+
+            users[0].ShouldNotBeNull();
+            users[1].ShouldNotBeNull();
+
+            users[0].UserId.ShouldBe(keys[0]);
+            users[1].UserId.ShouldBe(keys[1]);
+
+            mock.Verify(x => x.LoadAsync(It.IsAny<int>()), Times.Exactly(keys.Length));
+        }
+
         [Fact]
         public void LoadAsync_MultipleKeys_Works()
         {
@@ -53,8 +76,8 @@ namespace GraphQL.DataLoader.Tests
                 user3 = users2[2];
             });
 
-            users1.Count().ShouldBe(2, "First task with two keys should return array of two users");
-            users2.Count().ShouldBe(3, "Second task with three keys should return array of three users");
+            users1.Length.ShouldBe(2, "First task with two keys should return array of two users");
+            users2.Length.ShouldBe(3, "Second task with three keys should return array of three users");
 
             user1.ShouldNotBeNull();
             user2.ShouldNotBeNull();
