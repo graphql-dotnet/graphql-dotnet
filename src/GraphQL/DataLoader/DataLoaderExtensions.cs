@@ -15,7 +15,7 @@ namespace GraphQL.DataLoader
         /// A task that will complete when the DataLoader has been dispatched,
         /// or a completed task if the result is already cached.
         /// </returns>
-        public static async Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, IEnumerable<TKey> keys)
+        public static Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, IEnumerable<TKey> keys)
         {
             var tasks = new List<Task<T>>(keys.Count());
 
@@ -24,7 +24,7 @@ namespace GraphQL.DataLoader
                 tasks.Add(dataLoader.LoadAsync(key));
             }
 
-            return await Task.WhenAll(tasks);
+            return Task.WhenAll(tasks);
         }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace GraphQL.DataLoader
         /// A task that will complete when the DataLoader has been dispatched,
         /// or a completed task if the result is already cached.
         /// </returns>
-        public static async Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, params TKey[] keys)
+        public static Task<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, params TKey[] keys)
         {
-            return await dataLoader.LoadAsync(keys.AsEnumerable());
+            return dataLoader.LoadAsync(keys.AsEnumerable());
         }
     }
 }
