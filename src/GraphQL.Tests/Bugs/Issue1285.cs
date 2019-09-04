@@ -64,7 +64,7 @@ query {
     {
         private int _readOnlyProp;
 
-        public ArrayInput(int readOnlyProp)
+        private ArrayInput(int readOnlyProp)
         {
             _readOnlyProp = readOnlyProp;
         }

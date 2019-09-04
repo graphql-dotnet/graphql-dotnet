@@ -22,15 +22,15 @@ namespace GraphQL
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
-        /// Can use any constructor of the indicated type, provided that it is public and there are
-        /// keys in the dictionary that correspond (case sensitive) to the names of the constructor parameters.
+        /// Can use any constructor of the indicated type, provided that there are keys in the
+        /// dictionary that correspond (case sensitive) to the names of the constructor parameters.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
         public static object ToObject(this IDictionary<string, object> source, Type type)
         {
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters
-            var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
+            var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
 
             ConstructorInfo targetCtor = null;
             ParameterInfo[] ctorParameters = null;
