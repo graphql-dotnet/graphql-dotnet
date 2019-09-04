@@ -101,7 +101,9 @@ namespace GraphQL.Types
                 return inputObject.ToObject(argumentType);
             }
 
-            return arg.GetPropertyValue(argumentType);
+            var result = arg.GetPropertyValue(argumentType);
+
+            return result == null && argumentType.IsValueType ? defaultValue : result;
         }
 
         public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;

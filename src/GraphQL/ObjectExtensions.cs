@@ -31,12 +31,12 @@ namespace GraphQL
 
             foreach (var item in source)
             {
-                var propertyType = type.GetProperty(item.Key,
+                var propertyInfo = type.GetProperty(item.Key,
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                if (propertyType != null)
+                if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    var value = GetPropertyValue(item.Value, propertyType.PropertyType);
-                    propertyType.SetValue(obj, value, null);
+                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType);
+                    propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
 
@@ -51,13 +51,8 @@ namespace GraphQL
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
-            // Short-circuit conversion if the property value already
-            if (fieldType.IsInstanceOfType(propertyValue))
-            {
-                return propertyValue;
-            }
-
-            if (fieldType == typeof(object))
+            // Short-circuit conversion if the property value already of the right type
+            if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
             {
                 return propertyValue;
             }
@@ -72,30 +67,44 @@ namespace GraphQL
                 IList newArray;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
-                var implementsIList = fieldType.GetInterface("IList") != null;
+                var fieldTypeImplementsIList = fieldType.GetInterface("IList") != null;
 
-                if (implementsIList && !fieldType.IsArray)
+                var propertyValueAsIList = propertyValue as IList;
+
+                // Custom container
+                if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
                     newArray = (IList)Activator.CreateInstance(fieldType);
                 }
+                // Array
+                else if (fieldType.IsArray && propertyValueAsIList != null)
+                {
+                    newArray = Array.CreateInstance(elementType, propertyValueAsIList.Count);
+                }
+                // List<T>
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
                     newArray = (IList)Activator.CreateInstance(genericListType);
                 }
 
-                if (!(propertyValue is IEnumerable valueList)) return newArray;
+                if (!(propertyValue is IEnumerable valueList))
+                    return newArray;
 
-                foreach (var listItem in valueList)
+                if (fieldType.IsArray && propertyValueAsIList != null)
                 {
-                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    for (int i = 0; i < propertyValueAsIList.Count; ++i)
+                    {
+                        var listItem = propertyValueAsIList[i];
+                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType);
+                    }
                 }
-
-                if (fieldType.IsArray)
+                else
                 {
-                    var array = Array.CreateInstance(elementType, newArray.Count);
-                    newArray.CopyTo(array, 0);
-                    return array;
+                    foreach (var listItem in valueList)
+                    {
+                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    }
                 }
 
                 return newArray;

@@ -46,6 +46,10 @@ namespace GraphQL.Tests.Bugs
 
             var result = ctx.GetArgument<EnumType>("value");
             result.ShouldBe(EnumType.A);
+
+            // just place it here to also check for default value
+            var result2 = ctx.GetArgument<int>("value");
+            result2.ShouldBe(0);
         }
 
         [Fact]
