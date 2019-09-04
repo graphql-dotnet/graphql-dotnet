@@ -22,17 +22,50 @@ namespace GraphQL
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// Can use any constructor of the indicated type, provided that it is public and there are
+        /// keys in the dictionary that correspond (case sensitive) to the names of the constructor parameters.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
         public static object ToObject(this IDictionary<string, object> source, Type type)
         {
-            var obj = Activator.CreateInstance(type);
+            // attempt to use the most specific constructor sorting in decreasing order of number of parameters
+            var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
+
+            ConstructorInfo targetCtor = null;
+            ParameterInfo[] ctorParameters = null;
+
+            foreach (var ctor in ctorCandidates)
+            {
+                var parameters = ctor.GetParameters();
+                if (parameters.All(p => source.ContainsKey(p.Name)))
+                {
+                    targetCtor = ctor;
+                    ctorParameters = parameters;
+                    break;
+                }
+            }
+
+            if (targetCtor == null)
+                throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
+
+            object[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
+
+            for (int i = 0; i < ctorParameters.Length; ++i)
+            {
+                var arg = GetPropertyValue(source[ctorParameters[i].Name], ctorParameters[i].ParameterType);
+                ctorArguments[i] = arg;
+            }
+
+            var obj = targetCtor.Invoke(ctorArguments);
 
             foreach (var item in source)
             {
-                var propertyInfo = type.GetProperty(item.Key,
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                // these parameters have already been used in the constructor
+                if (ctorParameters.Any(p => p.Name == item.Key))
+                    continue;
+
+                var propertyInfo = type.GetProperty(item.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
                     var value = GetPropertyValue(item.Value, propertyInfo.PropertyType);

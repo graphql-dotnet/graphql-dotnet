@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = @"
 query {
-  getsome(input: { readOnlyProp: 7, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
+  getsome(input: { readOnlyProp: 7, privateSetProp: 3, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
 }
 ";
             var expected = @"{
@@ -53,6 +53,7 @@ query {
                     arg.IntsList2.Count.ShouldBe(20);
 
                     arg.ValueProp.ShouldBe(0);
+                    arg.PrivateSetProp.ShouldBe(3);
 
                     return arg.Ints;
                 });
@@ -61,6 +62,13 @@ query {
 
     public class ArrayInput
     {
+        private int _readOnlyProp;
+
+        public ArrayInput(int readOnlyProp)
+        {
+            _readOnlyProp = readOnlyProp;
+        }
+
         public int[] Ints { get; set; }
 
         public int[] Ints2 { get; set; }
@@ -71,7 +79,9 @@ query {
         
         public int ValueProp { get; set; }
 
-        public int ReadOnlyProp { get; }
+        public int ReadOnlyProp => _readOnlyProp;
+
+        public int PrivateSetProp { get; private set; } 
     }
 
     public class ArrayInputType : InputObjectGraphType<ArrayInput>
@@ -84,6 +94,7 @@ query {
             Field(o => o.IntsList2, nullable: true);
             Field(o => o.ValueProp, nullable: true);
             Field(o => o.ReadOnlyProp, nullable: true);
+            Field(o => o.PrivateSetProp, nullable: true);
         }
     }
 }
