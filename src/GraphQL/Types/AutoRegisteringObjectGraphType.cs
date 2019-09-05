@@ -24,6 +24,8 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
+            Name = typeof(TSourceType).GraphQLName();
+
             foreach (var propertyInfo in GetRegisteredProperties())
             {
                 if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
