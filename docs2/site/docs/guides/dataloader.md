@@ -71,7 +71,7 @@ var result = executer.ExecuteAsync(opts => {
 
 First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
-Then use the the `Context` property on the accessor to get the current `DataLoaderContext`. Each request will have its own context instance.
+Then use the `Context` property on the accessor to get the current `DataLoaderContext`. Each request will have its own context instance.
 
 Use one of the "GetOrAddLoader" methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
 

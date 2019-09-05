@@ -1,6 +1,6 @@
 # Variables
 
-You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
+You can pass variables received from the client to the execution engine by using the `Inputs` property.
 
 > See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
 

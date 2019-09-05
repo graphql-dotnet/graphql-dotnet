@@ -120,7 +120,8 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null)
+            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null,
+            IFieldNameConverter fieldNameConverter = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
             {
@@ -131,8 +132,8 @@ namespace GraphQL.Tests
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
-                options.FieldNameConverter = new CamelCaseFieldNameConverter();
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? ((ctx, ex) => ex);
+                options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
