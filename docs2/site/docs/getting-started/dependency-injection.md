@@ -48,6 +48,8 @@ How you integrate this into your system will depend on the dependency injection 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
+    services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+    services.AddSingleton<IDocumentWriter, DocumentWriter>();
     services.AddSingleton<StarWarsData>();
     services.AddSingleton<StarWarsQuery>();
     services.AddSingleton<StarWarsMutation>();
