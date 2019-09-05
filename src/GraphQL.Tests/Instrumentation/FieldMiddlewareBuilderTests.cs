@@ -118,8 +118,8 @@ namespace GraphQL.Tests.Instrumentation
         {
             var additionalData = new Dictionary<string, string[]>
             {
-                [ "errorCodes" ] = new[] { "one", "two" },
-                [ "otherErrorCodes" ] = new[] { "one", "four" }
+                ["errorCodes"] = new[] { "one", "two" },
+                ["otherErrorCodes"] = new[] { "one", "four" }
             };
             _builder.Use(next =>
             {
