@@ -1,6 +1,6 @@
 # Error Handling
 
-The `ExecutionResult` provides an `Errors` property which includes any errors encountered during exectution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/June2018/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
+The `ExecutionResult` provides an `Errors` property which includes any errors encountered during execution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/June2018/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
 
 To help debug errors, you can set `ExposeExceptions` on `ExecutionOptions` which will expose error stack traces.
 
