@@ -106,7 +106,7 @@ namespace GraphQL.Tests
 //             Console.WriteLine(writtenResult);
 // #endif
 
-            writtenResult.ShouldBe(expectedResult);
+            writtenResult.ShouldBeCrossPlat(expectedResult);
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
@@ -122,7 +122,8 @@ namespace GraphQL.Tests
             object root,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
-            IEnumerable<IValidationRule> rules = null)
+            IEnumerable<IValidationRule> rules = null,
+            IFieldNameConverter fieldNameConverter = null)
         {
             var runResult = Executer.ExecuteAsync(_ =>
             {
@@ -133,7 +134,7 @@ namespace GraphQL.Tests
                 _.UserContext = userContext;
                 _.CancellationToken = cancellationToken;
                 _.ValidationRules = rules;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
@@ -152,7 +153,7 @@ namespace GraphQL.Tests
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
 
             return runResult;
         }

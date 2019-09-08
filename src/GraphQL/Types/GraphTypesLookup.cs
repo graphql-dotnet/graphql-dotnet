@@ -52,7 +52,7 @@ namespace GraphQL.Types
         {
             var lookup = new GraphTypesLookup
             {
-                FieldNameConverter = fieldNameConverter ?? new CamelCaseFieldNameConverter()
+                FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance
             };
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
@@ -97,7 +97,7 @@ namespace GraphQL.Types
             return lookup;
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = new CamelCaseFieldNameConverter();
+        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
         public void Clear()
         {
@@ -375,7 +375,7 @@ namespace GraphQL.Types
                     .ResolvedInterfaces
                     .Select(i =>
                     {
-                        var interfaceType = ConvertTypeReference(objectType, i) as IInterfaceGraphType;
+                        var interfaceType = (IInterfaceGraphType)ConvertTypeReference(objectType, i);
 
                         if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                         {

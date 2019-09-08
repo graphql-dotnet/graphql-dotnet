@@ -92,13 +92,13 @@ namespace GraphQL.Types
 
             if (arg is Dictionary<string, object> inputObject)
             {
-                var type = argumentType;
-                if (type.Namespace?.StartsWith("System") == true)
-                {
+                if (argumentType == typeof(object))
                     return arg;
-                }
 
-                return inputObject.ToObject(type);
+                if (argumentType.IsPrimitive())
+                    throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
+
+                return inputObject.ToObject(argumentType);
             }
 
             return arg.GetPropertyValue(argumentType);
@@ -115,7 +115,7 @@ namespace GraphQL.Types
         {
             try
             {
-                return await resolve(this);
+                return await resolve(this).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace GraphQL.Types
                 else
                 {
                     var result = error(Errors);
-                    return result == null ? default : await result;
+                    return result == null ? default : await result.ConfigureAwait(false);
                 }
             }
         }

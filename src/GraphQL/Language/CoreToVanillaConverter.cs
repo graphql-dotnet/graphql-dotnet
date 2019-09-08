@@ -12,7 +12,7 @@ namespace GraphQL.Language
     {
         private readonly ISource _body;
 
-        private CoreToVanillaConverter(string body)
+        internal CoreToVanillaConverter(string body)
         {
             _body = new Source(body);
         }
@@ -162,13 +162,18 @@ namespace GraphQL.Language
             {
                 foreach (var d in directives)
                 {
-                    var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
-                    dir.Arguments = Arguments(d.Arguments);
-                    target.Add(dir);
+                    target.Add(Directive(d));
                 }
             }
 
             return target;
+        }
+
+        public Directive Directive(GraphQLDirective d)
+        {
+            var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
+            dir.Arguments = Arguments(d.Arguments);
+            return dir;
         }
 
         public Arguments Arguments(IEnumerable<GraphQLArgument> source)

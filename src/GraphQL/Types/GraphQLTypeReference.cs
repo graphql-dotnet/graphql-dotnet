@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GraphQL.Types
 {
+    [DebuggerDisplay("ref {TypeName,nq}")]
     public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         public GraphQLTypeReference(string typeName)

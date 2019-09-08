@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Instrumentation
                 FieldAst = new Field(null, new NameNode("Name")),
                 Source = new Person {Name = "Quinn"},
                 Errors = new ExecutionErrors(),
-                Metrics = new Metrics()
+                Metrics = new Metrics().Start(null)
             };
         }
 
@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.AllRecords.Skip(1).Single();
             record.Category.ShouldBe("test");
             record.Subject.ShouldBe("testing name");
         }
@@ -91,7 +91,7 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.AllRecords.Skip(1).Single();
             record.Category.ShouldBe("class");
             record.Subject.ShouldBe("from class");
         }

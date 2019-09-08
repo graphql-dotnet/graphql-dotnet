@@ -21,6 +21,11 @@ namespace GraphQL.Language.AST
         public IList<ISelection> Selections => _selections;
         public override IEnumerable<INode> Children => _selections;
 
+        public void Prepend(ISelection selection)
+        {
+            _selections.Insert(0, selection ?? throw new ArgumentNullException(nameof(selection)));
+        }
+
         public void Add(ISelection selection)
         {
             _selections.Add(selection ?? throw new ArgumentNullException(nameof(selection)));

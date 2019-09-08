@@ -73,7 +73,7 @@ namespace GraphQL.Http
         {
             using (var stream = new MemoryStream())
             {
-                await writer.WriteAsync(stream, value);
+                await writer.WriteAsync(stream, value).ConfigureAwait(false);
                 stream.Position = 0;
                 using (var reader = new StreamReader(stream, DocumentWriter.Utf8Encoding))
                 {

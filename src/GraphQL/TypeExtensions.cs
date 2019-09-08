@@ -50,20 +50,12 @@ namespace GraphQL
             return type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
-        /// <summary>
-        /// Returns the first non-null value from executing the func against the enumerable
-        /// </summary>
-        /// <returns><c>null</c> is all values were null.</returns>
-        public static TReturn FirstValue<TItem, TReturn>(this IEnumerable<TItem> enumerable, Func<TItem, TReturn> func)
-            where TReturn : class
+        public static bool IsPrimitive(this Type type)
         {
-            foreach (TItem item in enumerable)
-            {
-                TReturn @object = func(item);
-                if (@object != null) return @object;
-            }
-
-            return null;
+            return type.IsPrimitive
+                || type == typeof(string)
+                || type == typeof(DateTime)
+                || type == typeof(DateTimeOffset);
         }
 
         /// <summary>

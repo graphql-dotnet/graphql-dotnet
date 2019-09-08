@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Builders
             var type = new ObjectGraphType();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Fact]
