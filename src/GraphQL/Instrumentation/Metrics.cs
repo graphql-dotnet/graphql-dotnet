@@ -48,7 +48,7 @@ namespace GraphQL.Instrumentation
             if (_main == null)
                 throw new InvalidOperationException("Metrics.Start should be called before calling Metrics.Subject");
 
-            var record = new PerfRecord(category, subject, _stopwatch.GetElapsedTime().TotalMilliseconds, metadata);
+            var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
             _records.Add(record);
             return new Marker(record, _stopwatch);
         }
@@ -60,7 +60,7 @@ namespace GraphQL.Instrumentation
             if (!_enabled)
                 return null;
 
-            _main?.MarkEnd(_stopwatch.GetElapsedTime().TotalMilliseconds);
+            _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             return AllRecords;
         }
 
@@ -80,7 +80,7 @@ namespace GraphQL.Instrumentation
             public void Dispose()
             {
                 if (_record != null)
-                    _record.MarkEnd(_stopwatch.GetElapsedTime().TotalMilliseconds);
+                    _record.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
             }
         }
     }
