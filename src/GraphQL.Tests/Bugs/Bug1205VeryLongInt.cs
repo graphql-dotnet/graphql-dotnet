@@ -3,10 +3,11 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/1205
     public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     {
         [Fact]
-        public void ArrayOfArray_Should_Return_As_Is()
+        public void Very_Long_Int_Should_Return_As_Is()
         {
             var query = "{ big }";
             var expected = @"{
