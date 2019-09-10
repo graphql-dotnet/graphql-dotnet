@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
@@ -19,17 +20,17 @@ namespace GraphQL
         public string OperationName { get; set; }
         public Document Document { get; set; }
         public Inputs Inputs { get; set; }
-        public CancellationToken CancellationToken { get; set; } = default;
+        public CancellationToken CancellationToken { get; set; }
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
-        public ComplexityConfiguration ComplexityConfiguration { get; set; } = null;
+        public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
         public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
-        public bool ExposeExceptions { get; set; } = false;
+        public bool ExposeExceptions { get; set; }
 
         //Note disabling will increase performance
         public bool EnableMetrics { get; set; } = true;
@@ -37,7 +38,13 @@ namespace GraphQL
         //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
         public bool SetFieldMiddleware { get; set; } = true;
 
-        public bool ThrowOnUnhandledException { get; set; } = false;
+        public bool ThrowOnUnhandledException { get; set; }
+
+        /// <summary>
+        /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
+        /// This can be useful for hiding error messages that reveal server implementation details.
+        /// </summary>
+        public Func<Execution.ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; } = (ctx, ex) => ex;
 
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types.
