@@ -78,7 +78,7 @@ namespace GraphQL.Tests.Execution.Performance
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                         name
                         name1:name
                         name2:name
@@ -117,7 +117,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -129,12 +129,11 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        // [Fact]
         public async Task Executes_SimpleLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                         name
                     }
                 }
@@ -154,7 +153,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -166,12 +165,11 @@ namespace GraphQL.Tests.Execution.Performance
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        // [Fact]
         public async Task Executes_UnionLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                       __typename
                       name
                       pets {
@@ -203,7 +201,7 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();

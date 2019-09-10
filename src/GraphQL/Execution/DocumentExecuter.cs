@@ -65,14 +65,16 @@ namespace GraphQL
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
+            if (options.Schema == null)
+                throw new InvalidOperationException("Cannot execute request if no schema is specified");
 
-            var metrics = new Metrics(options.EnableMetrics);
-            metrics.Start(options.OperationName);
+            var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
             options.Schema.FieldNameConverter = options.FieldNameConverter;
             options.Schema.Filter = options.SchemaFilter;
 
             ExecutionResult result = null;
+            ExecutionContext context = null;
 
             try
             {
@@ -141,7 +143,7 @@ namespace GraphQL
                     };
                 }
 
-                var context = BuildExecutionContext(
+                context = BuildExecutionContext(
                     options.Schema,
                     options.Root,
                     document,
@@ -151,7 +153,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.UnhandledExceptionDelegate);
 
                 if (context.Errors.Any())
                 {
@@ -204,6 +207,8 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                ex = options.UnhandledExceptionDelegate(context, ex);
+
                 result = new ExecutionResult
                 {
                     Errors = new ExecutionErrors
@@ -232,7 +237,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            Func<ExecutionContext, Exception, Exception> unhandledExceptionDelegate)
         {
             var context = new ExecutionContext
             {
@@ -248,7 +254,8 @@ namespace GraphQL
 
                 Metrics = metrics,
                 Listeners = listeners,
-                ThrowOnUnhandledException = throwOnUnhandledException
+                ThrowOnUnhandledException = throwOnUnhandledException,
+                UnhandledExceptionDelegate = unhandledExceptionDelegate
             };
 
             return context;
