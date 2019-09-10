@@ -1,9 +1,9 @@
+using GraphQL.Resolvers;
+using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Resolvers;
-using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
@@ -28,13 +28,17 @@ namespace GraphQL.Instrumentation
                 // allocation free optimization for single middleware (InstrumentFieldsMiddleware)
                 _singleComponent = middleware;
             }
-            else
+            else if (_components == null)
             {
                 _components = new List<Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
                 {
                     _singleComponent,
                     middleware
                 };
+            }
+            else
+            {
+                _components.Add(middleware);
             }
 
             return this;
