@@ -23,7 +23,14 @@ namespace GraphQL
         public CancellationToken CancellationToken { get; set; }
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
+        /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
+        /// at the beginning of the first call to DocumentExecuter.ExecuteAsync.
+        /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
+
         public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
         public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
@@ -32,11 +39,10 @@ namespace GraphQL
 
         public bool ExposeExceptions { get; set; }
 
-        //Note disabling will increase performance
+        /// <summary>
+        /// This setting essentially allows Apollo Tracing. Disabling will increase performance.
+        /// </summary>
         public bool EnableMetrics { get; set; } = true;
-
-        //Note disabling will increase performance. When true all nodes will have the middleware injected for resolving fields.
-        public bool SetFieldMiddleware { get; set; } = true;
 
         public bool ThrowOnUnhandledException { get; set; }
 

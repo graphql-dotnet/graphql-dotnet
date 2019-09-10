@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Execution
         {
             long val = 89429901947254093;
             _context.Arguments["a"] = val;
-            Assert.Throws<OverflowException>(() => _context.GetArgument<int>("a"));
+            Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
         }
 
         [Fact]
