@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\**\*.md" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
+  </ItemGroup>
+
+</Project>
