@@ -288,7 +288,7 @@ namespace GraphQL
             if (ValueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
                 return conversion;
 
-            throw new InvalidOperationException($"Could not find conversion from {valueType.FullName} to {targetType.FullName}");
+            throw new InvalidOperationException($"Could not find conversion from '{valueType.FullName}' to '{targetType.FullName}'");
         }
 
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)

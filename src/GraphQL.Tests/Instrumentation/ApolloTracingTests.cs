@@ -42,6 +42,10 @@ query {
             trace.Version.ShouldBe(1);
             trace.Parsing.StartOffset.ShouldNotBe(0);
             trace.Parsing.Duration.ShouldNotBe(0);
+            trace.Validation.StartOffset.ShouldNotBe(0);
+            trace.Validation.Duration.ShouldNotBe(0);
+            Assert.NotEqual(trace.Validation.StartOffset, trace.Parsing.StartOffset);
+            Assert.NotEqual(trace.Validation.Duration, trace.Parsing.Duration);
 
             var expectedPaths = new HashSet<List<object>>
             {
