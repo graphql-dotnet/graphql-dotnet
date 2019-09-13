@@ -83,6 +83,7 @@ namespace GraphQL.Tests.Types
             GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
             type.Fields.Count().ShouldBe(18);
@@ -300,7 +301,7 @@ namespace GraphQL.Tests.Types
             var type = new ComplexType<TestObject>();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Theory]
@@ -311,7 +312,7 @@ namespace GraphQL.Tests.Types
             var type = new ComplexType<TestObject>();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>().Name(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Theory]

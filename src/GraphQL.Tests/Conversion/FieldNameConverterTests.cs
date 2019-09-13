@@ -12,20 +12,20 @@ namespace GraphQL.Tests.Conversion
         {
             var schema = new Schema
             {
-                FieldNameConverter = converter ?? new CamelCaseFieldNameConverter()
+                FieldNameConverter = converter ?? CamelCaseFieldNameConverter.Instance
             };
 
-            var person = new ObjectGraphType {Name = "Person"};
+            var person = new ObjectGraphType { Name = "Person" };
             person.Field("Name", new StringGraphType());
 
-            var query = new ObjectGraphType {Name = "Query"};
+            var query = new ObjectGraphType { Name = "Query" };
             query.Field(
                 "PeRsoN",
                 person,
                 arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
                 resolve: ctx =>
                 {
-                    return new Person{ Name = "Quinn" };
+                    return new Person { Name = "Quinn" };
                 });
 
             schema.Query = query;

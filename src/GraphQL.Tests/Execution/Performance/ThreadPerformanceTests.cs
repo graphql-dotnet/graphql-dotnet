@@ -83,7 +83,6 @@ namespace GraphQL.Tests.Execution.Performance
             var runResult2 = Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
-                _.SetFieldMiddleware = false;
                 _.Schema = Schema;
                 _.Query = query;
             }).GetAwaiter().GetResult();

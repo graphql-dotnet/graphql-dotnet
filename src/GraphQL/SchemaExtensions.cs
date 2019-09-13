@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Types;
@@ -10,10 +10,10 @@ namespace GraphQL
         public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
         {
             var executor = new DocumentExecuter();
-            var result = executor.ExecuteAsync(_ =>
+            var result = executor.ExecuteAsync(options =>
             {
-                _.Schema = schema;
-                configure(_);
+                options.Schema = schema;
+                configure(options);
             }).GetAwaiter().GetResult();
             return new DocumentWriter(indent: true).Write(result);
         }
@@ -21,11 +21,11 @@ namespace GraphQL
         public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
         {
             var executor = new DocumentExecuter();
-            var result = await executor.ExecuteAsync(_ =>
+            var result = await executor.ExecuteAsync(options =>
             {
-                _.Schema = schema;
-                configure(_);
-            });
+                options.Schema = schema;
+                configure(options);
+            }).ConfigureAwait(false);
             return new DocumentWriter(indent: true).Write(result);
         }
     }

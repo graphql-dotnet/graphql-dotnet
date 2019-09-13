@@ -254,6 +254,8 @@ namespace GraphQL.Execution
                 if (context.ThrowOnUnhandledException)
                     throw;
 
+                ex = context.UnhandledExceptionDelegate(context, ex);
+
                 var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
                 error.Path = node.Path;
@@ -294,24 +296,21 @@ namespace GraphQL.Execution
 
                 if (objectType == null)
                 {
-                    var error = new ExecutionError(
+                    throw new ExecutionError(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
                         $"runtime for field {node.Parent.GraphType.Name}.{node.Name} " +
                         $"with value '{result}', received 'null'.");
-                    throw error;
                 }
 
                 if (!abstractType.IsPossibleType(objectType))
                 {
-                    var error = new ExecutionError($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\"");
-                    throw error;
+                    throw new ExecutionError($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\".");
                 }
             }
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                var error = new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
-                throw error;
+                throw new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
             }
         }
 

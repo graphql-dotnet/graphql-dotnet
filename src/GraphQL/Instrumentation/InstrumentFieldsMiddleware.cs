@@ -11,15 +11,15 @@ namespace GraphQL.Instrumentation
         {
             var metadata = new Dictionary<string, object>
             {
-                {"typeName", context.ParentType.Name},
-                {"fieldName", context.FieldName},
-                {"returnTypeName", SchemaPrinter.ResolveName(context.ReturnType)},
-                {"path", context.Path},
+                { "typeName", context.ParentType.Name },
+                { "fieldName", context.FieldName },
+                { "returnTypeName", SchemaPrinter.ResolveName(context.ReturnType) },
+                { "path", context.Path },
             };
 
             using (context.Metrics.Subject("field", context.FieldName, metadata))
             {
-                var result = await next(context);
+                var result = await next(context).ConfigureAwait(false);
                 return result;
             }
         }

@@ -96,7 +96,7 @@ namespace GraphQL.Utilities.Federation
                                     Arguments = rep,
                                     ParentFieldContext = context
                                 };
-                                var result = await resolver.Resolve(resolveContext);
+                                var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
                                 results.Add(result);
                             }
                             else
@@ -140,7 +140,7 @@ namespace GraphQL.Utilities.Federation
             union.Name = "_Entity";
             union.Description = "A union of all types that use the @key directive";
 
-            var entities = _types.Values.Where(x => IsEntity(x)).Select(x => x as IObjectGraphType).ToList();
+            var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
             foreach(var e in entities)
             {
                 union.AddPossibleType(e);

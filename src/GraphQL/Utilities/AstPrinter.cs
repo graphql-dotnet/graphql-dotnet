@@ -93,7 +93,7 @@ namespace GraphQL.Utilities
 
         public void Print(Func<PrintFormat<T>, object> configure)
         {
-            PrintAst = (args) =>
+            PrintAst = args =>
             {
                 var f = new PrintFormat<T>(args);
                 return configure(f);

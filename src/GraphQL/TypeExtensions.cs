@@ -59,22 +59,6 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns the first non-null value from executing the func against the enumerable
-        /// </summary>
-        /// <returns><c>null</c> is all values were null.</returns>
-        public static TReturn FirstValue<TItem, TReturn>(this IEnumerable<TItem> enumerable, Func<TItem, TReturn> func)
-            where TReturn : class
-        {
-            foreach (TItem item in enumerable)
-            {
-                TReturn @object = func(item);
-                if (@object != null) return @object;
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>
         /// <param name="type">The type.</param>

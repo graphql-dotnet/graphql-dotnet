@@ -50,7 +50,7 @@ namespace GraphQL.Introspection
                             : type?.Fields;
 
                         fields = fields ?? Enumerable.Empty<FieldType>();
-                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f));
+                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f)).ConfigureAwait(false);
 
                         return fields.OrderBy(f => f.Name);
                     }
@@ -60,13 +60,13 @@ namespace GraphQL.Introspection
             {
                 var type = context.Source as IImplementInterfaces;
                 if (type == null) return null;
-                return await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x));
+                return await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
             });
             FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
-                    return await type.PossibleTypes.WhereAsync(x => context.Schema.Filter.AllowType(x));
+                    return await type.PossibleTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
                 }
 
                 return null;
@@ -86,7 +86,7 @@ namespace GraphQL.Introspection
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
 
-                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v));
+                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v)).ConfigureAwait(false);
                     }
 
                     return null;
@@ -95,7 +95,7 @@ namespace GraphQL.Introspection
             {
                 var type = context.Source as IInputObjectGraphType;
                 if (type == null) return null;
-                return await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f));
+                return await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f)).ConfigureAwait(false);
             });
             Field<__Type>("ofType", resolve: context =>
             {

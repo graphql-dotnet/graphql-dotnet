@@ -1,8 +1,8 @@
+using GraphQL.Types;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
@@ -10,10 +10,7 @@ namespace GraphQL.Instrumentation
     {
         public static string InvokeMethodName = "Resolve";
 
-        public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder)
-        {
-            return Use(builder, typeof(T));
-        }
+        public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
 
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
@@ -23,12 +20,12 @@ namespace GraphQL.Instrumentation
                 var invokeMethods = methods.Where(m => string.Equals(m.Name, InvokeMethodName, StringComparison.Ordinal)).ToArray();
                 if (invokeMethods.Length > 1)
                 {
-                    throw new InvalidOperationException($"There should be only a single method named {InvokeMethodName}.");
+                    throw new InvalidOperationException($"There should be only a single method named {InvokeMethodName}. Middleware actually has {invokeMethods.Length} methods.");
                 }
 
                 if (invokeMethods.Length == 0)
                 {
-                    throw new InvalidOperationException($"Could not find a method named {InvokeMethodName}");
+                    throw new InvalidOperationException($"Could not find a method named {InvokeMethodName}. Middleware must have a public instance method named {InvokeMethodName}.");
                 }
 
                 var methodInfo = invokeMethods[0];
@@ -38,14 +35,9 @@ namespace GraphQL.Instrumentation
                 }
 
                 var parameters = methodInfo.GetParameters();
-                if (parameters.Length == 0 || parameters[0].ParameterType != typeof(ResolveFieldContext))
+                if (parameters.Length != 2 || parameters[0].ParameterType != typeof(ResolveFieldContext) || parameters[1].ParameterType != typeof(FieldMiddlewareDelegate))
                 {
-                    throw new InvalidOperationException($"The {InvokeMethodName} method should take a parameter of type ResolveFieldContext as the first parameter.");
-                }
-
-                if (parameters.Length == 1 || parameters[1].ParameterType != typeof(FieldMiddlewareDelegate))
-                {
-                    throw new InvalidOperationException($"The {InvokeMethodName} method should take a parameter of type {typeof(FieldMiddlewareDelegate).Name} as the second parameter.");
+                    throw new InvalidOperationException($"The {InvokeMethodName} method of middleware should take a parameter of type {nameof(ResolveFieldContext)} as the first parameter and a parameter of type {nameof(FieldMiddlewareDelegate)} as the second parameter.");
                 }
 
                 var instance = Activator.CreateInstance(middleware);
