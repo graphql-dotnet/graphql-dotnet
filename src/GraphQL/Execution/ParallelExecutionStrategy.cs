@@ -39,7 +39,7 @@ namespace GraphQL.Execution
                     }
                     else
                     {
-                        // Node is actually asynchronous, so add it the list of current tasks being executed in parallel
+                        // Node is actually asynchronous, so add it to the list of current tasks being executed in parallel
                         currentTasks.Add(pendingNodeTask);
                     }
 
