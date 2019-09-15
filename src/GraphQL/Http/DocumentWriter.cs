@@ -10,7 +10,7 @@ namespace GraphQL.Http
     public interface IDocumentWriter
     {
         Task WriteAsync<T>(Stream stream, T value);
-    }   
+    }
 
     public class DocumentWriter : IDocumentWriter
     {
@@ -49,18 +49,6 @@ namespace GraphQL.Http
                 _serializer.Serialize(jsonWriter, value);
                 await jsonWriter.FlushAsync().ConfigureAwait(false);
             }
-        }
-
-        public string Write(object value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-
-            if (!(value is ExecutionResult))
-            {
-                throw new ArgumentOutOfRangeException($"Expected {nameof(value)} to be a GraphQL.ExecutionResult, got {value.GetType().FullName}");
-            }
-
-            return this.WriteToStringAsync(value).GetAwaiter().GetResult();
         }
     }
 

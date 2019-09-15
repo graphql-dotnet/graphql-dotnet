@@ -23,3 +23,7 @@ indent_size = 2
 [{package.json}]
 indent_style = space
 indent_size = 2
+
+# Do not insert newline for ApiApprovalTests
+[*.txt]
+insert_final_newline = false

@@ -598,7 +598,6 @@ namespace GraphQL.Http
         public DocumentWriter() { }
         public DocumentWriter(bool indent) { }
         public DocumentWriter(Newtonsoft.Json.Formatting formatting, Newtonsoft.Json.JsonSerializerSettings settings) { }
-        public string Write(object value) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value) { }
     }
     public class static DocumentWriterExtensions
