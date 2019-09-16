@@ -45,13 +45,8 @@ namespace GraphQL.Utilities
             var config = _fields[field];
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
 
-            if (Type != null)
+            if (Type != null && config.ResolverAccessor != null)
             {
-                if (config.ResolverAccessor == null)
-                {
-                    throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
-                }
-
                 config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
                 config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
             }
@@ -65,20 +60,10 @@ namespace GraphQL.Utilities
             config.ResolverAccessor = Type.ToAccessor(field, ResolverType.Resolver);
             config.SubscriberAccessor = Type.ToAccessor(field, ResolverType.Subscriber);
 
-            if (Type != null)
+            if (Type != null && config.ResolverAccessor != null && config.SubscriberAccessor != null)
             {
-                if (config.ResolverAccessor == null)
-                {
-                    throw new InvalidOperationException($"Expected to find method or property {field} on {Type.Name} but could not.");
-                }
-
                 config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, serviceProvider);
                 config.ResolverAccessor.GetAttributes<GraphQLAttribute>()?.Apply(a => a.Modify(config));
-
-                if (config.SubscriberAccessor == null)
-                {
-                    throw new InvalidOperationException($"Expected to find Subscribe method {field} on {Type.Name} but could not.");
-                }
 
                 if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                 {
