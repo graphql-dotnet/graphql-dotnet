@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
 using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace GraphQL.Tests.Instrumentation
 {
     public class ApolloTracingTests : StarWarsTestBase
     {
-        public ApolloTracingTests()
-            : base()
-        {
-        }
-
         [Fact]
         public void extension_has_expected_format()
         {
@@ -44,8 +39,8 @@ query {
             trace.Parsing.Duration.ShouldNotBe(0);
             trace.Validation.StartOffset.ShouldNotBe(0);
             trace.Validation.Duration.ShouldNotBe(0);
-            Assert.NotEqual(trace.Validation.StartOffset, trace.Parsing.StartOffset);
-            Assert.NotEqual(trace.Validation.Duration, trace.Parsing.Duration);
+            trace.Validation.StartOffset.ShouldNotBeSameAs(trace.Parsing.StartOffset);
+            trace.Validation.Duration.ShouldNotBeSameAs(trace.Parsing.Duration);
 
             var expectedPaths = new HashSet<List<object>>
             {

@@ -16,6 +16,8 @@ namespace GraphQL.Validation.Rules
                 $"Variable \"${varName}\" of type \"{varType}\" used in position " +
                 $"expecting type \"{expectedType}\".";
 
+        public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();

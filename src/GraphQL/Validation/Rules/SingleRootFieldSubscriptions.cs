@@ -10,6 +10,8 @@ namespace GraphQL.Validation.Rules
     {
         private static readonly string RuleCode = "5.2.3.1";
 
+        public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(config =>
@@ -35,7 +37,7 @@ namespace GraphQL.Validation.Rules
 
                     var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
 
-                    if (fragment == null )
+                    if (fragment == null)
                     {
                         return;
                     }

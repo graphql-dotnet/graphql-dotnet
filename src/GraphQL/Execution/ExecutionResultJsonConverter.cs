@@ -8,17 +8,16 @@ namespace GraphQL
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is ExecutionResult)) return;
+            if (value is ExecutionResult result)
+            {
+                writer.WriteStartObject();
 
-            var result = (ExecutionResult)value;
+                WriteData(result, writer, serializer);
+                WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+                WriteExtensions(result, writer, serializer);
 
-            writer.WriteStartObject();
-
-            WriteData(result, writer, serializer);
-            WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
-            WriteExtensions(result, writer, serializer);
-
-            writer.WriteEndObject();
+                writer.WriteEndObject();
+            }
         }
 
         private void WriteData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
@@ -86,7 +85,7 @@ namespace GraphQL
 
         private void WriteErrorExtensions(ExecutionError error, JsonWriter writer, JsonSerializer serializer)
         {
-            if (string.IsNullOrWhiteSpace(error.Code) && error.Data?.Count == 0)
+            if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
             {
                 return;
             }
@@ -100,7 +99,7 @@ namespace GraphQL
                 serializer.Serialize(writer, error.Code);
             }
 
-            if (error.Data.Count > 0)
+            if (error.Data?.Count > 0)
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
@@ -131,9 +130,8 @@ namespace GraphQL
             throw new NotImplementedException();
         }
 
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(ExecutionResult);
-        }
+        public override bool CanRead => false;
+
+        public override bool CanConvert(Type objectType) => objectType == typeof(ExecutionResult);
     }
 }

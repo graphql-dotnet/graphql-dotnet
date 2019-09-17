@@ -418,12 +418,12 @@ namespace GraphQL.Utilities
         {
             if (line.Length < len + 5)
             {
-                return new[] {line};
+                return new[] { line };
             }
             var parts = Regex.Split(line, $"((?: |^).{{15,{len - 40}}}(?= |$))");
             if (parts.Length < 4)
             {
-                return new[] {line};
+                return new[] { line };
             }
             var sublines = new List<string>
             {

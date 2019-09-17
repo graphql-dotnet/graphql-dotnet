@@ -29,6 +29,8 @@ namespace GraphQL.Validation
 
         public IEnumerable<ValidationError> Errors => _errors;
 
+        public bool HasErrors => _errors.Count > 0;
+
         public Inputs Inputs { get; set; }
 
         public void ReportError(ValidationError error)

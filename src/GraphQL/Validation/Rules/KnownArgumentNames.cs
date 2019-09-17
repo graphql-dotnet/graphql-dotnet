@@ -32,6 +32,8 @@ namespace GraphQL.Validation.Rules
             return message;
         }
 
+        public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
@@ -61,7 +63,8 @@ namespace GraphQL.Validation.Rules
                                     node));
                             }
                         }
-                    } else if (argumentOf is Directive)
+                    }
+                    else if (argumentOf is Directive)
                     {
                         var directive = context.TypeInfo.GetDirective();
                         if (directive != null)

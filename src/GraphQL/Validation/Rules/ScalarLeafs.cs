@@ -18,6 +18,8 @@ namespace GraphQL.Validation.Rules
         public Func<string, string, string> RequiredSubselectionMessage = (field, type) =>
             $"Field {field} of type {type} must have a sub selection";
 
+        public static readonly ScalarLeafs Instance = new ScalarLeafs();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
