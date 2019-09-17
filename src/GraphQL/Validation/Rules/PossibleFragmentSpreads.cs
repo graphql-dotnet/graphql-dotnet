@@ -1,4 +1,4 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
@@ -21,6 +21,8 @@ namespace GraphQL.Validation.Rules
         {
             return $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
         }
+
+        public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
         public INodeVisitor Validate(ValidationContext context)
         {

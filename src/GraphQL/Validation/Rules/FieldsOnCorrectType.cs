@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -6,14 +7,16 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Rules
 {
-  /// <summary>
-  /// Fields on correct type
-  ///
-  /// A GraphQL document is only valid if all fields selected are defined by the
-  /// parent type, or are an allowed meta field such as __typename
-  /// </summary>
-  public class FieldsOnCorrectType : IValidationRule
+    /// <summary>
+    /// Fields on correct type
+    ///
+    /// A GraphQL document is only valid if all fields selected are defined by the
+    /// parent type, or are an allowed meta field such as __typename
+    /// </summary>
+    public class FieldsOnCorrectType : IValidationRule
     {
+        public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
+
         public string UndefinedFieldMessage(
             string fieldName,
             string type,
@@ -66,7 +69,7 @@ namespace GraphQL.Validation.Rules
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Any()
-                                ? new string[] {}
+                                ? Array.Empty<string>()
                                 : getSuggestedFieldNames(type, fieldName);
 
                             // Report an error, including helpful suggestions.
@@ -81,6 +84,7 @@ namespace GraphQL.Validation.Rules
                 });
             });
         }
+
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces
         /// that they implement. If any of those types include the provided field,

@@ -15,6 +15,8 @@ namespace GraphQL.Validation.Rules
             return $"There can be only one variable named \"{variableName}\"";
         }
 
+        public static readonly UniqueVariableNames Instance = new UniqueVariableNames();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             Dictionary<string, VariableDefinition> knownVariables = null;

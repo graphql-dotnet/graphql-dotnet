@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -13,6 +13,8 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ArgumentsOfCorrectType : IValidationRule
     {
+        public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
