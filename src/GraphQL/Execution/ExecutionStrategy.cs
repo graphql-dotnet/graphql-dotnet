@@ -187,12 +187,14 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return node;
 
+            ResolveFieldContext resolveContext = null;
+
             try
             {
                 var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
                 var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
 
-                var resolveContext = new ResolveFieldContext
+                resolveContext = new ResolveFieldContext
                 {
                     FieldName = node.Field.Name,
                     FieldAst = node.Field,
@@ -254,7 +256,12 @@ namespace GraphQL.Execution
                 if (context.ThrowOnUnhandledException)
                     throw;
 
-                ex = context.UnhandledExceptionDelegate(context, ex);
+                if (context.UnhandledExceptionDelegate != null)
+                {
+                    var exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                    context.UnhandledExceptionDelegate(exceptionContext);
+                    ex = exceptionContext.Exception;
+                }
 
                 var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
