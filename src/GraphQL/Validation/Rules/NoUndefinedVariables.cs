@@ -17,6 +17,8 @@ namespace GraphQL.Validation.Rules
                 ? $"Variable \"${varName}\" is not defined by operation \"{opName}\"."
                 : $"Variable \"${varName}\" is not defined.";
 
+        public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var variableNameDefined = new Dictionary<string, bool>();

@@ -10,15 +10,15 @@ namespace GraphQL.Harness.Tests
         [Fact]
         public async Task hero()
         {
-            await run(_ =>
+            await run(scenario =>
             {
                 var input = new GraphQLRequest
                 {
                     Query = @"{ hero { name} }"
                 };
-                _.Post.Json(input).ToUrl("/api/graphql");
-                _.StatusCodeShouldBe(HttpStatusCode.OK);
-                _.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
+                scenario.Post.Json(input).ToUrl("/api/graphql");
+                scenario.StatusCodeShouldBe(HttpStatusCode.OK);
+                scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
             });
         }
     }

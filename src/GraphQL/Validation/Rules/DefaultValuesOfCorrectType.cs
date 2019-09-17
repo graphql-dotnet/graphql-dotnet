@@ -26,6 +26,8 @@ namespace GraphQL.Validation.Rules
                 return $"Variable \"{varName}\" of type \"{type}\" has invalid default value {value}.{message}";
             };
 
+        public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

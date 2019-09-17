@@ -295,14 +295,14 @@ namespace GraphQL.Tests.Utilities
         public void can_use_null_as_default_value()
         {
             var schema = Schema.For(@"
-input HumanInput {
-  name: String!
-  homePlanet: String = null
-}
- 
-type Mutation {
-  createHuman(human: HumanInput!): Human
-}
+                input HumanInput {
+                  name: String!
+                  homePlanet: String = null
+                }
+
+                type Mutation {
+                  createHuman(human: HumanInput!): Human
+                }
             ");
         }
 
@@ -411,6 +411,56 @@ type Mutation {
                 _.ExpectedResult = expected;
                 _.Variables = variables;
             });
+        }
+
+        [Fact]
+        public void does_not_require_scalar_fields_to_be_defined()
+        {
+            var defs = @"
+                type Person {
+                    name: String!
+                    age: Int!
+                }
+                type Query {
+                    me: Person
+                }
+            ";
+
+            Builder.Types.Include<PeopleQueryType>();
+            Builder.Types.Include<PersonQueryType>();
+
+            var query = @"{ me { name age } }";
+            var expected = @"{ 'me': { 'name': 'Quinn', 'age': 100 } }";
+
+            AssertQuery(_ =>
+            {
+                _.Query = query;
+                _.Definitions = defs;
+                _.ExpectedResult = expected;
+            });
+        }
+    }
+
+    public class Person
+    {
+        public string Name { get; set; }
+    }
+
+    [GraphQLMetadata("Person")]
+    public class PersonQueryType
+    {
+        public int Age()
+        {
+            return 100;
+        }
+    }
+
+    [GraphQLMetadata("Query")]
+    public class PeopleQueryType
+    {
+        public Person Me()
+        {
+            return new Person { Name = "Quinn" };
         }
     }
 

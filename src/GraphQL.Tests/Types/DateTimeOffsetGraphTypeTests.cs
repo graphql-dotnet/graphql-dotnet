@@ -29,8 +29,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                Assert.Throws<FormatException>(
-                    ()=>_type.ParseValue("some unknown date"));
+                Should.Throw<FormatException>(() => _type.ParseValue("some unknown date"));
             });
         }
 
@@ -39,8 +38,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                Assert.Throws<FormatException>(
-                ()=> _type.ParseValue("Dec 32 2012"));
+                Should.Throw<FormatException>(() => _type.ParseValue("Dec 32 2012"));
             });
         }
 
