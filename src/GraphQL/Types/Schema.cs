@@ -1,61 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.Types
 {
-    public interface ISchema : IDisposable
-    {
-        bool Initialized { get; }
-
-        void Initialize();
-
-        IFieldNameConverter FieldNameConverter { get; set; }
-
-        IObjectGraphType Query { get; set; }
-
-        IObjectGraphType Mutation { get; set; }
-
-        IObjectGraphType Subscription { get; set; }
-
-        IEnumerable<DirectiveGraphType> Directives { get; set; }
-
-        IEnumerable<IGraphType> AllTypes { get; }
-
-        IGraphType FindType(string name);
-
-        DirectiveGraphType FindDirective(string name);
-
-        IEnumerable<Type> AdditionalTypes { get; }
-
-        void RegisterType(IGraphType type);
-
-        void RegisterTypes(params IGraphType[] types);
-
-        void RegisterTypes(params Type[] types);
-
-        void RegisterType<T>() where T : IGraphType;
-
-        void RegisterDirective(DirectiveGraphType directive);
-
-        void RegisterDirectives(params DirectiveGraphType[] directives);
-
-        void RegisterValueConverter(IAstFromValueConverter converter);
-
-        IAstFromValueConverter FindValueConverter(object value, IGraphType type);
-
-        /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types.
-        /// </summary>
-        ISchemaFilter Filter { get; set; }
-    }
-
     public class Schema : ISchema
     {
-        private readonly Lazy<GraphTypesLookup> _lookup;
+        private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
         private readonly List<DirectiveGraphType> _directives;
@@ -103,10 +57,12 @@ namespace GraphQL.Types
 
         public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
-        public bool Initialized => _lookup.IsValueCreated;
+        public bool Initialized => _lookup?.IsValueCreated == true;
 
         public void Initialize()
         {
+            CheckDisposed();
+
             FindType("____");
         }
 
@@ -128,37 +84,42 @@ namespace GraphQL.Types
             get => _directives;
             set
             {
-                if (value == null)
-                {
-                    return;
-                }
+                CheckDisposed();
 
                 _directives.Clear();
-                _directives.AddRange(value);
+
+                if (value != null)
+                    _directives.AddRange(value);
             }
         }
 
         public IEnumerable<IGraphType> AllTypes =>
-            _lookup
+            _lookup?
                 .Value
                 .All()
-                .ToList();
+                .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
         public void RegisterType(IGraphType type)
         {
+            CheckDisposed();
+
             _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
         public void RegisterTypes(params IGraphType[] types)
         {
+            CheckDisposed();
+
             foreach (var type in types)
                 RegisterType(type);
         }
 
         public void RegisterTypes(params Type[] types)
         {
+            CheckDisposed();
+
             if (types == null)
             {
                 throw new ArgumentNullException(nameof(types));
@@ -172,22 +133,30 @@ namespace GraphQL.Types
 
         public void RegisterType<T>() where T : IGraphType
         {
+            CheckDisposed();
+
             RegisterType(typeof(T));
         }
 
         public void RegisterDirective(DirectiveGraphType directive)
         {
+            CheckDisposed();
+
             _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
         {
+            CheckDisposed();
+
             foreach (var directive in directives)
                 RegisterDirective(directive);
         }
 
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
+            CheckDisposed();
+
             foreach (var directive in directives)
                 RegisterDirective(directive);
         }
@@ -199,6 +168,8 @@ namespace GraphQL.Types
 
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
+            CheckDisposed();
+
             _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
         }
 
@@ -214,22 +185,37 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
             }
 
-            return _lookup.Value[name];
+            return _lookup?.Value[name];
         }
 
         public void Dispose()
         {
-            Services = null;
-            Query = null;
-            Mutation = null;
-            Subscription = null;
-            _additionalInstances.Clear();
-            _additionalTypes.Clear();
-
-            if (_lookup.IsValueCreated)
+            if (_lookup != null)
             {
-                _lookup.Value.Clear();
+                Services = null;
+                Query = null;
+                Mutation = null;
+                Subscription = null;
+                Filter = null;
+
+                _additionalInstances.Clear();
+                _additionalTypes.Clear();
+                _directives.Clear();
+                _converters.Clear();
+
+                if (_lookup.IsValueCreated)
+                {
+                    _lookup.Value.Clear(true);
+                }
+
+                _lookup = null;
             }
+        }
+
+        private void CheckDisposed()
+        {
+            if (_lookup == null)
+                throw new ObjectDisposedException(nameof(Schema));
         }
 
         private void RegisterType(Type type)
@@ -239,7 +225,7 @@ namespace GraphQL.Types
 
             if (!typeof(IGraphType).IsAssignableFrom(type))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of GraphType.");
+                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
             }
 
             if (!_additionalTypes.Contains(type))
@@ -248,28 +234,34 @@ namespace GraphQL.Types
             }
         }
 
+        private IEnumerable<IGraphType> GetRootTypes()
+        {
+            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
+            // if (Query == null)
+            //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
+
+            if (Query != null)
+                yield return Query;
+
+            if (Mutation != null)
+                yield return Mutation;
+
+            if (Subscription != null)
+                yield return Subscription;
+        }
+
         private GraphTypesLookup CreateTypesLookup()
         {
-            var resolvedTypes = _additionalTypes
-                .Select(t => Services.GetRequiredService(t.GetNamedType()) as IGraphType)
-                .ToList();
-
-            var types = _additionalInstances.Union(
-                    new IGraphType[]
-                    {
-                        Query,
-                        Mutation,
-                        Subscription
-                    })
-                .Union(resolvedTypes)
-                .Where(x => x != null)
-                .ToList();
+            var types = _additionalInstances
+                .Union(GetRootTypes())
+                .Union(_additionalTypes.Select(type => (IGraphType)Services.GetRequiredService(type.GetNamedType())));
 
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => Services.GetRequiredService(type) as IGraphType,
-                FieldNameConverter);
+                type => (IGraphType)Services.GetRequiredService(type),
+                FieldNameConverter,
+                seal: true);
         }
     }
 }

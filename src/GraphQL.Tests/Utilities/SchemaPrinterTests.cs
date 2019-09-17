@@ -453,7 +453,7 @@ schema {
   query: Root
 }
 
-type Bar implements Foo {
+type Bar implements IFoo {
   # This is of type String
   str: String
 }
@@ -476,13 +476,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -524,7 +524,7 @@ interface Baaz {
   int: Int
 }
 
-type Bar implements Foo & Baaz {
+type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
 }
@@ -547,13 +547,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -599,7 +599,7 @@ interface Baaz {
   int: Int
 }
 
-type Bar implements Foo, Baaz {
+type Bar implements IFoo, Baaz {
   # This is of type String
   str: String
 }
@@ -622,13 +622,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -675,7 +675,7 @@ interface Baaz {
   int: Int
 }
 
-type Bar implements Foo & Baaz {
+type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
 }
@@ -698,13 +698,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -740,7 +740,7 @@ scalar UShort
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), "", @"
-type Bar implements Foo {
+type Bar implements IFoo {
   # This is of type String
   str: String
 }
@@ -763,13 +763,21 @@ scalar DateTimeOffset
 
 scalar Decimal
 
-# This is a Foo interface type
-interface Foo {
+# This is a Foo object type
+type Foo {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar Guid
+
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
+  str: String
+}
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -1052,7 +1060,7 @@ enum __TypeKind {
         {
             public FooInterfaceType()
             {
-                Name = "Foo";
+                Name = "IFoo";
                 Description = "This is a Foo interface type";
                 ResolveType = obj => null;
                 Field<StringGraphType>(
