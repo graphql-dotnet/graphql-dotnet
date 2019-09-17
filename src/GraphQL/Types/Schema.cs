@@ -236,10 +236,12 @@ namespace GraphQL.Types
 
         private IEnumerable<IGraphType> GetRootTypes()
         {
-           // if (Query == null)
+            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
+            // if (Query == null)
             //    throw new InvalidOperationException("Query root type must be provided. See https://graphql.github.io/graphql-spec/June2018/#sec-Schema-Introspection");
 
-            yield return Query;
+            if (Query != null)
+                yield return Query;
 
             if (Mutation != null)
                 yield return Mutation;

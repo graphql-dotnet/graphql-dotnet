@@ -1710,7 +1710,7 @@ namespace GraphQL.Types
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
         public void Clear() { }
-        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter) { }
+        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter, bool seal = False) { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1978,7 +1978,7 @@ namespace GraphQL.Types
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
-        public System.IServiceProvider Services { get; set; }
+        public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public void Dispose() { }
         public GraphQL.Types.DirectiveGraphType FindDirective(string name) { }
