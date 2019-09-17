@@ -207,7 +207,12 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
-                ex = options.UnhandledExceptionDelegate(context, ex);
+                if (options.UnhandledExceptionDelegate != null)
+                {
+                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    options.UnhandledExceptionDelegate(exceptionContext);
+                    ex = exceptionContext.Exception;
+                }
 
                 result = new ExecutionResult
                 {
@@ -238,7 +243,7 @@ namespace GraphQL
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
-            Func<ExecutionContext, Exception, Exception> unhandledExceptionDelegate)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate)
         {
             var context = new ExecutionContext
             {

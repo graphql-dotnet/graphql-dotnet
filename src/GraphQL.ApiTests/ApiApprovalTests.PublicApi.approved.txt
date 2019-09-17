@@ -263,7 +263,7 @@ namespace GraphQL
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
-        public System.Func<GraphQL.Execution.ExecutionContext, System.Exception, System.Exception> UnhandledExceptionDelegate { get; set; }
+        public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> ValidationRules { get; set; }
     }
@@ -472,7 +472,7 @@ namespace GraphQL.Execution
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
-        public System.Func<GraphQL.Execution.ExecutionContext, System.Exception, System.Exception> UnhandledExceptionDelegate { get; set; }
+        public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
     }
@@ -584,6 +584,14 @@ namespace GraphQL.Execution
         public SubscriptionExecutionStrategy() { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+    }
+    public class UnhandledExceptionContext
+    {
+        public UnhandledExceptionContext(GraphQL.Execution.ExecutionContext context, GraphQL.Types.ResolveFieldContext fieldContext, System.Exception originalException) { }
+        public GraphQL.Execution.ExecutionContext Context { get; }
+        public System.Exception Exception { get; set; }
+        public GraphQL.Types.ResolveFieldContext FieldContext { get; }
+        public System.Exception OriginalException { get; }
     }
     public class ValueExecutionNode : GraphQL.Execution.ExecutionNode
     {

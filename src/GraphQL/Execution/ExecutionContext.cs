@@ -38,6 +38,6 @@ namespace GraphQL.Execution
         /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
-        public Func<ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; }
+        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
     }
 }

@@ -61,7 +61,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQueryIgnoreErrors(
@@ -85,7 +85,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
             {
@@ -95,7 +95,7 @@ namespace GraphQL.Tests
                 options.Inputs = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? ((ctx, ex) => ex);
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
@@ -120,7 +120,7 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
             IFieldNameConverter fieldNameConverter = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
@@ -132,7 +132,7 @@ namespace GraphQL.Tests
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? ((ctx, ex) => ex);
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
                 options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
