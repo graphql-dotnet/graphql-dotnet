@@ -28,7 +28,7 @@ namespace GraphQL.Types
 
         public Schema(IServiceProvider services)
         {
-            ServiceProvider = services;
+            Services = services;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -72,7 +72,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
-        public IServiceProvider ServiceProvider { get; set; }
+        public IServiceProvider Services { get; set; }
 
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types.
@@ -192,7 +192,7 @@ namespace GraphQL.Types
         {
             if (_lookup != null)
             {
-                ServiceProvider = null;
+                Services = null;
                 Query = null;
                 Mutation = null;
                 Subscription = null;
@@ -254,12 +254,12 @@ namespace GraphQL.Types
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)ServiceProvider.GetRequiredService(type.GetNamedType())));
+                .Union(_additionalTypes.Select(type => (IGraphType)Services.GetRequiredService(type.GetNamedType())));
 
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => (IGraphType)ServiceProvider.GetRequiredService(type),
+                type => (IGraphType)Services.GetRequiredService(type),
                 FieldNameConverter,
                 seal: true);
         }
