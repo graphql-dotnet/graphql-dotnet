@@ -37,7 +37,12 @@ namespace GraphQL.Types
             set
             {
                 _resolvedInterfaces.Clear();
-                _resolvedInterfaces.AddRange(value);
+
+                if (value != null)
+                {
+                    foreach (var item in value)
+                        _resolvedInterfaces.Add(item ?? throw new ArgumentNullException(nameof(value), "value contains null item"));
+                }
             }
         }
 
@@ -47,7 +52,12 @@ namespace GraphQL.Types
             set
             {
                 _interfaces.Clear();
-                _interfaces.AddRange(value);
+
+                if (value != null)
+                {
+                    foreach (var item in value)
+                        _interfaces.Add(item ?? throw new ArgumentNullException(nameof(value), "value contains null item"));
+                }
             }
         }
 
@@ -64,10 +74,12 @@ namespace GraphQL.Types
             {
                 throw new ArgumentNullException(nameof(type));
             }
+
             if (!type.GetInterfaces().Contains(typeof(IInterfaceGraphType)))
             {
-                throw new ArgumentException("Interface must implement IInterfaceGraphType", nameof(type));
+                throw new ArgumentException($"Interface must implement {nameof(IInterfaceGraphType)}", nameof(type));
             }
+
             if (!_interfaces.Contains(type))
                 _interfaces.Add(type);
         }

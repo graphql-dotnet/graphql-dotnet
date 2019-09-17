@@ -1,10 +1,11 @@
+using GraphQL.Conversion;
+using GraphQL.Types;
+using GraphQL.Utilities;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using GraphQL.Conversion;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -77,7 +78,7 @@ namespace GraphQL.Tests.Execution.Performance
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                         name
                         name1:name
                         name2:name
@@ -109,7 +110,6 @@ namespace GraphQL.Tests.Execution.Performance
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
-                _.SetFieldMiddleware = false;
                 _.Schema = Schema;
                 _.Query = query;
                 _.Root = PeopleList;
@@ -117,24 +117,23 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 6000 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(6000 * 2); //machine specific data with a buffer
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        // [Fact]
         public async Task Executes_SimpleLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                         name
                     }
                 }
@@ -146,7 +145,6 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
-                _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
                 _.Schema = Schema;
                 _.Query = query;
@@ -155,24 +153,23 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 700 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(700 * 2); //machine specific data with a buffer
         }
 
         [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
-        // [Fact]
         public async Task Executes_UnionLists_Are_Performant()
         {
             var query = @"
                 query AQuery {
-                    people{
+                    people {
                       __typename
                       name
                       pets {
@@ -196,7 +193,6 @@ namespace GraphQL.Tests.Execution.Performance
 
             var runResult2 = await Executer.ExecuteAsync(_ =>
             {
-                _.SetFieldMiddleware = false;
                 _.EnableMetrics = false;
                 _.Schema = Schema;
                 _.Query = query;
@@ -205,15 +201,15 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                _.FieldNameConverter = CamelCaseFieldNameConverter.Instance;
             });
 
             smallListTimer.Stop();
 
             _output.WriteLine($"Total Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 5600 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(5600 * 2); //machine specific data with a buffer
         }
     }
 

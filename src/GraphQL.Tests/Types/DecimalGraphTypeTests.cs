@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            Assert.Throws<FormatException>(()=>_type.ParseValue("abcd"));
+            Should.Throw<FormatException>(() => _type.ParseValue("abcd"));
         }
 
         [Fact]

@@ -54,18 +54,18 @@ namespace Example
 
             var request = Deserialize<GraphQLRequest>(context.Request.Body);
 
-            var result = await _executer.ExecuteAsync(_ =>
+            var result = await _executer.ExecuteAsync(options =>
             {
-                _.Schema = schema;
-                _.Query = request.Query;
-                _.OperationName = request.OperationName;
-                _.Inputs = request.Variables.ToInputs();
-                _.UserContext = _settings.BuildUserContext?.Invoke(context);
-                _.EnableMetrics = _settings.EnableMetrics;
-                _.ExposeExceptions = _settings.ExposeExceptions;
+                options.Schema = schema;
+                options.Query = request.Query;
+                options.OperationName = request.OperationName;
+                options.Inputs = request.Variables.ToInputs();
+                options.UserContext = _settings.BuildUserContext?.Invoke(context);
+                options.EnableMetrics = _settings.EnableMetrics;
+                options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
-                    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                    options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                 }
             });
 

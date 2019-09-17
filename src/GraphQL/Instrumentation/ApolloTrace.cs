@@ -10,9 +10,9 @@ namespace GraphQL.Instrumentation
     {
         public ApolloTrace(DateTime start, double durationMs)
         {
-            this.StartTime = start;
-            this.EndTime = start.AddMilliseconds(durationMs);
-            this.Duration = ConvertTime(durationMs);
+            StartTime = start;
+            EndTime = start.AddMilliseconds(durationMs);
+            Duration = ConvertTime(durationMs);
         }
 
         public int Version => 1;
