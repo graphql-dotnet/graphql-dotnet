@@ -1,10 +1,10 @@
+using GraphQL.Introspection;
+using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using GraphQL.Introspection;
-using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
@@ -304,18 +304,18 @@ namespace GraphQL.Utilities
                 builder.Append(PrintDescription(directive.Description));
             }
             builder.AppendLine($"directive @{directive.Name}(");
-            builder.AppendLine(formatDirectiveArguments(directive.Arguments));
-            builder.Append($") on {formatDirectiveLocationList(directive.Locations)}");
+            builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
+            builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
             return builder.ToString().TrimStart();
         }
 
-        private string formatDirectiveArguments(QueryArguments arguments)
+        private string FormatDirectiveArguments(QueryArguments arguments)
         {
             if (arguments == null || !arguments.Any()) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 
-        private string formatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
+        private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
         {
             var enums = new __DirectiveLocation();
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));

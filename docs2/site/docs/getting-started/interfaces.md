@@ -92,7 +92,7 @@ public class DroidType : ObjectGraphType
 }
 ```
 
-> `ObjectGraphType<T>` provides a default implementation of IsTypeOf for you.
+> `ObjectGraphType<T>` provides a default implementation of `IsTypeOf` for you.
 
 An alternate to using `IsTypeOf` is instead implementing `ResolveType` on the Interface or Union.  See the `ResolveType` section for more details.
 

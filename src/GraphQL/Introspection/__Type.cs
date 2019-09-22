@@ -1,6 +1,6 @@
+using GraphQL.Types;
 using System;
 using System.Linq;
-using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
@@ -58,9 +58,9 @@ namespace GraphQL.Introspection
                 });
             FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
             {
-                var type = context.Source as IImplementInterfaces;
-                if (type == null) return null;
-                return await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
+                return context.Source is IImplementInterfaces type
+                    ? await type.ResolvedInterfaces.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false)
+                    : null;
             });
             FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
@@ -93,9 +93,9 @@ namespace GraphQL.Introspection
                 });
             FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
             {
-                var type = context.Source as IInputObjectGraphType;
-                if (type == null) return null;
-                return await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f)).ConfigureAwait(false);
+                return context.Source is IInputObjectGraphType type
+                    ? await type.Fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f)).ConfigureAwait(false)
+                    : null;
             });
             Field<__Type>("ofType", resolve: context =>
             {

@@ -65,12 +65,12 @@ namespace GraphQL.Validation.Rules
                             var fieldName = node.Name;
 
                             // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = getSuggestedTypeNames(context.Schema, type, fieldName).ToList();
+                            var suggestedTypeNames = GetSuggestedTypeNames(context.Schema, type, fieldName).ToList();
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Any()
                                 ? Array.Empty<string>()
-                                : getSuggestedFieldNames(type, fieldName);
+                                : GetSuggestedFieldNames(type, fieldName);
 
                             // Report an error, including helpful suggestions.
                             context.ReportError(new ValidationError(
@@ -91,7 +91,7 @@ namespace GraphQL.Validation.Rules
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> getSuggestedTypeNames(
+        private IEnumerable<string> GetSuggestedTypeNames(
           ISchema schema,
           IGraphType type,
           string fieldName)
@@ -132,7 +132,7 @@ namespace GraphQL.Validation.Rules
         /// For the field name provided, determine if there are any similar field names
         /// that may be the result of a typo.
         /// </summary>
-        private IEnumerable<string> getSuggestedFieldNames(
+        private IEnumerable<string> GetSuggestedFieldNames(
           IGraphType type,
           string fieldName)
         {

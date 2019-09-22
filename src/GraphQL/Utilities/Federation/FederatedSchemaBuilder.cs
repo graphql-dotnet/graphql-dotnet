@@ -61,9 +61,7 @@ namespace GraphQL.Utilities.Federation
 
             if (query == null)
             {
-                query = new ObjectGraphType();
-                query.Name = "Query";
-                schema.Query = query;
+                schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
             query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new {});
@@ -136,9 +134,11 @@ namespace GraphQL.Utilities.Federation
 
         private UnionGraphType BuildEntityGraphType(ISchema schema)
         {
-            var union = new UnionGraphType();
-            union.Name = "_Entity";
-            union.Description = "A union of all types that use the @key directive";
+            var union = new UnionGraphType
+            {
+                Name = "_Entity",
+                Description = "A union of all types that use the @key directive"
+            };
 
             var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
             foreach(var e in entities)
