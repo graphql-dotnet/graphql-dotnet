@@ -11,6 +11,9 @@ public sealed class DefaultServiceProvider : IServiceProvider
 {
     public object GetService(Type serviceType)
     {
+        if (serviceType == null)
+            throw new ArgumentNullException(nameof(serviceType));
+
         try
         {
             return Activator.CreateInstance(serviceType);
