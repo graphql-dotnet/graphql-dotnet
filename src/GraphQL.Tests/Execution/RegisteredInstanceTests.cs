@@ -121,6 +121,8 @@ scalar Decimal
 
 scalar Guid
 
+scalar Long
+
 scalar Milliseconds
 
 type NestedObjType {
@@ -166,6 +168,8 @@ scalar Decimal
 
 scalar Guid
 
+scalar Long
+
 scalar Milliseconds
 
 type NestedObjType {
@@ -210,6 +214,8 @@ scalar DateTimeOffset
 scalar Decimal
 
 scalar Guid
+
+scalar Long
 
 scalar Milliseconds
 

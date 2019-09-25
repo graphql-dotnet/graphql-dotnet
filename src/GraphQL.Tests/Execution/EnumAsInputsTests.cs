@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Execution
             var inputs = "{ 'userId': 1000000000000000001 }".ToInputs();
 
             AssertQuerySuccess(
-                @"query aQuery($userId: Int!) { getLongUser(userId: $userId) { idLong }}",
+                @"query aQuery($userId: Long!) { getLongUser(userId: $userId) { idLong }}",
                 @"{
                   'getLongUser': {
                     'idLong': 1000000000000000001
@@ -150,7 +150,7 @@ namespace GraphQL.Tests.Execution
 
             Field<UserType>("getLongUser", "get user api",
                 new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>>
+                    new QueryArgument<NonNullGraphType<LongGraphType>>
                     {
                         Name = "userId",
                         Description = "user id"
@@ -225,7 +225,7 @@ namespace GraphQL.Tests.Execution
         {
             Name = "User";
             Field<IntGraphType>("id");
-            Field<IntGraphType>("idLong");
+            Field<LongGraphType>("idLong");
             Field<StringGraphType>("profileImage");
             Field<GenderEnum>("gender");
             Field<StringGraphType>(

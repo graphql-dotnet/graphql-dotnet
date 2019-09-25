@@ -36,9 +36,16 @@ namespace GraphQL.Tests.Execution
         public void converts_long_to_long_value()
         {
             long val = 12345678910111213;
-            var result = val.AstFromValue(null, new IntGraphType());
+            var result = val.AstFromValue(null, new LongGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeOfType<LongValue>();
+        }
+
+        [Fact]
+        public void converts_long_to_int_value()
+        {
+            long val = 12345678910111213;
+            Should.Throw<OverflowException>(() => val.AstFromValue(null, new IntGraphType()));
         }
 
         [Fact]

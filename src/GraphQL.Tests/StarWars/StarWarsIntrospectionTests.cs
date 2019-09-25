@@ -267,6 +267,10 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR',
                 },
                 {
+                  'name': 'Long',
+                  'kind': 'SCALAR',
+                },
+                {
                   'name': 'ULong',
                   'kind': 'SCALAR',
                 },

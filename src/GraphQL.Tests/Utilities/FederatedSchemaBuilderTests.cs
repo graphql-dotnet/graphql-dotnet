@@ -40,6 +40,8 @@ scalar Decimal
 
 scalar Guid
 
+scalar Long
+
 scalar Milliseconds
 
 extend type Query {

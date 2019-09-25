@@ -41,7 +41,7 @@ namespace GraphQL
 
         public override IDictionary Data => DataAsDictionary;
 
-        public void AddLocation(int line, int column)
+        public ExecutionError AddLocation(int line, int column)
         {
             if (_errorLocations == null)
             {
@@ -49,6 +49,8 @@ namespace GraphQL
             }
 
             _errorLocations.Add(new ErrorLocation { Line = line, Column = column });
+
+            return this;
         }
 
         private void SetCode(Exception exception)

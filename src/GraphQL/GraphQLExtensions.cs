@@ -163,7 +163,7 @@ namespace GraphQL
             {
                 if (!(valueAst is ObjectValue objValue))
                 {
-                    return new[] {$"Expected \"{inputType.Name}\", found not an object."};
+                    return new[] { $"Expected \"{inputType.Name}\", found not an object." };
                 }
 
                 var fields = inputType.Fields.ToList();

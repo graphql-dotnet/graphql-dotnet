@@ -79,7 +79,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs= null,
+            Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,

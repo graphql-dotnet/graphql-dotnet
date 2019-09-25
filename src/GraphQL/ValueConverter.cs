@@ -6,7 +6,7 @@ namespace GraphQL
 {
     public static class ValueConverter
     {
-        private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> ValueConversions
+        private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _valueConversions
             = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
 
         static ValueConverter()
@@ -266,13 +266,10 @@ namespace GraphQL
 
         public static object ConvertTo(object value, Type targetType)
         {
-            if (value == null)
-                return null;
+            if (value == null || targetType.IsInstanceOfType(value))
+                return value;
 
-            if (targetType.IsInstanceOfType(value)) return value;
-
-            var valueType = value.GetType();
-            var conversion = GetConversion(valueType, targetType);
+            var conversion = GetConversion(value.GetType(), targetType);
             return conversion(value);
         }
 
@@ -285,7 +282,7 @@ namespace GraphQL
 
         private static Func<object, object> GetConversion(Type valueType, Type targetType)
         {
-            if (ValueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
+            if (_valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
                 return conversion;
 
             throw new InvalidOperationException($"Could not find conversion from '{valueType.FullName}' to '{targetType.FullName}'");
@@ -293,8 +290,8 @@ namespace GraphQL
 
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
-            if (!ValueConversions.TryGetValue(valueType, out var conversions))
-                ValueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
+            if (!_valueConversions.TryGetValue(valueType, out var conversions))
+                _valueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
 
             conversions[targetType] = conversion;
         }

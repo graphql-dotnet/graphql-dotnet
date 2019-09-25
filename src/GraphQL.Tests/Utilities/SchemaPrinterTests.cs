@@ -64,6 +64,10 @@ scalar Seconds"
                 @"scalar Guid"
             },
             {
+                "Long",
+                @"scalar Long"
+            },
+            {
                 "Short",
                 @"scalar Short"
             },
@@ -484,6 +488,8 @@ interface IFoo {
   str: String
 }
 
+scalar Long
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -554,6 +560,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -629,6 +637,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -706,6 +716,8 @@ interface IFoo {
   str: String
 }
 
+scalar Long
+
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
 
@@ -778,6 +790,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds

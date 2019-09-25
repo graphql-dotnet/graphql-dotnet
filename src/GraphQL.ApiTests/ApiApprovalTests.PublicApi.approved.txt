@@ -230,7 +230,7 @@ namespace GraphQL
         public System.Collections.Generic.Dictionary<string, object> DataAsDictionary { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<string> Path { get; set; }
-        public void AddLocation(int line, int column) { }
+        public GraphQL.ExecutionError AddLocation(int line, int column) { }
     }
     public class static ExecutionErrorExtensions
     {
@@ -1841,6 +1841,13 @@ namespace GraphQL.Types
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
+    }
+    public class LongGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public LongGraphType() { }
+        public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object ParseValue(object value) { }
+        public override object Serialize(object value) { }
     }
     public class NonNullGraphType : GraphQL.Types.GraphType
     {

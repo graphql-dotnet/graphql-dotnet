@@ -16,11 +16,14 @@ namespace GraphQL.Types
 
         public GraphTypesLookup()
         {
+            // standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
             AddType<StringGraphType>();
             AddType<BooleanGraphType>();
             AddType<FloatGraphType>();
             AddType<IntGraphType>();
             AddType<IdGraphType>();
+
+            // .NET custom scalars
             AddType<DateGraphType>();
             AddType<DateTimeGraphType>();
             AddType<DateTimeOffsetGraphType>();
@@ -32,10 +35,12 @@ namespace GraphQL.Types
             AddType<ShortGraphType>();
             AddType<UShortGraphType>();
             AddType<UIntGraphType>();
+            AddType<LongGraphType>();
             AddType<ULongGraphType>();
             AddType<ByteGraphType>();
             AddType<SByteGraphType>();
 
+            // introspection types
             AddType<__Schema>();
             AddType<__Type>();
             AddType<__Directive>();

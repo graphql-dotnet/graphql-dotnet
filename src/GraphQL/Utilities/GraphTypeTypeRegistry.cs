@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
             _entries = new Dictionary<Type, Type>
             {
                 [typeof(int)] = typeof(IntGraphType),
-                [typeof(long)] = typeof(IntGraphType),
+                [typeof(long)] = typeof(LongGraphType),
                 [typeof(double)] = typeof(FloatGraphType),
                 [typeof(float)] = typeof(FloatGraphType),
                 [typeof(decimal)] = typeof(DecimalGraphType),
