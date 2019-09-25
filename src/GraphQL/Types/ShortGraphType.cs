@@ -4,8 +4,6 @@ namespace GraphQL.Types
 {
     public class ShortGraphType : ScalarGraphType
     {
-        public ShortGraphType() => Name = "Short";
-
         public override object ParseLiteral(IValue value)
         {
             switch (value)

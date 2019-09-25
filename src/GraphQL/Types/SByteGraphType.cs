@@ -4,8 +4,6 @@ namespace GraphQL.Types
 {
     public class SByteGraphType : ScalarGraphType
     {
-        public SByteGraphType() => Name = "SByte";
-
         public override object ParseLiteral(IValue value)
         {
             switch (value)
