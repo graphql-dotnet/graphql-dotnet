@@ -547,10 +547,10 @@ namespace GraphQL.Tests.Utilities
         {
             if (type == PetKind.Dog)
             {
-                return new Dog {Name = "Eli", Barks = true};
+                return new Dog { Name = "Eli", Barks = true };
             }
 
-            return new Cat {Name = "Biscuit", Meows = true};
+            return new Cat { Name = "Biscuit", Meows = true };
         }
     }
 

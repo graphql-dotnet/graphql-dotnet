@@ -5,24 +5,12 @@ namespace GraphQL.Utilities.Federation
 {
     public class AnyScalarGraphType : ScalarGraphType
     {
-        public AnyScalarGraphType()
-        {
-            Name = "_Any";
-        }
+        public AnyScalarGraphType() => Name = "_Any";
 
-        public override object ParseLiteral(IValue value)
-        {
-            return value.Value;
-        }
+        public override object ParseLiteral(IValue value) => value.Value;
 
-        public override object ParseValue(object value)
-        {
-            return value;
-        }
+        public override object ParseValue(object value) => value;
 
-        public override object Serialize(object value)
-        {
-            return value;
-        }
+        public override object Serialize(object value) => value;
     }
 }

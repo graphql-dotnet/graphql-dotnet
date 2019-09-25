@@ -16,11 +16,11 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void nested_groups_work()
         {
-            var product = new ObjectGraphType {Name = "Product"};
+            var product = new ObjectGraphType { Name = "Product" };
             product.Field("name", new StringGraphType());
             product.IsTypeOf = obj => obj is Product;
 
-            var catalog = new ObjectGraphType {Name = "Catalog"};
+            var catalog = new ObjectGraphType { Name = "Catalog" };
             catalog.Field("products", new ListGraphType(product), resolve: ctx =>
             {
                 return new List<Product> {
@@ -28,10 +28,10 @@ namespace GraphQL.Tests.Execution
                 };
             });
 
-            var retail = new ObjectGraphType {Name = "Retail"};
+            var retail = new ObjectGraphType { Name = "Retail" };
             retail.Field("catalog", catalog, resolve: ctx => new {});
 
-            var root = new ObjectGraphType {Name = "Root"};
+            var root = new ObjectGraphType { Name = "Root" };
             root.Field("retail", retail, resolve: ctx => new {});
 
             var schema = new Schema {Query = root};
@@ -50,14 +50,14 @@ namespace GraphQL.Tests.Execution
         {
             var schema = new Schema();
 
-            var person = new ObjectGraphType {Name = "Person"};
+            var person = new ObjectGraphType { Name = "Person" };
             person.Field("name", new StringGraphType());
             person.Field(
                 "friends",
                 new ListGraphType(new NonNullGraphType(person)),
-                resolve: ctx => new[] {new SomeObject {Name = "Jaime"}, new SomeObject {Name = "Joe"}});
+                resolve: ctx => new[] {new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" }});
 
-            var root = new ObjectGraphType {Name = "Root"};
+            var root = new ObjectGraphType { Name = "Root" };
             root.Field("hero", person, resolve: ctx => ctx.RootValue);
 
             schema.Query = root;
@@ -75,19 +75,19 @@ namespace GraphQL.Tests.Execution
         {
             var schema = new Schema();
 
-            var person = new ObjectGraphType {Name = "Person"};
+            var person = new ObjectGraphType { Name = "Person" };
             person.Field("name", new StringGraphType());
             person.IsTypeOf = type => true;
 
-            var robot = new ObjectGraphType {Name = "Robot"};
+            var robot = new ObjectGraphType { Name = "Robot" };
             robot.Field("name", new StringGraphType());
             robot.IsTypeOf = type => true;
 
-            var personOrRobot = new UnionGraphType {Name = "PersonOrRobot"};
+            var personOrRobot = new UnionGraphType { Name = "PersonOrRobot" };
             personOrRobot.AddPossibleType(person);
             personOrRobot.AddPossibleType(robot);
 
-            var root = new ObjectGraphType {Name = "Root"};
+            var root = new ObjectGraphType { Name = "Root" };
             root.Field("hero", personOrRobot, resolve: ctx => ctx.RootValue);
 
             schema.Query = root;
@@ -248,7 +248,7 @@ scalar UShort
                 ResolvedType = new IntGraphType(),
                 Name = "intField"
             });
-            var rootType = new ObjectGraphType {Name = "root"};
+            var rootType = new ObjectGraphType { Name = "root" };
             IGraphType resolvedType;
             switch (propType)
             {

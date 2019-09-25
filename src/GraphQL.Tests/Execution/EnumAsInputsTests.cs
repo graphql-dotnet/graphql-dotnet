@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -230,7 +230,7 @@ namespace GraphQL.Tests.Execution
             Field<GenderEnum>("gender");
             Field<StringGraphType>(
                 "printGender",
-                arguments: new QueryArguments(new QueryArgument<GenderEnum> {Name = "g"}),
+                arguments: new QueryArguments(new QueryArgument<GenderEnum> { Name = "g" }),
                 resolve: c =>
                 {
                     var gender = c.GetArgument<Gender>("g");
