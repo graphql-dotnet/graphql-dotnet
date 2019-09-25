@@ -20,12 +20,6 @@ namespace GraphQL.Types
         {
         }
 
-        [Obsolete("Use System.IServiceProvider instead.")]
-        public Schema(IDependencyResolver dependencyResolver)
-            : this(new DependencyResolverToServiceProviderAdapter(dependencyResolver))
-        {
-        }
-
         public Schema(IServiceProvider services)
         {
             Services = services;

@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using Xunit;
 
+#pragma warning disable 0618
+
 namespace GraphQL.Tests.Types
 {
     public class EnumGraphTypeTests

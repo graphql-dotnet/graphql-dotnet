@@ -62,11 +62,9 @@ query {
 
     public class ArrayInput
     {
-        private int _readOnlyProp;
-
         private ArrayInput(int readOnlyProp)
         {
-            _readOnlyProp = readOnlyProp;
+            ReadOnlyProp = readOnlyProp;
         }
 
         public int[] Ints { get; set; }
@@ -79,7 +77,7 @@ query {
         
         public int ValueProp { get; set; }
 
-        public int ReadOnlyProp => _readOnlyProp;
+        public int ReadOnlyProp { get; }
 
         public int PrivateSetProp { get; private set; } 
     }

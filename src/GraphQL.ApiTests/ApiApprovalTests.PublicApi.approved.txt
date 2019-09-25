@@ -289,12 +289,6 @@ namespace GraphQL
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
-    [System.ObsoleteAttribute("Use GraphQL.FuncServiceProvider instead.")]
-    public sealed class FuncDependencyResolver : System.IServiceProvider
-    {
-        public FuncDependencyResolver(System.Func<System.Type, object> resolver) { }
-        public object GetService(System.Type type) { }
-    }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
         public FuncServiceProvider(System.Func<System.Type, object> resolver) { }
@@ -340,12 +334,6 @@ namespace GraphQL
         public GraphQL.ResolverType Type { get; set; }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-    }
-    [System.ObsoleteAttribute("Use IServiceProvider instead")]
-    public interface IDependencyResolver
-    {
-        T Resolve<T>();
-        object Resolve(System.Type type);
     }
     public interface IDocumentExecuter
     {
@@ -1967,8 +1955,6 @@ namespace GraphQL.Types
     public class Schema : GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
-        [System.ObsoleteAttribute("Use System.IServiceProvider instead.")]
-        public Schema(GraphQL.IDependencyResolver dependencyResolver) { }
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }

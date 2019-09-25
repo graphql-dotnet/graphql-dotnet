@@ -20,7 +20,7 @@ namespace GraphQL.Types
         public ObjectGraphType()
         {
             if (typeof(TSourceType) != typeof(object))
-                IsTypeOf = type => type is TSourceType;
+                IsTypeOf = instance => instance is TSourceType;
         }
 
         public void AddResolvedInterface(IInterfaceGraphType graphType)
