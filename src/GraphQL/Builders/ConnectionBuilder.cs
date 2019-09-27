@@ -74,7 +74,7 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = typeof(TConnectionType),
-                Arguments = new QueryArguments(new QueryArgument[0]),
+                Arguments = new QueryArguments(),
             };
             return new ConnectionBuilder<TSourceType>(fieldType, false, false, null)
                 .Unidirectional();

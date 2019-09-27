@@ -1,7 +1,7 @@
 using GraphQL.Types;
 using Shouldly;
-using Xunit;
 using System;
+using Xunit;
 
 namespace GraphQL.Tests.Types
 {
@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Types
 
         [Fact]
         public void ParseValue_stringAsInvalidUri_ThrowsFormatException() =>
-            Assert.Throws<UriFormatException>(() => uriGraphType.ParseValue("www.wp.pl"));
+            Should.Throw<UriFormatException>(() => uriGraphType.ParseValue("www.wp.pl"));
 
         [Fact]
         public void Serialize_uriIsAString_ReturnValidUriGraphType() =>
@@ -35,6 +35,6 @@ namespace GraphQL.Tests.Types
 
         [Fact]
         public void Serialize_stringAsInvalidUri_ThrowsFormatException() =>
-            Assert.Throws<UriFormatException>(() => uriGraphType.Serialize("www.wp.pl"));
+            Should.Throw<UriFormatException>(() => uriGraphType.Serialize("www.wp.pl"));
     }
 }

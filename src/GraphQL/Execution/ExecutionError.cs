@@ -63,38 +63,43 @@ namespace GraphQL
 
         private void SetCode(Exception exception)
         {
-            Code = NormalizeErrorCode(exception);
+            if (exception != null)
+                Code = NormalizeErrorCode(exception);
         }
 
         private void SetData(Exception exception)
         {
-            if (exception?.Data == null)
-                return;
-
-            SetData(exception.Data);
+            if (exception?.Data != null)
+                SetData(exception.Data);
         }
 
         private void SetData(IDictionary dict)
         {
-            foreach (DictionaryEntry keyValuePair in dict)
+            if (dict != null)
             {
-                var key = keyValuePair.Key.ToString();
-                var value = keyValuePair.Value;
-                Data[key] = value;
+                foreach (DictionaryEntry keyValuePair in dict)
+                {
+                    var key = keyValuePair.Key.ToString();
+                    var value = keyValuePair.Value;
+                    Data[key] = value;
+                }
             }
         }
 
         private static string NormalizeErrorCode(Exception exception)
         {
-            var code = exception?.GetType().Name ?? string.Empty;
+            var code = exception.GetType().Name;
+
             if (code.EndsWith(nameof(Exception)))
             {
                 code = code.Substring(0, code.Length - nameof(Exception).Length);
             }
+
             if (code.StartsWith("GraphQL"))
             {
                 code = code.Substring("GraphQL".Length);
             }
+
             return GetAllCapsRepresentation(code);
         }
 

@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Shouldly;
 using System;
 using Xunit;
 
@@ -13,6 +14,6 @@ namespace GraphQL.Tests.Types
 
         [Fact]
         public void AddValue_whenEnumContainsInvalidCharacters_shouldThrowArgumentException() =>
-            Assert.Throws<ArgumentOutOfRangeException>(() => new EnumerationGraphType<Invalid>());
+            Should.Throw<ArgumentOutOfRangeException>(() => new EnumerationGraphType<Invalid>());
     }
 }

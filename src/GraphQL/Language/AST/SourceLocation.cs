@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Language.AST
+namespace GraphQL.Language.AST
 {
     public class SourceLocation
     {
@@ -30,8 +30,8 @@
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SourceLocation) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((SourceLocation)obj);
         }
 
         public override int GetHashCode()

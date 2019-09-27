@@ -19,7 +19,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
         {
-            RootQuery.Field<ListGraphType<HumanType>>("listOfHumans", resolve: (ctx) =>
+            RootQuery.Field<ListGraphType<HumanType>>("listOfHumans", resolve: ctx =>
             {
                 ctx.SubFields.ShouldNotBeNull();
                 ctx.SubFields.Keys.ShouldContain("id");
@@ -48,7 +48,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_is_not_null_for_single_ObjectGraphType()
         {
-            RootQuery.Field<HumanType>("singleHuman", resolve: (ctx) =>
+            RootQuery.Field<HumanType>("singleHuman", resolve: ctx =>
             {
                 ctx.SubFields.ShouldNotBeNull();
                 ctx.SubFields.Keys.ShouldContain("id");
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
         {
-            RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters", resolve: (ctx) =>
+            RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters", resolve: ctx =>
             {
                 ctx.SubFields.ShouldNotBeNull();
                 ctx.SubFields.Keys.ShouldContain("id");
@@ -106,7 +106,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_is_not_null_for_single_InterfaceGraphType()
         {
-            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: (ctx) =>
+            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: ctx =>
            {
                ctx.SubFields.ShouldNotBeNull();
                ctx.SubFields.Keys.ShouldContain("id");
@@ -136,7 +136,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_does_not_throw_for_primitive()
         {
-            RootQuery.Field<IntGraphType>("someNumber", resolve: (ctx) =>
+            RootQuery.Field<IntGraphType>("someNumber", resolve: ctx =>
             {
                 ctx.SubFields.ShouldBeNull();
                 return 1;
@@ -158,7 +158,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_does_not_throw_for_list_of_primitive()
         {
-            RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: (ctx) =>
+            RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: ctx =>
             {
                 ctx.SubFields.ShouldBeNull();
                 return new[] { 1, 2 };

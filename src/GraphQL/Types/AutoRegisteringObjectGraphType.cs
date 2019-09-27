@@ -13,6 +13,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Allows you to automatically register the necessary fields for the specified type.
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
+    /// Also it can get descriptions for fields from the xml comments.
     /// </summary>
     /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
@@ -23,6 +24,8 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
+            Name = typeof(TSourceType).GraphQLName();
+
             foreach (var propertyInfo in GetRegisteredProperties())
             {
                 if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
@@ -31,8 +34,8 @@ namespace GraphQL.Types
                 Field(
                     type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
                     name: propertyInfo.Name,
-                    description: (propertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description,
-                    deprecationReason: (propertyInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                    description: propertyInfo.Description(),
+                    deprecationReason: propertyInfo.ObsoleteMessage()
                 ).DefaultValue = (propertyInfo.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute)?.Value;
             }
         }

@@ -41,6 +41,12 @@ namespace GraphQL
                    namedType is IInputObjectGraphType;
         }
 
+        public static bool IsInputObjectType(this IGraphType type)
+        {
+            var namedType = type.GetNamedType();
+            return namedType is IInputObjectGraphType;
+        }
+
         public static IGraphType GetNamedType(this IGraphType type)
         {
             IGraphType unmodifiedType = type;
@@ -62,7 +68,7 @@ namespace GraphQL
         {
             if (resolve == null)
             {
-                resolve = t => (IGraphType) Activator.CreateInstance(t);
+                resolve = t => (IGraphType)Activator.CreateInstance(t);
             }
 
             if (type.IsGenericType)

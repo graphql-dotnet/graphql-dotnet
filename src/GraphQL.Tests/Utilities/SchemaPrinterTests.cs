@@ -107,7 +107,12 @@ scalar Seconds"
             return result;
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options = null)
+        private string print(ISchema schema)
+        {
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+        }
+
+        private string print(ISchema schema, SchemaPrinterOptions options)
         {
             var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
@@ -146,7 +151,7 @@ scalar Seconds"
         [Fact]
         public void prints_directive()
         {
-            var printer = new SchemaPrinter(null);
+            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
             var arg = DirectiveGraphType.Skip.Arguments.First();
             arg.ResolvedType = arg.Type.BuildNamedType();
 
@@ -228,7 +233,9 @@ directive @skip(
                     "Foo",
 @"# This is a Foo object type
 type Foo {
+  # This is of type String
   str: String
+  # This is of type Integer
   int: Int
 }"
                 },
@@ -446,7 +453,8 @@ schema {
   query: Root
 }
 
-type Bar implements Foo {
+type Bar implements IFoo {
+  # This is of type String
   str: String
 }
 
@@ -468,12 +476,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
+  # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -511,10 +520,12 @@ scalar UShort
 
             AssertEqual(result, "", @"
 interface Baaz {
+  # This is of type Integer
   int: Int
 }
 
-type Bar implements Foo & Baaz {
+type Bar implements IFoo & Baaz {
+  # This is of type String
   str: String
 }
 
@@ -536,12 +547,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
+  # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -577,15 +589,18 @@ scalar UShort
 
             var options = new SchemaPrinterOptions
             {
-                OldImplementsSyntax = true
+                OldImplementsSyntax = true,
+                IncludeDescriptions = true
             };
 
             AssertEqual(print(schema, options), "", @"
 interface Baaz {
+  # This is of type Integer
   int: Int
 }
 
-type Bar implements Foo, Baaz {
+type Bar implements IFoo, Baaz {
+  # This is of type String
   str: String
 }
 
@@ -607,12 +622,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
+  # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -659,7 +675,7 @@ interface Baaz {
   int: Int
 }
 
-type Bar implements Foo & Baaz {
+type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
 }
@@ -682,13 +698,13 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Guid
+
 # This is a Foo interface type
-interface Foo {
+interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Guid
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -724,7 +740,8 @@ scalar UShort
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), "", @"
-type Bar implements Foo {
+type Bar implements IFoo {
+  # This is of type String
   str: String
 }
 
@@ -746,12 +763,21 @@ scalar DateTimeOffset
 
 scalar Decimal
 
-# This is a Foo interface type
-interface Foo {
+# This is a Foo object type
+type Foo {
+  # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar Guid
+
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
+  str: String
+}
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -868,7 +894,7 @@ scalar UShort
                     Name = "Root"
                 }
             };
-            var printer = new SchemaPrinter(schema);
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
@@ -936,7 +962,7 @@ enum __DirectiveLocation {
 type __EnumValue {
   name: String!
   description: String
-  isDeprecated: String!
+  isDeprecated: Boolean!
   deprecationReason: String
 }
 
@@ -958,6 +984,7 @@ type __InputValue {
   name: String!
   description: String
   type: __Type!
+  # A GraphQL-formatted string representing the default value for this input value.
   defaultValue: String
 }
 
@@ -965,10 +992,15 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  # A list of all types supported by this server.
   types: [__Type!]!
+  # The type that query operations will be rooted at.
   queryType: __Type!
+  # If this server supports mutation, the type that mutation operations will be rooted at.
   mutationType: __Type
+  # If this server supports subscription, the type that subscription operations will be rooted at.
   subscriptionType: __Type
+  # A list of all directives supported by this server.
   directives: [__Directive!]!
 }
 
@@ -1028,7 +1060,7 @@ enum __TypeKind {
         {
             public FooInterfaceType()
             {
-                Name = "Foo";
+                Name = "IFoo";
                 Description = "This is a Foo interface type";
                 ResolveType = obj => null;
                 Field<StringGraphType>(

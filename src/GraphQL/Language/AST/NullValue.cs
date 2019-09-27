@@ -13,7 +13,7 @@ namespace GraphQL.Language.AST
         {
             if (ReferenceEquals(null, obj)) return true;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == this.GetType();
+            return obj.GetType() == GetType();
         }
     }
 }

@@ -1,12 +1,12 @@
+using GraphQL.DataLoader.Tests.Models;
+using GraphQL.DataLoader.Tests.Stores;
+using Moq;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.DataLoader.Tests.Models;
-using GraphQL.DataLoader.Tests.Stores;
-using Moq;
-using Shouldly;
 using Xunit;
 
 namespace GraphQL.DataLoader.Tests
@@ -75,7 +75,7 @@ namespace GraphQL.DataLoader.Tests
 
             await loader.DispatchAsync(cts.Token);
 
-            await Assert.ThrowsAsync<TaskCanceledException>(async () =>
+            await Should.ThrowAsync<TaskCanceledException>(async () =>
             {
                 await task;
             });
@@ -103,7 +103,7 @@ namespace GraphQL.DataLoader.Tests
 
             await loader.DispatchAsync(cts.Token);
 
-            await Assert.ThrowsAsync<TaskCanceledException>(async () =>
+            await Should.ThrowAsync<TaskCanceledException>(async () =>
             {
                 await task;
             });

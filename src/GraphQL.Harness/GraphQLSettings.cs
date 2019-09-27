@@ -9,5 +9,6 @@ namespace Example
         public PathString Path { get; set; } = "/api/graphql";
         public Func<HttpContext, IDictionary<string, object>> BuildUserContext { get; set; }
         public bool EnableMetrics { get; set; }
+        public bool ExposeExceptions { get; set; }
     }
 }

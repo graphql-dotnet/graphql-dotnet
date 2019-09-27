@@ -24,6 +24,35 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public void can_read_complex_schema()
+        {
+            var schema = Schema.For(
+                ReadSchema("PetComplex.graphql"),
+                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+            );
+
+            schema.AllTypes.Count().ShouldBe(31);
+
+            var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
+            cat.Description.ShouldBe(" A cat");
+            cat.GetField("name").Description.ShouldBe(" cat's name");
+            cat.GetField("weight").Arguments[0].Name.ShouldBe("inPounds");
+            cat.GetField("weight").Arguments[0].ResolvedType.GetType().ShouldBe(typeof(BooleanGraphType));
+            cat.GetField("weight").Arguments[0].Description.ShouldBe("comment on argument");
+            var dog = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Dog");
+            dog.Description.ShouldBe(" A dog");
+            dog.GetField("age").Description.ShouldBe(" dog's age");
+
+            var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
+            pet.Description.ShouldBe("Cats with dogs");
+            pet.PossibleTypes.Count().ShouldBe(2);
+
+            var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
+            query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
+            query.GetField("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
+        }
+
+        [Fact]
         public void can_execute_resolver()
         {
             var defs = @"
@@ -266,14 +295,14 @@ namespace GraphQL.Tests.Utilities
         public void can_use_null_as_default_value()
         {
             var schema = Schema.For(@"
-input HumanInput {
-  name: String!
-  homePlanet: String = null
-}
- 
-type Mutation {
-  createHuman(human: HumanInput!): Human
-}
+                input HumanInput {
+                  name: String!
+                  homePlanet: String = null
+                }
+
+                type Mutation {
+                  createHuman(human: HumanInput!): Human
+                }
             ");
         }
 
@@ -382,6 +411,56 @@ type Mutation {
                 _.ExpectedResult = expected;
                 _.Variables = variables;
             });
+        }
+
+        [Fact]
+        public void does_not_require_scalar_fields_to_be_defined()
+        {
+            var defs = @"
+                type Person {
+                    name: String!
+                    age: Int!
+                }
+                type Query {
+                    me: Person
+                }
+            ";
+
+            Builder.Types.Include<PeopleQueryType>();
+            Builder.Types.Include<PersonQueryType>();
+
+            var query = @"{ me { name age } }";
+            var expected = @"{ 'me': { 'name': 'Quinn', 'age': 100 } }";
+
+            AssertQuery(_ =>
+            {
+                _.Query = query;
+                _.Definitions = defs;
+                _.ExpectedResult = expected;
+            });
+        }
+    }
+
+    public class Person
+    {
+        public string Name { get; set; }
+    }
+
+    [GraphQLMetadata("Person")]
+    public class PersonQueryType
+    {
+        public int Age()
+        {
+            return 100;
+        }
+    }
+
+    [GraphQLMetadata("Query")]
+    public class PeopleQueryType
+    {
+        public Person Me()
+        {
+            return new Person { Name = "Quinn" };
         }
     }
 

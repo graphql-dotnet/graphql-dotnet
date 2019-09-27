@@ -1,8 +1,8 @@
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -51,19 +51,10 @@ namespace GraphQL.Types
             _arguments.Add(argument);
         }
 
-        public QueryArgument Find(string name)
-        {
-            return this.FirstOrDefault(x => x.Name == name);
-        }
+        public QueryArgument Find(string name) => this.FirstOrDefault(x => x.Name == name);
 
-        public IEnumerator<QueryArgument> GetEnumerator()
-        {
-            return _arguments.GetEnumerator();
-        }
+        public IEnumerator<QueryArgument> GetEnumerator() => _arguments.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -14,7 +14,7 @@ namespace GraphQL.Types
         }
     }
 
-    [DebuggerDisplay("{Name,nq}: {ResolvedType?.Name,nq}")]
+    [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class QueryArgument : IHaveDefaultValue, IProvideMetadata
     {
         public QueryArgument(IGraphType type)

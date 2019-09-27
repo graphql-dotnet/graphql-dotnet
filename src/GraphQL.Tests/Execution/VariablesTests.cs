@@ -38,9 +38,9 @@ namespace GraphQL.Tests.Execution
 
         public override object ParseLiteral(IValue value)
         {
-            if (value is StringValue)
+            if (value is StringValue stringValue)
             {
-                if (((StringValue) value).Value.Equals("SerializedValue"))
+                if (stringValue.Value.Equals("SerializedValue"))
                 {
                     return "DeserializedValue";
                 }

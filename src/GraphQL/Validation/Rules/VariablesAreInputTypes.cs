@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -14,6 +14,8 @@ namespace GraphQL.Validation.Rules
     {
         public Func<string, string, string> UndefinedVarMessage = (variableName, typeName) =>
             $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
+
+        public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
 
         public INodeVisitor Validate(ValidationContext context)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
@@ -22,6 +22,8 @@ namespace GraphQL.Validation.Rules
             }
             return message;
         };
+
+        public static readonly KnownTypeNames Instance = new KnownTypeNames();
 
         public INodeVisitor Validate(ValidationContext context)
         {

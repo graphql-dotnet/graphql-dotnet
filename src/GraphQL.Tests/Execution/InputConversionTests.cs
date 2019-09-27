@@ -85,7 +85,7 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldBe((int)1);
+            inputs["a"].ShouldBe(1);
             inputs["b"].ShouldBe("2");
 
             var myInput = inputs.ToObject<MyInput>();
@@ -103,7 +103,7 @@ namespace GraphQL.Tests.Execution
             var inputs = json.ToInputs();
 
             inputs.ShouldNotBeNull();
-            inputs["a"].ShouldBe((int)1);
+            inputs["a"].ShouldBe(1);
             inputs["b"].ShouldBe("2");
             inputs["c"].ShouldBeOfType<List<object>>();
 

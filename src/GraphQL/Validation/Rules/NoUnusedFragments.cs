@@ -17,6 +17,8 @@ namespace GraphQL.Validation.Rules
             return $"Fragment \"{fragName}\" is never used.";
         }
 
+        public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var operationDefs = new List<Operation>();
@@ -29,7 +31,7 @@ namespace GraphQL.Validation.Rules
                 _.Match<Document>(leave: document =>
                 {
                     var fragmentNamesUsed = operationDefs
-                        .SelectMany(op => context.GetRecursivelyReferencedFragments(op))
+                        .SelectMany(context.GetRecursivelyReferencedFragments)
                         .Select(fragment => fragment.Name)
                         .ToList();
 

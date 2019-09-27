@@ -757,7 +757,7 @@ namespace GraphQL.Tests.Introspection
                 ""name"": null,
                 ""ofType"": {
                   ""kind"": ""SCALAR"",
-                  ""name"": ""String"",
+                  ""name"": ""Boolean"",
                   ""ofType"": null
                 }
               },

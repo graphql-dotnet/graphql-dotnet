@@ -16,6 +16,8 @@ namespace GraphQL.Validation.Rules
             return $"The directive \"{directiveName}\" can only be used once at this location.";
         }
 
+        public static readonly UniqueDirectivesPerLocation Instance = new UniqueDirectivesPerLocation();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

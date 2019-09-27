@@ -68,7 +68,7 @@ namespace GraphQL.DataLoader
                 }
             }
 
-            var result = await DataLoaded;
+            var result = await DataLoaded.ConfigureAwait(false);
 
             if (result.TryGetValue(key, out T value))
             {
