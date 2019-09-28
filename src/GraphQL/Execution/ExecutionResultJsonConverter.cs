@@ -99,10 +99,13 @@ namespace GraphQL
                 serializer.Serialize(writer, error.Code);
             }
 
-            writer.WritePropertyName("codes");
-            writer.WriteStartArray();
-            error.Codes.Apply(code => serializer.Serialize(writer, code));
-            writer.WriteEndArray();
+            if (error.HasCodes)
+            {
+                writer.WritePropertyName("codes");
+                writer.WriteStartArray();
+                error.Codes.Apply(code => serializer.Serialize(writer, code));
+                writer.WriteEndArray();
+            }
 
             if (error.Data?.Count > 0)
             {
