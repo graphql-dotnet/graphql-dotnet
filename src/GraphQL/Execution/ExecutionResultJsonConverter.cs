@@ -24,7 +24,7 @@ namespace GraphQL
         {
             var data = result.Data;
 
-            if (result.Errors?.Any() == true && data == null)
+            if (result.Errors?.Count > 0 && data == null)
             {
                 return;
             }
@@ -35,7 +35,7 @@ namespace GraphQL
 
         private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
         {
-            if (errors == null || !errors.Any())
+            if (errors == null || errors.Count == 0)
             {
                 return;
             }
@@ -53,7 +53,7 @@ namespace GraphQL
                 // check if return StackTrace, including all inner exceptions
                 serializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
 
-                if (error.Locations != null)
+                if (error.HasLocations)
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
@@ -99,6 +99,11 @@ namespace GraphQL
                 serializer.Serialize(writer, error.Code);
             }
 
+            writer.WritePropertyName("codes");
+            writer.WriteStartArray();
+            error.Codes.Apply(code => serializer.Serialize(writer, code));
+            writer.WriteEndArray();
+
             if (error.Data?.Count > 0)
             {
                 writer.WritePropertyName("data");
@@ -116,19 +121,14 @@ namespace GraphQL
 
         private void WriteExtensions(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            if (result.Extensions == null || !result.Extensions.Any())
+            if (result.Extensions?.Count > 0)
             {
-                return;
+                writer.WritePropertyName("extensions");
+                serializer.Serialize(writer, result.Extensions);
             }
-
-            writer.WritePropertyName("extensions");
-            serializer.Serialize(writer, result.Extensions);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => throw new NotImplementedException();
 
         public override bool CanRead => false;
 

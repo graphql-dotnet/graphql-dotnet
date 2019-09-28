@@ -214,9 +214,8 @@ namespace GraphQL
     {
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
     }
-    public class ErrorLocation
+    public struct ErrorLocation
     {
-        public ErrorLocation() { }
         public int Column { get; set; }
         public int Line { get; set; }
     }
