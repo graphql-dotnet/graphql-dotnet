@@ -35,8 +35,6 @@ namespace GraphQL
 
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
-        internal bool HasLocations => _errorLocations != null && _errorLocations.Count > 0;
-
         public string Code { get; set; }
 
         internal bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);

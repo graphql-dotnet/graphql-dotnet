@@ -53,7 +53,7 @@ namespace GraphQL
                 // check if return StackTrace, including all inner exceptions
                 serializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
 
-                if (error.HasLocations)
+                if (error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
