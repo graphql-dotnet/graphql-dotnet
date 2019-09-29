@@ -230,7 +230,7 @@ namespace GraphQL
         public System.Collections.Generic.Dictionary<string, object> DataAsDictionary { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<string> Path { get; set; }
-        public GraphQL.ExecutionError AddLocation(int line, int column) { }
+        public void AddLocation(int line, int column) { }
     }
     public class static ExecutionErrorExtensions
     {
@@ -902,6 +902,11 @@ namespace GraphQL.Language.AST
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public GraphQL.Language.AST.IValue ValueFor(string name) { }
     }
+    public class BigIntegerValue : GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger>
+    {
+        public BigIntegerValue(System.Numerics.BigInteger value) { }
+        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger> other) { }
+    }
     public class BooleanValue : GraphQL.Language.AST.ValueNode<bool>
     {
         public BooleanValue(bool value) { }
@@ -1463,6 +1468,13 @@ namespace GraphQL.Types
     {
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+    }
+    public class BigIntegerGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public BigIntegerGraphType() { }
+        public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object ParseValue(object value) { }
+        public override object Serialize(object value) { }
     }
     public class BooleanGraphType : GraphQL.Types.ScalarGraphType
     {

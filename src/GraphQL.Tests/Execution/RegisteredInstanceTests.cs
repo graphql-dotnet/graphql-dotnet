@@ -109,6 +109,8 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
+scalar BigInteger
+
 scalar Byte
 
 scalar Date
@@ -156,6 +158,8 @@ scalar UShort
   query: root
 }
 
+scalar BigInteger
+
 scalar Byte
 
 scalar Date
@@ -202,6 +206,8 @@ scalar UShort
             build_schema("none").ShouldBeCrossPlat(@"schema {
   query: root
 }
+
+scalar BigInteger
 
 scalar Byte
 

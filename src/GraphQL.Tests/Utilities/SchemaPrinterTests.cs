@@ -14,6 +14,10 @@ namespace GraphQL.Tests.Utilities
         private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
         {
             {
+                "BigInteger",
+                "scalar BigInteger"
+            },
+            {
                 "Byte",
                 "scalar Byte"
             },
@@ -462,6 +466,8 @@ type Bar implements IFoo {
   str: String
 }
 
+scalar BigInteger
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -534,6 +540,8 @@ type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
 }
+
+scalar BigInteger
 
 scalar Byte
 
@@ -611,6 +619,8 @@ type Bar implements IFoo, Baaz {
   # This is of type String
   str: String
 }
+
+scalar BigInteger
 
 scalar Byte
 
@@ -690,6 +700,8 @@ type Bar implements IFoo & Baaz {
   str: String
 }
 
+scalar BigInteger
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -756,6 +768,8 @@ type Bar implements IFoo {
   # This is of type String
   str: String
 }
+
+scalar BigInteger
 
 scalar Byte
 

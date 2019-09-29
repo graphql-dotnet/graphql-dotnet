@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -14,6 +15,7 @@ namespace GraphQL.Utilities
             {
                 [typeof(int)] = typeof(IntGraphType),
                 [typeof(long)] = typeof(LongGraphType),
+                [typeof(BigInteger)] = typeof(BigIntegerGraphType),
                 [typeof(double)] = typeof(FloatGraphType),
                 [typeof(float)] = typeof(FloatGraphType),
                 [typeof(decimal)] = typeof(DecimalGraphType),

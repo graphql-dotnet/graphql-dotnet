@@ -14,18 +14,14 @@ namespace GraphQL.Language.AST
         }
 
         object IValue.Value => Name;
+
         public string Name { get; }
+
         public NameNode NameNode { get; }
 
-        public override string ToString()
-        {
-            return "EnumValue{{name={0}}}".ToFormat(Name);
-        }
+        public override string ToString() => "EnumValue{{name={0}}}".ToFormat(Name);
 
-        protected bool Equals(EnumValue other)
-        {
-            return string.Equals(Name, other.Name);
-        }
+        protected bool Equals(EnumValue other) => string.Equals(Name, other.Name);
 
         public override bool IsEqualTo(INode obj)
         {

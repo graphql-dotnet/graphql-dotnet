@@ -28,7 +28,9 @@ namespace GraphQL.Tests.Utilities
 
             var query = "{ _service { sdl } }";
 
-            var sdl = @"scalar Byte
+            var sdl = @"scalar BigInteger
+
+scalar Byte
 
 scalar Date
 

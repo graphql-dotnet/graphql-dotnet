@@ -5,6 +5,7 @@ using GraphQLParser;
 using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
+using System.Numerics;
 
 namespace GraphQL.Language
 {
@@ -129,15 +130,15 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.Field:
                 {
-                    return Field((GraphQLFieldSelection) source);
+                    return Field((GraphQLFieldSelection)source);
                 }
                 case ASTNodeKind.FragmentSpread:
                 {
-                    return FragmentSpread((GraphQLFragmentSpread) source);
+                    return FragmentSpread((GraphQLFragmentSpread)source);
                 }
                 case ASTNodeKind.InlineFragment:
                 {
-                    return InlineFragment((GraphQLInlineFragment) source);
+                    return InlineFragment((GraphQLInlineFragment)source);
                 }
             }
 
@@ -214,6 +215,12 @@ namespace GraphQL.Language
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
+                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    {
+                        return new BigIntegerValue(bigIntegerResult).WithLocation(str, _body);
+                    }
+
                     throw new ExecutionError($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
@@ -274,19 +281,19 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.NamedType:
                 {
-                    var name = (GraphQLNamedType) type;
+                    var name = (GraphQLNamedType)type;
                     return new NamedType(Name(name.Name)).WithLocation(name, _body);
                 }
 
                 case ASTNodeKind.NonNullType:
                 {
-                    var nonNull = (GraphQLNonNullType) type;
+                    var nonNull = (GraphQLNonNullType)type;
                     return new NonNullType(Type(nonNull.Type)).WithLocation(nonNull, _body);
                 }
 
                 case ASTNodeKind.ListType:
                 {
-                    var list = (GraphQLListType) type;
+                    var list = (GraphQLListType)type;
                     return new ListType(Type(list.Type)).WithLocation(list, _body);
                 }
             }

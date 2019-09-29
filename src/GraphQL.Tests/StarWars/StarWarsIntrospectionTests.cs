@@ -271,6 +271,10 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR',
                 },
                 {
+                  'name': 'BigInteger',
+                  'kind': 'SCALAR',
+                },
+                {
                   'name': 'ULong',
                   'kind': 'SCALAR',
                 },

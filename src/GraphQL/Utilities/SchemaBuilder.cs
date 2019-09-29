@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
@@ -538,6 +539,12 @@ namespace GraphQL.Utilities
                     if (long.TryParse(str.Value, out var longResult))
                     {
                         return longResult;
+                    }
+
+                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    {
+                        return bigIntegerResult;
                     }
 
                     throw new ExecutionError($"Invalid number {str.Value}");
