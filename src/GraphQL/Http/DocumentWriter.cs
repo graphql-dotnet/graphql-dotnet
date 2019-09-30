@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Http
 {
@@ -39,15 +40,10 @@ namespace GraphQL.Http
         public async Task WriteAsync<T>(Stream stream, T value)
         {
             using (var writer = new HttpResponseStreamWriter(stream, Utf8Encoding))
-            using (var jsonWriter = new JsonTextWriter(writer)
             {
-                ArrayPool = _jsonArrayPool,
-                CloseOutput = false,
-                AutoCompleteOnClose = false
-            })
-            {
-                _serializer.Serialize(jsonWriter, value);
-                await jsonWriter.FlushAsync().ConfigureAwait(false);
+                JToken jtoken = JToken.FromObject(value);
+                await writer.WriteAsync(jtoken.ToString()).ConfigureAwait(false); ;
+
             }
         }
     }
