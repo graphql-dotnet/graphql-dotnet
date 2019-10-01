@@ -902,6 +902,11 @@ namespace GraphQL.Language.AST
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public GraphQL.Language.AST.IValue ValueFor(string name) { }
     }
+    public class BigIntValue : GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger>
+    {
+        public BigIntValue(System.Numerics.BigInteger value) { }
+        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger> other) { }
+    }
     public class BooleanValue : GraphQL.Language.AST.ValueNode<bool>
     {
         public BooleanValue(bool value) { }
@@ -1464,6 +1469,13 @@ namespace GraphQL.Types
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
+    public class BigIntGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public BigIntGraphType() { }
+        public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object ParseValue(object value) { }
+        public override object Serialize(object value) { }
+    }
     public class BooleanGraphType : GraphQL.Types.ScalarGraphType
     {
         public BooleanGraphType() { }
@@ -1841,6 +1853,13 @@ namespace GraphQL.Types
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
+    }
+    public class LongGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public LongGraphType() { }
+        public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
+        public override object ParseValue(object value) { }
+        public override object Serialize(object value) { }
     }
     public class NonNullGraphType : GraphQL.Types.GraphType
     {

@@ -6,6 +6,13 @@ namespace GraphQL.Types
 {
     public abstract class GraphType : IGraphType
     {
+        protected GraphType()
+        {
+            var name = GetType().Name;
+            if (name.EndsWith(nameof(GraphType)))
+                Name = name.Substring(0, name.Length - nameof(GraphType).Length);
+        }
+
         public string Name { get; set; }
 
         public string Description { get; set; }

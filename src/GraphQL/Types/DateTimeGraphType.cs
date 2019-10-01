@@ -7,7 +7,6 @@ namespace GraphQL.Types
     {
         public DateTimeGraphType()
         {
-            Name = "DateTime";
             Description =
                 "The `DateTime` scalar type represents a date and time. `DateTime` expects timestamps " +
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";

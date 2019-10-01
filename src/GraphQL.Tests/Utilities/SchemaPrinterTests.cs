@@ -14,6 +14,10 @@ namespace GraphQL.Tests.Utilities
         private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
         {
             {
+                "BigInt",
+                "scalar BigInt"
+            },
+            {
                 "Byte",
                 "scalar Byte"
             },
@@ -64,6 +68,10 @@ scalar Seconds"
                 @"scalar Guid"
             },
             {
+                "Long",
+                @"scalar Long"
+            },
+            {
                 "Short",
                 @"scalar Short"
             },
@@ -87,7 +95,7 @@ scalar Seconds"
         {
             var args = arguments != null ? new QueryArguments(arguments) : null;
 
-            var root = new ObjectGraphType {Name = "Query"};
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<T>(
                 "singleField",
                 arguments: args);
@@ -222,7 +230,7 @@ directive @skip(
         [Fact]
         public void prints_object_field()
         {
-            var root = new ObjectGraphType {Name = "Query"};
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
@@ -252,7 +260,7 @@ type Foo {
         [Fact]
         public void prints_object_field_with_field_descriptions()
         {
-            var root = new ObjectGraphType {Name = "Query"};
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
@@ -287,7 +295,7 @@ type Foo {
         [Fact]
         public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
         {
-            var root = new ObjectGraphType {Name = "Query"};
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
@@ -327,7 +335,7 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" }
                 });
 
             const string expected =
@@ -343,7 +351,7 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne", DefaultValue = 2}
+                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
                 });
 
             const string expected =
@@ -359,7 +367,7 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "argOne"}
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
                 });
 
             const string expected =
@@ -375,8 +383,8 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" }
                 });
 
             const string expected =
@@ -392,9 +400,9 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne", DefaultValue = 1},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree"}
+                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
                 });
 
             const string expected =
@@ -410,9 +418,9 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo", DefaultValue = "foo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo", DefaultValue = "foo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
                 });
 
             const string expected =
@@ -428,9 +436,9 @@ type Foo {
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree", DefaultValue = false}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
                 });
 
             const string expected =
@@ -458,6 +466,8 @@ type Bar implements IFoo {
   str: String
 }
 
+scalar BigInt
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -483,6 +493,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -529,6 +541,8 @@ type Bar implements IFoo & Baaz {
   str: String
 }
 
+scalar BigInt
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -554,6 +568,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -604,6 +620,8 @@ type Bar implements IFoo, Baaz {
   str: String
 }
 
+scalar BigInt
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -629,6 +647,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -680,6 +700,8 @@ type Bar implements IFoo & Baaz {
   str: String
 }
 
+scalar BigInt
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -705,6 +727,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -745,6 +769,8 @@ type Bar implements IFoo {
   str: String
 }
 
+scalar BigInt
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -778,6 +804,8 @@ interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Long
 
 # The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
 scalar Milliseconds
@@ -814,7 +842,7 @@ scalar UShort
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<NonNullGraphType<StringGraphType>>(
                 "str",
-                arguments: new QueryArguments(new QueryArgument<InputType> {Name = "argOne"}));
+                arguments: new QueryArguments(new QueryArgument<InputType> { Name = "argOne" }));
 
             var schema = new Schema { Query = root };
 

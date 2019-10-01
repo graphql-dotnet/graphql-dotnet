@@ -7,7 +7,6 @@ namespace GraphQL.Types
     {
         public DateTimeOffsetGraphType()
         {
-            Name = "DateTimeOffset";
             Description =
                 "The `DateTimeOffset` scalar type represents a date, time and offset from UTC. `DateTimeOffset` expects timestamps " +
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
