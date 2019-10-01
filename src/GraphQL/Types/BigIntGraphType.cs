@@ -3,14 +3,14 @@ using System.Numerics;
 
 namespace GraphQL.Types
 {
-    public class BigIntegerGraphType : ScalarGraphType
+    public class BigIntGraphType : ScalarGraphType
     {
         public override object ParseLiteral(IValue value)
         {
             switch (value)
             {
-                case BigIntegerValue bigIntegerValue:
-                    return bigIntegerValue.Value;
+                case BigIntValue bigIntValue:
+                    return bigIntValue.Value;
 
                 case LongValue longValue:
                     return new BigInteger(longValue.Value);

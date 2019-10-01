@@ -218,7 +218,7 @@ namespace GraphQL.Language
                     // If the value doesn't fit in an long, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
-                        return new BigIntegerValue(bigIntegerResult).WithLocation(str, _body);
+                        return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
                     throw new ExecutionError($"Invalid number {str.Value}");

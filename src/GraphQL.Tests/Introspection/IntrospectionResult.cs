@@ -184,7 +184,7 @@ namespace GraphQL.Tests.Introspection
         },
         {
           ""kind"": ""SCALAR"",
-          ""name"": ""BigInteger"",
+          ""name"": ""BigInt"",
           ""description"": null,
           ""fields"": null,
           ""inputFields"": null,

@@ -34,7 +34,8 @@ These are additional scalars provided by this project.
 | `Long` | `LongGraphType` | `long` |
 | `ULong` | `ULongGraphType` | `ulong` |
 | `Byte` | `ByteGraphType` | `byte` |
-| `SByte` | `SByteGraphType` | `sbyte` 
+| `SByte` | `SByteGraphType` | `sbyte`
+| `BigInt` | `BigIntGraphType` | `BigInteger`
 
 Lists of data are also supported with any Scalar or Object types.
 

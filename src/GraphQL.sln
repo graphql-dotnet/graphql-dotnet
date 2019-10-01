@@ -30,6 +30,39 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Dummy", "GraphQL.Du
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A87E-4E8B-B068-8B396D00945A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\getting-started\aliases.md = ..\docs2\site\docs\getting-started\aliases.md
+		..\docs2\site\docs\getting-started\arguments.md = ..\docs2\site\docs\getting-started\arguments.md
+		..\docs2\site\docs\getting-started\authorization.md = ..\docs2\site\docs\getting-started\authorization.md
+		..\docs2\site\docs\getting-started\custom-scalars.md = ..\docs2\site\docs\getting-started\custom-scalars.md
+		..\docs2\site\docs\getting-started\databases.md = ..\docs2\site\docs\getting-started\databases.md
+		..\docs2\site\docs\getting-started\dependency-injection.md = ..\docs2\site\docs\getting-started\dependency-injection.md
+		..\docs2\site\docs\getting-started\directives.md = ..\docs2\site\docs\getting-started\directives.md
+		..\docs2\site\docs\getting-started\errors.md = ..\docs2\site\docs\getting-started\errors.md
+		..\docs2\site\docs\getting-started\field-middleware.md = ..\docs2\site\docs\getting-started\field-middleware.md
+		..\docs2\site\docs\getting-started\fields.md = ..\docs2\site\docs\getting-started\fields.md
+		..\docs2\site\docs\getting-started\fragments.md = ..\docs2\site\docs\getting-started\fragments.md
+		..\docs2\site\docs\getting-started\graphiql.md = ..\docs2\site\docs\getting-started\graphiql.md
+		..\docs2\site\docs\getting-started\installation.md = ..\docs2\site\docs\getting-started\installation.md
+		..\docs2\site\docs\getting-started\interfaces.md = ..\docs2\site\docs\getting-started\interfaces.md
+		..\docs2\site\docs\getting-started\introduction.md = ..\docs2\site\docs\getting-started\introduction.md
+		..\docs2\site\docs\getting-started\lists-non-null.md = ..\docs2\site\docs\getting-started\lists-non-null.md
+		..\docs2\site\docs\getting-started\malicious-queries.md = ..\docs2\site\docs\getting-started\malicious-queries.md
+		..\docs2\site\docs\getting-started\metadata.md = ..\docs2\site\docs\getting-started\metadata.md
+		..\docs2\site\docs\getting-started\metrics.md = ..\docs2\site\docs\getting-started\metrics.md
+		..\docs2\site\docs\getting-started\mutations.md = ..\docs2\site\docs\getting-started\mutations.md
+		..\docs2\site\docs\getting-started\queries.md = ..\docs2\site\docs\getting-started\queries.md
+		..\docs2\site\docs\getting-started\query-organization.md = ..\docs2\site\docs\getting-started\query-organization.md
+		..\docs2\site\docs\getting-started\query-validation.md = ..\docs2\site\docs\getting-started\query-validation.md
+		..\docs2\site\docs\getting-started\relay.md = ..\docs2\site\docs\getting-started\relay.md
+		..\docs2\site\docs\getting-started\schema-types.md = ..\docs2\site\docs\getting-started\schema-types.md
+		..\docs2\site\docs\getting-started\subscriptions.md = ..\docs2\site\docs\getting-started\subscriptions.md
+		..\docs2\site\docs\getting-started\unions.md = ..\docs2\site\docs\getting-started\unions.md
+		..\docs2\site\docs\getting-started\user-context.md = ..\docs2\site\docs\getting-started\user-context.md
+		..\docs2\site\docs\getting-started\variables.md = ..\docs2\site\docs\getting-started\variables.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

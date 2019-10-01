@@ -109,7 +109,7 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
-scalar BigInteger
+scalar BigInt
 
 scalar Byte
 
@@ -158,7 +158,7 @@ scalar UShort
   query: root
 }
 
-scalar BigInteger
+scalar BigInt
 
 scalar Byte
 
@@ -207,7 +207,7 @@ scalar UShort
   query: root
 }
 
-scalar BigInteger
+scalar BigInt
 
 scalar Byte
 

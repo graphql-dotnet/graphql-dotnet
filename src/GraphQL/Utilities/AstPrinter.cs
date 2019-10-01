@@ -300,7 +300,7 @@ namespace GraphQL.Utilities
                 c.Print(f => f.Arg(x => x.Value));
             });
 
-            Config<BigIntegerValue>(c =>
+            Config<BigIntValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f => f.Arg(x => x.Value));

@@ -152,15 +152,15 @@ namespace GraphQL.Tests.Bugs
                    return ctx.GetArgument<long>("in");
                });
 
-            Field<BigIntegerGraphType>(
+            Field<BigIntGraphType>(
                 "bigint",
                 resolve: ctx =>
                 {
                     return BigInteger.Parse("636474637870330463636474637870330463636474637870330463");
                 });
-            Field<BigIntegerGraphType>(
+            Field<BigIntGraphType>(
                "bigint_with_arg",
-               arguments: new QueryArguments(new QueryArgument<BigIntegerGraphType> { Name = "in" }),
+               arguments: new QueryArguments(new QueryArgument<BigIntGraphType> { Name = "in" }),
                resolve: ctx =>
                {
                    return ctx.GetArgument<BigInteger>("in");

@@ -15,7 +15,7 @@ namespace GraphQL.Utilities
             {
                 [typeof(int)] = typeof(IntGraphType),
                 [typeof(long)] = typeof(LongGraphType),
-                [typeof(BigInteger)] = typeof(BigIntegerGraphType),
+                [typeof(BigInteger)] = typeof(BigIntGraphType),
                 [typeof(double)] = typeof(FloatGraphType),
                 [typeof(float)] = typeof(FloatGraphType),
                 [typeof(decimal)] = typeof(DecimalGraphType),
