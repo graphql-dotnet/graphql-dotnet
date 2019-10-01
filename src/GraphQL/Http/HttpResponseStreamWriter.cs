@@ -246,7 +246,7 @@ namespace GraphQL.Http
                 _disposed = true;
                 try
                 {
-                    FlushInternal(flushEncoder: true);
+                    FlushInternalAsync(flushEncoder: true).Wait();
                 }
                 finally
                 {
