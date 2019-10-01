@@ -239,14 +239,14 @@ namespace GraphQL.Http
             return FlushInternalAsync(flushEncoder: true);
         }
 
-        protected override void Dispose(bool disposing)
+        protected override async void Dispose(bool disposing)
         {
             if (disposing && !_disposed)
             {
                 _disposed = true;
                 try
                 {
-                    FlushInternal(flushEncoder: true);
+                    await FlushInternalAsync(flushEncoder: true);
                 }
                 finally
                 {
