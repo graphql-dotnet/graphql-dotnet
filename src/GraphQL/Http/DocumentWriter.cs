@@ -1,9 +1,9 @@
-using System;
 using System.Buffers;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Http
 {
@@ -43,10 +43,12 @@ namespace GraphQL.Http
             {
                 ArrayPool = _jsonArrayPool,
                 CloseOutput = false,
-                AutoCompleteOnClose = false
+                AutoCompleteOnClose = false,
+                Formatting = _serializer.Formatting
             })
             {
-                _serializer.Serialize(jsonWriter, value);
+                var json = JToken.FromObject(value, _serializer);
+                await json.WriteToAsync(jsonWriter).ConfigureAwait(false);
                 await jsonWriter.FlushAsync().ConfigureAwait(false);
             }
         }
