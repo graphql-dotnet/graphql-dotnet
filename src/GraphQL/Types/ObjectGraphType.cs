@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -82,6 +83,12 @@ namespace GraphQL.Types
 
             if (!_interfaces.Contains(type))
                 _interfaces.Add(type);
+        }
+
+        public void ApplySchemaDirective(SchemaDirectiveVisitor directive)
+        {
+            this.AddSchemaDirective(directive);
+            directive.VisitObjectGraphType(this);
         }
     }
 

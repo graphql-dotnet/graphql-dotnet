@@ -13,6 +13,8 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
+        public const string SchemaDirectivesMetadataKey = "schema_directives";
+
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
         public static string TrimGraphQLTypes(this string name)
@@ -482,6 +484,26 @@ namespace GraphQL
             }
 
             throw new ExecutionError($"Cannot convert value to AST: {serialized}");
+        }
+
+        /// <summary>
+        /// Add <paramref name="directive"/> to object metadata.
+        /// </summary>
+        /// <param name="metadataProvider"> Metadata. </param>
+        /// <param name="directive"> Schema directive. </param>
+        public static void AddSchemaDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
+        {
+            List<SchemaDirectiveVisitor> directives;
+            if (metadataProvider.HasMetadata(SchemaDirectivesMetadataKey))
+            {
+                directives = metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new List<SchemaDirectiveVisitor>());
+            }
+            else
+            {
+                directives = new List<SchemaDirectiveVisitor>();
+                metadataProvider.Metadata.Add(SchemaDirectivesMetadataKey, directives);
+            }
+            directives.Add(directive);
         }
     }
 }

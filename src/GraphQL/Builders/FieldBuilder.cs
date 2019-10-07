@@ -154,5 +154,11 @@ namespace GraphQL.Builders
             FieldType.AsyncSubscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
             return this;
         }
+
+        public void ApplySchemaDirective(SchemaDirectiveVisitor directive)
+        {
+            FieldType.AddSchemaDirective(directive);
+            directive.VisitField(FieldType);
+        }
     }
 }

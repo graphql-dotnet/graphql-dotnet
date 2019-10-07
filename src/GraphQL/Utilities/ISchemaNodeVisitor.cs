@@ -6,6 +6,7 @@ namespace GraphQL.Utilities
     public interface ISchemaNodeVisitor
     {
         void VisitObjectGraphType(ObjectGraphType type);
+        void VisitObjectGraphType<TSourceType>(ObjectGraphType<TSourceType> type);
         void VisitField(FieldType field);
         void VisitEnumValue(EnumValueDefinition value);
     }
@@ -19,6 +20,10 @@ namespace GraphQL.Utilities
         }
 
         public virtual void VisitObjectGraphType(ObjectGraphType type)
+        {
+        }
+
+        public virtual void VisitObjectGraphType<TSourceType>(ObjectGraphType<TSourceType> type)
         {
         }
 

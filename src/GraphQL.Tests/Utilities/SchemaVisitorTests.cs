@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
@@ -90,6 +93,29 @@ namespace GraphQL.Tests.Utilities
                     return result;
                 });
             }
+        }
+
+        [Fact]
+        public void can_apply_custom_directive_when_graph_type_first()
+        {
+            var objectType = new ObjectGraphType();
+            objectType.Field<StringGraphType>()
+                .Name("hello")
+                .Resolve(_ => "Hello World!")
+                .ApplySchemaDirective(new UppercaseDirectiveVisitor());
+
+            var directivesMetadata = objectType.Fields.First().GetMetadata<List<SchemaDirectiveVisitor>>(GraphQLExtensions.SchemaDirectivesMetadataKey);
+            directivesMetadata.ShouldNotBeNull();
+            directivesMetadata.Count.ShouldBe(1, "Only 1 directive should be added");
+
+            var queryResult = CreateQueryResult("{ 'hello': 'HELLO WORLD!' }");
+            var schema = new Schema { Query = objectType };
+
+            AssertQuery(_ =>
+            {
+                _.Schema = schema;
+                _.Query = "{ hello }";
+            }, queryResult);
         }
     }
 }
