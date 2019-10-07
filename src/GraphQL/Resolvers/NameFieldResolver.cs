@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.Types;
 
@@ -44,24 +45,11 @@ namespace GraphQL.Resolvers
                 throw new InvalidOperationException($"Expected to find property {name} on {target.Name} but it does not exist.");
             }
 
-            // Use reflection to call the method to generate our delegate
-            MethodInfo constructedHelper = delegateHelperMethod.MakeGenericMethod(
-                property.DeclaringType, property.GetMethod.ReturnType);
+            var parameter = Expression.Parameter(typeof(object), "x");
+            var member = Expression.Property(Expression.Convert(parameter, target), property.Name);
+            var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(member, typeof(object)), parameter);
 
-            return (Func<object, object>)constructedHelper.Invoke(null, new object[] { property });
-        }
-
-        private static readonly MethodInfo delegateHelperMethod = typeof(NameFieldResolver).GetMethod(nameof(DelegateHelper),
-            BindingFlags.Static | BindingFlags.NonPublic);
-
-        private static Func<object, object> DelegateHelper<TTarget, TReturn>(PropertyInfo property)
-        {
-            // Convert the slow MethodInfo into a fast, strongly typed, open delegate
-            Func<TTarget, TReturn> func = (Func<TTarget, TReturn>)
-                Delegate.CreateDelegate(typeof(Func<TTarget, TReturn>), property.GetMethod);
-
-            // Now create a more weakly typed delegate which will call the strongly typed one
-            return (object target) => func((TTarget)target);
+            return lambda.Compile();
         }
     }
 }
