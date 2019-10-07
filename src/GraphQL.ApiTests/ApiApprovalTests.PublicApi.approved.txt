@@ -46,6 +46,7 @@ namespace GraphQL.Builders
     public class FieldBuilder<TSourceType, TReturnType>
     {
         public GraphQL.Types.EventStreamFieldType FieldType { get; }
+        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = null, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
@@ -303,6 +304,8 @@ namespace GraphQL
     }
     public class static GraphQLExtensions
     {
+        public const string SchemaDirectivesMetadataKey = "schema_directives";
+        public static void AddSchemaDirective(this GraphQL.Types.IProvideMetadata metadataProvider, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
         public static object DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -1611,6 +1614,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
+        public void ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
         public bool HasMetadata(string key) { }
     }
@@ -1891,6 +1895,7 @@ namespace GraphQL.Types
         public System.Func<object, bool> IsTypeOf { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType> ResolvedInterfaces { get; set; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public void ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
         public void Interface(System.Type type) { }
@@ -2180,6 +2185,7 @@ namespace GraphQL.Utilities
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public virtual void VisitField(GraphQL.Types.FieldType field) { }
         public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
+        public virtual void VisitObjectGraphType<TSourceType>(GraphQL.Types.ObjectGraphType<TSourceType> type) { }
         protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
     public class DeprecatedDirectiveVisistor : GraphQL.Utilities.SchemaDirectiveVisitor
@@ -2231,6 +2237,7 @@ namespace GraphQL.Utilities
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
         void VisitField(GraphQL.Types.FieldType field);
         void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type);
+        void VisitObjectGraphType<TSourceType>(GraphQL.Types.ObjectGraphType<TSourceType> type);
     }
     public interface IValueResolver
     {
