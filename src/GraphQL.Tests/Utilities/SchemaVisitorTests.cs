@@ -102,11 +102,12 @@ namespace GraphQL.Tests.Utilities
             objectType.Field<StringGraphType>()
                 .Name("hello")
                 .Resolve(_ => "Hello World!")
-                .ApplySchemaDirective(new UppercaseDirectiveVisitor());
+                .Directive("upper", new UppercaseDirectiveVisitor());
 
-            var directivesMetadata = objectType.Fields.First().GetMetadata<List<SchemaDirectiveVisitor>>(GraphQLExtensions.SchemaDirectivesMetadataKey);
+            var directivesMetadata = objectType.Fields.First().GetDirectives();
             directivesMetadata.ShouldNotBeNull();
             directivesMetadata.Count.ShouldBe(1, "Only 1 directive should be added");
+            directivesMetadata.ContainsKey("upper").ShouldBeTrue();
 
             var queryResult = CreateQueryResult("{ 'hello': 'HELLO WORLD!' }");
             var schema = new Schema { Query = objectType };

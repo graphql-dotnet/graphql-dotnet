@@ -46,7 +46,6 @@ namespace GraphQL.Builders
     public class FieldBuilder<TSourceType, TReturnType>
     {
         public GraphQL.Types.EventStreamFieldType FieldType { get; }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = null, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
@@ -56,6 +55,7 @@ namespace GraphQL.Builders
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
+        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolve) { }
@@ -304,14 +304,14 @@ namespace GraphQL
     }
     public class static GraphQLExtensions
     {
-        public const string SchemaDirectivesMetadataKey = "schema_directives";
-        public static void AddSchemaDirective(this GraphQL.Types.IProvideMetadata metadataProvider, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
+        public static void AddDirective(this GraphQL.Types.IProvideMetadata metadataProvider, string name, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
         public static object DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static bool DoTypesOverlap(this GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Utilities.SchemaDirectiveVisitor> GetDirectives(this GraphQL.Types.IProvideMetadata metadataProvider) { }
         public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
@@ -321,6 +321,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
+        public static void SetDirective(this GraphQL.Types.IProvideMetadata metadataProvider, string name, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public static string TrimGraphQLTypes(this string name) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
@@ -1614,7 +1615,6 @@ namespace GraphQL.Types
         public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
-        public void ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
         public bool HasMetadata(string key) { }
     }
@@ -1895,7 +1895,6 @@ namespace GraphQL.Types
         public System.Func<object, bool> IsTypeOf { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType> ResolvedInterfaces { get; set; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
-        public void ApplySchemaDirective(GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
         public void Interface(System.Type type) { }
@@ -2182,16 +2181,24 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
+        public virtual void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public virtual void VisitField(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputFieldDefinition(GraphQL.Types.FieldType value) { }
+        public virtual void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
+        public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition) { }
         public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
-        public virtual void VisitObjectGraphType<TSourceType>(GraphQL.Types.ObjectGraphType<TSourceType> type) { }
+        public virtual void VisitObjectGraphType(GraphQL.Types.IObjectGraphType type) { }
+        public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
+        public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
+        public virtual void VisitUnion(GraphQL.Types.UnionGraphType union) { }
         protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
-    public class DeprecatedDirectiveVisistor : GraphQL.Utilities.SchemaDirectiveVisitor
+    public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
         protected static readonly string DeprecatedDefaultValue;
-        public DeprecatedDirectiveVisistor() { }
+        public DeprecatedDirectiveVisitor() { }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public override void VisitField(GraphQL.Types.FieldType field) { }
     }
@@ -2234,10 +2241,18 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
+        void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument);
+        void VisitEnum(GraphQL.Types.EnumerationGraphType type);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
         void VisitField(GraphQL.Types.FieldType field);
+        void VisitInputFieldDefinition(GraphQL.Types.FieldType type);
+        void VisitInputObject(GraphQL.Types.InputObjectGraphType type);
+        void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition);
         void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type);
-        void VisitObjectGraphType<TSourceType>(GraphQL.Types.ObjectGraphType<TSourceType> type);
+        void VisitObjectGraphType(GraphQL.Types.IObjectGraphType type);
+        void VisitScalar(GraphQL.Types.ScalarGraphType scalar);
+        void VisitSchema(GraphQL.Types.Schema schema);
+        void VisitUnion(GraphQL.Types.UnionGraphType union);
     }
     public interface IValueResolver
     {

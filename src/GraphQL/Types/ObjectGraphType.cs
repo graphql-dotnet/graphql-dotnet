@@ -84,12 +84,6 @@ namespace GraphQL.Types
             if (!_interfaces.Contains(type))
                 _interfaces.Add(type);
         }
-
-        public void ApplySchemaDirective(SchemaDirectiveVisitor directive)
-        {
-            this.AddSchemaDirective(directive);
-            directive.VisitObjectGraphType(this);
-        }
     }
 
     public class ObjectGraphType : ObjectGraphType<object>

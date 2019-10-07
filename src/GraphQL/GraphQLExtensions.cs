@@ -13,7 +13,7 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        public const string SchemaDirectivesMetadataKey = "schema_directives";
+        private const string SchemaDirectivesMetadataKey = "schema_directives";
 
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
@@ -487,23 +487,89 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Add <paramref name="directive"/> to object metadata and apply it.
+        /// </summary>
+        /// <param name="metadataProvider"> Metadata. </param>
+        /// <param name="name"> Directive name. </param>
+        /// <param name="directive"> Schema directive. </param>
+        public static void AddDirective(this IProvideMetadata metadataProvider, string name, SchemaDirectiveVisitor directive)
+        {
+            // save directive to metadata
+            metadataProvider.SetDirective(name, directive);
+
+            // apply directive to target
+            switch (metadataProvider)
+            {
+                case Schema schema:
+                    directive.VisitSchema(schema);
+                    break;
+                case ObjectGraphType objectGraphType:
+                    directive.VisitObjectGraphType(objectGraphType);
+                    break;
+                case IObjectGraphType objectGraphType:
+                    directive.VisitObjectGraphType(objectGraphType);
+                    break;
+                case EnumerationGraphType enumeration:
+                    directive.VisitEnum(enumeration);
+                    break;
+                case EnumValueDefinition value:
+                    directive.VisitEnumValue(value);
+                    break;
+                case ScalarGraphType scalar:
+                    directive.VisitScalar(scalar);
+                    break;
+                case FieldType field:
+                    directive.VisitField(field);
+                    break;
+                case QueryArgument argument:
+                    directive.VisitArgumentDefinition(argument);
+                    break;
+                case InterfaceGraphType interfaceGraphType:
+                    directive.VisitInterface(interfaceGraphType);
+                    break;
+                case UnionGraphType union:
+                    directive.VisitUnion(union);
+                    break;
+                case InputObjectGraphType type:
+                    directive.VisitInputObject(type);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Add <paramref name="directive"/> to object metadata.
         /// </summary>
         /// <param name="metadataProvider"> Metadata. </param>
+        /// <param name="name"> Directive name. </param>
         /// <param name="directive"> Schema directive. </param>
-        public static void AddSchemaDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
+        public static void SetDirective(this IProvideMetadata metadataProvider, string name, SchemaDirectiveVisitor directive)
         {
-            List<SchemaDirectiveVisitor> directives;
+            Dictionary<string, SchemaDirectiveVisitor> directives;
             if (metadataProvider.HasMetadata(SchemaDirectivesMetadataKey))
             {
-                directives = metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new List<SchemaDirectiveVisitor>());
+                directives = metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new Dictionary<string, SchemaDirectiveVisitor>());
             }
             else
             {
-                directives = new List<SchemaDirectiveVisitor>();
+                directives = new Dictionary<string, SchemaDirectiveVisitor>();
                 metadataProvider.Metadata.Add(SchemaDirectivesMetadataKey, directives);
             }
-            directives.Add(directive);
+
+            if (directives.ContainsKey(name))
+            {
+                throw new InvalidOperationException($"Directive with name '{name}' already applied");
+            }
+
+            directives.Add(name, directive);
+        }
+
+        /// <summary>
+        /// Get all directives applied to <paramref name="metadataProvider"/>.
+        /// </summary>
+        /// <param name="metadataProvider"> Metadata. </param>
+        public static IDictionary<string, SchemaDirectiveVisitor> GetDirectives(this IProvideMetadata metadataProvider)
+        {
+            return metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new Dictionary<string, SchemaDirectiveVisitor>());
         }
     }
 }

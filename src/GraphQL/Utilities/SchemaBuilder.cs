@@ -29,7 +29,7 @@ namespace GraphQL.Utilities
 
         public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
         {
-            { "deprecated", typeof(DeprecatedDirectiveVisistor) }
+            { "deprecated", typeof(DeprecatedDirectiveVisitor) }
         };
 
         public SchemaBuilder RegisterDirectiveVisitor<T>(string name) where T : SchemaDirectiveVisitor
@@ -81,6 +81,7 @@ namespace GraphQL.Utilities
             }
 
             var schema = new Schema(ServiceProvider);
+            VisitNode(schema, v => v.VisitSchema(schema));
 
             PreConfigure(schema);
 
@@ -320,6 +321,7 @@ namespace GraphQL.Utilities
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
             };
+            VisitNode(field, v => v.VisitInputFieldDefinition(field));
 
             return field;
         }
@@ -334,6 +336,7 @@ namespace GraphQL.Utilities
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
+            VisitNode(type, v => v.VisitInterface(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -353,6 +356,7 @@ namespace GraphQL.Utilities
                 Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
+            VisitNode(type, v => v.VisitUnion(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -370,6 +374,7 @@ namespace GraphQL.Utilities
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
             };
+            VisitNode(type, v => v.VisitInputObject(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -388,6 +393,7 @@ namespace GraphQL.Utilities
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
             };
+            VisitNode(type, v => v.VisitEnum(type));
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -440,13 +446,16 @@ namespace GraphQL.Utilities
         {
             var type = ToGraphType(inputDef.Type);
 
-            return new QueryArgument(type)
+            var argument = new QueryArgument(type)
             {
                 Name = inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
             };
+            VisitNode(argument, v => v.VisitArgumentDefinition(argument));
+
+            return argument;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)
@@ -489,6 +498,12 @@ namespace GraphQL.Utilities
                 foreach(var visitor in selector.Select(node))
                 {
                     action(visitor);
+
+                    // save directive to metadata
+                    if (node is IProvideMetadata metadata && visitor is SchemaDirectiveVisitor schemaDirective)
+                    {
+                        metadata.SetDirective(schemaDirective.Name, schemaDirective);
+                    }
                 }
             }
         }

@@ -133,11 +133,5 @@ namespace GraphQL.Types
         }
 
         public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
-
-        public void ApplySchemaDirective(SchemaDirectiveVisitor directive)
-        {
-            this.AddSchemaDirective(directive);
-            directive.VisitEnumValue(this);
-        }
     }
 }

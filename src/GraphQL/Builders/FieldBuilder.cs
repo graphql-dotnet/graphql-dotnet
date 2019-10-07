@@ -155,10 +155,9 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> ApplySchemaDirective(SchemaDirectiveVisitor directive)
+        public FieldBuilder<TSourceType, TReturnType> Directive(string name, SchemaDirectiveVisitor directive)
         {
-            FieldType.AddSchemaDirective(directive);
-            directive.VisitField(FieldType);
+            FieldType.AddDirective(name, directive);
 
             return this;
         }
