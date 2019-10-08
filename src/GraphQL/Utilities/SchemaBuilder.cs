@@ -81,7 +81,6 @@ namespace GraphQL.Utilities
             }
 
             var schema = new Schema(ServiceProvider);
-            VisitNode(schema, v => v.VisitSchema(schema));
 
             PreConfigure(schema);
 
