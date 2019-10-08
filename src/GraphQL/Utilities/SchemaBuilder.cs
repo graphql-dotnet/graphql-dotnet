@@ -96,6 +96,9 @@ namespace GraphQL.Utilities
                     case ASTNodeKind.SchemaDefinition:
                     {
                         schemaDef = def as GraphQLSchemaDefinition;
+
+                        schema.SetAstType(schemaDef);
+                        VisitNode(schema, v => v.VisitSchema(schema));
                         break;
                     }
 
@@ -321,6 +324,7 @@ namespace GraphQL.Utilities
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
             };
+            field.SetAstType(inputDef);
             VisitNode(field, v => v.VisitInputFieldDefinition(field));
 
             return field;
@@ -336,6 +340,7 @@ namespace GraphQL.Utilities
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
+            type.SetAstType(interfaceDef);
             VisitNode(type, v => v.VisitInterface(type));
 
             CopyMetadata(type, typeConfig);
@@ -356,6 +361,7 @@ namespace GraphQL.Utilities
                 Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
             };
+            type.SetAstType(unionDef);
             VisitNode(type, v => v.VisitUnion(type));
 
             CopyMetadata(type, typeConfig);
@@ -374,6 +380,7 @@ namespace GraphQL.Utilities
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
             };
+            type.SetAstType(inputDef);
             VisitNode(type, v => v.VisitInputObject(type));
 
             CopyMetadata(type, typeConfig);
@@ -393,6 +400,7 @@ namespace GraphQL.Utilities
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
             };
+            type.SetAstType(enumDef);
             VisitNode(type, v => v.VisitEnum(type));
 
             var values = enumDef.Values.Select(ToEnumValue);
@@ -453,6 +461,7 @@ namespace GraphQL.Utilities
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
             };
+            argument.SetAstType(inputDef);
             VisitNode(argument, v => v.VisitArgumentDefinition(argument));
 
             return argument;

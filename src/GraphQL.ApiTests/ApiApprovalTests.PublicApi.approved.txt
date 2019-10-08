@@ -1975,7 +1975,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -1985,6 +1985,7 @@ namespace GraphQL.Types
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public System.IServiceProvider Services { get; set; }
@@ -1995,6 +1996,8 @@ namespace GraphQL.Types
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.ISchema For(string[] typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
         public static GraphQL.Types.ISchema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
         public void Initialize() { }
         public void RegisterDirective(GraphQL.Types.DirectiveGraphType directive) { }
         public void RegisterDirectives(System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives) { }
