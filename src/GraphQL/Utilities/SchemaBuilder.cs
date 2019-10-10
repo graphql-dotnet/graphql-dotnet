@@ -477,9 +477,9 @@ namespace GraphQL.Utilities
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
         {
-            foreach(var selector in _visitorSelectors)
+            foreach (var selector in _visitorSelectors)
             {
-                foreach(var visitor in selector.Select(node))
+                foreach (var visitor in selector.Select(node))
                 {
                     action(visitor);
                 }
