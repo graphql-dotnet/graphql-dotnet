@@ -22,7 +22,7 @@ namespace GraphQL.Utilities
 
         public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
         {
-            { "deprecated", typeof(DeprecatedDirectiveVisistor) }
+            { "deprecated", typeof(DeprecatedDirectiveVisitor) }
         };
 
         public SchemaBuilder RegisterDirectiveVisitor<T>(string name) where T : SchemaDirectiveVisitor

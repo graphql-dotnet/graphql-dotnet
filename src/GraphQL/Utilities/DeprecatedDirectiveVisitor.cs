@@ -2,7 +2,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    public class DeprecatedDirectiveVisistor : SchemaDirectiveVisitor
+    public class DeprecatedDirectiveVisitor : SchemaDirectiveVisitor
     {
         protected static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
 
