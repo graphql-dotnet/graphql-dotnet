@@ -2182,10 +2182,10 @@ namespace GraphQL.Utilities
         public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
         protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
-    public class DeprecatedDirectiveVisistor : GraphQL.Utilities.SchemaDirectiveVisitor
+    public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
         protected static readonly string DeprecatedDefaultValue;
-        public DeprecatedDirectiveVisistor() { }
+        public DeprecatedDirectiveVisitor() { }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public override void VisitField(GraphQL.Types.FieldType field) { }
     }
@@ -2274,8 +2274,6 @@ namespace GraphQL.Utilities
     {
         protected readonly System.Collections.Generic.IDictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
-        [System.ObsoleteAttribute("Use ServiceProvider instead")]
-        public System.IServiceProvider DependencyResolver { get; set; }
         public System.Collections.Generic.IDictionary<string, System.Type> Directives { get; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }

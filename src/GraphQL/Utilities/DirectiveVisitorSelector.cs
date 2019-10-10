@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -35,7 +35,7 @@ namespace GraphQL.Utilities
         private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
         {
             var filtered = directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)).ToList();
-            foreach(var dir in filtered)
+            foreach (var dir in filtered)
             {
                 var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
                 visitor.Name = dir.Name.Value;
