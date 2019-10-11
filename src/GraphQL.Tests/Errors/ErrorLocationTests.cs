@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Path.ShouldBe(new[] {"testSub", "two"});
+            error.Path.ShouldBe(new[] { "testSub", "two" });
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Path.ShouldBe(new[] {"testSubList", "0", "two"});
+            error.Path.ShouldBe(new[] { "testSubList", "0", "two" });
         }
 
         [Fact]
@@ -82,9 +82,9 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError("Error trying to resolve testasync.");
             error.AddLocation(1, 3);
-            error.Path = new[] {"testasync"};
+            error.Path = new[] { "testasync" };
 
-            var errors = new ExecutionErrors {error};
+            var errors = new ExecutionErrors { error };
 
             AssertQueryIgnoreErrors(
                 "{ testasync }",
@@ -111,11 +111,11 @@ namespace GraphQL.Tests.Errors
 
                 Field<TestSubObject>()
                     .Name("testSub")
-                    .Resolve(_ => new {One = "One", Two = "Two"});
+                    .Resolve(_ => new { One = "One", Two = "Two" });
 
                 Field<ListGraphType<TestSubObject>>()
                     .Name("testSubList")
-                    .Resolve(_ => new[] {new Thing {One = "One", Two = "Two"}});
+                    .Resolve(_ => new[] { new Thing { One = "One", Two = "Two" } });
             }
         }
 
