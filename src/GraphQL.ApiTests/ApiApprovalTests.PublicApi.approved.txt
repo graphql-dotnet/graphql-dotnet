@@ -214,9 +214,8 @@ namespace GraphQL
     {
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
     }
-    public class ErrorLocation
+    public struct ErrorLocation
     {
-        public ErrorLocation() { }
         public int Column { get; set; }
         public int Line { get; set; }
     }
@@ -577,6 +576,7 @@ namespace GraphQL.Execution
     {
         public UnhandledExceptionContext(GraphQL.Execution.ExecutionContext context, GraphQL.Types.ResolveFieldContext fieldContext, System.Exception originalException) { }
         public GraphQL.Execution.ExecutionContext Context { get; }
+        public string ErrorMessage { get; set; }
         public System.Exception Exception { get; set; }
         public GraphQL.Types.ResolveFieldContext FieldContext { get; }
         public System.Exception OriginalException { get; }

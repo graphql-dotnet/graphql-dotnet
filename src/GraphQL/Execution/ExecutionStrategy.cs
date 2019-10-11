@@ -256,14 +256,15 @@ namespace GraphQL.Execution
                 if (context.ThrowOnUnhandledException)
                     throw;
 
+                UnhandledExceptionContext exceptionContext = null;
                 if (context.UnhandledExceptionDelegate != null)
                 {
-                    var exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
                     context.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
 
-                var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
+                var error = new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
                 error.Path = node.Path;
                 context.Errors.Add(error);

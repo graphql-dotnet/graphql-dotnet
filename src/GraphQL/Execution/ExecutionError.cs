@@ -1,15 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 using GraphQLParser;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace GraphQL
 {
     [Serializable]
     public class ExecutionError : Exception
     {
+        private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
+
         private List<ErrorLocation> _errorLocations;
 
         public ExecutionError(string message)
@@ -26,14 +29,33 @@ namespace GraphQL
         public ExecutionError(string message, Exception exception)
             : base(message, exception)
         {
-            var ex = exception?.InnerException ?? exception;
-            SetCode(ex);
-            SetData(ex);
+            SetCode(exception);
+            SetData(exception);
         }
 
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
         public string Code { get; set; }
+
+        internal bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
+
+        internal IEnumerable<string> Codes
+        {
+            get
+            {
+                // Code could be set explicitly, and not through the constructor with the exception
+                if (!string.IsNullOrWhiteSpace(Code) && (InnerException == null || Code != GetErrorCode(InnerException)))
+                    yield return Code;
+
+                var current = InnerException;
+
+                while (current != null)
+                {
+                    yield return GetErrorCode(current);
+                    current = current.InnerException;
+                }
+            }
+        }
 
         public IEnumerable<string> Path { get; set; }
 
@@ -54,7 +76,7 @@ namespace GraphQL
         private void SetCode(Exception exception)
         {
             if (exception != null)
-                Code = NormalizeErrorCode(exception);
+                Code = GetErrorCode(exception);
         }
 
         private void SetData(Exception exception)
@@ -76,9 +98,11 @@ namespace GraphQL
             }
         }
 
-        private static string NormalizeErrorCode(Exception exception)
+        private static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
+
+        private static string NormalizeErrorCode(Type exceptionType)
         {
-            var code = exception.GetType().Name;
+            var code = exceptionType.Name;
 
             if (code.EndsWith(nameof(Exception)))
             {
@@ -117,9 +141,10 @@ namespace GraphQL
         }
     }
 
-    public class ErrorLocation
+    public struct ErrorLocation
     {
         public int Line { get; set; }
+
         public int Column { get; set; }
     }
 
@@ -127,7 +152,8 @@ namespace GraphQL
     {
         public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
         {
-            if (abstractNode == null) return;
+            if (abstractNode == null)
+                return;
 
             if (document != null)
             {
