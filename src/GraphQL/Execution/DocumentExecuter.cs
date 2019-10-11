@@ -218,7 +218,7 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        new ExecutionError(ex.Message, ex)
+                        new ExecutionError($"Error trying to execute document: {ex.Message}", ex)
                     }
                 };
             }

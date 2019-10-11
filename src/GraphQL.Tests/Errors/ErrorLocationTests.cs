@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
@@ -80,7 +80,7 @@ namespace GraphQL.Tests.Errors
         [Fact]
         public void async_field_with_errors()
         {
-            var error = new ExecutionError("Error trying to resolve testasync.");
+            var error = new ExecutionError("Error trying to resolve testasync: wat");
             error.AddLocation(1, 3);
             error.Path = new[] {"testasync"};
 
