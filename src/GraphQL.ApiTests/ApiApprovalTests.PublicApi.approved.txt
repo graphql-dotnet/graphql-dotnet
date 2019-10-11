@@ -576,6 +576,7 @@ namespace GraphQL.Execution
     {
         public UnhandledExceptionContext(GraphQL.Execution.ExecutionContext context, GraphQL.Types.ResolveFieldContext fieldContext, System.Exception originalException) { }
         public GraphQL.Execution.ExecutionContext Context { get; }
+        public string ErrorMessage { get; set; }
         public System.Exception Exception { get; set; }
         public GraphQL.Types.ResolveFieldContext FieldContext { get; }
         public System.Exception OriginalException { get; }
