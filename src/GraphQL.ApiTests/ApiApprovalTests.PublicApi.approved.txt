@@ -709,8 +709,7 @@ namespace GraphQL.Instrumentation
     public class Metrics
     {
         public Metrics(bool enabled = True) { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Instrumentation.PerfRecord> AllRecords { get; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Instrumentation.PerfRecord> Finish() { }
+        public GraphQL.Instrumentation.PerfRecord[] Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(string name) { }
         public GraphQL.Instrumentation.Metrics Start(string operationName) { }
         public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string subject, System.Collections.Generic.Dictionary<string, object> metadata = null) { }
