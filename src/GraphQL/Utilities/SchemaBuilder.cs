@@ -18,13 +18,6 @@ namespace GraphQL.Utilities
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
-        [Obsolete("Use ServiceProvider instead")]
-        public IServiceProvider DependencyResolver
-        {
-            get => ServiceProvider;
-            set => ServiceProvider = value;
-        }
-
         public TypeSettings Types { get; } = new TypeSettings();
 
         public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
@@ -501,9 +494,9 @@ namespace GraphQL.Utilities
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
         {
-            foreach(var selector in _visitorSelectors)
+            foreach (var selector in _visitorSelectors)
             {
-                foreach(var visitor in selector.Select(node))
+                foreach (var visitor in selector.Select(node))
                 {
                     action(visitor);
 

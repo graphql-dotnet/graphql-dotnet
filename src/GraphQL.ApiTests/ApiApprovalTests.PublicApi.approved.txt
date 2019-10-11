@@ -2299,8 +2299,6 @@ namespace GraphQL.Utilities
     {
         protected readonly System.Collections.Generic.IDictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
-        [System.ObsoleteAttribute("Use ServiceProvider instead")]
-        public System.IServiceProvider DependencyResolver { get; set; }
         public System.Collections.Generic.IDictionary<string, System.Type> Directives { get; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
