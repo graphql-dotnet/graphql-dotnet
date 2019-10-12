@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Numerics;
 using GraphQL.Types;
@@ -7,11 +8,11 @@ namespace GraphQL.Utilities
 {
     public static class GraphTypeTypeRegistry
     {
-        static readonly Dictionary<Type, Type> _entries;
+        static readonly ConcurrentDictionary<Type, Type> _entries;
 
         static GraphTypeTypeRegistry()
         {
-            _entries = new Dictionary<Type, Type>
+            _entries = new ConcurrentDictionary<Type, Type>
             {
                 [typeof(int)] = typeof(IntGraphType),
                 [typeof(long)] = typeof(LongGraphType),
