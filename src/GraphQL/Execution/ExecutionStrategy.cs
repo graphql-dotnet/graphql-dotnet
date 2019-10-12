@@ -318,7 +318,7 @@ namespace GraphQL.Execution
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
+                throw new ExecutionError($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
             }
         }
 
