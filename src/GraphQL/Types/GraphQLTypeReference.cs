@@ -9,6 +9,7 @@ namespace GraphQL.Types
     {
         public GraphQLTypeReference(string typeName)
         {
+            SetName("__GraphQLTypeReference", validate: false);
             TypeName = typeName;
         }
 
