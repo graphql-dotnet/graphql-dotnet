@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Rules;
+using System;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -66,7 +67,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = @"
                   fragment fragA on Human { relatives { ...fragA } },
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", new string[] {}), 2, 57);
+                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 2, 57);
             });
         }
 
@@ -78,7 +79,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = @"
                   fragment fragA on Dog { ...fragA }
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", new string[] {}), 2, 43);
+                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 2, 43);
             });
         }
 
@@ -94,7 +95,7 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", new string[] {}), 4, 23);
+                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 4, 23);
             });
         }
 
@@ -258,7 +259,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragB", new string[] { });
+                    e.Message = Rule.CycleErrorMessage("fragB", Array.Empty<string>());
                     e.Loc(3, 43);
                 });
                 _.Error(e =>
