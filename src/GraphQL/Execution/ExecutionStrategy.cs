@@ -174,6 +174,12 @@ namespace GraphQL.Execution
             }
         }
 
+        /// <summary>
+        /// Execute a single node
+        /// </summary>
+        /// <remarks>
+        /// Builds child nodes, but does not execute them
+        /// </remarks>
         protected virtual Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             return ExecuteNodeAsync(context, node, context.Services);
