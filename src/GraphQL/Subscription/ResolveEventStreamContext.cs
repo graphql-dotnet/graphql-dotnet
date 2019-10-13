@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.Subscription
 {
@@ -25,6 +25,7 @@ namespace GraphQL.Subscription
             CancellationToken = context.CancellationToken;
             Metrics = context.Metrics;
             Errors = context.Errors;
+            Services = context.Services;
         }
     }
 

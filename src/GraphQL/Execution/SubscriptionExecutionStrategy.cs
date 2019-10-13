@@ -79,7 +79,8 @@ namespace GraphQL.Execution
                     CancellationToken = context.CancellationToken,
                     Metrics = context.Metrics,
                     Errors = context.Errors,
-                    Path = node.Path
+                    Path = node.Path,
+                    Services = context.Services
                 };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
