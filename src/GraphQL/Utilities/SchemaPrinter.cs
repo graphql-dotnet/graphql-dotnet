@@ -2,6 +2,7 @@ using GraphQL.Introspection;
 using GraphQL.Types;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,8 +11,6 @@ namespace GraphQL.Utilities
 {
     public class SchemaPrinter : IDisposable
     {
-        private ISchema _schema;
-
         protected SchemaPrinterOptions Options { get; }
 
         private readonly List<string> _scalars = new List<string>(
@@ -28,7 +27,7 @@ namespace GraphQL.Utilities
             ISchema schema,
             SchemaPrinterOptions options = null)
         {
-            _schema = schema;
+            Schema = schema;
             Options = options ?? new SchemaPrinterOptions();
 
             if (Options.CustomScalars?.Count > 0)
@@ -37,7 +36,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private ISchema Schema => _schema;
+        private ISchema Schema { get; set; }
 
         public string Print()
         {
@@ -81,7 +80,7 @@ namespace GraphQL.Utilities
 
         public bool IsIntrospectionType(string typeName)
         {
-            return typeName.StartsWith("__");
+            return typeName.StartsWith("__", StringComparison.InvariantCulture);
         }
 
         public bool IsBuiltInScalar(string typeName)
@@ -330,7 +329,7 @@ namespace GraphQL.Utilities
 
             if (value is bool)
             {
-                return value.ToString().ToLower();
+                return value.ToString().ToLower(CultureInfo.InvariantCulture);
             }
 
             if (IsEnumType(graphType))
@@ -438,7 +437,7 @@ namespace GraphQL.Utilities
 
         public void Dispose()
         {
-            _schema = null;
+            Schema = null;
         }
     }
 }

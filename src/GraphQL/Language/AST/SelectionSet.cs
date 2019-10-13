@@ -37,10 +37,7 @@ namespace GraphQL.Language.AST
             return new SelectionSet(newSelection);
         }
 
-        protected bool Equals(SelectionSet selectionSet)
-        {
-            return false;
-        }
+        protected bool Equals(SelectionSet selectionSet) => false;
 
         public override bool IsEqualTo(INode obj)
         {
