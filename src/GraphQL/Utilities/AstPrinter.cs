@@ -181,7 +181,7 @@ namespace GraphQL.Utilities
                 c.Field(x => x.SelectionSet);
                 c.Print(p =>
                 {
-                    var op = p.Arg(x => x.OperationType).ToString().ToLower();
+                    var op = p.Arg(x => x.OperationType).ToString().ToLower(CultureInfo.InvariantCulture);
                     var name = p.Arg(x => x.Name)?.ToString();
                     var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
                     var directives = Join(p.ArgArray(x => x.Directives), " ");
@@ -322,7 +322,7 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = f.Arg(x => x.Value);
-                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\""))
+                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
                     {
                         val = $"\"{val}\"";
                     }
@@ -333,7 +333,7 @@ namespace GraphQL.Utilities
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
 
             Config<EnumValue>(c =>
@@ -364,7 +364,7 @@ namespace GraphQL.Utilities
             Config<UriValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
 
             // Directive

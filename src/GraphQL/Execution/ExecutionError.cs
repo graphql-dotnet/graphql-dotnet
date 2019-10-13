@@ -104,12 +104,12 @@ namespace GraphQL
         {
             var code = exceptionType.Name;
 
-            if (code.EndsWith(nameof(Exception)))
+            if (code.EndsWith(nameof(Exception), StringComparison.InvariantCulture))
             {
                 code = code.Substring(0, code.Length - nameof(Exception).Length);
             }
 
-            if (code.StartsWith("GraphQL"))
+            if (code.StartsWith("GraphQL", StringComparison.InvariantCulture))
             {
                 code = code.Substring("GraphQL".Length);
             }
