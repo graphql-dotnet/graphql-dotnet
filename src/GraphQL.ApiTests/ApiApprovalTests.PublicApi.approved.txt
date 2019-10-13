@@ -1989,6 +1989,7 @@ namespace GraphQL.Types
         public System.IServiceProvider Services { get; set; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public void Dispose() { }
+        protected virtual void Dispose(bool disposing) { }
         public GraphQL.Types.DirectiveGraphType FindDirective(string name) { }
         public GraphQL.Types.IGraphType FindType(string name) { }
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
