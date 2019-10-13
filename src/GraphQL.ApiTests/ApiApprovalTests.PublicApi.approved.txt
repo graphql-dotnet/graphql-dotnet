@@ -2210,12 +2210,6 @@ namespace GraphQL.Utilities
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
         public GraphQL.Reflection.IAccessor SubscriberAccessor { get; set; }
     }
-    public class GraphTypeInstanceRegistry
-    {
-        public GraphTypeInstanceRegistry() { }
-        public GraphQL.Types.IGraphType Get(System.Type type) { }
-        public void Register(System.Type type, GraphQL.Types.IGraphType graphType) { }
-    }
     public class static GraphTypeTypeRegistry
     {
         public static bool Contains(System.Type clrType) { }
