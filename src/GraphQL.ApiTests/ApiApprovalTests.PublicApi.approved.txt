@@ -689,7 +689,6 @@ namespace GraphQL.Instrumentation
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.ResolveFieldContext context);
     public class static FieldResolverBuilderExtensions
     {
-        public static string InvokeMethodName;
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
     }
@@ -800,9 +799,9 @@ namespace GraphQL.Introspection
     public class static SchemaIntrospection
     {
         public static readonly string IntrospectionQuery;
-        public static GraphQL.Introspection.SchemaMetaFieldType SchemaMeta;
-        public static GraphQL.Introspection.TypeMetaFieldType TypeMeta;
-        public static GraphQL.Introspection.TypeNameMetaFieldType TypeNameMeta;
+        public static readonly GraphQL.Introspection.SchemaMetaFieldType SchemaMeta;
+        public static readonly GraphQL.Introspection.TypeMetaFieldType TypeMeta;
+        public static readonly GraphQL.Introspection.TypeNameMetaFieldType TypeNameMeta;
     }
     public class SchemaMetaFieldType : GraphQL.Types.FieldType
     {
@@ -1559,9 +1558,9 @@ namespace GraphQL.Types
     }
     public class DirectiveGraphType : GraphQL.Types.INamedType
     {
-        public static GraphQL.Types.GraphQLDeprecatedDirective Deprecated;
-        public static GraphQL.Types.IncludeDirective Include;
-        public static GraphQL.Types.SkipDirective Skip;
+        public static readonly GraphQL.Types.GraphQLDeprecatedDirective Deprecated;
+        public static readonly GraphQL.Types.IncludeDirective Include;
+        public static readonly GraphQL.Types.SkipDirective Skip;
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public string Description { get; set; }
