@@ -214,10 +214,15 @@ namespace GraphQL
     {
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
     }
-    public struct ErrorLocation
+    public struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
         public int Column { get; set; }
         public int Line { get; set; }
+        public bool Equals(GraphQL.ErrorLocation other) { }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+        public static bool ==(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
+        public static bool !=(GraphQL.ErrorLocation left, GraphQL.ErrorLocation right) { }
     }
     public class ExecutionError : System.Exception
     {

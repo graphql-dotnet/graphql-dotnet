@@ -141,11 +141,21 @@ namespace GraphQL
         }
     }
 
-    public struct ErrorLocation
+    public struct ErrorLocation : IEquatable<ErrorLocation>
     {
         public int Line { get; set; }
 
         public int Column { get; set; }
+
+        public bool Equals(ErrorLocation other) => Line == other.Line && Column == other.Column;
+
+        public override bool Equals(object obj) => obj is Location loc && Equals(loc);
+
+        public override int GetHashCode() => (Line, Column).GetHashCode();
+
+        public static bool operator ==(ErrorLocation left, ErrorLocation right) => left.Equals(right);
+
+        public static bool operator !=(ErrorLocation left, ErrorLocation right) => !(left == right);
     }
 
     public static class ExecutionErrorExtensions
