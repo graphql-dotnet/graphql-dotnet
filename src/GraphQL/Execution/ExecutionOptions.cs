@@ -62,5 +62,7 @@ namespace GraphQL
         /// Provides the ability to filter the schema upon introspection to hide types.
         /// </summary>
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
+
+        public IServiceProvider Services { get; set; }
     }
 }

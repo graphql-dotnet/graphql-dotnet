@@ -44,5 +44,15 @@ namespace GraphQL.Execution
                 pendingNodes.AddRange(childNodes);
             }
         }
+
+        protected override async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        {
+            if (context.Services == null) return await ExecuteNodeAsync(context, node, null);
+            using (var serviceProvider = new ServiceProviderProxy(context.Services))
+            {
+                return await ExecuteNodeAsync(context, node, serviceProvider)
+                    .ConfigureAwait(false);
+            }
+        }
     }
 }

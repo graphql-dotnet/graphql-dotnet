@@ -154,7 +154,8 @@ namespace GraphQL
                     metrics,
                     options.Listeners,
                     options.ThrowOnUnhandledException,
-                    options.UnhandledExceptionDelegate);
+                    options.UnhandledExceptionDelegate,
+                    options.Services ?? (options.Schema as Schema)?.Services);
 
                 if (context.Errors.Any())
                 {
@@ -243,7 +244,8 @@ namespace GraphQL
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate,
+            IServiceProvider serviceProvider)
         {
             var context = new ExecutionContext
             {
@@ -260,7 +262,9 @@ namespace GraphQL
                 Metrics = metrics,
                 Listeners = listeners,
                 ThrowOnUnhandledException = throwOnUnhandledException,
-                UnhandledExceptionDelegate = unhandledExceptionDelegate
+                UnhandledExceptionDelegate = unhandledExceptionDelegate,
+
+                Services = serviceProvider
             };
 
             return context;

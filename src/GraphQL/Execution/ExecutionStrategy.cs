@@ -174,13 +174,18 @@ namespace GraphQL.Execution
             }
         }
 
+        protected virtual Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        {
+            return ExecuteNodeAsync(context, node, context.Services);
+        }
+
         /// <summary>
         /// Execute a single node
         /// </summary>
         /// <remarks>
         /// Builds child nodes, but does not execute them
         /// </remarks>
-        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node, IServiceProvider serviceProvider)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -214,7 +219,8 @@ namespace GraphQL.Execution
                     Metrics = context.Metrics,
                     Errors = context.Errors,
                     Path = node.Path,
-                    SubFields = subFields
+                    SubFields = subFields,
+                    Services = serviceProvider
                 };
 
                 var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();

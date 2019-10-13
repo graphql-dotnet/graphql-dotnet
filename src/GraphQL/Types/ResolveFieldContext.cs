@@ -51,6 +51,8 @@ namespace GraphQL.Types
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
+        public IServiceProvider Services { get; set; }
+
         public ResolveFieldContext() { }
 
         public ResolveFieldContext(ResolveFieldContext context)
@@ -74,6 +76,7 @@ namespace GraphQL.Types
             Errors = context.Errors;
             SubFields = context.SubFields;
             Path = context.Path;
+            Services = context.Services;
         }
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
@@ -172,6 +175,30 @@ namespace GraphQL.Types
             Metrics = context.Metrics;
             Errors = context.Errors;
             Path = path;
+            Services = context.Services;
+        }
+
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, object source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path, IServiceProvider serviceProvider)
+        {
+            Source = source;
+            FieldName = field.Name;
+            FieldAst = field;
+            FieldDefinition = type;
+            ReturnType = type.ResolvedType;
+            ParentType = parentType;
+            Arguments = arguments;
+            Schema = context.Schema;
+            Document = context.Document;
+            Fragments = context.Fragments;
+            RootValue = context.RootValue;
+            UserContext = context.UserContext;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+            Metrics = context.Metrics;
+            Errors = context.Errors;
+            Path = path;
+            Services = serviceProvider;
         }
     }
 }
