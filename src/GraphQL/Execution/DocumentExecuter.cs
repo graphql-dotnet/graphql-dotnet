@@ -155,7 +155,7 @@ namespace GraphQL
                     options.Listeners,
                     options.ThrowOnUnhandledException,
                     options.UnhandledExceptionDelegate,
-                    options.Services ?? (options.Schema as Schema)?.Services);
+                    options.Services);
 
                 if (context.Errors.Any())
                 {
