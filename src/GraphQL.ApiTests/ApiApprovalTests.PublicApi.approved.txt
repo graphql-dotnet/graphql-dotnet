@@ -2248,9 +2248,8 @@ namespace GraphQL.Utilities
         public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
         public bool HasMetadata(string key) { }
     }
-    public class NameValidator
+    public class static NameValidator
     {
-        public NameValidator() { }
         public static void ValidateName(string name, string type = "field") { }
     }
     public class PrintFormat<T>
@@ -2609,8 +2608,8 @@ namespace GraphQL.Validation.Rules
     }
     public class DefaultValuesOfCorrectType : GraphQL.Validation.IValidationRule
     {
-        public System.Func<string, string, string, System.Collections.Generic.IEnumerable<string>, string> BadValueForDefaultArgMessage;
-        public System.Func<string, string, string, string> BadValueForNonNullArgMessage;
+        public readonly System.Func<string BadValueForDefaultArgMessage;
+        public readonly System.Func<string, string, string, string> BadValueForNonNullArgMessage;
         public static readonly GraphQL.Validation.Rules.DefaultValuesOfCorrectType Instance;
         public DefaultValuesOfCorrectType() { }
         public GraphQL.Validation.INodeVisitor Validate(GraphQL.Validation.ValidationContext context) { }
@@ -2772,8 +2771,8 @@ namespace GraphQL.Validation.Rules
     public class ScalarLeafs : GraphQL.Validation.IValidationRule
     {
         public static readonly GraphQL.Validation.Rules.ScalarLeafs Instance;
-        public System.Func<string, string, string> NoSubselectionAllowedMessage;
-        public System.Func<string, string, string> RequiredSubselectionMessage;
+        public readonly System.Func<string, string, string> NoSubselectionAllowedMessage;
+        public readonly System.Func<string, string, string> RequiredSubselectionMessage;
         public ScalarLeafs() { }
         public GraphQL.Validation.INodeVisitor Validate(GraphQL.Validation.ValidationContext context) { }
     }
