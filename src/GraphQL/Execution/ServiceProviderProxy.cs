@@ -43,8 +43,14 @@ namespace GraphQL.Execution
             //   need to as it effectively always creates objects as transients
             if (_serviceProvider == null)
             {
-                _serviceScope = _rootServiceProvider.GetService<IServiceScopeFactory>()?.CreateScope();
-                _serviceProvider = _serviceScope?.ServiceProvider ?? _rootServiceProvider;
+                lock (this)
+                {
+                    if (_serviceProvider == null)
+                    {
+                        _serviceScope = _rootServiceProvider.GetService<IServiceScopeFactory>()?.CreateScope();
+                        _serviceProvider = _serviceScope?.ServiceProvider ?? _rootServiceProvider;
+                    }
+                }
             }
             return _serviceProvider.GetService(serviceType);
         }
