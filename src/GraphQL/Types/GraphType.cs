@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public abstract class GraphType : IGraphType
+    public abstract class GraphType : MetadataProvider, IGraphType
     {
         protected GraphType()
         {
@@ -18,16 +19,6 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         public string DeprecationReason { get; set; }
-
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
-        }
-
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
