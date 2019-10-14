@@ -55,7 +55,7 @@ namespace GraphQL.Utilities
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(__EXTENSION_AST_MetaField__, new List<ASTNode>());
+            return type.GetMetadata(__EXTENSION_AST_MetaField__, () => new List<ASTNode>());
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
