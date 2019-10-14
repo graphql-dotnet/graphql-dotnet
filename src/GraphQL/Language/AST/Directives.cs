@@ -21,37 +21,24 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public Directive Find(string name)
-        {
-            _unique.TryGetValue(name, out Directive value);
-            return value;
-        }
+        public Directive Find(string name) => _unique.TryGetValue(name, out Directive value) ? value : null;
 
         public int Count => _directives.Count;
 
         public bool HasDuplicates => _directives.Count != _unique.Count;
 
-        public IEnumerator<Directive> GetEnumerator()
-        {
-            return _directives.GetEnumerator();
-        }
+        public IEnumerator<Directive> GetEnumerator() => _directives.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected bool Equals(Directives directives)
-        {
-            return false;
-        }
+        protected bool Equals(Directives directives) => false;
 
         public override bool IsEqualTo(INode obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Directives) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Directives)obj);
         }
     }
 }

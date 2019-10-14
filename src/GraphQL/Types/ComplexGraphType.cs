@@ -1,13 +1,13 @@
 using GraphQL.Builders;
 using GraphQL.Resolvers;
+using GraphQL.Subscription;
+using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using GraphQL.Subscription;
-using GraphQL.Utilities;
-using GraphQL.Types.Relay;
 
 namespace GraphQL.Types
 {
@@ -25,6 +25,12 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         private readonly List<FieldType> _fields = new List<FieldType>();
+
+        protected ComplexGraphType()
+        {
+            Description = Description ?? typeof(TSourceType).Description();
+            DeprecationReason = DeprecationReason ?? typeof(TSourceType).ObsoleteMessage();
+        }
 
         public IEnumerable<FieldType> Fields
         {
@@ -60,7 +66,7 @@ namespace GraphQL.Types
             if (HasField(fieldType.Name))
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
-                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? this.GetType().Name}");
+                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? GetType().Name}");
             }
 
             if (fieldType.ResolvedType == null)

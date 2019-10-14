@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -6,14 +7,16 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Rules
 {
-  /// <summary>
-  /// Fields on correct type
-  ///
-  /// A GraphQL document is only valid if all fields selected are defined by the
-  /// parent type, or are an allowed meta field such as __typename
-  /// </summary>
-  public class FieldsOnCorrectType : IValidationRule
+    /// <summary>
+    /// Fields on correct type
+    ///
+    /// A GraphQL document is only valid if all fields selected are defined by the
+    /// parent type, or are an allowed meta field such as __typename
+    /// </summary>
+    public class FieldsOnCorrectType : IValidationRule
     {
+        public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
+
         public string UndefinedFieldMessage(
             string fieldName,
             string type,
@@ -62,12 +65,12 @@ namespace GraphQL.Validation.Rules
                             var fieldName = node.Name;
 
                             // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = getSuggestedTypeNames(context.Schema, type, fieldName).ToList();
+                            var suggestedTypeNames = GetSuggestedTypeNames(context.Schema, type, fieldName).ToList();
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Any()
-                                ? new string[] {}
-                                : getSuggestedFieldNames(type, fieldName);
+                                ? Array.Empty<string>()
+                                : GetSuggestedFieldNames(type, fieldName);
 
                             // Report an error, including helpful suggestions.
                             context.ReportError(new ValidationError(
@@ -81,13 +84,14 @@ namespace GraphQL.Validation.Rules
                 });
             });
         }
+
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces
         /// that they implement. If any of those types include the provided field,
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> getSuggestedTypeNames(
+        private IEnumerable<string> GetSuggestedTypeNames(
           ISchema schema,
           IGraphType type,
           string fieldName)
@@ -128,7 +132,7 @@ namespace GraphQL.Validation.Rules
         /// For the field name provided, determine if there are any similar field names
         /// that may be the result of a typo.
         /// </summary>
-        private IEnumerable<string> getSuggestedFieldNames(
+        private IEnumerable<string> GetSuggestedFieldNames(
           IGraphType type,
           string fieldName)
         {

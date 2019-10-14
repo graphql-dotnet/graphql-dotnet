@@ -41,6 +41,12 @@ namespace GraphQL
                    namedType is IInputObjectGraphType;
         }
 
+        public static bool IsInputObjectType(this IGraphType type)
+        {
+            var namedType = type.GetNamedType();
+            return namedType is IInputObjectGraphType;
+        }
+
         public static IGraphType GetNamedType(this IGraphType type)
         {
             IGraphType unmodifiedType = type;
@@ -62,7 +68,7 @@ namespace GraphQL
         {
             if (resolve == null)
             {
-                resolve = t => (IGraphType) Activator.CreateInstance(t);
+                resolve = t => (IGraphType)Activator.CreateInstance(t);
             }
 
             if (type.IsGenericType)
@@ -99,8 +105,6 @@ namespace GraphQL
             return type;
         }
 
-        private static readonly IEnumerable<string> EmptyStringArray = new string[0];
-
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             if (type is NonNullGraphType nonNull)
@@ -121,19 +125,19 @@ namespace GraphQL
             }
             else if (valueAst is NullValue)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (valueAst == null)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (type is ListGraphType list)
@@ -157,7 +161,7 @@ namespace GraphQL
             {
                 if (!(valueAst is ObjectValue objValue))
                 {
-                    return new[] {$"Expected \"{inputType.Name}\", found not an object."};
+                    return new[] { $"Expected \"{inputType.Name}\", found not an object." };
                 }
 
                 var fields = inputType.Fields.ToList();
@@ -196,7 +200,7 @@ namespace GraphQL
                 return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            return EmptyStringArray;
+            return Array.Empty<string>();
         }
 
         public static string NameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)

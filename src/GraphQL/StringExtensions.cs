@@ -9,65 +9,6 @@ namespace GraphQL
     public static class StringExtensions
     {
         /// <summary>
-        /// Determines whether the specified string is empty.
-        /// </summary>
-        /// <param name="str">The string.</param>
-        /// <returns><c>true</c> if the specified string is empty; otherwise, <c>false</c>.</returns>
-        public static bool IsEmpty(this string str)
-        {
-            return string.IsNullOrEmpty(str);
-        }
-
-        /// <summary>
-        /// Splits a string on commas (,)
-        /// </summary>
-        /// <param name="content">The string to split.</param>
-        public static string[] ToDelimitedArray(this string content)
-        {
-            return content.ToDelimitedArray(',');
-        }
-
-        /// <summary>
-        /// Splits a string on the indicated character.
-        /// </summary>
-        /// <param name="content">The string to split.</param>
-        /// <param name="delimiter">The delimiter.</param>
-        public static string[] ToDelimitedArray(this string content, char delimiter)
-        {
-            var array = content.Split(delimiter);
-            for (var i = 0; i < array.Length; i++)
-            {
-                array[i] = array[i].Trim();
-            }
-
-            return array;
-        }
-
-        /// <summary>
-        /// Equivalent to String.GetEnumerator.
-        /// </summary>
-        /// <param name="this">The this.</param>
-        public static IEnumerable<char> ToEnumerable(this string @this)
-        {
-            if (@this == null) throw new ArgumentNullException(nameof(@this));
-
-            for (var i = 0; i < @this.Length; ++i)
-            {
-                yield return @this[i];
-            }
-        }
-
-        /// <summary>
-        /// Converts an enumeration of Char into a string.
-        /// </summary>
-        /// <param name="chars">The chars.</param>
-        /// <returns>System.String.</returns>
-        public static string ToStr(this IEnumerable<char> chars)
-        {
-            return new string(chars.ToArray());
-        }
-
-        /// <summary>
         /// Equivalent to String.Format.
         /// </summary>
         /// <param name="format">The format string in String.Format style.</param>

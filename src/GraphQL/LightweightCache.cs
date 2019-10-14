@@ -14,9 +14,6 @@ namespace GraphQL
     public class LightweightCache<TKey, TValue> : IEnumerable<TValue>
     {
         private readonly IDictionary<TKey, TValue> _values;
-
-        private Func<TValue, TKey> _getKey = delegate { throw new NotImplementedException(); };
-
         private Func<TKey, TValue> _onMissing = delegate (TKey key)
         {
             var message = $"Key '{key}' could not be found";
@@ -62,7 +59,6 @@ namespace GraphQL
             _values = dictionary;
         }
 
-
         /// <summary>
         /// Action to perform if the key is missing. Defaults to <see cref="KeyNotFoundException"/>
         /// </summary>
@@ -71,19 +67,12 @@ namespace GraphQL
             set { _onMissing = value; }
         }
 
-        public Func<TValue, TKey> GetKey
-        {
-            get { return _getKey; }
-            set { _getKey = value; }
-        }
+        public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
 
         /// <summary>
         /// Gets the count.
         /// </summary>
-        public int Count
-        {
-            get { return _values.Count; }
-        }
+        public int Count => _values.Count;
 
         public TValue First
         {
@@ -139,20 +128,14 @@ namespace GraphQL
         /// <summary>
         /// Returns an enumerator that iterates through the values.
         /// </summary>
-        /// <returns>An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<TValue>)this).GetEnumerator();
-        }
+        /// <returns>An <see cref="System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.</returns>
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TValue>)this).GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator that iterates through the values.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-        public IEnumerator<TValue> GetEnumerator()
-        {
-            return _values.Values.GetEnumerator();
-        }
+        public IEnumerator<TValue> GetEnumerator() => _values.Values.GetEnumerator();
 
         /// <summary>
         /// Guarantees that the Cache has a value for a given key.
@@ -228,10 +211,7 @@ namespace GraphQL
         /// Equivalent to ContainsKey
         /// </summary>
         /// <param name="key">The key.</param>
-        public bool Has(TKey key)
-        {
-            return _values.ContainsKey(key);
-        }
+        public bool Has(TKey key) => _values.ContainsKey(key);
 
         /// <summary>
         /// Determines if a given value exists in the dictionary.

@@ -24,8 +24,6 @@ namespace GraphQL.Harness
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
-
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
@@ -58,7 +56,8 @@ namespace GraphQL.Harness
                 {
                     User = ctx.User
                 },
-                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics")
+                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics"),
+                ExposeExceptions = Configuration.GetValue<bool>("ExposeExceptions")
             });
 
             app.UseDefaultFiles();

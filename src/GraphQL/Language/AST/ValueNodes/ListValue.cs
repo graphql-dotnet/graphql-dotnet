@@ -5,18 +5,9 @@ namespace GraphQL.Language.AST
 {
     public class ListValue : AbstractNode, IValue
     {
-        public ListValue(IEnumerable<IValue> values)
-        {
-            Values = values;
-        }
+        public ListValue(IEnumerable<IValue> values) => Values = values;
 
-        public object Value
-        {
-            get
-            {
-                return Values.Select(x => x.Value).ToList();
-            }
-        }
+        public object Value => Values.Select(x => x.Value).ToList();
 
         public IEnumerable<IValue> Values { get; }
 
@@ -31,7 +22,7 @@ namespace GraphQL.Language.AST
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
 
             return true;
         }

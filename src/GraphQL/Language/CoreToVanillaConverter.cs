@@ -5,6 +5,7 @@ using GraphQLParser;
 using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
+using System.Numerics;
 
 namespace GraphQL.Language
 {
@@ -12,7 +13,7 @@ namespace GraphQL.Language
     {
         private readonly ISource _body;
 
-        private CoreToVanillaConverter(string body)
+        internal CoreToVanillaConverter(string body)
         {
             _body = new Source(body);
         }
@@ -129,15 +130,15 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.Field:
                 {
-                    return Field((GraphQLFieldSelection) source);
+                    return Field((GraphQLFieldSelection)source);
                 }
                 case ASTNodeKind.FragmentSpread:
                 {
-                    return FragmentSpread((GraphQLFragmentSpread) source);
+                    return FragmentSpread((GraphQLFragmentSpread)source);
                 }
                 case ASTNodeKind.InlineFragment:
                 {
-                    return InlineFragment((GraphQLInlineFragment) source);
+                    return InlineFragment((GraphQLInlineFragment)source);
                 }
             }
 
@@ -162,13 +163,18 @@ namespace GraphQL.Language
             {
                 foreach (var d in directives)
                 {
-                    var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
-                    dir.Arguments = Arguments(d.Arguments);
-                    target.Add(dir);
+                    target.Add(Directive(d));
                 }
             }
 
             return target;
+        }
+
+        public Directive Directive(GraphQLDirective d)
+        {
+            var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
+            dir.Arguments = Arguments(d.Arguments);
+            return dir;
         }
 
         public Arguments Arguments(IEnumerable<GraphQLArgument> source)
@@ -207,6 +213,12 @@ namespace GraphQL.Language
                     if (long.TryParse(str.Value, out var longResult))
                     {
                         return new LongValue(longResult).WithLocation(str, _body);
+                    }
+
+                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    {
+                        return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
                     throw new ExecutionError($"Invalid number {str.Value}");
@@ -269,19 +281,19 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.NamedType:
                 {
-                    var name = (GraphQLNamedType) type;
+                    var name = (GraphQLNamedType)type;
                     return new NamedType(Name(name.Name)).WithLocation(name, _body);
                 }
 
                 case ASTNodeKind.NonNullType:
                 {
-                    var nonNull = (GraphQLNonNullType) type;
+                    var nonNull = (GraphQLNonNullType)type;
                     return new NonNullType(Type(nonNull.Type)).WithLocation(nonNull, _body);
                 }
 
                 case ASTNodeKind.ListType:
                 {
-                    var list = (GraphQLListType) type;
+                    var list = (GraphQLListType)type;
                     return new ListType(Type(list.Type)).WithLocation(list, _body);
                 }
             }

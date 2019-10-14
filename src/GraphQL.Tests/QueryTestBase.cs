@@ -33,10 +33,7 @@ namespace GraphQL.Tests
 
         public ISimpleContainer Services { get; set; }
 
-        public TSchema Schema
-        {
-            get { return Services.Get<TSchema>(); }
-        }
+        public TSchema Schema => Services.Get<TSchema>();
 
         public IDocumentExecuter Executer { get; private set; }
 
@@ -48,7 +45,7 @@ namespace GraphQL.Tests
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
@@ -61,9 +58,10 @@ namespace GraphQL.Tests
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
-            bool renderErrors = false)
+            bool renderErrors = false,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQueryIgnoreErrors(
@@ -74,39 +72,38 @@ namespace GraphQL.Tests
                 userContext,
                 cancellationToken,
                 expectedErrorCount,
-                renderErrors);
+                renderErrors,
+                unhandledExceptionDelegate);
         }
 
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs= null,
+            Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
-            bool renderErrors = false)
+            bool renderErrors = false,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
-            var runResult = Executer.ExecuteAsync(_ =>
+            var runResult = Executer.ExecuteAsync(options =>
             {
-                _.Schema = Schema;
-                _.Query = query;
-                _.Root = root;
-                _.Inputs = inputs;
-                _.UserContext = userContext;
-                _.CancellationToken = cancellationToken;
+                options.Schema = Schema;
+                options.Query = query;
+                options.Root = root;
+                options.Inputs = inputs;
+                options.UserContext = userContext;
+                options.CancellationToken = cancellationToken;
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
-            var renderResult = renderErrors ? runResult : new ExecutionResult {Data = runResult.Data};
+            var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
 
             var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
-// #if DEBUG
-//             Console.WriteLine(writtenResult);
-// #endif
-
-            writtenResult.ShouldBe(expectedResult);
+            writtenResult.ShouldBeCrossPlat(expectedResult);
 
             var errors = runResult.Errors ?? new ExecutionErrors();
 
@@ -121,27 +118,26 @@ namespace GraphQL.Tests
             Inputs inputs,
             object root,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
-            IEnumerable<IValidationRule> rules = null)
+            CancellationToken cancellationToken = default,
+            IEnumerable<IValidationRule> rules = null,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
+            IFieldNameConverter fieldNameConverter = null)
         {
-            var runResult = Executer.ExecuteAsync(_ =>
+            var runResult = Executer.ExecuteAsync(options =>
             {
-                _.Schema = Schema;
-                _.Query = query;
-                _.Root = root;
-                _.Inputs = inputs;
-                _.UserContext = userContext;
-                _.CancellationToken = cancellationToken;
-                _.ValidationRules = rules;
-                _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                options.Schema = Schema;
+                options.Query = query;
+                options.Root = root;
+                options.Inputs = inputs;
+                options.UserContext = userContext;
+                options.CancellationToken = cancellationToken;
+                options.ValidationRules = rules;
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
+                options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
-
-// #if DEBUG
-//             Console.WriteLine(writtenResult);
-// #endif
 
             string additionalInfo = null;
 
@@ -152,12 +148,12 @@ namespace GraphQL.Tests
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
 
             return runResult;
         }
 
-        public ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
+        public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
         {
             object data = null;
             if (!string.IsNullOrWhiteSpace(result))
@@ -165,7 +161,7 @@ namespace GraphQL.Tests
                 data = JObject.Parse(result);
             }
 
-            return new ExecutionResult { Data = data, Errors = errors};
+            return new ExecutionResult { Data = data, Errors = errors };
         }
     }
 }

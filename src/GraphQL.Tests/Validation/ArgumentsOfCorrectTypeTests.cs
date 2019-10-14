@@ -887,7 +887,7 @@ namespace GraphQL.Tests.Validation
         {
             if (errors == null)
             {
-                errors = new [] {$"Expected type \"{typeName}\", found {value}."};
+                errors = new [] { $"Expected type \"{typeName}\", found {value}." };
             }
 
             _.Error(

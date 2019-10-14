@@ -6,6 +6,13 @@ namespace GraphQL.Types
 {
     public abstract class GraphType : IGraphType
     {
+        protected GraphType()
+        {
+            var name = GetType().Name;
+            if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
+                Name = name.Substring(0, name.Length - nameof(GraphType).Length);
+        }
+
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -37,10 +44,7 @@ namespace GraphQL.Types
                 ? GetType().Name
                 : Name;
 
-        protected bool Equals(IGraphType other)
-        {
-            return string.Equals(Name, other.Name);
-        }
+        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         public override bool Equals(object obj)
         {
@@ -51,10 +55,7 @@ namespace GraphQL.Types
             return Equals((IGraphType)obj);
         }
 
-        public override int GetHashCode()
-        {
-            return Name?.GetHashCode() ?? 0;
-        }
+        public override int GetHashCode() => Name?.GetHashCode() ?? 0;
     }
 
     /// <summary>

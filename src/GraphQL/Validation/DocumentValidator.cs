@@ -13,18 +13,47 @@ namespace GraphQL.Validation
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             Inputs inputs = null);
     }
 
     public class DocumentValidator : IDocumentValidator
     {
+        public static readonly IEnumerable<IValidationRule> CoreRules = new List<IValidationRule>
+        {
+            UniqueOperationNames.Instance,
+            LoneAnonymousOperation.Instance,
+            SingleRootFieldSubscriptions.Instance,
+            KnownTypeNames.Instance,
+            FragmentsOnCompositeTypes.Instance,
+            VariablesAreInputTypes.Instance,
+            ScalarLeafs.Instance,
+            FieldsOnCorrectType.Instance,
+            UniqueFragmentNames.Instance,
+            KnownFragmentNames.Instance,
+            NoUnusedFragments.Instance,
+            PossibleFragmentSpreads.Instance,
+            NoFragmentCycles.Instance,
+            NoUndefinedVariables.Instance,
+            NoUnusedVariables.Instance,
+            UniqueVariableNames.Instance,
+            KnownDirectives.Instance,
+            UniqueDirectivesPerLocation.Instance,
+            KnownArgumentNames.Instance,
+            UniqueArgumentNames.Instance,
+            ArgumentsOfCorrectType.Instance,
+            ProvidedNonNullArguments.Instance,
+            DefaultValuesOfCorrectType.Instance,
+            VariablesInAllowedPosition.Instance,
+            UniqueInputFieldNames.Instance
+        }.AsReadOnly();
+
         public IValidationResult Validate(
             string originalQuery,
             ISchema schema,
             Document document,
             IEnumerable<IValidationRule> rules = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             Inputs inputs = null)
         {
             if (!schema.Initialized)
@@ -44,7 +73,7 @@ namespace GraphQL.Validation
 
             if (rules == null)
             {
-                rules = CoreRules();
+                rules = CoreRules;
             }
 
             var visitors = rules.Select(x => x.Validate(context)).ToList();
@@ -58,42 +87,10 @@ namespace GraphQL.Validation
 
             basic.Visit(document);
 
-            var result = new ValidationResult();
-            result.Errors.AddRange(context.Errors);
-            return result;
-        }
+            if (context.HasErrors)
+                return new ValidationResult(context.Errors);
 
-        public static List<IValidationRule> CoreRules()
-        {
-            var rules = new List<IValidationRule>
-            {
-                new UniqueOperationNames(),
-                new LoneAnonymousOperation(),
-                new SingleRootFieldSubscriptions(),
-                new KnownTypeNames(),
-                new FragmentsOnCompositeTypes(),
-                new VariablesAreInputTypes(),
-                new ScalarLeafs(),
-                new FieldsOnCorrectType(),
-                new UniqueFragmentNames(),
-                new KnownFragmentNames(),
-                new NoUnusedFragments(),
-                new PossibleFragmentSpreads(),
-                new NoFragmentCycles(),
-                new NoUndefinedVariables(),
-                new NoUnusedVariables(),
-                new UniqueVariableNames(),
-                new KnownDirectives(),
-                new UniqueDirectivesPerLocation(),
-                new KnownArgumentNames(),
-                new UniqueArgumentNames(),
-                new ArgumentsOfCorrectType(),
-                new ProvidedNonNullArguments(),
-                new DefaultValuesOfCorrectType(),
-                new VariablesInAllowedPosition(),
-                new UniqueInputFieldNames()
-            };
-            return rules;
+            return SuccessfullyValidatedResult.Instance;
         }
     }
 }

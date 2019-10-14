@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
@@ -25,7 +25,7 @@ namespace GraphQL.Language.AST
         {
             if (ReferenceEquals(null, node)) return false;
             if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != this.GetType()) return false;
+            if (node.GetType() != GetType()) return false;
 
             return true;
         }

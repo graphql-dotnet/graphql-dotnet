@@ -1,11 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -69,7 +69,13 @@ namespace GraphQL.Types
         }
     }
 
-    public class EnumerationGraphType<TEnum> : EnumerationGraphType
+    /// <summary>
+    /// Allows you to automatically register the necessary enumeration members for the specified enum.
+    /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
+    /// Also it can get descriptions for enum fields from the xml comments.
+    /// </summary>
+    /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
         public EnumerationGraphType()
         {
@@ -81,11 +87,13 @@ namespace GraphQL.Types
             var enumGraphData = enumMembers.Select(e => (
                 name: ChangeEnumCase(e.name),
                 value: Enum.Parse(type, e.name),
-                description: (e.member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description,
-                deprecation: (e.member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                description: e.member.Description(),
+                deprecation: e.member.ObsoleteMessage()
             ));
 
             Name = Name ?? StringUtils.ToPascalCase(type.Name);
+            Description = Description ?? typeof(TEnum).Description();
+            DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
 
             foreach (var (name, value, description, deprecation) in enumGraphData)
             {
@@ -93,10 +101,7 @@ namespace GraphQL.Types
             }
         }
 
-        protected virtual string ChangeEnumCase(string val)
-        {
-            return StringUtils.ToConstantCase(val);
-        }
+        protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
     }
 
     public class EnumValues : IEnumerable<EnumValueDefinition>
@@ -105,27 +110,28 @@ namespace GraphQL.Types
 
         public EnumValueDefinition this[string name] => _values.FirstOrDefault(enumDef => enumDef.Name == name);
 
-        public void Add(EnumValueDefinition value)
-        {
-            _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
-        }
+        public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
-        public IEnumerator<EnumValueDefinition> GetEnumerator()
-        {
-            return _values.GetEnumerator();
-        }
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class EnumValueDefinition
+    public class EnumValueDefinition : IProvideMetadata
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
+
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
+        {
+            var local = Metadata;
+            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
+        }
+
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

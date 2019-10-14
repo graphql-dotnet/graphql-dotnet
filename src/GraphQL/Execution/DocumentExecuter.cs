@@ -65,13 +65,16 @@ namespace GraphQL
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
+            if (options.Schema == null)
+                throw new InvalidOperationException("Cannot execute request if no schema is specified");
 
-            var metrics = new Metrics(options.EnableMetrics);
-            metrics.Start(options.OperationName);
+            var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
             options.Schema.FieldNameConverter = options.FieldNameConverter;
+            options.Schema.Filter = options.SchemaFilter;
 
             ExecutionResult result = null;
+            ExecutionContext context = null;
 
             try
             {
@@ -81,10 +84,7 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        if (options.SetFieldMiddleware)
-                        {
-                            options.FieldMiddleware.ApplyTo(options.Schema);
-                        }
+                        options.FieldMiddleware.ApplyTo(options.Schema);
                         options.Schema.Initialize();
                     }
                 }
@@ -139,11 +139,11 @@ namespace GraphQL
                     {
                         Errors = validationResult.Errors,
                         ExposeExceptions = options.ExposeExceptions,
-                        Perf = metrics.Finish()?.ToArray()
+                        Perf = metrics.Finish()
                     };
                 }
 
-                var context = BuildExecutionContext(
+                context = BuildExecutionContext(
                     options.Schema,
                     options.Root,
                     document,
@@ -153,7 +153,8 @@ namespace GraphQL
                     options.CancellationToken,
                     metrics,
                     options.Listeners,
-                    options.ThrowOnUnhandledException);
+                    options.ThrowOnUnhandledException,
+                    options.UnhandledExceptionDelegate);
 
                 if (context.Errors.Any())
                 {
@@ -161,7 +162,7 @@ namespace GraphQL
                     {
                         Errors = context.Errors,
                         ExposeExceptions = options.ExposeExceptions,
-                        Perf = metrics.Finish()?.ToArray()
+                        Perf = metrics.Finish()
                     };
                 }
 
@@ -206,6 +207,13 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                if (options.UnhandledExceptionDelegate != null)
+                {
+                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    options.UnhandledExceptionDelegate(exceptionContext);
+                    ex = exceptionContext.Exception;
+                }
+
                 result = new ExecutionResult
                 {
                     Errors = new ExecutionErrors
@@ -218,7 +226,7 @@ namespace GraphQL
             {
                 result = result ?? new ExecutionResult();
                 result.ExposeExceptions = options.ExposeExceptions;
-                result.Perf = metrics.Finish()?.ToArray();
+                result.Perf = metrics.Finish();
             }
 
             return result;
@@ -234,7 +242,8 @@ namespace GraphQL
             CancellationToken cancellationToken,
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
-            bool throwOnUnhandledException)
+            bool throwOnUnhandledException,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate)
         {
             var context = new ExecutionContext
             {
@@ -250,7 +259,8 @@ namespace GraphQL
 
                 Metrics = metrics,
                 Listeners = listeners,
-                ThrowOnUnhandledException = throwOnUnhandledException
+                ThrowOnUnhandledException = throwOnUnhandledException,
+                UnhandledExceptionDelegate = unhandledExceptionDelegate
             };
 
             return context;

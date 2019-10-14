@@ -15,7 +15,7 @@ namespace GraphQL.Introspection
             Field(f => f.Name);
             Field(f => f.Description, nullable: true);
 
-            Field<NonNullGraphType<StringGraphType>>("isDeprecated", resolve: context =>
+            Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context =>
             {
                 return !string.IsNullOrWhiteSpace(context.Source?.DeprecationReason);
             });

@@ -1,6 +1,7 @@
-using System;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
+using Shouldly;
+using System;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -9,10 +10,11 @@ namespace GraphQL.Tests.Bugs
     /// This class adds a variable to count the calls to ApplyTo()
     /// in the FieldMiddlewareBuilder class
     /// </summary>
-    public class ApplyCounterMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
+    public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
     {
         public int AppliedCount;
-        IFieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
+        private FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
+
         public void ApplyTo(ISchema schema)
         {
             AppliedCount++;
@@ -29,20 +31,21 @@ namespace GraphQL.Tests.Bugs
             return overriddenBuilder.Use(middleware);
         }
     }
+
     public class Bug252ExecutorAppliesBuilderOnceTests
     {
         [Fact]
         public void apply_to_not_called_without_execute()
         {
             var docExec = new DocumentExecuter();
-            var execOptions = new ExecutionOptions {Schema = new Schema()};
+            var execOptions = new ExecutionOptions { Schema = new Schema() };
             var mockMiddleware = new ApplyCounterMiddlewareBuilder();
             execOptions.FieldMiddleware = mockMiddleware;
 
             // no execute in this test
             //docExec.ExecuteAsync(execOptions).Wait();
 
-            Assert.Equal(0, mockMiddleware.AppliedCount);
+            mockMiddleware.AppliedCount.ShouldBe(0);
         }
         [Fact]
         public void apply_to_called_once()
@@ -58,7 +61,7 @@ namespace GraphQL.Tests.Bugs
 
             docExec.ExecuteAsync(execOptions).Wait();
 
-            Assert.Equal(1, mockMiddleware.AppliedCount);
+            mockMiddleware.AppliedCount.ShouldBe(1);
         }
 
         [Fact]
@@ -76,7 +79,7 @@ namespace GraphQL.Tests.Bugs
             docExec.ExecuteAsync(execOptions).Wait();
             docExec.ExecuteAsync(execOptions).Wait();
 
-            Assert.Equal(1, mockMiddleware.AppliedCount);
+            mockMiddleware.AppliedCount.ShouldBe(1);
         }
     }
 }

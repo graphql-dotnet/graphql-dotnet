@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -18,6 +19,7 @@ namespace GraphQL.Language.AST
         }
 
         public string Name => NameNode?.Name;
+
         public NameNode NameNode { get; }
 
         public OperationType OperationType { get; set; }
@@ -54,15 +56,15 @@ namespace GraphQL.Language.AST
 
         protected bool Equals(Operation other)
         {
-            return string.Equals(Name, other.Name) && OperationType == other.OperationType;
+            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && OperationType == other.OperationType;
         }
 
         public override bool IsEqualTo(INode node)
         {
             if (ReferenceEquals(null, node)) return false;
             if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != this.GetType()) return false;
-            return Equals((Operation) node);
+            if (node.GetType() != GetType()) return false;
+            return Equals((Operation)node);
         }
     }
 }

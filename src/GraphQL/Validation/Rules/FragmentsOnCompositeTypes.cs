@@ -1,4 +1,4 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -20,6 +20,8 @@ namespace GraphQL.Validation.Rules
         {
             return $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
         }
+
+        public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
 
         public INodeVisitor Validate(ValidationContext context)
         {

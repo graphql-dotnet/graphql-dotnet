@@ -22,21 +22,54 @@ namespace GraphQL
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// Can use any constructor of the indicated type, provided that there are keys in the
+        /// dictionary that correspond (case sensitive) to the names of the constructor parameters.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
         public static object ToObject(this IDictionary<string, object> source, Type type)
         {
-            var obj = Activator.CreateInstance(type);
+            // attempt to use the most specific constructor sorting in decreasing order of number of parameters
+            var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
+
+            ConstructorInfo targetCtor = null;
+            ParameterInfo[] ctorParameters = null;
+
+            foreach (var ctor in ctorCandidates)
+            {
+                var parameters = ctor.GetParameters();
+                if (parameters.All(p => source.ContainsKey(p.Name)))
+                {
+                    targetCtor = ctor;
+                    ctorParameters = parameters;
+                    break;
+                }
+            }
+
+            if (targetCtor == null)
+                throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
+
+            object[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
+
+            for (int i = 0; i < ctorParameters.Length; ++i)
+            {
+                var arg = GetPropertyValue(source[ctorParameters[i].Name], ctorParameters[i].ParameterType);
+                ctorArguments[i] = arg;
+            }
+
+            var obj = targetCtor.Invoke(ctorArguments);
 
             foreach (var item in source)
             {
-                var propertyType = type.GetProperty(item.Key,
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                if (propertyType != null)
+                // these parameters have already been used in the constructor
+                if (ctorParameters.Any(p => p.Name == item.Key))
+                    continue;
+
+                var propertyInfo = type.GetProperty(item.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    var value = GetPropertyValue(item.Value, propertyType.PropertyType);
-                    propertyType.SetValue(obj, value, null);
+                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType);
+                    propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
 
@@ -51,13 +84,8 @@ namespace GraphQL
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
         public static object GetPropertyValue(this object propertyValue, Type fieldType)
         {
-            // Short-circuit conversion if the property value already
-            if (fieldType.IsInstanceOfType(propertyValue))
-            {
-                return propertyValue;
-            }
-
-            if (fieldType.FullName == "System.Object")
+            // Short-circuit conversion if the property value already of the right type
+            if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
             {
                 return propertyValue;
             }
@@ -66,36 +94,50 @@ namespace GraphQL
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (fieldType.Name != "String"
+            if (fieldType != typeof(string)
                 && enumerableInterface != null)
             {
                 IList newArray;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
-                var implementsIList = fieldType.GetInterface("IList") != null;
+                var fieldTypeImplementsIList = fieldType.GetInterface("IList") != null;
 
-                if (implementsIList && !fieldType.IsArray)
+                var propertyValueAsIList = propertyValue as IList;
+
+                // Custom container
+                if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
                     newArray = (IList)Activator.CreateInstance(fieldType);
                 }
+                // Array
+                else if (fieldType.IsArray && propertyValueAsIList != null)
+                {
+                    newArray = Array.CreateInstance(elementType, propertyValueAsIList.Count);
+                }
+                // List<T>
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
                     newArray = (IList)Activator.CreateInstance(genericListType);
                 }
 
-                if (!(propertyValue is IEnumerable valueList)) return newArray;
+                if (!(propertyValue is IEnumerable valueList))
+                    return newArray;
 
-                foreach (var listItem in valueList)
+                if (fieldType.IsArray && propertyValueAsIList != null)
                 {
-                    newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    for (int i = 0; i < propertyValueAsIList.Count; ++i)
+                    {
+                        var listItem = propertyValueAsIList[i];
+                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType);
+                    }
                 }
-
-                if (fieldType.IsArray)
+                else
                 {
-                    var array = Array.CreateInstance(elementType, newArray.Count);
-                    newArray.CopyTo(array, 0);
-                    return array;
+                    foreach (var listItem in valueList)
+                    {
+                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                    }
                 }
 
                 return newArray;
@@ -160,7 +202,6 @@ namespace GraphQL
 
             return val;
         }
-
 
         /// <summary>
         /// Returns an interface implemented by the indicated type whose name matches the desired name.

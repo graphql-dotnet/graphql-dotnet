@@ -16,7 +16,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -38,7 +38,7 @@ namespace GraphQL.Execution
                 if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
                     continue;
 
-                streams[name] = await ResolveEventStreamAsync(context, node);
+                streams[name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
             }
 
             return streams;
@@ -93,7 +93,7 @@ namespace GraphQL.Execution
                 }
                 else if (eventStreamField?.AsyncSubscriber != null)
                 {
-                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext);
+                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else
                 {

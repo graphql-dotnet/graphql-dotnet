@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Execution
         {
             long val = 89429901947254093;
             _context.Arguments["a"] = val;
-            Assert.Throws<OverflowException>(() => _context.GetArgument<int>("a"));
+            Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
         }
 
         [Fact]
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Execution
             var exception = new Exception("Test");
             var result = await _context.TryAsyncResolve<int>(
                 c => throw exception);
-            result.ShouldBe(default(int));
+            result.ShouldBe(default);
             _context.Errors.First().InnerException.ShouldBe(exception);
         }
 

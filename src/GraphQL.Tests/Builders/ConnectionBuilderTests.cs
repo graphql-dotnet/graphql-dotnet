@@ -27,7 +27,7 @@ namespace GraphQL.Tests.Builders
             var type = new ObjectGraphType();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Fact]
@@ -386,7 +386,7 @@ namespace GraphQL.Tests.Builders
             }
         }
 
-        private static readonly int ConnectionField1Value = 123;
+        private const int ConnectionField1Value = 123;
         private static readonly DateTime FriendedAt = new DateTime(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public class ParentType : ObjectGraphType<Parent>

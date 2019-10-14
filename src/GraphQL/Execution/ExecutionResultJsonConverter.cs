@@ -8,24 +8,23 @@ namespace GraphQL
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is ExecutionResult)) return;
+            if (value is ExecutionResult result)
+            {
+                writer.WriteStartObject();
 
-            var result = (ExecutionResult)value;
+                WriteData(result, writer, serializer);
+                WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+                WriteExtensions(result, writer, serializer);
 
-            writer.WriteStartObject();
-
-            WriteData(result, writer, serializer);
-            WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
-            WriteExtensions(result, writer, serializer);
-
-            writer.WriteEndObject();
+                writer.WriteEndObject();
+            }
         }
 
         private void WriteData(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
             var data = result.Data;
 
-            if (result.Errors?.Any() == true && data == null)
+            if (result.Errors?.Count > 0 && data == null)
             {
                 return;
             }
@@ -36,7 +35,7 @@ namespace GraphQL
 
         private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
         {
-            if (errors == null || !errors.Any())
+            if (errors == null || errors.Count == 0)
             {
                 return;
             }
@@ -86,7 +85,7 @@ namespace GraphQL
 
         private void WriteErrorExtensions(ExecutionError error, JsonWriter writer, JsonSerializer serializer)
         {
-            if (string.IsNullOrWhiteSpace(error.Code) && error.Data?.Count == 0)
+            if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
             {
                 return;
             }
@@ -100,7 +99,15 @@ namespace GraphQL
                 serializer.Serialize(writer, error.Code);
             }
 
-            if (error.Data.Count > 0)
+            if (error.HasCodes)
+            {
+                writer.WritePropertyName("codes");
+                writer.WriteStartArray();
+                error.Codes.Apply(code => serializer.Serialize(writer, code));
+                writer.WriteEndArray();
+            }
+
+            if (error.Data?.Count > 0)
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
@@ -117,23 +124,17 @@ namespace GraphQL
 
         private void WriteExtensions(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)
         {
-            if (result.Extensions == null || !result.Extensions.Any())
+            if (result.Extensions?.Count > 0)
             {
-                return;
+                writer.WritePropertyName("extensions");
+                serializer.Serialize(writer, result.Extensions);
             }
-
-            writer.WritePropertyName("extensions");
-            serializer.Serialize(writer, result.Extensions);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => throw new NotImplementedException();
 
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(ExecutionResult);
-        }
+        public override bool CanRead => false;
+
+        public override bool CanConvert(Type objectType) => objectType == typeof(ExecutionResult);
     }
 }

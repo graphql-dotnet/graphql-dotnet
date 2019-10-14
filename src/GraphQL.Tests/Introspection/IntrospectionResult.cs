@@ -174,6 +174,26 @@ namespace GraphQL.Tests.Introspection
         },
         {
           ""kind"": ""SCALAR"",
+          ""name"": ""Long"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""BigInt"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
           ""name"": ""ULong"",
           ""description"": null,
           ""fields"": null,
@@ -757,7 +777,7 @@ namespace GraphQL.Tests.Introspection
                 ""name"": null,
                 ""ofType"": {
                   ""kind"": ""SCALAR"",
-                  ""name"": ""String"",
+                  ""name"": ""Boolean"",
                   ""ofType"": null
                 }
               },

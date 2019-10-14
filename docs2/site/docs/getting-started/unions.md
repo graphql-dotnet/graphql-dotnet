@@ -1,6 +1,6 @@
 # Unions
 
-Unions are a composition of two different types.
+Unions are a composition of two or more different types.
 
 ```csharp
 public class CatOrDog : UnionGraphType
