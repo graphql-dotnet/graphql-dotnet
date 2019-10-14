@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
@@ -34,6 +33,8 @@ namespace GraphQL.Tests.Utilities
         {
             public override void VisitField(FieldType field)
             {
+                base.VisitField(field);
+
                 var inner = field.Resolver ?? new NameFieldResolver();
                 field.Resolver = new FuncFieldResolver<object>(context =>
                 {
@@ -80,6 +81,8 @@ namespace GraphQL.Tests.Utilities
         {
             public override void VisitField(FieldType field)
             {
+                base.VisitField(field);
+
                 var inner = WrapResolver(field.Resolver);
                 field.Resolver = new AsyncFieldResolver<object>(async context =>
                 {
@@ -123,6 +126,7 @@ namespace GraphQL.Tests.Utilities
         {
             public override void VisitSchema(Schema schema)
             {
+                base.VisitSchema(schema);
                 schema.RegisterType(new ObjectGraphType
                 {
                     Name = "TestType"
@@ -134,65 +138,78 @@ namespace GraphQL.Tests.Utilities
         {
             public DescriptionDirectiveVisitor()
             {
+                Name = "description";
             }
 
             public DescriptionDirectiveVisitor(string description)
+                : this()
             {
                 Arguments.Add("description", description);
             }
 
-            public override void VisitObjectGraphType(IObjectGraphType type)
+            public override void VisitObject(IObjectGraphType type)
             {
+                base.VisitObject(type);
                 type.Description = GetArgument("description", string.Empty);
             }
 
-            public override void VisitObjectGraphType(ObjectGraphType type)
+            public override void VisitObject(ObjectGraphType type)
             {
+                base.VisitObject(type);
                 type.Description = GetArgument("description", string.Empty);
             }
 
-            public override void VisitEnum(EnumerationGraphType type)
+            public override void VisitEnumeration(EnumerationGraphType type)
             {
+                base.VisitEnumeration(type);
                 type.Description = GetArgument("description", string.Empty);
             }
 
-            public override void VisitEnumValue(EnumValueDefinition value)
+            public override void VisitEnumerationValue(EnumValueDefinition value)
             {
+                base.VisitEnumerationValue(value);
                 value.Description = GetArgument("description", string.Empty);
             }
 
             public override void VisitScalar(ScalarGraphType scalar)
             {
+                base.VisitScalar(scalar);
                 scalar.Description = GetArgument("description", string.Empty);
             }
 
             public override void VisitField(FieldType field)
             {
+                base.VisitField(field);
                 field.Description = GetArgument("description", string.Empty);
             }
 
             public override void VisitInterface(InterfaceGraphType interfaceDefinition)
             {
+                base.VisitInterface(interfaceDefinition);
                 interfaceDefinition.Description = GetArgument("description", string.Empty);
             }
 
             public override void VisitUnion(UnionGraphType union)
             {
+                base.VisitUnion(union);
                 union.Description = GetArgument("description", string.Empty);
             }
 
-            public override void VisitArgumentDefinition(QueryArgument argument)
+            public override void VisitArgument(QueryArgument argument)
             {
+                base.VisitArgument(argument);
                 argument.Description = GetArgument("description", string.Empty);
             }
 
             public override void VisitInputObject(InputObjectGraphType type)
             {
+                base.VisitInputObject(type);
                 type.Description = GetArgument("description", string.Empty);
             }
 
-            public override void VisitInputFieldDefinition(FieldType value)
+            public override void VisitInputField(FieldType value)
             {
+                base.VisitInputField(value);
                 value.Description = GetArgument("description", string.Empty);
             }
         }

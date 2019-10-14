@@ -13,7 +13,7 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        private const string SchemaDirectivesMetadataKey = "schema_directives";
+        private const string SchemaDirectivesMetadataKey = "directives";
 
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
@@ -494,8 +494,7 @@ namespace GraphQL
         /// <param name="directive"> Schema directive. </param>
         public static void AddDirective(this IProvideMetadata metadataProvider, string name, SchemaDirectiveVisitor directive)
         {
-            // save directive to metadata
-            metadataProvider.SetDirective(name, directive);
+            directive.Name = name;
 
             // apply directive to target
             switch (metadataProvider)
@@ -504,16 +503,16 @@ namespace GraphQL
                     directive.VisitSchema(schema);
                     break;
                 case ObjectGraphType objectGraphType:
-                    directive.VisitObjectGraphType(objectGraphType);
+                    directive.VisitObject(objectGraphType);
                     break;
                 case IObjectGraphType objectGraphType:
-                    directive.VisitObjectGraphType(objectGraphType);
+                    directive.VisitObject(objectGraphType);
                     break;
                 case EnumerationGraphType enumeration:
-                    directive.VisitEnum(enumeration);
+                    directive.VisitEnumeration(enumeration);
                     break;
                 case EnumValueDefinition value:
-                    directive.VisitEnumValue(value);
+                    directive.VisitEnumerationValue(value);
                     break;
                 case ScalarGraphType scalar:
                     directive.VisitScalar(scalar);
@@ -522,7 +521,7 @@ namespace GraphQL
                     directive.VisitField(field);
                     break;
                 case QueryArgument argument:
-                    directive.VisitArgumentDefinition(argument);
+                    directive.VisitArgument(argument);
                     break;
                 case InterfaceGraphType interfaceGraphType:
                     directive.VisitInterface(interfaceGraphType);
@@ -555,12 +554,7 @@ namespace GraphQL
                 metadataProvider.Metadata.Add(SchemaDirectivesMetadataKey, directives);
             }
 
-            if (directives.ContainsKey(name))
-            {
-                throw new InvalidOperationException($"Directive with name '{name}' already applied");
-            }
-
-            directives.Add(name, directive);
+            directives[name] = directive;
         }
 
         /// <summary>

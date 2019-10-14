@@ -245,7 +245,7 @@ namespace GraphQL.Utilities
                 type.SetAstType(astType);
             }
 
-            VisitNode(type, v => v.VisitObjectGraphType(type));
+            VisitNode(type, v => v.VisitObject(type));
 
             return type;
         }
@@ -268,7 +268,6 @@ namespace GraphQL.Utilities
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
             field.DeprecationReason = fieldConfig.DeprecationReason;
-
             field.SetAstType(fieldDef);
 
             VisitNode(field, v => v.VisitField(field));
@@ -296,7 +295,6 @@ namespace GraphQL.Utilities
 
             var args = fieldDef.Arguments.Select(ToArguments);
             field.Arguments = new QueryArguments(args);
-
             field.SetAstType(fieldDef);
 
             VisitNode(field, v => v.VisitField(field));
@@ -315,9 +313,8 @@ namespace GraphQL.Utilities
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
-            };
-            field.SetAstType(inputDef);
-            VisitNode(field, v => v.VisitInputFieldDefinition(field));
+            }.SetAstType(inputDef);
+            VisitNode(field, v => v.VisitInputField(field));
 
             return field;
         }
@@ -331,8 +328,7 @@ namespace GraphQL.Utilities
                 Name = interfaceDef.Name.Value,
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
-            type.SetAstType(interfaceDef);
+            }.SetAstType(interfaceDef);
             VisitNode(type, v => v.VisitInterface(type));
 
             CopyMetadata(type, typeConfig);
@@ -352,8 +348,7 @@ namespace GraphQL.Utilities
                 Name = unionDef.Name.Value,
                 Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
-            type.SetAstType(unionDef);
+            }.SetAstType(unionDef);
             VisitNode(type, v => v.VisitUnion(type));
 
             CopyMetadata(type, typeConfig);
@@ -371,8 +366,7 @@ namespace GraphQL.Utilities
             {
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
-            };
-            type.SetAstType(inputDef);
+            }.SetAstType(inputDef);
             VisitNode(type, v => v.VisitInputObject(type));
 
             CopyMetadata(type, typeConfig);
@@ -391,9 +385,8 @@ namespace GraphQL.Utilities
             {
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
-            };
-            type.SetAstType(enumDef);
-            VisitNode(type, v => v.VisitEnum(type));
+            }.SetAstType(enumDef);
+            VisitNode(type, v => v.VisitEnumeration(type));
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -433,11 +426,9 @@ namespace GraphQL.Utilities
                 Value = valDef.Name.Value,
                 Name = valDef.Name.Value,
                 Description = valDef.Comment?.Text
-            };
+            }.SetAstType(valDef);
 
-            val.SetAstType(valDef);
-
-            VisitNode(val, v => v.VisitEnumValue(val));
+            VisitNode(val, v => v.VisitEnumerationValue(val));
 
             return val;
         }
@@ -452,9 +443,8 @@ namespace GraphQL.Utilities
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
-            };
-            argument.SetAstType(inputDef);
-            VisitNode(argument, v => v.VisitArgumentDefinition(argument));
+            }.SetAstType(inputDef);
+            VisitNode(argument, v => v.VisitArgument(argument));
 
             return argument;
         }
@@ -499,12 +489,6 @@ namespace GraphQL.Utilities
                 foreach (var visitor in selector.Select(node))
                 {
                     action(visitor);
-
-                    // save directive to metadata
-                    if (node is IProvideMetadata metadata && visitor is SchemaDirectiveVisitor schemaDirective)
-                    {
-                        metadata.SetDirective(schemaDirective.Name, schemaDirective);
-                    }
                 }
             }
         }
