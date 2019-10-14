@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
+using GraphQL.Tests.Utilities.Visitors;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -27,27 +28,6 @@ namespace GraphQL.Tests.Utilities
                 _.Root = new { Hello = "Hello World!" };
                 _.ExpectedResult = "{ 'hello': 'HELLO WORLD!' }";
             });
-        }
-
-        public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
-        {
-            public override void VisitField(FieldType field)
-            {
-                base.VisitField(field);
-
-                var inner = field.Resolver ?? new NameFieldResolver();
-                field.Resolver = new FuncFieldResolver<object>(context =>
-                {
-                    var result = inner.Resolve(context);
-
-                    if (result is string str)
-                    {
-                        return str.ToUpperInvariant();
-                    }
-
-                    return result;
-                });
-            }
         }
 
         [Fact]
@@ -77,27 +57,6 @@ namespace GraphQL.Tests.Utilities
             }
         }
 
-        public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
-        {
-            public override void VisitField(FieldType field)
-            {
-                base.VisitField(field);
-
-                var inner = WrapResolver(field.Resolver);
-                field.Resolver = new AsyncFieldResolver<object>(async context =>
-                {
-                    var result = await inner.ResolveAsync(context);
-
-                    if (result is string str)
-                    {
-                        return str.ToUpperInvariant();
-                    }
-
-                    return result;
-                });
-            }
-        }
-
         [Fact]
         public void can_apply_custom_directive_when_graph_type_first()
         {
@@ -120,98 +79,6 @@ namespace GraphQL.Tests.Utilities
                 _.Schema = schema;
                 _.Query = "{ hello }";
             }, queryResult);
-        }
-
-        public class RegisterTypeDirectiveVisitor : SchemaDirectiveVisitor
-        {
-            public override void VisitSchema(Schema schema)
-            {
-                base.VisitSchema(schema);
-                schema.RegisterType(new ObjectGraphType
-                {
-                    Name = "TestType"
-                });
-            }
-        }
-
-        public class DescriptionDirectiveVisitor : SchemaDirectiveVisitor
-        {
-            public DescriptionDirectiveVisitor()
-            {
-                Name = "description";
-            }
-
-            public DescriptionDirectiveVisitor(string description)
-                : this()
-            {
-                Arguments.Add("description", description);
-            }
-
-            public override void VisitObject(IObjectGraphType type)
-            {
-                base.VisitObject(type);
-                type.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitObject(ObjectGraphType type)
-            {
-                base.VisitObject(type);
-                type.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitEnumeration(EnumerationGraphType type)
-            {
-                base.VisitEnumeration(type);
-                type.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitEnumerationValue(EnumValueDefinition value)
-            {
-                base.VisitEnumerationValue(value);
-                value.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitScalar(ScalarGraphType scalar)
-            {
-                base.VisitScalar(scalar);
-                scalar.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitField(FieldType field)
-            {
-                base.VisitField(field);
-                field.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitInterface(InterfaceGraphType interfaceDefinition)
-            {
-                base.VisitInterface(interfaceDefinition);
-                interfaceDefinition.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitUnion(UnionGraphType union)
-            {
-                base.VisitUnion(union);
-                union.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitArgument(QueryArgument argument)
-            {
-                base.VisitArgument(argument);
-                argument.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitInputObject(InputObjectGraphType type)
-            {
-                base.VisitInputObject(type);
-                type.Description = GetArgument("description", string.Empty);
-            }
-
-            public override void VisitInputField(FieldType value)
-            {
-                base.VisitInputField(value);
-                value.Description = GetArgument("description", string.Empty);
-            }
         }
 
         public class TestType
@@ -237,13 +104,14 @@ namespace GraphQL.Tests.Utilities
             directivesMetadata.Count.ShouldBe(1, "Only 1 directive should be added");
             directivesMetadata.ContainsKey("test").ShouldBeTrue();
 
-            schema.FindType("TestType").ShouldNotBeNull();
+            schema.FindType("TestAdditionalType").ShouldNotBeNull();
         }
 
         [Fact]
         public void can_create_custom_directive_for_all_locations()
         {
             Builder.RegisterDirectiveVisitor<DescriptionDirectiveVisitor>("description");
+            Builder.RegisterDirectiveVisitor<RegisterTypeDirectiveVisitor>("registerType");
             Builder.Types.For("TestType").IsTypeOf<TestType>();
             Builder.Types.For("TestTypeForUnion").IsTypeOf<TestTypeForUnion>();
 
@@ -272,7 +140,17 @@ namespace GraphQL.Tests.Utilities
                       TESTVAL2
                       TESTVAL3
                     }
-                ");
+
+                    input TestInputType @description(description: ""input-type"") {
+                        id: Int = 0 @description(description: ""input-field"")
+                    }
+
+                    scalar TestScalar @description(description: ""scalar"")
+
+                    schema @registerType {
+                      query: Query
+                    } 
+            ");
             schema.Initialize();
 
             // object type
@@ -307,6 +185,19 @@ namespace GraphQL.Tests.Utilities
             var enumVal = enumType.Values.FirstOrDefault(ev => ev.Name == "TESTVAL1");
             enumVal.ShouldNotBeNull();
             enumVal.Description.ShouldBe("enum-value");
+
+            type = schema.FindType("TestInputType");
+            type.ShouldNotBeNull();
+            var inputType = type.ShouldBeOfType<InputObjectGraphType>();
+            inputType.Description.ShouldBe("input-type");
+
+            field = inputType.Fields.FirstOrDefault(f => f.Name == "id");
+            field.ShouldNotBeNull();
+            field.Description.ShouldBe("input-field");
+
+            // registerType directive test
+            type = schema.FindType("TestAdditionalType");
+            type.ShouldNotBeNull();
         }
 
         [Fact]
@@ -315,6 +206,10 @@ namespace GraphQL.Tests.Utilities
             var objectType = new ObjectGraphType();
             objectType.AddDirective("desc", new DescriptionDirectiveVisitor("type"));
             objectType.Description.ShouldBe("type");
+
+            var field = objectType.Field<StringGraphType>("test");
+            field.AddDirective("desc", new DescriptionDirectiveVisitor("field"));
+            field.Description.ShouldBe("field");
 
             var interfaceType = new InterfaceGraphType();
             interfaceType.AddDirective("desc", new DescriptionDirectiveVisitor("interface"));
@@ -339,6 +234,14 @@ namespace GraphQL.Tests.Utilities
             var inputType = new InputObjectGraphType();
             inputType.AddDirective("desc", new DescriptionDirectiveVisitor("inputType"));
             inputType.Description.ShouldBe("inputType");
+
+            field = inputType.Field<StringGraphType>("test");
+            field.AddDirective("desc", new DescriptionDirectiveVisitor("input-field"));
+            field.Description.ShouldBe("input-field");
+
+            var scalarType = new BigIntGraphType();
+            scalarType.AddDirective("desc", new DescriptionDirectiveVisitor("scalar"));
+            scalarType.Description.ShouldBe("scalar");
         }
     }
 }

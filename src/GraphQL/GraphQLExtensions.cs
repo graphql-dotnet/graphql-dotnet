@@ -546,7 +546,7 @@ namespace GraphQL
             Dictionary<string, SchemaDirectiveVisitor> directives;
             if (metadataProvider.HasMetadata(SchemaDirectivesMetadataKey))
             {
-                directives = metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new Dictionary<string, SchemaDirectiveVisitor>());
+                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(SchemaDirectivesMetadataKey);
             }
             else
             {
