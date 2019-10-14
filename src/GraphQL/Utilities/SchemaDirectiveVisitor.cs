@@ -47,12 +47,6 @@ namespace GraphQL.Utilities
             scalar.SetDirective(Name, this);
         }
 
-        public override void VisitObject(ObjectGraphType type)
-        {
-            base.VisitObject(type);
-            type.SetDirective(Name, this);
-        }
-
         public override void VisitObject(IObjectGraphType type)
         {
             base.VisitObject(type);

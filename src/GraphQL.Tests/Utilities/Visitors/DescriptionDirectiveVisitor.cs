@@ -28,12 +28,6 @@ namespace GraphQL.Tests.Utilities.Visitors
             type.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitObject(ObjectGraphType type)
-        {
-            base.VisitObject(type);
-            type.Description = GetArgument("description", string.Empty);
-        }
-
         public override void VisitEnumeration(EnumerationGraphType type)
         {
             base.VisitEnumeration(type);

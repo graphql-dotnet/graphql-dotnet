@@ -2191,7 +2191,6 @@ namespace GraphQL.Utilities
         public virtual void VisitInputField(GraphQL.Types.FieldType value) { }
         public virtual void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
         public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition) { }
-        public virtual void VisitObject(GraphQL.Types.ObjectGraphType type) { }
         public virtual void VisitObject(GraphQL.Types.IObjectGraphType type) { }
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
         public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
@@ -2251,7 +2250,6 @@ namespace GraphQL.Utilities
         void VisitInputField(GraphQL.Types.FieldType type);
         void VisitInputObject(GraphQL.Types.InputObjectGraphType type);
         void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition);
-        void VisitObject(GraphQL.Types.ObjectGraphType type);
         void VisitObject(GraphQL.Types.IObjectGraphType type);
         void VisitScalar(GraphQL.Types.ScalarGraphType scalar);
         void VisitSchema(GraphQL.Types.Schema schema);
@@ -2339,7 +2337,6 @@ namespace GraphQL.Utilities
         public override void VisitInputField(GraphQL.Types.FieldType value) { }
         public override void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
         public override void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition) { }
-        public override void VisitObject(GraphQL.Types.ObjectGraphType type) { }
         public override void VisitObject(GraphQL.Types.IObjectGraphType type) { }
         public override void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
         public override void VisitSchema(GraphQL.Types.Schema schema) { }

@@ -7,7 +7,6 @@ namespace GraphQL.Utilities
     {
         void VisitSchema(Schema schema);
         void VisitScalar(ScalarGraphType scalar);
-        void VisitObject(ObjectGraphType type);
         void VisitObject(IObjectGraphType type);
         void VisitField(FieldType field);
         void VisitArgument(QueryArgument argument);
@@ -32,10 +31,6 @@ namespace GraphQL.Utilities
         }
 
         public virtual void VisitScalar(ScalarGraphType scalar)
-        {
-        }
-
-        public virtual void VisitObject(ObjectGraphType type)
         {
         }
 
