@@ -60,14 +60,14 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
 type User @key(fields: ""id"") {
   id: ID! @external
   username: String!
 }
-
-scalar UShort
 ";
 
             var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";

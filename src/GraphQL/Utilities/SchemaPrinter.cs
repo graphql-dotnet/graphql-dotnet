@@ -3,6 +3,7 @@ using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -56,10 +57,10 @@ namespace GraphQL.Utilities
                 Schema.Initialize();
             }
 
-            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).ToList();
+            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
                 .Where(t => typeFilter(t.Name))
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.Name, StringComparer.Ordinal)
                 .ToList();
 
             var result = new[]
