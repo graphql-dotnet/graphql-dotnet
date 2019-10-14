@@ -11,7 +11,7 @@ namespace GraphQL.Utilities.Federation
     {
         internal const string ResolverMetadataField = "__FedResolver__";
 
-        private static readonly string FederatedSDL = @"
+        private const string FederatedSDL = @"
             scalar _Any
             # scalar _FieldSet
 

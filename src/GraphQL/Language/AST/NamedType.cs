@@ -1,3 +1,5 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
     public class NamedType : AbstractNode, IType
@@ -17,7 +19,7 @@ namespace GraphQL.Language.AST
 
         protected bool Equals(NamedType other)
         {
-            return string.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
         }
 
         public override bool IsEqualTo(INode obj)

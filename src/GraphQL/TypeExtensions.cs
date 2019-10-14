@@ -93,7 +93,7 @@ namespace GraphQL
 
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
-            return typeName.EndsWith(nameof(Type))
+            return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
                 ? typeName.Remove(typeName.Length - nameof(Type).Length)
                 : typeName;
         }
