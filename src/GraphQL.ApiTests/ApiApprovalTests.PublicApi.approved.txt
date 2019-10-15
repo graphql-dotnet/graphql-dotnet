@@ -1607,13 +1607,16 @@ namespace GraphQL.Types
         [System.ComponentModel.DescriptionAttribute("Location adjacent to an input object field definition.")]
         InputFieldDefinition = 17,
     }
-    public class EnumValueDefinition : GraphQL.Utilities.MetadataProvider
+    public class EnumValueDefinition : GraphQL.Types.IProvideMetadata
     {
         public EnumValueDefinition() { }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
     }
     public class EnumValues : System.Collections.Generic.IEnumerable<GraphQL.Types.EnumValueDefinition>, System.Collections.IEnumerable
     {
@@ -1644,17 +1647,20 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
+    public class FieldType : GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public object DefaultValue { get; set; }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver Resolver { get; set; }
         public System.Type Type { get; set; }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1678,16 +1684,19 @@ namespace GraphQL.Types
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
     }
-    public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
+    public abstract class GraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public virtual string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
         public override string ToString() { }
     }
     public class GraphTypesLookup
@@ -1771,7 +1780,6 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IDictionary<string, object> Metadata { get; }
         TType GetMetadata<TType>(string key, TType defaultValue = null);
-        TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         bool HasMetadata(string key);
     }
     public interface ISchema : System.IDisposable
@@ -1891,15 +1899,18 @@ namespace GraphQL.Types
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
         public void Interface(System.Type type) { }
     }
-    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue
+    public class QueryArgument : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
         public object DefaultValue { get; set; }
         public string Description { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType
@@ -1964,7 +1975,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -1974,6 +1985,7 @@ namespace GraphQL.Types
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
+        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public System.IServiceProvider Services { get; set; }
@@ -1984,6 +1996,8 @@ namespace GraphQL.Types
         public GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.ISchema For(string[] typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
         public static GraphQL.Types.ISchema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
+        public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
+        public bool HasMetadata(string key) { }
         public void Initialize() { }
         public void RegisterDirective(GraphQL.Types.DirectiveGraphType directive) { }
         public void RegisterDirectives(System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives) { }
@@ -2258,7 +2272,6 @@ namespace GraphQL.Utilities
         public MetadataProvider() { }
         public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
         public TType GetMetadata<TType>(string key, TType defaultValue = null) { }
-        public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public bool HasMetadata(string key) { }
     }
     public class NameValidator

@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,13 +10,8 @@ namespace GraphQL.Utilities
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
-            return GetMetadata(key, () => defaultValue);
-        }
-
-        public TType GetMetadata<TType>(string key, Func<TType> defaultValueFactory)
-        {
             var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValueFactory();
+            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
         }
 
         public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;

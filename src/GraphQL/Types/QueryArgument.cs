@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -16,7 +15,7 @@ namespace GraphQL.Types
     }
 
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class QueryArgument : MetadataProvider, IHaveDefaultValue
+    public class QueryArgument : IHaveDefaultValue, IProvideMetadata
     {
         public QueryArgument(IGraphType type)
         {
@@ -42,5 +41,15 @@ namespace GraphQL.Types
         public IGraphType ResolvedType { get; set; }
 
         public Type Type { get; private set; }
+
+        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
+        {
+            var local = Metadata;
+            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
+        }
+
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }
