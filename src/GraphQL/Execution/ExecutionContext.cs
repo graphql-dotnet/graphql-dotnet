@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using GraphQL.Abstractions;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public class ExecutionContext : IHasUserContext
+    public class ExecutionContext : IProvideUserContext
     {
         public Document Document { get; set; }
 

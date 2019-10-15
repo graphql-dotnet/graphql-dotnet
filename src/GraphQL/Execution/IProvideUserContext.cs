@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GraphQL.Abstractions
+namespace GraphQL.Execution
 {
-    public interface IHasUserContext
+    public interface IProvideUserContext
     {
         IDictionary<string, object> UserContext { get; }
     }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Abstractions;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -13,7 +12,7 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
-    public class ExecutionOptions : IHasUserContext
+    public class ExecutionOptions : IProvideUserContext
     {
         public ISchema Schema { get; set; }
         public object Root { get; set; }

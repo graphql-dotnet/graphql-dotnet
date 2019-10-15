@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using GraphQL.Abstractions;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Validation
 {
-    public class ValidationContext : IHasUserContext
+    public class ValidationContext : IProvideUserContext
     {
         private readonly List<ValidationError> _errors = new List<ValidationError>();
 

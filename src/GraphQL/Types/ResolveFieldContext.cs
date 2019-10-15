@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Abstractions;
 using Field = GraphQL.Language.AST.Field;
+using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource> : IHasUserContext
+    public class ResolveFieldContext<TSource> : IProvideUserContext
     {
         public string FieldName { get; set; }
 
