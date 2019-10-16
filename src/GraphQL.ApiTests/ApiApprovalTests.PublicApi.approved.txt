@@ -886,10 +886,6 @@ namespace GraphQL.Introspection.Extended
     {
         public @__DirectiveValue() { }
     }
-    public class @__ExtendedField : GraphQL.Introspection.@__Field
-    {
-        public @__ExtendedField() { }
-    }
 }
 namespace GraphQL.Language.AST
 {

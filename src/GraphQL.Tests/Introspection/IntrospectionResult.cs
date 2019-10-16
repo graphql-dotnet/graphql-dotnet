@@ -619,6 +619,22 @@ namespace GraphQL.Tests.Introspection
               ""deprecationReason"": null
             },
             {
+              ""name"": ""directives"",
+              ""description"": ""Directives applied to the field"",
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""LIST"",
+                ""name"": null,
+                ""ofType"": {
+                  ""kind"": ""OBJECT"",
+                  ""name"": ""__DirectiveValue"",
+                  ""ofType"": null
+                }
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null
+            },
+            {
               ""name"": ""isDeprecated"",
               ""description"": null,
               ""args"": [],
@@ -729,6 +745,92 @@ namespace GraphQL.Tests.Introspection
                   ""name"": ""__Type"",
                   ""ofType"": null
                 }
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null
+            }
+          ],
+          ""inputFields"": null,
+          ""interfaces"": [],
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""OBJECT"",
+          ""name"": ""__DirectiveValue"",
+          ""description"": ""Schema Directive applied to a element"",
+          ""fields"": [
+            {
+              ""name"": ""args"",
+              ""description"": ""Values of Directive arguments"",
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""LIST"",
+                ""name"": null,
+                ""ofType"": {
+                  ""kind"": ""NON_NULL"",
+                  ""name"": null,
+                  ""ofType"": {
+                    ""kind"": ""OBJECT"",
+                    ""name"": ""__ArgumentValue"",
+                    ""ofType"": null
+                  }
+                }
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null
+            },
+            {
+              ""name"": ""name"",
+              ""description"": ""Directive name"",
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""NON_NULL"",
+                ""name"": null,
+                ""ofType"": {
+                  ""kind"": ""SCALAR"",
+                  ""name"": ""String"",
+                  ""ofType"": null
+                }
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null
+            }
+          ],
+          ""inputFields"": null,
+          ""interfaces"": [],
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""OBJECT"",
+          ""name"": ""__ArgumentValue"",
+          ""description"": ""Value of an argument provided to Directive"",
+          ""fields"": [
+            {
+              ""name"": ""name"",
+              ""description"": ""Argument name"",
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""NON_NULL"",
+                ""name"": null,
+                ""ofType"": {
+                  ""kind"": ""SCALAR"",
+                  ""name"": ""String"",
+                  ""ofType"": null
+                }
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null
+            },
+            {
+              ""name"": ""value"",
+              ""description"": ""A GraphQL-formatted string representing the value for argument."",
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""SCALAR"",
+                ""name"": ""String"",
+                ""ofType"": null
               },
               ""isDeprecated"": false,
               ""deprecationReason"": null

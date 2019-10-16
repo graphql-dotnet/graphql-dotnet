@@ -1,5 +1,6 @@
 using GraphQL.Types;
 using System.Linq;
+using GraphQL.Introspection.Extended;
 
 namespace GraphQL.Introspection
 {
@@ -27,6 +28,11 @@ namespace GraphQL.Introspection
                 return !string.IsNullOrWhiteSpace(context.Source.DeprecationReason);
             });
             Field(f => f.DeprecationReason, nullable: true);
+
+            Field<ListGraphType<__DirectiveValue>>(
+                name: "directives",
+                description: "Directives applied to the field",
+                resolve: context => context.Source.GetDirectives());
         }
     }
 }

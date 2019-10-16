@@ -30,7 +30,6 @@ namespace GraphQL.Harness
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
             // extended Introspection
-            services.AddSingleton<__Field, __ExtendedField>();
             services.AddSingleton<StarWarsData>();
             services.AddSingleton<StarWarsQuery>();
             services.AddSingleton<StarWarsMutation>();
