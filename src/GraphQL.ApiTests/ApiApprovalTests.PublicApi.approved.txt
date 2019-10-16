@@ -249,7 +249,7 @@ namespace GraphQL
         public virtual void AddRange(System.Collections.Generic.IEnumerable<GraphQL.ExecutionError> errors) { }
         public System.Collections.Generic.IEnumerator<GraphQL.ExecutionError> GetEnumerator() { }
     }
-    public class ExecutionOptions
+    public class ExecutionOptions : GraphQL.Execution.IProvideUserContext
     {
         public ExecutionOptions() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
@@ -451,7 +451,7 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(T userContext, System.Threading.CancellationToken token) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(T userContext, System.Threading.CancellationToken token) { }
     }
-    public class ExecutionContext
+    public class ExecutionContext : GraphQL.Execution.IProvideUserContext
     {
         public ExecutionContext() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
@@ -544,6 +544,10 @@ namespace GraphQL.Execution
     public interface IParentExecutionNode
     {
         System.Collections.Generic.IEnumerable<GraphQL.Execution.ExecutionNode> GetChildNodes();
+    }
+    public interface IProvideUserContext
+    {
+        System.Collections.Generic.IDictionary<string, object> UserContext { get; }
     }
     public class InvalidValueException : GraphQL.ExecutionError
     {
@@ -1931,7 +1935,7 @@ namespace GraphQL.Types
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, object source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
     }
-    public class ResolveFieldContext<TSource>
+    public class ResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.ResolveFieldContext context) { }
@@ -2531,7 +2535,7 @@ namespace GraphQL.Validation
         public GraphQL.Types.IGraphType GetParentType() { }
         public void Leave(GraphQL.Language.AST.INode node) { }
     }
-    public class ValidationContext
+    public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {
         public ValidationContext() { }
         public GraphQL.Language.AST.Document Document { get; set; }
