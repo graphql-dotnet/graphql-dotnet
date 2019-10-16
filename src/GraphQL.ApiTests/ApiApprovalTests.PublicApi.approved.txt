@@ -876,6 +876,21 @@ namespace GraphQL.Introspection
         public @__TypeKind() { }
     }
 }
+namespace GraphQL.Introspection.Extended
+{
+    public class @__ArgumentValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.ParamValue>
+    {
+        public @__ArgumentValue() { }
+    }
+    public class @__DirectiveValue : GraphQL.Types.ObjectGraphType<System.Collections.Generic.KeyValuePair<string, GraphQL.Utilities.SchemaDirectiveVisitor>>
+    {
+        public @__DirectiveValue() { }
+    }
+    public class @__ExtendedField : GraphQL.Introspection.@__Field
+    {
+        public @__ExtendedField() { }
+    }
+}
 namespace GraphQL.Language.AST
 {
     public abstract class AbstractNode : GraphQL.Language.AST.INode
@@ -1699,7 +1714,7 @@ namespace GraphQL.Types
     }
     public class GraphTypesLookup
     {
-        public GraphTypesLookup() { }
+        public GraphTypesLookup(System.IServiceProvider serviceProvider) { }
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
@@ -1712,7 +1727,7 @@ namespace GraphQL.Types
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
         public void Clear() { }
-        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter, bool seal = False) { }
+        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter, System.IServiceProvider serviceProvider, bool seal = False) { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1897,6 +1912,13 @@ namespace GraphQL.Types
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
         public void Interface(System.Type type) { }
+    }
+    public class ParamValue
+    {
+        public ParamValue() { }
+        public string Name { get; set; }
+        public GraphQL.Types.IGraphType ResolvedType { get; set; }
+        public object Value { get; set; }
     }
     public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue
     {
