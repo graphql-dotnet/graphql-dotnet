@@ -51,7 +51,7 @@ mutation M($input_0: MyInput!) {
     {
         public MyInput()
         {
-            Name = "MyInput ";
+            Name = "MyInput"; // changed from "MyInput "
             Field<NonNullGraphType<StringGraphType>>("id");
             Field<StringGraphType>("foo");
             Field<StringGraphType>("bar");

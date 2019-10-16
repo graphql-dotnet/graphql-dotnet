@@ -131,10 +131,6 @@ type NestedObjType {
   intField: Int
 }
 
-type root {
-  listOfObjField: [NestedObjType]
-}
-
 scalar SByte
 
 scalar Seconds
@@ -145,9 +141,13 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
-scalar UShort
+type root {
+  listOfObjField: [NestedObjType]
+}
 ");
         }
 
@@ -180,10 +180,6 @@ type NestedObjType {
   intField: Int
 }
 
-type root {
-  listOfObjField: NestedObjType!
-}
-
 scalar SByte
 
 scalar Seconds
@@ -194,9 +190,13 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
-scalar UShort
+type root {
+  listOfObjField: NestedObjType!
+}
 ");
         }
 
@@ -229,10 +229,6 @@ type NestedObjType {
   intField: Int
 }
 
-type root {
-  listOfObjField: NestedObjType
-}
-
 scalar SByte
 
 scalar Seconds
@@ -243,9 +239,13 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
-scalar UShort
+type root {
+  listOfObjField: NestedObjType
+}
 ");
         }
 

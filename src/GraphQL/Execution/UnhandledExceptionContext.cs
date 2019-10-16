@@ -32,5 +32,10 @@ namespace GraphQL.Execution
         /// Allows to change resulting exception keeping original exception unmodified.
         /// </summary>
         public Exception Exception { get; set; }
+
+        /// <summary>
+        /// Allows to change resulting error message from default one.
+        /// </summary>
+        public string ErrorMessage { get; set; }
     }
 }

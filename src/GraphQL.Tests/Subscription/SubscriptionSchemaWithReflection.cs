@@ -7,9 +7,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
 {
-    public class SubscriptionSchemaWithReflection
+    public static class SubscriptionSchemaWithReflection
     {
-        public static string TypeDefs = @"
+        private const string TypeDefs = @"
             type MessageFrom {
                 id: String
                 displayName: String

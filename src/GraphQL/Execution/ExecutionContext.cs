@@ -8,7 +8,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public class ExecutionContext
+    public class ExecutionContext : IProvideUserContext
     {
         public Document Document { get; set; }
 

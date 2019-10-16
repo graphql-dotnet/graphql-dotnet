@@ -8,7 +8,7 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class SingleRootFieldSubscriptions : IValidationRule
     {
-        private static readonly string RuleCode = "5.2.3.1";
+        private const string RuleCode = "5.2.3.1";
 
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 

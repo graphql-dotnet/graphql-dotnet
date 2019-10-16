@@ -161,7 +161,7 @@ namespace GraphQL.Tests
                 data = JObject.Parse(result);
             }
 
-            return new ExecutionResult { Data = data, Errors = errors};
+            return new ExecutionResult { Data = data, Errors = errors };
         }
     }
 }
