@@ -91,7 +91,7 @@ namespace GraphQL.Types
                 deprecation: e.member.ObsoleteMessage()
             ));
 
-            Name = Name ?? StringUtils.ToPascalCase(type.Name);
+            Name = StringUtils.ToPascalCase(type.Name);
             Description = Description ?? typeof(TEnum).Description();
             DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
 

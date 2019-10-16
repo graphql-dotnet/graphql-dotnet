@@ -3,9 +3,14 @@ using System.ComponentModel;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Directives must only be used in the locations they are declared to belong in.
+    /// https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives
+    /// </summary>
     public enum DirectiveLocation
     {
-        // Operations
+        // ExecutableDirectiveLocation
+
         [Description("Location adjacent to a query operation.")]
         Query,
         [Description("Location adjacent to a mutation operation.")]
@@ -20,7 +25,9 @@ namespace GraphQL.Types
         FragmentSpread,
         [Description("Location adjacent to an inline fragment.")]
         InlineFragment,
-        // Schema Definitions
+
+        // TypeSystemDirectiveLocation
+
         [Description("Location adjacent to a schema definition.")]
         Schema,
         [Description("Location adjacent to a scalar definition.")]
