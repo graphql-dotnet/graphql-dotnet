@@ -12,7 +12,7 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
-    public class ExecutionOptions
+    public class ExecutionOptions : IProvideUserContext
     {
         public ISchema Schema { get; set; }
         public object Root { get; set; }

@@ -2,10 +2,11 @@ using GraphQL.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public abstract class GraphType : IGraphType
+    public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
 
@@ -16,7 +17,7 @@ namespace GraphQL.Types
                 // GraphType must always have a valid name so set it to default name in ctor.
                 // This name can be always changed later to any valid value.
                 var name = GetType().Name.Replace('`', '_');
-                if (name.EndsWith(nameof(GraphType)))
+                if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
                     name = name.Substring(0, name.Length - nameof(GraphType).Length);
 
                 // skip validation only for well-known types including introspection 
@@ -55,16 +56,6 @@ namespace GraphQL.Types
 
         public string DeprecationReason { get; set; }
 
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
-        }
-
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
-
         public virtual string CollectTypes(TypeCollectionContext context)
         {
             if (string.IsNullOrWhiteSpace(Name))
@@ -80,7 +71,7 @@ namespace GraphQL.Types
                 ? GetType().Name
                 : Name;
 
-        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name);
+        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         public override bool Equals(object obj)
         {

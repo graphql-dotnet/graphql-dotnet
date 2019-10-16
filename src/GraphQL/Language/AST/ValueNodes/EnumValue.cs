@@ -1,3 +1,5 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
     public class EnumValue : AbstractNode, IValue
@@ -21,7 +23,7 @@ namespace GraphQL.Language.AST
 
         public override string ToString() => "EnumValue{{name={0}}}".ToFormat(Name);
 
-        protected bool Equals(EnumValue other) => string.Equals(Name, other.Name);
+        protected bool Equals(EnumValue other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         public override bool IsEqualTo(INode obj)
         {

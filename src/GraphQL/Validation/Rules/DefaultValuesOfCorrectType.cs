@@ -14,12 +14,12 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class DefaultValuesOfCorrectType : IValidationRule
     {
-        public Func<string, string, string, string> BadValueForNonNullArgMessage =
+        public readonly Func<string, string, string, string> BadValueForNonNullArgMessage =
             (varName, type, guessType) => $"Variable \"{varName}\" of type \"{type}\" is required and" +
                                           " will not use default value. " +
                                           $"Perhaps you mean to use type \"{guessType}\"?";
 
-        public Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
+        public readonly Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
             (varName, type, value, verboseErrors) =>
             {
                 var message = verboseErrors != null ? "\n" + string.Join("\n", verboseErrors) : "";

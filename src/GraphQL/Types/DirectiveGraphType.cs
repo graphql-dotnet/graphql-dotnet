@@ -58,9 +58,9 @@ namespace GraphQL.Types
     /// </summary>
     public class DirectiveGraphType : INamedType
     {
-        public static IncludeDirective Include = new IncludeDirective();
-        public static SkipDirective Skip = new SkipDirective();
-        public static GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
+        public static readonly IncludeDirective Include = new IncludeDirective();
+        public static readonly SkipDirective Skip = new SkipDirective();
+        public static readonly GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
 
         private readonly List<DirectiveLocation> _directiveLocations = new List<DirectiveLocation>();
 

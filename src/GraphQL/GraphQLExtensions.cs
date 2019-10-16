@@ -105,8 +105,6 @@ namespace GraphQL
             return type;
         }
 
-        private static readonly IEnumerable<string> EmptyStringArray = new string[0];
-
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             if (type is NonNullGraphType nonNull)
@@ -127,19 +125,19 @@ namespace GraphQL
             }
             else if (valueAst is NullValue)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (valueAst == null)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (type is ListGraphType list)
@@ -202,7 +200,7 @@ namespace GraphQL
                 return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            return EmptyStringArray;
+            return Array.Empty<string>();
         }
 
         public static string NameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
