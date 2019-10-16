@@ -3,7 +3,7 @@ using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Introspection.Extended
+namespace GraphQL.Introspection
 {
     public class __DirectiveValue : ObjectGraphType<KeyValuePair<string, SchemaDirectiveVisitor>>
     {

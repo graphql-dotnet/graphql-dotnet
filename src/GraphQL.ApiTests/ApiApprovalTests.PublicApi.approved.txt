@@ -843,6 +843,10 @@ namespace GraphQL.Introspection
     {
         public TypeNameMetaFieldType() { }
     }
+    public class @__ArgumentValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.ParamValue>
+    {
+        public @__ArgumentValue() { }
+    }
     public class @__Directive : GraphQL.Types.ObjectGraphType<GraphQL.Types.DirectiveGraphType>
     {
         public @__Directive() { }
@@ -850,6 +854,10 @@ namespace GraphQL.Introspection
     public class @__DirectiveLocation : GraphQL.Types.EnumerationGraphType<GraphQL.Types.DirectiveLocation>
     {
         public @__DirectiveLocation() { }
+    }
+    public class @__DirectiveValue : GraphQL.Types.ObjectGraphType<System.Collections.Generic.KeyValuePair<string, GraphQL.Utilities.SchemaDirectiveVisitor>>
+    {
+        public @__DirectiveValue() { }
     }
     public class @__EnumValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.EnumValueDefinition>
     {
@@ -874,17 +882,6 @@ namespace GraphQL.Introspection
     public class @__TypeKind : GraphQL.Types.EnumerationGraphType<GraphQL.Introspection.TypeKind>
     {
         public @__TypeKind() { }
-    }
-}
-namespace GraphQL.Introspection.Extended
-{
-    public class @__ArgumentValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.ParamValue>
-    {
-        public @__ArgumentValue() { }
-    }
-    public class @__DirectiveValue : GraphQL.Types.ObjectGraphType<System.Collections.Generic.KeyValuePair<string, GraphQL.Utilities.SchemaDirectiveVisitor>>
-    {
-        public @__DirectiveValue() { }
     }
 }
 namespace GraphQL.Language.AST

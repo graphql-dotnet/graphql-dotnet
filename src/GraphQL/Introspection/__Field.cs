@@ -1,6 +1,5 @@
 using GraphQL.Types;
 using System.Linq;
-using GraphQL.Introspection.Extended;
 
 namespace GraphQL.Introspection
 {

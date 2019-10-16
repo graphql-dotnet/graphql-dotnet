@@ -1,7 +1,5 @@
 using Example;
 using GraphQL.Http;
-using GraphQL.Introspection;
-using GraphQL.Introspection.Extended;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
@@ -29,7 +27,6 @@ namespace GraphQL.Harness
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
-            // extended Introspection
             services.AddSingleton<StarWarsData>();
             services.AddSingleton<StarWarsQuery>();
             services.AddSingleton<StarWarsMutation>();

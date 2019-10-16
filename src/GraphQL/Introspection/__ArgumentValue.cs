@@ -1,7 +1,7 @@
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Introspection.Extended
+namespace GraphQL.Introspection
 {
     public class __ArgumentValue : ObjectGraphType<ParamValue>
     {
