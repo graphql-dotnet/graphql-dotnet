@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Types
         internal class ComplexType<T> : ComplexGraphType<T> {
             public ComplexType()
             {
-                Name = typeof(T).GetFriendlyName();
+                Name = typeof(T).GetFriendlyName().Replace("<", "Of").Replace(">", "");
             }
         }
 
@@ -267,7 +267,7 @@ namespace GraphQL.Tests.Types
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
             exception.ParamName.ShouldBe("Type");
-            exception.Message.ShouldStartWith("The declared field 'genericname' on 'List<Droid>' requires a field 'Type' when no 'ResolvedType' is provided.");
+            exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
         [Theory]

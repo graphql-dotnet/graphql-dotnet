@@ -8,7 +8,7 @@ namespace GraphQL.Instrumentation
 {
     public static class FieldResolverBuilderExtensions
     {
-        public static string InvokeMethodName = "Resolve";
+        private const string InvokeMethodName = "Resolve";
 
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
 

@@ -2,6 +2,7 @@ namespace GraphQL.Tests.Bugs
 {
     using GraphQL.Types;
     using Shouldly;
+    using System;
     using System.Collections.Generic;
     using Xunit;
 
@@ -12,8 +13,8 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nullable } }";
             const string EXPECTED = "{ nullableDataGraph: { nullable: null } }";
-            var data = new Data {Nullable = null};
-            var errors = new ExecutionError[] { };
+            var data = new Data { Nullable = null };
+            var errors = Array.Empty<ExecutionError>();
 
             AssertResult(QUERY, EXPECTED, data, errors);
         }
@@ -24,7 +25,7 @@ namespace GraphQL.Tests.Bugs
             const string QUERY = "{ nullableDataGraph { nonNullable } }";
             const string EXPECTED = "{ nullableDataGraph: { nonNullable: 'data' } }";
             var data = new Data { NonNullable = "data" };
-            var errors = new ExecutionError[] { };
+            var errors = Array.Empty<ExecutionError>();
 
             AssertResult(QUERY, EXPECTED, data, errors);
         }

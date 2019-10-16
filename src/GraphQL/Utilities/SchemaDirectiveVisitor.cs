@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
@@ -23,7 +24,7 @@ namespace GraphQL.Utilities
             if (arg is Dictionary<string, object> inputObject)
             {
                 var type = argumentType;
-                if (type.Namespace?.StartsWith("System") == true)
+                if (type.Namespace?.StartsWith("System", StringComparison.InvariantCulture) == true)
                 {
                     return arg;
                 }
@@ -32,6 +33,72 @@ namespace GraphQL.Utilities
             }
 
             return arg.GetPropertyValue(argumentType);
+        }
+
+        public override void VisitSchema(Schema schema)
+        {
+            base.VisitSchema(schema);
+            schema.SetDirective(Name, this);
+        }
+
+        public override void VisitScalar(ScalarGraphType scalar)
+        {
+            base.VisitScalar(scalar);
+            scalar.SetDirective(Name, this);
+        }
+
+        public override void VisitObject(IObjectGraphType type)
+        {
+            base.VisitObject(type);
+            type.SetDirective(Name, this);
+        }
+
+        public override void VisitField(FieldType field)
+        {
+            base.VisitField(field);
+            field.SetDirective(Name, this);
+        }
+
+        public override void VisitArgument(QueryArgument argument)
+        {
+            base.VisitArgument(argument);
+            argument.SetDirective(Name, this);
+        }
+
+        public override void VisitInterface(InterfaceGraphType interfaceDefinition)
+        {
+            base.VisitInterface(interfaceDefinition);
+            interfaceDefinition.SetDirective(Name, this);
+        }
+
+        public override void VisitUnion(UnionGraphType union)
+        {
+            base.VisitUnion(union);
+            union.SetDirective(Name, this);
+        }
+
+        public override void VisitEnumeration(EnumerationGraphType type)
+        {
+            base.VisitEnumeration(type);
+            type.SetDirective(Name, this);
+        }
+
+        public override void VisitEnumerationValue(EnumValueDefinition value)
+        {
+            base.VisitEnumerationValue(value);
+            value.SetDirective(Name, this);
+        }
+
+        public override void VisitInputObject(InputObjectGraphType type)
+        {
+            base.VisitInputObject(type);
+            type.SetDirective(Name, this);
+        }
+
+        public override void VisitInputField(FieldType value)
+        {
+            base.VisitInputField(value);
+            value.SetDirective(Name, this);
         }
     }
 }

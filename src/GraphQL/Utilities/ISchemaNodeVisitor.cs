@@ -7,16 +7,15 @@ namespace GraphQL.Utilities
     {
         void VisitSchema(Schema schema);
         void VisitScalar(ScalarGraphType scalar);
-        void VisitObjectGraphType(ObjectGraphType type);
-        void VisitObjectGraphType(IObjectGraphType type);
+        void VisitObject(IObjectGraphType type);
         void VisitField(FieldType field);
-        void VisitArgumentDefinition(QueryArgument argument);
+        void VisitArgument(QueryArgument argument);
         void VisitInterface(InterfaceGraphType interfaceDefinition);
         void VisitUnion(UnionGraphType union);
-        void VisitEnum(EnumerationGraphType type);
-        void VisitEnumValue(EnumValueDefinition value);
+        void VisitEnumeration(EnumerationGraphType type);
+        void VisitEnumerationValue(EnumValueDefinition value);
         void VisitInputObject(InputObjectGraphType type);
-        void VisitInputFieldDefinition(FieldType type);
+        void VisitInputField(FieldType type);
     }
 
     public abstract class BaseSchemaNodeVisitor : ISchemaNodeVisitor
@@ -35,11 +34,7 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitObjectGraphType(ObjectGraphType type)
-        {
-        }
-
-        public virtual void VisitObjectGraphType(IObjectGraphType type)
+        public virtual void VisitObject(IObjectGraphType type)
         {
         }
 
@@ -47,7 +42,7 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitArgumentDefinition(QueryArgument argument)
+        public virtual void VisitArgument(QueryArgument argument)
         {
         }
 
@@ -59,11 +54,11 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitEnum(EnumerationGraphType type)
+        public virtual void VisitEnumeration(EnumerationGraphType type)
         {
         }
 
-        public virtual void VisitEnumValue(EnumValueDefinition value)
+        public virtual void VisitEnumerationValue(EnumValueDefinition value)
         {
         }
 
@@ -71,7 +66,7 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitInputFieldDefinition(FieldType value)
+        public virtual void VisitInputField(FieldType value)
         {
         }
     }

@@ -8,8 +8,16 @@ namespace GraphQL.Tests.Utilities
     public class NameValidatorTests
     {
         [Fact]
+        public void ValidateName_whenNameIsNull_throwsArgumentOutOfRange() =>
+           Should.Throw<ArgumentOutOfRangeException>(() => ValidateName(null));
+
+        [Fact]
         public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange() =>
             Should.Throw<ArgumentOutOfRangeException>(() => ValidateName(string.Empty));
+
+        [Fact]
+        public void ValidateName_whenNameIsWhitespace_throwsArgumentOutOfRange() =>
+            Should.Throw<ArgumentOutOfRangeException>(() => ValidateName(" "));
 
         [Fact]
         public void ValidateName_whenNameStartsWithReservedCharacters_throwsArgumentOutOfRange() =>

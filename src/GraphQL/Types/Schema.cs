@@ -2,13 +2,12 @@ using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema : ISchema, IProvideMetadata
+    public class Schema : MetadataProvider, ISchema
     {
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
@@ -185,25 +184,34 @@ namespace GraphQL.Types
 
         public void Dispose()
         {
-            if (_lookup != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                Services = null;
-                Query = null;
-                Mutation = null;
-                Subscription = null;
-                Filter = null;
-
-                _additionalInstances.Clear();
-                _additionalTypes.Clear();
-                _directives.Clear();
-                _converters.Clear();
-
-                if (_lookup.IsValueCreated)
+                if (_lookup != null)
                 {
-                    _lookup.Value.Clear(true);
-                }
+                    Services = null;
+                    Query = null;
+                    Mutation = null;
+                    Subscription = null;
+                    Filter = null;
 
-                _lookup = null;
+                    _additionalInstances.Clear();
+                    _additionalTypes.Clear();
+                    _directives.Clear();
+                    _converters.Clear();
+
+                    if (_lookup.IsValueCreated)
+                    {
+                        _lookup.Value.Clear(true);
+                    }
+
+                    _lookup = null;
+                }
             }
         }
 
@@ -259,15 +267,5 @@ namespace GraphQL.Types
                 Services,
                 seal: true);
         }
-
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
-        }
-
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }
