@@ -264,7 +264,6 @@ namespace GraphQL.Types
                 _directives,
                 type => (IGraphType)Services.GetRequiredService(type),
                 FieldNameConverter,
-                Services,
                 seal: true);
         }
     }

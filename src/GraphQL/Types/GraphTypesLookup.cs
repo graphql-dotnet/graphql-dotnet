@@ -10,15 +10,12 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
-        private readonly IServiceProvider _serviceProvider;
 
         private readonly object _lock = new object();
         private bool _sealed;
 
-        public GraphTypesLookup(IServiceProvider serviceProvider)
+        public GraphTypesLookup()
         {
-            _serviceProvider = serviceProvider;
-
             // standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
             AddType<StringGraphType>();
             AddType<BooleanGraphType>();
@@ -65,10 +62,9 @@ namespace GraphQL.Types
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
             IFieldNameConverter fieldNameConverter,
-            IServiceProvider serviceProvider,
             bool seal = false)
         {
-            var lookup = new GraphTypesLookup(serviceProvider)
+            var lookup = new GraphTypesLookup
             {
                 FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance
             };
@@ -188,12 +184,7 @@ namespace GraphQL.Types
             var context = new TypeCollectionContext(
                 type =>
                 {
-                    return BuildNamedType(type, t =>
-                    {
-                        var instance = _serviceProvider.GetService(t);
-
-                        return (IGraphType) (instance ?? Activator.CreateInstance(t));
-                    });
+                    return BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t));
                 },
                 (name, type, ctx) =>
                 {

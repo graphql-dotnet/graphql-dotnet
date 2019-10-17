@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Types
 
         private readonly ManualResetEvent _inIteration = new ManualResetEvent(false);
         private readonly ManualResetEvent _lookupModified = new ManualResetEvent(false);
-        private readonly GraphTypesLookup _lookup = new GraphTypesLookup(new DefaultServiceProvider());
+        private readonly GraphTypesLookup _lookup = new GraphTypesLookup();
 
         [Fact]
         public void is_thread_safe()
