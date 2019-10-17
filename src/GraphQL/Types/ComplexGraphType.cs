@@ -275,7 +275,7 @@ namespace GraphQL.Types
         public FieldBuilder<TSourceType, object> Field<TGraphType>()
             => Field<TGraphType, object>();
 
-        public FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
            bool nullable = false,
