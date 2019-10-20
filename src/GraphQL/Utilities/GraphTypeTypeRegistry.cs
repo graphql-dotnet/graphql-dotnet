@@ -39,7 +39,7 @@ namespace GraphQL.Utilities
             _entries[clrType ?? throw new ArgumentNullException(nameof(clrType))] = graphType ?? throw new ArgumentNullException(nameof(graphType));
         }
 
-        public static Type Get<TClr>() => Get(typeof(TClr));
+        public static Type Get<TClrType>() => Get(typeof(TClrType));
 
         public static Type Get(Type clrType) => _entries.TryGetValue(clrType, out var graphType) ? graphType : null;
 

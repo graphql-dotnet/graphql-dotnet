@@ -1,8 +1,6 @@
 using GraphQL.Utilities;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using GraphQL.Utilities;
+using System.Reflection;
 
 namespace GraphQL.Types
 {
@@ -14,18 +12,32 @@ namespace GraphQL.Types
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
             {
-                // GraphType must always have a valid name so set it to default name in ctor.
+                // GraphType must always have a valid name so set it to default name in constructor
+                // and skip validation only for well-known types including introspection.
                 // This name can be always changed later to any valid value.
-                var name = GetType().Name.Replace('`', '_');
-                if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
-                    name = name.Substring(0, name.Length - nameof(GraphType).Length);
-
-                // skip validation only for well-known types including introspection 
-                SetName(name, validate: GetType().Assembly != typeof(GraphType).Assembly);
+                SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
             }
         }
 
         private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+
+        private string GetDefaultName()
+        {
+            var type = GetType();
+
+            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+
+            if (!string.IsNullOrEmpty(attr?.Name))
+            {
+                return attr.Name;
+            }
+
+            var name = type.Name.Replace('`', '_');
+            if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
+                name = name.Substring(0, name.Length - nameof(GraphType).Length);
+
+            return name;
+        }
 
         internal void SetName(string name, bool validate)
         {
@@ -49,7 +61,7 @@ namespace GraphQL.Types
         public string Name
         {
             get => _name;
-            set => SetName(value, true);
+            set => SetName(value, validate: true);
         }
 
         public string Description { get; set; }
