@@ -212,14 +212,14 @@ namespace GraphQL
         public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                ? expr.Member.Description()
                 : null;
         }
 
         public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                ? expr.Member.ObsoleteMessage()
                 : null;
         }
 
