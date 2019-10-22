@@ -961,7 +961,7 @@ type __Directive {
   onField: Boolean!
 }
 
-# Value of an argument provided to Directive
+# Value of an argument provided to directive
 type __DirectiveArgument {
   # Argument name
   name: String!
@@ -996,7 +996,7 @@ enum __DirectiveLocation {
 type __DirectiveUsage {
   # Directive name
   name: String!
-  # Values of Directive arguments
+  # Values of directive arguments
   args: [__DirectiveArgument!]!
 }
 

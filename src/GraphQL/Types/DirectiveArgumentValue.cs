@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace GraphQL.Types
 {
-    public class ParamValue
+    public class DirectiveArgumentValue
     {
         public string Name { get; set; }
 

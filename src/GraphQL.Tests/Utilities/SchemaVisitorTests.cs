@@ -1,10 +1,8 @@
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Resolvers;
 using GraphQL.Tests.Utilities.Visitors;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using Shouldly;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
@@ -64,12 +62,12 @@ namespace GraphQL.Tests.Utilities
             objectType.Field<StringGraphType>()
                 .Name("hello")
                 .Resolve(_ => "Hello World!")
-                .Directive("upper", new UppercaseDirectiveVisitor());
+                .Directive(new UppercaseDirectiveVisitor());
 
-            var directivesMetadata = objectType.Fields.First().GetDirectives();
-            directivesMetadata.ShouldNotBeNull();
-            directivesMetadata.Count.ShouldBe(1, "Only 1 directive should be added");
-            directivesMetadata.ContainsKey("upper").ShouldBeTrue();
+            var directives = objectType.Fields.First().GetDirectives().ToList();
+            directives.ShouldNotBeNull();
+            directives.Count.ShouldBe(1, "Only 1 directive should be added");
+            directives.Any(d => d.Name == "upper").ShouldBeTrue();
 
             var queryResult = CreateQueryResult("{ 'hello': 'HELLO WORLD!' }");
             var schema = new Schema { Query = objectType };
@@ -97,12 +95,12 @@ namespace GraphQL.Tests.Utilities
         public void can_apply_custom_directive_to_schema()
         {
             var schema = new Schema();
-            schema.AddDirective("test", new RegisterTypeDirectiveVisitor());
+            schema.AddDirective(new RegisterTypeDirectiveVisitor());
 
-            var directivesMetadata = schema.GetDirectives();
-            directivesMetadata.ShouldNotBeNull();
-            directivesMetadata.Count.ShouldBe(1, "Only 1 directive should be added");
-            directivesMetadata.ContainsKey("test").ShouldBeTrue();
+            var directives = schema.GetDirectives().ToList();
+            directives.ShouldNotBeNull();
+            directives.Count.ShouldBe(1, "Only 1 directive should be added");
+            directives.Any(d => d.Name == "registerType").ShouldBeTrue();
 
             schema.FindType("TestAdditionalType").ShouldNotBeNull();
         }
@@ -204,43 +202,43 @@ namespace GraphQL.Tests.Utilities
         public void can_create_custom_directive_for_all_locations_graph_type_first()
         {
             var objectType = new ObjectGraphType();
-            objectType.AddDirective("desc", new DescriptionDirectiveVisitor("type"));
+            objectType.AddDirective(new DescriptionDirectiveVisitor("type"));
             objectType.Description.ShouldBe("type");
 
             var field = objectType.Field<StringGraphType>("test");
-            field.AddDirective("desc", new DescriptionDirectiveVisitor("field"));
+            field.AddDirective(new DescriptionDirectiveVisitor("field"));
             field.Description.ShouldBe("field");
 
             var interfaceType = new InterfaceGraphType();
-            interfaceType.AddDirective("desc", new DescriptionDirectiveVisitor("interface"));
+            interfaceType.AddDirective(new DescriptionDirectiveVisitor("interface"));
             interfaceType.Description.ShouldBe("interface");
 
             var unionType = new UnionGraphType();
-            unionType.AddDirective("desc", new DescriptionDirectiveVisitor("union"));
+            unionType.AddDirective(new DescriptionDirectiveVisitor("union"));
             unionType.Description.ShouldBe("union");
 
             var arg = new QueryArgument(new StringGraphType());
-            arg.AddDirective("desc", new DescriptionDirectiveVisitor("arg"));
+            arg.AddDirective(new DescriptionDirectiveVisitor("arg"));
             arg.Description.ShouldBe("arg");
 
             var enumType = new EnumerationGraphType();
-            enumType.AddDirective("desc", new DescriptionDirectiveVisitor("enumType"));
+            enumType.AddDirective(new DescriptionDirectiveVisitor("enumType"));
             enumType.Description.ShouldBe("enumType");
 
             var enumValue = new EnumValueDefinition();
-            enumValue.AddDirective("desc", new DescriptionDirectiveVisitor("enumValue"));
+            enumValue.AddDirective(new DescriptionDirectiveVisitor("enumValue"));
             enumValue.Description.ShouldBe("enumValue");
 
             var inputType = new InputObjectGraphType();
-            inputType.AddDirective("desc", new DescriptionDirectiveVisitor("inputType"));
+            inputType.AddDirective(new DescriptionDirectiveVisitor("inputType"));
             inputType.Description.ShouldBe("inputType");
 
             field = inputType.Field<StringGraphType>("test");
-            field.AddDirective("desc", new DescriptionDirectiveVisitor("input-field"));
+            field.AddDirective(new DescriptionDirectiveVisitor("input-field"));
             field.Description.ShouldBe("input-field");
 
             var scalarType = new BigIntGraphType();
-            scalarType.AddDirective("desc", new DescriptionDirectiveVisitor("scalar"));
+            scalarType.AddDirective(new DescriptionDirectiveVisitor("scalar"));
             scalarType.Description.ShouldBe("scalar");
         }
     }

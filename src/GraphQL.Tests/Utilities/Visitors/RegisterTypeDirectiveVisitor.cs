@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -11,6 +8,8 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class RegisterTypeDirectiveVisitor : SchemaDirectiveVisitor
     {
+        public override string Name => "registerType";
+
         public override void VisitSchema(Schema schema)
         {
             base.VisitSchema(schema);

@@ -4,6 +4,8 @@ namespace GraphQL.Utilities
 {
     public class DeprecatedDirectiveVisitor : SchemaDirectiveVisitor
     {
+        public override string Name => "deprecated";
+
         protected static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
 
         public override void VisitField(FieldType field)

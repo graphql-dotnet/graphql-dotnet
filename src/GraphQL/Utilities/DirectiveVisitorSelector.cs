@@ -21,10 +21,8 @@ namespace GraphQL.Utilities
 
         public IEnumerable<ISchemaNodeVisitor> Select(object node)
         {
-            if (node is IProvideMetadata meta)
+            if (node is IProvideMetadata meta && meta.GetAstType<IHasDirectivesNode>() is IHasDirectivesNode ast)
             {
-                var ast = meta.GetAstType<IHasDirectivesNode>();
-                if (ast == null) yield break;
                 foreach (var visitor in BuildVisitors(ast.Directives))
                 {
                     yield return visitor;
@@ -34,11 +32,11 @@ namespace GraphQL.Utilities
 
         private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
         {
-            var filtered = directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)).ToList();
-            foreach (var dir in filtered)
+            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)))
             {
                 var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
-                visitor.Name = dir.Name.Value;
+                if (visitor.Name != dir.Name.Value)
+                    throw new InvalidOperationException($"SchemaDirectiveVisitor '{visitor.GetType().Name}' has '{visitor.Name}' name but registered in {nameof(SchemaBuilder)} as '{dir.Name.Value}'. Names must match.");
                 visitor.Arguments = ToArguments(dir.Arguments);
                 yield return visitor;
             }
