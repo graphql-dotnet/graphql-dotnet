@@ -10,6 +10,8 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
     {
+        public override string Name => "upper";
+
         public override void VisitField(FieldType field)
         {
             base.VisitField(field);
@@ -35,6 +37,8 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
     {
+        public override string Name => "upper";
+
         public override void VisitField(FieldType field)
         {
             base.VisitField(field);

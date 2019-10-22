@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -11,13 +8,11 @@ namespace GraphQL.Tests.Utilities.Visitors
     /// </summary>
     public class DescriptionDirectiveVisitor : SchemaDirectiveVisitor
     {
-        public DescriptionDirectiveVisitor()
-        {
-            Name = "description";
-        }
+        public override string Name => "description";
+
+        public DescriptionDirectiveVisitor() { }
 
         public DescriptionDirectiveVisitor(string description)
-            : this()
         {
             Arguments.Add("description", description);
         }

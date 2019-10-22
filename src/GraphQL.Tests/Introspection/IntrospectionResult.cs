@@ -795,7 +795,7 @@ namespace GraphQL.Tests.Introspection
           ""fields"": [
             {
               ""name"": ""args"",
-              ""description"": ""Values of Directive arguments"",
+              ""description"": ""Values of directive arguments"",
               ""args"": [],
               ""type"": {
                 ""kind"": ""NON_NULL"",
@@ -844,7 +844,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""OBJECT"",
           ""name"": ""__DirectiveArgument"",
-          ""description"": ""Value of an argument provided to Directive"",
+          ""description"": ""Value of an argument provided to directive"",
           ""fields"": [
             {
               ""name"": ""name"",
