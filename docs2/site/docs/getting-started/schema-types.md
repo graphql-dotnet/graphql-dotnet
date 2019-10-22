@@ -14,7 +14,7 @@ These are the scalars provided by the [GraphQL Specification](https://graphql.gi
 | `Boolean`   | `BooleanGraphType`  | `bool`                  |
 | `ID`        | `IdGraphType`       | `int`, `long`, `string` |
 
-> Note that you can use a `Guid` with `ID`.  It will just be serialized to a `string` and should be sent to your GraphQL Server as a `string`.
+> Note that you can use a `Guid` with `ID`. It will just be serialized to a `string` and should be sent to your GraphQL Server as a `string`.
 
 These are additional scalars provided by this project.
 

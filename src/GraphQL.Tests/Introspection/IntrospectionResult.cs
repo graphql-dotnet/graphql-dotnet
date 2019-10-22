@@ -522,43 +522,43 @@ namespace GraphQL.Tests.Introspection
             },
             {
               ""name"": ""OBJECT"",
-              ""description"": ""Indicates this type is an object.  `fields` and `possibleTypes` are valid fields."",
+              ""description"": ""Indicates this type is an object. `fields` and `possibleTypes` are valid fields."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""INTERFACE"",
-              ""description"": ""Indicates this type is an interface.  `fields` and `possibleTypes` are valid fields."",
+              ""description"": ""Indicates this type is an interface. `fields` and `possibleTypes` are valid fields."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""UNION"",
-              ""description"": ""Indicates this type is a union.  `possibleTypes` is a valid field."",
+              ""description"": ""Indicates this type is a union. `possibleTypes` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""ENUM"",
-              ""description"": ""Indicates this type is an enum.  `enumValues` is a valid field."",
+              ""description"": ""Indicates this type is an enum. `enumValues` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""INPUT_OBJECT"",
-              ""description"": ""Indicates this type is an input object.  `inputFields` is a valid field."",
+              ""description"": ""Indicates this type is an input object. `inputFields` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""LIST"",
-              ""description"": ""Indicates this type is a list.  `ofType` is a valid field."",
+              ""description"": ""Indicates this type is a list. `ofType` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""NON_NULL"",
-              ""description"": ""Indicates this type is a non-null.  `ofType` is a valid field."",
+              ""description"": ""Indicates this type is a non-null. `ofType` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             }

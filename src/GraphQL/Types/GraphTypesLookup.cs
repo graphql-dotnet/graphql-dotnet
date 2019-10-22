@@ -257,7 +257,7 @@ namespace GraphQL.Types
                         {
                             throw new ExecutionError((
                                 "Interface type {0} does not provide a \"resolveType\" function " +
-                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                 "There is no way to resolve this possible type during execution.")
                                 .ToFormat(interfaceInstance.Name, obj.Name));
                         }
@@ -414,7 +414,7 @@ namespace GraphQL.Types
                         {
                             throw new ExecutionError((
                                     "Interface type {0} does not provide a \"resolveType\" function " +
-                                    "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
+                                    "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                     "There is no way to resolve this possible type during execution.")
                                 .ToFormat(interfaceType.Name, objectType.Name));
                         }

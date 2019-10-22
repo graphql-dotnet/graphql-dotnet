@@ -1,6 +1,6 @@
 # Query Organization
 
-In GraphQL there is only a single root `Query` object. This can make your root objects bloat with unrelated functionality.  You can group sets of functionality by adding a top level group.  You can apply this same trick to mutations and subscriptions.
+In GraphQL there is only a single root `Query` object. This can make your root objects bloat with unrelated functionality. You can group sets of functionality by adding a top level group. You can apply this same trick to mutations and subscriptions.
 
 ```graphql
 type Query {
