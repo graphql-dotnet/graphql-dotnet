@@ -35,8 +35,7 @@ namespace GraphQL.Tests.Types
         public void should_throw_on_invalid_graphtype_name()
         {
             Should.Throw<ArgumentOutOfRangeException>(() => new TypeWithInvalidName())
-                .Message.ShouldBe(@"A type name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but ::: does not.
-Parameter name: name");
+                .Message.Replace("\r", "").Replace("\n", "").ShouldBe("A type name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but ::: does not.Parameter name: name");
         }
     }
 }
