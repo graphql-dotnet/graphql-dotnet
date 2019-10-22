@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using System;
+using System.Linq;
 
 namespace GraphQL.Introspection
 {
-    public class __DirectiveUsage : ObjectGraphType<KeyValuePair<string, SchemaDirectiveVisitor>>
+    public class __DirectiveUsage : ObjectGraphType<SchemaDirectiveVisitor>
     {
         public __DirectiveUsage()
         {
@@ -16,26 +15,25 @@ namespace GraphQL.Introspection
             Field<NonNullGraphType<StringGraphType>>(
                 "name",
                 "Directive name",
-                resolve: context => context.Source.Key);
+                resolve: context => context.Source.Name);
+
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>(
                 "args",
-                "Values of Directive arguments",
+                "Values of directive arguments",
                 resolve: context =>
                 {
-                    var parameter = context.Source;
-                    if (parameter.Value?.Arguments == null) return Array.Empty<ParamValue>();
+                    var visitor = context.Source;
+                    if (visitor.Arguments == null) return Array.Empty<DirectiveArgumentValue>();
 
-                    // get directive description from schema
-                    var directiveType = context.Schema.Directives.FirstOrDefault(d => d.Name == parameter.Key);
+                    // get registered directive from schema
+                    var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == visitor.Name);
 
-                    return directiveType?.Arguments.Select(arg =>
+                    return registeredDirective?.Arguments.Select(arg =>
                     {
-                        var argValue = parameter.Value.Arguments.FirstOrDefault(p => p.Key == arg.Name);
-
-                        return new ParamValue
+                        return new DirectiveArgumentValue
                         {
                             Name = arg.Name,
-                            Value = argValue.Value ?? arg.DefaultValue,
+                            Value = visitor.Arguments.TryGetValue(arg.Name, out var value) ? value : arg.DefaultValue,
                             ResolvedType = arg.ResolvedType
                         };
                     });

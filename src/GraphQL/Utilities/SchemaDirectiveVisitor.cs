@@ -6,7 +6,8 @@ namespace GraphQL.Utilities
 {
     public abstract class SchemaDirectiveVisitor : BaseSchemaNodeVisitor
     {
-        public string Name { get; set; }
+        public abstract string Name { get; }
+
         public Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
@@ -38,67 +39,67 @@ namespace GraphQL.Utilities
         public override void VisitSchema(Schema schema)
         {
             base.VisitSchema(schema);
-            schema.SetDirective(Name, this);
+            schema.SetDirective(this);
         }
 
         public override void VisitScalar(ScalarGraphType scalar)
         {
             base.VisitScalar(scalar);
-            scalar.SetDirective(Name, this);
+            scalar.SetDirective(this);
         }
 
         public override void VisitObject(IObjectGraphType type)
         {
             base.VisitObject(type);
-            type.SetDirective(Name, this);
+            type.SetDirective(this);
         }
 
         public override void VisitField(FieldType field)
         {
             base.VisitField(field);
-            field.SetDirective(Name, this);
+            field.SetDirective(this);
         }
 
         public override void VisitArgument(QueryArgument argument)
         {
             base.VisitArgument(argument);
-            argument.SetDirective(Name, this);
+            argument.SetDirective(this);
         }
 
         public override void VisitInterface(InterfaceGraphType interfaceDefinition)
         {
             base.VisitInterface(interfaceDefinition);
-            interfaceDefinition.SetDirective(Name, this);
+            interfaceDefinition.SetDirective(this);
         }
 
         public override void VisitUnion(UnionGraphType union)
         {
             base.VisitUnion(union);
-            union.SetDirective(Name, this);
+            union.SetDirective(this);
         }
 
         public override void VisitEnumeration(EnumerationGraphType type)
         {
             base.VisitEnumeration(type);
-            type.SetDirective(Name, this);
+            type.SetDirective(this);
         }
 
         public override void VisitEnumerationValue(EnumValueDefinition value)
         {
             base.VisitEnumerationValue(value);
-            value.SetDirective(Name, this);
+            value.SetDirective(this);
         }
 
         public override void VisitInputObject(InputObjectGraphType type)
         {
             base.VisitInputObject(type);
-            type.SetDirective(Name, this);
+            type.SetDirective(this);
         }
 
         public override void VisitInputField(FieldType value)
         {
             base.VisitInputField(value);
-            value.SetDirective(Name, this);
+            value.SetDirective(this);
         }
     }
 }

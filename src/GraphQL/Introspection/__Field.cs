@@ -33,16 +33,17 @@ namespace GraphQL.Introspection
                 description: "Directives applied to the field",
                 resolve: context =>
                 {
-                    return context.Source.GetDirectives().WhereAsync(async directive =>
+                    return context.Source.GetDirectives().WhereAsync(async visitor =>
                     {
-                        // return only directives allowed by filter 
-                        var directiveDefinition = context.Schema.Directives.FirstOrDefault(d => d.Name == directive.Key);
-                        if (directiveDefinition == null)
+                        // return only registered directives allowed by filter 
+                        var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == visitor.Name);
+                        if (registeredDirective == null)
                         {
+                            // unknown directive
                             return false;
                         }
 
-                        return await context.Schema.Filter.AllowDirective(directiveDefinition);
+                        return await context.Schema.Filter.AllowDirective(registeredDirective);
                     });
                 });
         }
