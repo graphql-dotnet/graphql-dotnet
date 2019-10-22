@@ -249,7 +249,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""mutationType"",
@@ -261,7 +262,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""queryType"",
@@ -277,7 +279,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""subscriptionType"",
@@ -289,7 +292,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""types"",
@@ -313,7 +317,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -336,7 +341,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""enumValues"",
@@ -367,7 +373,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""fields"",
@@ -398,7 +405,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""inputFields"",
@@ -418,7 +426,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""interfaces"",
@@ -438,7 +447,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""kind"",
@@ -454,7 +464,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -466,7 +477,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""ofType"",
@@ -478,7 +490,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""possibleTypes"",
@@ -498,7 +511,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -592,7 +606,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""deprecationReason"",
@@ -604,7 +619,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""description"",
@@ -616,23 +632,33 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""directives"",
               ""description"": ""Directives applied to the field"",
               ""args"": [],
               ""type"": {
-                ""kind"": ""LIST"",
+                ""kind"": ""NON_NULL"",
                 ""name"": null,
                 ""ofType"": {
-                  ""kind"": ""OBJECT"",
-                  ""name"": ""__DirectiveValue"",
-                  ""ofType"": null
+                  ""kind"": ""LIST"",
+                  ""name"": null,
+                  ""ofType"": {
+                    ""kind"": ""NON_NULL"",
+                    ""name"": null,
+                    ""ofType"": {
+                      ""kind"": ""OBJECT"",
+                      ""name"": ""__DirectiveUsage"",
+                      ""ofType"": null
+                    }
+                  }
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""isDeprecated"",
@@ -648,7 +674,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -664,7 +691,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""type"",
@@ -680,7 +708,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -703,7 +732,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""description"",
@@ -715,7 +745,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -731,7 +762,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""type"",
@@ -747,7 +779,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -757,28 +790,33 @@ namespace GraphQL.Tests.Introspection
         },
         {
           ""kind"": ""OBJECT"",
-          ""name"": ""__DirectiveValue"",
-          ""description"": ""Schema Directive applied to a element"",
+          ""name"": ""__DirectiveUsage"",
+          ""description"": ""Directive applied to a schema element"",
           ""fields"": [
             {
               ""name"": ""args"",
               ""description"": ""Values of Directive arguments"",
               ""args"": [],
               ""type"": {
-                ""kind"": ""LIST"",
+                ""kind"": ""NON_NULL"",
                 ""name"": null,
                 ""ofType"": {
-                  ""kind"": ""NON_NULL"",
+                  ""kind"": ""LIST"",
                   ""name"": null,
                   ""ofType"": {
-                    ""kind"": ""OBJECT"",
-                    ""name"": ""__ArgumentValue"",
-                    ""ofType"": null
+                    ""kind"": ""NON_NULL"",
+                    ""name"": null,
+                    ""ofType"": {
+                      ""kind"": ""OBJECT"",
+                      ""name"": ""__DirectiveArgument"",
+                      ""ofType"": null
+                    }
                   }
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -794,7 +832,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -804,7 +843,7 @@ namespace GraphQL.Tests.Introspection
         },
         {
           ""kind"": ""OBJECT"",
-          ""name"": ""__ArgumentValue"",
+          ""name"": ""__DirectiveArgument"",
           ""description"": ""Value of an argument provided to Directive"",
           ""fields"": [
             {
@@ -821,7 +860,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""value"",
@@ -833,7 +873,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -856,7 +897,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""description"",
@@ -868,7 +910,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""isDeprecated"",
@@ -884,7 +927,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -900,7 +944,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             }
           ],
           ""inputFields"": null,
@@ -935,7 +980,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""description"",
@@ -947,7 +993,8 @@ namespace GraphQL.Tests.Introspection
                 ""ofType"": null
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""locations"",
@@ -971,7 +1018,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""name"",
@@ -987,7 +1035,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": false,
-              ""deprecationReason"": null
+              ""deprecationReason"": null,
+              ""directives"": []
             },
             {
               ""name"": ""onField"",
@@ -1003,7 +1052,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use 'locations'.""
+              ""deprecationReason"": ""Use 'locations'."",
+              ""directives"": []
             },
             {
               ""name"": ""onFragment"",
@@ -1019,7 +1069,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use 'locations'.""
+              ""deprecationReason"": ""Use 'locations'."",
+              ""directives"": []
             },
             {
               ""name"": ""onOperation"",
@@ -1035,7 +1086,8 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use 'locations'.""
+              ""deprecationReason"": ""Use 'locations'."",
+              ""directives"": []
             }
           ],
           ""inputFields"": null,

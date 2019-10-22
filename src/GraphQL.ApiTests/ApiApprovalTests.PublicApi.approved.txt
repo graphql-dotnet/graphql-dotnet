@@ -843,21 +843,21 @@ namespace GraphQL.Introspection
     {
         public TypeNameMetaFieldType() { }
     }
-    public class @__ArgumentValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.ParamValue>
-    {
-        public @__ArgumentValue() { }
-    }
     public class @__Directive : GraphQL.Types.ObjectGraphType<GraphQL.Types.DirectiveGraphType>
     {
         public @__Directive() { }
+    }
+    public class @__DirectiveArgument : GraphQL.Types.ObjectGraphType<GraphQL.Types.ParamValue>
+    {
+        public @__DirectiveArgument() { }
     }
     public class @__DirectiveLocation : GraphQL.Types.EnumerationGraphType<GraphQL.Types.DirectiveLocation>
     {
         public @__DirectiveLocation() { }
     }
-    public class @__DirectiveValue : GraphQL.Types.ObjectGraphType<System.Collections.Generic.KeyValuePair<string, GraphQL.Utilities.SchemaDirectiveVisitor>>
+    public class @__DirectiveUsage : GraphQL.Types.ObjectGraphType<System.Collections.Generic.KeyValuePair<string, GraphQL.Utilities.SchemaDirectiveVisitor>>
     {
-        public @__DirectiveValue() { }
+        public @__DirectiveUsage() { }
     }
     public class @__EnumValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.EnumValueDefinition>
     {

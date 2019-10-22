@@ -3,11 +3,10 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
-    public class __ArgumentValue : ObjectGraphType<ParamValue>
+    public class __DirectiveArgument : ObjectGraphType<ParamValue>
     {
-        public __ArgumentValue()
+        public __DirectiveArgument()
         {
-            Name = nameof(__ArgumentValue);
             Description =
                 "Value of an argument provided to Directive";
 

@@ -28,10 +28,23 @@ namespace GraphQL.Introspection
             });
             Field(f => f.DeprecationReason, nullable: true);
 
-            Field<ListGraphType<__DirectiveValue>>(
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveUsage>>>>(
                 name: "directives",
                 description: "Directives applied to the field",
-                resolve: context => context.Source.GetDirectives());
+                resolve: context =>
+                {
+                    return context.Source.GetDirectives().WhereAsync(async directive =>
+                    {
+                        // return only directives allowed by filter 
+                        var directiveDefinition = context.Schema.Directives.FirstOrDefault(d => d.Name == directive.Key);
+                        if (directiveDefinition == null)
+                        {
+                            return false;
+                        }
+
+                        return await context.Schema.Filter.AllowDirective(directiveDefinition);
+                    });
+                });
         }
     }
 }

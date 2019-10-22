@@ -307,11 +307,11 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'OBJECT'
                 },
                 {
-                  'name': '__DirectiveValue',
+                  'name': '__DirectiveUsage',
                   'kind': 'OBJECT',
                 },
                 {
-                  'name': '__ArgumentValue',
+                  'name': '__DirectiveArgument',
                   'kind': 'OBJECT'
                 },
                 {

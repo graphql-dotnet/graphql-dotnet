@@ -1,5 +1,7 @@
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL.Introspection
 {
@@ -36,7 +38,21 @@ namespace GraphQL.Introspection
 
         public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
         {
-            return Task.FromResult(true);
+            // true for known "deprecated" directive
+            if (directive.Name == DirectiveGraphType.Deprecated.Name)
+            {
+                return Task.FromResult(true);
+            }
+
+            // true for all ExecutableDirectiveLocation
+            return Task.FromResult(directive.Locations.All(l =>
+                l == DirectiveLocation.Query ||
+                l == DirectiveLocation.Mutation ||
+                l == DirectiveLocation.Subscription ||
+                l == DirectiveLocation.Field ||
+                l == DirectiveLocation.FragmentDefinition ||
+                l == DirectiveLocation.FragmentSpread ||
+                l == DirectiveLocation.InlineFragment));
         }
     }
 }
