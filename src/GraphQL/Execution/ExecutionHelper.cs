@@ -67,7 +67,7 @@ namespace GraphQL.Execution
 
             if (parentType == null)
             {
-                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
+                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
                 error.AddLocation(field, document);
                 throw error;
             }
