@@ -961,6 +961,14 @@ type __Directive {
   onField: Boolean!
 }
 
+# Value of an argument provided to directive
+type __DirectiveArgument {
+  # Argument name
+  name: String!
+  # A GraphQL-formatted string representing the value for argument.
+  value: String
+}
+
 # A Directive can be adjacent to many parts of the GraphQL language, a
 # __DirectiveLocation describes one such possible adjacencies.
 enum __DirectiveLocation {
@@ -984,6 +992,14 @@ enum __DirectiveLocation {
   INPUT_FIELD_DEFINITION
 }
 
+# Directive applied to a schema element
+type __DirectiveUsage {
+  # Directive name
+  name: String!
+  # Values of directive arguments
+  args: [__DirectiveArgument!]!
+}
+
 # One possible value for a given Enum. Enum values are unique values, not a
 # placeholder for a string or numeric value. However an Enum value is returned in
 # a JSON response as a string.
@@ -1003,6 +1019,8 @@ type __Field {
   type: __Type!
   isDeprecated: Boolean!
   deprecationReason: String
+  # Directives applied to the field
+  directives: [__DirectiveUsage!]!
 }
 
 # Arguments provided to Fields or Directives and the input fields of an

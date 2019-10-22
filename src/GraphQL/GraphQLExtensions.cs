@@ -13,7 +13,7 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        private const string SchemaDirectivesMetadataKey = "directives";
+        private const string DirectivesMetadataKey = "directives";
 
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
@@ -214,14 +214,14 @@ namespace GraphQL
         public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                ? expr.Member.Description()
                 : null;
         }
 
         public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                ? expr.Member.ObsoleteMessage()
                 : null;
         }
 
@@ -488,12 +488,9 @@ namespace GraphQL
         /// Add <paramref name="directive"/> to object metadata and apply it.
         /// </summary>
         /// <param name="metadataProvider"> Metadata. </param>
-        /// <param name="name"> Directive name. </param>
         /// <param name="directive"> Schema directive. </param>
-        public static void AddDirective(this IProvideMetadata metadataProvider, string name, SchemaDirectiveVisitor directive)
+        public static void AddDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
         {
-            directive.Name = name;
-
             // apply directive to target
             switch (metadataProvider)
             {
@@ -537,31 +534,38 @@ namespace GraphQL
         /// Add <paramref name="directive"/> to object metadata.
         /// </summary>
         /// <param name="metadataProvider"> Metadata. </param>
-        /// <param name="name"> Directive name. </param>
         /// <param name="directive"> Schema directive. </param>
-        public static void SetDirective(this IProvideMetadata metadataProvider, string name, SchemaDirectiveVisitor directive)
+        public static void SetDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
         {
+            if (directive == null)
+                throw new ArgumentNullException(nameof(directive));
+            
             Dictionary<string, SchemaDirectiveVisitor> directives;
-            if (metadataProvider.HasMetadata(SchemaDirectivesMetadataKey))
+            if (metadataProvider.HasMetadata(DirectivesMetadataKey))
             {
-                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(SchemaDirectivesMetadataKey);
+                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DirectivesMetadataKey);
             }
             else
             {
                 directives = new Dictionary<string, SchemaDirectiveVisitor>();
-                metadataProvider.Metadata.Add(SchemaDirectivesMetadataKey, directives);
+                metadataProvider.Metadata.Add(DirectivesMetadataKey, directives);
             }
 
-            directives[name] = directive;
+            directives[directive.Name] = directive;
         }
 
         /// <summary>
         /// Get all directives applied to <paramref name="metadataProvider"/>.
         /// </summary>
         /// <param name="metadataProvider"> Metadata. </param>
-        public static IDictionary<string, SchemaDirectiveVisitor> GetDirectives(this IProvideMetadata metadataProvider)
+        public static IEnumerable<SchemaDirectiveVisitor> GetDirectives(this IProvideMetadata metadataProvider)
         {
-            return metadataProvider.GetMetadata(SchemaDirectivesMetadataKey, new Dictionary<string, SchemaDirectiveVisitor>());
+            var directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DirectivesMetadataKey);
+
+            if (directives == null)
+                return Array.Empty<SchemaDirectiveVisitor>();
+
+            return directives.Values;
         }
     }
 }
