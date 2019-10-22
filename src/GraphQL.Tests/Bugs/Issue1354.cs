@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Bugs
             var query = "query { seconds1 }";
             var expected = "{ seconds1: null }";
             var result = AssertQueryWithErrors(query, expected, root: TimeSpan.FromSeconds(42), renderErrors: false, expectedErrorCount: 1);
-            result.Errors[0].InnerException.ShouldBeOfType<ArgumentException>();
+            result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>();
         }
     }
 
