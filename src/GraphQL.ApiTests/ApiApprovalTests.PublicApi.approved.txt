@@ -126,14 +126,14 @@ namespace GraphQL.DataLoader
     {
         protected DataLoaderBase() { }
         protected System.Threading.Tasks.Task<T> DataLoaded { get; }
-        public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = null) { }
+        public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
         protected abstract System.Threading.Tasks.Task<T> FetchAsync(System.Threading.CancellationToken cancellationToken);
         protected abstract bool IsFetchNeeded();
     }
     public class DataLoaderContext
     {
         public DataLoaderContext() { }
-        public System.Threading.Tasks.Task DispatchAllAsync(System.Threading.CancellationToken cancellationToken = null) { }
+        public System.Threading.Tasks.Task DispatchAllAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public TDataLoader GetOrAdd<TDataLoader>(string loaderKey, System.Func<TDataLoader> dataLoaderFactory)
             where TDataLoader : GraphQL.DataLoader.IDataLoader { }
     }
@@ -173,7 +173,7 @@ namespace GraphQL.DataLoader
     }
     public interface IDataLoader
     {
-        System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = null);
+        System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default);
     }
     public interface IDataLoaderContextAccessor
     {
@@ -725,10 +725,10 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.Metrics SetOperationName(string name) { }
         public GraphQL.Instrumentation.Metrics Start(string operationName) { }
         public GraphQL.Instrumentation.Metrics.Marker Subject(string category, string subject, System.Collections.Generic.Dictionary<string, object> metadata = null) { }
-        public struct Marker : System.IDisposable
+        public struct readonly Marker : System.IDisposable
         {
             public static readonly GraphQL.Instrumentation.Metrics.Marker Empty;
-            public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
+            public readonly Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
             public void Dispose() { }
         }
     }
@@ -778,7 +778,7 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.FieldStat this[string fieldName] { get; }
         public string Name { get; set; }
     }
-    public struct ValueStopwatch
+    public struct readonly ValueStopwatch
     {
         public System.TimeSpan Elapsed { get; }
         public bool IsActive { get; }
@@ -2649,7 +2649,7 @@ namespace GraphQL.Validation.Rules
     }
     public class DefaultValuesOfCorrectType : GraphQL.Validation.IValidationRule
     {
-        public readonly System.Func<string BadValueForDefaultArgMessage;
+        public readonly System.Func<string, string, string, System.Collections.Generic.IEnumerable<string>, string> BadValueForDefaultArgMessage;
         public readonly System.Func<string, string, string, string> BadValueForNonNullArgMessage;
         public static readonly GraphQL.Validation.Rules.DefaultValuesOfCorrectType Instance;
         public DefaultValuesOfCorrectType() { }
