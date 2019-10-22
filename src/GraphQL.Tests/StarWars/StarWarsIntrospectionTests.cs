@@ -307,6 +307,14 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'OBJECT'
                 },
                 {
+                  'name': '__DirectiveUsage',
+                  'kind': 'OBJECT',
+                },
+                {
+                  'name': '__DirectiveArgument',
+                  'kind': 'OBJECT'
+                },
+                {
                   'name': '__EnumValue',
                   'kind': 'OBJECT'
                 },

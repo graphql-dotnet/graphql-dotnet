@@ -27,6 +27,25 @@ namespace GraphQL.Introspection
                 return !string.IsNullOrWhiteSpace(context.Source.DeprecationReason);
             });
             Field(f => f.DeprecationReason, nullable: true);
+
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveUsage>>>>(
+                name: "directives",
+                description: "Directives applied to the field",
+                resolve: context =>
+                {
+                    return context.Source.GetDirectives().WhereAsync(async visitor =>
+                    {
+                        // return only registered directives allowed by filter 
+                        var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == visitor.Name);
+                        if (registeredDirective == null)
+                        {
+                            // unknown directive
+                            return false;
+                        }
+
+                        return await context.Schema.Filter.AllowDirective(registeredDirective);
+                    });
+                });
         }
     }
 }

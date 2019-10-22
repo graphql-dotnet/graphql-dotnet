@@ -41,6 +41,13 @@ namespace GraphQL.Introspection
       }
       isDeprecated
       deprecationReason
+      directives {
+        name
+        args {
+          name
+          value
+        }
+      }
     }
     inputFields {
       ...InputValue

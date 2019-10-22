@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Utilities
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         [Theory]
-        [InlineData("PetAfterAll.graphql", 33)]
-        [InlineData("PetBeforeAll.graphql", 33)]
+        [InlineData("PetAfterAll.graphql", 35)]
+        [InlineData("PetBeforeAll.graphql", 35)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
@@ -31,7 +31,7 @@ namespace GraphQL.Tests.Utilities
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
-            schema.AllTypes.Count().ShouldBe(33);
+            schema.AllTypes.Count().ShouldBe(35);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
