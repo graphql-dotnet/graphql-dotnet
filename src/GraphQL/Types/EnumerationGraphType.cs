@@ -1,8 +1,8 @@
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
+
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -112,16 +112,22 @@ namespace GraphQL.Types
 
         public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
-        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.Where(x => x.Visible).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public class EnumValueDefinition : MetadataProvider
     {
+        public EnumValueDefinition()
+        {
+            Visible = true;
+        }
+
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
+        public bool Visible { get; set; }
     }
 }
