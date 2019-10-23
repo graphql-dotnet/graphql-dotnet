@@ -71,7 +71,10 @@ namespace GraphQL.Types
         }
 
         public string Name { get; set; }
+
         public string Description { get; set; }
+
+        public virtual bool? Introspectable { get; }
 
         public QueryArguments Arguments { get; set; }
 
@@ -127,6 +130,8 @@ namespace GraphQL.Types
     /// </summary>
     public class GraphQLDeprecatedDirective : DirectiveGraphType
     {
+        public override bool? Introspectable => true;
+
         public GraphQLDeprecatedDirective()
             : base("deprecated", new[]
             {

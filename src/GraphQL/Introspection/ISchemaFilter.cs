@@ -29,9 +29,8 @@ namespace GraphQL.Introspection
 
         public virtual Task<bool> AllowDirective(DirectiveGraphType directive)
         {
-            // true for known "deprecated" directive
-            if (directive == DirectiveGraphType.Deprecated)
-                return Task.FromResult(true);
+            if (directive.Introspectable.HasValue)
+                return Task.FromResult(directive.Introspectable.Value);
 
             // true for all ExecutableDirectiveLocation
             return Task.FromResult(directive.Locations.All(l =>
