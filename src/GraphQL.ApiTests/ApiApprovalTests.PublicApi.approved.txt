@@ -1592,6 +1592,7 @@ namespace GraphQL.Types
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public string Description { get; set; }
+        public virtual System.Nullable<bool> Introspectable { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
     }
@@ -1693,6 +1694,7 @@ namespace GraphQL.Types
     public class GraphQLDeprecatedDirective : GraphQL.Types.DirectiveGraphType
     {
         public GraphQLDeprecatedDirective() { }
+        public override System.Nullable<bool> Introspectable { get; }
     }
     public class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideMetadata
     {
