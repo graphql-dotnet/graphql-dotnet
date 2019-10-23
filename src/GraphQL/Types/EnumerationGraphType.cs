@@ -112,7 +112,7 @@ namespace GraphQL.Types
 
         public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
-        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.Where(x => x.Visible).GetEnumerator();
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
@@ -123,6 +123,5 @@ namespace GraphQL.Types
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
-        public bool Visible { get; set; } = true;
     }
 }
