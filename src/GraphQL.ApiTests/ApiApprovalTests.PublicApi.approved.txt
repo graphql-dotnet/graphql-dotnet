@@ -1483,6 +1483,11 @@ namespace GraphQL.Types
         public static GraphQL.Types.IObjectGraphType GetTypeOf(this GraphQL.Types.IAbstractGraphType abstractType, object value) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
+    public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
+    {
+        public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
+        protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
+    }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
@@ -2239,7 +2244,7 @@ namespace GraphQL.Utilities
     public class static GraphTypeTypeRegistry
     {
         public static bool Contains(System.Type clrType) { }
-        public static System.Type Get<TClr>() { }
+        public static System.Type Get<TClrType>() { }
         public static System.Type Get(System.Type clrType) { }
         public static void Register<T, TGraph>()
             where TGraph : GraphQL.Types.GraphType { }
