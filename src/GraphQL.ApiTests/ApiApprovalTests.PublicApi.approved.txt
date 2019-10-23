@@ -1622,6 +1622,7 @@ namespace GraphQL.Types
         public string Description { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
+        public bool Visible { get; set; }
     }
     public class EnumValues : System.Collections.Generic.IEnumerable<GraphQL.Types.EnumValueDefinition>, System.Collections.IEnumerable
     {
@@ -1906,7 +1907,7 @@ namespace GraphQL.Types
         public object DefaultValue { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
-        public GraphQL.Types.IGraphType ResolvedType { get; set; }
+        public virtual GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
