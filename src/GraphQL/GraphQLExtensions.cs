@@ -453,7 +453,7 @@ namespace GraphQL
                 return new ByteValue(@byte);
             }
 
-            if(serialized is short @short)
+            if (serialized is short @short)
             {
                 return new ShortValue(@short);
             }
