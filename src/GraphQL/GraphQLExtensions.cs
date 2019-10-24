@@ -489,7 +489,8 @@ namespace GraphQL
         /// </summary>
         /// <param name="metadataProvider"> Metadata. </param>
         /// <param name="directive"> Schema directive. </param>
-        public static void AddDirective(this IProvideMetadata metadataProvider, SchemaDirectiveVisitor directive)
+        public static TMetadataProvider AddDirective<TMetadataProvider>(this TMetadataProvider metadataProvider, SchemaDirectiveVisitor directive)
+            where TMetadataProvider : IProvideMetadata
         {
             // apply directive to target
             switch (metadataProvider)
@@ -528,6 +529,8 @@ namespace GraphQL
                     directive.VisitInputObject(type);
                     break;
             }
+
+            return metadataProvider;
         }
 
         /// <summary>
