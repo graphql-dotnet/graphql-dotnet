@@ -443,6 +443,11 @@ namespace GraphQL
                 return new GuidValue(guid);
             }
 
+            if (serialized is sbyte @sbyte)
+            {
+                return new SByteValue(@sbyte);
+            }
+
             if (serialized is byte @byte)
             {
                 return new ByteValue(@byte);

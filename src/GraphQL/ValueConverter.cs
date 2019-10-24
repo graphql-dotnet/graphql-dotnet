@@ -12,6 +12,7 @@ namespace GraphQL
 
         static ValueConverter()
         {
+            Register(typeof(string), typeof(sbyte), value => sbyte.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(byte), value => byte.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(short), value => short.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(ushort), value => ushort.Parse((string)value, NumberFormatInfo.InvariantInfo));
@@ -41,6 +42,7 @@ namespace GraphQL
             Register(typeof(DateTimeOffset), typeof(DateTime), value => ((DateTimeOffset)value).UtcDateTime);
             Register(typeof(TimeSpan), typeof(long), value => ((TimeSpan)value).TotalSeconds);
 
+            Register(typeof(int), typeof(sbyte), value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
@@ -53,6 +55,7 @@ namespace GraphQL
             Register(typeof(int), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(TimeSpan), value => TimeSpan.FromSeconds((int)value));
 
+            Register(typeof(long), typeof(sbyte), value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
@@ -64,6 +67,7 @@ namespace GraphQL
             Register(typeof(long), typeof(decimal), value => (decimal)(long)value);
             Register(typeof(long), typeof(TimeSpan), value => TimeSpan.FromSeconds((long)value));
 
+            Register(typeof(BigInteger), typeof(sbyte), value => (sbyte)(BigInteger)value);
             Register(typeof(BigInteger), typeof(byte), value => (byte)(BigInteger)value);
             Register(typeof(BigInteger), typeof(decimal), value => (decimal)(BigInteger)value);
             Register(typeof(BigInteger), typeof(double), value => (double)(BigInteger)value);
@@ -76,6 +80,7 @@ namespace GraphQL
             Register(typeof(BigInteger), typeof(int), value => (int)(BigInteger)value);
             Register(typeof(BigInteger), typeof(float), value => (float)(BigInteger)value);
 
+            Register(typeof(uint), typeof(sbyte), value => (sbyte)(uint)value);
             Register(typeof(uint), typeof(byte), value => (byte)(uint)value);
             Register(typeof(uint), typeof(int), value => (int)(uint)value);
             Register(typeof(uint), typeof(long), value => (long)(uint)value);
@@ -86,6 +91,7 @@ namespace GraphQL
 
             Register(typeof(ulong), typeof(BigInteger), value => new BigInteger((ulong)value));
 
+            Register(typeof(byte), typeof(sbyte), value => (sbyte)(byte)value);
             Register(typeof(byte), typeof(int), value => (int)(byte)value);
             Register(typeof(byte), typeof(long), value => (long)(byte)value);
             Register(typeof(byte), typeof(ulong), value => (ulong)(byte)value);
@@ -93,6 +99,7 @@ namespace GraphQL
             Register(typeof(byte), typeof(ushort), value => (ushort)(byte)value);
             Register(typeof(byte), typeof(BigInteger), value => new BigInteger((byte)value));
 
+            Register(typeof(sbyte), typeof(byte), value => (byte)(sbyte)value);
             Register(typeof(sbyte), typeof(int), value => (int)(sbyte)value);
             Register(typeof(sbyte), typeof(long), value => (long)(sbyte)value);
             Register(typeof(sbyte), typeof(ulong), value => (ulong)(sbyte)value);

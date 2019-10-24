@@ -100,25 +100,21 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void converts_sbyte_to_sbyte_value()
+        {
+            sbyte val = -12;
+            var result = val.AstFromValue(null, new SByteGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<SByteValue>();
+        }
+
+        [Fact]
         public void converts_uri_to_uri_value()
         {
             var val = new Uri("http://www.wp.pl");
             var result = val.AstFromValue(null, new UriGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeOfType<UriValue>();
-        }
-    }
-
-    internal class ByteValueConverter : IAstFromValueConverter
-    {
-        public bool Matches(object value, IGraphType type)
-        {
-            return value is byte;
-        }
-
-        public IValue Convert(object value, IGraphType type)
-        {
-            return new ByteValue((byte)value);
         }
     }
 
@@ -169,6 +165,19 @@ namespace GraphQL.Tests.Execution
         {
             var byteValue = value as ByteValue;
             return byteValue?.Value;
+        }
+    }
+
+    internal class ByteValueConverter : IAstFromValueConverter
+    {
+        public bool Matches(object value, IGraphType type)
+        {
+            return value is byte;
+        }
+
+        public IValue Convert(object value, IGraphType type)
+        {
+            return new ByteValue((byte)value);
         }
     }
 }
