@@ -443,9 +443,19 @@ namespace GraphQL
                 return new GuidValue(guid);
             }
 
-            if(serialized is short int16)
+            if (serialized is sbyte @sbyte)
             {
-                return new ShortValue(int16);
+                return new SByteValue(@sbyte);
+            }
+
+            if (serialized is byte @byte)
+            {
+                return new ByteValue(@byte);
+            }
+
+            if (serialized is short @short)
+            {
+                return new ShortValue(@short);
             }
 
             if (serialized is ushort uint16)
