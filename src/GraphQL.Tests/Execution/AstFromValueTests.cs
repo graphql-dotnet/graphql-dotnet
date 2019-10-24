@@ -96,7 +96,7 @@ namespace GraphQL.Tests.Execution
             byte value = 12;
             var result = value.AstFromValue(schema, new ByteGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<ByteValue>();
+            result.ShouldBeOfType<GraphQL.Language.AST.ByteValue>();
         }
 
         [Fact]

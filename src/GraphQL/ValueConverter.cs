@@ -12,6 +12,7 @@ namespace GraphQL
 
         static ValueConverter()
         {
+            Register(typeof(string), typeof(byte), value => byte.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(short), value => short.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(ushort), value => ushort.Parse((string)value, NumberFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(int), value => int.Parse((string)value, NumberFormatInfo.InvariantInfo));
@@ -40,6 +41,7 @@ namespace GraphQL
             Register(typeof(DateTimeOffset), typeof(DateTime), value => ((DateTimeOffset)value).UtcDateTime);
             Register(typeof(TimeSpan), typeof(long), value => ((TimeSpan)value).TotalSeconds);
 
+            Register(typeof(int), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo));
@@ -51,6 +53,7 @@ namespace GraphQL
             Register(typeof(int), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(TimeSpan), value => TimeSpan.FromSeconds((int)value));
 
+            Register(typeof(long), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(long), typeof(int), value => Convert.ToInt32(value, NumberFormatInfo.InvariantInfo));
@@ -73,6 +76,7 @@ namespace GraphQL
             Register(typeof(BigInteger), typeof(int), value => (int)(BigInteger)value);
             Register(typeof(BigInteger), typeof(float), value => (float)(BigInteger)value);
 
+            Register(typeof(uint), typeof(byte), value => (byte)(uint)value);
             Register(typeof(uint), typeof(int), value => (int)(uint)value);
             Register(typeof(uint), typeof(long), value => (long)(uint)value);
             Register(typeof(uint), typeof(ulong), value => (ulong)(uint)value);

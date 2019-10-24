@@ -443,6 +443,11 @@ namespace GraphQL
                 return new GuidValue(guid);
             }
 
+            if (serialized is byte @byte)
+            {
+                return new ByteValue(@byte);
+            }
+
             if(serialized is short int16)
             {
                 return new ShortValue(int16);
