@@ -118,6 +118,19 @@ namespace GraphQL.Tests.Execution
         }
     }
 
+    internal class ByteValueConverter : IAstFromValueConverter
+    {
+        public bool Matches(object value, IGraphType type)
+        {
+            return value is byte;
+        }
+
+        public IValue Convert(object value, IGraphType type)
+        {
+            return new ByteValue((byte)value);
+        }
+    }
+
     internal class ByteValue : ValueNode<byte>
     {
         public ByteValue(byte value)
@@ -165,19 +178,6 @@ namespace GraphQL.Tests.Execution
         {
             var byteValue = value as ByteValue;
             return byteValue?.Value;
-        }
-    }
-
-    internal class ByteValueConverter : IAstFromValueConverter
-    {
-        public bool Matches(object value, IGraphType type)
-        {
-            return value is byte;
-        }
-
-        public IValue Convert(object value, IGraphType type)
-        {
-            return new ByteValue((byte)value);
         }
     }
 }
