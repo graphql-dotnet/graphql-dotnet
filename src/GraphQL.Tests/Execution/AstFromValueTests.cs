@@ -91,12 +91,11 @@ namespace GraphQL.Tests.Execution
         public void converts_byte_to_byte_value()
         {
             var schema = new Schema();
-            schema.RegisterValueConverter(new ByteValueConverter());
 
             byte value = 12;
             var result = value.AstFromValue(schema, new ByteGraphType());
             result.ShouldNotBeNull();
-            result.ShouldBeOfType<.ByteValue>();
+            result.ShouldBeOfType<ByteValue>();
         }
 
         [Fact]
