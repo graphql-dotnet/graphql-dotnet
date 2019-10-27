@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -19,7 +20,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var operationDefs = new List<Operation>();
             var fragmentDefs = new List<FragmentDefinition>();
@@ -46,7 +47,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

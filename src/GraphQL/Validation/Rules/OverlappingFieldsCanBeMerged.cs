@@ -3,6 +3,7 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -30,7 +31,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
@@ -56,7 +57,7 @@ namespace GraphQL.Validation.Rules
                             ));
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private List<Conflict> FindConflictsWithinSelectionSet(

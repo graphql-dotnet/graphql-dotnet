@@ -14,11 +14,6 @@ using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
-    public interface IDocumentExecuter
-    {
-        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
-        Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
-    }
 
     public class DocumentExecuter : IDocumentExecuter
     {
@@ -109,7 +104,7 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    validationResult = _documentValidator.Validate(
+                    validationResult = await _documentValidator.ValidateAsync(
                         options.Query,
                         options.Schema,
                         document,

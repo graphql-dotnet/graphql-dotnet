@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -19,7 +20,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var variableNameDefined = new Dictionary<string, bool>();
 
@@ -46,7 +47,7 @@ namespace GraphQL.Validation.Rules
                             }
                         }
                     });
-            });
+            }).ToTask();
         }
     }
 }
