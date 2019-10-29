@@ -62,6 +62,7 @@ namespace GraphQL.DI
                 {
                     //wait for at least one task to complete
                     var completedTask = await Task.WhenAny(waitingTasks).ConfigureAwait(false);
+                    //note: errors are not thrown here, but rather down at task.Result
                     completedTasks = new Task<ExecutionNode>[] { completedTask };
                     waitingTasks.Remove(completedTask);
                     if (waitingSyncTask == completedTask) waitingSyncTask = null;
@@ -81,9 +82,13 @@ namespace GraphQL.DI
                     waitingSyncTask = null;
                 }
 
+                //if the request was canceled, quit out now
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 //check each completed task
-                foreach (var node in completedTasks.Select(x => x.Result))
+                foreach (var task in completedTasks)
                 {
+                    var node = task.Result;
                     //if the result of the node is an IDelayLoadedResult, then add this
                     //  node to a list of nodes to be loaded once everything else possible
                     //  has been loaded
@@ -112,6 +117,7 @@ namespace GraphQL.DI
                         }
                     }
                 }
+                completedTasks = null;
 
                 //if there's no sync/async nodes being processed or waiting to be processed,
                 //  then load any IDelayLoadedResult values

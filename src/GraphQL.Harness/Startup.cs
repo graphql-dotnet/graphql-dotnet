@@ -24,15 +24,20 @@ namespace GraphQL.Harness
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            //services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddScoped<IDocumentExecuter, DI.DIDocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
-            services.AddSingleton<StarWarsData>();
-            services.AddSingleton<StarWarsQuery>();
+            services.AddSingleton<StarWarsData>(); //should be scoped, but since all of the singleton types still depend on this, it's a singleton
+            //services.AddSingleton<StarWarsQuery>();
+            services.AddScoped<StarWarsQueryDI>();
+            services.AddSingleton<DI.DIObjectGraphType<StarWarsQueryDI>>();
             services.AddSingleton<StarWarsMutation>();
             services.AddSingleton<HumanType>();
             services.AddSingleton<HumanInputType>();
-            services.AddSingleton<DroidType>();
+            //services.AddSingleton<DroidType>();
+            services.AddScoped<DroidTypeDI>();
+            services.AddSingleton<DroidTypeDIGraph>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<EpisodeEnum>();
             services.AddSingleton<ISchema, StarWarsSchema>();

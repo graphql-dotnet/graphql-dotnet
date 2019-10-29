@@ -16,9 +16,12 @@ namespace GraphQL.StarWars.Types
     {
         public DroidTypeDIGraph()
         {
+            //add some fields using declarative graph code
             Field(d => d.Id).Description("The id of the droid.");
             Field(d => d.Name, nullable: true).Description("The name of the droid.");
 
+            //interfaces are not yet supported as an attribute on the class below, but as
+            //  the code is backwards compatible, we can still use this feature
             Interface<CharacterInterface>();
         }
     }
@@ -27,17 +30,17 @@ namespace GraphQL.StarWars.Types
     [Description("A mechanical creature in the Star Wars universe.")]
     public class DroidTypeDI : DIObjectGraphBase<Droid>
     {
-        private StarWarsData _data;
+        private StarWarsData _data; //this could be a scoped service
 
         public DroidTypeDI(StarWarsData data)
         {
             _data = data;
         }
 
-        [GraphType(typeof(ListGraphType<CharacterInterface>))]
+        [GraphType(typeof(ListGraphType<CharacterInterface>))] //not required when using GraphTypeTypeRegistry
         public IEnumerable<StarWarsCharacter> Friends([FromSource] Droid droid) => _data.GetFriends(droid);
 
-        [GraphType(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>))]
+        [GraphType(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>))] //not required when using GraphTypeTypeRegistry
         [Description("A list of a character's friends.")]
         public Connection<StarWarsCharacter> FriendsConnection(ResolveFieldContext context, [FromSource] Droid droid, int? first, int? last, string after, string before)
         {
@@ -52,7 +55,7 @@ namespace GraphQL.StarWars.Types
             return connectionContext.GetPagedResults<Droid, StarWarsCharacter>(_data, droid.Friends);
         }
 
-        [GraphType(typeof(ListGraphType<EpisodeEnum>))]
+        [GraphType(typeof(ListGraphType<EpisodeEnum>))] //not required when using GraphTypeTypeRegistry
         [Description("Which movie they appear in.")]
         public static int[] AppearsIn([FromSource] Droid droid) => droid.AppearsIn;
 
