@@ -28,7 +28,7 @@ namespace GraphQL.DI
             nodes.Push(rootNode);
             var asyncNodes = new List<ExecutionNode>(); //asynchronous nodes to be executed
             var waitingTasks = new List<Task<ExecutionNode>>(); //nodes currently executing
-            var pendingNodes = new List<ExecutionNode>(); //IDelayLoadedResult nodes pending completion
+            var pendingNodes = new Stack<ExecutionNode>(); //IDelayLoadedResult nodes pending completion
             Task<ExecutionNode> waitingSyncTask = null;
 
             // Process each node on the stack one by one
@@ -89,7 +89,7 @@ namespace GraphQL.DI
                     //  has been loaded
                     if (node.Result is IDelayLoadedResult)
                     {
-                        pendingNodes.Add(node);
+                        pendingNodes.Push(node);
                     }
                     else
                     {
@@ -117,8 +117,18 @@ namespace GraphQL.DI
                 //  then load any IDelayLoadedResult values
                 if (nodes.Count == 0 && asyncNodes.Count == 0 && waitingTasks.Count == 0 && pendingNodes.Count > 0)
                 {
-                    waitingTasks.AddRange(pendingNodes.Select(node => CompleteNodeAsync(context, node)));
-                    pendingNodes.Clear();
+                    //must be synchronously, as all DelayLoaders will exist in the same scope
+                    //however, once a single node is resolved, all the rest of the tasks from the same DelayLoader will already be completed
+                    //also, must execute all these nodes at once, otherwise
+                    //  a child node might execute and queue a child dataloader node,
+                    //  which may try to execute before this 'level' of dataloaders have executed
+                    while (pendingNodes.Count > 0)
+                    {
+                        var pendingNode = pendingNodes.Pop();
+                        var task = CompleteNodeAsync(context, pendingNode);
+                        await task.ConfigureAwait(false);
+                        waitingTasks.Add(task);
+                    }
                 }
             }
         }
