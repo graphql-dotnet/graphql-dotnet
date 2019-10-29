@@ -142,9 +142,16 @@ namespace GraphQL.Execution
             {
                 var value = item.ToValue();
 
-                if (value == null && ((ListGraphType)item.FieldDefinition.ResolvedType).ResolvedType is NonNullGraphType)
+                if (value == null)
                 {
-                    return null;
+                    var listType = item.FieldDefinition.ResolvedType;
+                    if (listType is NonNullGraphType nonNull)
+                        listType = nonNull.ResolvedType;
+
+                    if (((ListGraphType)listType).ResolvedType is NonNullGraphType)
+                    {
+                        return null;
+                    }
                 }
 
                 items.Add(value);
