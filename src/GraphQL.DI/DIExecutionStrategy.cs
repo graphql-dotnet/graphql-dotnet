@@ -183,7 +183,7 @@ namespace GraphQL.DI
                     SubFields = subFields
                 };
 
-                var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
+                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
 
                 if (result is Task task)
