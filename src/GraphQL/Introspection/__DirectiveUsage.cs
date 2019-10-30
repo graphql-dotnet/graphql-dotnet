@@ -23,20 +23,19 @@ namespace GraphQL.Introspection
                 resolve: context =>
                 {
                     var visitor = context.Source;
-                    if (visitor.Arguments == null) return Array.Empty<DirectiveArgumentValue>();
 
                     // get registered directive from schema
                     var registeredDirective = context.Schema.Directives.FirstOrDefault(directive => directive.Name == visitor.Name);
 
-                    return registeredDirective?.Arguments.Select(arg =>
+                    return registeredDirective?.Arguments?.Select(arg =>
                     {
                         return new DirectiveArgumentValue
                         {
                             Name = arg.Name,
-                            Value = visitor.Arguments.TryGetValue(arg.Name, out var value) ? value : arg.DefaultValue,
+                            Value = visitor.GetArgument(arg.Name, arg.DefaultValue),
                             ResolvedType = arg.ResolvedType
                         };
-                    });
+                    }) ?? Array.Empty<DirectiveArgumentValue>();
                 });
         }
     }

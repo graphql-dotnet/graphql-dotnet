@@ -1,3 +1,4 @@
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -24,8 +25,13 @@ namespace GraphQL.Introspection
                     if (argumentValue.Value == null) return null;
 
                     var ast = argumentValue.Value.AstFromValue(context.Schema, argumentValue.ResolvedType);
-                    var result = AstPrinter.Print(ast);
-                    return string.IsNullOrWhiteSpace(result) ? null : result;
+                    if (ast is StringValue value) //TODO: ???
+                        return value.Value;
+                    else
+                    {
+                        var result = AstPrinter.Print(ast);
+                        return string.IsNullOrWhiteSpace(result) ? null : result;
+                    }
                 });
         }
     }
