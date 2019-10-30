@@ -5,7 +5,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    internal class NameFieldResolver : IFieldResolver
+    public class NameFieldResolver : IFieldResolver
     {
         private const BindingFlags _flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
 
