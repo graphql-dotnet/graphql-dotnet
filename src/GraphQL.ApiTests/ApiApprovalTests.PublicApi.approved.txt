@@ -308,7 +308,8 @@ namespace GraphQL
     }
     public class static GraphQLExtensions
     {
-        public static void AddDirective(this GraphQL.Types.IProvideMetadata metadataProvider, GraphQL.Utilities.SchemaDirectiveVisitor directive) { }
+        public static TMetadataProvider AddDirective<TMetadataProvider>(this TMetadataProvider metadataProvider, GraphQL.Utilities.SchemaDirectiveVisitor directive)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Language.AST.IValue AstFromValue(this object value, GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Types.IGraphType BuildNamedType(this System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve = null) { }
         public static object DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
