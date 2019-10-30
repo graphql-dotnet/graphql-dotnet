@@ -40,7 +40,7 @@ namespace GraphQL.DI
 
         //grab some methods via reflection for us to use later
         private static MethodInfo getRequiredServiceMethod = typeof(AsyncServiceProvider).GetMethods(BindingFlags.Public | BindingFlags.Static).Single(x => x.Name == nameof(AsyncServiceProvider.GetRequiredService) && !x.IsGenericMethod);
-        private static MethodInfo asMethod = typeof(ResolveFieldContext).GetMethod(nameof(ResolveFieldContext.As), BindingFlags.Instance | BindingFlags.NonPublic);
+        private static MethodInfo asMethod = typeof(ResolveFieldContextExtensions).GetMethod(nameof(ResolveFieldContextExtensions.As), BindingFlags.Static | BindingFlags.Public);
         private static MethodInfo getArgumentMethod = typeof(ResolveFieldContext).GetMethods(BindingFlags.Public | BindingFlags.Instance).Single(x => x.Name == nameof(ResolveFieldContext.GetArgument) && x.IsGenericMethod);
         private static PropertyInfo sourceProperty = typeof(ResolveFieldContext).GetProperty(nameof(ResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
 
@@ -270,7 +270,7 @@ namespace GraphQL.DI
                 //convert the ResolveFieldContext to the specified ResolveFieldContext<>
                 var asMethodTyped = asMethod.MakeGenericMethod(genericType);
                 //e.g. Func<ResolveFieldContext, ResolveFieldContext<MyClass>> = (context) => context.As<MyClass>();
-                expr = Expression.Call(resolveFieldContextParameter, asMethodTyped);
+                expr = Expression.Call(asMethodTyped, resolveFieldContextParameter);
                 //and do not add it as a QueryArgument
                 return null;
             }
