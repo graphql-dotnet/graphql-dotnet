@@ -184,25 +184,34 @@ namespace GraphQL.Types
 
         public void Dispose()
         {
-            if (_lookup != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                Services = null;
-                Query = null;
-                Mutation = null;
-                Subscription = null;
-                Filter = null;
-
-                _additionalInstances.Clear();
-                _additionalTypes.Clear();
-                _directives.Clear();
-                _converters.Clear();
-
-                if (_lookup.IsValueCreated)
+                if (_lookup != null)
                 {
-                    _lookup.Value.Clear(true);
-                }
+                    Services = null;
+                    Query = null;
+                    Mutation = null;
+                    Subscription = null;
+                    Filter = null;
 
-                _lookup = null;
+                    _additionalInstances.Clear();
+                    _additionalTypes.Clear();
+                    _directives.Clear();
+                    _converters.Clear();
+
+                    if (_lookup.IsValueCreated)
+                    {
+                        _lookup.Value.Clear(true);
+                    }
+
+                    _lookup = null;
+                }
             }
         }
 

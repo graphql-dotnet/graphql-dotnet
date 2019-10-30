@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,21 +8,23 @@ namespace GraphQL.Instrumentation
     {
         private readonly bool _enabled;
         private ValueStopwatch _stopwatch;
-        private readonly ConcurrentBag<PerfRecord> _records;
+        private readonly List<PerfRecord> _records;
         private PerfRecord _main;
 
         public Metrics(bool enabled = true)
         {
             _enabled = enabled;
-
             if (enabled)
-                _records = new ConcurrentBag<PerfRecord>();
+                _records = new List<PerfRecord>();
         }
 
         public Metrics Start(string operationName)
         {
             if (_enabled)
             {
+                if (_main != null)
+                    throw new InvalidOperationException("Metrics.Start has already been called");
+
                 _main = new PerfRecord("operation", operationName, 0);
                 _records.Add(_main);
                 _stopwatch = ValueStopwatch.StartNew();
@@ -49,19 +50,18 @@ namespace GraphQL.Instrumentation
                 throw new InvalidOperationException("Metrics.Start should be called before calling Metrics.Subject");
 
             var record = new PerfRecord(category, subject, _stopwatch.Elapsed.TotalMilliseconds, metadata);
-            _records.Add(record);
+            lock (_records)
+                _records.Add(record);
             return new Marker(record, _stopwatch);
         }
 
-        public IEnumerable<PerfRecord> AllRecords => _records.OrderBy(x => x.Start);
-
-        public IEnumerable<PerfRecord> Finish()
+        public PerfRecord[] Finish()
         {
             if (!_enabled)
                 return null;
 
             _main?.MarkEnd(_stopwatch.Elapsed.TotalMilliseconds);
-            return AllRecords;
+            return _records.OrderBy(x => x.Start).ToArray();
         }
 
         public readonly struct Marker : IDisposable

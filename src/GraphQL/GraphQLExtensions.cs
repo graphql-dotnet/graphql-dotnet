@@ -105,8 +105,6 @@ namespace GraphQL
             return type;
         }
 
-        private static readonly IEnumerable<string> EmptyStringArray = new string[0];
-
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             if (type is NonNullGraphType nonNull)
@@ -127,19 +125,19 @@ namespace GraphQL
             }
             else if (valueAst is NullValue)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (valueAst == null)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             // This function only tests literals, and assumes variables will provide
             // values of the correct type.
             if (valueAst is VariableReference)
             {
-                return EmptyStringArray;
+                return Array.Empty<string>();
             }
 
             if (type is ListGraphType list)
@@ -202,7 +200,7 @@ namespace GraphQL
                 return new[] { $"Expected type \"{type.Name}\", found {AstPrinter.Print(valueAst)}." };
             }
 
-            return EmptyStringArray;
+            return Array.Empty<string>();
         }
 
         public static string NameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
@@ -214,14 +212,14 @@ namespace GraphQL
         public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description
+                ? expr.Member.Description()
                 : null;
         }
 
         public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
-                ? (expr.Member.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message
+                ? expr.Member.ObsoleteMessage()
                 : null;
         }
 
@@ -445,9 +443,19 @@ namespace GraphQL
                 return new GuidValue(guid);
             }
 
-            if(serialized is short int16)
+            if (serialized is sbyte @sbyte)
             {
-                return new ShortValue(int16);
+                return new SByteValue(@sbyte);
+            }
+
+            if (serialized is byte @byte)
+            {
+                return new ByteValue(@byte);
+            }
+
+            if (serialized is short @short)
+            {
+                return new ShortValue(@short);
             }
 
             if (serialized is ushort uint16)

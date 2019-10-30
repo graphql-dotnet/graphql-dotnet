@@ -464,9 +464,9 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    public class PostData
+    public static class PostData
     {
-        public static List<Post> Posts = new List<Post>
+        public static readonly List<Post> Posts = new List<Post>
         {
             new Post {Id = "1", Title = "Post One"}
         };

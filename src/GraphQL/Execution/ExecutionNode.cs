@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -115,7 +116,7 @@ namespace GraphQL.Execution
     public class RootExecutionNode : ObjectExecutionNode
     {
         public RootExecutionNode(IObjectGraphType graphType)
-            : base(null, graphType, null, null, new string[0])
+            : base(null, graphType, null, null, Array.Empty<string>())
         {
 
         }

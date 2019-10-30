@@ -6,7 +6,7 @@ namespace GraphQL.Introspection
     {
         public __TypeKind()
         {
-            Name = nameof(__TypeKind);
+            SetName(nameof(__TypeKind), validate: false);
             Description = "An enum describing what kind of type a given __Type is.";
         }
     }

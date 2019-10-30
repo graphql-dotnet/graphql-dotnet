@@ -46,7 +46,7 @@ namespace GraphQL.Instrumentation
 
         public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
         {
-            var app = start ?? (context => Task.FromResult(new NameFieldResolver().Resolve(context)));
+            var app = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 
             if (_components != null)
             {
