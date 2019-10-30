@@ -43,6 +43,7 @@ namespace GraphQL.DI
         private static MethodInfo asMethod = typeof(ResolveFieldContextExtensions).GetMethod(nameof(ResolveFieldContextExtensions.As), BindingFlags.Static | BindingFlags.Public);
         private static MethodInfo getArgumentMethod = typeof(ResolveFieldContext).GetMethods(BindingFlags.Public | BindingFlags.Instance).Single(x => x.Name == nameof(ResolveFieldContext.GetArgument) && x.IsGenericMethod);
         private static PropertyInfo sourceProperty = typeof(ResolveFieldContext).GetProperty(nameof(ResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
+        private static PropertyInfo currentServiceProviderProperty = typeof(AsyncServiceProvider).GetProperty(nameof(AsyncServiceProvider.Current), BindingFlags.Public | BindingFlags.Static);
 
         protected virtual List<DIFieldType> CreateFieldTypeList()
         {
@@ -211,6 +212,12 @@ namespace GraphQL.DI
             return GetServiceExpression(resolveFieldContextParameter, typeof(TDIGraph));
         }
 
+        protected virtual Expression GetServiceProviderExpression(ParameterExpression resolveFieldContextParameter)
+        {
+            //returns: AsyncServiceProvider.Current
+            return Expression.Property(null, currentServiceProviderProperty);
+        }
+
         protected virtual Expression GetServiceExpression(ParameterExpression resolveFieldContextParameter, Type serviceType)
         {
             //returns: (serviceType)(AsyncServiceProvider.GetRequiredService(serviceType))
@@ -282,6 +289,16 @@ namespace GraphQL.DI
                 //retrieve the value and cast it to the specified type
                 //e.g. Func<ResolveFieldContext, TSource> = (context) => (TSource)context.Source;
                 expr = Expression.Convert(Expression.Property(resolveFieldContextParameter, sourceProperty), param.ParameterType);
+                //and do not add it as a QueryArgument
+                return null;
+            }
+            if (param.ParameterType == typeof(IServiceProvider))
+            {
+                //if they want the service provider, just pass it in
+                //e.g. Func<ResolveFieldContext, IServiceProvider> = (context) => AsyncServiceProvider.Current;
+                expr = GetServiceProviderExpression(resolveFieldContextParameter);
+                //note that we have a parameter that pulls from the service provider
+                usesServices = true;
                 //and do not add it as a QueryArgument
                 return null;
             }
