@@ -46,10 +46,11 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
-            IEnumerable<IValidationRule> rules = null)
+            IEnumerable<IValidationRule> rules = null,
+            IFieldNameConverter fieldNameConverter = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, fieldNameConverter);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -61,7 +62,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
             var queryResult = CreateQueryResult(expected);
             return AssertQueryIgnoreErrors(
@@ -79,13 +80,13 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
-            Inputs inputs= null,
+            Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             int expectedErrorCount = 0,
             bool renderErrors = false,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
             {
@@ -95,7 +96,7 @@ namespace GraphQL.Tests
                 options.Inputs = inputs;
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? ((ctx, ex) => ex);
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
             }).GetAwaiter().GetResult();
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
@@ -120,7 +121,7 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            Func<GraphQL.Execution.ExecutionContext, Exception, Exception> unhandledExceptionDelegate = null,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
             IFieldNameConverter fieldNameConverter = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
@@ -132,7 +133,7 @@ namespace GraphQL.Tests
                 options.UserContext = userContext;
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
-                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? ((ctx, ex) => ex);
+                options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
                 options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
@@ -161,7 +162,7 @@ namespace GraphQL.Tests
                 data = JObject.Parse(result);
             }
 
-            return new ExecutionResult { Data = data, Errors = errors};
+            return new ExecutionResult { Data = data, Errors = errors };
         }
     }
 }

@@ -22,7 +22,11 @@ query {
 
             var list = new List<Exception>();
 
-            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, unhandledExceptionDelegate: (ctx, ex) => { list.Add(ex); return new InvalidOperationException(ex.Message); } );
+            var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, unhandledExceptionDelegate: ctx =>
+            {
+                list.Add(ctx.OriginalException);
+                ctx.Exception = new InvalidOperationException(ctx.OriginalException.Message);
+            });
 
             list.Count.ShouldBe(1);
             list[0].ShouldBeOfType<InvalidTimeZoneException>().StackTrace.ShouldNotBeNull();

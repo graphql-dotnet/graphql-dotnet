@@ -5,8 +5,6 @@ namespace GraphQL.Types
 {
     public class GuidGraphType : ScalarGraphType
     {
-        public GuidGraphType() => Name = "Guid";
-
         public override object ParseLiteral(IValue value)
         {
             if (value is GuidValue guidValue)

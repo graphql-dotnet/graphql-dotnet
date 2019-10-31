@@ -4,8 +4,6 @@ namespace GraphQL.Types
 {
     public class ByteGraphType : ScalarGraphType
     {
-        public ByteGraphType() => Name = "Byte";
-
         public override object ParseLiteral(IValue value)
         {
             switch (value)

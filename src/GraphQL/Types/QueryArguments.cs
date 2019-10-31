@@ -12,7 +12,7 @@ namespace GraphQL.Types
 
         public QueryArguments(params QueryArgument[] args)
         {
-            foreach(var arg in args)
+            foreach (var arg in args)
             {
                 Add(arg);
             }
@@ -20,7 +20,7 @@ namespace GraphQL.Types
 
         public QueryArguments(IEnumerable<QueryArgument> list)
         {
-            foreach(var arg in list)
+            foreach (var arg in list)
             {
                 Add(arg);
             }

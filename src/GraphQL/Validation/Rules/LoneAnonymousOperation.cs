@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -13,6 +13,8 @@ namespace GraphQL.Validation.Rules
     {
         public Func<string> AnonOperationNotAloneMessage => () =>
             "This anonymous operation must be the only defined operation.";
+
+        public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
 
         public INodeVisitor Validate(ValidationContext context)
         {

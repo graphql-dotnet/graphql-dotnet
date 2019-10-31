@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -115,7 +116,7 @@ namespace GraphQL.Execution
     public class RootExecutionNode : ObjectExecutionNode
     {
         public RootExecutionNode(IObjectGraphType graphType)
-            : base(null, graphType, null, null, new string[0])
+            : base(null, graphType, null, null, Array.Empty<string>())
         {
 
         }
@@ -141,9 +142,16 @@ namespace GraphQL.Execution
             {
                 var value = item.ToValue();
 
-                if (value == null && ((ListGraphType)item.FieldDefinition.ResolvedType).ResolvedType is NonNullGraphType)
+                if (value == null)
                 {
-                    return null;
+                    var listType = item.FieldDefinition.ResolvedType;
+                    if (listType is NonNullGraphType nonNull)
+                        listType = nonNull.ResolvedType;
+
+                    if (((ListGraphType)listType).ResolvedType is NonNullGraphType)
+                    {
+                        return null;
+                    }
                 }
 
                 items.Add(value);

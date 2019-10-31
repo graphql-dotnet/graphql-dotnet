@@ -36,9 +36,16 @@ namespace GraphQL.Tests.Execution
         public void converts_long_to_long_value()
         {
             long val = 12345678910111213;
-            var result = val.AstFromValue(null, new IntGraphType());
+            var result = val.AstFromValue(null, new LongGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeOfType<LongValue>();
+        }
+
+        [Fact]
+        public void converts_long_to_int_value()
+        {
+            long val = 12345678910111213;
+            Should.Throw<OverflowException>(() => val.AstFromValue(null, new IntGraphType()));
         }
 
         [Fact]
@@ -84,12 +91,20 @@ namespace GraphQL.Tests.Execution
         public void converts_byte_to_byte_value()
         {
             var schema = new Schema();
-            schema.RegisterValueConverter(new ByteValueConverter());
 
             byte value = 12;
             var result = value.AstFromValue(schema, new ByteGraphType());
             result.ShouldNotBeNull();
             result.ShouldBeOfType<ByteValue>();
+        }
+
+        [Fact]
+        public void converts_sbyte_to_sbyte_value()
+        {
+            sbyte val = -12;
+            var result = val.AstFromValue(null, new SByteGraphType());
+            result.ShouldNotBeNull();
+            result.ShouldBeOfType<SByteValue>();
         }
 
         [Fact]
@@ -112,56 +127,6 @@ namespace GraphQL.Tests.Execution
         public IValue Convert(object value, IGraphType type)
         {
             return new ByteValue((byte)value);
-        }
-    }
-
-    internal class ByteValue : ValueNode<byte>
-    {
-        public ByteValue(byte value)
-        {
-            Value = value;
-        }
-
-        protected override bool Equals(ValueNode<byte> node)
-        {
-            return Value == node.Value;
-        }
-    }
-
-    internal class ByteGraphType : ScalarGraphType
-    {
-        public ByteGraphType()
-        {
-            Name = "Byte";
-        }
-
-        public override object Serialize(object value)
-        {
-            return ParseValue(value);
-        }
-
-        public override object ParseValue(object value)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                var result = Convert.ToByte(value);
-                return result;
-            }
-            catch (FormatException)
-            {
-                return null;
-            }
-        }
-
-        public override object ParseLiteral(IValue value)
-        {
-            var byteValue = value as ByteValue;
-            return byteValue?.Value;
         }
     }
 }

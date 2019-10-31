@@ -1,17 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using GraphQL.Introspection;
 using GraphQL.Types;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
     public class SchemaPrinter : IDisposable
     {
-        private ISchema _schema;
-
         protected SchemaPrinterOptions Options { get; }
 
         private readonly List<string> _scalars = new List<string>(
@@ -28,7 +28,7 @@ namespace GraphQL.Utilities
             ISchema schema,
             SchemaPrinterOptions options = null)
         {
-            _schema = schema;
+            Schema = schema;
             Options = options ?? new SchemaPrinterOptions();
 
             if (Options.CustomScalars?.Count > 0)
@@ -37,7 +37,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private ISchema Schema => _schema;
+        private ISchema Schema { get; set; }
 
         public string Print()
         {
@@ -56,10 +56,10 @@ namespace GraphQL.Utilities
                 Schema.Initialize();
             }
 
-            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).ToList();
+            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
                 .Where(t => typeFilter(t.Name))
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.Name, StringComparer.Ordinal)
                 .ToList();
 
             var result = new[]
@@ -81,7 +81,7 @@ namespace GraphQL.Utilities
 
         public bool IsIntrospectionType(string typeName)
         {
-            return typeName.StartsWith("__");
+            return typeName.StartsWith("__", StringComparison.InvariantCulture);
         }
 
         public bool IsBuiltInScalar(string typeName)
@@ -304,18 +304,18 @@ namespace GraphQL.Utilities
                 builder.Append(PrintDescription(directive.Description));
             }
             builder.AppendLine($"directive @{directive.Name}(");
-            builder.AppendLine(formatDirectiveArguments(directive.Arguments));
-            builder.Append($") on {formatDirectiveLocationList(directive.Locations)}");
+            builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
+            builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
             return builder.ToString().TrimStart();
         }
 
-        private string formatDirectiveArguments(QueryArguments arguments)
+        private string FormatDirectiveArguments(QueryArguments arguments)
         {
             if (arguments == null || !arguments.Any()) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 
-        private string formatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
+        private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
         {
             var enums = new __DirectiveLocation();
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
@@ -330,7 +330,7 @@ namespace GraphQL.Utilities
 
             if (value is bool)
             {
-                return value.ToString().ToLower();
+                return value.ToString().ToLower(CultureInfo.InvariantCulture);
             }
 
             if (IsEnumType(graphType))
@@ -438,7 +438,7 @@ namespace GraphQL.Utilities
 
         public void Dispose()
         {
-            _schema = null;
+            Schema = null;
         }
     }
 }

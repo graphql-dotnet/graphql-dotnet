@@ -60,7 +60,7 @@ namespace GraphQL.Utilities
 
         public TVal Arg<TVal>(string key)
         {
-            return (TVal) Arg(key);
+            return (TVal)Arg(key);
         }
 
         public object Arg<TProperty>(Expression<Func<T, TProperty>> argument)
@@ -115,7 +115,7 @@ namespace GraphQL.Utilities
         {
             if (Source != null)
             {
-                return (TType) Source;
+                return (TType)Source;
             }
 
             return default;
@@ -181,7 +181,7 @@ namespace GraphQL.Utilities
                 c.Field(x => x.SelectionSet);
                 c.Print(p =>
                 {
-                    var op = p.Arg(x => x.OperationType).ToString().ToLower();
+                    var op = p.Arg(x => x.OperationType).ToString().ToLower(CultureInfo.InvariantCulture);
                     var name = p.Arg(x => x.Name)?.ToString();
                     var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
                     var directives = Join(p.ArgArray(x => x.Directives), " ");
@@ -299,6 +299,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Value);
                 c.Print(f => f.Arg(x => x.Value));
             });
+
+            Config<BigIntValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f => f.Arg(x => x.Value));
+            });
+
             Config<FloatValue>(c =>
             {
                 c.Field(x => x.Value);
@@ -308,49 +315,56 @@ namespace GraphQL.Utilities
                     return val.ToString("0.0##############", CultureInfo.InvariantCulture);
                 });
             });
+
             Config<StringValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
                     var val = f.Arg(x => x.Value);
-                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\""))
+                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
                     {
                         val = $"\"{val}\"";
                     }
                     return val;
                 });
             });
+
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
+
             Config<EnumValue>(c =>
             {
                 c.Field(x => x.Name);
                 c.Print(p => p.Arg(x => x.Name));
             });
+
             Config<ListValue>(c =>
             {
                 c.Field(x => x.Values);
                 c.Print(p => $"[{Join(p.ArgArray(x => x.Values), ", ")}]");
             });
+
             Config<ObjectValue>(c =>
             {
                 c.Field(x => x.ObjectFields);
                 c.Print(p => $"{{{Join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
             });
+
             Config<ObjectField>(c =>
             {
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
+
             Config<UriValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
 
             // Directive
@@ -372,11 +386,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Print(p => p.Arg(x => x.Name));
             });
+
             Config<ListType>(c =>
             {
                 c.Field(x => x.Type);
                 c.Print(p => $"[{p.Arg(x => x.Type)}]");
             });
+
             Config<NonNullType>(c =>
             {
                 c.Field(x => x.Type);

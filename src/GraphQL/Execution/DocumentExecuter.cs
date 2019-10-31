@@ -139,7 +139,7 @@ namespace GraphQL
                     {
                         Errors = validationResult.Errors,
                         ExposeExceptions = options.ExposeExceptions,
-                        Perf = metrics.Finish()?.ToArray()
+                        Perf = metrics.Finish()
                     };
                 }
 
@@ -163,7 +163,7 @@ namespace GraphQL
                     {
                         Errors = context.Errors,
                         ExposeExceptions = options.ExposeExceptions,
-                        Perf = metrics.Finish()?.ToArray()
+                        Perf = metrics.Finish()
                     };
                 }
 
@@ -208,7 +208,12 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
-                ex = options.UnhandledExceptionDelegate(context, ex);
+                if (options.UnhandledExceptionDelegate != null)
+                {
+                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    options.UnhandledExceptionDelegate(exceptionContext);
+                    ex = exceptionContext.Exception;
+                }
 
                 result = new ExecutionResult
                 {
@@ -222,7 +227,7 @@ namespace GraphQL
             {
                 result = result ?? new ExecutionResult();
                 result.ExposeExceptions = options.ExposeExceptions;
-                result.Perf = metrics.Finish()?.ToArray();
+                result.Perf = metrics.Finish();
             }
 
             return result;
@@ -239,7 +244,7 @@ namespace GraphQL
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
-            Func<ExecutionContext, Exception, Exception> unhandledExceptionDelegate,
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate,
             int? maxParallelExecutionCount)
         {
             var context = new ExecutionContext

@@ -14,7 +14,7 @@ namespace GraphQL.Utilities
     {
         protected SyncToAsyncResolverAdapter WrapResolver(IFieldResolver resolver)
         {
-            var inner = resolver ?? new NameFieldResolver();
+            var inner = resolver ?? NameFieldResolver.Instance;
             return new SyncToAsyncResolverAdapter(inner);
         }
 

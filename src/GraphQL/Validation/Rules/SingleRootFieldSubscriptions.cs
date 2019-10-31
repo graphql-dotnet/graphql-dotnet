@@ -8,7 +8,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class SingleRootFieldSubscriptions : IValidationRule
     {
-        private static readonly string RuleCode = "5.2.3.1";
+        private const string RuleCode = "5.2.3.1";
+
+        public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
         public INodeVisitor Validate(ValidationContext context)
         {
@@ -35,7 +37,7 @@ namespace GraphQL.Validation.Rules
 
                     var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
 
-                    if (fragment == null )
+                    if (fragment == null)
                     {
                         return;
                     }

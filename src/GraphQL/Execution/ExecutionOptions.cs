@@ -12,7 +12,7 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
-    public class ExecutionOptions
+    public class ExecutionOptions : IProvideUserContext
     {
         public ISchema Schema { get; set; }
         public object Root { get; set; }
@@ -20,8 +20,14 @@ namespace GraphQL
         public string OperationName { get; set; }
         public Document Document { get; set; }
         public Inputs Inputs { get; set; }
+        
         public CancellationToken CancellationToken { get; set; }
+
+        /// <summary>
+        /// Note if not set then standard list of validation rules will be used.
+        /// </summary>
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
+
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
@@ -50,7 +56,7 @@ namespace GraphQL
         /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
-        public Func<Execution.ExecutionContext, Exception, Exception> UnhandledExceptionDelegate { get; set; } = (ctx, ex) => ex;
+        public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; } = context => { };
 
         /// <summary>
         /// If set, limits the maximum number of nodes executed in parallel

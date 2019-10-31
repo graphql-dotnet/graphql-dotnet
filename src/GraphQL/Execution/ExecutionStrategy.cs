@@ -187,12 +187,14 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return node;
 
+            ResolveFieldContext resolveContext = null;
+
             try
             {
                 var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
                 var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
 
-                var resolveContext = new ResolveFieldContext
+                resolveContext = new ResolveFieldContext
                 {
                     FieldName = node.Field.Name,
                     FieldAst = node.Field,
@@ -215,7 +217,7 @@ namespace GraphQL.Execution
                     SubFields = subFields
                 };
 
-                var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
+                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
 
                 if (result is Task task)
@@ -254,9 +256,15 @@ namespace GraphQL.Execution
                 if (context.ThrowOnUnhandledException)
                     throw;
 
-                ex = context.UnhandledExceptionDelegate(context, ex);
+                UnhandledExceptionContext exceptionContext = null;
+                if (context.UnhandledExceptionDelegate != null)
+                {
+                    exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                    context.UnhandledExceptionDelegate(exceptionContext);
+                    ex = exceptionContext.Exception;
+                }
 
-                var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
+                var error = new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
                 error.Path = node.Path;
                 context.Errors.Add(error);
@@ -310,7 +318,7 @@ namespace GraphQL.Execution
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
+                throw new ExecutionError($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
             }
         }
 

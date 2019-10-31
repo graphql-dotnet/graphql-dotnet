@@ -21,6 +21,8 @@ namespace GraphQL.Validation.Rules
             return $"Directive \"{directiveName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
         }
 
+        public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

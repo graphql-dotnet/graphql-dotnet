@@ -28,7 +28,9 @@ namespace GraphQL.Tests.Utilities
 
             var query = "{ _service { sdl } }";
 
-            var sdl = @"scalar Byte
+            var sdl = @"scalar BigInt
+
+scalar Byte
 
 scalar Date
 
@@ -39,6 +41,8 @@ scalar DateTimeOffset
 scalar Decimal
 
 scalar Guid
+
+scalar Long
 
 scalar Milliseconds
 
@@ -56,14 +60,14 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
 type User @key(fields: ""id"") {
   id: ID! @external
   username: String!
 }
-
-scalar UShort
 ";
 
             var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";

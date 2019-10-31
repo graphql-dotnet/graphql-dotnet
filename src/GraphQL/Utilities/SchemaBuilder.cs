@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
@@ -17,18 +18,11 @@ namespace GraphQL.Utilities
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
-        [Obsolete("Use ServiceProvider instead")]
-        public IServiceProvider DependencyResolver
-        {
-            get => ServiceProvider;
-            set => ServiceProvider = value;
-        }
-
         public TypeSettings Types { get; } = new TypeSettings();
 
         public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
         {
-            { "deprecated", typeof(DeprecatedDirectiveVisistor) }
+            { "deprecated", typeof(DeprecatedDirectiveVisitor) }
         };
 
         public SchemaBuilder RegisterDirectiveVisitor<T>(string name) where T : SchemaDirectiveVisitor
@@ -483,9 +477,9 @@ namespace GraphQL.Utilities
 
         protected virtual void VisitNode(object node, Action<ISchemaNodeVisitor> action)
         {
-            foreach(var selector in _visitorSelectors)
+            foreach (var selector in _visitorSelectors)
             {
-                foreach(var visitor in selector.Select(node))
+                foreach (var visitor in selector.Select(node))
                 {
                     action(visitor);
                 }
@@ -538,6 +532,12 @@ namespace GraphQL.Utilities
                     if (long.TryParse(str.Value, out var longResult))
                     {
                         return longResult;
+                    }
+
+                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    {
+                        return bigIntegerResult;
                     }
 
                     throw new ExecutionError($"Invalid number {str.Value}");

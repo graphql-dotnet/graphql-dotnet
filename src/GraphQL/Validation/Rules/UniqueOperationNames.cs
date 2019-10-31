@@ -14,6 +14,8 @@ namespace GraphQL.Validation.Rules
         public Func<string, string> DuplicateOperationNameMessage => opName =>
             $"There can only be one operation named {opName}.";
 
+        public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
+
         public INodeVisitor Validate(ValidationContext context)
         {
             var frequency = new HashSet<string>();

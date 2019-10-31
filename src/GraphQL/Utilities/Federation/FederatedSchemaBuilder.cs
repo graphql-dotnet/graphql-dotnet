@@ -11,7 +11,7 @@ namespace GraphQL.Utilities.Federation
     {
         internal const string ResolverMetadataField = "__FedResolver__";
 
-        private static readonly string FederatedSDL = @"
+        private const string FederatedSDL = @"
             scalar _Any
             # scalar _FieldSet
 
@@ -61,9 +61,7 @@ namespace GraphQL.Utilities.Federation
 
             if (query == null)
             {
-                query = new ObjectGraphType();
-                query.Name = "Query";
-                schema.Query = query;
+                schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
             query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new {});
@@ -81,7 +79,7 @@ namespace GraphQL.Utilities.Federation
 
                     var results = new List<object>();
 
-                    foreach(var rep in reps)
+                    foreach (var rep in reps)
                     {
                         var typeName = rep["__typename"].ToString();
                         var type = context.Schema.FindType(typeName);
@@ -117,7 +115,7 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            foreach(var selection in field.SelectionSet.Selections)
+            foreach (var selection in field.SelectionSet.Selections)
             {
                 // TODO: check to see if the SelectionSet already has the __typename field?
 
@@ -136,12 +134,14 @@ namespace GraphQL.Utilities.Federation
 
         private UnionGraphType BuildEntityGraphType(ISchema schema)
         {
-            var union = new UnionGraphType();
-            union.Name = "_Entity";
-            union.Description = "A union of all types that use the @key directive";
+            var union = new UnionGraphType
+            {
+                Name = "_Entity",
+                Description = "A union of all types that use the @key directive"
+            };
 
             var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
-            foreach(var e in entities)
+            foreach (var e in entities)
             {
                 union.AddPossibleType(e);
             }

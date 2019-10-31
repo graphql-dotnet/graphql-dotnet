@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
@@ -14,6 +14,8 @@ namespace GraphQL.Validation.Rules
     {
         public Func<string, string> DuplicateInputField =
             fieldName => $"There can be only one input field named {fieldName}.";
+
+        public static readonly UniqueInputFieldNames Instance = new UniqueInputFieldNames();
 
         public INodeVisitor Validate(ValidationContext context)
         {

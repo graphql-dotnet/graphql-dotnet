@@ -3,12 +3,20 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Unique argument names
+    ///
+    /// A GraphQL field or directive is only valid if all supplied arguments at a given field
+    /// are uniquely named.
+    /// </summary>
     public class UniqueArgumentNames : IValidationRule
     {
         public string DuplicateArgMessage(string argName)
         {
             return $"There can be only one argument named \"{argName}\".";
         }
+
+        public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
 
         public INodeVisitor Validate(ValidationContext context)
         {

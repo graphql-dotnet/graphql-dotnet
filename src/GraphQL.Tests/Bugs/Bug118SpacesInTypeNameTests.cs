@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -33,10 +33,9 @@ mutation M($input_0: MyInput!) {
     {
         public MyMutation()
         {
-            Name = "MyMutation";
             Field<StringGraphType>(
                 "run",
-                arguments: new QueryArguments(new QueryArgument<MyInput> {Name = "input"}),
+                arguments: new QueryArguments(new QueryArgument<MyInput> { Name = "input" }),
                 resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
         }
     }
@@ -52,7 +51,7 @@ mutation M($input_0: MyInput!) {
     {
         public MyInput()
         {
-            Name = "MyInput ";
+            Name = "MyInput"; // changed from "MyInput "
             Field<NonNullGraphType<StringGraphType>>("id");
             Field<StringGraphType>("foo");
             Field<StringGraphType>("bar");

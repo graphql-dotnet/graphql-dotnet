@@ -4,8 +4,6 @@ namespace GraphQL.Types
 {
     public class ULongGraphType : ScalarGraphType
     {
-        public ULongGraphType() => Name = "ULong";
-
         public override object ParseLiteral(IValue value)
         {
             switch (value)

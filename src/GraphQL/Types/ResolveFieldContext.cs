@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Field = GraphQL.Language.AST.Field;
+using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource>
+    public class ResolveFieldContext<TSource> : IProvideUserContext
     {
         public string FieldName { get; set; }
 
@@ -101,7 +102,9 @@ namespace GraphQL.Types
                 return inputObject.ToObject(argumentType);
             }
 
-            return arg.GetPropertyValue(argumentType);
+            var result = arg.GetPropertyValue(argumentType);
+
+            return result == null && argumentType.IsValueType ? defaultValue : result;
         }
 
         public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;

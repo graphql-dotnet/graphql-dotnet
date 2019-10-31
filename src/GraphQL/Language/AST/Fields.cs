@@ -28,15 +28,9 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public IEnumerator<Field> GetEnumerator()
-        {
-            return _fields.Values.GetEnumerator();
-        }
+        public IEnumerator<Field> GetEnumerator() => _fields.Values.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public static implicit operator Dictionary<string, Field>(Fields fields) => fields._fields;
     }
