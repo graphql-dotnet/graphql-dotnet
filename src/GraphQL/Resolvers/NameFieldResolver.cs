@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace GraphQL.Resolvers
 {
-    internal class NameFieldResolver : IFieldResolver
+    public class NameFieldResolver : IFieldResolver
     {
         private static readonly ConcurrentDictionary<(Type targetType, string name), Func<object, object>> _delegates
             = new ConcurrentDictionary<(Type, string), Func<object, object>>();

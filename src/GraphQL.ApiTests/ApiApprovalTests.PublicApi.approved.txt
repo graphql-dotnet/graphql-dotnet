@@ -1440,6 +1440,11 @@ namespace GraphQL.Resolvers
     {
         T Resolve(GraphQL.Types.ResolveFieldContext context);
     }
+    public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
+    {
+        public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
+        public object Resolve(GraphQL.Types.ResolveFieldContext context) { }
+    }
 }
 namespace GraphQL.Subscription
 {
