@@ -1,14 +1,15 @@
 using GraphQL.Types;
+using System.Threading.Tasks;
 
 namespace GraphQL.Resolvers
 {
     public interface IFieldResolver
     {
-        object Resolve(ResolveFieldContext context);
+        Task<object> ResolveAsync(ResolveFieldContext context);
     }
 
-    public interface IFieldResolver<out T> : IFieldResolver
+    public interface IFieldResolver<T> : IFieldResolver
     {
-        new T Resolve(ResolveFieldContext context);
+        new Task<T> ResolveAsync(ResolveFieldContext context);
     }
 }

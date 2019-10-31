@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,8 +22,8 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             Name = "CancellationTestType";
 
-            Field<StringGraphType>("one", resolve: GetOneAsync);
-            Field<StringGraphType>("two", resolve: GetTwoAsync);
+            FieldAsync<StringGraphType, string>("one", resolve: GetOneAsync);
+            FieldAsync<StringGraphType, string>("two", resolve: GetTwoAsync);
         }
 
         public Task<string> GetOneAsync(ResolveFieldContext<object> context)

@@ -144,7 +144,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<NumberHolderType>(
+            FieldAsync<NumberHolderType, NumberHolder>(
                 "promiseToChangeTheNumber",
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType>
@@ -178,7 +178,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<NumberHolderType>(
+            FieldAsync<NumberHolderType, NumberHolder>(
                 "promiseAndFailToChangeTheNumber",
                 arguments: new QueryArguments(
                     new QueryArgument<IntGraphType>
@@ -211,7 +211,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<DateTimeHolderType>(
+            FieldAsync<DateTimeHolderType, DateTimeHolder>(
                 "promiseToChangeTheDateTime",
                 arguments: new QueryArguments(
                     new QueryArgument<DateTimeGraphType>
@@ -243,7 +243,7 @@ namespace GraphQL.Tests.Execution
                 }
             );
 
-            Field<DateTimeHolderType>(
+            FieldAsync<DateTimeHolderType, DateTimeHolder>(
                 "promiseAndFailToChangeTheDateTime",
                 arguments: new QueryArguments(
                     new QueryArgument<DateTimeGraphType>

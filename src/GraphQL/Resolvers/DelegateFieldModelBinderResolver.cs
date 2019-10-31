@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL.Reflection;
 using GraphQL.Types;
 
@@ -16,10 +17,16 @@ namespace GraphQL.Resolvers
             _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public async Task<object> ResolveAsync(ResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
-            return _resolver.DynamicInvoke(arguments);
+            var ret = _resolver.DynamicInvoke(arguments);
+            if (ret is Task task)
+            {
+                await task.ConfigureAwait(false);
+                return task.GetResult();
+            }
+            return ret;
         }
     }
 }

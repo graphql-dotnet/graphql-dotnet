@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Execution
             public AsyncGraphType()
             {
                 Name = "Query";
-                Field<StringGraphType>("foo", resolve: context =>
+                FieldAsync<StringGraphType, string>("foo", resolve: context =>
                 {
                     var uc = context.UserContext.As<TestContext>();
                     return uc.ResolveAsync();

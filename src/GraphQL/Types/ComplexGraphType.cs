@@ -172,6 +172,27 @@ namespace GraphQL.Types
             });
         }
 
+        public FieldType FieldAsync<TReturnType>(
+            Type type,
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
+            string deprecationReason = null)
+        {
+            return AddField(new FieldType
+            {
+                Name = name,
+                Description = description,
+                DeprecationReason = deprecationReason,
+                Type = type,
+                Arguments = arguments,
+                Resolver = resolve != null
+                    ? new AsyncFieldResolver<TSourceType, TReturnType>(resolve)
+                    : null
+            });
+        }
+
         public FieldType FieldAsync<TGraphType>(
             string name,
             string description = null,

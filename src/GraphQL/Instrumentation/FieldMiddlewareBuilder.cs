@@ -46,7 +46,7 @@ namespace GraphQL.Instrumentation
 
         public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
         {
-            var app = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
+            var app = start ?? (context => NameFieldResolver.Instance.ResolveAsync(context));
 
             if (_components != null)
             {
@@ -76,9 +76,9 @@ namespace GraphQL.Instrumentation
                     {
                         var resolver = new MiddlewareResolver(field.Resolver);
 
-                        FieldMiddlewareDelegate app = Build(resolver.Resolve);
+                        FieldMiddlewareDelegate app = Build(resolver.ResolveAsync);
 
-                        field.Resolver = new FuncFieldResolver<object>(app.Invoke);
+                        field.Resolver = new AsyncFieldResolver<object>(app.Invoke);
                     }
                 }
             }

@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Utilities
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
                 field.Resolver = new FuncFieldResolver<object>(context =>
                 {
-                    var result = inner.Resolve(context);
+                    var result = inner.ResolveAsync(context).Result;
 
                     if (result is string str)
                     {
@@ -77,7 +77,7 @@ namespace GraphQL.Tests.Utilities
         {
             public override void VisitField(FieldType field)
             {
-                var inner = WrapResolver(field.Resolver);
+                var inner = field.Resolver;
                 field.Resolver = new AsyncFieldResolver<object>(async context =>
                 {
                     var result = await inner.ResolveAsync(context);

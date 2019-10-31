@@ -111,7 +111,7 @@ namespace GraphQL.Tests.Builders
         }
 
         [Fact]
-        public void can_define_simple_connection_with_resolver()
+        public async Task can_define_simple_connection_with_resolver()
         {
             var type = new ObjectGraphType();
 
@@ -145,7 +145,8 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-            var result = field.Resolver.Resolve(new ResolveFieldContext()) as Connection<Child>;
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+            var result = boxedResult as Connection<Child>;
 
             result.ShouldNotBeNull();
             if (result != null)
@@ -197,7 +198,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as Connection<Child>;
 
             result.ShouldNotBeNull();
@@ -251,7 +252,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
             result.ShouldNotBeNull();
@@ -328,7 +329,7 @@ namespace GraphQL.Tests.Builders
             field.Name.ShouldBe("testConnection");
             field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-            var boxedResult = await (Task<object>)field.Resolver.Resolve(new ResolveFieldContext());
+            var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
             var result = boxedResult as ParentChildrenConnection;
 
             result.ShouldNotBeNull();

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -15,7 +16,7 @@ namespace GraphQL.Reflection
             _serviceProvider = serviceProvider;
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public async Task<object> ResolveAsync(ResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
@@ -29,7 +30,13 @@ namespace GraphQL.Reflection
                 throw new InvalidOperationException($"Could not resolve an instance of {_accessor.DeclaringType.Name} to execute {parentType}{context.FieldName}");
             }
 
-            return _accessor.GetValue(target, arguments);
+            var value = _accessor.GetValue(target, arguments);
+            if (value is Task task)
+            {
+                await task.ConfigureAwait(false);
+                return task.GetResult();
+            }
+            return value;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
@@ -10,8 +10,8 @@ namespace GraphQL.StarWars
         {
             Name = "Query";
 
-            Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
-            Field<HumanType>(
+            FieldAsync<CharacterInterface, Droid>("hero", resolve: context => data.GetDroidByIdAsync("3"));
+            FieldAsync<HumanType, Human>(
                 "human",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }

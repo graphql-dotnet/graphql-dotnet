@@ -728,10 +728,10 @@ namespace GraphQL.Instrumentation
             public void Dispose() { }
         }
     }
-    public class MiddlewareResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<System.Threading.Tasks.Task<object>>
+    public class MiddlewareResolver : GraphQL.Resolvers.IFieldResolver
     {
         public MiddlewareResolver(GraphQL.Resolvers.IFieldResolver next) { }
-        public System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class PerfRecord
     {
@@ -1371,20 +1371,20 @@ namespace GraphQL.Resolvers
         public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscriber) { }
         public System.Threading.Tasks.Task<System.IObservable<TReturnType>> SubscribeAsync(GraphQL.Subscription.ResolveEventStreamContext context) { }
     }
-    public class AsyncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<System.Threading.Tasks.Task<TReturnType>>
+    public class AsyncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
         public AsyncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext, System.Threading.Tasks.Task<TReturnType>> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
-    public class AsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<System.Threading.Tasks.Task<TReturnType>>
+    public class AsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
         public AsyncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class DelegateFieldModelBinderResolver : GraphQL.Resolvers.IFieldResolver
     {
         public DelegateFieldModelBinderResolver(System.Delegate resolver) { }
-        public object Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class EventStreamResolver : GraphQL.Resolvers.IEventStreamResolver
     {
@@ -1404,17 +1404,17 @@ namespace GraphQL.Resolvers
     public class ExpressionFieldResolver<TSourceType, TProperty> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TProperty>
     {
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
-        public TProperty Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TProperty> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class FuncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
         public FuncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext, TReturnType> resolver) { }
-        public TReturnType Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class FuncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
         public FuncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolver) { }
-        public TReturnType Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public interface IAsyncEventStreamResolver
     {
@@ -1434,16 +1434,16 @@ namespace GraphQL.Resolvers
     }
     public interface IFieldResolver
     {
-        object Resolve(GraphQL.Types.ResolveFieldContext context);
+        System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context);
     }
-    public interface IFieldResolver<out T> : GraphQL.Resolvers.IFieldResolver
+    public interface IFieldResolver<T> : GraphQL.Resolvers.IFieldResolver
     {
-        T Resolve(GraphQL.Types.ResolveFieldContext context);
+        System.Threading.Tasks.Task<T> ResolveAsync(GraphQL.Types.ResolveFieldContext context);
     }
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
     {
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
-        public object Resolve(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
 }
 namespace GraphQL.Subscription
@@ -1529,6 +1529,7 @@ namespace GraphQL.Types
         public GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
         public GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
         public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldAsync<TReturnType>(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null) { }
         public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null)
@@ -2187,7 +2188,6 @@ namespace GraphQL.Utilities
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public virtual void VisitField(GraphQL.Types.FieldType field) { }
         public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
-        protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
@@ -2367,12 +2367,6 @@ namespace GraphQL.Utilities
         public static string ToConstantCase(string str) { }
         public static string ToPascalCase(string str) { }
         public static System.Collections.Generic.IEnumerable<string> ToWords(string str) { }
-    }
-    public sealed class SyncToAsyncResolverAdapter : GraphQL.Resolvers.IFieldResolver
-    {
-        public SyncToAsyncResolverAdapter(GraphQL.Resolvers.IFieldResolver inner) { }
-        public object Resolve(GraphQL.Types.ResolveFieldContext context) { }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
     }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {

@@ -26,7 +26,7 @@ namespace GraphQL.Tests
                 Name = "Anyone"
             };
 
-            Func<object> result = () => NameFieldResolver.Instance.Resolve(new ResolveFieldContext { Source = person, FieldAst = new Field(null, new NameNode(name) { }) });
+            Func<object> result = () => NameFieldResolver.Instance.ResolveAsync(new ResolveFieldContext { Source = person, FieldAst = new Field(null, new NameNode(name) { }) }).Result;
 
             if (throws)
                 Should.Throw<InvalidOperationException>(() => result());

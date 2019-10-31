@@ -12,12 +12,6 @@ namespace GraphQL.Utilities
 
     public abstract class BaseSchemaNodeVisitor : ISchemaNodeVisitor
     {
-        protected SyncToAsyncResolverAdapter WrapResolver(IFieldResolver resolver)
-        {
-            var inner = resolver ?? NameFieldResolver.Instance;
-            return new SyncToAsyncResolverAdapter(inner);
-        }
-
         public virtual void VisitObjectGraphType(ObjectGraphType type)
         {
         }

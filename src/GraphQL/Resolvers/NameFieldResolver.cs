@@ -2,6 +2,7 @@ using GraphQL.Types;
 using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace GraphQL.Resolvers
 {
@@ -14,7 +15,7 @@ namespace GraphQL.Resolvers
 
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
-        public object Resolve(ResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
+        public Task<object> ResolveAsync(ResolveFieldContext context) => Task.FromResult(Resolve(context?.Source, context?.FieldAst?.Name));
 
         private static object Resolve(object source, string name)
         {

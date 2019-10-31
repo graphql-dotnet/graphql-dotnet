@@ -4,6 +4,7 @@ using Shouldly;
 using Xunit;
 using GraphQL.StarWars.Types;
 using GraphQL.StarWars;
+using System.Threading.Tasks;
 
 namespace GraphQL.Tests.StarWars
 {
@@ -111,7 +112,7 @@ namespace GraphQL.Tests.StarWars
                ctx.SubFields.ShouldNotBeNull();
                ctx.SubFields.Keys.ShouldContain("id");
                ctx.SubFields.Keys.ShouldContain("friends");
-               return null;
+               return Task.FromResult<object>(null);
            });
             var query = @"
                 {
