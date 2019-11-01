@@ -154,7 +154,8 @@ namespace GraphQL
                     metrics,
                     options.Listeners,
                     options.ThrowOnUnhandledException,
-                    options.UnhandledExceptionDelegate);
+                    options.UnhandledExceptionDelegate,
+                    options.MaxParallelExecutionCount);
 
                 if (context.Errors.Any())
                 {
@@ -243,7 +244,8 @@ namespace GraphQL
             Metrics metrics,
             IEnumerable<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
-            Action<UnhandledExceptionContext> unhandledExceptionDelegate)
+            Action<UnhandledExceptionContext> unhandledExceptionDelegate,
+            int? maxParallelExecutionCount)
         {
             var context = new ExecutionContext
             {
@@ -260,7 +262,8 @@ namespace GraphQL
                 Metrics = metrics,
                 Listeners = listeners,
                 ThrowOnUnhandledException = throwOnUnhandledException,
-                UnhandledExceptionDelegate = unhandledExceptionDelegate
+                UnhandledExceptionDelegate = unhandledExceptionDelegate,
+                MaxParallelExecutionCount = maxParallelExecutionCount
             };
 
             return context;

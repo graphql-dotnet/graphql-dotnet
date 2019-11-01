@@ -185,6 +185,24 @@ namespace GraphQL.Tests.Bugs
             AssertResult(QUERY, EXPECTED, data, errors);
         }
 
+        [Fact]
+        public void NoNullListOfNonNull_with_exception_should_bubble_up_the_null()
+        {
+            const string QUERY = "{ nonNullableListOfNonNullableDataGraph { nonNullableListOfNonNullableThrow } }";
+            const string EXPECTED = "";
+            var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
+            var errors = new[]
+            {
+                new ExecutionError(
+                    "Error trying to resolve nonNullableListOfNonNullableThrow.")
+                {
+                    Path = new[] { "nonNullableListOfNonNullableDataGraph", "0", "nonNullableListOfNonNullableThrow"}
+                }
+            };
+
+            AssertResult(QUERY, EXPECTED, data, errors);
+        }
+
         private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors)
         {
             ExecutionResult result =
@@ -233,6 +251,10 @@ namespace GraphQL.Tests.Bugs
                 resolve: c => new DataGraphType { Data = c.Source as Data }
             );
 
+            query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>(
+               "nonNullableListOfNonNullableDataGraph",
+               resolve: c => new[] { new DataGraphType() });
+
             Query = query;
         }
     }
@@ -262,6 +284,10 @@ namespace GraphQL.Tests.Bugs
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
                 "nonNullableListOfNonNullable",
                 resolve: c => c.Source.Data.ListOfStrings);
+
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
+                "nonNullableListOfNonNullableThrow",
+                resolve: c => throw new Exception("test"));
 
             Field<NonNullGraphType<DataGraphType>>(
                 "nonNullableNest",
