@@ -11,5 +11,10 @@ namespace GraphQL.DI.DelayLoader
         {
             return new ContinueWith<TOut, TResult>(parent, func);
         }
+
+        public static IDelayLoadedResult<TResult> Then<TOut, TResult>(this IDelayLoadedResult<TOut> parent, Func<TOut, TResult> func)
+        {
+            return new ContinueWith<TOut, TResult>(parent, (value) => Task.FromResult(func(value)));
+        }
     }
 }
