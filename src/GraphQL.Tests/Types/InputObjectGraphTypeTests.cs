@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Types
         private class MyInputGraphType : InputObjectGraphType { }
         private class MyEnumGraphType : EnumerationGraphType { }
 
-        [Fact(Skip = "Exception disabled due to SchemaBuilder using GraphQLTypeReference")]
+        [Fact]
         public void should_throw_an_exception_if_input_object_graph_type_contains_object_graph_type_field()
         {
             var type = new InputObjectGraphType();
