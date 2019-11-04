@@ -59,6 +59,11 @@ namespace GraphQL
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; } = context => { };
 
         /// <summary>
+        /// If set, limits the maximum number of nodes executed in parallel
+        /// </summary>
+        public int? MaxParallelExecutionCount { get; set; }
+
+        /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types.
         /// </summary>
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();

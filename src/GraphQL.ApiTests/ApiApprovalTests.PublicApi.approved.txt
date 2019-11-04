@@ -261,6 +261,7 @@ namespace GraphQL
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.IList<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
+        public System.Nullable<int> MaxParallelExecutionCount { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
         public object Root { get; set; }
@@ -459,6 +460,7 @@ namespace GraphQL.Execution
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
+        public System.Nullable<int> MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public object RootValue { get; set; }
@@ -1439,6 +1441,11 @@ namespace GraphQL.Resolvers
     public interface IFieldResolver<out T> : GraphQL.Resolvers.IFieldResolver
     {
         T Resolve(GraphQL.Types.ResolveFieldContext context);
+    }
+    public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
+    {
+        public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
+        public object Resolve(GraphQL.Types.ResolveFieldContext context) { }
     }
 }
 namespace GraphQL.Subscription
