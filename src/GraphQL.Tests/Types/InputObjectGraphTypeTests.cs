@@ -7,11 +7,15 @@ namespace GraphQL.Tests.Types
 {
     public class InputObjectGraphTypeTests
     {
-        [Fact]
+        private class MyObjectGraphType : ObjectGraphType { }
+        private class MyInputGraphType : InputObjectGraphType { }
+        private class MyEnumGraphType : EnumerationGraphType { }
+
+        [Fact(Skip = "Exception disabled due to SchemaBuilder using GraphQLTypeReference")]
         public void should_throw_an_exception_if_input_object_graph_type_contains_object_graph_type_field()
         {
             var type = new InputObjectGraphType();
-            var exception = Should.Throw<ArgumentException>(() => type.Field<ObjectGraphType>().Name("test"));
+            var exception = Should.Throw<ArgumentException>(() => type.Field<NonNullGraphType<ListGraphType<MyObjectGraphType>>>().Name("test"));
 
             exception.Message.ShouldContain("InputObjectGraphType cannot have fields containing a ObjectGraphType.");
         }
@@ -20,7 +24,9 @@ namespace GraphQL.Tests.Types
         public void should_not_throw_an_exception_if_input_object_graph_type_doesnt_contains_object_graph_type_field()
         {
             var type = new InputObjectGraphType();
-            var exception = type.Field<ComplexGraphType<object>>().Name("test");
+            var field1 = type.Field<NonNullGraphType<ListGraphType<MyInputGraphType>>>().Name("test1");
+            var field2 = type.Field<StringGraphType>().Name("test2");
+            var field3 = type.Field<MyEnumGraphType>().Name("test3");
         }
     }
 }

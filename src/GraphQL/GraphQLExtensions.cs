@@ -93,6 +93,20 @@ namespace GraphQL
                        $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
         }
 
+        public static bool IsInputType(this Type type)
+        {
+            var namedType = type.GetNamedType();
+            return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
+                   typeof(EnumerationGraphType).IsAssignableFrom(namedType) ||
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
+        }
+
+        public static bool IsInputObjectType(this Type type)
+        {
+            var namedType = type.GetNamedType();
+            return typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
+        }
+
         public static Type GetNamedType(this Type type)
         {
             if (type.IsGenericType
