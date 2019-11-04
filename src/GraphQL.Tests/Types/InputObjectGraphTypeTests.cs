@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Types
             var type = new InputObjectGraphType();
             var exception = Should.Throw<ArgumentException>(() => type.Field<NonNullGraphType<ListGraphType<MyObjectGraphType>>>().Name("test"));
 
-            exception.Message.ShouldContain("InputObjectGraphType cannot have fields containing a ObjectGraphType.");
+            exception.Message.ShouldContain("InputObjectGraphType should contain only fields of 'input types' - enumerations, scalars and other InputObjectGraphTypes");
         }
 
         [Fact]

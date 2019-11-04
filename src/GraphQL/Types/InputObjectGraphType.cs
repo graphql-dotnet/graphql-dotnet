@@ -16,7 +16,7 @@ namespace GraphQL.Types
         {
             if (!ValidateFieldType(fieldType))
             {
-                throw new ArgumentException("InputObjectGraphType cannot have fields containing a ObjectGraphType.", nameof(fieldType.Type));
+                throw new ArgumentException("InputObjectGraphType should contain only fields of 'input types' - enumerations, scalars and other InputObjectGraphTypes", nameof(fieldType.Type));
             }
 
             return base.AddField(fieldType);
