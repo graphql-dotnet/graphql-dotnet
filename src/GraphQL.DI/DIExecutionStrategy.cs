@@ -24,30 +24,32 @@ namespace GraphQL.DI
             //set up the service provider
             AsyncServiceProvider.Current = _serviceProvider;
 
-            var nodes = new Stack<ExecutionNode>(); //synchronous nodes to be executed
-            nodes.Push(rootNode);
-            var asyncNodes = new List<ExecutionNode>(); //asynchronous nodes to be executed
+            var nodes = new Queue<ExecutionNode>(); //synchronous nodes to be executed
+            nodes.Enqueue(rootNode);
+            var asyncNodes = new Queue<ExecutionNode>(); //asynchronous nodes to be executed
             var waitingTasks = new List<Task<ExecutionNode>>(); //nodes currently executing
-            var pendingNodes = new Stack<ExecutionNode>(); //IDelayLoadedResult nodes pending completion
+            var pendingNodes = new Queue<ExecutionNode>(); //IDelayLoadedResult nodes pending completion
             Task<ExecutionNode> waitingSyncTask = null;
+            int maxTasks = context.MaxParallelExecutionCount ?? int.MaxValue;
+            if (maxTasks < 1) throw new InvalidOperationException("Invalid maximum number of tasks");
 
-            // Process each node on the stack one by one
-            while (nodes.Count > 0 || asyncNodes.Count > 0 || waitingTasks.Count > 0 || pendingNodes.Count > 0)
+            // Process each node in the queue
+            while (true)
             {
                 //start executing all asynchronous nodes
-                if (asyncNodes.Count > 0)
+                while (asyncNodes.Count > 0 && waitingTasks.Count < maxTasks)
                 {
                     //this does not actually execute any nodes yet
-                    var tasks = asyncNodes.Select(asyncNode => ExecuteNodeAsync(context, asyncNode));
+                    var tasks = ExecuteNodeAsync(context, asyncNodes.Dequeue());
                     //the tasks are executed while being enumerated here
-                    waitingTasks.AddRange(tasks);
+                    waitingTasks.Add(tasks);
                 }
 
                 //start executing one synchronous task, if none is yet waiting to be completed
-                if (nodes.Count > 0 && waitingSyncTask == null)
+                if (nodes.Count > 0 && waitingSyncTask == null && waitingTasks.Count < maxTasks)
                 {
                     //grab a synchronous node to execute
-                    var node = nodes.Pop();
+                    var node = nodes.Dequeue();
                     //execute it (asynchronously)
                     var task = ExecuteNodeAsync(context, node);
                     //notate the synchronous task that is currently executing
@@ -56,72 +58,75 @@ namespace GraphQL.DI
                     waitingTasks.Add(task);
                 }
 
-                //check if there are any listeners
-                IEnumerable<Task<ExecutionNode>> completedTasks;
-                if (context.Listeners.Count() == 0)
+                //complete one or more tasks
+                if (waitingTasks.Count > 0)
                 {
-                    //wait for at least one task to complete
-                    var completedTask = await Task.WhenAny(waitingTasks).ConfigureAwait(false);
-                    //note: errors are not thrown here, but rather down at task.Result
-                    completedTasks = new Task<ExecutionNode>[] { completedTask };
-                    waitingTasks.Remove(completedTask);
-                    if (waitingSyncTask == completedTask) waitingSyncTask = null;
-                }
-                else
-                {
-                    //wait for listeners (this really makes no sense, and
-                    //  is a really poor way of implementing an IDataLoader)
-                    await OnBeforeExecutionStepAwaitedAsync(context)
-                        .ConfigureAwait(false);
-
-                    //execute all pending tasks
-                    await Task.WhenAll(waitingTasks).ConfigureAwait(false);
-
-                    completedTasks = waitingTasks;
-                    waitingTasks = new List<Task<ExecutionNode>>();
-                    waitingSyncTask = null;
-                }
-
-                //if the request was canceled, quit out now
-                context.CancellationToken.ThrowIfCancellationRequested();
-
-                //check each completed task
-                foreach (var task in completedTasks)
-                {
-                    var node = task.Result;
-                    //if the result of the node is an IDelayLoadedResult, then add this
-                    //  node to a list of nodes to be loaded once everything else possible
-                    //  has been loaded
-                    if (node.Result is IDelayLoadedResult)
+                    //check if there are any listeners
+                    IEnumerable<Task<ExecutionNode>> completedTasks;
+                    if (context.Listeners.Count() == 0)
                     {
-                        pendingNodes.Push(node);
+                        //wait for at least one task to complete
+                        var completedTask = await Task.WhenAny(waitingTasks).ConfigureAwait(false);
+                        //note: errors are not thrown here, but rather down at task.Result
+                        completedTasks = new Task<ExecutionNode>[] { completedTask };
+                        waitingTasks.Remove(completedTask);
+                        if (waitingSyncTask == completedTask) waitingSyncTask = null;
                     }
                     else
                     {
-                        // Push any child nodes on top of the stack
-                        if (node is IParentExecutionNode parentNode)
+                        //wait for listeners (this really makes no sense, and
+                        //  is a really poor way of implementing an IDataLoader)
+                        await OnBeforeExecutionStepAwaitedAsync(context)
+                            .ConfigureAwait(false);
+
+                        //execute all pending tasks
+                        await Task.WhenAll(waitingTasks).ConfigureAwait(false);
+
+                        completedTasks = waitingTasks;
+                        waitingTasks = new List<Task<ExecutionNode>>();
+                        waitingSyncTask = null;
+                    }
+
+                    //if the request was canceled, quit out now
+                    context.CancellationToken.ThrowIfCancellationRequested();
+
+                    //check each completed task
+                    foreach (var task in completedTasks)
+                    {
+                        var node = task.Result;
+                        //if the result of the node is an IDelayLoadedResult, then add this
+                        //  node to a list of nodes to be loaded once everything else possible
+                        //  has been loaded
+                        if (node.Result is IDelayLoadedResult)
                         {
-                            // Add in reverse order so fields are executed in the correct order (for synchronous tasks)
-                            foreach (var child in parentNode.GetChildNodes().Reverse())
+                            pendingNodes.Enqueue(node);
+                        }
+                        else
+                        {
+                            // Push any child nodes on top of the stack
+                            if (node is IParentExecutionNode parentNode)
                             {
-                                //add node to async list or sync list, as appropriate
-                                if (child.FieldDefinition is DIFieldType fieldType && fieldType.Concurrent)
+                                // Add in reverse order so fields are executed in the correct order (for synchronous tasks)
+                                foreach (var child in parentNode.GetChildNodes())
                                 {
-                                    asyncNodes.Add(child);
-                                }
-                                else
-                                {
-                                    nodes.Push(child);
+                                    //add node to async list or sync list, as appropriate
+                                    if (child.FieldDefinition is DIFieldType fieldType && fieldType.Concurrent)
+                                    {
+                                        asyncNodes.Enqueue(child);
+                                    }
+                                    else
+                                    {
+                                        nodes.Enqueue(child);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                completedTasks = null;
 
                 //if there's no sync/async nodes being processed or waiting to be processed,
                 //  then load any IDelayLoadedResult values
-                if (nodes.Count == 0 && asyncNodes.Count == 0 && waitingTasks.Count == 0 && pendingNodes.Count > 0)
+                if (nodes.Count == 0 && asyncNodes.Count == 0 && waitingTasks.Count == 0)
                 {
                     //must be synchronously, as all DelayLoaders will exist in the same scope
                     //however, once a single node is resolved, all the rest of the tasks from the same DelayLoader will already be completed
@@ -130,11 +135,14 @@ namespace GraphQL.DI
                     //  which may try to execute before this 'level' of dataloaders have executed
                     while (pendingNodes.Count > 0)
                     {
-                        var pendingNode = pendingNodes.Pop();
+                        var pendingNode = pendingNodes.Dequeue();
                         var task = CompleteNodeAsync(context, pendingNode);
-                        await task.ConfigureAwait(false);
+                        await task.ConfigureAwait(false); //execute synchronously
                         waitingTasks.Add(task);
                     }
+                    //if there were no pending nodes, there would be no waitingTasks, and that means there's no more nodes left to execute
+                    if (waitingTasks.Count == 0) return;
+                    //otherwise, the pending waitingTasks will all need to execute before the DelayLoaders attempt to execute again
                 }
             }
         }
