@@ -24,9 +24,9 @@ namespace GraphQL.DI
             //set up the service provider
             AsyncServiceProvider.Current = _serviceProvider;
 
-            var nodes = new Queue<ExecutionNode>(); //synchronous nodes to be executed
-            nodes.Enqueue(rootNode);
-            var asyncNodes = new Queue<ExecutionNode>(); //asynchronous nodes to be executed
+            var nodes = new Stack<ExecutionNode>(); //synchronous nodes to be executed
+            nodes.Push(rootNode);
+            var asyncNodes = new Stack<ExecutionNode>(); //asynchronous nodes to be executed
             var waitingTasks = new List<Task<ExecutionNode>>(); //nodes currently executing
             var pendingNodes = new Queue<ExecutionNode>(); //IDelayLoadedResult nodes pending completion
             Task<ExecutionNode> waitingSyncTask = null;
@@ -39,9 +39,11 @@ namespace GraphQL.DI
                 //start executing all asynchronous nodes
                 while (asyncNodes.Count > 0 && waitingTasks.Count < maxTasks)
                 {
-                    //this does not actually execute any nodes yet
-                    var tasks = ExecuteNodeAsync(context, asyncNodes.Dequeue());
-                    //the tasks are executed while being enumerated here
+                    //grab an asynchronous node to execute
+                    var node = asyncNodes.Pop();
+                    //execute it (asynchronously)
+                    var tasks = ExecuteNodeAsync(context, node);
+                    //add this task to the list of tasks waiting to be completed
                     waitingTasks.Add(tasks);
                 }
 
@@ -49,7 +51,7 @@ namespace GraphQL.DI
                 if (nodes.Count > 0 && waitingSyncTask == null && waitingTasks.Count < maxTasks)
                 {
                     //grab a synchronous node to execute
-                    var node = nodes.Dequeue();
+                    var node = nodes.Pop();
                     //execute it (asynchronously)
                     var task = ExecuteNodeAsync(context, node);
                     //notate the synchronous task that is currently executing
@@ -107,16 +109,16 @@ namespace GraphQL.DI
                             if (node is IParentExecutionNode parentNode)
                             {
                                 // Add in reverse order so fields are executed in the correct order (for synchronous tasks)
-                                foreach (var child in parentNode.GetChildNodes())
+                                foreach (var child in parentNode.GetChildNodes().Reverse())
                                 {
                                     //add node to async list or sync list, as appropriate
                                     if (child.FieldDefinition is DIFieldType fieldType && fieldType.Concurrent)
                                     {
-                                        asyncNodes.Enqueue(child);
+                                        asyncNodes.Push(child);
                                     }
                                     else
                                     {
-                                        nodes.Enqueue(child);
+                                        nodes.Push(child);
                                     }
                                 }
                             }
