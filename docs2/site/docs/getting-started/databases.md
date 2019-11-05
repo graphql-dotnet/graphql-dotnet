@@ -4,7 +4,6 @@ This library will work with any data source that you provide.  Here are a few re
 
 
 ## Entity Framework
-* [Entity Framework Blog Series](https://github.com/fiyazbinhasan/GraphQLCore/tree/master) by [Fiyaz Hasan](https://twitter.com/FiyazBinHasan)
 * [Entity Framework](https://github.com/JacekKosciesza/StarWars) by [Jacek Kościesza](https://github.com/JacekKosciesza)
 * [GraphQL.EntityFramework](https://github.com/SimonCropp/GraphQL.EntityFramework) Adds EntityFramework Core IQueryable support by [Simon Cropp](https://github.com/SimonCropp/)
 
