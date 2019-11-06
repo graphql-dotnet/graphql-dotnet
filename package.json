@@ -30,7 +30,7 @@
     "graphiql": "^0.11.11",
     "graphql": "^0.13.2",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-dom": "^16.4.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
