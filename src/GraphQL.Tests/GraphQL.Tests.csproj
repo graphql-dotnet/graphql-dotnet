@@ -1,17 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Tests.props" />
+  
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.2</TargetFrameworks>
-    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-    <AssemblyName>GraphQL.Tests</AssemblyName>
-    <PackageId>GraphQL.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
-    <NoWarn>$(NoWarn);1591;IDE1006</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,15 +21,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="xunit.runner.reporters" Version="2.4.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Shouldly" Version="4.0.0-beta0002" />
   </ItemGroup>
 
   <ItemGroup>
