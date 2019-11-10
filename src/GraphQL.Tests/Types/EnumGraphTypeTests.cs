@@ -110,5 +110,17 @@ namespace GraphQL.Tests.Types
         {
             type.ParseValue("RED").ShouldBe(Colors.Red);
         }
+
+        [Fact]
+        public void parse_value_is_null_safe()
+        {
+            type.ParseValue(null).ShouldBe(null);
+        }
+
+        [Fact]
+        public void does_not_allow_nulls_to_be_added()
+        {
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
+        }
     }
 }
