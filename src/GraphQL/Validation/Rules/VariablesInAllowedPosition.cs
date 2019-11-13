@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
@@ -18,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();
 
@@ -64,7 +65,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 );
-            });
+            }).ToTask();
         }
 
         /// <summary>

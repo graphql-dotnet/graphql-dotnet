@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -34,7 +35,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -84,7 +85,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

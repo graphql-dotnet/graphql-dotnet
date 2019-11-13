@@ -2,6 +2,7 @@ namespace GraphQL.Validation.Rules
 {
     using GraphQL.Language.AST;
     using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Subscription operations must have exactly one root field.
@@ -12,7 +13,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(config =>
             {
@@ -63,7 +64,7 @@ namespace GraphQL.Validation.Rules
                     }
 
                 });
-            });
+            }).ToTask();
         }
 
         public static string InvalidNumberOfRootFieldMessage(string name)
