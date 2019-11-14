@@ -54,7 +54,7 @@ namespace GraphQL.DI.DelayLoader
 
         //this function may be called on multiple threads only if IDelayLoader.LoadAsync
         //  is called on multiple threads for different lists of queued items
-        public abstract Task LoadValuesAsync(IEnumerable<DelayLoadedPair<TIn, TOut>> list, CancellationToken cancellationToken);
+        protected abstract Task LoadValuesAsync(IEnumerable<DelayLoadedPair<TIn, TOut>> list, CancellationToken cancellationToken);
 
         internal Task StartLoading(DelayLoadedList<TIn, TOut> listToLoad, CancellationToken cancellationToken)
         {
