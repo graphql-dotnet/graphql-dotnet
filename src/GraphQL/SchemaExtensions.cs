@@ -7,6 +7,7 @@ namespace GraphQL
 {
     public static class SchemaExtensions
     {
+        [Obsolete(@"This action is async. Use ExecuteAsync. Will be removed in v4.")]
         public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
         {
             return ExecuteAsync(schema, configure).GetAwaiter().GetResult();
@@ -21,7 +22,8 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await new DocumentWriter(indent: true).WriteToStringAsync(result).ConfigureAwait(false);
+            var documentWriter = new DocumentWriter(indent: true);
+            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
         }
     }
 }
