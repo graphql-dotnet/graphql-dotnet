@@ -400,7 +400,6 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
-        public static string Execute(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
     public static class StringExtensions
