@@ -374,7 +374,7 @@ namespace GraphQL.Utilities
         {
             if (string.IsNullOrWhiteSpace(description)) return "";
 
-            indentation = indentation ?? "";
+            indentation ??= "";
 
             // normalize newlines
             description = description.Replace("\r", "");
