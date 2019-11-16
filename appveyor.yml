@@ -26,7 +26,6 @@ build_script:
 - cmd: >-
     yarn build-ci
 
-
 artifacts:
   - path: 'artifacts\*.nupkg'
 

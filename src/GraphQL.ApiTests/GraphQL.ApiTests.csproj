@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
   
   <PropertyGroup>
@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PublicApiGenerator" Version="10.0.0-beta4" />
+    <PackageReference Include="PublicApiGenerator" Version="10.0.0-beta5" />
   </ItemGroup>
 
   <ItemGroup>
