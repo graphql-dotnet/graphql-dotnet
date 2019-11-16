@@ -346,7 +346,7 @@ namespace GraphQL.Types
         private void AddTypeWithLoopCheck(IGraphType resolvedType, TypeCollectionContext context, Type namedType)
         {
             if (context.InFlightRegisteredTypes.Any(t => t == namedType))
-                throw new InvalidOperationException(@$"A loop has been detected while registering schema types.
+                throw new InvalidOperationException($@"A loop has been detected while registering schema types.
 There was an attempt to re-register '{namedType.FullName}' with instance of '{resolvedType.GetType().FullName}'.
 Make sure that your ServiceProvider is configured correctly.");
 
