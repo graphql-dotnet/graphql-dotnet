@@ -33,12 +33,6 @@ namespace GraphQL.Tests
             TypeExtensions.IsNullable(type).ShouldBeTrue();
         }
 
-        [Fact]
-        public void will_throw_on_open_generic()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(() => TypeExtensions.GetGraphTypeFromType(typeof(List<>)));
-        }
-
         private enum TestEnum { }
     }
 }
