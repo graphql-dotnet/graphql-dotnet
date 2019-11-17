@@ -109,41 +109,9 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: [NestedObjType]
@@ -158,41 +126,9 @@ type root {
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: NestedObjType!
@@ -207,41 +143,9 @@ type root {
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: NestedObjType

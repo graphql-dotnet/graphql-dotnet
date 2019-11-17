@@ -9,7 +9,6 @@ namespace GraphQL.Utilities.Federation
 {
     public class FederatedSchemaPrinter : SchemaPrinter
     {
-
         private readonly List<string> _federatedDirectives = new List<string>
         {
             "external",

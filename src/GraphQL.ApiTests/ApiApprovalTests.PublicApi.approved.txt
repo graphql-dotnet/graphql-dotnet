@@ -326,6 +326,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
+        public static bool References(this GraphQL.Types.ISchema schema, string typeName) { }
         public static string TrimGraphQLTypes(this string name) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
@@ -2348,7 +2349,7 @@ namespace GraphQL.Utilities
     public class SchemaPrinterOptions
     {
         public SchemaPrinterOptions() { }
-        public System.Collections.Generic.List<string> CustomScalars { get; set; }
+        public bool IncludeAllTypes { get; set; }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }

@@ -13,15 +13,21 @@ namespace GraphQL.Utilities
     {
         protected SchemaPrinterOptions Options { get; }
 
-        private readonly List<string> _scalars = new List<string>(
-            new[]
-            {
-                "String",
-                "Boolean",
-                "Int",
-                "Float",
-                "ID"
-            });
+        private readonly List<string> _builtInScalars = new List<string>
+        {
+            "String",
+            "Boolean",
+            "Int",
+            "Float",
+            "ID"
+        };
+
+        private readonly List<string> _buildInDirectives = new List<string>
+        {
+            "skip",
+            "include",
+            "deprecated"
+        };
 
         public SchemaPrinter(
             ISchema schema,
@@ -29,11 +35,6 @@ namespace GraphQL.Utilities
         {
             Schema = schema;
             Options = options ?? new SchemaPrinterOptions();
-
-            if (Options.CustomScalars?.Count > 0)
-            {
-                _scalars.AddRange(Options.CustomScalars);
-            }
         }
 
         private ISchema Schema { get; set; }
@@ -75,7 +76,7 @@ namespace GraphQL.Utilities
 
         public virtual bool IsDefinedType(string typeName)
         {
-            return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
+            return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName) && (Options.IncludeAllTypes || Schema.References(typeName));
         }
 
         public bool IsIntrospectionType(string typeName)
@@ -85,18 +86,12 @@ namespace GraphQL.Utilities
 
         public bool IsBuiltInScalar(string typeName)
         {
-            return _scalars.Contains(typeName);
+            return _builtInScalars.Contains(typeName);
         }
 
         public bool IsSpecDirective(string directiveName)
         {
-            var names = new []
-            {
-                "skip",
-                "include",
-                "deprecated"
-            };
-            return names.Contains(directiveName);
+            return _buildInDirectives.Contains(directiveName);
         }
 
         public string PrintSchemaDefinition(ISchema schema)

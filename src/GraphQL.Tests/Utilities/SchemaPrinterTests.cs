@@ -117,7 +117,7 @@ scalar Seconds"
 
         private string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeAllTypes = true });
         }
 
         private string print(ISchema schema, SchemaPrinterOptions options)
@@ -263,11 +263,12 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
-                IncludeDescriptions = true
+                IncludeDescriptions = true,
+                IncludeAllTypes = true
             };
 
             var expected = new Dictionary<string, string>
@@ -298,12 +299,13 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true,
-                IncludeDeprecationReasons = true
+                IncludeDeprecationReasons = true,
+                IncludeAllTypes = true
             };
 
             var expected = new Dictionary<string, string>
@@ -620,57 +622,15 @@ type Bar implements IFoo, Baaz {
   str: String
 }
 
-scalar BigInt
-
-scalar Byte
-
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
 
-scalar Long
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
-
 type Query {
   bar: Bar
 }
-
-scalar SByte
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 ", excludeScalars: true);
         }
 
@@ -700,57 +660,15 @@ type Bar implements IFoo & Baaz {
   str: String
 }
 
-scalar BigInt
-
-scalar Byte
-
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
 
-scalar Long
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
-
 type Query {
   bar: Bar
 }
-
-scalar SByte
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 ", excludeScalars: true);
         }
 

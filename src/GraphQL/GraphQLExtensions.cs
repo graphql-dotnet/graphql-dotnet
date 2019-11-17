@@ -439,5 +439,63 @@ namespace GraphQL
                     : throw new ExecutionError($"Cannot convert value to AST: {serialized}");
             }
         }
+
+
+        public static bool References(this ISchema schema, string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName))
+                return false;
+
+            if (!schema.Initialized)
+                schema.Initialize();
+
+            if (schema.Query?.Name == typeName || schema.Mutation?.Name == typeName || schema.Subscription?.Name == typeName)
+                return true;
+
+            foreach (var directive in schema.Directives)
+            {
+                if (directive.Arguments != null)
+                    foreach (var arg in directive.Arguments)
+                    {
+                        if (arg.ResolvedType.GetNamedType().Name == typeName)
+                            return true;
+                    }
+            }
+
+            foreach (var type in schema.AllTypes.OfType<IComplexGraphType>())
+            {
+                if (type is UnionGraphType union)
+                {
+                    foreach (var possible in union.PossibleTypes)
+                        if (possible.Name == typeName)
+                            return true;
+                }
+
+                if (type is IImplementInterfaces ifaces)
+                {
+                    foreach (var iface in ifaces.ResolvedInterfaces)
+                        if (iface.Name == typeName)
+                            return true;
+                }
+                
+                if (type is IComplexGraphType complex)
+                {
+                    foreach (var field in complex.Fields)
+                    {
+                        if (field.ResolvedType.GetNamedType().Name == typeName)
+                            return true;
+
+                        if (field.Arguments != null)
+                            foreach (var arg in field.Arguments)
+                            {
+                                if (arg.ResolvedType.GetNamedType().Name == typeName)
+                                    return true;
+                            }
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }
