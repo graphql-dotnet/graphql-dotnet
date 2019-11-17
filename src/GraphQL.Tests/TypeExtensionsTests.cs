@@ -34,7 +34,7 @@ namespace GraphQL.Tests
         }
 
         [Fact]
-        public void will_throw_on_unknown_list()
+        public void will_throw_on_open_generic()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => TypeExtensions.GetGraphTypeFromType(typeof(List<>)));
         }
