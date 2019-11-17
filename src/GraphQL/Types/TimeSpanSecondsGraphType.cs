@@ -12,44 +12,28 @@ namespace GraphQL.Types
                 "The `Seconds` scalar type represents a period of time represented as the total number of seconds.";
         }
 
-        public override object Serialize(object value)
+        public override object Serialize(object value) => value switch
         {
-            if (value is TimeSpan timeSpan)
-            {
-                return (long)timeSpan.TotalSeconds;
-            }
-            else if (value is int i)
-            {
-                return i;
-            }
-            else if (value is long l)
-            {
-                return l;
-            }
+            TimeSpan timeSpan => (long)timeSpan.TotalSeconds,
+            int i => i,
+            long l => l,
+            _ => (object)null
+        };
 
-            return null;
-        }
-
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(TimeSpan));
-
-        public override object ParseLiteral(IValue value)
+        public override object ParseValue(object value) => value switch
         {
-            if (value is TimeSpanValue spanValue)
-            {
-                return ParseValue(spanValue.Value);
-            }
+            int i => TimeSpan.FromSeconds(i),
+            long l => TimeSpan.FromSeconds(l),
+            TimeSpan t => t,
+            _ => (object)null
+        };
 
-            if (value is LongValue longValue)
-            {
-                return ParseValue(longValue.Value);
-            }
-
-            if (value is IntValue intValue)
-            {
-                return ParseValue(intValue.Value);
-            }
-
-            return null;
-        }
+        public override object ParseLiteral(IValue value) => value switch
+        {
+            TimeSpanValue spanValue => ParseValue(spanValue.Value),
+            LongValue longValue => ParseValue(longValue.Value),
+            IntValue intValue => ParseValue(intValue.Value),
+            _ => null
+        };
     }
 }

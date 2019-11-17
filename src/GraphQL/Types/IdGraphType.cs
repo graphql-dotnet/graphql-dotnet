@@ -18,24 +18,12 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is StringValue str)
-            {
-                return ParseValue(str.Value);
-            }
-
-            if (value is IntValue num)
-            {
-                return num.Value;
-            }
-
-            if (value is LongValue longVal)
-            {
-                return longVal.Value;
-            }
-
-            return null;
-        }
+            StringValue str => ParseValue(str.Value),
+            IntValue num => num.Value,
+            LongValue longVal => longVal.Value,
+            _ => null,
+        };
     }
 }

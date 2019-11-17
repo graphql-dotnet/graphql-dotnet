@@ -8,34 +8,14 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(decimal));
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            if (value is IntValue intValue)
-            {
-                return ParseValue(intValue.Value);
-            }
-
-            if (value is LongValue longValue)
-            {
-                return ParseValue(longValue.Value);
-            }
-
-            if (value is FloatValue floatValue)
-            {
-                return ParseValue(floatValue.Value);
-            }
-
-            if (value is DecimalValue decimalValue)
-            {
-                return decimalValue.Value;
-            }
-
-            return null;
-        }
+            StringValue stringValue => ParseValue(stringValue.Value),
+            IntValue intValue => ParseValue(intValue.Value),
+            LongValue longValue => ParseValue(longValue.Value),
+            FloatValue floatValue => ParseValue(floatValue.Value),
+            DecimalValue decimalValue => decimalValue.Value,
+            _ => null
+        };
     }
 }
