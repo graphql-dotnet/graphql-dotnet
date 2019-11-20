@@ -46,23 +46,23 @@ namespace GraphQL.Builders
     public class FieldBuilder<TSourceType, TReturnType>
     {
         public GraphQL.Types.EventStreamFieldType FieldType { get; }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = null, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = null, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument> configure = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(System.Type type = null, string name = "default") { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = null) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolve) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscribe) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscribeAsync) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolve) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscribe) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscribeAsync) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
     }
     public class ResolveConnectionContext<T> : GraphQL.Types.ResolveFieldContext<T>
     {
@@ -1525,10 +1525,10 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType Field(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null) { }
         public GraphQL.Types.FieldType Field<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default") { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>() { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
-        public GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default") { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>() { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
         public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null) { }
         public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
