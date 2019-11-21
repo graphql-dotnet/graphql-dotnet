@@ -36,6 +36,8 @@ namespace GraphQL.Builders
 
         private bool _isBidirectional;
 
+        private bool _allowBidirectionalSlicing;
+
         private int? _pageSize;
 
         public FieldType FieldType { get; protected set; }
@@ -48,6 +50,7 @@ namespace GraphQL.Builders
         {
             _isUnidirectional = isUnidirectional;
             _isBidirectional = isBidirectional;
+            _allowBidirectionalSlicing = false;
             _pageSize = pageSize;
             FieldType = fieldType;
         }
@@ -98,10 +101,11 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TSourceType> Bidirectional()
+        public ConnectionBuilder<TSourceType> Bidirectional(bool allowBidirectionalSlicing = false)
         {
             if (_isBidirectional)
             {
+                _allowBidirectionalSlicing = allowBidirectionalSlicing;
                 return this;
             }
 
@@ -112,6 +116,7 @@ namespace GraphQL.Builders
 
             _isUnidirectional = false;
             _isBidirectional = true;
+            _allowBidirectionalSlicing = allowBidirectionalSlicing;
 
             return this;
         }
@@ -194,7 +199,7 @@ namespace GraphQL.Builders
 
         private void CheckForErrors(ResolveConnectionContext<TSourceType> args)
         {
-            if (args.First.HasValue && args.Last.HasValue)
+            if (args.First.HasValue && args.Last.HasValue && !_allowBidirectionalSlicing)
             {
                 throw new ArgumentException("Cannot specify both `first` and `last`.");
             }

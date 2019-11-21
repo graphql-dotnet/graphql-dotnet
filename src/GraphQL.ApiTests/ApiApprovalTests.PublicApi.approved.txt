@@ -19,7 +19,7 @@ namespace GraphQL.Builders
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description, TArgumentType defaultValue = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional() { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Bidirectional(bool allowBidirectionalSlicing = False) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
             where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
