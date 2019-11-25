@@ -61,25 +61,41 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
+            if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
+            {
+                if (this is IInputObjectGraphType)
+                {
+                    if (fieldType.ResolvedType?.IsInputType() == false || fieldType.Type?.IsInputType() == false)
+                        throw new ArgumentOutOfRangeException(nameof(fieldType),
+                            $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+                }
+                else
+                {
+                    if (fieldType.ResolvedType?.IsOutputType() == false || fieldType.Type?.IsOutputType() == false)
+                        throw new ArgumentOutOfRangeException(nameof(fieldType),
+                            $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
+                }
+            }
+
             NameValidator.ValidateName(fieldType.Name);
 
             if (HasField(fieldType.Name))
             {
-                throw new ArgumentOutOfRangeException(nameof(fieldType.Name),
-                    $"A field with the name: {fieldType.Name} is already registered for GraphType: {Name ?? GetType().Name}");
+                throw new ArgumentOutOfRangeException(nameof(fieldType),
+                    $"A field with the name '{fieldType.Name}' is already registered for GraphType '{Name ?? GetType().Name}'");
             }
 
             if (fieldType.ResolvedType == null)
             {
                 if (fieldType.Type == null)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
+                    throw new ArgumentOutOfRangeException(nameof(fieldType),
                         $"The declared field '{fieldType.Name ?? fieldType.GetType().GetFriendlyName()}' on '{Name ?? GetType().GetFriendlyName()}' requires a field '{nameof(fieldType.Type)}' when no '{nameof(fieldType.ResolvedType)}' is provided.");
                 }
                 else if (!fieldType.Type.IsGraphType())
                 {
-                    throw new ArgumentOutOfRangeException(nameof(fieldType.Type),
-                        $"The declared Field type: {fieldType.Type.Name} should derive from GraphType.");
+                    throw new ArgumentOutOfRangeException(nameof(fieldType),
+                        $"The declared Field type '{fieldType.Type.Name}' should derive from GraphType.");
                 }
             }
 
