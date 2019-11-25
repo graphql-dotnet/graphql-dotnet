@@ -28,8 +28,8 @@ namespace GraphQL.Types
 
         protected ComplexGraphType()
         {
-            Description = Description ?? typeof(TSourceType).Description();
-            DeprecationReason = DeprecationReason ?? typeof(TSourceType).ObsoleteMessage();
+            Description ??= typeof(TSourceType).Description();
+            DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }
 
         public IEnumerable<FieldType> Fields

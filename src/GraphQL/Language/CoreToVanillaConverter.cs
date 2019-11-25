@@ -124,26 +124,13 @@ namespace GraphQL.Language
             return set;
         }
 
-        public ISelection Selection(ASTNode source)
+        public ISelection Selection(ASTNode source) => source.Kind switch
         {
-            switch (source.Kind)
-            {
-                case ASTNodeKind.Field:
-                {
-                    return Field((GraphQLFieldSelection)source);
-                }
-                case ASTNodeKind.FragmentSpread:
-                {
-                    return FragmentSpread((GraphQLFragmentSpread)source);
-                }
-                case ASTNodeKind.InlineFragment:
-                {
-                    return InlineFragment((GraphQLInlineFragment)source);
-                }
-            }
-
-            throw new ExecutionError($"Unmapped selection {source.Kind}");
-        }
+            ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
+            ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
+            ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
+            _ => throw new ExecutionError($"Unmapped selection {source.Kind}")
+        };
 
         public Field Field(GraphQLFieldSelection source)
         {
@@ -306,22 +293,13 @@ namespace GraphQL.Language
             return new NameNode(name.Value).WithLocation(name, _body);
         }
 
-        public static OperationType ToOperationType(OperationTypeParser type)
+        public static OperationType ToOperationType(OperationTypeParser type) => type switch
         {
-            switch (type)
-            {
-                case OperationTypeParser.Query:
-                    return OperationType.Query;
-
-                case OperationTypeParser.Mutation:
-                    return OperationType.Mutation;
-
-                case OperationTypeParser.Subscription:
-                    return OperationType.Subscription;
-            }
-
-            throw new ExecutionError($"Unmapped operation type {type}");
-        }
+            OperationTypeParser.Query => OperationType.Query,
+            OperationTypeParser.Mutation => OperationType.Mutation,
+            OperationTypeParser.Subscription => OperationType.Subscription,
+            _ => throw new ExecutionError($"Unmapped operation type {type}")
+        };
     }
 
     public static class AstNodeExtensions

@@ -4,20 +4,12 @@ namespace GraphQL.Types
 {
     public class LongGraphType : ScalarGraphType
     {
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            switch (value)
-            {
-                case LongValue longValue:
-                    return longValue.Value;
-
-                case IntValue intValue:
-                    return (long)intValue.Value;
-
-                default:
-                    return null;
-            }
-        }
+            LongValue longValue => longValue.Value,
+            IntValue intValue => (long)intValue.Value,
+            _ => (object)null
+        };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(long));
 

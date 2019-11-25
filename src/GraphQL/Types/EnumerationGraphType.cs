@@ -91,8 +91,8 @@ namespace GraphQL.Types
             ));
 
             Name = StringUtils.ToPascalCase(type.Name);
-            Description = Description ?? typeof(TEnum).Description();
-            DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
+            Description ??= typeof(TEnum).Description();
+            DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
             foreach (var (name, value, description, deprecation) in enumGraphData)
             {

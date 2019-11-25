@@ -282,8 +282,8 @@ namespace GraphQL.Tests.Validation
             int line = 0,
             int column = 0)
         {
-            suggestedTypes = suggestedTypes ?? Enumerable.Empty<string>();
-            suggestedFields = suggestedFields ?? Enumerable.Empty<string>();
+            suggestedTypes ??= Enumerable.Empty<string>();
+            suggestedFields ??= Enumerable.Empty<string>();
 
             _.Error(Rule.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
         }

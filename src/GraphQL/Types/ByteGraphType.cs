@@ -4,22 +4,12 @@ namespace GraphQL.Types
 {
     public class ByteGraphType : ScalarGraphType
     {
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            switch (value)
-            {
-                case ByteValue byteValue:
-                    return byteValue.Value;
-
-                case IntValue intValue:
-                    if (byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue)
-                        return (byte)intValue.Value;
-                    return null;
-
-                default:
-                    return null;
-            }
-        }
+            ByteValue byteValue => byteValue.Value,
+            IntValue intValue => byte.MinValue <= intValue.Value && intValue.Value <= byte.MaxValue ? (byte?)intValue.Value : null,
+            _ => null
+        };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(byte));
 

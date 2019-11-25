@@ -49,27 +49,28 @@ namespace GraphQL
 
         public static IGraphType GetNamedType(this IGraphType type)
         {
-            IGraphType unmodifiedType = type;
-
-            if (type is NonNullGraphType nonNull)
+            return type switch
             {
-                return GetNamedType(nonNull.ResolvedType);
-            }
+                NonNullGraphType nonNull => GetNamedType(nonNull.ResolvedType),
+                ListGraphType list => GetNamedType(list.ResolvedType),
+                _ => type
+            };
+        }
 
-            if (type is ListGraphType list)
-            {
-                return GetNamedType(list.ResolvedType);
-            }
+        public static Type GetNamedType(this Type type)
+        {
+            if (!type.IsGenericType)
+                return type;
 
-            return unmodifiedType;
+            var genericDef = type.GetGenericTypeDefinition();
+            return genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>)
+                ? GetNamedType(type.GenericTypeArguments[0])
+                : type;
         }
 
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
         {
-            if (resolve == null)
-            {
-                resolve = t => (IGraphType)Activator.CreateInstance(t);
-            }
+            resolve ??= t => (IGraphType)Activator.CreateInstance(t);
 
             if (type.IsGenericType)
             {
@@ -91,18 +92,6 @@ namespace GraphQL
             return resolve(type) ??
                    throw new InvalidOperationException(
                        $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
-        }
-
-        public static Type GetNamedType(this Type type)
-        {
-            if (type.IsGenericType
-                && (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>) ||
-                    type.GetGenericTypeDefinition() == typeof(ListGraphType<>)))
-            {
-                return GetNamedType(type.GenericTypeArguments[0]);
-            }
-
-            return type;
         }
 
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
@@ -377,119 +366,46 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-
             Invariant.Check(
                 type.IsInputType(),
                 $"Must provide Input Type, cannot use: {type}");
-
 
             var inputType = type as ScalarGraphType;
 
             // Since value is an internally represented value, it must be serialized
             // to an externally represented value before converting into an AST.
             var serialized = inputType.Serialize(value);
-            if (serialized == null)
+
+            return serialized switch
             {
-                return null;
-            }
+                null => null,
+                bool b => new BooleanValue(b),
+                int i => new IntValue(i),
+                long l => new LongValue(l),
+                decimal @decimal => new DecimalValue(@decimal),
+                double d => new FloatValue(d),
+                DateTime time => new DateTimeValue(time),
+                Uri uri => new UriValue(uri),
+                DateTimeOffset offset => new DateTimeOffsetValue(offset),
+                TimeSpan span => new TimeSpanValue(span),
+                Guid guid => new GuidValue(guid),
+                sbyte @sbyte => new SByteValue(@sbyte),
+                byte @byte => new ByteValue(@byte),
+                short @short => new ShortValue(@short),
+                ushort uint16 => new UShortValue(uint16),
+                uint uint32 => new UIntValue(uint32),
+                ulong uint64 => new ULongValue(uint64),
+                string str => type is EnumerationGraphType ? (IValue)new EnumValue(str) : new StringValue(str),
+                _ => Convert()
+            };
 
-            if (serialized is bool b)
+            IValue Convert()
             {
-                return new BooleanValue(b);
+                var converter = schema.FindValueConverter(serialized, type);
+                return converter != null
+                    ? converter.Convert(serialized, type)
+                    : throw new ExecutionError($"Cannot convert value to AST: {serialized}");
             }
-
-            if (serialized is int i)
-            {
-                return new IntValue(i);
-            }
-
-            if (serialized is long l)
-            {
-                return new LongValue(l);
-            }
-
-            if (serialized is decimal @decimal)
-            {
-                return new DecimalValue(@decimal);
-            }
-
-            if (serialized is double d)
-            {
-                return new FloatValue(d);
-            }
-
-            if (serialized is DateTime time)
-            {
-                return new DateTimeValue(time);
-            }
-
-            if (serialized is Uri uri)
-            {
-                return new UriValue(uri);
-            }
-
-            if (serialized is DateTimeOffset offset)
-            {
-                return new DateTimeOffsetValue(offset);
-            }
-
-            if (serialized is TimeSpan span)
-            {
-                return new TimeSpanValue(span);
-            }
-
-            if (serialized is Guid guid)
-            {
-                return new GuidValue(guid);
-            }
-
-            if (serialized is sbyte @sbyte)
-            {
-                return new SByteValue(@sbyte);
-            }
-
-            if (serialized is byte @byte)
-            {
-                return new ByteValue(@byte);
-            }
-
-            if (serialized is short @short)
-            {
-                return new ShortValue(@short);
-            }
-
-            if (serialized is ushort uint16)
-            {
-                return new UShortValue(uint16);
-            }
-
-            if (serialized is uint uint32)
-            {
-                return new UIntValue(uint32);
-            }
-
-            if (serialized is ulong uint64)
-            {
-                return new ULongValue(uint64);
-            }
-
-            if (serialized is string)
-            {
-                if (type is EnumerationGraphType)
-                {
-                    return new EnumValue(serialized.ToString());
-                }
-
-                return new StringValue(serialized.ToString());
-            }
-
-            var converter = schema.FindValueConverter(serialized, type);
-            if (converter != null)
-            {
-                return converter.Convert(serialized, type);
-            }
-
-            throw new ExecutionError($"Cannot convert value to AST: {serialized}");
         }
     }
 }
