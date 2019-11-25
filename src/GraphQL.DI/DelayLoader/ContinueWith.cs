@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.DI.DelayLoader
@@ -21,9 +22,19 @@ namespace GraphQL.DI.DelayLoader
             return await _func(await _parent.GetResultAsync());
         }
 
+        public async Task<TResult> GetResultAsync(CancellationToken cancellationToken)
+        {
+            return await _func(await _parent.GetResultAsync(cancellationToken));
+        }
+
         async Task<object> IDelayLoadedResult.GetResultAsync()
         {
             return (object)(await GetResultAsync());
+        }
+
+        async Task<object> IDelayLoadedResult.GetResultAsync(CancellationToken cancellationToken)
+        {
+            return (object)(await GetResultAsync(cancellationToken));
         }
     }
 }

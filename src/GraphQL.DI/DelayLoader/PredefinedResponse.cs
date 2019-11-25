@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.DI.DelayLoader
@@ -13,7 +14,11 @@ namespace GraphQL.DI.DelayLoader
 
         public Task<TOut> GetResultAsync() => Task.FromResult(_result);
 
+        public Task<TOut> GetResultAsync(CancellationToken cancellationToken) => Task.FromResult(_result);
+
         Task<object> IDelayLoadedResult.GetResultAsync() => Task.FromResult((object)_result);
+
+        Task<object> IDelayLoadedResult.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult((object)_result);
     }
 
 }
