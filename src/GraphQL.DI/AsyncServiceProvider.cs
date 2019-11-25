@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace GraphQL.DI
 {
-    internal static class AsyncServiceProvider
+    public static class AsyncServiceProvider
     {
         private static AsyncLocal<IServiceProvider> _currentServiceProvider = new AsyncLocal<IServiceProvider>();
 

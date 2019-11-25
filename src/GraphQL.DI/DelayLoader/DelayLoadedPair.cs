@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.DI.DelayLoader
@@ -32,9 +33,23 @@ namespace GraphQL.DI.DelayLoader
             return this.Result;
         }
 
+        public async Task<TOut> GetResultAsync(CancellationToken cancellationToken)
+        {
+            await this.Loader.LoadAsync(cancellationToken).ConfigureAwait(false);
+            if (!IsResultSet) throw new Exception("Result has not been set");
+            return this.Result;
+        }
+
         async Task<object> IDelayLoadedResult.GetResultAsync()
         {
             await this.Loader.LoadAsync().ConfigureAwait(false);
+            if (!IsResultSet) throw new Exception("Result has not been set");
+            return (object)this.Result;
+        }
+
+        async Task<object> IDelayLoadedResult.GetResultAsync(CancellationToken cancellationToken)
+        {
+            await this.Loader.LoadAsync(cancellationToken).ConfigureAwait(false);
             if (!IsResultSet) throw new Exception("Result has not been set");
             return (object)this.Result;
         }
