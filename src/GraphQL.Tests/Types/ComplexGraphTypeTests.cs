@@ -280,7 +280,7 @@ namespace GraphQL.Tests.Types
 
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
-            exception.ParamName.ShouldBe("Type");
+            exception.ParamName.ShouldBe("fieldType");
             exception.Message.ShouldStartWith("The declared field 'name' on 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
@@ -298,7 +298,7 @@ namespace GraphQL.Tests.Types
 
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
-            exception.ParamName.ShouldBe("Type");
+            exception.ParamName.ShouldBe("fieldType");
             exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 

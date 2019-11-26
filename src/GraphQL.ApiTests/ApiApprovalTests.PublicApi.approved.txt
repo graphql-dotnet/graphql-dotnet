@@ -318,8 +318,11 @@ namespace GraphQL
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
+        public static bool IsInputType(this System.Type type) { }
         public static bool IsInputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
+        public static bool IsOutputType(this System.Type type) { }
+        public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -1830,7 +1833,6 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
-        public override GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
     }
     public class IntGraphType : GraphQL.Types.ScalarGraphType
     {

@@ -33,12 +33,44 @@ namespace GraphQL
             return namedType is ScalarGraphType || namedType is EnumerationGraphType;
         }
 
+        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        public static bool IsInputType(this Type type)
+        {
+            var namedType = type.GetNamedType();
+            return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
+                   typeof(EnumerationGraphType).IsAssignableFrom(namedType) || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
+        }
+
+        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
         public static bool IsInputType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
             return namedType is ScalarGraphType ||
-                   namedType is EnumerationGraphType ||
+                   namedType is EnumerationGraphType || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
                    namedType is IInputObjectGraphType;
+        }
+
+        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        public static bool IsOutputType(this Type type)
+        {
+            var namedType = type.GetNamedType();
+            return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
+                   typeof(IObjectGraphType).IsAssignableFrom(namedType) ||
+                   typeof(IInterfaceGraphType).IsAssignableFrom(namedType) ||
+                   typeof(UnionGraphType).IsAssignableFrom(namedType) ||
+                   typeof(EnumerationGraphType).IsAssignableFrom(namedType); // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+        }
+
+        // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        public static bool IsOutputType(this IGraphType type)
+        {
+            var namedType = type.GetNamedType();
+            return namedType is ScalarGraphType ||
+                   namedType is IObjectGraphType ||
+                   namedType is IInterfaceGraphType ||
+                   namedType is UnionGraphType ||
+                   namedType is EnumerationGraphType; // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
         }
 
         public static bool IsInputObjectType(this IGraphType type)
