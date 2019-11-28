@@ -1,12 +1,12 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.Subscription
 {
-    public class ResolveEventStreamContext<T> : ResolveFieldContext<T>
+    public class ResolveEventStreamContext<T> : ResolveFieldContext<T>, IResolveEventStreamContext<T>
     {
         public ResolveEventStreamContext() { }
 
-        public ResolveEventStreamContext(ResolveEventStreamContext context)
+        public ResolveEventStreamContext(IResolveEventStreamContext context)
         {
             Source = (T)context.Source;
             FieldName = context.FieldName;
@@ -28,7 +28,7 @@ namespace GraphQL.Subscription
         }
     }
 
-    public class ResolveEventStreamContext : ResolveEventStreamContext<object>
+    public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext
     {
         internal ResolveEventStreamContext<TSourceType> As<TSourceType>()
         {

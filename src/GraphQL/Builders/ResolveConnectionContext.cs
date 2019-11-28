@@ -7,7 +7,7 @@ namespace GraphQL.Builders
     {
         private readonly int? _defaultPageSize;
 
-        public ResolveConnectionContext(ResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
+        public ResolveConnectionContext(IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
                 : base(context)
         {
             IsUnidirectional = isUnidirectional;

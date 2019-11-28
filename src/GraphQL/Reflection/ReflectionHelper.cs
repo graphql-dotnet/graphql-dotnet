@@ -75,7 +75,7 @@ namespace GraphQL.Reflection
             return property;
         }
 
-        public static object[] BuildArguments<T>(ParameterInfo[] parameters,  T context) where T : ResolveFieldContext<object>
+        public static object[] BuildArguments<T>(ParameterInfo[] parameters,  T context) where T : IResolveFieldContext
         {
             if (parameters == null || parameters.Length == 0) return null;
 

@@ -9,7 +9,7 @@ using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource> : IProvideUserContext
+    public class ResolveFieldContext<TSource> : IProvideUserContext, IResolveFieldContext<TSource>
     {
         public string FieldName { get; set; }
 
@@ -52,9 +52,11 @@ namespace GraphQL.Types
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
+        object IResolveFieldContext.Source => Source;
+
         public ResolveFieldContext() { }
 
-        public ResolveFieldContext(ResolveFieldContext context)
+        public ResolveFieldContext(IResolveFieldContext context)
         {
             Source = (TSource)context.Source;
             FieldName = context.FieldName;
@@ -79,35 +81,15 @@ namespace GraphQL.Types
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
-            return (TType)GetArgument(typeof(TType), name, defaultValue);
+            return ResolveFieldContextExtensions.GetArgument(this, name, defaultValue);
         }
 
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
         {
-            var argumentName = Schema?.FieldNameConverter.NameFor(name, null) ?? name;
-
-            if (Arguments == null || !Arguments.TryGetValue(argumentName, out var arg))
-            {
-                return defaultValue;
-            }
-
-            if (arg is Dictionary<string, object> inputObject)
-            {
-                if (argumentType == typeof(object))
-                    return arg;
-
-                if (argumentType.IsPrimitive())
-                    throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
-
-                return inputObject.ToObject(argumentType);
-            }
-
-            var result = arg.GetPropertyValue(argumentType);
-
-            return result == null && argumentType.IsValueType ? defaultValue : result;
+            return ResolveFieldContextExtensions.GetArgument(this, argumentType, name, defaultValue);
         }
 
-        public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;
+        public bool HasArgument(string argumentName) => ResolveFieldContextExtensions.HasArgument(this, argumentName);
 
         public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
         {

@@ -109,7 +109,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
         {
             return AddField(new FieldType
@@ -129,7 +129,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
         {
@@ -172,7 +172,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, Task<object>> resolve = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
             string deprecationReason = null)
         {
             return AddField(new FieldType
@@ -192,7 +192,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, Task<object>> resolve = null,
+            Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
         {
@@ -213,7 +213,7 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
+            Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
         {
@@ -234,8 +234,8 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<ResolveEventStreamContext, IObservable<object>> subscribe = null,
+            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<IResolveEventStreamContext, IObservable<object>> subscribe = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
         {
@@ -259,8 +259,8 @@ namespace GraphQL.Types
             string name,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext<TSourceType>, object> resolve = null,
-            Func<ResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
+            Func<IResolveFieldContext<TSourceType>, object> resolve = null,
+            Func<IResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
         {

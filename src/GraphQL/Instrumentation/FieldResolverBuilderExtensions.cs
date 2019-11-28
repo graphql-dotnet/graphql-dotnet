@@ -35,9 +35,9 @@ namespace GraphQL.Instrumentation
                 }
 
                 var parameters = methodInfo.GetParameters();
-                if (parameters.Length != 2 || parameters[0].ParameterType != typeof(ResolveFieldContext) || parameters[1].ParameterType != typeof(FieldMiddlewareDelegate))
+                if (parameters.Length != 2 || parameters[0].ParameterType != typeof(IResolveFieldContext) || parameters[1].ParameterType != typeof(FieldMiddlewareDelegate))
                 {
-                    throw new InvalidOperationException($"The {InvokeMethodName} method of middleware should take a parameter of type {nameof(ResolveFieldContext)} as the first parameter and a parameter of type {nameof(FieldMiddlewareDelegate)} as the second parameter.");
+                    throw new InvalidOperationException($"The {InvokeMethodName} method of middleware should take a parameter of type {nameof(IResolveFieldContext)} as the first parameter and a parameter of type {nameof(FieldMiddlewareDelegate)} as the second parameter.");
                 }
 
                 var instance = Activator.CreateInstance(middleware);
