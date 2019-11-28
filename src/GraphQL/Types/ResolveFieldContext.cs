@@ -123,14 +123,6 @@ namespace GraphQL.Types
 
     public class ResolveFieldContext : ResolveFieldContext<object>
     {
-        internal ResolveFieldContext<TSourceType> As<TSourceType>()
-        {
-            if (this is ResolveFieldContext<TSourceType> typedContext)
-                return typedContext;
-
-            return new ResolveFieldContext<TSourceType>(this);
-        }
-
         public ResolveFieldContext()
         {
         }

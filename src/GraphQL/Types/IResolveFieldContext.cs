@@ -47,7 +47,7 @@ namespace GraphQL.Types
 
     }
 
-    public interface IResolveFieldContext<TSource> : IResolveFieldContext
+    public interface IResolveFieldContext<out TSource> : IResolveFieldContext
     {
         new public TSource Source { get; }
     }

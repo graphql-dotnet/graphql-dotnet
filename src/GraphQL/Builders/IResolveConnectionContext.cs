@@ -27,7 +27,7 @@ namespace GraphQL.Builders
         public bool IsPartial { get; }
     }
 
-    public interface IResolveConnectionContext<T> : IResolveFieldContext<T>, IResolveConnectionContext
+    public interface IResolveConnectionContext<out T> : IResolveFieldContext<T>, IResolveConnectionContext
     {
 
     }

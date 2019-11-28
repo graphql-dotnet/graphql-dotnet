@@ -76,7 +76,7 @@ namespace GraphQL.Builders
         int? PageSize { get; }
         int? TotalCount { get; }
     }
-    public interface IResolveConnectionContext<T> : GraphQL.Builders.IResolveConnectionContext, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T> { }
+    public interface IResolveConnectionContext<out T> : GraphQL.Builders.IResolveConnectionContext, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T> { }
     public class ResolveConnectionContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Builders.IResolveConnectionContext, GraphQL.Builders.IResolveConnectionContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
     {
         public ResolveConnectionContext(GraphQL.Types.IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize) { }
@@ -411,8 +411,6 @@ namespace GraphQL
     }
     public static class ResolveFieldContextExtensions
     {
-        public static GraphQL.Types.IResolveFieldContext<T> As<T>(this GraphQL.Types.IResolveFieldContext context) { }
-        public static GraphQL.Subscription.IResolveEventStreamContext<T> As<T>(this GraphQL.Subscription.IResolveEventStreamContext context) { }
         public static TType GetArgument<TType>(this GraphQL.Types.IResolveFieldContext context, string name, TType defaultValue = null) { }
         public static object GetArgument(this GraphQL.Types.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
         public static bool HasArgument(this GraphQL.Types.IResolveFieldContext context, string argumentName) { }
@@ -1474,7 +1472,7 @@ namespace GraphQL.Resolvers
 namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext { }
-    public interface IResolveEventStreamContext<TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource> { }
+    public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource> { }
     public interface ISubscriptionExecuter
     {
         System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
@@ -1835,7 +1833,7 @@ namespace GraphQL.Types
         System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
     }
-    public interface IResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
+    public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
     {
         TSource Source { get; }
     }

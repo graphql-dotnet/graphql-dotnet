@@ -11,9 +11,6 @@ namespace GraphQL.Subscription
 
     public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext
     {
-        internal ResolveEventStreamContext<TSourceType> As<TSourceType>()
-        {
-            return new ResolveEventStreamContext<TSourceType>(this);
-        }
+
     }
 }

@@ -42,13 +42,19 @@ namespace GraphQL
             return context.Arguments?.ContainsKey(argumentName) ?? false;
         }
 
-        public static IResolveFieldContext<T> As<T>(this IResolveFieldContext context)
+        internal static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
         {
-            return new ResolveFieldContext<T>(context);
+            if (context is ResolveFieldContext<TSourceType> typedContext)
+                return typedContext;
+
+            return new ResolveFieldContext<TSourceType>(context);
         }
 
-        public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
+        internal static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
+            if (context is ResolveEventStreamContext<T> typedContext)
+                return typedContext;
+
             return new ResolveEventStreamContext<T>(context);
         }
     }
