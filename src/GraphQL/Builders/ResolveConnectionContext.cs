@@ -62,12 +62,6 @@ namespace GraphQL.Builders
         {
             get { return First ?? Last ?? _defaultPageSize; }
         }
-
-        public int? NumberOfSkippedEntries { get; set; }
-
-        public int? TotalCount { get; set; }
-
-        public bool IsPartial { get; set; }
     }
 
 }
