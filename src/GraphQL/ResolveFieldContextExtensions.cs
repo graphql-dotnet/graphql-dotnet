@@ -44,7 +44,7 @@ namespace GraphQL
 
         internal static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
         {
-            if (context is ResolveFieldContext<TSourceType> typedContext)
+            if (context is IResolveFieldContext<TSourceType> typedContext)
                 return typedContext;
 
             return new ResolveFieldContext<TSourceType>(context);
@@ -52,7 +52,7 @@ namespace GraphQL
 
         internal static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
-            if (context is ResolveEventStreamContext<T> typedContext)
+            if (context is IResolveEventStreamContext<T> typedContext)
                 return typedContext;
 
             return new ResolveEventStreamContext<T>(context);
