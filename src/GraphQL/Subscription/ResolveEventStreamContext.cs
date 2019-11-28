@@ -6,26 +6,7 @@ namespace GraphQL.Subscription
     {
         public ResolveEventStreamContext() { }
 
-        public ResolveEventStreamContext(IResolveEventStreamContext context)
-        {
-            Source = (T)context.Source;
-            FieldName = context.FieldName;
-            FieldAst = context.FieldAst;
-            FieldDefinition = context.FieldDefinition;
-            ReturnType = context.ReturnType;
-            ParentType = context.ParentType;
-            Arguments = context.Arguments;
-            Schema = context.Schema;
-            Document = context.Document;
-            Fragments = context.Fragments;
-            RootValue = context.RootValue;
-            UserContext = context.UserContext;
-            Operation = context.Operation;
-            Variables = context.Variables;
-            CancellationToken = context.CancellationToken;
-            Metrics = context.Metrics;
-            Errors = context.Errors;
-        }
+        public ResolveEventStreamContext(IResolveEventStreamContext context) : base(context) { }
     }
 
     public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext

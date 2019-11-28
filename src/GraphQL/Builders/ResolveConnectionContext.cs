@@ -3,7 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Builders
 {
-    public class ResolveConnectionContext<T> : ResolveFieldContext<T>
+    public class ResolveConnectionContext<T> : ResolveFieldContext<T>, IResolveConnectionContext<T>
     {
         private readonly int? _defaultPageSize;
 
