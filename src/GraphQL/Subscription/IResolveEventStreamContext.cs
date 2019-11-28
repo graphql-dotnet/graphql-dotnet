@@ -10,7 +10,7 @@ namespace GraphQL.Subscription
 
     }
 
-    public interface IResolveEventStreamContext<out TSource> : IResolveFieldContext<TSource>
+    public interface IResolveEventStreamContext<out TSource> : IResolveFieldContext<TSource>, IResolveEventStreamContext
     {
 
     }

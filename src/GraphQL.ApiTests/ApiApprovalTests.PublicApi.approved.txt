@@ -1466,7 +1466,7 @@ namespace GraphQL.Resolvers
 namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext { }
-    public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource> { }
+    public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource> { }
     public interface ISubscriptionExecuter
     {
         System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
@@ -1475,7 +1475,7 @@ namespace GraphQL.Subscription
     {
         public ResolveEventStreamContext() { }
     }
-    public class ResolveEventStreamContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext<T>, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
+    public class ResolveEventStreamContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Subscription.IResolveEventStreamContext<T>, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
     {
         public ResolveEventStreamContext() { }
         public ResolveEventStreamContext(GraphQL.Subscription.IResolveEventStreamContext context) { }
