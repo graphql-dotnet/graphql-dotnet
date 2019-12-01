@@ -1932,12 +1932,7 @@ namespace GraphQL.Types
         public GraphQL.Types.QueryArgument Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
-    public class ResolveFieldContext : GraphQL.Types.ResolveFieldContext<object>
-    {
-        public ResolveFieldContext() { }
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, object source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
-    }
-    public class ResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.ResolveFieldContext context) { }
@@ -1956,15 +1951,22 @@ namespace GraphQL.Types
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public TSource Source { get; set; }
+        public object Source { get; set; }
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
         public TType GetArgument<TType>(string name, TType defaultValue = null) { }
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null) { }
         public bool HasArgument(string argumentName) { }
-        public System.Threading.Tasks.Task<object> TryAsyncResolve(System.Func<GraphQL.Types.ResolveFieldContext<TSource>, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
-        public System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(System.Func<GraphQL.Types.ResolveFieldContext<TSource>, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
+        public System.Threading.Tasks.Task<object> TryAsyncResolve(System.Func<GraphQL.Types.ResolveFieldContext, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
+        public System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(System.Func<GraphQL.Types.ResolveFieldContext, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
+    }
+    public class ResolveFieldContext<TSource> : GraphQL.Types.ResolveFieldContext
+    {
+        public ResolveFieldContext() { }
+        public ResolveFieldContext(GraphQL.Types.ResolveFieldContext context) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public TSource Source { get; set; }
     }
     public class SByteGraphType : GraphQL.Types.ScalarGraphType
     {
