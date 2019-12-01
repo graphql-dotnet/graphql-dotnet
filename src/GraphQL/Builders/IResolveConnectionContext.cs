@@ -1,13 +1,9 @@
 using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GraphQL.Builders
 {
     public interface IResolveConnectionContext : IResolveFieldContext
     {
-
         bool IsUnidirectional { get; }
 
         int? First { get; }
@@ -29,6 +25,5 @@ namespace GraphQL.Builders
 
     public interface IResolveConnectionContext<out T> : IResolveFieldContext<T>, IResolveConnectionContext
     {
-
     }
 }

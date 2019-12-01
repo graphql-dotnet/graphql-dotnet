@@ -414,6 +414,8 @@ namespace GraphQL
         public static TType GetArgument<TType>(this GraphQL.Types.IResolveFieldContext context, string name, TType defaultValue = null) { }
         public static object GetArgument(this GraphQL.Types.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
         public static bool HasArgument(this GraphQL.Types.IResolveFieldContext context, string argumentName) { }
+        public static System.Threading.Tasks.Task<object> TryAsyncResolve(this GraphQL.Types.IResolveFieldContext context, System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
+        public static System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(this GraphQL.Types.IResolveFieldContext context, System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
     }
     public enum ResolverType
     {
