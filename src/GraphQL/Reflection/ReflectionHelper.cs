@@ -75,14 +75,14 @@ namespace GraphQL.Reflection
             return property;
         }
 
-        public static object[] BuildArguments<T>(ParameterInfo[] parameters,  T context) where T : IResolveFieldContext
+        public static object[] BuildArguments(ParameterInfo[] parameters, IResolveFieldContext context)
         {
             if (parameters == null || parameters.Length == 0) return null;
 
             object[] arguments = new object[parameters.Length];
 
             var index = 0;
-            if (typeof(T) == parameters[index].ParameterType)
+            if (parameters[index].ParameterType.IsAssignableFrom(context.GetType()))
             {
                 arguments[index] = context;
                 index++;

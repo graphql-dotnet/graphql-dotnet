@@ -9,7 +9,7 @@ using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource> : IProvideUserContext, IResolveFieldContext<TSource>
+    public class ResolveFieldContext : IProvideUserContext, IResolveFieldContext
     {
         public string FieldName { get; set; }
 
@@ -27,7 +27,7 @@ namespace GraphQL.Types
 
         public IDictionary<string, object> UserContext { get; set; }
 
-        public TSource Source { get; set; }
+        public object Source { get; set; }
 
         public ISchema Schema { get; set; }
 
@@ -52,13 +52,11 @@ namespace GraphQL.Types
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
-        object IResolveFieldContext.Source => Source;
-
         public ResolveFieldContext() { }
 
         public ResolveFieldContext(IResolveFieldContext context)
         {
-            Source = (TSource)context.Source;
+            Source = context.Source;
             FieldName = context.FieldName;
             FieldAst = context.FieldAst;
             FieldDefinition = context.FieldDefinition;
@@ -79,6 +77,14 @@ namespace GraphQL.Types
             Path = context.Path;
         }
 
+        internal ResolveFieldContext<TSourceType> As<TSourceType>()
+        {
+            if (this is ResolveFieldContext<TSourceType> typedContext)
+                return typedContext;
+
+            return new ResolveFieldContext<TSourceType>(this);
+        }
+
         public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
             return ResolveFieldContextExtensions.GetArgument(this, name, defaultValue);
@@ -96,7 +102,7 @@ namespace GraphQL.Types
             return TryAsyncResolve<object>(resolve, error);
         }
 
-        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
+        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
         {
             try
             {
@@ -121,13 +127,25 @@ namespace GraphQL.Types
         }
     }
 
-    public class ResolveFieldContext : ResolveFieldContext<object>
+    public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
         public ResolveFieldContext()
         {
         }
 
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, object source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
+        public ResolveFieldContext(ResolveFieldContext context) : base(context)
+        {
+            if (context.Source != null && !(context.Source is TSource))
+                throw new ArgumentException($"ResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
+        }
+
+        public new TSource Source
+        {
+            get => (TSource)base.Source;
+            set => base.Source = value;
+        }
+
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
         {
             Source = source;
             FieldName = field.Name;
