@@ -205,9 +205,4 @@ namespace GraphQL.Tests.Execution
             Two
         }
     }
-
-    internal static class ResolveFieldContextTestExtensions
-    {
-    }
-
 }
