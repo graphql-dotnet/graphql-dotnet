@@ -8,17 +8,17 @@ namespace GraphQL.Builders
     public interface IResolveConnectionContext : IResolveFieldContext
     {
 
-        public bool IsUnidirectional { get; }
+        bool IsUnidirectional { get; }
 
-        public int? First { get; }
+        int? First { get; }
 
-        public int? Last { get; }
+        int? Last { get; }
 
-        public string After { get; }
+        string After { get; }
 
-        public string Before { get; }
+        string Before { get; }
 
-        public int? PageSize { get; }
+        int? PageSize { get; }
     }
 
     public interface IResolveConnectionContext<out T> : IResolveFieldContext<T>, IResolveConnectionContext

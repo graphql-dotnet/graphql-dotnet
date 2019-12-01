@@ -34,7 +34,7 @@ namespace GraphQL.Builders
         {
             get
             {
-                var first = GetArgument<int?>("first");
+                var first = this.GetArgument<int?>("first");
                 return first.HasValue ? (int?)Math.Abs(first.Value) : null;
             }
         }
@@ -43,19 +43,19 @@ namespace GraphQL.Builders
         {
             get
             {
-                var last = GetArgument<int?>("last");
+                var last = this.GetArgument<int?>("last");
                 return last.HasValue ? (int?)Math.Abs(last.Value) : null;
             }
         }
 
         public string After
         {
-            get { return GetArgument<string>("after"); }
+            get { return this.GetArgument<string>("after"); }
         }
 
         public string Before
         {
-            get { return GetArgument<string>("before"); }
+            get { return this.GetArgument<string>("before"); }
         }
 
         public int? PageSize

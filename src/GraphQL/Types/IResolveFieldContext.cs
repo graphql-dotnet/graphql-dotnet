@@ -9,46 +9,46 @@ namespace GraphQL.Types
 {
     public interface IResolveFieldContext : IProvideUserContext
     {
-        public string FieldName { get; }
+        string FieldName { get; }
 
-        public Field FieldAst { get; }
+        Field FieldAst { get; }
 
-        public FieldType FieldDefinition { get; }
+        FieldType FieldDefinition { get; }
 
-        public IGraphType ReturnType { get; }
+        IGraphType ReturnType { get; }
 
-        public IObjectGraphType ParentType { get; }
+        IObjectGraphType ParentType { get; }
 
-        public Dictionary<string, object> Arguments { get; }
+        Dictionary<string, object> Arguments { get; }
 
-        public object RootValue { get; }
+        object RootValue { get; }
 
-        public object Source { get; }
+        object Source { get; }
 
-        public ISchema Schema { get; }
+        ISchema Schema { get; }
 
-        public Document Document { get; }
+        Document Document { get; }
 
-        public Operation Operation { get; }
+        Operation Operation { get; }
 
-        public Fragments Fragments { get; }
+        Fragments Fragments { get; }
 
-        public Variables Variables { get; }
+        Variables Variables { get; }
 
-        public CancellationToken CancellationToken { get; }
+        CancellationToken CancellationToken { get; }
 
-        public Metrics Metrics { get; }
+        Metrics Metrics { get; }
 
-        public ExecutionErrors Errors { get; }
+        ExecutionErrors Errors { get; }
 
-        public IEnumerable<string> Path { get; }
+        IEnumerable<string> Path { get; }
 
-        public IDictionary<string, Field> SubFields { get; }
+        IDictionary<string, Field> SubFields { get; }
 
     }
 
     public interface IResolveFieldContext<out TSource> : IResolveFieldContext
     {
-        new public TSource Source { get; }
+        new TSource Source { get; }
     }
 }

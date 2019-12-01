@@ -9,7 +9,7 @@ using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext : IProvideUserContext, IResolveFieldContext
+    public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
     {
         public string FieldName { get; set; }
 
@@ -77,46 +77,6 @@ namespace GraphQL.Types
             Path = context.Path;
         }
 
-        public TType GetArgument<TType>(string name, TType defaultValue = default)
-        {
-            return ResolveFieldContextExtensions.GetArgument(this, name, defaultValue);
-        }
-
-        public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
-        {
-            return ResolveFieldContextExtensions.GetArgument(this, argumentType, name, defaultValue);
-        }
-
-        public bool HasArgument(string argumentName) => ResolveFieldContextExtensions.HasArgument(this, argumentName);
-
-        public Task<object> TryAsyncResolve(Func<ResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-        {
-            return TryAsyncResolve<object>(resolve, error);
-        }
-
-        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
-        {
-            try
-            {
-                return await resolve(this).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                if (error == null)
-                {
-                    var er = new ExecutionError(ex.Message, ex);
-                    er.AddLocation(FieldAst, Document);
-                    er.Path = Path;
-                    Errors.Add(er);
-                    return default;
-                }
-                else
-                {
-                    var result = error(Errors);
-                    return result == null ? default : await result.ConfigureAwait(false);
-                }
-            }
-        }
     }
 
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
@@ -128,7 +88,7 @@ namespace GraphQL.Types
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
             if (context.Source != null && !(context.Source is TSource))
-                throw new ArgumentException($"ResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
+                throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 
         public new TSource Source
