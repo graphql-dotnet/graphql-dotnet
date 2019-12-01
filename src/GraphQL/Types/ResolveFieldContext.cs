@@ -97,7 +97,7 @@ namespace GraphQL.Types
 
         public bool HasArgument(string argumentName) => ResolveFieldContextExtensions.HasArgument(this, argumentName);
 
-        public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+        public Task<object> TryAsyncResolve(Func<ResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
         {
             return TryAsyncResolve<object>(resolve, error);
         }
@@ -133,7 +133,7 @@ namespace GraphQL.Types
         {
         }
 
-        public ResolveFieldContext(ResolveFieldContext context) : base(context)
+        public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
             if (context.Source != null && !(context.Source is TSource))
                 throw new ArgumentException($"ResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
