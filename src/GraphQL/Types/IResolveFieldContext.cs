@@ -44,7 +44,6 @@ namespace GraphQL.Types
         IEnumerable<string> Path { get; }
 
         IDictionary<string, Field> SubFields { get; }
-
     }
 
     public interface IResolveFieldContext<out TSource> : IResolveFieldContext
