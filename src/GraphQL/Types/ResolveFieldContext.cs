@@ -77,14 +77,6 @@ namespace GraphQL.Types
             Path = context.Path;
         }
 
-        internal ResolveFieldContext<TSourceType> As<TSourceType>()
-        {
-            if (this is ResolveFieldContext<TSourceType> typedContext)
-                return typedContext;
-
-            return new ResolveFieldContext<TSourceType>(this);
-        }
-
         public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
             return ResolveFieldContextExtensions.GetArgument(this, name, defaultValue);
