@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.Subscription
 {
@@ -30,7 +30,7 @@ namespace GraphQL.Subscription
 
     public class ResolveEventStreamContext : ResolveEventStreamContext<object>
     {
-        internal ResolveEventStreamContext<TSourceType> As<TSourceType>()
+        internal new ResolveEventStreamContext<TSourceType> As<TSourceType>()
         {
             return new ResolveEventStreamContext<TSourceType>(this);
         }
