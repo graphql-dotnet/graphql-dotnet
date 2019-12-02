@@ -5,7 +5,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation
 {
-    public class InstrumentFieldsMiddleware
+    public class InstrumentFieldsMiddleware : IFieldMiddleware
     {
         public async Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
         {
