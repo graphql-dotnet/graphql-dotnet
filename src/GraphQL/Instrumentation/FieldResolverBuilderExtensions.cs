@@ -11,7 +11,7 @@ namespace GraphQL.Instrumentation
     {
         private const string InvokeMethodName = "Resolve";
 
-        public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
+        public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) where T : new() => Use(builder, typeof(T));
 
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
