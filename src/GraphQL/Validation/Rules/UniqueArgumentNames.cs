@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -18,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var knownArgs = new Dictionary<string, Argument>();
 
@@ -44,7 +45,7 @@ namespace GraphQL.Validation.Rules
                         knownArgs[argName] = argument;
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

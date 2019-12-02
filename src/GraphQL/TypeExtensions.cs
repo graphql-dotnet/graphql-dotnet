@@ -104,7 +104,8 @@ namespace GraphQL
         /// <param name="type">The type for which a graph type is desired.</param>
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
-        /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
+        /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+        /// <example><see>IList<string></see> -> <see>ListGraphType<StringGraphType></see></example>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))

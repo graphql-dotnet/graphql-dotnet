@@ -1,4 +1,5 @@
 using GraphQL.Language.AST;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,7 +24,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -52,7 +53,7 @@ namespace GraphQL.Validation.Rules
                             node.Type));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

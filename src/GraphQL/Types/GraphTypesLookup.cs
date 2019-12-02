@@ -274,6 +274,9 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.PossibleTypes)
                 {
+                    // skip references
+                    if (unionedType is GraphQLTypeReference) continue;
+
                     AddTypeIfNotRegistered(unionedType, context);
 
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)

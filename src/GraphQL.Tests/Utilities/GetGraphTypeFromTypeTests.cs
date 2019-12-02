@@ -1,3 +1,4 @@
+using System;
 using GraphQL.Types;
 using Shouldly;
 using System.Collections.Generic;
@@ -5,7 +6,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Utilities
 {
-    public class TypeExtensionsTests
+    public class GetGraphTypeFromTypeTests
     {
         [Fact]
         public void supports_decimal_type()
@@ -70,5 +71,9 @@ namespace GraphQL.Tests.Utilities
         [Fact]
         public void GetGraphTypeFromType_ForString_EqualToStringGraphType() =>
             typeof(string).GetGraphTypeFromType(true).ShouldBe(typeof(StringGraphType));
+
+        [Fact]
+        public void GetGraphTypeFromType_ForOpenGeneric_ThrowsArgumentOutOfRangeException() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() => typeof(List<>).GetGraphTypeFromType(true));
     }
 }

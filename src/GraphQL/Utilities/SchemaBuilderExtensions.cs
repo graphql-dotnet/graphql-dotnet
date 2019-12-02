@@ -18,19 +18,12 @@ namespace GraphQL.Utilities
 
         public static bool AstTypeHasFields(this IProvideMetadata type)
         {
-            var ast = GetAstType<ASTNode>(type);
-            if (ast == null) return false;
-
-            switch (ast.Kind)
+            return GetAstType<ASTNode>(type) switch
             {
-                case ASTNodeKind.ObjectTypeDefinition:
-                    return ((GraphQLObjectTypeDefinition)ast).Fields.Any();
-
-                case ASTNodeKind.InterfaceTypeDefinition:
-                    return ((GraphQLInterfaceTypeDefinition)ast).Fields.Any();
-            }
-
-            return false;
+                GraphQLObjectTypeDefinition otd => otd.Fields.Any(),
+                GraphQLInterfaceTypeDefinition itd => itd.Fields.Any(),
+                _ => false
+            };
         }
 
         public static T GetAstType<T>(this IProvideMetadata type) where T : class

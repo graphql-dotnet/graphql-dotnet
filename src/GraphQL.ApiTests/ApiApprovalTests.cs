@@ -13,11 +13,12 @@ namespace GraphQL.ApiTests
         [InlineData(typeof(IGraphType))]
         public void PublicApi(Type type)
         {
-            string publicApi = ApiGenerator.GeneratePublicApi(
-                type.Assembly,
-                shouldIncludeAssemblyAttributes: false,
-                //whitelistedNamespacePrefixes: new[] { "Microsoft.Extensions.DependencyInjection" },
-                excludeAttributes: new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
+            string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions
+            {
+                IncludeAssemblyAttributes = false,
+                //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
+                ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
+            });
 
             publicApi.ShouldMatchApproved();
         }

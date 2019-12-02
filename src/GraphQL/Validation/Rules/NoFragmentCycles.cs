@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -19,7 +20,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             // Tracks already visited fragments to maintain O(N) and to ensure that cycles
             // are not redundantly reported.
@@ -40,7 +41,7 @@ namespace GraphQL.Validation.Rules
                         detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private void detectCycleRecursive(
