@@ -211,79 +211,7 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR'
                 },
                 {
-                  'name': 'Float',
-                  'kind': 'SCALAR'
-                },
-                {
                   'name': 'Int',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'ID',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Date',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'DateTime',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'DateTimeOffset',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Seconds',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Milliseconds',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Decimal',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Uri',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Guid',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Short',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'UShort',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'UInt',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Long',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'BigInt',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'ULong',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Byte',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'SByte',
                   'kind': 'SCALAR'
                 },
                 {

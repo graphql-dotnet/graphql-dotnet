@@ -1,5 +1,7 @@
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using System;
+using System.Linq;
 
 namespace GraphQL.Introspection
 {
@@ -8,7 +10,7 @@ namespace GraphQL.Introspection
         public SchemaMetaFieldType()
         {
             Name = "__schema";
-            Type = typeof (__Schema);
+            Type = typeof(__Schema);
             Description = "Access the current type schema of this server.";
             Resolver = new FuncFieldResolver<ISchema>(context => context.Schema);
         }
@@ -29,7 +31,10 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: async context =>
                 {
-                    return await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
+                    return await context.Schema.AllTypes
+                        .Where(x => x.Name.StartsWith("__", StringComparison.InvariantCulture) || context.Schema.References(x.Name))
+                        .WhereAsync(x => context.Schema.Filter.AllowType(x))
+                        .ConfigureAwait(false);
                 });
 
             Field<NonNullGraphType<__Type>>(
