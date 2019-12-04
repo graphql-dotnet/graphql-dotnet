@@ -15,9 +15,35 @@ namespace GraphQL
     {
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
+        private static readonly List<string> _builtInScalars = new List<string>
+        {
+            "String",
+            "Boolean",
+            "Int",
+            "Float",
+            "ID"
+        };
+
+        private static readonly List<string> _builtInDirectives = new List<string>
+        {
+            "skip",
+            "include",
+            "deprecated"
+        };
+
         public static string TrimGraphQLTypes(this string name)
         {
             return TrimPattern.Replace(name, string.Empty).Trim();
+        }
+
+        public static bool IsBuiltInScalar(this string typeName)
+        {
+            return _builtInScalars.Contains(typeName);
+        }
+
+        public static bool IsSpecDirective(this string directiveName)
+        {
+            return _builtInDirectives.Contains(directiveName);
         }
 
         public static bool IsCompositeType(this IGraphType type)

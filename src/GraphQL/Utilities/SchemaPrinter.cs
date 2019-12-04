@@ -13,22 +13,6 @@ namespace GraphQL.Utilities
     {
         protected SchemaPrinterOptions Options { get; }
 
-        private readonly List<string> _builtInScalars = new List<string>
-        {
-            "String",
-            "Boolean",
-            "Int",
-            "Float",
-            "ID"
-        };
-
-        private readonly List<string> _builtInDirectives = new List<string>
-        {
-            "skip",
-            "include",
-            "deprecated"
-        };
-
         public SchemaPrinter(
             ISchema schema,
             SchemaPrinterOptions options = null)
@@ -41,12 +25,12 @@ namespace GraphQL.Utilities
 
         public string Print()
         {
-            return PrintFilteredSchema(n => !IsSpecDirective(n), IsDefinedType);
+            return PrintFilteredSchema(n => !n.IsSpecDirective(), IsDefinedType);
         }
 
         public string PrintIntrospectionSchema()
         {
-            return PrintFilteredSchema(IsSpecDirective, IsIntrospectionType);
+            return PrintFilteredSchema(n => n.IsSpecDirective(), IsIntrospectionType);
         }
 
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
@@ -76,22 +60,12 @@ namespace GraphQL.Utilities
 
         public virtual bool IsDefinedType(string typeName)
         {
-            return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName) && Schema.References(typeName);
+            return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar() && Schema.References(typeName);
         }
 
         public bool IsIntrospectionType(string typeName)
         {
             return typeName.StartsWith("__", StringComparison.InvariantCulture);
-        }
-
-        public bool IsBuiltInScalar(string typeName)
-        {
-            return _builtInScalars.Contains(typeName);
-        }
-
-        public bool IsSpecDirective(string directiveName)
-        {
-            return _builtInDirectives.Contains(directiveName);
         }
 
         public string PrintSchemaDefinition(ISchema schema)

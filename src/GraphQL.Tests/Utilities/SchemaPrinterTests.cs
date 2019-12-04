@@ -1122,7 +1122,7 @@ enum __TypeKind {
 
             public override bool IsDefinedType(string typeName)
             {
-                return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
+                return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar();
             }
         }
     }

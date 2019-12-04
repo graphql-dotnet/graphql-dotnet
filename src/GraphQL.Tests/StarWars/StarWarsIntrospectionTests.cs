@@ -211,7 +211,15 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'SCALAR'
                 },
                 {
+                  'name': 'Float',
+                  'kind': 'SCALAR'
+                },
+                {
                   'name': 'Int',
+                  'kind': 'SCALAR'
+                },
+                {
+                  'name': 'ID',
                   'kind': 'SCALAR'
                 },
                 {
