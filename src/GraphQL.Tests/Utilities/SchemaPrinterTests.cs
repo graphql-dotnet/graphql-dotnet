@@ -117,12 +117,12 @@ scalar Seconds"
 
         private string print(ISchema schema)
         {
-            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true, IncludeAllTypes = true });
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true }, true);
         }
 
-        private string print(ISchema schema, SchemaPrinterOptions options)
+        private string print(ISchema schema, SchemaPrinterOptions options, bool printAllTypes = false)
         {
-            var printer = new SchemaPrinter(schema, options);
+            var printer = printAllTypes ? new AllTypesSchemaPrinter(schema, options) : new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
         }
 
@@ -267,8 +267,7 @@ type Foo {
 
             var options = new SchemaPrinterOptions
             {
-                IncludeDescriptions = true,
-                IncludeAllTypes = true
+                IncludeDescriptions = true
             };
 
             var expected = new Dictionary<string, string>
@@ -290,7 +289,7 @@ type Foo {
 }"
                 },
             };
-            AssertEqual(print(schema, options), expected);
+            AssertEqual(print(schema, options, true), expected);
         }
 
         [Fact]
@@ -304,8 +303,7 @@ type Foo {
             var options = new SchemaPrinterOptions
             {
                 IncludeDescriptions = true,
-                IncludeDeprecationReasons = true,
-                IncludeAllTypes = true
+                IncludeDeprecationReasons = true
             };
 
             var expected = new Dictionary<string, string>
@@ -327,7 +325,7 @@ type Foo {
 }"
                 },
             };
-            var result = print(schema, options);
+            var result = print(schema, options, true);
             AssertEqual(result, expected);
         }
 
@@ -1113,6 +1111,18 @@ enum __TypeKind {
                 AddValue("RED", "", 0);
                 AddValue("GREEN", "", 1);
                 AddValue("BLUE", "", 2);
+            }
+        }
+
+        private class AllTypesSchemaPrinter : SchemaPrinter
+        {
+            public AllTypesSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null) : base(schema, options)
+            {
+            }
+
+            public override bool IsDefinedType(string typeName)
+            {
+                return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
             }
         }
     }
