@@ -62,15 +62,13 @@ namespace GraphQL.Utilities
 
         protected virtual void Validate(GraphQLDocument document)
         {
-            // this can be simplified once https://github.com/graphql-dotnet/parser/pull/43 is done
-            var definitions = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => def is INamedNode && !(def is GraphQLTypeExtensionDefinition)).ToList();
-            var definitionsByName = definitions.ToLookup(def => ((INamedNode)def).Name.Value);
+            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name.Value);
             var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
             if (duplicates.Length > 0)
                 throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
 
-            // checks may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
+            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
         }
 
         private static GraphQLDocument Parse(string document)
