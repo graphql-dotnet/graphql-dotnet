@@ -25,7 +25,7 @@ namespace GraphQL.Types
 
         protected NonNullGraphType(Type type)
         {
-            if (type == typeof (NonNullGraphType))
+            if (type == typeof(NonNullGraphType))
             {
                 throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
             }

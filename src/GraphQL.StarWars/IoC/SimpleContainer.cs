@@ -29,8 +29,8 @@ namespace GraphQL.StarWars.IoC
             _registrations.Add(typeof(TService),
                 () =>
                 {
-                    var implType = typeof (TImpl);
-                    return typeof (TService) == implType
+                    var implType = typeof(TImpl);
+                    return typeof(TService) == implType
                         ? CreateInstance(implType)
                         : Get(implType);
                 });
@@ -54,7 +54,7 @@ namespace GraphQL.StarWars.IoC
 
         public T Get<T>()
         {
-            return (T)Get(typeof (T));
+            return (T)Get(typeof(T));
         }
 
         public object Get(Type serviceType)
