@@ -22,7 +22,7 @@ namespace GraphQL.Utilities
             "ID"
         };
 
-        private readonly List<string> _buildInDirectives = new List<string>
+        private readonly List<string> _builtInDirectives = new List<string>
         {
             "skip",
             "include",
@@ -91,7 +91,7 @@ namespace GraphQL.Utilities
 
         public bool IsSpecDirective(string directiveName)
         {
-            return _buildInDirectives.Contains(directiveName);
+            return _builtInDirectives.Contains(directiveName);
         }
 
         public string PrintSchemaDefinition(ISchema schema)
