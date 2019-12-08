@@ -3,6 +3,7 @@ using GraphQL.Introspection;
 using GraphQL.Types.Relay;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace GraphQL.Types
@@ -108,6 +109,7 @@ namespace GraphQL.Types
 
             lookup.ApplyTypeReferences();
 
+            Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
             lookup._sealed = seal;
 
             return lookup;
@@ -197,6 +199,8 @@ namespace GraphQL.Types
                 });
 
             AddType<TType>(context);
+
+            Debug.Assert(context.InFlightRegisteredTypes.Count == 0);
         }
 
         private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver)
@@ -274,6 +278,9 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.PossibleTypes)
                 {
+                    // skip references
+                    if (unionedType is GraphQLTypeReference) continue;
+
                     AddTypeIfNotRegistered(unionedType, context);
 
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)
@@ -338,6 +345,25 @@ namespace GraphQL.Types
             }
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/pull/1010
+        private void AddTypeWithLoopCheck(IGraphType resolvedType, TypeCollectionContext context, Type namedType)
+        {
+            if (context.InFlightRegisteredTypes.Any(t => t == namedType))
+                throw new InvalidOperationException($@"A loop has been detected while registering schema types.
+There was an attempt to re-register '{namedType.FullName}' with instance of '{resolvedType.GetType().FullName}'.
+Make sure that your ServiceProvider is configured correctly.");
+
+            context.InFlightRegisteredTypes.Push(namedType);
+            try
+            {
+                AddType(resolvedType, context);
+            }
+            finally
+            {
+                context.InFlightRegisteredTypes.Pop();
+            }
+        }
+
         private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
             var namedType = type.GetNamedType();
@@ -358,7 +384,7 @@ namespace GraphQL.Types
                         return;
                     }
                 }
-                AddType(context.ResolveType(namedType), context);
+                AddTypeWithLoopCheck(context.ResolveType(namedType), context, namedType);
             }
         }
 

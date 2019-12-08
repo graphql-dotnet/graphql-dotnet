@@ -1,14 +1,29 @@
 # GraphQL for .NET
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/graphql-dotnet/graphql-dotnet?branch=master&svg=true)](https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet)
-[![NuGet](https://img.shields.io/nuget/v/GraphQL.svg)](https://www.nuget.org/packages/GraphQL/)
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![Nuget](https://img.shields.io/nuget/vpre/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
+
+![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
+![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
+![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
+
+![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
+
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
+
+Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the [GraphQL Foundation](https://foundation.graphql.org/).
 
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
 
 ## Installation
+
+> WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
+> If errors occur, it is recommended that you first check the behavior on the latest available preview version before
+> reporting a issue.
 
 You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 

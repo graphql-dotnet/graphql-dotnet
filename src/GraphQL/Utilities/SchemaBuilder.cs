@@ -56,7 +56,19 @@ namespace GraphQL.Utilities
         public virtual ISchema Build(string typeDefinitions)
         {
             var document = Parse(typeDefinitions);
+            Validate(document);
             return BuildSchemaFrom(document);
+        }
+
+        protected virtual void Validate(GraphQLDocument document)
+        {
+            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name.Value);
+            var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
+            if (duplicates.Length > 0)
+                throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
+Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
+
+            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
         }
 
         private static GraphQLDocument Parse(string document)

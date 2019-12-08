@@ -14,11 +14,6 @@ using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
-    public interface IDocumentExecuter
-    {
-        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
-        Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
-    }
 
     public class DocumentExecuter : IDocumentExecuter
     {
@@ -109,7 +104,7 @@ namespace GraphQL
                 IValidationResult validationResult;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    validationResult = _documentValidator.Validate(
+                    validationResult = await _documentValidator.ValidateAsync(
                         options.Query,
                         options.Schema,
                         document,
@@ -225,7 +220,7 @@ namespace GraphQL
             }
             finally
             {
-                result = result ?? new ExecutionResult();
+                result ??= new ExecutionResult();
                 result.ExposeExceptions = options.ExposeExceptions;
                 result.Perf = metrics.Finish();
             }
@@ -279,20 +274,13 @@ namespace GraphQL
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
             // TODO: Should we use cached instances of the default execution strategies?
-            switch (context.Operation.OperationType)
+            return context.Operation.OperationType switch
             {
-                case OperationType.Query:
-                    return new ParallelExecutionStrategy();
-
-                case OperationType.Mutation:
-                    return new SerialExecutionStrategy();
-
-                case OperationType.Subscription:
-                    return new SubscriptionExecutionStrategy();
-
-                default:
-                    throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}");
-            }
+                OperationType.Query => new ParallelExecutionStrategy(),
+                OperationType.Mutation => new SerialExecutionStrategy(),
+                OperationType.Subscription => new SubscriptionExecutionStrategy(),
+                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
+            };
         }
     }
 }

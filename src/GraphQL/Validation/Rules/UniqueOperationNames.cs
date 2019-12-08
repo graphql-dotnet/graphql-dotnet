@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -16,7 +17,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var frequency = new HashSet<string>();
 
@@ -44,7 +45,7 @@ namespace GraphQL.Validation.Rules
                             context.ReportError(error);
                         }
                     });
-            });
+            }).ToTask();
         }
     }
 }

@@ -35,7 +35,8 @@ namespace GraphQL.Types
             set => throw Invalid();
         }
 
-        private InvalidOperationException Invalid() => new InvalidOperationException("This is just a reference. Resolve the real type first.");
+        private InvalidOperationException Invalid() => new InvalidOperationException(
+            $"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         public override bool Equals(object obj)
         {

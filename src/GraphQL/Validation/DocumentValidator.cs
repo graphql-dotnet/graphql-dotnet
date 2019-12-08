@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Rules;
@@ -8,7 +9,7 @@ namespace GraphQL.Validation
 {
     public interface IDocumentValidator
     {
-        IValidationResult Validate(
+        Task<IValidationResult> ValidateAsync(
             string originalQuery,
             ISchema schema,
             Document document,
@@ -48,7 +49,7 @@ namespace GraphQL.Validation
             UniqueInputFieldNames.Instance
         }.AsReadOnly();
 
-        public IValidationResult Validate(
+        public async Task<IValidationResult> ValidateAsync(
             string originalQuery,
             ISchema schema,
             Document document,
@@ -76,7 +77,8 @@ namespace GraphQL.Validation
                 rules = CoreRules;
             }
 
-            var visitors = rules.Select(x => x.Validate(context)).ToList();
+            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
+            var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
 
             visitors.Insert(0, context.TypeInfo);
 // #if DEBUG

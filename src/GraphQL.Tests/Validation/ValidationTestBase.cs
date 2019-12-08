@@ -91,7 +91,7 @@ namespace GraphQL.Tests.Validation
             var documentBuilder = new GraphQLDocumentBuilder();
             var document = documentBuilder.Build(query);
             var validator = new DocumentValidator();
-            return validator.Validate(query, schema, document, rules);
+            return validator.ValidateAsync(query, schema, document, rules).Result;
         }
     }
 }

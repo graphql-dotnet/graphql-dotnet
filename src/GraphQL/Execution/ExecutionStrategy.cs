@@ -150,28 +150,19 @@ namespace GraphQL.Execution
 
         public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
         {
-            path = path ?? AppendPath(parent.Path, field.Name);
+            path ??= AppendPath(parent.Path, field.Name);
 
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
-            switch (graphType)
+            return graphType switch
             {
-                case ListGraphType listGraphType:
-                    return new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IObjectGraphType objectGraphType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IAbstractGraphType abstractType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case ScalarGraphType scalarType:
-                    return new ValueExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                default:
-                    throw new InvalidOperationException($"Unexpected type: {graphType}");
-            }
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path),
+                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, path),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -16,7 +17,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var operationCount = context.Document.Operations.Count;
 
@@ -35,7 +36,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(error);
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }
