@@ -79,32 +79,47 @@ namespace GraphQL.Types
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
         {
-            return (TType)GetArgument(typeof(TType), name, defaultValue);
+            bool exists = TryGetArgument(typeof(TType), name, out object result);
+            return exists
+                ? result == null && typeof(TType).IsValueType ? defaultValue : (TType)result
+                : defaultValue;
         }
 
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
+        {
+            bool exists = TryGetArgument(argumentType, name, out object result);
+            return exists
+                ? result == null && argumentType.IsValueType ? defaultValue : result
+                : defaultValue;
+        }
+
+        private bool TryGetArgument(System.Type argumentType, string name, out object result)
         {
             var argumentName = Schema?.FieldNameConverter.NameFor(name, null) ?? name;
 
             if (Arguments == null || !Arguments.TryGetValue(argumentName, out var arg))
             {
-                return defaultValue;
+                result = null;
+                return false;
             }
 
             if (arg is Dictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
-                    return arg;
+                {
+                    result = arg;
+                    return true;
+                }
 
                 if (argumentType.IsPrimitive())
                     throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
 
-                return inputObject.ToObject(argumentType);
+                result = inputObject.ToObject(argumentType);
+                return true;
             }
 
-            var result = arg.GetPropertyValue(argumentType);
-
-            return result == null && argumentType.IsValueType ? defaultValue : result;
+            result = arg.GetPropertyValue(argumentType);
+            return true;
         }
 
         public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;
