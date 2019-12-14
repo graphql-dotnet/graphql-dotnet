@@ -196,6 +196,13 @@ namespace GraphQL.DataLoader
 }
 namespace GraphQL
 {
+    public static class BoolBox
+    {
+        public static readonly object False;
+        public static readonly object True;
+        public static object Boxed(this bool value) { }
+        public static object Boxed(this bool? value) { }
+    }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
@@ -1637,6 +1644,8 @@ namespace GraphQL.Types
         public EnumValues() { }
         public GraphQL.Types.EnumValueDefinition this[string name] { get; }
         public void Add(GraphQL.Types.EnumValueDefinition value) { }
+        public GraphQL.Types.EnumValueDefinition FindByName(string name, System.StringComparison comparison = 5) { }
+        public GraphQL.Types.EnumValueDefinition FindByValue(object value) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.EnumValueDefinition> GetEnumerator() { }
     }
     public class EnumerationGraphType : GraphQL.Types.ScalarGraphType
