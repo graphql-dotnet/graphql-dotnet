@@ -2216,7 +2216,7 @@ namespace GraphQL.Utilities
     public class ExpressionValueResolver<TObject, TProperty> : GraphQL.Utilities.IValueResolver, GraphQL.Utilities.IValueResolver<TProperty>
     {
         public ExpressionValueResolver(System.Linq.Expressions.Expression<System.Func<TObject, TProperty>> property) { }
-        public TProperty Resolve(GraphQL.Utilities.ResolveValueContext context) { }
+        public TProperty Resolve(in GraphQL.Utilities.ResolveValueContext context) { }
     }
     public class FieldConfig : GraphQL.Utilities.MetadataProvider
     {
@@ -2247,11 +2247,11 @@ namespace GraphQL.Utilities
     }
     public interface IValueResolver
     {
-        object Resolve(GraphQL.Utilities.ResolveValueContext context);
+        object Resolve(in GraphQL.Utilities.ResolveValueContext context);
     }
     public interface IValueResolver<T> : GraphQL.Utilities.IValueResolver
     {
-        T Resolve(GraphQL.Utilities.ResolveValueContext context);
+        T Resolve(in GraphQL.Utilities.ResolveValueContext context);
     }
     public interface IVisitorSelector
     {
@@ -2277,10 +2277,10 @@ namespace GraphQL.Utilities
         public object Arg<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
         public System.Collections.Generic.IEnumerable<object> ArgArray<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> argument) { }
     }
-    public class ResolveValueContext
+    public readonly struct ResolveValueContext
     {
-        public ResolveValueContext() { }
-        public object Source { get; set; }
+        public ResolveValueContext(object source) { }
+        public object Source { get; }
         public TType SourceAs<TType>() { }
     }
     public class SchemaBuilder

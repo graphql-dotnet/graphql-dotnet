@@ -107,9 +107,14 @@ namespace GraphQL.Utilities
         public IValueResolver Resolver { get; set; }
     }
 
-    public class ResolveValueContext
+    public readonly struct ResolveValueContext
     {
-        public object Source { get; set; }
+        public ResolveValueContext(object source)
+        {
+            Source = source;
+        }
+
+        public object Source { get; }
 
         public TType SourceAs<TType>()
         {
@@ -124,12 +129,12 @@ namespace GraphQL.Utilities
 
     public interface IValueResolver
     {
-        object Resolve(ResolveValueContext context);
+        object Resolve(in ResolveValueContext context);
     }
 
     public interface IValueResolver<T> : IValueResolver
     {
-        new T Resolve(ResolveValueContext context);
+        new T Resolve(in ResolveValueContext context);
     }
 
     public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
@@ -141,12 +146,12 @@ namespace GraphQL.Utilities
             _property = property.Compile();
         }
 
-        public TProperty Resolve(ResolveValueContext context)
+        public TProperty Resolve(in ResolveValueContext context)
         {
             return _property(context.SourceAs<TObject>());
         }
 
-        object IValueResolver.Resolve(ResolveValueContext context)
+        object IValueResolver.Resolve(in ResolveValueContext context)
         {
             return Resolve(context);
         }
@@ -460,10 +465,7 @@ namespace GraphQL.Utilities
 
                 config.Fields.Apply(f =>
                 {
-                    var ctx = new ResolveValueContext
-                    {
-                        Source = node
-                    };
+                    var ctx = new ResolveValueContext(node);
 
                     var result = f.Resolver.Resolve(ctx);
                     if (result is INode nodeResult)
