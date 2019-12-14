@@ -16,7 +16,15 @@ namespace GraphQL.Language.AST
             _arguments.Add(arg ?? throw new ArgumentNullException(nameof(arg)));
         }
 
-        public IValue ValueFor(string name) => _arguments.FirstOrDefault(x => x.Name == name)?.Value;
+        public IValue ValueFor(string name)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var x in _arguments)
+                if (x.Name == name)
+                    return x.Value;
+
+            return null;
+        }
 
         protected bool Equals(Arguments args) => false;
 
