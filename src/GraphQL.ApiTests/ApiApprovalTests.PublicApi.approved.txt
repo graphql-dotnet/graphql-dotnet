@@ -2151,20 +2151,21 @@ namespace GraphQL.Types.Relay.DataObjects
 }
 namespace GraphQL.Utilities
 {
-    public class AstPrintConfig
+    public abstract class AstPrintConfig
     {
-        public AstPrintConfig() { }
+        protected AstPrintConfig() { }
         public System.Collections.Generic.IEnumerable<GraphQL.Utilities.AstPrintFieldDefinition> Fields { get; }
-        public System.Func<GraphQL.Language.AST.INode, bool> Matches { get; set; }
-        public System.Func<System.Collections.Generic.IDictionary<string, object>, object> PrintAst { get; set; }
+        public abstract System.Func<GraphQL.Language.AST.INode, bool> Matches { get; }
+        public abstract System.Func<System.Collections.Generic.IDictionary<string, object>, object> PrintAst { get; }
         public void Field(GraphQL.Utilities.AstPrintFieldDefinition field) { }
     }
     public class AstPrintConfig<T> : GraphQL.Utilities.AstPrintConfig
         where T : GraphQL.Language.AST.INode
     {
-        public AstPrintConfig() { }
+        public AstPrintConfig(System.Func<GraphQL.Utilities.PrintFormat<T>, object> configure) { }
+        public override System.Func<GraphQL.Language.AST.INode, bool> Matches { get; }
+        public override System.Func<System.Collections.Generic.IDictionary<string, object>, object> PrintAst { get; }
         public void Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> resolve) { }
-        public void Print(System.Func<GraphQL.Utilities.PrintFormat<T>, object> configure) { }
     }
     public class AstPrintFieldDefinition
     {
@@ -2176,7 +2177,7 @@ namespace GraphQL.Utilities
     {
         public AstPrintVisitor() { }
         public object ApplyConfig(GraphQL.Language.AST.INode node) { }
-        public void Config<T>(System.Action<GraphQL.Utilities.AstPrintConfig<T>> configure)
+        public void Config<T>(System.Func<GraphQL.Utilities.PrintFormat<T>, object> printAst, System.Action<GraphQL.Utilities.AstPrintConfig<T>> configure = null)
             where T : GraphQL.Language.AST.INode { }
         public object Visit(GraphQL.Language.AST.INode node) { }
     }
