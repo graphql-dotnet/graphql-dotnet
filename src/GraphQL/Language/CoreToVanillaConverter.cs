@@ -87,7 +87,7 @@ namespace GraphQL.Language
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    (defs ?? new VariableDefinitions()).Add(def);
+                    (defs ?? (defs = new VariableDefinitions())).Add(def);
                 }
             }
 
@@ -151,7 +151,7 @@ namespace GraphQL.Language
             {
                 foreach (var d in directives)
                 {
-                    (target ?? new Directives()).Add(Directive(d));
+                    (target ?? (target = new Directives())).Add(Directive(d));
                 }
             }
 

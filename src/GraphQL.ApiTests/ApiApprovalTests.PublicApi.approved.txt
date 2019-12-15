@@ -1586,7 +1586,7 @@ namespace GraphQL.Types
         public DirectiveGraphType(string name, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> locations) { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
         public string Description { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveLocation> Locations { get; }
+        public System.Collections.Generic.List<GraphQL.Types.DirectiveLocation> Locations { get; }
         public string Name { get; set; }
     }
     public enum DirectiveLocation
