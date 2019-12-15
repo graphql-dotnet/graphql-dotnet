@@ -81,15 +81,16 @@ namespace GraphQL.Language
 
         public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
-            var defs = new VariableDefinitions();
+            VariableDefinitions defs = null;
 
             if (source != null)
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    defs.Add(def);
+                    (defs ?? new VariableDefinitions()).Add(def);
                 }
             }
+
             return defs;
         }
 
@@ -144,13 +145,13 @@ namespace GraphQL.Language
 
         public Directives Directives(IEnumerable<GraphQLDirective> directives)
         {
-            var target = new Directives();
+            Directives target = null;
 
             if (directives != null)
             {
                 foreach (var d in directives)
                 {
-                    target.Add(Directive(d));
+                    (target ?? new Directives()).Add(Directive(d));
                 }
             }
 

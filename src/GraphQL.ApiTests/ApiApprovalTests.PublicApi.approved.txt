@@ -1026,7 +1026,6 @@ namespace GraphQL.Language.AST
     public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public FragmentDefinition(GraphQL.Language.AST.NameNode node) { }
-        public FragmentDefinition() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
@@ -1040,7 +1039,6 @@ namespace GraphQL.Language.AST
     public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
         public FragmentSpread(GraphQL.Language.AST.NameNode node) { }
-        public FragmentSpread() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
@@ -1176,7 +1174,6 @@ namespace GraphQL.Language.AST
     public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
         public Operation(GraphQL.Language.AST.NameNode name) { }
-        public Operation() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }

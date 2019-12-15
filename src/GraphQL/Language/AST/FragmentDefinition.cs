@@ -6,14 +6,8 @@ namespace GraphQL.Language.AST
     public class FragmentDefinition : AbstractNode, IDefinition, IHaveSelectionSet
     {
         public FragmentDefinition(NameNode node)
-            : this()
         {
             NameNode = node;
-        }
-
-        public FragmentDefinition()
-        {
-            Directives = new Directives();
         }
 
         public string Name => NameNode?.Name;
@@ -32,9 +26,12 @@ namespace GraphQL.Language.AST
             {
                 yield return Type;
 
-                foreach (var directive in Directives)
+                if (Directives != null)
                 {
-                    yield return directive;
+                    foreach (var directive in Directives)
+                    {
+                        yield return directive;
+                    }
                 }
 
                 yield return SelectionSet;

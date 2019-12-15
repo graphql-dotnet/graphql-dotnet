@@ -1,23 +1,32 @@
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Language.AST
 {
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
-        private readonly List<Argument> _arguments = new List<Argument>();
+        private List<Argument> _arguments;
 
         public override IEnumerable<INode> Children => _arguments;
 
         public void Add(Argument arg)
         {
-            _arguments.Add(arg ?? throw new ArgumentNullException(nameof(arg)));
+            if (arg == null)
+                throw new ArgumentNullException(nameof(arg));
+
+            if (_arguments == null)
+                _arguments = new List<Argument>();
+
+            _arguments.Add(arg);
         }
 
         public IValue ValueFor(string name)
         {
+            if (_arguments == null)
+                return null;
+
             // DO NOT USE LINQ ON HOT PATH
             foreach (var x in _arguments)
                 if (x.Name == name)
@@ -36,7 +45,13 @@ namespace GraphQL.Language.AST
             return Equals((Arguments)obj);
         }
 
-        public IEnumerator<Argument> GetEnumerator() => _arguments.GetEnumerator();
+        public IEnumerator<Argument> GetEnumerator()
+        {
+            if (_arguments == null)
+                return EmptyEnumerator<Argument>.Instance;
+
+            return _arguments.GetEnumerator();
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

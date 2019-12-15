@@ -231,10 +231,10 @@ namespace GraphQL.Utilities
 
             Config<SelectionSet>(c =>
             {
-                c.Field(x => x.Selections);
+                c.Field(x => x.SelectionsList);
                 c.Print(p =>
                 {
-                    return Block(p.ArgArray(x => x.Selections));
+                    return Block(p.ArgArray(x => x.SelectionsList));
                 });
             });
 

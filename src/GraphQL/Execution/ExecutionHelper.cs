@@ -314,7 +314,7 @@ namespace GraphQL.Execution
         {
             if (selectionSet != null)
             {
-                foreach (var selection in selectionSet.Selections)
+                foreach (var selection in selectionSet.SelectionsList)
                 {
                     if (selection is Field field)
                     {
@@ -357,7 +357,6 @@ namespace GraphQL.Execution
 
                         CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
-
                 }
             }
 

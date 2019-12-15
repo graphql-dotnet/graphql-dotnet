@@ -1,3 +1,4 @@
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,15 +34,24 @@ namespace GraphQL.Language.AST
 
     public class VariableDefinitions : IEnumerable<VariableDefinition>
     {
-        private readonly List<VariableDefinition> _variables = new List<VariableDefinition>();
+        private List<VariableDefinition> _variables;
 
         public void Add(VariableDefinition variable)
         {
-            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+            if (variable == null)
+                throw new ArgumentNullException(nameof(variable));
+
+            if (_variables == null)
+                _variables = new List<VariableDefinition>();
+
+            _variables.Add(variable);
         }
 
         public IEnumerator<VariableDefinition> GetEnumerator()
         {
+            if (_variables == null)
+                return EmptyEnumerator<VariableDefinition>.Instance;
+
             return _variables.GetEnumerator();
         }
 
