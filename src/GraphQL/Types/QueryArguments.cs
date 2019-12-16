@@ -43,6 +43,8 @@ namespace GraphQL.Types
             }
         }
 
+        internal List<QueryArgument> Arguments => _arguments;
+
         public int Count => _arguments?.Count ?? 0;
 
         public void Add(QueryArgument argument)

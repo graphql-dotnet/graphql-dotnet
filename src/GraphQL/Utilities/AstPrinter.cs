@@ -457,7 +457,7 @@ namespace GraphQL.Utilities
 
         public object ApplyConfig(INode node)
         {
-            var config = _configs.SingleOrDefault(c => c.Matches(node));
+            var config = FindFor(node);
 
             if (config != null)
             {
@@ -482,6 +482,16 @@ namespace GraphQL.Utilities
 
                 return config.PrintAst(vals);
             }
+
+            return null;
+        }
+
+        private AstPrintConfig FindFor(INode node)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var c in _configs)
+                if (c.Matches(node))
+                    return c;
 
             return null;
         }
