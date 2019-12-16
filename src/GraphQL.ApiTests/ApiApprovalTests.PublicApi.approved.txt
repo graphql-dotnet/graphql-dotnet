@@ -449,7 +449,7 @@ namespace GraphQL.Execution
     public class ArrayExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path) { }
-        public System.Collections.Generic.IList<GraphQL.Execution.ExecutionNode> Items { get; set; }
+        public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public override object ToValue() { }
     }
     public abstract class DocumentExecutionListenerBase<T> : GraphQL.Execution.IDocumentExecutionListener, GraphQL.Execution.IDocumentExecutionListener<T>
