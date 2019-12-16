@@ -24,6 +24,7 @@ namespace GraphQL
     public static class EnumerableExtensions
     {
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
+        public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
     }
     public struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
@@ -71,7 +72,7 @@ namespace GraphQL
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
-        public System.Collections.Generic.IList<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
+        public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
@@ -468,7 +469,7 @@ namespace GraphQL.Execution
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Language.AST.Fragments Fragments { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
+        public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
