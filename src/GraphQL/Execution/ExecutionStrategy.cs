@@ -330,11 +330,12 @@ namespace GraphQL.Execution
 
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
-            foreach (var listener in context.Listeners)
-            {
-                await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
-                    .ConfigureAwait(false);
-            }
+            if (context.Listeners != null)
+                foreach (var listener in context.Listeners)
+                {
+                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                        .ConfigureAwait(false);
+                }
         }
     }
 }

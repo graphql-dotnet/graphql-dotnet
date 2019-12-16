@@ -208,7 +208,7 @@ namespace GraphQL.Utilities
 
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
             var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
-            var implementedInterfaces = interfaces.Any()
+            var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
@@ -261,7 +261,7 @@ namespace GraphQL.Utilities
 
         public string PrintArgs(FieldType field)
         {
-            if (field.Arguments == null || !field.Arguments.Any())
+            if (field.Arguments == null || field.Arguments.Count == 0)
             {
                 return string.Empty;
             }
@@ -310,7 +310,7 @@ namespace GraphQL.Utilities
 
         private string FormatDirectiveArguments(QueryArguments arguments)
         {
-            if (arguments == null || !arguments.Any()) return null;
+            if (arguments == null || arguments.Count == 0) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 

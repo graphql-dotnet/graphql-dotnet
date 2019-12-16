@@ -2,14 +2,11 @@ using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Types
 {
     public class QueryArguments : IEnumerable<QueryArgument>
     {
-        private List<QueryArgument> _arguments;
-
         public QueryArguments(params QueryArgument[] args)
         {
             foreach (var arg in args)
@@ -28,7 +25,7 @@ namespace GraphQL.Types
 
         public QueryArgument this[int index]
         {
-            get => _arguments != null ? _arguments[index] : throw new IndexOutOfRangeException();
+            get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
             set
             {
                 if (value != null)
@@ -36,16 +33,16 @@ namespace GraphQL.Types
                     NameValidator.ValidateName(value.Name, "argument");
                 }
 
-                if (_arguments == null)
+                if (ArgumentsList == null)
                     throw new IndexOutOfRangeException();
 
-                _arguments[index] = value;
+                ArgumentsList[index] = value;
             }
         }
 
-        internal List<QueryArgument> Arguments => _arguments;
+        internal List<QueryArgument> ArgumentsList { get; private set; }
 
-        public int Count => _arguments?.Count ?? 0;
+        public int Count => ArgumentsList?.Count ?? 0;
 
         public void Add(QueryArgument argument)
         {
@@ -54,20 +51,31 @@ namespace GraphQL.Types
 
             NameValidator.ValidateName(argument.Name, "argument");
 
-            if (_arguments == null)
-                _arguments = new List<QueryArgument>();
+            if (ArgumentsList == null)
+                ArgumentsList = new List<QueryArgument>();
 
-            _arguments.Add(argument);
+            ArgumentsList.Add(argument);
         }
 
-        public QueryArgument Find(string name) => this.FirstOrDefault(x => x.Name == name);
+        public QueryArgument Find(string name)
+        {
+            if (ArgumentsList == null)
+                return null;
+
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var arg in ArgumentsList)
+                if (arg.Name == name)
+                    return arg;
+
+            return null;
+        }
 
         public IEnumerator<QueryArgument> GetEnumerator()
         {
-            if (_arguments == null)
+            if (ArgumentsList == null)
                 return EmptyEnumerator<QueryArgument>.Instance;
 
-            return _arguments.GetEnumerator();
+            return ArgumentsList.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -26,20 +26,19 @@ namespace GraphQL.Utilities
 
     public class AstPrintConfig
     {
-        private readonly List<AstPrintFieldDefinition> _fields = new List<AstPrintFieldDefinition>();
-
-        public IEnumerable<AstPrintFieldDefinition> Fields => _fields;
+        internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
+        public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
         public Func<INode, bool> Matches { get; set; }
         public Func<IDictionary<string, object>, object> PrintAst { get; set; }
 
         public void Field(AstPrintFieldDefinition field)
         {
-            if (_fields.Exists(x => x.Name == field.Name))
+            if (FieldsList.Exists(x => x.Name == field.Name))
             {
                 throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
             }
 
-            _fields.Add(field);
+            FieldsList.Add(field);
         }
     }
 
@@ -432,7 +431,7 @@ namespace GraphQL.Utilities
         private string Block(IEnumerable<object> nodes)
         {
             var list = nodes.ToList();
-            return list.Any()
+            return list.Count > 0
                 ? Indent($"{{\n{Join(list, "\n")}") + "\n}"
                 : "";
         }
@@ -463,7 +462,7 @@ namespace GraphQL.Utilities
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.Fields.Apply(f =>
+                config.FieldsList.Apply(f =>
                 {
                     var ctx = new ResolveValueContext(node);
 

@@ -38,7 +38,7 @@ namespace GraphQL.Utilities
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
-            return GetExtensionAstTypes(type).Any();
+            return GetExtensionAstTypes(type).Count > 0;
         }
 
         public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode 

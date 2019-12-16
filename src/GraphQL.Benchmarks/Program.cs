@@ -20,7 +20,7 @@ namespace GraphQL.Benchmarks
             while (true)
             {
                 bench.Introspection();
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
             }
         }
     }

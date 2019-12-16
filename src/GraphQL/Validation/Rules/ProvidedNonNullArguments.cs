@@ -58,12 +58,12 @@ namespace GraphQL.Validation.Rules
                 {
                     var directive = context.TypeInfo.GetDirective();
 
-                    if (directive == null || directive.Arguments == null)
+                    if (directive?.Arguments?.ArgumentsList == null)
                     {
                         return;
                     }
 
-                    foreach (var arg in directive.Arguments)
+                    foreach (var arg in directive.Arguments.ArgumentsList)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;

@@ -166,7 +166,7 @@ namespace GraphQL
 
             var genericArgs = type.GetGenericArguments();
 
-            if (genericArgs.Any())
+            if (genericArgs.Length > 0)
             {
                 int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0)
