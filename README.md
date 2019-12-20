@@ -68,7 +68,7 @@ var schema = Schema.For(@"
 ");
 
 var root = new { Hello = "Hello World!" };
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ hello }";
   _.Root = root;
@@ -110,7 +110,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ droid { id name } }";
 });
@@ -152,7 +152,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 });
