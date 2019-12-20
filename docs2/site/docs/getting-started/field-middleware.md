@@ -3,7 +3,7 @@
 You can write middleware for fields to provide additional behaviors during field resolution.  The following example is how Metrics are captured.  You register Field Middleware in the `ExecutionOptions`.
 
 ```csharp
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
