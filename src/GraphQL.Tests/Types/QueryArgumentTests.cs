@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -30,13 +30,17 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void does_not_throw_with_valid_type()
         {
-            new QueryArgument(typeof(GraphType));
+            new QueryArgument<StringGraphType>();
+            new QueryArgument<InputObjectGraphType>();
+            new QueryArgument(typeof(StringGraphType));
+            new QueryArgument(typeof(InputObjectGraphType));
         }
 
         [Fact]
-        public void does_not_throw_with_object_type()
+        public void throw_with_object_type()
         {
-            new QueryArgument(typeof(ObjectGraphType));
+            Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(typeof(ObjectGraphType)));
+            Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument<ObjectGraphType<int>>());
         }
     }
 }
