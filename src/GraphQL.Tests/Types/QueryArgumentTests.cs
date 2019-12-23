@@ -37,6 +37,13 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void does_not_throw_when_set_null()
+        {
+            var type = new QueryArgument<StringGraphType>();
+            type.ResolvedType = null;
+        }
+
+        [Fact]
         public void throw_with_object_type()
         {
             Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(typeof(ObjectGraphType)));
