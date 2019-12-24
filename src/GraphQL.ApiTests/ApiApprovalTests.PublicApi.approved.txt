@@ -718,7 +718,8 @@ namespace GraphQL.Instrumentation
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
     public static class FieldResolverBuilderExtensions
     {
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
+            where T : new() { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
     }
     public class FieldStat
@@ -2347,6 +2348,7 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.IObjectGraphType ToObjectGraphType(GraphQLParser.AST.GraphQLObjectTypeDefinition astType, bool isExtensionType = False) { }
         protected virtual GraphQL.Types.FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.UnionGraphType ToUnionType(GraphQLParser.AST.GraphQLUnionTypeDefinition unionDef) { }
+        protected virtual void Validate(GraphQLParser.AST.GraphQLDocument document) { }
         protected virtual void VisitNode(object node, System.Action<GraphQL.Utilities.ISchemaNodeVisitor> action) { }
     }
     public abstract class SchemaDirectiveVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor

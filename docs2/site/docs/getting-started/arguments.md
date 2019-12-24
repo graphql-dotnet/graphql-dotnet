@@ -47,7 +47,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 });
@@ -95,7 +95,7 @@ public class StarWarsQuery : ObjectGraphType
 }
 
 var schema = new Schema { Query = new StarWarsQuery() };
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 })

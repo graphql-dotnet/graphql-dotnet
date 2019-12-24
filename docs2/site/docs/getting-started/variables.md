@@ -33,7 +33,7 @@ var variablesJson = // get from request
 // `ToInputs` extension method converts the json to the `Inputs` class
 var inputs = variablesJson.ToInputs();
 
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.Inputs = inputs;

@@ -1,5 +1,6 @@
 using GraphQL.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace GraphQL.Types
@@ -112,5 +113,6 @@ namespace GraphQL.Types
 
         public Func<Type, IGraphType> ResolveType { get; private set; }
         public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
+        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }
