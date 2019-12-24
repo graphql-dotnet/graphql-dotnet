@@ -1,7 +1,6 @@
 using GraphQL.Types;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -39,22 +38,11 @@ namespace GraphQL.Instrumentation
                 throw new InvalidOperationException($"The {InvokeMethodName} method of middleware should take a parameter of type {nameof(ResolveFieldContext)} as the first parameter and a parameter of type {nameof(FieldMiddlewareDelegate)} as the second parameter.");
             }
 
-            //func = (context, next) => (new <middleware>()).Resolve(context, next);
-            var paramContext = Expression.Parameter(typeof(ResolveFieldContext));
-            var paramNext = Expression.Parameter(typeof(FieldMiddlewareDelegate));
-            var func = Expression.Lambda<Func<ResolveFieldContext, FieldMiddlewareDelegate, Task<object>>>(
-                Expression.Call(
-                    Expression.New(middleware),
-                    methodInfo,
-                    paramContext,
-                    paramNext),
-                paramContext,
-                paramNext)
-                .Compile();
-
             return builder.Use(next =>
             {
-                return context => func(context, next);
+                var instance = Activator.CreateInstance(middleware);
+
+                return context => (Task<object>)methodInfo.Invoke(instance, new object[] { context, next });
             });
         }
     }
