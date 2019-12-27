@@ -35,7 +35,7 @@ You can also provide that operation name to the `ExecutionOptions`.
 
 ```csharp
 var schema = new Schema { Query = new StarWarsQuery() };
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.OperationName = "MyHeroQuery";
   _.Query = @"
