@@ -23,15 +23,15 @@ namespace GraphQL.Tests.Utilities.Visitors
             type.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitEnumeration(EnumerationGraphType type)
+        public override void VisitEnum(EnumerationGraphType type)
         {
-            base.VisitEnumeration(type);
+            base.VisitEnum(type);
             type.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitEnumerationValue(EnumValueDefinition value)
+        public override void VisitEnumValue(EnumValueDefinition value)
         {
-            base.VisitEnumerationValue(value);
+            base.VisitEnumValue(value);
             value.Description = GetArgument("description", string.Empty);
         }
 
@@ -41,9 +41,9 @@ namespace GraphQL.Tests.Utilities.Visitors
             scalar.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitField(field);
+            base.VisitFieldDefinition(field);
             field.Description = GetArgument("description", string.Empty);
         }
 
@@ -59,9 +59,9 @@ namespace GraphQL.Tests.Utilities.Visitors
             union.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitArgument(QueryArgument argument)
+        public override void VisitArgumentDefinition(QueryArgument argument)
         {
-            base.VisitArgument(argument);
+            base.VisitArgumentDefinition(argument);
             argument.Description = GetArgument("description", string.Empty);
         }
 
@@ -71,9 +71,9 @@ namespace GraphQL.Tests.Utilities.Visitors
             type.Description = GetArgument("description", string.Empty);
         }
 
-        public override void VisitInputField(FieldType value)
+        public override void VisitInputFieldDefinition(FieldType value)
         {
-            base.VisitInputField(value);
+            base.VisitInputFieldDefinition(value);
             value.Description = GetArgument("description", string.Empty);
         }
     }

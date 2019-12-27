@@ -31,8 +31,9 @@ namespace GraphQL.Utilities
             return type.GetMetadata<T>(__AST_MetaField__);
         }
 
-        public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider type, ASTNode node)
-            where TMetadataProvider : IProvideMetadata => type.WithMetadata(__AST_MetaField__, node);
+        public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node)
+            where TMetadataProvider : IProvideMetadata
+            => provider.WithMetadata(__AST_MetaField__, node);
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {

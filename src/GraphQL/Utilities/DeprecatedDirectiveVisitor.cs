@@ -8,18 +8,18 @@ namespace GraphQL.Utilities
 
         protected static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitField(field);
+            base.VisitFieldDefinition(field);
 
             // if a value has already been set, prefer that
             if (!string.IsNullOrWhiteSpace(field.DeprecationReason)) return;
             field.DeprecationReason = GetArgument<string>("reason") ?? DeprecatedDefaultValue;
         }
 
-        public override void VisitEnumerationValue(EnumValueDefinition value)
+        public override void VisitEnumValue(EnumValueDefinition value)
         {
-            base.VisitEnumerationValue(value);
+            base.VisitEnumValue(value);
 
             // if a value has already been set, prefer that
             if (!string.IsNullOrWhiteSpace(value.DeprecationReason)) return;

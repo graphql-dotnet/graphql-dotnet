@@ -463,19 +463,19 @@ namespace GraphQL
                     directive.VisitObject(objectGraphType);
                     break;
                 case EnumerationGraphType enumeration:
-                    directive.VisitEnumeration(enumeration);
+                    directive.VisitEnum(enumeration);
                     break;
                 case EnumValueDefinition value:
-                    directive.VisitEnumerationValue(value);
+                    directive.VisitEnumValue(value);
                     break;
                 case ScalarGraphType scalar:
                     directive.VisitScalar(scalar);
                     break;
                 case FieldType field:
-                    directive.VisitField(field);
+                    directive.VisitFieldDefinition(field);
                     break;
                 case QueryArgument argument:
-                    directive.VisitArgument(argument);
+                    directive.VisitArgumentDefinition(argument);
                     break;
                 case InterfaceGraphType interfaceGraphType:
                     directive.VisitInterface(interfaceGraphType);

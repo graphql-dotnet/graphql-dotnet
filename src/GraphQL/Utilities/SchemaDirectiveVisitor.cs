@@ -54,15 +54,15 @@ namespace GraphQL.Utilities
             type.SetDirective(this);
         }
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitField(field);
+            base.VisitFieldDefinition(field);
             field.SetDirective(this);
         }
 
-        public override void VisitArgument(QueryArgument argument)
+        public override void VisitArgumentDefinition(QueryArgument argument)
         {
-            base.VisitArgument(argument);
+            base.VisitArgumentDefinition(argument);
             argument.SetDirective(this);
         }
 
@@ -78,15 +78,15 @@ namespace GraphQL.Utilities
             union.SetDirective(this);
         }
 
-        public override void VisitEnumeration(EnumerationGraphType type)
+        public override void VisitEnum(EnumerationGraphType type)
         {
-            base.VisitEnumeration(type);
+            base.VisitEnum(type);
             type.SetDirective(this);
         }
 
-        public override void VisitEnumerationValue(EnumValueDefinition value)
+        public override void VisitEnumValue(EnumValueDefinition value)
         {
-            base.VisitEnumerationValue(value);
+            base.VisitEnumValue(value);
             value.SetDirective(this);
         }
 
@@ -96,9 +96,9 @@ namespace GraphQL.Utilities
             type.SetDirective(this);
         }
 
-        public override void VisitInputField(FieldType value)
+        public override void VisitInputFieldDefinition(FieldType value)
         {
-            base.VisitInputField(value);
+            base.VisitInputFieldDefinition(value);
             value.SetDirective(this);
         }
     }

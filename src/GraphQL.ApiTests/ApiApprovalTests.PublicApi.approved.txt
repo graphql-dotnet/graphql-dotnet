@@ -2210,13 +2210,13 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
-        public virtual void VisitArgument(GraphQL.Types.QueryArgument argument) { }
-        public virtual void VisitEnumeration(GraphQL.Types.EnumerationGraphType type) { }
-        public virtual void VisitEnumerationValue(GraphQL.Types.EnumValueDefinition value) { }
-        public virtual void VisitField(GraphQL.Types.FieldType field) { }
-        public virtual void VisitInputField(GraphQL.Types.FieldType value) { }
+        public virtual void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
+        public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
+        public virtual void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputFieldDefinition(GraphQL.Types.FieldType field) { }
         public virtual void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
-        public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition) { }
+        public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType iface) { }
         public virtual void VisitObject(GraphQL.Types.IObjectGraphType type) { }
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
         public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
@@ -2228,8 +2228,8 @@ namespace GraphQL.Utilities
         protected static readonly string DeprecatedDefaultValue;
         public DeprecatedDirectiveVisitor() { }
         public override string Name { get; }
-        public override void VisitEnumerationValue(GraphQL.Types.EnumValueDefinition value) { }
-        public override void VisitField(GraphQL.Types.FieldType field) { }
+        public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
+        public override void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
     }
     public class DirectiveVisitorSelector : GraphQL.Utilities.IVisitorSelector
     {
@@ -2264,13 +2264,13 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
-        void VisitArgument(GraphQL.Types.QueryArgument argument);
-        void VisitEnumeration(GraphQL.Types.EnumerationGraphType type);
-        void VisitEnumerationValue(GraphQL.Types.EnumValueDefinition value);
-        void VisitField(GraphQL.Types.FieldType field);
-        void VisitInputField(GraphQL.Types.FieldType type);
+        void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument);
+        void VisitEnum(GraphQL.Types.EnumerationGraphType type);
+        void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
+        void VisitFieldDefinition(GraphQL.Types.FieldType field);
+        void VisitInputFieldDefinition(GraphQL.Types.FieldType field);
         void VisitInputObject(GraphQL.Types.InputObjectGraphType type);
-        void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition);
+        void VisitInterface(GraphQL.Types.InterfaceGraphType iface);
         void VisitObject(GraphQL.Types.IObjectGraphType type);
         void VisitScalar(GraphQL.Types.ScalarGraphType scalar);
         void VisitSchema(GraphQL.Types.Schema schema);
@@ -2352,11 +2352,11 @@ namespace GraphQL.Utilities
         public abstract string Name { get; }
         public TType GetArgument<TType>(string name, TType defaultValue = null) { }
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null) { }
-        public override void VisitArgument(GraphQL.Types.QueryArgument argument) { }
-        public override void VisitEnumeration(GraphQL.Types.EnumerationGraphType type) { }
-        public override void VisitEnumerationValue(GraphQL.Types.EnumValueDefinition value) { }
-        public override void VisitField(GraphQL.Types.FieldType field) { }
-        public override void VisitInputField(GraphQL.Types.FieldType value) { }
+        public override void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public override void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
+        public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
+        public override void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
+        public override void VisitInputFieldDefinition(GraphQL.Types.FieldType value) { }
         public override void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
         public override void VisitInterface(GraphQL.Types.InterfaceGraphType interfaceDefinition) { }
         public override void VisitObject(GraphQL.Types.IObjectGraphType type) { }

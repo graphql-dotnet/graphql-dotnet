@@ -12,9 +12,9 @@ namespace GraphQL.Tests.Utilities.Visitors
     {
         public override string Name => "upper";
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitField(field);
+            base.VisitFieldDefinition(field);
 
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new FuncFieldResolver<object>(context =>
@@ -39,9 +39,9 @@ namespace GraphQL.Tests.Utilities.Visitors
     {
         public override string Name => "upper";
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
-            base.VisitField(field);
+            base.VisitFieldDefinition(field);
 
             var inner = WrapResolver(field.Resolver);
             field.Resolver = new AsyncFieldResolver<object>(async context =>
