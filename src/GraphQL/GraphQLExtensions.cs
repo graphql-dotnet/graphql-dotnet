@@ -100,6 +100,34 @@ namespace GraphQL
                 : type;
         }
 
+        /// <summary>
+        /// An Interface defines a list of fields; Object types that implement that interface are guaranteed to implement those fields.
+        /// Whenever the type system claims it will return an interface, it will return a valid implementing type.
+        /// </summary>
+        /// <param name="iface"></param>
+        /// <param name="type"></param>
+        /// <param name="throwError"> Set to <c>true</c> to generate an error if the type does not match the interface. </param>
+        /// <returns></returns>
+        public static bool IsValidInterfaceFor(this IInterfaceGraphType iface, IObjectGraphType type, bool throwError = true)
+        {
+            foreach (var field in iface.Fields)
+            {
+                var found = type.GetField(field.Name);
+
+                if (found == null)
+                {
+                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Type '{type.Name}' has no field '{field.Name}'.") : false;
+                }
+
+                if (found.Type != field.Type)
+                {
+                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Field '{type.Name}.{field.Name}' must be of type '{field.Type.GetFriendlyName()}', but in fact it is of type '{found.Type.GetFriendlyName()}'.") : false;
+                }
+            }
+
+            return true;
+        }
+
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
         {
             resolve ??= t => (IGraphType)Activator.CreateInstance(t);
