@@ -5,7 +5,6 @@ using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,28 +36,21 @@ namespace GraphQL.Harness
             services.AddSingleton<EpisodeEnum>();
             services.AddSingleton<ISchema, StarWarsSchema>();
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+            services.AddHttpContextAccessor();
             services.AddLogging(builder => builder.AddConsole());
+
+            services.Configure<GraphQLSettings>(Configuration);
+            services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+                app.UseDeveloperExceptionPage();
 
-            app.UseMiddleware<GraphQLMiddleware>(new GraphQLSettings
-            {
-                BuildUserContext = ctx => new GraphQLUserContext
-                {
-                    User = ctx.User
-                },
-                EnableMetrics = Configuration.GetValue<bool>("EnableMetrics"),
-                ExposeExceptions = Configuration.GetValue<bool>("ExposeExceptions")
-            });
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app.UseMiddleware<GraphQLMiddleware>();
+            app.UseGraphQLPlayground();
         }
     }
 }
