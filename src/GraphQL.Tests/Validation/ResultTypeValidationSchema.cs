@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Validation
         public StringBox()
         {
             Field<StringGraphType>("scalar");
-            Field<StringBox>("deepBox");
+            Field<SomeBox>("deepBox");
             Field<StringGraphType>("unrelatedField");
             Field<ListGraphType<StringBox>>("listStringBox");
             Field<StringBox>("stringBox");
@@ -52,7 +52,7 @@ namespace GraphQL.Tests.Validation
         public IntBox()
         {
             Field<IntGraphType>("scalar");
-            Field<IntBox>("deepBox");
+            Field<SomeBox>("deepBox");
             Field<StringGraphType>("unrelatedField");
             Field<ListGraphType<StringBox>>("listStringBox");
             Field<StringBox>("stringBox");
