@@ -3,7 +3,16 @@
     "Playground": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "ui/playground/",
+      "launchUrl": "ui/playground",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:62248/"
+    },
+    "GraphiQL": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "graphiql",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
