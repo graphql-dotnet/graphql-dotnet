@@ -4,13 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace GraphQL.Http
+namespace GraphQL.NewtonsoftJson
 {
-    public interface IDocumentWriter
-    {
-        Task WriteAsync<T>(Stream stream, T value);
-    }
-
     public class DocumentWriter : IDocumentWriter
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
@@ -23,16 +18,18 @@ namespace GraphQL.Http
         }
 
         public DocumentWriter(bool indent)
-            : this(
-                indent ? Formatting.Indented : Formatting.None,
-                new JsonSerializerSettings())
+            : this(new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None })
         {
         }
 
-        public DocumentWriter(Formatting formatting, JsonSerializerSettings settings)
+        public DocumentWriter(JsonSerializerSettings settings)
         {
             _serializer = JsonSerializer.CreateDefault(settings);
-            _serializer.Formatting = formatting;
+
+            if (settings.ContractResolver == null)
+            {
+                _serializer.ContractResolver = new NewtonsoftContractResolver();
+            }
         }
 
         public async Task WriteAsync<T>(Stream stream, T value)
@@ -47,25 +44,6 @@ namespace GraphQL.Http
             {
                 _serializer.Serialize(jsonWriter, value);
                 await jsonWriter.FlushAsync().ConfigureAwait(false);
-            }
-        }
-    }
-
-    public static class DocumentWriterExtensions
-    {
-        /// <summary>
-        /// Writes the <paramref name="value"/> to string.
-        /// </summary>
-        public static async Task<string> WriteToStringAsync<T>(this IDocumentWriter writer, T value)
-        {
-            using (var stream = new MemoryStream())
-            {
-                await writer.WriteAsync(stream, value).ConfigureAwait(false);
-                stream.Position = 0;
-                using (var reader = new StreamReader(stream, DocumentWriter.Utf8Encoding))
-                {
-                    return await reader.ReadToEndAsync().ConfigureAwait(false);
-                }
             }
         }
     }

@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
-using Newtonsoft.Json;
 
 namespace GraphQL
 {
-    [JsonConverter(typeof(ExecutionResultJsonConverter))]
     public class ExecutionResult
     {
         public object Data { get; set; }

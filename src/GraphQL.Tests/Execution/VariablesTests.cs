@@ -1,5 +1,6 @@
 using System.Linq;
 using GraphQL.Language.AST;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Newtonsoft.Json;

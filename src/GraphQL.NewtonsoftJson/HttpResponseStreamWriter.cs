@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GraphQL.Http
+namespace GraphQL.NewtonsoftJson
 {
     /// <summary>
     /// Writes to the <see cref="Stream"/> using the supplied <see cref="Encoding"/>.

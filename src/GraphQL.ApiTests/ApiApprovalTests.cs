@@ -1,7 +1,8 @@
+using System;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using PublicApiGenerator;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.ApiTests
@@ -11,6 +12,7 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
+        [InlineData(typeof(DocumentWriter))]
         public void PublicApi(Type type)
         {
             string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions
@@ -20,7 +22,7 @@ namespace GraphQL.ApiTests
                 ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
             });
 
-            publicApi.ShouldMatchApproved();
+            publicApi.ShouldMatchApproved(options => options.WithDiscriminator(type.Assembly.GetName().Name));
         }
     }
 }

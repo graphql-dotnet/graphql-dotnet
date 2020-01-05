@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
-using GraphQL.Http;
+using GraphQL.NewtonsoftJson;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;

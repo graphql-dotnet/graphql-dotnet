@@ -65,6 +65,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A
 		..\docs2\site\docs\getting-started\variables.md = ..\docs2\site\docs\getting-started\variables.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

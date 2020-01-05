@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Types;
+using GraphQL.NewtonsoftJson;
 using Shouldly;
 using Xunit;
-using System.Threading.Tasks;
 
 namespace GraphQL.Tests.Execution
 {

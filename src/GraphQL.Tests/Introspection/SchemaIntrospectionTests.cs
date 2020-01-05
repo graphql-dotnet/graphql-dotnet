@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using GraphQL.Http;
 using GraphQL.Introspection;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;

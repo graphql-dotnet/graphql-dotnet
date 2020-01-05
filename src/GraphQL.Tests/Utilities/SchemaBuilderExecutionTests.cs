@@ -1,9 +1,9 @@
-using GraphQL.Http;
 using GraphQL.Types;
 using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.NewtonsoftJson;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
