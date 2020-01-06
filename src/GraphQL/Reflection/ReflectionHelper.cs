@@ -98,13 +98,11 @@ namespace GraphQL.Reflection
             }
 
             if (parameters.Length > index
-                && context.UserContext != null)
+                && context.UserContext != null
+                && parameters[index].ParameterType.IsInstanceOfType(context.UserContext))
             {
-                if (parameters[index].ParameterType.IsInstanceOfType(context.UserContext))
-                {
-                    arguments[index] = context.UserContext;
-                    index++;
-                }
+                arguments[index] = context.UserContext;
+                index++;
             }
 
             foreach (var parameter in parameters.Skip(index))
