@@ -292,6 +292,30 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public async Task can_use_inherited_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContext: String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = await schema.ExecuteAsync(_ =>
+            {
+                _.Query = @"{ userContext }";
+                _.UserContext = new ChildMyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
         public void can_use_null_as_default_value()
         {
             var schema = Schema.For(@"
@@ -637,5 +661,8 @@ namespace GraphQL.Tests.Utilities
     class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
+    }
+    class ChildMyUserContext: MyUserContext
+    {
     }
 }
