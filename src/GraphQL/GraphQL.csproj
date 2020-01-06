@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" />
-    <None Include="$(SolutionDir)..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
