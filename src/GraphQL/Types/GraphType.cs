@@ -49,7 +49,7 @@ namespace GraphQL.Types
                     NameValidator.ValidateName(name, "type");
 
                     if (IsTypeModifier)
-                        throw new ArgumentOutOfRangeException("A type modifier (List, NonNull) name must be null");
+                        throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
                 }
 
                 _name = name;
