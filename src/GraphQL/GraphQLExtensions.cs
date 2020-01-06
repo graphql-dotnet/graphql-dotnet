@@ -30,7 +30,7 @@ namespace GraphQL
         public static bool IsLeafType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
-            return namedType is ScalarGraphType || namedType is EnumerationGraphType;
+            return namedType is ScalarGraphType;
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
