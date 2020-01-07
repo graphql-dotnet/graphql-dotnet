@@ -15,9 +15,8 @@ namespace GraphQL.NewtonsoftJson
     /// Writes to the <see cref="Stream"/> using the supplied <see cref="Encoding"/>.
     /// It does not write the BOM and also does not close the stream.
     /// </summary>
-    public class HttpResponseStreamWriter : TextWriter
+    internal class HttpResponseStreamWriter : TextWriter
     {
-        private const int MinBufferSize = 128;
         internal const int DefaultBufferSize = 16 * 1024;
 
         private Stream _stream;
@@ -34,11 +33,6 @@ namespace GraphQL.NewtonsoftJson
 
         public HttpResponseStreamWriter(Stream stream, Encoding encoding)
             : this(stream, encoding, DefaultBufferSize, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
-        {
-        }
-
-        public HttpResponseStreamWriter(Stream stream, Encoding encoding, int bufferSize)
-            : this(stream, encoding, bufferSize, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
         {
         }
 
