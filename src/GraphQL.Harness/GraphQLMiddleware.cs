@@ -1,14 +1,13 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Http;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Example
 {
@@ -21,12 +20,12 @@ namespace Example
 
         public GraphQLMiddleware(
             RequestDelegate next,
-            GraphQLSettings settings,
+            IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
             IDocumentWriter writer)
         {
             _next = next;
-            _settings = settings;
+            _settings = options.Value;
             _executer = executer;
             _writer = writer;
         }
@@ -44,7 +43,7 @@ namespace Example
 
         private bool IsGraphQLRequest(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments(_settings.Path)
+            return context.Request.Path.StartsWithSegments(_settings.GraphQLPath)
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -80,7 +79,7 @@ namespace Example
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
+            context.Response.StatusCode = 200; // OK
 
             await _writer.WriteAsync(context.Response.Body, result);
         }
