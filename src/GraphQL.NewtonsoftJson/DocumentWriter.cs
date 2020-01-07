@@ -10,7 +10,7 @@ namespace GraphQL.NewtonsoftJson
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
-        internal static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
+        private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 
         public DocumentWriter()
             : this(indent: false)

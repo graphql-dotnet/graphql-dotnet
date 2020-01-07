@@ -11,7 +11,7 @@ namespace GraphQL
 
     public static class DocumentWriterExtensions
     {
-        internal static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
+        private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
 
         /// <summary>
         /// Writes the <paramref name="value"/> to string.
