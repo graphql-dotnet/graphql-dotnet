@@ -15,22 +15,6 @@ namespace GraphQL.NewtonsoftJson
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
-    public class HttpResponseStreamWriter : System.IO.TextWriter
-    {
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding) { }
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding, int bufferSize) { }
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding, int bufferSize, System.Buffers.ArrayPool<byte> bytePool, System.Buffers.ArrayPool<char> charPool) { }
-        public override System.Text.Encoding Encoding { get; }
-        protected override void Dispose(bool disposing) { }
-        public override void Flush() { }
-        public override System.Threading.Tasks.Task FlushAsync() { }
-        public override void Write(char value) { }
-        public override void Write(char[] values, int index, int count) { }
-        public override void Write(string value) { }
-        public override System.Threading.Tasks.Task WriteAsync(char value) { }
-        public override System.Threading.Tasks.Task WriteAsync(char[] values, int index, int count) { }
-        public override System.Threading.Tasks.Task WriteAsync(string value) { }
-    }
     public class NewtonsoftContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
         public NewtonsoftContractResolver() { }
