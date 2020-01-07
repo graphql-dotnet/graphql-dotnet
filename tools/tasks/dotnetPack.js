@@ -26,6 +26,6 @@ export default async function compile(settings) {
 
   const version = versions.join(sep)
 
-  const cmd = `dotnet pack src/GraphQL -o ${settings.artifacts} -c ${settings.target} --include-symbols --include-source /p:PackageVersion=${version}`
+  const cmd = `dotnet pack src -o ${settings.artifacts} -c ${settings.target} --include-symbols --include-source /p:PackageVersion=${version}`
   return exec(cmd)
 }
