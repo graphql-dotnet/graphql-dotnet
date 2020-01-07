@@ -43,6 +43,9 @@ http://graphql-dotnet.github.io
 
 https://github.com/graphql-dotnet/examples
 
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+It supports two popular IDE for managing GraphQL requests - GraphQL Playground and GraphiQL.
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.

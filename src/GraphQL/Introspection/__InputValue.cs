@@ -21,7 +21,7 @@ namespace GraphQL.Introspection
                 resolve: context =>
                 {
                     var hasDefault = context.Source;
-                    if (context.Source == null) return null;
+                    if (hasDefault?.DefaultValue == null) return null;
 
                     var ast = hasDefault.DefaultValue.AstFromValue(context.Schema, hasDefault.ResolvedType);
                     var result = AstPrinter.Print(ast);
