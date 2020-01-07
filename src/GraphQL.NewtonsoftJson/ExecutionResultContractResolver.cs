@@ -5,7 +5,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.NewtonsoftJson
 {
-    public class NewtonsoftContractResolver : DefaultContractResolver
+    public class ExecutionResultContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
 

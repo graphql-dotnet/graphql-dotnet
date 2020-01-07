@@ -7,6 +7,12 @@ namespace GraphQL.NewtonsoftJson
         public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings settings) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value) { }
     }
+    public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+    {
+        public ExecutionResultContractResolver() { }
+        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
+        protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
+    }
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
         public ExecutionResultJsonConverter() { }
@@ -14,12 +20,6 @@ namespace GraphQL.NewtonsoftJson
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
         public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
-    }
-    public class NewtonsoftContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
-    {
-        public NewtonsoftContractResolver() { }
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
-        protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
     }
     public static class SchemaExtensions
     {

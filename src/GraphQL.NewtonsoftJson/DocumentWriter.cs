@@ -28,7 +28,7 @@ namespace GraphQL.NewtonsoftJson
 
             if (settings.ContractResolver == null)
             {
-                _serializer.ContractResolver = new NewtonsoftContractResolver();
+                _serializer.ContractResolver = new ExecutionResultContractResolver();
             }
         }
 
