@@ -7,11 +7,6 @@ namespace GraphQL
 {
     public static class SchemaExtensions
     {
-        public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
-        {
-            return ExecuteAsync(schema, configure).GetAwaiter().GetResult();
-        }
-
         public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
         {
             var executor = new DocumentExecuter();
@@ -21,7 +16,8 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await new DocumentWriter(indent: true).WriteToStringAsync(result).ConfigureAwait(false);
+            var documentWriter = new DocumentWriter(indent: true);
+            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
         }
     }
 }

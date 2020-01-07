@@ -8,7 +8,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public class ExecutionContext
+    public class ExecutionContext : IProvideUserContext
     {
         public Document Document { get; set; }
 
@@ -39,6 +39,8 @@ namespace GraphQL.Execution
         /// This can be useful for hiding error messages that reveal server implementation details.
         /// </summary>
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
+
+        public int? MaxParallelExecutionCount { get; set; }
 
         public IServiceProvider Services { get; set; }
     }

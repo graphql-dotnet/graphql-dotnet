@@ -24,14 +24,55 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
-            Name = typeof(TSourceType).GraphQLName();
+            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
+        }
 
-            foreach (var propertyInfo in GetRegisteredProperties())
+        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
+        {
+            return typeof(TSourceType)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => AutoRegisteringHelper.IsEnabledForRegister(p.PropertyType, true));
+        }
+    }
+
+    /// <summary>
+    /// Allows you to automatically register the necessary fields for the specified input type.
+    /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
+    /// Also it can get descriptions for fields from the xml comments.
+    /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
+    /// </summary>
+    /// <typeparam name="TSourceType"></typeparam>
+    public class AutoRegisteringInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+    {
+        /// <summary>
+        /// Creates a GraphQL type by specifying fields to exclude from registration.
+        /// </summary>
+        /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
+        public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
+        {
+            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
+        }
+
+        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
+        {
+            return typeof(TSourceType)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => AutoRegisteringHelper.IsEnabledForRegister(p.PropertyType, true));
+        }
+    }
+
+    internal static class AutoRegisteringHelper
+    {
+        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object>>[] excludedProperties)
+        {
+            type.Name = typeof(TSourceType).GraphQLName();
+
+            foreach (var propertyInfo in properties)
             {
                 if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
                     continue;
 
-                Field(
+                type.Field(
                     type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
@@ -49,7 +90,7 @@ namespace GraphQL.Types
             return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
-        private static string GetPropertyName(Expression<Func<TSourceType, object>> expression)
+        private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object>> expression)
         {
             if (expression.Body is MemberExpression m1)
                 return m1.Member.Name;
@@ -60,14 +101,7 @@ namespace GraphQL.Types
             throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
         }
 
-        protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
-        {
-            return typeof(TSourceType)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => IsEnabledForRegister(p.PropertyType, true));
-        }
-
-        private static bool IsEnabledForRegister(Type propertyType, bool firstCall)
+        internal static bool IsEnabledForRegister(Type propertyType, bool firstCall)
         {
             if (propertyType == typeof(string)) return true;
 
@@ -82,7 +116,7 @@ namespace GraphQL.Types
                     return IsEnabledForRegister(realType, false);
             }
 
-            return false; 
+            return false;
         }
 
         private static Type GetRealType(Type propertyType)

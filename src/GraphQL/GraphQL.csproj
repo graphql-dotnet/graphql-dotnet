@@ -5,11 +5,9 @@
     <VersionPrefix>3.0.0</VersionPrefix>
     <Authors>Joe McBride</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>GraphQL</AssemblyName>
-    <PackageId>GraphQL</PackageId>
     <PackageTags>GraphQL;json;api</PackageTags>
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/graphql-dotnet/graphql-dotnet/master/assets/logo.64x64.png</PackageIconUrl>
+    <PackageIcon>logo.64x64.png</PackageIcon>
     <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -22,10 +20,11 @@
 
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="4.1.1" />
+    <PackageReference Include="GraphQL-Parser" Version="4.2.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />

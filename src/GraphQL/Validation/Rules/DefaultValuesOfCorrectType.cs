@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -14,12 +15,12 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class DefaultValuesOfCorrectType : IValidationRule
     {
-        public Func<string, string, string, string> BadValueForNonNullArgMessage =
+        public readonly Func<string, string, string, string> BadValueForNonNullArgMessage =
             (varName, type, guessType) => $"Variable \"{varName}\" of type \"{type}\" is required and" +
                                           " will not use default value. " +
                                           $"Perhaps you mean to use type \"{guessType}\"?";
 
-        public Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
+        public readonly Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
             (varName, type, value, verboseErrors) =>
             {
                 var message = verboseErrors != null ? "\n" + string.Join("\n", verboseErrors) : "";
@@ -28,7 +29,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -67,7 +68,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

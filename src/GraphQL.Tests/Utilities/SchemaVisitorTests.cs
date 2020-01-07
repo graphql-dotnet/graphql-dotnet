@@ -29,9 +29,9 @@ namespace GraphQL.Tests.Utilities
 
         public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
         {
-            public override void VisitField(FieldType field)
+            public override void VisitFieldDefinition(FieldType field)
             {
-                var inner = field.Resolver ?? new NameFieldResolver();
+                var inner = field.Resolver ?? NameFieldResolver.Instance;
                 field.Resolver = new FuncFieldResolver<object>(context =>
                 {
                     var result = inner.Resolve(context);
@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Utilities
 
         public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
         {
-            public override void VisitField(FieldType field)
+            public override void VisitFieldDefinition(FieldType field)
             {
                 var inner = WrapResolver(field.Resolver);
                 field.Resolver = new AsyncFieldResolver<object>(async context =>

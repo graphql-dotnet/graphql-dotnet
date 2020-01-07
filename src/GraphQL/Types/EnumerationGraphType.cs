@@ -2,7 +2,6 @@ using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -91,9 +90,9 @@ namespace GraphQL.Types
                 deprecation: e.member.ObsoleteMessage()
             ));
 
-            Name = Name ?? StringUtils.ToPascalCase(type.Name);
-            Description = Description ?? typeof(TEnum).Description();
-            DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
+            Name = StringUtils.ToPascalCase(type.Name);
+            Description ??= typeof(TEnum).Description();
+            DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
             foreach (var (name, value, description, deprecation) in enumGraphData)
             {
@@ -117,21 +116,11 @@ namespace GraphQL.Types
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class EnumValueDefinition : IProvideMetadata
+    public class EnumValueDefinition : MetadataProvider
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
-
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
-        }
-
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

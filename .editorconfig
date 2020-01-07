@@ -13,16 +13,6 @@ trim_trailing_whitespace = true
 
 [*.cs]
 indent_size = 4
-indent_style = space
-
-[*.js]
-charset = utf-8
-indent_style = space
-indent_size = 2
-
-[{package.json}]
-indent_style = space
-indent_size = 2
 
 # Do not insert newline for ApiApprovalTests
 [*.txt]

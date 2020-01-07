@@ -49,7 +49,7 @@ namespace GraphQL.Introspection
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
 
-                        fields = fields ?? Enumerable.Empty<FieldType>();
+                        fields ??= Enumerable.Empty<FieldType>();
                         fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f)).ConfigureAwait(false);
 
                         return fields.OrderBy(f => f.Name);
@@ -115,29 +115,17 @@ namespace GraphQL.Introspection
             });
         }
 
-        private TypeKind KindForInstance(IGraphType type)
+        private TypeKind KindForInstance(IGraphType type) => type switch
         {
-            switch (type)
-            {
-                case EnumerationGraphType _:
-                    return TypeKind.ENUM;
-                case ScalarGraphType _:
-                    return TypeKind.SCALAR;
-                case IObjectGraphType _:
-                    return TypeKind.OBJECT;
-                case IInterfaceGraphType _:
-                    return TypeKind.INTERFACE;
-                case UnionGraphType _:
-                    return TypeKind.UNION;
-                case IInputObjectGraphType _:
-                    return TypeKind.INPUT_OBJECT;
-                case ListGraphType _:
-                    return TypeKind.LIST;
-                case NonNullGraphType _:
-                    return TypeKind.NON_NULL;
-                default:
-                    throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
-            }
-        }
+            EnumerationGraphType _ => TypeKind.ENUM,
+            ScalarGraphType _ => TypeKind.SCALAR,
+            IObjectGraphType _ => TypeKind.OBJECT,
+            IInterfaceGraphType _ => TypeKind.INTERFACE,
+            UnionGraphType _ => TypeKind.UNION,
+            IInputObjectGraphType _ => TypeKind.INPUT_OBJECT,
+            ListGraphType _ => TypeKind.LIST,
+            NonNullGraphType _ => TypeKind.NON_NULL,
+            _ => throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type))
+        };
     }
 }

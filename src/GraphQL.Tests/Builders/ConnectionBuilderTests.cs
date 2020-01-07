@@ -386,7 +386,7 @@ namespace GraphQL.Tests.Builders
             }
         }
 
-        private static readonly int ConnectionField1Value = 123;
+        private const int ConnectionField1Value = 123;
         private static readonly DateTime FriendedAt = new DateTime(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public class ParentType : ObjectGraphType<Parent>

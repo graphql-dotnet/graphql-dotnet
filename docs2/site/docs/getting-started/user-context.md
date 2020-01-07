@@ -7,7 +7,7 @@ public class MyGraphQLUserContext : Dictionary<string, object>
 {
 }
 
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.UserContext = new MyGraphQLUserContext();
@@ -26,5 +26,4 @@ public class Query : ObjectGraphType
       });
   }
 }
-
 ```

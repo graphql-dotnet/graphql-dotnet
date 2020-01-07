@@ -46,10 +46,11 @@ namespace GraphQL.Tests
             object root = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
-            IEnumerable<IValidationRule> rules = null)
+            IEnumerable<IValidationRule> rules = null,
+            IFieldNameConverter fieldNameConverter = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, fieldNameConverter);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -161,7 +162,7 @@ namespace GraphQL.Tests
                 data = JObject.Parse(result);
             }
 
-            return new ExecutionResult { Data = data, Errors = errors};
+            return new ExecutionResult { Data = data, Errors = errors };
         }
     }
 }

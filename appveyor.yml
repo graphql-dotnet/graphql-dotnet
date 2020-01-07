@@ -5,7 +5,7 @@ skip_tags: true
 skip_branch_with_pr: false
 test: off
 
-os: Visual Studio 2017
+os: Visual Studio 2019
 
 environment:
   CI: true
@@ -25,7 +25,6 @@ install:
 build_script:
 - cmd: >-
     yarn build-ci
-
 
 artifacts:
   - path: 'artifacts\*.nupkg'

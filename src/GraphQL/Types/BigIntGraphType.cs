@@ -5,23 +5,13 @@ namespace GraphQL.Types
 {
     public class BigIntGraphType : ScalarGraphType
     {
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            switch (value)
-            {
-                case BigIntValue bigIntValue:
-                    return bigIntValue.Value;
-
-                case LongValue longValue:
-                    return new BigInteger(longValue.Value);
-
-                case IntValue intValue:
-                    return new BigInteger(intValue.Value);
-
-                default:
-                    return null;
-            }
-        }
+            BigIntValue bigIntValue => bigIntValue.Value,
+            LongValue longValue => new BigInteger(longValue.Value),
+            IntValue intValue => new BigInteger(intValue.Value),
+            _ => (object)null
+        };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
 

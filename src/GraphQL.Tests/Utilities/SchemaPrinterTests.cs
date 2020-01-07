@@ -148,7 +148,7 @@ scalar Seconds"
                 var orderedScalars = built_in_scalars
                     .ToDictionary(x => x.Key, x => x.Value)
                     .Union(expected)
-                    .OrderBy(x => x.Key)
+                    .OrderBy(x => x.Key, StringComparer.Ordinal)
                     .Select(x => x.Value);
                 exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
             }
@@ -514,9 +514,9 @@ scalar UInt
 
 scalar ULong
 
-scalar Uri
-
 scalar UShort
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -539,6 +539,8 @@ interface Baaz {
 type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -589,9 +591,9 @@ scalar UInt
 
 scalar ULong
 
-scalar Uri
-
 scalar UShort
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -618,6 +620,8 @@ interface Baaz {
 type Bar implements IFoo, Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -668,9 +672,9 @@ scalar UInt
 
 scalar ULong
 
-scalar Uri
-
 scalar UShort
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -698,6 +702,8 @@ interface Baaz {
 type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -748,9 +754,9 @@ scalar UInt
 
 scalar ULong
 
-scalar Uri
-
 scalar UShort
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -830,9 +836,9 @@ scalar UInt
 
 scalar ULong
 
-scalar Uri
-
 scalar UShort
+
+scalar Uri
 ", excludeScalars: true);
         }
 
@@ -930,6 +936,11 @@ schema {
   query: Root
 }
 
+# Marks an element of a GraphQL schema as no longer supported.
+directive @deprecated(
+  reason: String = ""No longer supported""
+) on FIELD_DEFINITION | ENUM_VALUE
+
 # Directs the executor to include this field or fragment only when the 'if' argument is true.
 directive @include(
   if: Boolean!
@@ -939,11 +950,6 @@ directive @include(
 directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-
-# Marks an element of a GraphQL schema as no longer supported.
-directive @deprecated(
-  reason: String = ""No longer supported""
-) on FIELD_DEFINITION | ENUM_VALUE
 
 # A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
 #
@@ -1129,6 +1135,9 @@ enum __TypeKind {
                 Field<StringGraphType>(
                     name: "str",
                     description: "This is of type String");
+                Field<IntGraphType>(
+                  name: "int",
+                  description: "This is of type Integer");
                 Interface<FooInterfaceType>();
                 Interface<BaazInterfaceType>();
             }

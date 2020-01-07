@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -24,7 +25,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly KnownDirectives Instance = new KnownDirectives();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -47,7 +48,7 @@ namespace GraphQL.Validation.Rules
                             node));
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)

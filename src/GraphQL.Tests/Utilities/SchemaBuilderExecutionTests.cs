@@ -184,7 +184,7 @@ namespace GraphQL.Tests.Utilities
             ");
 
             var root = new { Hello = "Hello World!" };
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "{ hello }";
                 _.Root = root;
@@ -208,7 +208,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "{ source }";
                 _.Root = new { Hello =  "World" };
@@ -232,7 +232,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = "{ resolve }";
                 _.ExposeExceptions = true;
@@ -256,7 +256,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = @"{ resolveWithParam(id: ""abcd"") }";
             });
@@ -279,10 +279,34 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public async Task can_use_inherited_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContext: String
+                }
+            ", _=>
+            {
+                _.Types.Include<ParametersType>();
+            });
+
+            var result = await schema.ExecuteAsync(_ =>
+            {
+                _.Query = @"{ userContext }";
+                _.UserContext = new ChildMyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
@@ -318,7 +342,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = @"{ userContextWithParam(id: ""abcd"") }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
@@ -342,7 +366,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = @"{ three }";
                 _.Root = new { Hello = "World" };
@@ -367,7 +391,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(_ =>
             {
                 _.Query = @"{ four(id: 123) }";
                 _.Root = new { Hello = "World" };
@@ -439,6 +463,47 @@ namespace GraphQL.Tests.Utilities
                 _.ExpectedResult = expected;
             });
         }
+
+        [Fact]
+        public async Task resolves_union_references_when_union_defined_first()
+        {
+            var schema = Schema.For(@"
+                union Pet = Dog | Cat
+
+                enum PetKind {
+                    CAT
+                    DOG
+                }
+
+                type Query {
+                    pet(type: PetKind = DOG): Pet
+                }
+
+                type Dog {
+                    name: String!
+                }
+
+                type Cat {
+                    name: String!
+                }
+            ", _=>
+            {
+                _.Types.For("Dog").IsTypeOf<Dog>();
+                _.Types.For("Cat").IsTypeOf<Cat>();
+                _.Types.Include<PetQueryType>();
+            });
+
+            var result = await schema.ExecuteAsync(_ =>
+            {
+                _.Query = @"{ pet { ... on Dog { name } } }";
+            });
+
+            var expected = @"{ 'pet': { 'name' : 'Eli' } }";
+            var expectedResult = CreateQueryResult(expected);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
     }
 
     public class Person
@@ -464,9 +529,9 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    public class PostData
+    public static class PostData
     {
-        public static List<Post> Posts = new List<Post>
+        public static readonly List<Post> Posts = new List<Post>
         {
             new Post {Id = "1", Title = "Post One"}
         };
@@ -596,5 +661,8 @@ namespace GraphQL.Tests.Utilities
     class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
+    }
+    class ChildMyUserContext: MyUserContext
+    {
     }
 }

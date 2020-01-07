@@ -48,7 +48,7 @@ namespace GraphQL.Introspection
     {
         public __DirectiveLocation()
         {
-            Name = nameof(__DirectiveLocation);
+            SetName(nameof(__DirectiveLocation), validate: false);
             Description =
                 "A Directive can be adjacent to many parts of the GraphQL language, a " +
                 "__DirectiveLocation describes one such possible adjacencies.";

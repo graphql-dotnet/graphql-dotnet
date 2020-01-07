@@ -16,7 +16,7 @@ public class ComplexityConfiguration
 ```
 
 ```csharp
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.ComplexityConfiguration = new ComplexityConfiguration { MaxDepth = 15 };
