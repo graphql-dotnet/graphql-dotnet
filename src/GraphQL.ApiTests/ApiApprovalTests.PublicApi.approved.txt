@@ -267,6 +267,7 @@ namespace GraphQL
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
+        public System.IServiceProvider Services { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
@@ -468,6 +469,7 @@ namespace GraphQL.Execution
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
+        public System.IServiceProvider Services { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
@@ -510,6 +512,7 @@ namespace GraphQL.Execution
         public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task<GraphQL.Execution.ExecutionNode> ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.Execution.ExecutionNode> ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.IServiceProvider serviceProvider) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         public static void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
@@ -568,6 +571,7 @@ namespace GraphQL.Execution
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public ParallelExecutionStrategy() { }
+        protected override System.Threading.Tasks.Task<GraphQL.Execution.ExecutionNode> ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
@@ -579,6 +583,15 @@ namespace GraphQL.Execution
     {
         public SerialExecutionStrategy() { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
+    }
+    public class ServiceProviderProxy : System.IDisposable, System.IServiceProvider
+    {
+        protected readonly System.IServiceProvider _rootServiceProvider;
+        protected System.IServiceProvider _serviceProvider;
+        protected Microsoft.Extensions.DependencyInjection.IServiceScope _serviceScope;
+        public ServiceProviderProxy(System.IServiceProvider rootServiceProvider) { }
+        public void Dispose() { }
+        public object GetService(System.Type serviceType) { }
     }
     public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
     {
@@ -1938,6 +1951,7 @@ namespace GraphQL.Types
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, object source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, object source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path, System.IServiceProvider serviceProvider) { }
     }
     public class ResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext
     {
@@ -1958,6 +1972,7 @@ namespace GraphQL.Types
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
+        public System.IServiceProvider Services { get; set; }
         public TSource Source { get; set; }
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
