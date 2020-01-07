@@ -47,7 +47,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Gets the value contained in a JObject, JValue, JProperty, or JArray.
+        /// Gets the value contained in a JObject, JValue, JProperty or JArray.
         /// </summary>
         /// <param name="value">The object containing the value to extract.</param>
         /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
