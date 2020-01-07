@@ -7,7 +7,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>GraphQL;json;api</PackageTags>
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/graphql-dotnet/graphql-dotnet/master/assets/logo.64x64.png</PackageIconUrl>
+    <PackageIcon>logo.64x64.png</PackageIcon>
     <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
