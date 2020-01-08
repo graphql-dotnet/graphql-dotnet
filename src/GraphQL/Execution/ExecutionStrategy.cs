@@ -105,7 +105,7 @@ namespace GraphQL.Execution
 
             foreach (var d in data)
             {
-                var path = AppendPath(parent.Path, (index++).ToString());
+                var path = AppendPath(parent.Path, index++.ToString());
 
                 if (d != null)
                 {

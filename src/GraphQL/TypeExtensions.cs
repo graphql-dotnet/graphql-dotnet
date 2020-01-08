@@ -178,7 +178,7 @@ namespace GraphQL
                 for (int i = 0; i < typeParameters.Length; ++i)
                 {
                     string typeParamName = GetFriendlyName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                    friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
                 friendlyName += ">";
             }

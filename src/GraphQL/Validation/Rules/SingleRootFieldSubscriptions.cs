@@ -73,10 +73,8 @@ namespace GraphQL.Validation.Rules
             return $"{prefix} must select only one top level field.";
         }
 
-        private static bool IsSubscription(Operation operation) =>
-            operation.OperationType == OperationType.Subscription;
+        private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
 
-        private static bool IsFragment(ISelection selection) =>
-            (selection is FragmentSpread) || (selection is InlineFragment);
+        private static bool IsFragment(ISelection selection) => selection is FragmentSpread || selection is InlineFragment;
     }
 }
