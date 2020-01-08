@@ -5,7 +5,10 @@ namespace GraphQL.Language.AST
 {
     public class ListValue : AbstractNode, IValue
     {
-        public ListValue(IEnumerable<IValue> values) => Values = values;
+        public ListValue(IEnumerable<IValue> values)
+        {
+            Values = values;
+        }
 
         public object Value => Values.Select(x => x.Value).ToList();
 
