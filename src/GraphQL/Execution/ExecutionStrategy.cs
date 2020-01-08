@@ -78,7 +78,7 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
-                subFields[kvp.Key] = node;
+                subFields[name] = node;
             }
 
             parent.SubFields = subFields;
