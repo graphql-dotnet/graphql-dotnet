@@ -1,9 +1,9 @@
+using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.Language.AST;
+
 namespace GraphQL.Validation.Rules
 {
-    using GraphQL.Language.AST;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Subscription operations must have exactly one root field.
     /// </summary>

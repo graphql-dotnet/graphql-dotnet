@@ -1,15 +1,14 @@
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    using System.Collections;
-    using System.ComponentModel;
-
     public static class TypeExtensions
     {
         /// <summary>

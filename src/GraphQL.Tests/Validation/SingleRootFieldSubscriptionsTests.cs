@@ -1,8 +1,8 @@
+using GraphQL.Validation.Rules;
+using Xunit;
+
 namespace GraphQL.Tests.Validation
 {
-    using GraphQL.Validation.Rules;
-    using Xunit;
-
     public class SingleRootFieldSubscriptionsTests
         : ValidationTestBase<SingleRootFieldSubscriptions, ValidationSchema>
     {
