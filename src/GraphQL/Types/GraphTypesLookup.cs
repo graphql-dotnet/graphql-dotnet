@@ -184,10 +184,7 @@ namespace GraphQL.Types
             CheckSealed();
 
             var context = new TypeCollectionContext(
-                type =>
-                {
-                    return BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t));
-                },
+                type => BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t)),
                 (name, type, ctx) =>
                 {
                     var trimmed = name.TrimGraphQLTypes();
