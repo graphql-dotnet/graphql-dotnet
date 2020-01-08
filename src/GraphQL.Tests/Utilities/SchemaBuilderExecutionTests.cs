@@ -324,10 +324,17 @@ namespace GraphQL.Tests.Utilities
                   homePlanet: String = null
                 }
 
+                type Human {
+                  id: String!
+                }
+
                 type Mutation {
                   createHuman(human: HumanInput!): Human
                 }
             ");
+
+            var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
+            type.GetField("homePlanet").DefaultValue.ShouldBeNull();
         }
 
         [Fact]
