@@ -56,7 +56,7 @@ namespace GraphQL
             return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
                    typeof(IObjectGraphType).IsAssignableFrom(namedType) ||
                    typeof(IInterfaceGraphType).IsAssignableFrom(namedType) ||
-                   typeof(UnionGraphType).IsAssignableFrom(namedType)
+                   typeof(UnionGraphType).IsAssignableFrom(namedType);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -66,8 +66,7 @@ namespace GraphQL
             return namedType is ScalarGraphType ||
                    namedType is IObjectGraphType ||
                    namedType is IInterfaceGraphType ||
-                   namedType is UnionGraphType ||
-                   namedType is EnumerationGraphType; // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   namedType is UnionGraphType;
         }
 
         public static bool IsInputObjectType(this IGraphType type)
