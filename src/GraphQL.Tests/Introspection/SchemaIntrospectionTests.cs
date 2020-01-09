@@ -29,7 +29,10 @@ namespace GraphQL.Tests.Introspection
 
         public class TestQuery : ObjectGraphType
         {
-            public TestQuery() => Name = "TestQuery";
+            public TestQuery()
+            {
+                Name = "TestQuery";
+            }
         }
 
         [Fact]
