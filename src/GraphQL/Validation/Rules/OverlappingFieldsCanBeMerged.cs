@@ -19,10 +19,7 @@ namespace GraphQL.Validation.Rules
             {
                 return string.Join(
                     " and ",
-                    reasonMessage.Msgs.Select(x =>
-                    {
-                        return $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}";
-                    }).ToArray()
+                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
                 );
             }
             else

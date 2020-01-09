@@ -95,10 +95,7 @@ type User @key(fields: ""id"") {
                 }
             ";
 
-            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
-            {
-                return Task.FromResult(new User { Id = "123", Username = "Quinn" });
-            });
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
 
             var query = @"
                 query ($_representations: [_Any!]!) {
