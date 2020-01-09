@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using GraphQL.Types;
+using Shouldly;
+using Xunit;
+
 namespace GraphQL.Tests.Bugs
 {
-    using GraphQL.Types;
-    using Shouldly;
-    using System;
-    using System.Collections.Generic;
-    using Xunit;
-
     public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         [Fact]
