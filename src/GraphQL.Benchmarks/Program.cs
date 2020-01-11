@@ -1,15 +1,41 @@
 using BenchmarkDotNet.Running;
 using System;
+using System.Threading;
 
 namespace GraphQL.Benchmarks
 {
-    public class Program
+    internal static class Program
     {
-        public static void Main()
+        // Call without args for BenchmarkDotNet
+        // Call with some arbitrary args for any memory profiler
+        private static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<ExecutionBenchmark>();
-            //if (summary.HasCriticalValidationErrors)
-                Console.ReadLine();
+            if (args.Length == 0)
+                BenchmarkRunner.Run<ExecutionBenchmark>();
+            else
+                RunMemoryProfilerPayload();
+        }
+
+        private static void RunMemoryProfilerPayload()
+        {
+            var bench = new ExecutionBenchmark();
+            bench.GlobalSetup();
+
+            int count = 0;
+            while (true)
+            {
+                bench.Hero();
+
+                Thread.Sleep(10);
+
+                ++count;
+                if (count == 100)
+                    break;
+            }
+
+            Console.WriteLine("========== END ==========");
+            Console.ReadLine();
         }
     }
+
 }

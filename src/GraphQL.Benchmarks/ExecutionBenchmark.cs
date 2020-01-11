@@ -9,13 +9,15 @@ using System;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
+    [RPlotExporter, CsvMeasurementsExporter]
     public class ExecutionBenchmark
     {
-        private readonly IServiceProvider _provider;
-        private readonly ISchema _schema;
-        private readonly DocumentExecuter _executer = new DocumentExecuter();
+        private IServiceProvider _provider;
+        private ISchema _schema;
+        private DocumentExecuter _executer;
 
-        public ExecutionBenchmark()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
             var services = new ServiceCollection();
             
@@ -31,18 +33,19 @@ namespace GraphQL.Benchmarks
 
             _provider = services.BuildServiceProvider();
             _schema = _provider.GetRequiredService<ISchema>();
+            _executer = new DocumentExecuter();
         }
 
-        [Benchmark(Description = "Introspection Query")]
+        [Benchmark]
         public void Introspection()
         {
             var result = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
         }
 
-        [Benchmark(Description = "Small Query")]
+        [Benchmark]
         public void Hero()
         {
-            var result = ExecuteQuery(_schema, "hero { id name }");
+            var result = ExecuteQuery(_schema, "{ hero { id name } }");
         }
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query)
