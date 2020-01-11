@@ -1,6 +1,6 @@
 namespace GraphQL
 {
-    public static class BoolBox
+    internal static class BoolBox
     {
         public static readonly object True = true;
         public static readonly object False = false;
