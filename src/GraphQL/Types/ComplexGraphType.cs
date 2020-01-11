@@ -32,15 +32,7 @@ namespace GraphQL.Types
             DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }
 
-        public IEnumerable<FieldType> Fields
-        {
-            get => _fields;
-            private set
-            {
-                _fields.Clear();
-                _fields.AddRange(value);
-            }
-        }
+        public IEnumerable<FieldType> Fields => _fields;
 
         public bool HasField(string name)
         {

@@ -87,12 +87,12 @@ namespace GraphQL.DataLoader.Tests
                 await loader.DispatchAsync();
 
                 // Now await tasks
-                users1 = (await task1);
+                users1 = await task1;
                 users1.ShouldNotBeNull();
                 user1 = users1[0];
                 user2 = users1[1];
 
-                users2 = (await task2);
+                users2 = await task2;
                 users2.ShouldNotBeNull();
                 user3 = users2[2];
             });

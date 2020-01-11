@@ -28,7 +28,8 @@ This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) orig
 You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 
 ```
-PM> Install-Package GraphQL
+> dotnet add package GraphQL
+> dotnet add package GraphQL -v 3.0.0-preview-1352
 ```
 
 Or you can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json).
@@ -42,9 +43,13 @@ http://graphql-dotnet.github.io
 
 https://github.com/graphql-dotnet/examples
 
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+It supports two popular IDE for managing GraphQL requests - GraphQL Playground and GraphiQL.
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.
+* [Building GraphQL APIs with ASP.NET Core](https://app.pluralsight.com/library/courses/building-graphql-apis-aspdotnet-core/table-of-contents) by [Roland Guijt](https://github.com/RolandGuijt)
 
 ## Upgrade Guides
 
@@ -68,7 +73,7 @@ var schema = Schema.For(@"
 ");
 
 var root = new { Hello = "Hello World!" };
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ hello }";
   _.Root = root;
@@ -110,7 +115,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ droid { id name } }";
 });
@@ -152,7 +157,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 });
@@ -161,7 +166,7 @@ var json = schema.Execute(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](http://facebook.github.io/graphql/June2018/).
+- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](https://graphql.github.io/graphql-spec/June2018/).
 
 ### Operation Execution
 - [x] Scalars

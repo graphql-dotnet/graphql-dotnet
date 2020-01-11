@@ -31,7 +31,7 @@ namespace GraphQL
         public static bool IsLeafType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
-            return namedType is ScalarGraphType || namedType is EnumerationGraphType;
+            return namedType is ScalarGraphType;
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -39,7 +39,6 @@ namespace GraphQL
         {
             var namedType = type.GetNamedType();
             return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
-                   typeof(EnumerationGraphType).IsAssignableFrom(namedType) || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
                    typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
         }
 
@@ -48,7 +47,6 @@ namespace GraphQL
         {
             var namedType = type.GetNamedType();
             return namedType is ScalarGraphType ||
-                   namedType is EnumerationGraphType || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
                    namedType is IInputObjectGraphType;
         }
 
@@ -59,8 +57,7 @@ namespace GraphQL
             return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
                    typeof(IObjectGraphType).IsAssignableFrom(namedType) ||
                    typeof(IInterfaceGraphType).IsAssignableFrom(namedType) ||
-                   typeof(UnionGraphType).IsAssignableFrom(namedType) ||
-                   typeof(EnumerationGraphType).IsAssignableFrom(namedType); // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   typeof(UnionGraphType).IsAssignableFrom(namedType);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -70,8 +67,7 @@ namespace GraphQL
             return namedType is ScalarGraphType ||
                    namedType is IObjectGraphType ||
                    namedType is IInterfaceGraphType ||
-                   namedType is UnionGraphType ||
-                   namedType is EnumerationGraphType; // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   namedType is UnionGraphType;
         }
 
         public static bool IsInputObjectType(this IGraphType type)
@@ -99,6 +95,34 @@ namespace GraphQL
             return genericDef == typeof(NonNullGraphType<>) || genericDef == typeof(ListGraphType<>)
                 ? GetNamedType(type.GenericTypeArguments[0])
                 : type;
+        }
+
+        /// <summary>
+        /// An Interface defines a list of fields; Object types that implement that interface are guaranteed to implement those fields.
+        /// Whenever the type system claims it will return an interface, it will return a valid implementing type.
+        /// </summary>
+        /// <param name="iface"></param>
+        /// <param name="type"></param>
+        /// <param name="throwError"> Set to <c>true</c> to generate an error if the type does not match the interface. </param>
+        /// <returns></returns>
+        public static bool IsValidInterfaceFor(this IInterfaceGraphType iface, IObjectGraphType type, bool throwError = true)
+        {
+            foreach (var field in iface.Fields)
+            {
+                var found = type.GetField(field.Name);
+
+                if (found == null)
+                {
+                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Type '{type.Name}' has no field '{field.Name}'.") : false;
+                }
+
+                if (found.Type != field.Type)
+                {
+                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Field '{type.Name}.{field.Name}' must be of type '{field.Type.GetFriendlyName()}', but in fact it is of type '{found.Type.GetFriendlyName()}'.") : false;
+                }
+            }
+
+            return true;
         }
 
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)

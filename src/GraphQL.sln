@@ -33,6 +33,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A87E-4E8B-B068-8B396D00945A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-started", "{587B3CCD-8B68-491B-9AC5-0E04DF3E9507}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\getting-started\aliases.md = ..\docs2\site\docs\getting-started\aliases.md
 		..\docs2\site\docs\getting-started\arguments.md = ..\docs2\site\docs\getting-started\arguments.md
@@ -66,6 +68,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Benchmarks", "GraphQL.Benchmarks\GraphQL.Benchmarks.csproj", "{F08D07D5-1BD7-41A7-8F1B-FF655517A058}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F263-BCEB-4738-9111-C85139BC63A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
+		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
+		..\docs2\site\docs\guides\migration.md = ..\docs2\site\docs\guides\migration.md
+		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +129,8 @@ Global
 		{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{17CA647F-903F-4A0A-BF8F-E5123AAA2617} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{587B3CCD-8B68-491B-9AC5-0E04DF3E9507} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
+		{F279F263-BCEB-4738-9111-C85139BC63A7} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

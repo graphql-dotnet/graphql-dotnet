@@ -118,10 +118,7 @@ namespace GraphQL.Tests.Bugs
         {
             Field<IntGraphType>(
                 "int",
-                resolve: ctx =>
-                {
-                    return 636474637870330463;
-                });
+                resolve: ctx => 636474637870330463);
             Field<IntGraphType>(
                "int_with_arg",
                arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "in" }),
@@ -133,37 +130,22 @@ namespace GraphQL.Tests.Bugs
 
             Field<LongGraphType>(
                 "long",
-                resolve: ctx =>
-                {
-                    return 636474637870330463;
-                });
+                resolve: ctx => 636474637870330463);
             Field<LongGraphType>(
               "long_return_bigint",
-              resolve: ctx =>
-              {
-                  return BigInteger.Parse("636474637870330463636474637870330463636474637870330463");
-              });
+              resolve: ctx => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
             Field<LongGraphType>(
                "long_with_arg",
                arguments: new QueryArguments(new QueryArgument<LongGraphType> { Name = "in" }),
-               resolve: ctx =>
-               {
-                   return ctx.GetArgument<long>("in");
-               });
+               resolve: ctx => ctx.GetArgument<long>("in"));
 
             Field<BigIntGraphType>(
                 "bigint",
-                resolve: ctx =>
-                {
-                    return BigInteger.Parse("636474637870330463636474637870330463636474637870330463");
-                });
+                resolve: ctx => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
             Field<BigIntGraphType>(
                "bigint_with_arg",
                arguments: new QueryArguments(new QueryArgument<BigIntGraphType> { Name = "in" }),
-               resolve: ctx =>
-               {
-                   return ctx.GetArgument<BigInteger>("in");
-               });
+               resolve: ctx => ctx.GetArgument<BigInteger>("in"));
         }
     }
 }

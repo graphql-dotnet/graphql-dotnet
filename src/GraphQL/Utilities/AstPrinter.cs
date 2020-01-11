@@ -222,19 +222,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Field(x => x.Type);
                 c.Field(x => x.DefaultValue);
-                c.Print(p =>
-                {
-                    return $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}";
-                });
+                c.Print(p => $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}");
             });
 
             Config<SelectionSet>(c =>
             {
                 c.Field(x => x.SelectionsList);
-                c.Print(p =>
-                {
-                    return Block(p.ArgArray(x => x.SelectionsList));
-                });
+                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)));
             });
 
             Config<Arguments>(c =>
@@ -293,10 +287,7 @@ namespace GraphQL.Utilities
                 c.Print(f => f.Arg(x => x.Value));
             });
 
-            Config<NullValue>(c =>
-            {
-                c.Print(f => "null");
-            });
+            Config<NullValue>(c => c.Print(f => "null"));
 
             Config<LongValue>(c =>
             {

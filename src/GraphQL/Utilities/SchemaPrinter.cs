@@ -394,10 +394,7 @@ namespace GraphQL.Utilities
                     // For > 120 character long lines, cut at space boundaries into sublines
                     // of ~80 chars.
                     var sublines = BreakLine(line, 120 - indentation.Length);
-                    sublines.Apply(sub =>
-                    {
-                        desc += $"{indentation}# {sub}{Environment.NewLine}";
-                    });
+                    sublines.Apply(sub => desc += $"{indentation}# {sub}{Environment.NewLine}");
                 }
             });
 

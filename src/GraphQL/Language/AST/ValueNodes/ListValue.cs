@@ -5,7 +5,10 @@ namespace GraphQL.Language.AST
 {
     public class ListValue : AbstractNode, IValue
     {
-        public ListValue(IEnumerable<IValue> values) => Values = values;
+        public ListValue(IEnumerable<IValue> values)
+        {
+            Values = values;
+        }
 
         public object Value => Values.Select(x => x.Value).ToList();
 
@@ -20,7 +23,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 

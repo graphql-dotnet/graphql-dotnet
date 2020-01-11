@@ -27,6 +27,7 @@ namespace GraphQL.Types
         {
             if (!_resolvedInterfaces.Contains(graphType))
             {
+                graphType.IsValidInterfaceFor(this, throwError: true);
                 _resolvedInterfaces.Add(graphType ?? throw new ArgumentNullException(nameof(graphType)));
             }
         }

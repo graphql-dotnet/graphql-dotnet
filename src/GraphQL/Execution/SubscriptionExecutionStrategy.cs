@@ -35,7 +35,7 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var node = kvp.Value;
 
-                if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
+                if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
                 streams[name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
