@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>GraphQL.NewtonsoftJson</RootNamespace>
+    <Description>JSON.NET serializer for GraphQL.NET</Description>
+    <PackageTags>GraphQL;json</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
