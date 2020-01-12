@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <None Include="**\*.md" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
   <ItemGroup>
