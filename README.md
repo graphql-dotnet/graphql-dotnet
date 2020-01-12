@@ -44,7 +44,7 @@ http://graphql-dotnet.github.io
 https://github.com/graphql-dotnet/examples
 
 You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
-It supports two popular IDE for managing GraphQL requests - GraphQL Playground and GraphiQL.
+It supports the popular IDEs for managing GraphQL requests - GraphQL Playground, GraphiQL and Altair.
 
 ## Training
 
