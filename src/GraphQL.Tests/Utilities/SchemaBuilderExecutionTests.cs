@@ -227,10 +227,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolve: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -251,15 +248,9 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolveWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = @"{ resolveWithParam(id: ""abcd"") }";
-            });
+            var result = await schema.ExecuteAsync(_ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
             var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
@@ -298,10 +289,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContext: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -324,10 +312,17 @@ namespace GraphQL.Tests.Utilities
                   homePlanet: String = null
                 }
 
+                type Human {
+                  id: String!
+                }
+
                 type Mutation {
                   createHuman(human: HumanInput!): Human
                 }
             ");
+
+            var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
+            type.GetField("homePlanet").DefaultValue.ShouldBeNull();
         }
 
         [Fact]
@@ -337,10 +332,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContextWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -386,10 +378,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   four(id: Int): Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -493,10 +482,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<PetQueryType>();
             });
 
-            var result = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = @"{ pet { ... on Dog { name } } }";
-            });
+            var result = await schema.ExecuteAsync(_ => _.Query = @"{ pet { ... on Dog { name } } }");
 
             var expected = @"{ 'pet': { 'name' : 'Eli' } }";
             var expectedResult = CreateQueryResult(expected);

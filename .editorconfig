@@ -144,7 +144,7 @@ csharp_style_prefer_switch_expression = true:suggestion
 # .NET formatting settings - Organize using directives
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions?view=vs-2019#organize-using-directives
 dotnet_sort_system_directives_first = true
-dotnet_separate_import_directive_groups = true
+dotnet_separate_import_directive_groups = false
 
 # C# formatting settings - New-line options
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions?view=vs-2019#new-line-options

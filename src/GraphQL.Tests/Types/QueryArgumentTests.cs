@@ -39,8 +39,10 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void does_not_throw_when_set_null()
         {
-            var type = new QueryArgument<StringGraphType>();
-            type.ResolvedType = null;
+            new QueryArgument<StringGraphType>
+            {
+                ResolvedType = null
+            };
         }
 
         [Fact]

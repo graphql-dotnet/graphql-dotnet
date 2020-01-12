@@ -188,10 +188,7 @@ namespace GraphQL.Tests.Utilities
 
             var customScalar = new CustomScalarType();
 
-            var schema = Schema.For(definitions, _ =>
-            {
-                _.RegisterType(customScalar);
-            });
+            var schema = Schema.For(definitions, _ => _.RegisterType(customScalar));
 
             schema.Initialize();
 
