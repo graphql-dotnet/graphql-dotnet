@@ -100,6 +100,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     case ASTNodeKind.SchemaDefinition:
                     {
                         schemaDef = def as GraphQLSchemaDefinition;
+                        schema.SetAstType(schemaDef);
+
+                        VisitNode(schema, v => v.VisitSchema(schema));
                         break;
                     }
 
@@ -254,7 +257,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 type.SetAstType(astType);
             }
 
-            VisitNode(type, v => v.VisitObjectGraphType(type));
+            VisitNode(type, v => v.VisitObject(type));
 
             return type;
         }
@@ -280,7 +283,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             field.SetAstType(fieldDef);
 
-            VisitNode(field, v => v.VisitField(field));
+            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -308,7 +311,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             field.SetAstType(fieldDef);
 
-            VisitNode(field, v => v.VisitField(field));
+            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -324,7 +327,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(field, v => v.VisitInputFieldDefinition(field));
 
             return field;
         }
@@ -338,7 +343,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Name = interfaceDef.Name.Value,
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
+            }.SetAstType(interfaceDef);
+
+            VisitNode(type, v => v.VisitInterface(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -357,7 +364,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Name = unionDef.Name.Value,
                 Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
+            }.SetAstType(unionDef);
+
+            VisitNode(type, v => v.VisitUnion(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -374,7 +383,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(type, v => v.VisitInputObject(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -392,7 +403,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
-            };
+            }.SetAstType(enumDef);
+
+            VisitNode(type, v => v.VisitEnum(type));
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -432,9 +445,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Value = valDef.Name.Value,
                 Name = valDef.Name.Value,
                 Description = valDef.Comment?.Text
-            };
-
-            val.SetAstType(valDef);
+            }.SetAstType(valDef);
 
             VisitNode(val, v => v.VisitEnumValue(val));
 
@@ -445,13 +456,17 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         {
             var type = ToGraphType(inputDef.Type);
 
-            return new QueryArgument(type)
+            var argument = new QueryArgument(type)
             {
                 Name = inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(argument, v => v.VisitArgumentDefinition(argument));
+
+            return argument;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)

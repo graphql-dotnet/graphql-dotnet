@@ -99,7 +99,7 @@ namespace GraphQL.Reflection
 
             if (parameters.Length > index
                 && context.UserContext != null
-                && context.UserContext?.GetType() == parameters[index].ParameterType)
+                && parameters[index].ParameterType.IsInstanceOfType(context.UserContext))
             {
                 arguments[index] = context.UserContext;
                 index++;

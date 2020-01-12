@@ -337,6 +337,7 @@ namespace GraphQL
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
+        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = True) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string TrimGraphQLTypes(this string name) { }
@@ -2026,7 +2027,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -2233,9 +2234,17 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
+        public virtual void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
-        public virtual void VisitField(GraphQL.Types.FieldType field) { }
-        public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
+        public virtual void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputFieldDefinition(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
+        public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType iface) { }
+        public virtual void VisitObject(GraphQL.Types.IObjectGraphType type) { }
+        public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
+        public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
+        public virtual void VisitUnion(GraphQL.Types.UnionGraphType union) { }
         protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
@@ -2243,7 +2252,7 @@ namespace GraphQL.Utilities
         protected static readonly string DeprecatedDefaultValue;
         public DeprecatedDirectiveVisitor() { }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
-        public override void VisitField(GraphQL.Types.FieldType field) { }
+        public override void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
     }
     public class DirectiveVisitorSelector : GraphQL.Utilities.IVisitorSelector
     {
@@ -2278,9 +2287,17 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
+        void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument);
+        void VisitEnum(GraphQL.Types.EnumerationGraphType type);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
-        void VisitField(GraphQL.Types.FieldType field);
-        void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type);
+        void VisitFieldDefinition(GraphQL.Types.FieldType field);
+        void VisitInputFieldDefinition(GraphQL.Types.FieldType field);
+        void VisitInputObject(GraphQL.Types.InputObjectGraphType type);
+        void VisitInterface(GraphQL.Types.InterfaceGraphType iface);
+        void VisitObject(GraphQL.Types.IObjectGraphType type);
+        void VisitScalar(GraphQL.Types.ScalarGraphType scalar);
+        void VisitSchema(GraphQL.Types.Schema schema);
+        void VisitUnion(GraphQL.Types.UnionGraphType union);
     }
     public interface IValueResolver
     {

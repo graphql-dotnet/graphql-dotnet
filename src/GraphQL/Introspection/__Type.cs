@@ -27,10 +27,7 @@ namespace GraphQL.Introspection
 
                 throw new ExecutionError($"Unknown kind of type: {context.Source}");
             });
-            Field<StringGraphType>("name", resolve: context =>
-            {
-                return ((IGraphType)context.Source).Name;
-            });
+            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
             Field<StringGraphType>("description");
             FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(

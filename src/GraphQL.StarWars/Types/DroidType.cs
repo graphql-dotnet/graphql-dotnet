@@ -26,10 +26,7 @@ namespace GraphQL.StarWars.Types
                 .Name("friendsConnection")
                 .Description("A list of a character's friends.")
                 .Bidirectional()
-                .Resolve(context =>
-                {
-                    return context.GetPagedResults<Droid, StarWarsCharacter>(data, context.Source.Friends);
-                });
+                .Resolve(context => context.GetPagedResults<Droid, StarWarsCharacter>(data, context.Source.Friends));
                 
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
             Field(d => d.PrimaryFunction, nullable: true).Description("The primary function of the droid.");
