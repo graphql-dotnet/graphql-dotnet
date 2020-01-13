@@ -1846,6 +1846,7 @@ namespace GraphQL.Types
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
+        System.IServiceProvider Services { get; }
         object Source { get; }
         System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
@@ -2014,8 +2015,8 @@ namespace GraphQL.Types
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public object Source { get; set; }
         public System.IServiceProvider Services { get; set; }
+        public object Source { get; set; }
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
@@ -2025,6 +2026,7 @@ namespace GraphQL.Types
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
         public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path, System.IServiceProvider serviceProvider) { }
         public TSource Source { get; set; }
     }
     public class SByteGraphType : GraphQL.Types.ScalarGraphType

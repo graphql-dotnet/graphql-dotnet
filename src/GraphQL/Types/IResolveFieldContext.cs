@@ -1,6 +1,7 @@
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Field = GraphQL.Language.AST.Field;
@@ -44,6 +45,8 @@ namespace GraphQL.Types
         IEnumerable<string> Path { get; }
 
         IDictionary<string, Field> SubFields { get; }
+
+        IServiceProvider Services { get; }
     }
 
     public interface IResolveFieldContext<out TSource> : IResolveFieldContext

@@ -123,7 +123,7 @@ namespace GraphQL.Types
             Services = context.Services;
         }
 
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, object source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path, IServiceProvider serviceProvider)
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path, IServiceProvider serviceProvider)
         {
             Source = source;
             FieldName = field.Name;
