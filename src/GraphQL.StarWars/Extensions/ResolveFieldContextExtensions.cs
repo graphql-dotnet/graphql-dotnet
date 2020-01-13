@@ -9,7 +9,7 @@ namespace GraphQL.StarWars.Extensions
 {
     public static class ResolveFieldContextExtensions
     {
-        public static Connection<U> GetPagedResults<T, U>(this ResolveConnectionContext<T> context, StarWarsData data, List<string> ids) where U : StarWarsCharacter
+        public static Connection<U> GetPagedResults<T, U>(this IResolveConnectionContext<T> context, StarWarsData data, List<string> ids) where U : StarWarsCharacter
         {
             List<string> idList;
             List<U> list;

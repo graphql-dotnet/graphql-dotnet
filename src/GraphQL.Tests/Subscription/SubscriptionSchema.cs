@@ -83,7 +83,7 @@ namespace GraphQL.Tests.Subscription
             });
         }
 
-        private IObservable<Message> SubscribeById(ResolveEventStreamContext context)
+        private IObservable<Message> SubscribeById(IResolveEventStreamContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -92,7 +92,7 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private async Task<IObservable<Message>> SubscribeByIdAsync(ResolveEventStreamContext context)
+        private async Task<IObservable<Message>> SubscribeByIdAsync(IResolveEventStreamContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -100,19 +100,19 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private Message ResolveMessage(ResolveFieldContext context)
+        private Message ResolveMessage(IResolveFieldContext context)
         {
             var message = context.Source as Message;
 
             return message;
         }
 
-        private IObservable<Message> Subscribe(ResolveEventStreamContext context)
+        private IObservable<Message> Subscribe(IResolveEventStreamContext context)
         {
             return _chat.Messages();
         }
 
-        private Task<IObservable<Message>> SubscribeAsync(ResolveEventStreamContext context)
+        private Task<IObservable<Message>> SubscribeAsync(IResolveEventStreamContext context)
         {
             return _chat.MessagesAsync();
         }
@@ -152,7 +152,7 @@ namespace GraphQL.Tests.Subscription
             Field(o => o.From, false, typeof(MessageFromType)).Resolve(ResolveFrom);
         }
 
-        private MessageFrom ResolveFrom(ResolveFieldContext<Message> context)
+        private MessageFrom ResolveFrom(IResolveFieldContext<Message> context)
         {
             var message = context.Source;
             return message.From;
