@@ -592,6 +592,33 @@ namespace GraphQL.Execution
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
+    public static class ResolveFieldContextSlim
+    {
+        public static GraphQL.Types.IResolveFieldContext Create(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
+    }
+    public class ResolveFieldContextSlim<T> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
+    {
+        public ResolveFieldContextSlim(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
+        public System.Collections.Generic.Dictionary<string, object> Arguments { get; }
+        public System.Threading.CancellationToken CancellationToken { get; }
+        public GraphQL.Language.AST.Document Document { get; }
+        public GraphQL.ExecutionErrors Errors { get; }
+        public GraphQL.Language.AST.Field FieldAst { get; }
+        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public string FieldName { get; }
+        public GraphQL.Language.AST.Fragments Fragments { get; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; }
+        public GraphQL.Language.AST.Operation Operation { get; }
+        public GraphQL.Types.IObjectGraphType ParentType { get; }
+        public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public GraphQL.Types.IGraphType ReturnType { get; }
+        public object RootValue { get; }
+        public GraphQL.Types.ISchema Schema { get; }
+        public T Source { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
+        public GraphQL.Language.AST.Variables Variables { get; }
+    }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
         public RootExecutionNode(GraphQL.Types.IObjectGraphType graphType) { }
