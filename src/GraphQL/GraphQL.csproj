@@ -6,9 +6,6 @@
     <Authors>Joe McBride</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>GraphQL;json;api</PackageTags>
-    <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
-    <PackageIcon>logo.64x64.png</PackageIcon>
-    <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

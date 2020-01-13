@@ -13,12 +13,12 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public TProperty Resolve(ResolveFieldContext context)
+        public TProperty Resolve(IResolveFieldContext context)
         {
             return _property((TSourceType)context.Source);
         }
 
-        object IFieldResolver.Resolve(ResolveFieldContext context)
+        object IFieldResolver.Resolve(IResolveFieldContext context)
         {
             return Resolve(context);
         }

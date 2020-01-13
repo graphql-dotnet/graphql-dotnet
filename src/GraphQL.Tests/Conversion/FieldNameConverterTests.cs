@@ -23,10 +23,7 @@ namespace GraphQL.Tests.Conversion
                 "PeRsoN",
                 person,
                 arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
-                resolve: ctx =>
-                {
-                    return new Person { Name = "Quinn" };
-                });
+                resolve: ctx => new Person { Name = "Quinn" });
 
             schema.Query = query;
             return schema;
