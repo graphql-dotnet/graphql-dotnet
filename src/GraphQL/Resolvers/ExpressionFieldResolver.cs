@@ -14,12 +14,12 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public Task<TProperty> ResolveAsync(ResolveFieldContext context)
+        public Task<TProperty> ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult(_property((TSourceType)context.Source));
         }
 
-        Task<object> IFieldResolver.ResolveAsync(ResolveFieldContext context)
+        Task<object> IFieldResolver.ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult((object)_property((TSourceType)context.Source));
         }

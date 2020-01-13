@@ -15,7 +15,7 @@ namespace GraphQL.Resolvers
 
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
-        public Task<object> ResolveAsync(ResolveFieldContext context) => Task.FromResult(Resolve(context?.Source, context?.FieldAst?.Name));
+        public Task<object> ResolveAsync(IResolveFieldContext context) => Task.FromResult(Resolve(context?.Source, context?.FieldAst?.Name));
 
         private static object Resolve(object source, string name)
         {

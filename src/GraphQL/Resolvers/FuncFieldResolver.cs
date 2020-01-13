@@ -6,19 +6,19 @@ namespace GraphQL.Resolvers
 {
     public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
     {
-        private readonly Func<ResolveFieldContext, TReturnType> _resolver;
+        private readonly Func<IResolveFieldContext, TReturnType> _resolver;
 
-        public FuncFieldResolver(Func<ResolveFieldContext, TReturnType> resolver)
+        public FuncFieldResolver(Func<IResolveFieldContext, TReturnType> resolver)
         {
             _resolver = resolver;
         }
 
-        public Task<TReturnType> ResolveAsync(ResolveFieldContext context)
+        public Task<TReturnType> ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult(_resolver(context));
         }
 
-        Task<object> IFieldResolver.ResolveAsync(ResolveFieldContext context)
+        Task<object> IFieldResolver.ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult((object)_resolver(context));
         }
@@ -26,19 +26,19 @@ namespace GraphQL.Resolvers
 
     public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
     {
-        private readonly Func<ResolveFieldContext<TSourceType>, TReturnType> _resolver;
+        private readonly Func<IResolveFieldContext<TSourceType>, TReturnType> _resolver;
 
-        public FuncFieldResolver(Func<ResolveFieldContext<TSourceType>, TReturnType> resolver)
+        public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
-        public Task<TReturnType> ResolveAsync(ResolveFieldContext context)
+        public Task<TReturnType> ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult(_resolver(context.As<TSourceType>()));
         }
 
-        Task<object> IFieldResolver.ResolveAsync(ResolveFieldContext context)
+        Task<object> IFieldResolver.ResolveAsync(IResolveFieldContext context)
         {
             return Task.FromResult((object)_resolver(context.As<TSourceType>()));
         }

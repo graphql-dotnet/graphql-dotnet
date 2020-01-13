@@ -5,11 +5,11 @@ namespace GraphQL.Resolvers
 {
     public interface IFieldResolver
     {
-        Task<object> ResolveAsync(ResolveFieldContext context);
+        Task<object> ResolveAsync(IResolveFieldContext context);
     }
 
     public interface IFieldResolver<T> : IFieldResolver
     {
-        new Task<T> ResolveAsync(ResolveFieldContext context);
+        new Task<T> ResolveAsync(IResolveFieldContext context);
     }
 }

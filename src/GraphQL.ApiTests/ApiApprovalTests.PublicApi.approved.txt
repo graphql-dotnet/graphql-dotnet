@@ -33,8 +33,8 @@ namespace GraphQL.Builders
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Description(string description) { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
-        public void Resolve(System.Func<GraphQL.Builders.ResolveConnectionContext<TSourceType>, object> resolver) { }
-        public void ResolveAsync(System.Func<GraphQL.Builders.ResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object>> resolver) { }
+        public void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object> resolver) { }
+        public void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object>> resolver) { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Unidirectional() { }
     }
@@ -57,16 +57,29 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string description) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver resolver) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, TReturnType> resolve) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscribe) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscribeAsync) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Subscribe(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscribe) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> SubscribeAsync(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscribeAsync) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
     }
-    public class ResolveConnectionContext<T> : GraphQL.Types.ResolveFieldContext<T>
+    public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
     {
-        public ResolveConnectionContext(GraphQL.Types.ResolveFieldContext context, bool isUnidirectional, int? defaultPageSize) { }
+        string After { get; }
+        string Before { get; }
+        int? First { get; }
+        bool IsPartial { get; }
+        bool IsUnidirectional { get; }
+        int? Last { get; }
+        int? NumberOfSkippedEntries { get; }
+        int? PageSize { get; }
+        int? TotalCount { get; }
+    }
+    public interface IResolveConnectionContext<out T> : GraphQL.Builders.IResolveConnectionContext, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T> { }
+    public class ResolveConnectionContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Builders.IResolveConnectionContext, GraphQL.Builders.IResolveConnectionContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
+    {
+        public ResolveConnectionContext(GraphQL.Types.IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize) { }
         public string After { get; }
         public string Before { get; }
         public int? First { get; }
@@ -324,6 +337,7 @@ namespace GraphQL
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
+        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = True) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string TrimGraphQLTypes(this string name) { }
@@ -395,6 +409,14 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
             where T :  class, new () { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object> source, System.Type type) { }
+    }
+    public static class ResolveFieldContextExtensions
+    {
+        public static TType GetArgument<TType>(this GraphQL.Types.IResolveFieldContext context, string name, TType defaultValue = null) { }
+        public static object GetArgument(this GraphQL.Types.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
+        public static bool HasArgument(this GraphQL.Types.IResolveFieldContext context, string argumentName) { }
+        public static System.Threading.Tasks.Task<object> TryAsyncResolve(this GraphQL.Types.IResolveFieldContext context, System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
+        public static System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(this GraphQL.Types.IResolveFieldContext context, System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
     }
     public enum ResolverType
     {
@@ -587,11 +609,11 @@ namespace GraphQL.Execution
     }
     public class UnhandledExceptionContext
     {
-        public UnhandledExceptionContext(GraphQL.Execution.ExecutionContext context, GraphQL.Types.ResolveFieldContext fieldContext, System.Exception originalException) { }
+        public UnhandledExceptionContext(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IResolveFieldContext fieldContext, System.Exception originalException) { }
         public GraphQL.Execution.ExecutionContext Context { get; }
         public string ErrorMessage { get; set; }
         public System.Exception Exception { get; set; }
-        public GraphQL.Types.ResolveFieldContext FieldContext { get; }
+        public GraphQL.Types.IResolveFieldContext FieldContext { get; }
         public System.Exception OriginalException { get; }
     }
     public class ValueExecutionNode : GraphQL.Execution.ExecutionNode
@@ -694,10 +716,11 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.FieldMiddlewareDelegate Build(GraphQL.Instrumentation.FieldMiddlewareDelegate start = null) { }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
-    public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.ResolveFieldContext context);
+    public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
     public static class FieldResolverBuilderExtensions
     {
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
+            where T : new() { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
     }
     public class FieldStat
@@ -716,7 +739,7 @@ namespace GraphQL.Instrumentation
     public class InstrumentFieldsMiddleware
     {
         public InstrumentFieldsMiddleware() { }
-        public System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.ResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
+        public System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
     }
     public class Metrics
     {
@@ -735,7 +758,7 @@ namespace GraphQL.Instrumentation
     public class MiddlewareResolver : GraphQL.Resolvers.IFieldResolver
     {
         public MiddlewareResolver(GraphQL.Resolvers.IFieldResolver next) { }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class PerfRecord
     {
@@ -1367,103 +1390,105 @@ namespace GraphQL.Resolvers
     }
     public class AsyncEventStreamResolver<T> : GraphQL.Resolvers.IAsyncEventStreamResolver, GraphQL.Resolvers.IAsyncEventStreamResolver<T>
     {
-        public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.ResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<T>>> subscriber) { }
-        public System.Threading.Tasks.Task<System.IObservable<T>> SubscribeAsync(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<T>>> subscriber) { }
+        public System.Threading.Tasks.Task<System.IObservable<T>> SubscribeAsync(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class AsyncEventStreamResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IAsyncEventStreamResolver, GraphQL.Resolvers.IAsyncEventStreamResolver<TReturnType>
     {
-        public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscriber) { }
-        public System.Threading.Tasks.Task<System.IObservable<TReturnType>> SubscribeAsync(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public AsyncEventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType>>> subscriber) { }
+        public System.Threading.Tasks.Task<System.IObservable<TReturnType>> SubscribeAsync(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class AsyncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
-        public AsyncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext, System.Threading.Tasks.Task<TReturnType>> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public AsyncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class AsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
-        public AsyncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public AsyncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class DelegateFieldModelBinderResolver : GraphQL.Resolvers.IFieldResolver
     {
         public DelegateFieldModelBinderResolver(System.Delegate resolver) { }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class EventStreamResolver : GraphQL.Resolvers.IEventStreamResolver
     {
         public EventStreamResolver(GraphQL.Reflection.IAccessor accessor, System.IServiceProvider serviceProvider) { }
-        public System.IObservable<object> Subscribe(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public System.IObservable<object> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class EventStreamResolver<T> : GraphQL.Resolvers.IEventStreamResolver, GraphQL.Resolvers.IEventStreamResolver<T>
     {
-        public EventStreamResolver(System.Func<GraphQL.Subscription.ResolveEventStreamContext, System.IObservable<T>> subscriber) { }
-        public System.IObservable<T> Subscribe(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<T>> subscriber) { }
+        public System.IObservable<T> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class EventStreamResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IEventStreamResolver, GraphQL.Resolvers.IEventStreamResolver<TReturnType>
     {
-        public EventStreamResolver(System.Func<GraphQL.Subscription.ResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscriber) { }
-        public System.IObservable<TReturnType> Subscribe(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public EventStreamResolver(System.Func<GraphQL.Subscription.IResolveEventStreamContext<TSourceType>, System.IObservable<TReturnType>> subscriber) { }
+        public System.IObservable<TReturnType> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class ExpressionFieldResolver<TSourceType, TProperty> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TProperty>
     {
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
-        public System.Threading.Tasks.Task<TProperty> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<TProperty> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class FuncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
-        public FuncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext, TReturnType> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public FuncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext, TReturnType> resolver) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public class FuncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
-        public FuncFieldResolver(System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, TReturnType> resolver) { }
-        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public FuncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, TReturnType> resolver) { }
+        public System.Threading.Tasks.Task<TReturnType> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
     public interface IAsyncEventStreamResolver
     {
-        System.Threading.Tasks.Task<System.IObservable<object>> SubscribeAsync(GraphQL.Subscription.ResolveEventStreamContext context);
+        System.Threading.Tasks.Task<System.IObservable<object>> SubscribeAsync(GraphQL.Subscription.IResolveEventStreamContext context);
     }
     public interface IAsyncEventStreamResolver<T> : GraphQL.Resolvers.IAsyncEventStreamResolver
     {
-        System.Threading.Tasks.Task<System.IObservable<T>> SubscribeAsync(GraphQL.Subscription.ResolveEventStreamContext context);
+        System.Threading.Tasks.Task<System.IObservable<T>> SubscribeAsync(GraphQL.Subscription.IResolveEventStreamContext context);
     }
     public interface IEventStreamResolver
     {
-        System.IObservable<object> Subscribe(GraphQL.Subscription.ResolveEventStreamContext context);
+        System.IObservable<object> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context);
     }
     public interface IEventStreamResolver<out T> : GraphQL.Resolvers.IEventStreamResolver
     {
-        System.IObservable<T> Subscribe(GraphQL.Subscription.ResolveEventStreamContext context);
+        System.IObservable<T> Subscribe(GraphQL.Subscription.IResolveEventStreamContext context);
     }
     public interface IFieldResolver
     {
-        System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context);
+        System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.IResolveFieldContext context);
     }
     public interface IFieldResolver<T> : GraphQL.Resolvers.IFieldResolver
     {
-        System.Threading.Tasks.Task<T> ResolveAsync(GraphQL.Types.ResolveFieldContext context);
+        System.Threading.Tasks.Task<T> ResolveAsync(GraphQL.Types.IResolveFieldContext context);
     }
     public class NameFieldResolver : GraphQL.Resolvers.IFieldResolver
     {
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.ResolveFieldContext context) { }
+        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.Types.IResolveFieldContext context) { }
     }
 }
 namespace GraphQL.Subscription
 {
+    public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext { }
+    public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource> { }
     public interface ISubscriptionExecuter
     {
         System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
     }
-    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>
+    public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Types.IResolveFieldContext
     {
         public ResolveEventStreamContext() { }
     }
-    public class ResolveEventStreamContext<T> : GraphQL.Types.ResolveFieldContext<T>
+    public class ResolveEventStreamContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Subscription.IResolveEventStreamContext<T>, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
     {
         public ResolveEventStreamContext() { }
-        public ResolveEventStreamContext(GraphQL.Subscription.ResolveEventStreamContext context) { }
+        public ResolveEventStreamContext(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
     public class SubscriptionExecutionResult : GraphQL.ExecutionResult
     {
@@ -1525,24 +1550,24 @@ namespace GraphQL.Types
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
-        public GraphQL.Types.FieldType Field(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null) { }
-        public GraphQL.Types.FieldType Field<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType Field(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType Field<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, object> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default") { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = False, System.Type type = null) { }
-        public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null) { }
-        public GraphQL.Types.FieldType FieldAsync<TReturnType>(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null) { }
-        public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldAsync<TReturnType>(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object>> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType FieldDelegate<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Delegate resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.ResolveEventStreamContext, System.IObservable<object>> subscribe = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.IObservable<object>> subscribe = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType FieldSubscribeAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.ResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<object>>> subscribeAsync = null, string deprecationReason = null)
+        public GraphQL.Types.FieldType FieldSubscribeAsync<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.Subscription.IResolveEventStreamContext, System.Threading.Tasks.Task<System.IObservable<object>>> subscribeAsync = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType GetField(string name) { }
         public bool HasField(string name) { }
@@ -1792,6 +1817,31 @@ namespace GraphQL.Types
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         bool HasMetadata(string key);
     }
+    public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
+    {
+        System.Collections.Generic.Dictionary<string, object> Arguments { get; }
+        System.Threading.CancellationToken CancellationToken { get; }
+        GraphQL.Language.AST.Document Document { get; }
+        GraphQL.ExecutionErrors Errors { get; }
+        GraphQL.Language.AST.Field FieldAst { get; }
+        GraphQL.Types.FieldType FieldDefinition { get; }
+        string FieldName { get; }
+        GraphQL.Language.AST.Fragments Fragments { get; }
+        GraphQL.Instrumentation.Metrics Metrics { get; }
+        GraphQL.Language.AST.Operation Operation { get; }
+        GraphQL.Types.IObjectGraphType ParentType { get; }
+        System.Collections.Generic.IEnumerable<string> Path { get; }
+        GraphQL.Types.IGraphType ReturnType { get; }
+        object RootValue { get; }
+        GraphQL.Types.ISchema Schema { get; }
+        object Source { get; }
+        System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        GraphQL.Language.AST.Variables Variables { get; }
+    }
+    public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
+    {
+        TSource Source { get; }
+    }
     public interface ISchema : System.IDisposable
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
@@ -1894,8 +1944,8 @@ namespace GraphQL.Types
     }
     public static class ObjectGraphTypeExtensions
     {
-        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext, object> resolve = null) { }
-        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.ResolveFieldContext, System.Threading.Tasks.Task<object>> resolve = null) { }
+        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext, object> resolve = null) { }
+        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve = null) { }
     }
     public class ObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideMetadata
     {
@@ -1933,15 +1983,10 @@ namespace GraphQL.Types
         public GraphQL.Types.QueryArgument Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
-    public class ResolveFieldContext : GraphQL.Types.ResolveFieldContext<object>
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
     {
         public ResolveFieldContext() { }
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, object source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
-    }
-    public class ResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext
-    {
-        public ResolveFieldContext() { }
-        public ResolveFieldContext(GraphQL.Types.ResolveFieldContext context) { }
+        public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
         public System.Collections.Generic.Dictionary<string, object> Arguments { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
@@ -1957,15 +2002,17 @@ namespace GraphQL.Types
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public TSource Source { get; set; }
+        public object Source { get; set; }
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
-        public TType GetArgument<TType>(string name, TType defaultValue = null) { }
-        public object GetArgument(System.Type argumentType, string name, object defaultValue = null) { }
-        public bool HasArgument(string argumentName) { }
-        public System.Threading.Tasks.Task<object> TryAsyncResolve(System.Func<GraphQL.Types.ResolveFieldContext<TSource>, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
-        public System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(System.Func<GraphQL.Types.ResolveFieldContext<TSource>, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
+    }
+    public class ResolveFieldContext<TSource> : GraphQL.Types.ResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<TSource>
+    {
+        public ResolveFieldContext() { }
+        public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public TSource Source { get; set; }
     }
     public class SByteGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1981,7 +2028,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -2188,16 +2235,24 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
+        public virtual void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
-        public virtual void VisitField(GraphQL.Types.FieldType field) { }
-        public virtual void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type) { }
+        public virtual void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputFieldDefinition(GraphQL.Types.FieldType field) { }
+        public virtual void VisitInputObject(GraphQL.Types.InputObjectGraphType type) { }
+        public virtual void VisitInterface(GraphQL.Types.InterfaceGraphType iface) { }
+        public virtual void VisitObject(GraphQL.Types.IObjectGraphType type) { }
+        public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
+        public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
+        public virtual void VisitUnion(GraphQL.Types.UnionGraphType union) { }
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
         protected static readonly string DeprecatedDefaultValue;
         public DeprecatedDirectiveVisitor() { }
         public override void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
-        public override void VisitField(GraphQL.Types.FieldType field) { }
+        public override void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
     }
     public class DirectiveVisitorSelector : GraphQL.Utilities.IVisitorSelector
     {
@@ -2232,9 +2287,17 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
+        void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument);
+        void VisitEnum(GraphQL.Types.EnumerationGraphType type);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
-        void VisitField(GraphQL.Types.FieldType field);
-        void VisitObjectGraphType(GraphQL.Types.ObjectGraphType type);
+        void VisitFieldDefinition(GraphQL.Types.FieldType field);
+        void VisitInputFieldDefinition(GraphQL.Types.FieldType field);
+        void VisitInputObject(GraphQL.Types.InputObjectGraphType type);
+        void VisitInterface(GraphQL.Types.InterfaceGraphType iface);
+        void VisitObject(GraphQL.Types.IObjectGraphType type);
+        void VisitScalar(GraphQL.Types.ScalarGraphType scalar);
+        void VisitSchema(GraphQL.Types.Schema schema);
+        void VisitUnion(GraphQL.Types.UnionGraphType union);
     }
     public interface IValueResolver
     {
@@ -2302,6 +2365,7 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.IObjectGraphType ToObjectGraphType(GraphQLParser.AST.GraphQLObjectTypeDefinition astType, bool isExtensionType = False) { }
         protected virtual GraphQL.Types.FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.UnionGraphType ToUnionType(GraphQLParser.AST.GraphQLUnionTypeDefinition unionDef) { }
+        protected virtual void Validate(GraphQLParser.AST.GraphQLDocument document) { }
         protected virtual void VisitNode(object node, System.Action<GraphQL.Utilities.ISchemaNodeVisitor> action) { }
     }
     public abstract class SchemaDirectiveVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
@@ -2423,7 +2487,7 @@ namespace GraphQL.Utilities.Federation
     {
         public FederatedResolveContext() { }
         public System.Collections.Generic.Dictionary<string, object> Arguments { get; set; }
-        public GraphQL.Types.ResolveFieldContext ParentFieldContext { get; set; }
+        public GraphQL.Types.IResolveFieldContext ParentFieldContext { get; set; }
     }
     public class FederatedSchema
     {

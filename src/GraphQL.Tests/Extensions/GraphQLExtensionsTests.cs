@@ -14,14 +14,14 @@ namespace GraphQL.Tests.Extensions
     public class GraphQLExtensionsTests
     {
         [Fact]
-        void BuildNamedType_ResolveReturnNull_Throws()
+        public void BuildNamedType_ResolveReturnNull_Throws()
         {
             Should.Throw<InvalidOperationException>(
                 () => typeof(ListGraphType<ListGraphType<EpisodeEnum>>).BuildNamedType(_ => null));
         }
 
         [Fact]
-        void GetResult_Extension_Should_Work()
+        public void GetResult_Extension_Should_Work()
         {
             var task1 = Task.FromResult(42);
             task1.GetResult().ShouldBe(42);

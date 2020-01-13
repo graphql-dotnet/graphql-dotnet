@@ -16,7 +16,7 @@ namespace GraphQL.Reflection
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<object> ResolveAsync(ResolveFieldContext context)
+        public async Task<object> ResolveAsync(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 

@@ -12,7 +12,7 @@ namespace GraphQL.Tests.StarWars
     {
         public StarWarsSubFieldsTests() : base()
         {
-            this.RootQuery = (StarWarsQuery)this.Schema.Query;
+            RootQuery = (StarWarsQuery)Schema.Query;
         }
 
         public StarWarsQuery RootQuery;

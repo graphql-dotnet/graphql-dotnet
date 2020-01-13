@@ -227,10 +227,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolve: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -251,15 +248,9 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolveWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = @"{ resolveWithParam(id: ""abcd"") }";
-            });
+            var result = await schema.ExecuteAsync(_ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
             var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
@@ -292,6 +283,27 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
+        public async Task can_use_inherited_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContext: String
+                }
+            ", _ => _.Types.Include<ParametersType>());
+
+            var result = await schema.ExecuteAsync(_ =>
+            {
+                _.Query = @"{ userContext }";
+                _.UserContext = new ChildMyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
         public void can_use_null_as_default_value()
         {
             var schema = Schema.For(@"
@@ -300,10 +312,17 @@ namespace GraphQL.Tests.Utilities
                   homePlanet: String = null
                 }
 
+                type Human {
+                  id: String!
+                }
+
                 type Mutation {
                   createHuman(human: HumanInput!): Human
                 }
             ");
+
+            var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
+            type.GetField("homePlanet").DefaultValue.ShouldBeNull();
         }
 
         [Fact]
@@ -313,10 +332,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContextWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -362,10 +378,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   four(id: Int): Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(_ =>
             {
@@ -469,10 +482,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<PetQueryType>();
             });
 
-            var result = await schema.ExecuteAsync(_ =>
-            {
-                _.Query = @"{ pet { ... on Dog { name } } }";
-            });
+            var result = await schema.ExecuteAsync(_ => _.Query = @"{ pet { ... on Dog { name } } }");
 
             var expected = @"{ 'pet': { 'name' : 'Eli' } }";
             var expectedResult = CreateQueryResult(expected);
@@ -603,12 +613,12 @@ namespace GraphQL.Tests.Utilities
             return source != null;
         }
 
-        public string Resolve(ResolveFieldContext context)
+        public string Resolve(IResolveFieldContext context)
         {
             return "Resolved";
         }
 
-        public string ResolveWithParam(ResolveFieldContext context, string id)
+        public string ResolveWithParam(IResolveFieldContext context, string id)
         {
             return $"Resolved {id}";
         }
@@ -623,12 +633,12 @@ namespace GraphQL.Tests.Utilities
             return $"{context.Name} {id}";
         }
 
-        public bool Three(ResolveFieldContext resolveContext, object source, MyUserContext context)
+        public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
         {
             return resolveContext != null && context != null && source != null;
         }
 
-        public bool Four(ResolveFieldContext resolveContext, object source, MyUserContext context, int id)
+        public bool Four(IResolveFieldContext resolveContext, object source, MyUserContext context, int id)
         {
             return resolveContext != null && context != null && source != null && id != 0;
         }
@@ -637,5 +647,8 @@ namespace GraphQL.Tests.Utilities
     class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
+    }
+    class ChildMyUserContext: MyUserContext
+    {
     }
 }

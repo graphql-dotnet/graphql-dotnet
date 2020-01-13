@@ -56,7 +56,19 @@ namespace GraphQL.Utilities
         public virtual ISchema Build(string typeDefinitions)
         {
             var document = Parse(typeDefinitions);
+            Validate(document);
             return BuildSchemaFrom(document);
+        }
+
+        protected virtual void Validate(GraphQLDocument document)
+        {
+            var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().Where(def => !(def is GraphQLTypeExtensionDefinition)).ToLookup(def => def.Name.Value);
+            var duplicates = definitionsByName.Where(grouping => grouping.Count() > 1).ToArray();
+            if (duplicates.Length > 0)
+                throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
+Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
+
+            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
         }
 
         private static GraphQLDocument Parse(string document)
@@ -88,6 +100,9 @@ namespace GraphQL.Utilities
                     case ASTNodeKind.SchemaDefinition:
                     {
                         schemaDef = def as GraphQLSchemaDefinition;
+                        schema.SetAstType(schemaDef);
+
+                        VisitNode(schema, v => v.VisitSchema(schema));
                         break;
                     }
 
@@ -242,7 +257,7 @@ namespace GraphQL.Utilities
                 type.SetAstType(astType);
             }
 
-            VisitNode(type, v => v.VisitObjectGraphType(type));
+            VisitNode(type, v => v.VisitObject(type));
 
             return type;
         }
@@ -268,7 +283,7 @@ namespace GraphQL.Utilities
 
             field.SetAstType(fieldDef);
 
-            VisitNode(field, v => v.VisitField(field));
+            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -296,7 +311,7 @@ namespace GraphQL.Utilities
 
             field.SetAstType(fieldDef);
 
-            VisitNode(field, v => v.VisitField(field));
+            VisitNode(field, v => v.VisitFieldDefinition(field));
 
             return field;
         }
@@ -312,7 +327,9 @@ namespace GraphQL.Utilities
                 Description = fieldConfig.Description ?? inputDef.Comment?.Text,
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(field, v => v.VisitInputFieldDefinition(field));
 
             return field;
         }
@@ -326,7 +343,9 @@ namespace GraphQL.Utilities
                 Name = interfaceDef.Name.Value,
                 Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
+            }.SetAstType(interfaceDef);
+
+            VisitNode(type, v => v.VisitInterface(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -345,7 +364,9 @@ namespace GraphQL.Utilities
                 Name = unionDef.Name.Value,
                 Description = typeConfig.Description ?? unionDef.Comment?.Text,
                 ResolveType = typeConfig.ResolveType
-            };
+            }.SetAstType(unionDef);
+
+            VisitNode(type, v => v.VisitUnion(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -362,7 +383,9 @@ namespace GraphQL.Utilities
             {
                 Name = inputDef.Name.Value,
                 Description = typeConfig.Description ?? inputDef.Comment?.Text
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(type, v => v.VisitInputObject(type));
 
             CopyMetadata(type, typeConfig);
 
@@ -380,7 +403,9 @@ namespace GraphQL.Utilities
             {
                 Name = enumDef.Name.Value,
                 Description = typeConfig.Description ?? enumDef.Comment?.Text
-            };
+            }.SetAstType(enumDef);
+
+            VisitNode(type, v => v.VisitEnum(type));
 
             var values = enumDef.Values.Select(ToEnumValue);
             values.Apply(type.AddValue);
@@ -420,9 +445,7 @@ namespace GraphQL.Utilities
                 Value = valDef.Name.Value,
                 Name = valDef.Name.Value,
                 Description = valDef.Comment?.Text
-            };
-
-            val.SetAstType(valDef);
+            }.SetAstType(valDef);
 
             VisitNode(val, v => v.VisitEnumValue(val));
 
@@ -433,13 +456,17 @@ namespace GraphQL.Utilities
         {
             var type = ToGraphType(inputDef.Type);
 
-            return new QueryArgument(type)
+            var argument = new QueryArgument(type)
             {
                 Name = inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 Description = inputDef.Comment?.Text
-            };
+            }.SetAstType(inputDef);
+
+            VisitNode(argument, v => v.VisitArgumentDefinition(argument));
+
+            return argument;
         }
 
         private IGraphType ToGraphType(GraphQLType astType)

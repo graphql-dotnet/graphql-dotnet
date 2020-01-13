@@ -17,7 +17,7 @@ namespace GraphQL.Resolvers
             _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
-        public async Task<object> ResolveAsync(ResolveFieldContext context)
+        public async Task<object> ResolveAsync(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             var ret = _resolver.DynamicInvoke(arguments);
