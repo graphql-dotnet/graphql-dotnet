@@ -199,6 +199,25 @@ namespace GraphQL.Tests.Execution
             result.ShouldBe("Test Result");
         }
 
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_when_null()
+        {
+            Should.Throw<NullReferenceException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<object>(null);
+            });
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_if_invalid_type()
+        {
+            var context = new ResolveFieldContext() { Source = "test" };
+            Should.Throw<InvalidCastException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
+        }
+
         enum SomeEnum
         {
             One,
