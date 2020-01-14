@@ -5,11 +5,11 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
-    internal class ResolveFieldContextAs<T> : IResolveFieldContext<T>
+    internal class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
         private readonly IResolveFieldContext _baseContext;
 
-        public ResolveFieldContextAs(IResolveFieldContext baseContext)
+        public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
         {
             Source = (T)baseContext.Source; //will throw NullReferenceException or InvalidCastException if there's a problem
             _baseContext = baseContext;

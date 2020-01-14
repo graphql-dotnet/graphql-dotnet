@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using Field = GraphQL.Language.AST.Field;
 
-namespace GraphQL.Execution
+namespace GraphQL.Types
 {
     public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {
@@ -57,7 +56,7 @@ namespace GraphQL.Execution
 
         public Variables Variables => _executionContext.Variables;
 
-        public CancellationToken CancellationToken => _executionContext.CancellationToken;
+        public System.Threading.CancellationToken CancellationToken => _executionContext.CancellationToken;
 
         public Metrics Metrics => _executionContext.Metrics;
 
