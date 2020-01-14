@@ -218,6 +218,14 @@ namespace GraphQL.Tests.Execution
             });
         }
 
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<int>(context);
+            adapter.Source.ShouldBe(0);
+        }
+
         enum SomeEnum
         {
             One,
