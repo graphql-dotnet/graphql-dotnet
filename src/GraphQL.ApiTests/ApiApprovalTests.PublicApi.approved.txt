@@ -592,13 +592,9 @@ namespace GraphQL.Execution
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
     }
-    public static class ResolveFieldContextSlim
+    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<object>
     {
-        public static GraphQL.Types.IResolveFieldContext Create(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
-    }
-    public class ResolveFieldContextSlim<T> : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
-    {
-        public ResolveFieldContextSlim(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
+        public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         public System.Collections.Generic.Dictionary<string, object> Arguments { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
@@ -614,7 +610,7 @@ namespace GraphQL.Execution
         public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
-        public T Source { get; }
+        public object Source { get; }
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }

@@ -10,54 +10,14 @@ using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Execution
 {
-    public static class ResolveFieldContextSlim
-    {
-        private static readonly ConcurrentDictionary<System.Type, Func<ExecutionNode, ExecutionContext, IResolveFieldContext>> dic =
-            new ConcurrentDictionary<System.Type, Func<ExecutionNode, ExecutionContext, IResolveFieldContext>>();
-
-        public static IResolveFieldContext Create(ExecutionNode node, ExecutionContext context)
-        {
-            //get the type of the source object, and just use typeof(object) when the source is null
-            var sourceType = node.Source?.GetType() ?? typeof(object);
-
-            //retrieve the constructor
-            var func = dic.GetOrAdd(sourceType, LazyCreate);
-
-            //execute the constructor and return the new ResolveFieldContextSlim<T> (cast as IResolveFieldContext)
-            return func(node, context);
-        }
-
-        private static Func<ExecutionNode, ExecutionContext, IResolveFieldContext> LazyCreate(System.Type sourceType)
-        {
-            //rfcsType = typeof(ResolveFieldContextSlim<sourceType>);
-            var rfcsType = typeof(ResolveFieldContextSlim<>).MakeGenericType(sourceType);
-
-            //constructor = (the only constructor)
-            var constructor = rfcsType.GetConstructors()[0];
-
-            //create the 2 parameters to the lambda: executionNode and executionContext
-            var executionNodeParameter = Expression.Parameter(typeof(ExecutionNode), "executionNode");
-            var executionContextParameter = Expression.Parameter(typeof(ExecutionContext), "executionContext");
-
-            //body = new ResolveFieldContextSlim<sourceType>(executionNode, executionContext);
-            var expressionBody = Expression.New(constructor, executionNodeParameter, executionContextParameter);
-
-            //lambda expression = (executionNode, executionContext) => new ResolveFieldContextSlim<sourceType>(executionNode, executionContext);
-            var lambdaExpression = Expression.Lambda<Func<ExecutionNode, ExecutionContext, IResolveFieldContext>>(expressionBody, executionNodeParameter, executionContextParameter);
-
-            //compile the expression into a function and return it
-            return lambdaExpression.Compile();
-        }
-    }
-
-    public class ResolveFieldContextSlim<T> : IResolveFieldContext<T>
+    public class ReadonlyResolveFieldContext : IResolveFieldContext, IResolveFieldContext<object>
     {
         private readonly ExecutionNode _executionNode;
         private readonly ExecutionContext _executionContext;
         private Dictionary<string, object> _arguments;
         private IDictionary<string, Field> _subFields;
 
-        public ResolveFieldContextSlim(ExecutionNode node, ExecutionContext context)
+        public ReadonlyResolveFieldContext(ExecutionNode node, ExecutionContext context)
         {
             _executionNode = node ?? throw new ArgumentNullException(nameof(node));
             _executionContext = context ?? throw new ArgumentNullException(nameof(context));
@@ -73,7 +33,7 @@ namespace GraphQL.Execution
             return ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
         }
 
-        public T Source => (T)_executionNode.Source;
+        public object Source => _executionNode.Source;
 
         public string FieldName => _executionNode.Field.Name;
 

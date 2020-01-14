@@ -182,7 +182,7 @@ namespace GraphQL.Execution
 
             try
             {
-                resolveContext = ResolveFieldContextSlim.Create(node, context);
+                resolveContext = new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
