@@ -10,7 +10,7 @@ using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Execution
 {
-    public class ReadonlyResolveFieldContext : IResolveFieldContext, IResolveFieldContext<object>
+    public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {
         private readonly ExecutionNode _executionNode;
         private readonly ExecutionContext _executionContext;
