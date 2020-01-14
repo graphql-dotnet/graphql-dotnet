@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Execution
@@ -55,23 +54,21 @@ namespace GraphQL.Execution
     {
         private readonly ExecutionNode _executionNode;
         private readonly ExecutionContext _executionContext;
-        private readonly Lazy<Dictionary<string, object>> _arguments;
-        private readonly Lazy<IDictionary<string, Field>> _subFields;
+        private Dictionary<string, object> _arguments;
+        private IDictionary<string, Field> _subFields;
 
         public ResolveFieldContextSlim(ExecutionNode node, ExecutionContext context)
         {
-            _executionNode = node;
-            _executionContext = context;
-            _arguments = new Lazy<Dictionary<string, object>>(LazyArgumentInitializer, LazyThreadSafetyMode.PublicationOnly);
-            _subFields = new Lazy<IDictionary<string, Field>>(LazySubfieldInitializer, LazyThreadSafetyMode.PublicationOnly);
+            _executionNode = node ?? throw new ArgumentNullException(nameof(node));
+            _executionContext = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        private IDictionary<string, Field> LazySubfieldInitializer()
+        private IDictionary<string, Field> GetSubFields()
         {
             return ExecutionHelper.SubFieldsFor(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field);
         }
 
-        private Dictionary<string, object> LazyArgumentInitializer()
+        private Dictionary<string, object> GetArguments()
         {
             return ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
         }
@@ -88,7 +85,7 @@ namespace GraphQL.Execution
 
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
-        public Dictionary<string, object> Arguments => _arguments.Value;
+        public Dictionary<string, object> Arguments => _arguments ?? (_arguments = GetArguments());
 
         public object RootValue => _executionContext.RootValue;
 
@@ -110,7 +107,7 @@ namespace GraphQL.Execution
 
         public IEnumerable<string> Path => _executionNode.Path;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _subFields.Value;
+        public IDictionary<string, Language.AST.Field> SubFields => _subFields ?? (_subFields = GetSubFields());
 
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
 
