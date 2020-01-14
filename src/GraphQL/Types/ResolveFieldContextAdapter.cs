@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Instrumentation;
@@ -11,8 +12,14 @@ namespace GraphQL.Types
 
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
         {
-            Source = (T)baseContext.Source; //will throw NullReferenceException or InvalidCastException if there's a problem
-            _baseContext = baseContext;
+            _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
+
+            if (baseContext.Source is null)
+                Source = default(T);
+            else if (baseContext.Source is T source)
+                Source = source;
+            else
+                throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
         }
 
         public T Source { get; }

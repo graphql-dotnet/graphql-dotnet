@@ -202,7 +202,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void resolveFieldContextAdapter_throws_error_when_null()
         {
-            Should.Throw<NullReferenceException>(() =>
+            Should.Throw<ArgumentNullException>(() =>
             {
                 var adapter = new ResolveFieldContextAdapter<object>(null);
             });
@@ -212,7 +212,7 @@ namespace GraphQL.Tests.Execution
         public void resolveFieldContextAdapter_throws_error_if_invalid_type()
         {
             var context = new ResolveFieldContext() { Source = "test" };
-            Should.Throw<InvalidCastException>(() =>
+            Should.Throw<ArgumentException>(() =>
             {
                 var adapter = new ResolveFieldContextAdapter<int>(context);
             });
