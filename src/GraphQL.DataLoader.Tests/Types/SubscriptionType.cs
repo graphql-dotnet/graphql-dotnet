@@ -25,12 +25,12 @@ namespace GraphQL.DataLoader.Tests.Types
             });
         }
 
-        private Order ResolveMessage(ResolveFieldContext context)
+        private Order ResolveMessage(IResolveFieldContext context)
         {
             return context.Source as Order;
         }
 
-        private IObservable<Order> Subscribe(ResolveEventStreamContext context)
+        private IObservable<Order> Subscribe(IResolveEventStreamContext context)
         {
             return ordersStore.GetOrderObservable();
         }

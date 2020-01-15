@@ -8,7 +8,7 @@ namespace GraphQL.Execution
     /// </summary>
     public class UnhandledExceptionContext
     {
-        public UnhandledExceptionContext(ExecutionContext context, ResolveFieldContext fieldContext, Exception originalException)
+        public UnhandledExceptionContext(ExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
         {
             Context = context;
             FieldContext = fieldContext;
@@ -21,7 +21,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Field context whose resolver generated an error. Can be null if the error came from DocumentExecuter.
         /// </summary>
-        public ResolveFieldContext FieldContext { get; }
+        public IResolveFieldContext FieldContext { get; }
 
         /// <summary>
         /// Original exception from field resolver or DocumentExecuter.

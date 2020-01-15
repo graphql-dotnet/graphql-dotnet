@@ -150,7 +150,7 @@ namespace GraphQL.Tests.Instrumentation
 
         public class SimpleMiddleware
         {
-            public Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
+            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 using (context.Metrics.Subject("class", "from class"))
                 {

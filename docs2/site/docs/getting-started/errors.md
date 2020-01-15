@@ -13,7 +13,7 @@ ExecutionResult result = await executor.ExecuteAsync(_ =>
 });
 ```
 
-You can throw an `ExecutionError` error in your resolver and it will be caught and displayed.  You can also add errors to the `ResolveFieldContext.Errors` directly.
+You can throw an `ExecutionError` error in your resolver and it will be caught and displayed.  You can also add errors to the `IResolveFieldContext.Errors` directly.
 
 ```csharp
 Field<DroidType>(

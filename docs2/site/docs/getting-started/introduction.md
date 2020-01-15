@@ -208,8 +208,8 @@ public class DroidType
   public string Name(Droid droid) => droid.Name;
 
   // these two parameters are optional
-  // ResolveFieldContext provides contextual information about the field
-  public Character Friend(ResolveFieldContext context, Droid source)
+  // IResolveFieldContext provides contextual information about the field
+  public Character Friend(IResolveFieldContext context, Droid source)
   {
     return new Character { Name = "C3-PO" };
   }
