@@ -34,7 +34,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public Dictionary<string, object> Arguments => _baseContext.Arguments;
+        public IDictionary<string, object> Arguments => _baseContext.Arguments;
 
         public object RootValue => _baseContext.RootValue;
 

@@ -1985,7 +1985,7 @@ namespace GraphQL.Types
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<object>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
-        public System.Collections.Generic.Dictionary<string, object> Arguments { get; }
+        public System.Collections.Generic.IDictionary<string, object> Arguments { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }

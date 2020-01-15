@@ -11,7 +11,7 @@ namespace GraphQL.Types
     {
         private readonly ExecutionNode _executionNode;
         private readonly ExecutionContext _executionContext;
-        private Dictionary<string, object> _arguments;
+        private IDictionary<string, object> _arguments;
         private IDictionary<string, Field> _subFields;
 
         public ReadonlyResolveFieldContext(ExecutionNode node, ExecutionContext context)
@@ -25,7 +25,7 @@ namespace GraphQL.Types
             return ExecutionHelper.SubFieldsFor(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field);
         }
 
-        private Dictionary<string, object> GetArguments()
+        private IDictionary<string, object> GetArguments()
         {
             return ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
         }
@@ -42,7 +42,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
-        public Dictionary<string, object> Arguments => _arguments ?? (_arguments = GetArguments());
+        public IDictionary<string, object> Arguments => _arguments ?? (_arguments = GetArguments());
 
         public object RootValue => _executionContext.RootValue;
 
