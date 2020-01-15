@@ -69,12 +69,9 @@ namespace GraphQL.Builders
         string After { get; }
         string Before { get; }
         int? First { get; }
-        bool IsPartial { get; }
         bool IsUnidirectional { get; }
         int? Last { get; }
-        int? NumberOfSkippedEntries { get; }
         int? PageSize { get; }
-        int? TotalCount { get; }
     }
     public interface IResolveConnectionContext<out T> : GraphQL.Builders.IResolveConnectionContext, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T> { }
     public class ResolveConnectionContext<T> : GraphQL.Types.ResolveFieldContext<T>, GraphQL.Builders.IResolveConnectionContext, GraphQL.Builders.IResolveConnectionContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<T>
@@ -83,12 +80,9 @@ namespace GraphQL.Builders
         public string After { get; }
         public string Before { get; }
         public int? First { get; }
-        public bool IsPartial { get; set; }
         public bool IsUnidirectional { get; }
         public int? Last { get; }
-        public int? NumberOfSkippedEntries { get; set; }
         public int? PageSize { get; }
-        public int? TotalCount { get; set; }
     }
 }
 namespace GraphQL.Conversion

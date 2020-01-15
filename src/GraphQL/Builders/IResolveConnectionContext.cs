@@ -15,12 +15,6 @@ namespace GraphQL.Builders
         string Before { get; }
 
         int? PageSize { get; }
-
-        int? NumberOfSkippedEntries { get; }
-
-        int? TotalCount { get; }
-
-        bool IsPartial { get; }
     }
 
     public interface IResolveConnectionContext<out T> : IResolveFieldContext<T>, IResolveConnectionContext
