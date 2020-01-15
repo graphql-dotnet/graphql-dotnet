@@ -21,7 +21,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType ParentType { get; set; }
 
-        public Dictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, object> Arguments { get; set; }
 
         public object RootValue { get; set; }
 

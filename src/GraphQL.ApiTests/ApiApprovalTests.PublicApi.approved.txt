@@ -1818,7 +1818,7 @@ namespace GraphQL.Types
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
-        System.Collections.Generic.Dictionary<string, object> Arguments { get; }
+        System.Collections.Generic.IDictionary<string, object> Arguments { get; }
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
@@ -2009,7 +2009,7 @@ namespace GraphQL.Types
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
-        public System.Collections.Generic.Dictionary<string, object> Arguments { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Arguments { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
