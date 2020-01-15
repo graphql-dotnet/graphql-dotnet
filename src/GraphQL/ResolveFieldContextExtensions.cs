@@ -48,7 +48,7 @@ namespace GraphQL
             if (context is IResolveFieldContext<TSourceType> typedContext)
                 return typedContext;
 
-            return new ResolveFieldContext<TSourceType>(context);
+            return new ResolveFieldContextAdapter<TSourceType>(context);
         }
 
         internal static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)

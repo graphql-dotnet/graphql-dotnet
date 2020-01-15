@@ -1831,7 +1831,7 @@ namespace GraphQL.Types
     }
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
-        System.Collections.Generic.Dictionary<string, object> Arguments { get; }
+        System.Collections.Generic.IDictionary<string, object> Arguments { get; }
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
@@ -1996,11 +1996,35 @@ namespace GraphQL.Types
         public GraphQL.Types.QueryArgument Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
+    public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext, GraphQL.Types.IResolveFieldContext<object>
+    {
+        public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context, System.IServiceProvider serviceProvider) { }
+        public System.Collections.Generic.IDictionary<string, object> Arguments { get; }
+        public System.Threading.CancellationToken CancellationToken { get; }
+        public GraphQL.Language.AST.Document Document { get; }
+        public GraphQL.ExecutionErrors Errors { get; }
+        public GraphQL.Language.AST.Field FieldAst { get; }
+        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public string FieldName { get; }
+        public GraphQL.Language.AST.Fragments Fragments { get; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; }
+        public GraphQL.Language.AST.Operation Operation { get; }
+        public GraphQL.Types.IObjectGraphType ParentType { get; }
+        public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public GraphQL.Types.IGraphType ReturnType { get; }
+        public object RootValue { get; }
+        public GraphQL.Types.ISchema Schema { get; }
+        public System.IServiceProvider Services { get; }
+        public object Source { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
+        public GraphQL.Language.AST.Variables Variables { get; }
+    }
     public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.Types.IResolveFieldContext
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
-        public System.Collections.Generic.Dictionary<string, object> Arguments { get; set; }
+        public System.Collections.Generic.IDictionary<string, object> Arguments { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
