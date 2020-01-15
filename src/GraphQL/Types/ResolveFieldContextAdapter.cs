@@ -14,12 +14,18 @@ namespace GraphQL.Types
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
 
-            if (baseContext.Source is null)
-                Source = default(T);
-            else if (baseContext.Source is T source)
-                Source = source;
-            else
+            try
+            {
+                Source = (T)baseContext.Source;
+            }
+            catch (InvalidCastException)
+            {
                 throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
+            }
+            catch (NullReferenceException)
+            {
+                throw new ArgumentException("baseContext.Source is null and cannot be cast to non-nullable value type " + typeof(T).Name, nameof(baseContext));
+            }
         }
 
         public T Source { get; }

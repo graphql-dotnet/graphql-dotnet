@@ -219,11 +219,29 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public void resolveFieldContextAdapter_accepts_null_sources()
+        public void resolveFieldContextAdapter_accepts_null_sources_ref()
         {
             var context = new ResolveFieldContext();
-            var adapter = new ResolveFieldContextAdapter<int>(context);
-            adapter.Source.ShouldBe(0);
+            var adapter = new ResolveFieldContextAdapter<string>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources_nullable()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<int?>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_for_null_values()
+        {
+            var context = new ResolveFieldContext();
+            Should.Throw<ArgumentException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
         }
 
         enum SomeEnum
