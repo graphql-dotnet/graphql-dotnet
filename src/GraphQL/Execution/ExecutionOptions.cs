@@ -69,8 +69,7 @@ namespace GraphQL
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
 
         /// <summary>
-        /// Sets the service scope to be used for this request.  If not set, execution will default
-        /// to the service provider set in the schema.
+        /// If set, sets the service scope to be used for scoped services during this request.
         /// </summary>
         public IServiceProvider Services { get; set; }
     }
