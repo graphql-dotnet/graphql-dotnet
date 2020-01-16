@@ -223,6 +223,10 @@ namespace GraphQL
         protected virtual GraphQL.Language.AST.Operation GetOperation(string operationName, GraphQL.Language.AST.Document document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
+    public static class DocumentWriterExtensions
+    {
+        public static System.Threading.Tasks.Task<string> WriteToStringAsync<T>(this GraphQL.IDocumentWriter writer, T value) { }
+    }
     public static class EnumerableExtensions
     {
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
@@ -243,8 +247,10 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception exception) { }
         public string Code { get; set; }
+        public System.Collections.Generic.IEnumerable<string> Codes { get; }
         public override System.Collections.IDictionary Data { get; }
         public System.Collections.Generic.Dictionary<string, object> DataAsDictionary { get; }
+        public bool HasCodes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<string> Path { get; set; }
         public void AddLocation(int line, int column) { }
@@ -285,7 +291,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> ValidationRules { get; set; }
     }
-    [Newtonsoft.Json.JsonConverter(typeof(GraphQL.ExecutionResultJsonConverter))]
     public class ExecutionResult
     {
         public ExecutionResult() { }
@@ -298,14 +303,6 @@ namespace GraphQL
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
         public string Query { get; set; }
-    }
-    public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
-    {
-        public ExecutionResultJsonConverter() { }
-        public override bool CanRead { get; }
-        public override bool CanConvert(System.Type objectType) { }
-        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
-        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -361,6 +358,10 @@ namespace GraphQL
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(System.Action<GraphQL.ExecutionOptions> configure);
+    }
+    public interface IDocumentWriter
+    {
+        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value);
     }
     public class Inputs : System.Collections.Generic.Dictionary<string, object>
     {
@@ -425,16 +426,12 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
-        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IDocumentWriter documentWriter, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
     public static class StringExtensions
     {
-        public static object GetValue(this object value) { }
         public static string ToCamelCase(this string s) { }
-        public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
         public static string ToFormat(this string format, params object[] args) { }
-        public static GraphQL.Inputs ToInputs(this string json) { }
-        public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
         public static string ToPascalCase(this string s) { }
     }
     public static class TypeExtensions
@@ -622,49 +619,8 @@ namespace GraphQL.Execution
         public override object ToValue() { }
     }
 }
-namespace GraphQL.Http
-{
-    public class DocumentWriter : GraphQL.Http.IDocumentWriter
-    {
-        public DocumentWriter() { }
-        public DocumentWriter(bool indent) { }
-        public DocumentWriter(Newtonsoft.Json.Formatting formatting, Newtonsoft.Json.JsonSerializerSettings settings) { }
-        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value) { }
-    }
-    public static class DocumentWriterExtensions
-    {
-        public static System.Threading.Tasks.Task<string> WriteToStringAsync<T>(this GraphQL.Http.IDocumentWriter writer, T value) { }
-    }
-    public class HttpResponseStreamWriter : System.IO.TextWriter
-    {
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding) { }
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding, int bufferSize) { }
-        public HttpResponseStreamWriter(System.IO.Stream stream, System.Text.Encoding encoding, int bufferSize, System.Buffers.ArrayPool<byte> bytePool, System.Buffers.ArrayPool<char> charPool) { }
-        public override System.Text.Encoding Encoding { get; }
-        protected override void Dispose(bool disposing) { }
-        public override void Flush() { }
-        public override System.Threading.Tasks.Task FlushAsync() { }
-        public override void Write(char value) { }
-        public override void Write(char[] values, int index, int count) { }
-        public override void Write(string value) { }
-        public override System.Threading.Tasks.Task WriteAsync(char value) { }
-        public override System.Threading.Tasks.Task WriteAsync(char[] values, int index, int count) { }
-        public override System.Threading.Tasks.Task WriteAsync(string value) { }
-    }
-    public interface IDocumentWriter
-    {
-        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value);
-    }
-    public class JsonArrayPool : Newtonsoft.Json.IArrayPool<char>
-    {
-        public JsonArrayPool(System.Buffers.ArrayPool<char> inner) { }
-        public char[] Rent(int minimumLength) { }
-        public void Return(char[] array) { }
-    }
-}
 namespace GraphQL.Instrumentation
 {
-    [Newtonsoft.Json.JsonObject(NamingStrategyType=typeof(Newtonsoft.Json.Serialization.CamelCaseNamingStrategy))]
     public class ApolloTrace
     {
         public ApolloTrace(System.DateTime start, double durationMs) { }
@@ -676,13 +632,11 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Validation { get; }
         public int Version { get; }
         public static long ConvertTime(double ms) { }
-        [Newtonsoft.Json.JsonObject(NamingStrategyType=typeof(Newtonsoft.Json.Serialization.CamelCaseNamingStrategy))]
         public class ExecutionTrace
         {
             public ExecutionTrace() { }
             public System.Collections.Generic.List<GraphQL.Instrumentation.ApolloTrace.ResolverTrace> Resolvers { get; }
         }
-        [Newtonsoft.Json.JsonObject(NamingStrategyType=typeof(Newtonsoft.Json.Serialization.CamelCaseNamingStrategy))]
         public class OperationTrace
         {
             public OperationTrace() { }
