@@ -613,12 +613,12 @@ namespace GraphQL.Tests.Utilities
             return source != null;
         }
 
-        public string Resolve(ResolveFieldContext context)
+        public string Resolve(IResolveFieldContext context)
         {
             return "Resolved";
         }
 
-        public string ResolveWithParam(ResolveFieldContext context, string id)
+        public string ResolveWithParam(IResolveFieldContext context, string id)
         {
             return $"Resolved {id}";
         }
@@ -633,12 +633,12 @@ namespace GraphQL.Tests.Utilities
             return $"{context.Name} {id}";
         }
 
-        public bool Three(ResolveFieldContext resolveContext, object source, MyUserContext context)
+        public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
         {
             return resolveContext != null && context != null && source != null;
         }
 
-        public bool Four(ResolveFieldContext resolveContext, object source, MyUserContext context, int id)
+        public bool Four(IResolveFieldContext resolveContext, object source, MyUserContext context, int id)
         {
             return resolveContext != null && context != null && source != null && id != 0;
         }
