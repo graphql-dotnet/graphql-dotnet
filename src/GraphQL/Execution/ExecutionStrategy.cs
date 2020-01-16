@@ -148,7 +148,7 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path = null)
         {
             path ??= AppendPath(parent.Path, field.Name);
 

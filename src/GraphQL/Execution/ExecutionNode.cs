@@ -12,7 +12,7 @@ namespace GraphQL.Execution
         public IGraphType GraphType { get; }
         public Field Field { get; }
         public FieldType FieldDefinition { get; }
-        public string[] Path { get; protected set; }
+        public IEnumerable<string> Path { get; protected set; }
 
         public string Name => Field?.Alias ?? Field?.Name;
 
@@ -36,7 +36,7 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path)
         {
             Parent = parent;
             GraphType = graphType;
@@ -70,7 +70,7 @@ namespace GraphQL.Execution
     {
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
-        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
+        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path)
             : base(parent, graphType, field, fieldDefinition, path)
         {
         }
@@ -126,7 +126,7 @@ namespace GraphQL.Execution
     {
         public IList<ExecutionNode> Items { get; set; }
 
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
+        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path)
             : base(parent, graphType, field, fieldDefinition, path)
         {
 
@@ -168,7 +168,7 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
+        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path)
             : base(parent, graphType, field, fieldDefinition, path)
         {
 

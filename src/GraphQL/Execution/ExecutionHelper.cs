@@ -446,15 +446,11 @@ namespace GraphQL.Execution
             return CollectFields(context, fieldType, field.SelectionSet);
         }
 
-        public static string[] AppendPath(string[] path, string pathSegment)
+        public static IEnumerable<string> AppendPath(IEnumerable<string> path, string pathSegment)
         {
-            var newPath = new string[path.Length + 1];
-
-            path.CopyTo(newPath, 0);
-
-            newPath[path.Length] = pathSegment;
-
-            return newPath;
+            foreach (var item in path) yield return item;
+            yield return pathSegment;
         }
     }
+
 }
