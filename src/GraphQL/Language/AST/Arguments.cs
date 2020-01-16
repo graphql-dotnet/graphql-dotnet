@@ -1,4 +1,3 @@
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,7 +47,7 @@ namespace GraphQL.Language.AST
         public IEnumerator<Argument> GetEnumerator()
         {
             if (_arguments == null)
-                return EmptyEnumerator<Argument>.Instance;
+                return System.Linq.Enumerable.Empty<Argument>().GetEnumerator();
 
             return _arguments.GetEnumerator();
         }

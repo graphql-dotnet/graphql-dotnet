@@ -1,7 +1,7 @@
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -73,7 +73,7 @@ namespace GraphQL.Types
         public IEnumerator<QueryArgument> GetEnumerator()
         {
             if (ArgumentsList == null)
-                return EmptyEnumerator<QueryArgument>.Instance;
+                return System.Linq.Enumerable.Empty<QueryArgument>().GetEnumerator();
 
             return ArgumentsList.GetEnumerator();
         }

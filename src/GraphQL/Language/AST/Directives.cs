@@ -1,4 +1,3 @@
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace GraphQL.Language.AST
         public IEnumerator<Directive> GetEnumerator()
         {
             if (_directives == null)
-                return EmptyEnumerator<Directive>.Instance;
+                return System.Linq.Enumerable.Empty<Directive>().GetEnumerator();
 
             return _directives.GetEnumerator();
         }
