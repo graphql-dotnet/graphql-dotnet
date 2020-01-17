@@ -3,8 +3,8 @@ namespace GraphQL.NewtonsoftJson
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
-        public DocumentWriter(bool indent) { }
         public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings settings) { }
+        public DocumentWriter(bool indent) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value) { }
     }
     public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
@@ -29,7 +29,7 @@ namespace GraphQL.NewtonsoftJson
     {
         public static object GetValue(this object value) { }
         public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
-        public static GraphQL.Inputs ToInputs(this string json) { }
         public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
+        public static GraphQL.Inputs ToInputs(this string json) { }
     }
 }
