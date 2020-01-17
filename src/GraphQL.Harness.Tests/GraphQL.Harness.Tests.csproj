@@ -1,13 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
   
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alba" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.All" />
+    <PackageReference Include="Alba" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
