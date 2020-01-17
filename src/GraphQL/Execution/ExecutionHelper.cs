@@ -222,7 +222,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments)
+            foreach (var arg in definitionArguments.ArgumentsList)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -314,7 +314,7 @@ namespace GraphQL.Execution
         {
             if (selectionSet != null)
             {
-                foreach (var selection in selectionSet.Selections)
+                foreach (var selection in selectionSet.SelectionsList)
                 {
                     if (selection is Field field)
                     {
@@ -357,7 +357,6 @@ namespace GraphQL.Execution
 
                         CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
-
                 }
             }
 

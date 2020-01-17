@@ -92,7 +92,7 @@ namespace GraphQL.Validation
             {
                 var set = setsToVisit.Pop();
 
-                foreach (var selection in set.Selections)
+                foreach (var selection in set.SelectionsList)
                 {
                     if (selection is FragmentSpread spread)
                     {

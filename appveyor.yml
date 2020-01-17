@@ -17,7 +17,7 @@ nuget:
 
 install:
   - ps: Install-Product node LTS
-  - ps: choco install dotnetcore-sdk --no-progress --confirm --version 2.2.401
+  - ps: choco install dotnetcore-sdk --no-progress --confirm --version 3.0.100
   - node --version
   - npm --version
   - dotnet --version

@@ -124,7 +124,7 @@ namespace GraphQL.Execution
 
     public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     {
-        public IList<ExecutionNode> Items { get; set; }
+        public List<ExecutionNode> Items { get; set; }
 
         public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, IEnumerable<string> path)
             : base(parent, graphType, field, fieldDefinition, path)

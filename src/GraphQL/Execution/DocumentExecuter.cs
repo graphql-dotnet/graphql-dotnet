@@ -152,7 +152,7 @@ namespace GraphQL
                     options.UnhandledExceptionDelegate,
                     options.MaxParallelExecutionCount);
 
-                if (context.Errors.Any())
+                if (context.Errors.Count > 0)
                 {
                     return new ExecutionResult
                     {
@@ -164,11 +164,12 @@ namespace GraphQL
 
                 using (metrics.Subject("execution", "Executing operation"))
                 {
-                    foreach (var listener in context.Listeners)
-                    {
-                        await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
-                            .ConfigureAwait(false);
-                    }
+                    if (context.Listeners != null)
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
+                                .ConfigureAwait(false);
+                        }
 
                     IExecutionStrategy executionStrategy = SelectExecutionStrategy(context);
 
@@ -178,22 +179,24 @@ namespace GraphQL
                     var task = executionStrategy.ExecuteAsync(context)
                         .ConfigureAwait(false);
 
-                    foreach (var listener in context.Listeners)
-                    {
-                        await listener.BeforeExecutionAwaitedAsync(context.UserContext, context.CancellationToken)
-                            .ConfigureAwait(false);
-                    }
+                    if (context.Listeners != null)
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.BeforeExecutionAwaitedAsync(context.UserContext, context.CancellationToken)
+                                .ConfigureAwait(false);
+                        }
 
                     result = await task;
 
-                    foreach (var listener in context.Listeners)
-                    {
-                        await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
-                            .ConfigureAwait(false);
-                    }
+                    if (context.Listeners != null)
+                        foreach (var listener in context.Listeners)
+                        {
+                            await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
+                                .ConfigureAwait(false);
+                        }
                 }
 
-                if (context.Errors.Any())
+                if (context.Errors.Count > 0)
                 {
                     result.Errors = context.Errors;
                 }
@@ -237,7 +240,7 @@ namespace GraphQL
             IDictionary<string, object> userContext,
             CancellationToken cancellationToken,
             Metrics metrics,
-            IEnumerable<IDocumentExecutionListener> listeners,
+            List<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate,
             int? maxParallelExecutionCount)

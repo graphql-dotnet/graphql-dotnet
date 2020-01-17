@@ -30,7 +30,7 @@ namespace GraphQL.Execution
 
         public Metrics Metrics { get; set; }
 
-        public IEnumerable<IDocumentExecutionListener> Listeners { get; set; } = Enumerable.Empty<IDocumentExecutionListener>();
+        public List<IDocumentExecutionListener> Listeners { get; set; }
 
         public bool ThrowOnUnhandledException { get; set; }
 

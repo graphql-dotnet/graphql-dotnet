@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace GraphQL
@@ -371,6 +372,8 @@ namespace GraphQL
             return false;
         }
 
+        private static readonly NullValue _null = new NullValue();
+
         public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
         {
             if (type is NonNullGraphType nonnull)
@@ -380,7 +383,7 @@ namespace GraphQL
 
             if (value == null || type == null)
             {
-                return new NullValue();
+                return _null;
             }
 
             // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
@@ -437,6 +440,7 @@ namespace GraphQL
                 null => null,
                 bool b => new BooleanValue(b),
                 int i => new IntValue(i),
+                BigInteger bi => new BigIntValue(bi),
                 long l => new LongValue(l),
                 decimal @decimal => new DecimalValue(@decimal),
                 double d => new FloatValue(d),

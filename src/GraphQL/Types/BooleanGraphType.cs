@@ -8,6 +8,6 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(bool));
 
-        public override object ParseLiteral(IValue value) => (value as BooleanValue)?.Value;
+        public override object ParseLiteral(IValue value) => ((value as BooleanValue)?.Value).Boxed();
     }
 }
