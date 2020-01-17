@@ -54,7 +54,7 @@ namespace GraphQL.Validation.Rules
                     if (inputType != null && defaultValue != null)
                     {
                         var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
-                        if (errors.Any())
+                        if (errors.Count > 0)
                         {
                             context.ReportError(new ValidationError(
                                 context.OriginalQuery,

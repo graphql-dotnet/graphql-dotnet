@@ -4,10 +4,7 @@ namespace GraphQL.Language.AST
     {
         object IValue.Value => null;
 
-        public override string ToString()
-        {
-            return "null";
-        }
+        public override string ToString() => "null";
 
         public override bool IsEqualTo(INode obj)
         {

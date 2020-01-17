@@ -54,11 +54,11 @@ namespace GraphQL.Execution
                 currentTasks.Clear();
 
                 // Add child nodes to pending nodes to execute the next level in parallel
-                foreach (var childNode in completedNodes
-                    .OfType<IParentExecutionNode>()
-                    .SelectMany(x => x.GetChildNodes()))
+                foreach (var node in completedNodes)
+                    if (node is IParentExecutionNode p)
                 {
-                    pendingNodes.Enqueue(childNode);
+                    foreach (var childNode in p.GetChildNodes())
+                        pendingNodes.Enqueue(childNode);
                 }
             }
         }

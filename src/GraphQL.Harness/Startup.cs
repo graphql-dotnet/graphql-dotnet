@@ -1,5 +1,5 @@
 using Example;
-using GraphQL.Http;
+using GraphQL.NewtonsoftJson;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;

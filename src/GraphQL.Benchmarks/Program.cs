@@ -37,5 +37,4 @@ namespace GraphQL.Benchmarks
             Console.ReadLine();
         }
     }
-
 }

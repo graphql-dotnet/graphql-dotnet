@@ -6,14 +6,8 @@ namespace GraphQL.Language.AST
     public class FragmentSpread : AbstractNode, IFragment
     {
         public FragmentSpread(NameNode node)
-            : this()
         {
             NameNode = node;
-        }
-
-        public FragmentSpread()
-        {
-            Directives = new Directives();
         }
 
         public string Name => NameNode?.Name;

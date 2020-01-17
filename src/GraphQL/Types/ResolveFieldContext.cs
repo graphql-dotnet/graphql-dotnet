@@ -3,7 +3,6 @@ using GraphQL.Language.AST;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Field = GraphQL.Language.AST.Field;
 using GraphQL.Execution;
 
@@ -21,7 +20,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType ParentType { get; set; }
 
-        public Dictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, object> Arguments { get; set; }
 
         public object RootValue { get; set; }
 
@@ -76,7 +75,6 @@ namespace GraphQL.Types
             SubFields = context.SubFields;
             Path = context.Path;
         }
-
     }
 
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>

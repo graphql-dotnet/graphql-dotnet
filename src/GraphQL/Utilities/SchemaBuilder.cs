@@ -80,7 +80,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
         {
-            if (Directives.Any())
+            if (Directives.Count > 0)
             {
                 _visitorSelectors.Add(new DirectiveVisitorSelector(Directives, t => (SchemaDirectiveVisitor)ServiceProvider.GetRequiredService(t)));
             }

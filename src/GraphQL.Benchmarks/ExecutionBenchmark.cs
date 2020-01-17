@@ -33,6 +33,7 @@ namespace GraphQL.Benchmarks
 
             _provider = services.BuildServiceProvider();
             _schema = _provider.GetRequiredService<ISchema>();
+            //_schema = new SchemaForIntrospection();
             _executer = new DocumentExecuter();
         }
 

@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
             if (suggestedTypeNames != null)
             {
                 var suggestedTypeNamesList = suggestedTypeNames.ToList();
-                if (suggestedTypeNamesList.Any())
+                if (suggestedTypeNamesList.Count > 0)
                 {
                     var suggestions = StringUtils.QuotedOrList(suggestedTypeNamesList);
                     message += $" Did you mean to use an inline fragment on {suggestions}?";
@@ -40,7 +40,7 @@ namespace GraphQL.Validation.Rules
             if (suggestedFieldNames != null)
             {
                 var suggestedFieldNamesList = suggestedFieldNames.ToList();
-                if (suggestedFieldNamesList.Any())
+                if (suggestedFieldNamesList.Count > 0)
                 {
                     message += $" Did you mean {StringUtils.QuotedOrList(suggestedFieldNamesList)}?";
                 }
@@ -69,7 +69,7 @@ namespace GraphQL.Validation.Rules
                             var suggestedTypeNames = GetSuggestedTypeNames(context.Schema, type, fieldName).ToList();
 
                             // If there are no suggested types, then perhaps this was a typo?
-                            var suggestedFieldNames = suggestedTypeNames.Any()
+                            var suggestedFieldNames = suggestedTypeNames.Count > 0
                                 ? Array.Empty<string>()
                                 : GetSuggestedFieldNames(type, fieldName);
 
