@@ -33,10 +33,10 @@ namespace GraphQL.Validation.Rules
                                 context.OriginalQuery,
                                 RuleCode,
                                 InvalidNumberOfRootFieldMessage(operation.Name),
-                                operation.SelectionSet.Selections.Skip(1).ToArray()));
+                                operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
                     }
 
-                    var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
+                    var fragment = operation.SelectionSet.SelectionsList.FirstOrDefault(IsFragment);
 
                     if (fragment == null)
                     {

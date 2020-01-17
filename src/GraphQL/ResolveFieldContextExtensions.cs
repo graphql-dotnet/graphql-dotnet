@@ -10,38 +10,50 @@ namespace GraphQL
     {
         public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
         {
-            return (TType)context.GetArgument(typeof(TType), name, defaultValue);
+            bool exists = context.TryGetArgument(typeof(TType), name, out object result);
+            return exists
+                ? result == null && typeof(TType).IsValueType ? defaultValue : (TType)result
+                : defaultValue;
         }
 
         public static object GetArgument(this IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null)
+        {
+            bool exists = context.TryGetArgument(argumentType, name, out object result);
+            return exists
+                ? result == null && argumentType.IsValueType ? defaultValue : result
+                : defaultValue;
+        }
+
+        private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
         {
             var argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
-                return defaultValue;
+                result = null;
+                return false;
             }
 
             if (arg is Dictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
-                    return arg;
+                {
+                    result = arg;
+                    return true;
+                }
 
                 if (argumentType.IsPrimitive())
                     throw new InvalidOperationException($"Could not read primitive type '{argumentType.FullName}' from complex argument '{argumentName}'");
 
-                return inputObject.ToObject(argumentType);
+                result = inputObject.ToObject(argumentType);
+                return true;
             }
 
-            var result = arg.GetPropertyValue(argumentType);
-
-            return result == null && argumentType.IsValueType ? defaultValue : result;
+            result = arg.GetPropertyValue(argumentType);
+            return true;
         }
 
-        public static bool HasArgument(this IResolveFieldContext context, string argumentName)
-        {
-            return context.Arguments?.ContainsKey(argumentName) ?? false;
-        }
+        public static bool HasArgument(this IResolveFieldContext context, string argumentName) => context.Arguments?.ContainsKey(argumentName) ?? false;
 
         internal static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
         {
