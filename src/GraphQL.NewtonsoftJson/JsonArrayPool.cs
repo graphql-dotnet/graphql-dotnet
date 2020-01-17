@@ -1,9 +1,9 @@
 using System.Buffers;
 using Newtonsoft.Json;
 
-namespace GraphQL.Http
+namespace GraphQL.NewtonsoftJson
 {
-    public class JsonArrayPool : IArrayPool<char>
+    internal class JsonArrayPool : IArrayPool<char>
     {
         private readonly ArrayPool<char> _inner;
 

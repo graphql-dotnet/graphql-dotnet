@@ -1,6 +1,6 @@
 using GraphQL;
-using GraphQL.Http;
 using GraphQL.Instrumentation;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

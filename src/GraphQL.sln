@@ -77,6 +77,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Benchmarks", "GraphQL.Benchmarks\GraphQL.Benchmarks.csproj", "{03D461E6-BB99-4802-9CD6-63430E6C449A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +123,14 @@ Global
 		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03D461E6-BB99-4802-9CD6-63430E6C449A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03D461E6-BB99-4802-9CD6-63430E6C449A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03D461E6-BB99-4802-9CD6-63430E6C449A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03D461E6-BB99-4802-9CD6-63430E6C449A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
