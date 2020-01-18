@@ -109,7 +109,7 @@ namespace GraphQL.Utilities.Federation
         public string PrintFederatedSchema()
         {
             return PrintFilteredSchema(
-                directiveName => !directiveName.IsSpecDirective() && !IsFederatedDirective(directiveName),
+                directiveName => !directiveName.IsBuiltInDirective() && !IsFederatedDirective(directiveName),
                 typeName => !IsFederatedType(typeName) && IsDefinedType(typeName));
         }
 

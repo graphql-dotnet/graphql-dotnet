@@ -42,7 +42,7 @@ namespace GraphQL
             return _builtInScalars.Contains(typeName);
         }
 
-        public static bool IsSpecDirective(this string directiveName)
+        public static bool IsBuiltInDirective(this string directiveName)
         {
             return _builtInDirectives.Contains(directiveName);
         }

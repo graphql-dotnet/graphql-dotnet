@@ -25,12 +25,12 @@ namespace GraphQL.Utilities
 
         public string Print()
         {
-            return PrintFilteredSchema(n => !n.IsSpecDirective(), IsDefinedType);
+            return PrintFilteredSchema(n => !n.IsBuiltInDirective(), IsDefinedType);
         }
 
         public string PrintIntrospectionSchema()
         {
-            return PrintFilteredSchema(n => n.IsSpecDirective(), IsIntrospectionType);
+            return PrintFilteredSchema(n => n.IsBuiltInDirective(), IsIntrospectionType);
         }
 
         public string PrintFilteredSchema(Func<string, bool> directiveFilter, Func<string, bool> typeFilter)
