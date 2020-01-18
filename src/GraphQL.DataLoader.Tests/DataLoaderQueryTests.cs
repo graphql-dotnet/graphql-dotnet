@@ -195,7 +195,7 @@ mutation {
 }",
                 expected: @"
 {
-    ordersn: [
+    orders: [
     {
         orderId: 1,
         user: {
