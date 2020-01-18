@@ -1,5 +1,6 @@
 using GraphQL.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace GraphQL.Types
@@ -48,7 +49,7 @@ namespace GraphQL.Types
                     NameValidator.ValidateName(name, "type");
 
                     if (IsTypeModifier)
-                        throw new ArgumentOutOfRangeException("A type modifier (List, NonNull) name must be null");
+                        throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
                 }
 
                 _name = name;
@@ -87,7 +88,7 @@ namespace GraphQL.Types
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 
@@ -112,5 +113,6 @@ namespace GraphQL.Types
 
         public Func<Type, IGraphType> ResolveType { get; private set; }
         public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
+        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }

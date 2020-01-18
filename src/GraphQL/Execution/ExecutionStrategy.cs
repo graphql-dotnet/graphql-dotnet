@@ -78,7 +78,7 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
-                subFields[kvp.Key] = node;
+                subFields[name] = node;
             }
 
             parent.SubFields = subFields;
@@ -105,7 +105,7 @@ namespace GraphQL.Execution
 
             foreach (var d in data)
             {
-                var path = AppendPath(parent.Path, (index++).ToString());
+                var path = AppendPath(parent.Path, GetStringIndex(index++));
 
                 if (d != null)
                 {
@@ -148,6 +148,21 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
+        private static string GetStringIndex(int index) => index switch
+        {
+            0 => "0",
+            1 => "1",
+            2 => "2",
+            3 => "3",
+            4 => "4",
+            5 => "5",
+            6 => "6",
+            7 => "7",
+            8 => "8",
+            9 => "9",
+            _ => index.ToString()
+        };
+
         public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
         {
             path ??= AppendPath(parent.Path, field.Name);
@@ -178,35 +193,11 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return node;
 
-            ResolveFieldContext resolveContext = null;
+            IResolveFieldContext resolveContext = null;
 
             try
             {
-                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
-                var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
-
-                resolveContext = new ResolveFieldContext
-                {
-                    FieldName = node.Field.Name,
-                    FieldAst = node.Field,
-                    FieldDefinition = node.FieldDefinition,
-                    ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GetParentType(context.Schema),
-                    Arguments = arguments,
-                    Source = node.Source,
-                    Schema = context.Schema,
-                    Document = context.Document,
-                    Fragments = context.Fragments,
-                    RootValue = context.RootValue,
-                    UserContext = context.UserContext,
-                    Operation = context.Operation,
-                    Variables = context.Variables,
-                    CancellationToken = context.CancellationToken,
-                    Metrics = context.Metrics,
-                    Errors = context.Errors,
-                    Path = node.Path,
-                    SubFields = subFields
-                };
+                resolveContext = new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -315,11 +306,12 @@ namespace GraphQL.Execution
 
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
-            foreach (var listener in context.Listeners)
-            {
-                await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
-                    .ConfigureAwait(false);
-            }
+            if (context.Listeners != null)
+                foreach (var listener in context.Listeners)
+                {
+                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                        .ConfigureAwait(false);
+                }
         }
     }
 }

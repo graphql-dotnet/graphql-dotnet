@@ -12,7 +12,10 @@ namespace GraphQL.Instrumentation
 
         public bool IsActive => _startTimestamp != 0;
 
-        private ValueStopwatch(long startTimestamp) => _startTimestamp = startTimestamp;
+        private ValueStopwatch(long startTimestamp)
+        {
+            _startTimestamp = startTimestamp;
+        }
 
         public static ValueStopwatch StartNew() => new ValueStopwatch(Stopwatch.GetTimestamp());
 

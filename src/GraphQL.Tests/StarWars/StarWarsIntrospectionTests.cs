@@ -263,14 +263,6 @@ namespace GraphQL.Tests.StarWars
                   'kind': 'INTERFACE'
                 },
                 {
-                  'name': 'Episode',
-                  'kind': 'ENUM'
-                },
-                {
-                  'name': 'Human',
-                  'kind': 'OBJECT'
-                },
-                {
                   'name': 'CharacterInterfaceConnection',
                   'kind': 'OBJECT'
                 },
@@ -280,6 +272,14 @@ namespace GraphQL.Tests.StarWars
                 },
                 {
                   'name': 'CharacterInterfaceEdge',
+                  'kind': 'OBJECT'
+                },
+                {
+                  'name': 'Episode',
+                  'kind': 'ENUM'
+                },
+                {
+                  'name': 'Human',
                   'kind': 'OBJECT'
                 },
                 {
@@ -376,7 +376,7 @@ namespace GraphQL.Tests.StarWars
                             'kind': 'SCALAR'
                           }
                         },
-                        'defaultValue': 'null'
+                        'defaultValue': null
                       }
                     ]
                   },
@@ -398,7 +398,7 @@ namespace GraphQL.Tests.StarWars
                             'kind': 'SCALAR'
                           }
                         },
-                        'defaultValue': 'null'
+                        'defaultValue': null
                       }
                     ]
                   }

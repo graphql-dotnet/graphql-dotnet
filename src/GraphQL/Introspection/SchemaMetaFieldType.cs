@@ -40,10 +40,7 @@ namespace GraphQL.Introspection
             Field<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",
-                resolve: context =>
-                {
-                    return context.Schema.Query;
-                });
+                resolve: context => context.Schema.Query);
 
             FieldAsync<__Type>(
                 "mutationType",
@@ -72,10 +69,7 @@ namespace GraphQL.Introspection
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
                 "directives",
                 "A list of all directives supported by this server.",
-                resolve: async context =>
-                {
-                    return await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false);
-                });
+                resolve: async context => await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false));
         }
     }
 }

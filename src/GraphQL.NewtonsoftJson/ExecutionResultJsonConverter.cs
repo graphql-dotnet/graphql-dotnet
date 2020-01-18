@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace GraphQL
+namespace GraphQL.NewtonsoftJson
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {

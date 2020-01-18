@@ -7,7 +7,7 @@ namespace GraphQL.Instrumentation
 {
     public class InstrumentFieldsMiddleware
     {
-        public async Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             var metadata = new Dictionary<string, object>
             {

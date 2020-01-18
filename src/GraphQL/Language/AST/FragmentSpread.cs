@@ -6,14 +6,8 @@ namespace GraphQL.Language.AST
     public class FragmentSpread : AbstractNode, IFragment
     {
         public FragmentSpread(NameNode node)
-            : this()
         {
             NameNode = node;
-        }
-
-        public FragmentSpread()
-        {
-            Directives = new Directives();
         }
 
         public string Name => NameNode?.Name;
@@ -36,7 +30,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
             return Equals((FragmentSpread)obj);

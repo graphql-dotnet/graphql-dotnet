@@ -27,10 +27,7 @@ namespace GraphQL.Introspection
 
                 throw new ExecutionError($"Unknown kind of type: {context.Source}");
             });
-            Field<StringGraphType>("name", resolve: context =>
-            {
-                return ((IGraphType)context.Source).Name;
-            });
+            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
             Field<StringGraphType>("description");
             FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
@@ -115,16 +112,16 @@ namespace GraphQL.Introspection
             });
         }
 
-        private TypeKind KindForInstance(IGraphType type) => type switch
+        private static object KindForInstance(IGraphType type) => type switch
         {
-            EnumerationGraphType _ => TypeKind.ENUM,
-            ScalarGraphType _ => TypeKind.SCALAR,
-            IObjectGraphType _ => TypeKind.OBJECT,
-            IInterfaceGraphType _ => TypeKind.INTERFACE,
-            UnionGraphType _ => TypeKind.UNION,
-            IInputObjectGraphType _ => TypeKind.INPUT_OBJECT,
-            ListGraphType _ => TypeKind.LIST,
-            NonNullGraphType _ => TypeKind.NON_NULL,
+            EnumerationGraphType _ => TypeKindBoxed.ENUM,
+            ScalarGraphType _ => TypeKindBoxed.SCALAR,
+            IObjectGraphType _ => TypeKindBoxed.OBJECT,
+            IInterfaceGraphType _ => TypeKindBoxed.INTERFACE,
+            UnionGraphType _ => TypeKindBoxed.UNION,
+            IInputObjectGraphType _ => TypeKindBoxed.INPUT_OBJECT,
+            ListGraphType _ => TypeKindBoxed.LIST,
+            NonNullGraphType _ => TypeKindBoxed.NON_NULL,
             _ => throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type))
         };
     }

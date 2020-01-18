@@ -16,7 +16,7 @@ namespace GraphQL.Resolvers
             _parameters = _resolver.GetMethodInfo().GetParameters();
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public object Resolve(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_parameters, context);
             return _resolver.DynamicInvoke(arguments);

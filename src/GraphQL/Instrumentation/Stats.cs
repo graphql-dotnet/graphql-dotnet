@@ -37,10 +37,7 @@ namespace GraphQL.Instrumentation
             {
                 _fields.Clear();
 
-                value.Apply(f =>
-                {
-                    _fields[f.Name] = f;
-                });
+                value.Apply(f => _fields[f.Name] = f);
             }
         }
 

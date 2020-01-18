@@ -75,10 +75,7 @@ namespace GraphQL.DataLoader.Tests
 
             await loader.DispatchAsync(cts.Token);
 
-            await Should.ThrowAsync<TaskCanceledException>(async () =>
-            {
-                await task;
-            });
+            await Should.ThrowAsync<TaskCanceledException>(task);
 
             mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
         }
@@ -103,10 +100,7 @@ namespace GraphQL.DataLoader.Tests
 
             await loader.DispatchAsync(cts.Token);
 
-            await Should.ThrowAsync<TaskCanceledException>(async () =>
-            {
-                await task;
-            });
+            await Should.ThrowAsync<TaskCanceledException>(task);
 
             // Fetch delegate should not be called
             mock.VerifyNoOtherCalls();
@@ -132,10 +126,7 @@ namespace GraphQL.DataLoader.Tests
 
             await loader.DispatchAsync();
 
-            var ex = await Should.ThrowAsync<Exception>(async () =>
-            {
-                await task;
-            });
+            var ex = await Should.ThrowAsync<Exception>(task);
 
             ex.Message.ShouldBe("Deferred");
         }
@@ -146,10 +137,7 @@ namespace GraphQL.DataLoader.Tests
             var mock = new Mock<IUsersStore>();
 
             mock.Setup(store => store.GetAllUsersAsync(default))
-                .Returns(() =>
-                {
-                    throw new Exception("Immediate");
-                });
+                .Returns(() => throw new Exception("Immediate"));
 
             var usersStore = mock.Object;
 
@@ -158,10 +146,7 @@ namespace GraphQL.DataLoader.Tests
             var task = loader.LoadAsync();
             await loader.DispatchAsync();
 
-            var ex = await Should.ThrowAsync<Exception>(async () =>
-            {
-                await task;
-            });
+            var ex = await Should.ThrowAsync<Exception>(task);
 
             ex.Message.ShouldBe("Immediate");
         }

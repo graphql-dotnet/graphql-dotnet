@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -316,8 +316,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("barks");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Dog;
         }
     }
 
@@ -331,8 +329,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("meows");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Cat;
         }
     }
 
@@ -358,8 +354,6 @@ namespace GraphQL.Tests.Execution
             Field<ListGraphType<NamedType>>("friends");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Person;
         }
     }
 
