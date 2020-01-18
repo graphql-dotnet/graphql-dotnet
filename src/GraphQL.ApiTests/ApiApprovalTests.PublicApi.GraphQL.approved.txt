@@ -327,6 +327,7 @@ namespace GraphQL
         public static bool DoTypesOverlap(this GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
         public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
         public static System.Type GetNamedType(this System.Type type) { }
+        public static bool IsBuiltInDirective(this string directiveName) { }
         public static bool IsBuiltInScalar(this string typeName) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
@@ -335,12 +336,11 @@ namespace GraphQL
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
-        public static bool IsSpecDirective(this string directiveName) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, GraphQL.Types.ISchema schema) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static System.Collections.Generic.IEnumerable<string> IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public static bool References(this GraphQL.Types.ISchema schema, string typeName) { }
+        public static bool Supports(this GraphQL.Types.ISchema schema, string typeName) { }
         public static string TrimGraphQLTypes(this string name) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }

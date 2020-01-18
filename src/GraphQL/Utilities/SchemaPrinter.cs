@@ -60,7 +60,7 @@ namespace GraphQL.Utilities
 
         public virtual bool IsDefinedType(string typeName)
         {
-            return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar() && Schema.References(typeName);
+            return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar() && Schema.Supports(typeName);
         }
 
         public bool IsIntrospectionType(string typeName)

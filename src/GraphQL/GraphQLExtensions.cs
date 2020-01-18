@@ -494,20 +494,32 @@ namespace GraphQL
             }
         }
 
-
-        public static bool References(this ISchema schema, string typeName)
+        /// <summary>
+        /// From http://spec.graphql.org/June2018/#sec-Schema:
+        ///
+        /// A schema is defined in terms of the types and directives it supports as well as the root operation
+        /// types for each kind of operation
+        /// 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="typeName"></param>
+        /// <returns> <c>true</c> if the provided schema supports <paramref name="typeName"/>, otherwise <c>false</c>. </returns>
+        public static bool Supports(this ISchema schema, string typeName)
         {
             if (string.IsNullOrEmpty(typeName))
                 return false;
 
             if (!schema.Initialized)
                 schema.Initialize();
-
+        
             if (schema.Query?.Name == typeName || schema.Mutation?.Name == typeName || schema.Subscription?.Name == typeName)
                 return true;
 
             foreach (var directive in schema.Directives)
             {
+                if (directive.Name == typeName)
+                    return true;
+
                 if (directive.Arguments != null)
                     foreach (var arg in directive.Arguments)
                     {
