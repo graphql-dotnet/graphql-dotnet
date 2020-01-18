@@ -60,6 +60,8 @@ namespace GraphQL.Utilities
 
         public virtual bool IsDefinedType(string typeName)
         {
+            // From spec:
+            // When representing a GraphQL schema using the type system definition language, all built‐in scalars must be omitted for brevity.
             return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar() && Schema.Supports(typeName);
         }
 

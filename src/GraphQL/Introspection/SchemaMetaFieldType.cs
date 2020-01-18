@@ -32,7 +32,7 @@ namespace GraphQL.Introspection
                 resolve: async context =>
                 {
                     return await context.Schema.AllTypes
-                        .Where(x => x.Name.StartsWith("__", StringComparison.InvariantCulture) || x.Name.IsBuiltInScalar() || context.Schema.Supports(x.Name))
+                        .Where(x => x.Name.StartsWith("__", StringComparison.InvariantCulture) || context.Schema.Supports(x.Name))
                         .WhereAsync(x => context.Schema.Filter.AllowType(x))
                         .ConfigureAwait(false);
                 });

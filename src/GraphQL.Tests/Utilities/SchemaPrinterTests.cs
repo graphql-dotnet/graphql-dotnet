@@ -18,6 +18,10 @@ namespace GraphQL.Tests.Utilities
                 "scalar BigInt"
             },
             {
+                "Boolean",
+                "scalar Boolean"
+            },
+            {
                 "Byte",
                 "scalar Byte"
             },
@@ -43,7 +47,19 @@ scalar DateTimeOffset"
             },
             {
                 "Decimal",
-@"scalar Decimal"
+                "scalar Decimal"
+            },
+            {
+                "Float",
+                "scalar Float"
+            },
+            {
+                "ID",
+                "scalar ID"
+            },
+            {
+                "Int",
+                "scalar Int"
             },
             {
                 "Milliseconds",
@@ -65,27 +81,31 @@ scalar Seconds"
             },
             {
                 "Guid",
-                @"scalar Guid"
+                "scalar Guid"
             },
             {
                 "Long",
-                @"scalar Long"
+                "scalar Long"
             },
             {
                 "Short",
-                @"scalar Short"
+                "scalar Short"
+            },
+            {
+                "String",
+                "scalar String"
             },
             {
                 "UShort",
-                @"scalar UShort"
+                "scalar UShort"
             },
             {
                 "UInt",
-                @"scalar UInt"
+                "scalar UInt"
             },
             {
                 "ULong",
-                @"scalar ULong"
+                "scalar ULong"
             }
         };
 
@@ -468,6 +488,8 @@ type Bar implements IFoo {
 
 scalar BigInt
 
+scalar Boolean
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -486,13 +508,19 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Float
+
 scalar Guid
+
+scalar ID
 
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Int
 
 scalar Long
 
@@ -509,6 +537,8 @@ scalar SByte
 scalar Seconds
 
 scalar Short
+
+scalar String
 
 scalar UInt
 
@@ -545,6 +575,8 @@ type Bar implements IFoo & Baaz {
 
 scalar BigInt
 
+scalar Boolean
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -563,13 +595,19 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Float
+
 scalar Guid
+
+scalar ID
 
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Int
 
 scalar Long
 
@@ -586,6 +624,8 @@ scalar SByte
 scalar Seconds
 
 scalar Short
+
+scalar String
 
 scalar UInt
 
@@ -693,6 +733,8 @@ type Bar implements IFoo {
 
 scalar BigInt
 
+scalar Boolean
+
 scalar Byte
 
 # The `Date` scalar type represents a year, month and day in accordance with the
@@ -711,6 +753,8 @@ scalar DateTimeOffset
 
 scalar Decimal
 
+scalar Float
+
 # This is a Foo object type
 type Foo {
   # This is of type String
@@ -721,11 +765,15 @@ type Foo {
 
 scalar Guid
 
+scalar ID
+
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
+
+scalar Int
 
 scalar Long
 
@@ -747,6 +795,8 @@ scalar Seconds
 scalar Short
 
 union SingleUnion = Foo
+
+scalar String
 
 scalar UInt
 
@@ -1132,7 +1182,7 @@ enum __TypeKind {
 
             public override bool IsDefinedType(string typeName)
             {
-                return !IsIntrospectionType(typeName) && !typeName.IsBuiltInScalar();
+                return !IsIntrospectionType(typeName);
             }
         }
     }
