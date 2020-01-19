@@ -32,7 +32,7 @@ namespace GraphQL.Types
             }
 
             var valueAsString = (string)value;
-            if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo,DateTimeStyles.None, out var date))
+            if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
             {
                 return date;
             }
