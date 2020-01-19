@@ -28,7 +28,7 @@ namespace GraphQL.DataLoader
         /// A task that will complete when the DataLoader has been dispatched,
         /// or a completed task if the result is already cached.
         /// </returns>
-        Task<T> LoadAsync();
+        IDataLoaderResult<T> LoadAsync();
     }
 
     /// <summary>
@@ -46,6 +46,6 @@ namespace GraphQL.DataLoader
         /// A task that will complete when the DataLoader has been dispatched,
         /// or a completed task if the result is already cached.
         /// </returns>
-        Task<T> LoadAsync(TKey key);
+        IDataLoaderResult<T> LoadAsync(TKey key);
     }
 }

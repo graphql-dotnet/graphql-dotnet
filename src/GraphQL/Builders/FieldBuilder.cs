@@ -4,6 +4,7 @@ using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using System.Threading.Tasks;
 using GraphQL.Utilities;
+using GraphQL.DataLoader;
 
 namespace GraphQL.Builders
 {
@@ -103,6 +104,16 @@ namespace GraphQL.Builders
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
         {
             return Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
+        }
+
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
+        {
+            return Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+        }
+
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
+        {
+            return Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
         }
 
         public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()

@@ -6,118 +6,47 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class BatchDataLoader<TKey, T> : DataLoaderBase<IDictionary<TKey, T>>, IDataLoader<TKey, T>
+    public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>, IDataLoader<TKey, T>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> _loader;
-        private readonly HashSet<TKey> _pendingKeys;
-        private readonly Dictionary<TKey, T> _cache;
         private readonly T _defaultValue;
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
-            IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default)
+               IEqualityComparer<TKey> keyComparer = null,
+               T defaultValue = default) : base(keyComparer)
         {
-            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
-
-            keyComparer ??= EqualityComparer<TKey>.Default;
-
-            _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+            _loader = loader;
             _defaultValue = defaultValue;
         }
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default)
+            T defaultValue = default) : base(keyComparer)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
-
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            keyComparer ??= EqualityComparer<TKey>.Default;
-
-            async Task<IDictionary<TKey, T>> LoadAndMapToDictionary(IEnumerable<TKey> keys, CancellationToken cancellationToken)
+            _loader = async (keys, cancellationToken) =>
             {
-                var values = await loader(keys, cancellationToken).ConfigureAwait(false);
-                return values.ToDictionary(keySelector, keyComparer);
-            }
-
-            _loader = LoadAndMapToDictionary;
-            _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+                var ret = await loader(keys, cancellationToken);
+                return ret.ToDictionary(keySelector);
+            };
             _defaultValue = defaultValue;
         }
 
-        public async Task<T> LoadAsync(TKey key)
+        protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken)
         {
-            lock (_cache)
+            var keys = list.Select(x => x.Key);
+            var dictionary = await _loader(keys, cancellationToken);
+            foreach (var item in list)
             {
-                // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out T cacheValue))
-                {
-                    return cacheValue;
-                }
-
-                // Otherwise add to pending keys
-                if (!_pendingKeys.Contains(key))
-                {
-                    _pendingKeys.Add(key);
-                }
+                if (!dictionary.TryGetValue(item.Key, out var value))
+                    value = _defaultValue;
+                item.SetResult(value);
             }
-
-            var result = await DataLoaded.ConfigureAwait(false);
-
-            if (result.TryGetValue(key, out T value))
-            {
-                return value;
-            }
-            else
-            {
-                return _defaultValue;
-            }
-        }
-
-        protected override bool IsFetchNeeded()
-        {
-            lock (_cache)
-            {
-                return _pendingKeys.Count > 0;
-            }
-        }
-
-        protected override async Task<IDictionary<TKey, T>> FetchAsync(CancellationToken cancellationToken)
-        {
-            IList<TKey> keys;
-
-            lock (_cache)
-            {
-                // Get pending keys and clear pending list
-                keys = _pendingKeys.ToArray();
-                _pendingKeys.Clear();
-            }
-
-            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
-
-            // Populate cache
-            lock (_cache)
-            {
-                foreach (TKey key in keys)
-                {
-                    if (dictionary.TryGetValue(key, out T value))
-                    {
-                        _cache[key] = value;
-                    }
-                    else
-                    {
-                        _cache[key] = _defaultValue;
-                    }
-                }
-            }
-
-            return dictionary;
         }
     }
 }

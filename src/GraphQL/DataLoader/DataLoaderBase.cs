@@ -1,52 +1,94 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public abstract class DataLoaderBase<T> : IDataLoader
+    public abstract partial class DataLoaderBase<TKey, T>: IDataLoader
     {
-        protected abstract Task<T> FetchAsync(CancellationToken cancellationToken);
+        //this class is designed to support multithreaded operation
+        //it also supports adding more items after LoadAsync has been called,
+        //  and calling LoadAsync will then load those items
 
-        protected Task<T> DataLoaded => _completionSource.Task;
-        private TaskCompletionSource<T> _completionSource = CreateCompletionsSource();
+        private DataLoaderList _list;
+        private readonly Dictionary<TKey, DataLoaderPair<TKey, T>> _cachedList;
+        private readonly object _sync = new object();
+        protected internal readonly IEqualityComparer<TKey> EqualityComparer;
 
-        private static TaskCompletionSource<T> CreateCompletionsSource() => new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+        public DataLoaderBase() : this(true, null) { }
+        public DataLoaderBase(bool caching) : this(caching, null) { }
+        public DataLoaderBase(IEqualityComparer<TKey> equalityComparer) : this(true, equalityComparer) { }
 
-        protected abstract bool IsFetchNeeded();
-
-        public async Task DispatchAsync(CancellationToken cancellationToken = default)
+        public DataLoaderBase(bool caching, IEqualityComparer<TKey> equalityComparer)
         {
-            if (!IsFetchNeeded())
-            {
-                return;
-            }
+            EqualityComparer = equalityComparer ?? EqualityComparer<TKey>.Default;
+            if (caching)
+                _cachedList = new Dictionary<TKey, DataLoaderPair<TKey, T>>();
+        }
 
-            var tcs = Interlocked.Exchange(ref _completionSource, CreateCompletionsSource());
+        public virtual IDataLoaderResult<T> LoadAsync(TKey inputValue)
+        {
+            lock (_sync)
+            {
+                //once it enters the lock, it is guaranteed to exit the lock, as it does not depend on external code
+                if (_cachedList != null)
+                {
+                    if (_cachedList.TryGetValue(inputValue, out var ret2))
+                        return ret2;
+                }
+                else if (_list != null)
+                {
+                    if (_list.TryGetValue(inputValue, out var ret2))
+                        return ret2;
+                }
+                else
+                {
+                    _list = new DataLoaderList(this);
+                }
+                var ret = new DataLoaderPair<TKey, T>(_list, inputValue);
+                _list.Add(inputValue, ret);
+                _cachedList?.Add(inputValue, ret);
+                return ret;
+            }
+        }
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                // If cancellation has been requested already,
-                // set the task to cancelled without calling FetchAsync()
-                tcs.TrySetCanceled();
-                return;
-            }
+        public static IDataLoaderResult<T> FromResult(T outputValue) => new DataLoaderResult<T>(Task.FromResult(outputValue));
 
-            try
-            {
-                var result = await FetchAsync(cancellationToken)
-                    .ConfigureAwait(false);
+        public static IDataLoaderResult<T> FromResult(Task<T> outputTask) => new DataLoaderResult<T>(outputTask);
 
-                tcs.SetResult(result);
-            }
-            catch (OperationCanceledException)
+        //this function may be called on multiple threads only if IDataLoader.LoadAsync
+        //  is called on multiple threads for different lists of queued items
+        //it will never be called on multiple threads for the same list of items
+        protected abstract Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken);
+
+        private Task StartLoading(DataLoaderList listToLoad, CancellationToken cancellationToken)
+        {
+            if (listToLoad == null)
+                throw new ArgumentNullException(nameof(listToLoad));
+            lock (_sync)
             {
-                tcs.TrySetCanceled();
+                //once it enters the lock, it is guaranteed to exit the lock, as it does not depend on external code
+                if (_list == listToLoad)
+                    _list = null;
             }
-            catch (Exception ex)
+            return FetchAsync(listToLoad.Values, cancellationToken);
+        }
+
+        public Task DispatchAsync(CancellationToken cancellationToken = default)
+        {
+            //start loading the currently queued items
+            DataLoaderList listToLoad;
+            lock (_sync)
             {
-                tcs.SetException(ex);
+                //once it enters the lock, it is guaranteed to exit the lock, as it does not depend on external code
+                //cannot use Interlocked.Exchange here because that can execute during another lock
+                listToLoad = _list;
+                _list = null;
             }
+            if (listToLoad == null)
+                return Task.CompletedTask;
+            return listToLoad.DispatchAsync(cancellationToken);
         }
     }
 }

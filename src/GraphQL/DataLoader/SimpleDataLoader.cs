@@ -4,48 +4,34 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class SimpleDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
+    public class SimpleDataLoader<T> : IDataLoader, IDataLoader<T>, IDataLoaderResult<T>
     {
-        private readonly object _lock = new object();
         private readonly Func<CancellationToken, Task<T>> _loader;
-
-        private Task<T> _cachedTask;
+        private Task<T> _result;
 
         public SimpleDataLoader(Func<CancellationToken, Task<T>> loader)
         {
-            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            _loader = loader;
         }
 
-        public Task<T> LoadAsync()
-        {
-            // Return the cached task if we have one
-            if (_cachedTask != null)
-                return _cachedTask;
+        public Task DispatchAsync(CancellationToken cancellationToken = default) => GetResultAsync(cancellationToken);
 
-            lock (_lock)
+        public Task<T> GetResultAsync(CancellationToken cancellationToken = default)
+        {
+            if (_result != null)
+                return _result;
+
+            lock (this)
             {
-                return _cachedTask ?? DataLoaded;
+                if (_result != null)
+                    return _result;
+
+                return (_result = _loader(cancellationToken));
             }
         }
 
-        protected override bool IsFetchNeeded()
-        {
-            lock (_lock)
-            {
-                // No need to re-fetch if we have a cached task
-                return _cachedTask == null;
-            }
-        }
+        public IDataLoaderResult<T> LoadAsync() => this;
 
-        protected override Task<T> FetchAsync(CancellationToken cancellationToken)
-        {
-            lock (_lock)
-            {
-                // Cache the task
-                _cachedTask = _loader(cancellationToken);
-            }
-
-            return _cachedTask;
-        }
+        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken);
     }
 }
