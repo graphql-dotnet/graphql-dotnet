@@ -289,7 +289,6 @@ mutation {
             ordersMock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1, 2 }, default), Times.Once);
             ordersMock.Verify(x => x.GetItemsByOrderIdAsync(new[] { 1, 2, 3, 4 }), Times.Once);
             ordersMock.VerifyNoOtherCalls();
-
         }
 
         [Fact]
