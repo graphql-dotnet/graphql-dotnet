@@ -876,7 +876,7 @@ namespace GraphQL.Validation.Rules
         }
     }
 
-    public static class ISelectionExtensions
+    internal static class ISelectionExtensions
     {
         public static string GetName(this ISelection selection)
         {
@@ -897,10 +897,10 @@ namespace GraphQL.Validation.Rules
         {
             if (selection is Field field)
             {
-                return field.Arguments;
+                return field.Arguments ?? Arguments.Empty;
             }
 
-            return new Arguments();
+            return Arguments.Empty;
         }
 
         public static SelectionSet GetSelectionSet(this ISelection selection)
