@@ -39,7 +39,7 @@ namespace GraphQL.DataLoader.Tests
             usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         }
 
-        [Fact(Skip = "Fails with deadlock due to listener executing before LoadAsync is called")]
+        [Fact(Skip = "Fails with deadlock due to listener executing before LoadAsync is called - issue #945")]
         public void SingleQueryRootWithDelay_Works()
         {
             var users = Fake.Users.Generate(2);
@@ -167,7 +167,7 @@ namespace GraphQL.DataLoader.Tests
             usersMock.VerifyNoOtherCalls();
         }
 
-        [Fact(Skip = "DataLoader does not batch results with SerialExecutionStrategy")]
+        [Fact(Skip = "DataLoader does not batch results with SerialExecutionStrategy - issues #1191 and #837")]
         public void TwoLevel_MultipleResults_OperationsAreBatched_SerialExecution()
         {
             var users = Fake.Users.Generate(2);
@@ -218,6 +218,78 @@ mutation {
 
             usersMock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
             usersMock.VerifyNoOtherCalls();
+        }
+
+        [Fact(Skip = "Chaining dataloaders causes deadlock - issue #1042")]
+        public void Chained_DataLoaders_Works()
+        {
+            var users = Fake.Users.Generate(2);
+            var orders = Fake.GenerateOrdersForUsers(users, 2);
+            var orderItems = Fake.GetItemsForOrders(orders, 2);
+
+            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+            var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
+
+            usersMock.Setup(x => x.GetAllUsersAsync(default))
+                .ReturnsAsync(users);
+
+            ordersMock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(orders.ToLookup(o => o.UserId));
+
+            ordersMock.Setup(x => x.GetItemsByOrderIdAsync(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(orderItems.ToLookup(x => x.OrderId));
+
+            AssertQuerySuccess<DataLoaderTestSchema>(
+                query: @"
+{
+    users {
+        orderedItems {
+            orderItemId
+        }
+    }
+}",
+                expected: @"
+{
+    users: [
+    {
+        orderedItems: [
+        {
+            orderItemId: 1
+        },
+        {
+            orderItemId: 2
+        },
+        {
+            orderItemId: 3
+        },
+        {
+            orderItemId: 4
+        }],
+    },
+    {
+        orderedItems: [
+        {
+            orderItemId: 5
+        },
+        {
+            orderItemId: 6
+        },
+        {
+            orderItemId: 7
+        },
+        {
+            orderItemId: 8
+        }],
+    }]
+}
+");
+            usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
+            usersMock.VerifyNoOtherCalls();
+
+            ordersMock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1, 2 }, default), Times.Once);
+            ordersMock.Verify(x => x.GetItemsByOrderIdAsync(new[] { 1, 2, 3, 4 }), Times.Once);
+            ordersMock.VerifyNoOtherCalls();
+
         }
 
         [Fact]
