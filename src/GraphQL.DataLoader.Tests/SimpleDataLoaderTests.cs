@@ -26,17 +26,18 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var delayResult = loader.LoadAsync();
 
             await loader.DispatchAsync();
 
-            var result1 = await task;
+            var result1 = await delayResult.GetResultAsync();
 
             result1.ShouldNotBeNull();
             result1.Count().ShouldBe(2);
 
             // Load again. Result should be cached
-            var task2 = loader.LoadAsync();
+            var delayResult2 = loader.LoadAsync();
+            var task2 = delayResult2.GetResultAsync();
 
             task2.Status.ShouldBe(TaskStatus.RanToCompletion);
 
@@ -69,11 +70,13 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
             cts.CancelAfter(TimeSpan.FromMilliseconds(5));
 
             await loader.DispatchAsync(cts.Token);
+
+            var task = result.GetResultAsync();
 
             await Should.ThrowAsync<TaskCanceledException>(task);
 
@@ -94,11 +97,13 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
             cts.Cancel();
 
             await loader.DispatchAsync(cts.Token);
+
+            var task = result.GetResultAsync();
 
             await Should.ThrowAsync<TaskCanceledException>(task);
 
@@ -122,9 +127,11 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
             await loader.DispatchAsync();
+
+            var task = result.GetResultAsync();
 
             var ex = await Should.ThrowAsync<Exception>(task);
 
@@ -143,8 +150,9 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
             await loader.DispatchAsync();
+            var task = result.GetResultAsync();
 
             var ex = await Should.ThrowAsync<Exception>(task);
 

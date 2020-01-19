@@ -34,7 +34,7 @@ namespace GraphQL.DataLoader.Tests.Types
                     var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
                         users.GetAllUsersAsync);
 
-                    return await loader.LoadAsync();
+                    return loader.LoadAsync();
                 });
 
             Field<OrderType, Order>()

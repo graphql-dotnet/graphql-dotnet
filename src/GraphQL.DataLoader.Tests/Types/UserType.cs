@@ -30,29 +30,34 @@ namespace GraphQL.DataLoader.Tests.Types
 
             Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
                 .Name("OrderedItems")
-                .ResolveAsync(async ctx =>
+                .Returns<IDataLoaderResult<IDataLoaderResult<IEnumerable<OrderItem>>>>()
+                .Resolve(ctx =>
                 {
                     //obtain a reference to the GetOrdersByUserId batch loader
                     var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
                         orders.GetOrdersByUserIdAsync);
 
                     //wait for dataloader to pull the orders for this user
-                    var orderResults = await ordersLoader.LoadAsync(ctx.Source.UserId);
+                    var ret = ordersLoader.LoadAsync(ctx.Source.UserId).Then(orderResults =>
+                    {
+                        //obtain a reference to the GetOrderItemsById batch loader
+                        var itemsLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
+                            orders.GetItemsByOrderIdAsync);
 
-                    //obtain a reference to the GetOrderItemsById batch loader
-                    var itemsLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
-                        orders.GetItemsByOrderIdAsync);
+                        //wait for dataloader to pull the items for each order
+                        return itemsLoader.LoadAsync(orderResults.Select(o => o.OrderId)).Then(allResults =>
+                        {
+                            //without dataloader, this would be:
+                            //var batchResults = await orders.GetItemsByOrderIdAsync(orderResults.Select(o => o.OrderId));
+                            //var allResults = orderResults.Select(o => batchResults[o.OrderId]);
 
-                    //wait for dataloader to pull the items for each order
-                    var itemsTasks = orderResults.Select(o => itemsLoader.LoadAsync(o.OrderId));
-                    var allResults = await Task.WhenAll(itemsTasks);
+                            //flatten and return the results
+                            return allResults.SelectMany(x => x);
+                        });
 
-                    //without dataloader, this would be:
-                    //var batchResults = await orders.GetItemsByOrderIdAsync(orderResults.Select(o => o.OrderId));
-                    //var allResults = orderResults.Select(o => batchResults[o.OrderId]);
+                    });
 
-                    //flatten and return the results
-                    return allResults.SelectMany(x => x);
+                    return ret;
                 });
         }
     }

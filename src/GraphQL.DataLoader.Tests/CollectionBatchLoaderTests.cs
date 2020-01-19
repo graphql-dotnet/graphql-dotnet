@@ -27,11 +27,14 @@ namespace GraphQL.DataLoader.Tests
             var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
-            var task1 = loader.LoadAsync(1);
-            var task2 = loader.LoadAsync(2);
+            var result1 = loader.LoadAsync(1);
+            var result2 = loader.LoadAsync(2);
 
             // Dispatch loading
             await loader.DispatchAsync();
+
+            var task1 = result1.GetResultAsync();
+            var task2 = result2.GetResultAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -65,11 +68,14 @@ namespace GraphQL.DataLoader.Tests
             var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load by User ID
-            var task1 = loader.LoadAsync(1);
-            var task2 = loader.LoadAsync(2);
+            var result1 = loader.LoadAsync(1);
+            var result2 = loader.LoadAsync(2);
 
             // Dispatch loading
             await loader.DispatchAsync();
+
+            var task1 = result1.GetResultAsync();
+            var task2 = result2.GetResultAsync();
 
             var user1Orders = await task1;
             var user2Orders = await task2;
@@ -83,9 +89,10 @@ namespace GraphQL.DataLoader.Tests
             // Request keys 1 and 2 again. Result should be cached.
             // Key 3 should NOT be cached
 
-            var task1b = loader.LoadAsync(1);
-            var task2b = loader.LoadAsync(2);
-            var task3 = loader.LoadAsync(3);
+            //due to the new dataloader design, these status checks are meaningless
+            var task1b = loader.LoadAsync(1).GetResultAsync();
+            var task2b = loader.LoadAsync(2).GetResultAsync();
+            var task3 = loader.LoadAsync(3).GetResultAsync();
 
             task1b.Status.ShouldBe(TaskStatus.RanToCompletion, "Result should already be cached");
             task2b.Status.ShouldBe(TaskStatus.RanToCompletion, "Result should already be cached");
@@ -128,11 +135,14 @@ namespace GraphQL.DataLoader.Tests
             var loader = new CollectionBatchDataLoader<int, Order>(ordersStore.GetOrdersByUserIdAsync);
 
             // Start async tasks to load duplicate keys
-            var task1 = loader.LoadAsync(1);
-            var task2 = loader.LoadAsync(1);
+            var result1 = loader.LoadAsync(1);
+            var result2 = loader.LoadAsync(1);
 
             // Dispatch loading
             await loader.DispatchAsync();
+
+            var task1 = result1.GetResultAsync();
+            var task2 = result2.GetResultAsync();
 
             // Now await tasks
             var user1Orders = await task1;
