@@ -18,7 +18,7 @@ namespace GraphQL.Types
 
             if (date is DateTime dateTime)
             {
-                return dateTime.ToString("yyyy-MM-dd",CultureInfo.InvariantCulture);
+                return dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
             return null;
