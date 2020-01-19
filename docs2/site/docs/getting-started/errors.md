@@ -6,8 +6,9 @@ which means stack traces are excluded. The `ExecutionResult` is transformed to w
 requires using one or the other `IDocumentWriter`. For example `GraphQL.NewtonsoftJson.DocumentWriter`
 uses JSON.NET and `GraphQL.SystemTextJson.DocumentWriter` uses new .NET Core memory optimized
 serializer from [`System.Text.Json`](https://docs.microsoft.com/en-us/dotnet/api/system.text.json).
-For JSON.NET you can change what information is provided by setting your `ContractResolver` in
-`JsonSerializerSettings` passed to `DocumentWriter` constructor.
+For JSON.NET you can change what information is provided by setting your values (`ContractResolver`,
+`Converters`, etc.) in `JsonSerializerSettings` passed to `DocumentWriter` constructor. Or you
+can implement your own `IDocumentWriter`.
 
 To help debug errors, you can set `ExposeExceptions` on `ExecutionOptions` which will expose error stack traces.
 
