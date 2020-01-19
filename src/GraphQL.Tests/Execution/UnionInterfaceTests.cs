@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using Xunit;
 
@@ -17,7 +19,7 @@ namespace GraphQL.Tests.Execution
             Services.Register<PetType>();
             Services.Register<PersonType>();
 
-            Services.Singleton(new UnionSchema(new FuncDependencyResolver(type => Services.Get(type))));
+            Services.Singleton(new UnionSchema(new SimpleContainerAdapter(Services)));
 
             var garfield = new Cat
             {
@@ -314,8 +316,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("barks");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Dog;
         }
     }
 
@@ -329,8 +329,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("meows");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Cat;
         }
     }
 
@@ -356,17 +354,15 @@ namespace GraphQL.Tests.Execution
             Field<ListGraphType<NamedType>>("friends");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Person;
         }
     }
 
     public class UnionSchema : Schema
     {
-        public UnionSchema(IDependencyResolver resolver)
+        public UnionSchema(IServiceProvider resolver)
             : base(resolver)
         {
-            Query = resolver.Resolve<PersonType>();
+            Query = resolver.GetRequiredService<PersonType>();
         }
     }
 }

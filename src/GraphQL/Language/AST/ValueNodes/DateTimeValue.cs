@@ -9,9 +9,6 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<DateTime> other)
-        {
-            return DateTime.Equals(Value, other.Value);
-        }
+        protected override bool Equals(ValueNode<DateTime> other) => DateTime.Equals(Value, other.Value);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
-using GraphQL.Http;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +60,7 @@ namespace GraphQL.DataLoader.Tests
             string query,
             string expected,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
@@ -81,7 +81,7 @@ namespace GraphQL.DataLoader.Tests
             var schema = Services.GetRequiredService<TSchema>();
 
             // Run the executer within an async context to make sure there are no deadlock issues
-            var runResult = AsyncContext.Run(() => executer.ExecuteAsync((opts) =>
+            var runResult = AsyncContext.Run(() => executer.ExecuteAsync(opts =>
             {
                 options(opts);
                 opts.Schema = schema;
@@ -111,7 +111,7 @@ namespace GraphQL.DataLoader.Tests
             var schema = Services.GetRequiredService<TSchema>();
 
             // Run the executer within an async context to make sure there are no deadlock issues
-            return executer.ExecuteAsync((opts) =>
+            return executer.ExecuteAsync(opts =>
             {
                 opts.Schema = schema;
                 opts.ExposeExceptions = true;
@@ -127,7 +127,7 @@ namespace GraphQL.DataLoader.Tests
             string query,
             ExecutionResult expectedExecutionResult,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {

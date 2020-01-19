@@ -19,7 +19,8 @@ namespace GraphQL.Types
         {
             if (!_possibleTypes.Contains(type))
             {
-                _possibleTypes.Add(type);
+                this.IsValidInterfaceFor(type, throwError: true);
+                _possibleTypes.Add(type ?? throw new ArgumentNullException(nameof(type)));
             }
         }
     }

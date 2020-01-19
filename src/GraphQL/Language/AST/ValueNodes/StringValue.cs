@@ -1,3 +1,5 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
     public class StringValue : ValueNode<string>
@@ -7,9 +9,6 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<string> other)
-        {
-            return string.Equals(Value, other.Value);
-        }
+        protected override bool Equals(ValueNode<string> other) => string.Equals(Value, other.Value, StringComparison.InvariantCulture);
     }
 }

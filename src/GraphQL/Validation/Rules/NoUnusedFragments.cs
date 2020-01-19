@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -17,7 +18,9 @@ namespace GraphQL.Validation.Rules
             return $"Fragment \"{fragName}\" is never used.";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var operationDefs = new List<Operation>();
             var fragmentDefs = new List<FragmentDefinition>();
@@ -29,7 +32,7 @@ namespace GraphQL.Validation.Rules
                 _.Match<Document>(leave: document =>
                 {
                     var fragmentNamesUsed = operationDefs
-                        .SelectMany(op => context.GetRecursivelyReferencedFragments(op))
+                        .SelectMany(context.GetRecursivelyReferencedFragments)
                         .Select(fragment => fragment.Name)
                         .ToList();
 
@@ -44,7 +47,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

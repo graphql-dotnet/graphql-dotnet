@@ -7,9 +7,6 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<bool> other)
-        {
-            return Value == other.Value;
-        }
+        protected override bool Equals(ValueNode<bool> other) => Value == other.Value;
     }
 }

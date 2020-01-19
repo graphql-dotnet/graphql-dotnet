@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Errors
             });
 
             var errors = new ExecutionErrors();
-            var error = new ValidationError(query, code, "Error trying to resolve firstSync.");
+            var error = new ValidationError(query, code, "Error trying to resolve firstSync.", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")));
             error.AddLocation(1, 3);
             error.Path = new[] { "firstSync" };
             errors.Add(error);
@@ -60,7 +60,7 @@ namespace GraphQL.Tests.Errors
                 Name = "Query";
                 Field<StringGraphType>(
                     "firstSync",
-                    resolve: _ => throw new FirstException("Exception from synchronous resolver")
+                    resolve: _ => throw new FirstException("Exception from synchronous resolver", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")))
                 );
                 FieldAsync<StringGraphType>(
                     "firstAsync",
@@ -97,6 +97,11 @@ namespace GraphQL.Tests.Errors
         {
             public FirstException(string message)
                 : base(message)
+            {
+            }
+
+            public FirstException(string message, Exception innerException)
+                : base(message, innerException)
             {
             }
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace GraphQL.Language.AST
 
         public void Add(Operation operation)
         {
-            _operations.Add(operation);
+            _operations.Add(operation ?? throw new ArgumentNullException(nameof(operation)));
         }
 
         public Operation WithName(string operationName)

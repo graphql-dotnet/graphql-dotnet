@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -13,7 +14,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ArgumentsOfCorrectType : IValidationRule
     {
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -24,7 +27,7 @@ namespace GraphQL.Validation.Rules
 
                     var type = argDef.ResolvedType;
                     var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
-                    if (errors.Any())
+                    if (errors.Count > 0)
                     {
                         var error = new ValidationError(
                             context.OriginalQuery,
@@ -34,7 +37,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(error);
                     }
                 });
-            });
+            }).ToTask();
         }
 
         public string BadValueMessage(

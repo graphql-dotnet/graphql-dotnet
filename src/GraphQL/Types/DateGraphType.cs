@@ -1,6 +1,6 @@
+using GraphQL.Language.AST;
 using System;
 using System.Globalization;
-using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -8,7 +8,6 @@ namespace GraphQL.Types
     {
         public DateGraphType()
         {
-            Name = "Date";
             Description = "The `Date` scalar type represents a year, month and day in accordance with the " +
                 "[ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }

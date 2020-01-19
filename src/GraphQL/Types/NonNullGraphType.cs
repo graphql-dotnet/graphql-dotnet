@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace GraphQL.Types
 {
@@ -45,5 +45,7 @@ namespace GraphQL.Types
             context.AddType(name, innerType, context);
             return "{0}!".ToFormat(name);
         }
+
+        public override string ToString() => $"{ResolvedType}!";
     }
 }

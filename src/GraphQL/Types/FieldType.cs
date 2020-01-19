@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using GraphQL.Resolvers;
+using System;
+using System.Diagnostics;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -13,7 +13,8 @@ namespace GraphQL.Types
         QueryArguments Arguments { get; set; }
     }
 
-    public class FieldType : IFieldType
+    [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
+    public class FieldType : MetadataProvider, IFieldType
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -23,26 +24,5 @@ namespace GraphQL.Types
         public IGraphType ResolvedType { get; set; }
         public QueryArguments Arguments { get; set; }
         public IFieldResolver Resolver { get; set; }
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            if (!HasMetadata(key))
-            {
-                return defaultValue;
-            }
-
-            if (Metadata.TryGetValue(key, out var item))
-            {
-                return (TType) item;
-            }
-
-            return defaultValue;
-        }
-
-        public bool HasMetadata(string key)
-        {
-            return Metadata?.ContainsKey(key) ?? false;
-        }
     }
 }

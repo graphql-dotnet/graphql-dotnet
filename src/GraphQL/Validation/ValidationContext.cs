@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Validation
 {
-    public class ValidationContext
+    public class ValidationContext : IProvideUserContext
     {
         private readonly List<ValidationError> _errors = new List<ValidationError>();
 
@@ -25,9 +26,11 @@ namespace GraphQL.Validation
 
         public TypeInfo TypeInfo { get; set; }
 
-        public object UserContext { get; set; }
+        public IDictionary<string, object> UserContext { get; set; }
 
         public IEnumerable<ValidationError> Errors => _errors;
+
+        public bool HasErrors => _errors.Count > 0;
 
         public Inputs Inputs { get; set; }
 
@@ -89,7 +92,7 @@ namespace GraphQL.Validation
             {
                 var set = setsToVisit.Pop();
 
-                foreach (var selection in set.Selections)
+                foreach (var selection in set.SelectionsList)
                 {
                     if (selection is FragmentSpread spread)
                     {

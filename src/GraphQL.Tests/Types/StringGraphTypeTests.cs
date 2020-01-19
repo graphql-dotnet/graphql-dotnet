@@ -20,6 +20,24 @@ namespace GraphQL.Tests.Types
         }
 
         [Fact]
+        public void serializes_int_to_string()
+        {
+            _type.Serialize(1).ShouldBe("1");
+        }
+
+        [Fact]
+        public void serializes_long_to_string()
+        {
+            _type.Serialize(long.MaxValue).ShouldBe($"{long.MaxValue}");
+        }
+
+        [Fact]
+        public void serializes_null_to_null()
+        {
+            _type.Serialize(null).ShouldBeNull();
+        }
+
+        [Fact]
         public void parse_value_keeps__quotes()
         {
             _type.ParseValue("\"one\"").ShouldBe("\"one\"");

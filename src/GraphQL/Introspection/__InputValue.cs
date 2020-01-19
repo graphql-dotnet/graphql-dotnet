@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     {
         public __InputValue()
         {
-            Name = "__InputValue";
+            Name = nameof(__InputValue);
             Description =
                 "Arguments provided to Fields or Directives and the input fields of an " +
                 "InputObject are represented as Input Values which describe their type " +
@@ -21,7 +21,7 @@ namespace GraphQL.Introspection
                 resolve: context =>
                 {
                     var hasDefault = context.Source;
-                    if (context.Source == null) return null;
+                    if (hasDefault?.DefaultValue == null) return null;
 
                     var ast = hasDefault.DefaultValue.AstFromValue(context.Schema, hasDefault.ResolvedType);
                     var result = AstPrinter.Print(ast);

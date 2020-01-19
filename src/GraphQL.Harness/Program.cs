@@ -1,4 +1,3 @@
-using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
@@ -13,11 +12,7 @@ namespace GraphQL.Harness
 
         public static IWebHost BuildWebHost(string[] args)
         {
-            var directory = Directory.GetCurrentDirectory();
-
             return WebHost.CreateDefaultBuilder(args)
-                .UseContentRoot(directory)
-                .UseWebRoot(Path.Combine(directory, "public"))
                 .UseStartup<Startup>()
                 .Build();
         }

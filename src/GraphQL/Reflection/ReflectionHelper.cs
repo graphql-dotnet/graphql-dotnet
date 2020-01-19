@@ -15,10 +15,10 @@ namespace GraphQL.Reflection
         /// <param name="resolverType">defaults to Resolver</param>
         public static IAccessor ToAccessor(this Type type, string field, ResolverType resolverType)
         {
-            if(type == null) return null;
+            if (type == null) return null;
 
             var methodInfo = type.MethodForField(field, resolverType);
-            if(methodInfo != null)
+            if (methodInfo != null)
             {
                 return new SingleMethodAccessor(methodInfo);
             }
@@ -29,7 +29,7 @@ namespace GraphQL.Reflection
             }
 
             var propertyInfo = type.PropertyForField(field);
-            if(propertyInfo != null)
+            if (propertyInfo != null)
             {
                 return new SinglePropertyAccessor(propertyInfo);
             }
@@ -75,14 +75,14 @@ namespace GraphQL.Reflection
             return property;
         }
 
-        public static object[] BuildArguments<T>(ParameterInfo[] parameters,  T context) where T : ResolveFieldContext<object>
+        public static object[] BuildArguments(ParameterInfo[] parameters, IResolveFieldContext context)
         {
             if (parameters == null || parameters.Length == 0) return null;
 
             object[] arguments = new object[parameters.Length];
 
             var index = 0;
-            if (typeof(T) == parameters[index].ParameterType)
+            if (parameters[index].ParameterType.IsAssignableFrom(context.GetType()))
             {
                 arguments[index] = context;
                 index++;
@@ -99,7 +99,7 @@ namespace GraphQL.Reflection
 
             if (parameters.Length > index
                 && context.UserContext != null
-                && context.UserContext?.GetType() == parameters[index].ParameterType)
+                && parameters[index].ParameterType.IsInstanceOfType(context.UserContext))
             {
                 arguments[index] = context.UserContext;
                 index++;

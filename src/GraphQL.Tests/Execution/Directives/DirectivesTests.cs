@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Execution.Directives
@@ -67,6 +67,30 @@ namespace GraphQL.Tests.Execution.Directives
         public void skip_true_omits_scalar()
         {
             AssertQuerySuccess("{a, b @skip(if: true) }", "{a: 'a'}", null, _data);
+        }
+
+        [Fact]
+        public void skip_true_include_true_omits_scalar()
+        {
+            AssertQuerySuccess("{a, b @skip(if: true) @include(if: true) }", "{a: 'a'}", null, _data);
+        }
+
+        [Fact]
+        public void skip_false_include_false_omits_scalar()
+        {
+            AssertQuerySuccess("{a, b @skip(if: false) @include(if: false) }", "{a: 'a'}", null, _data);
+        }
+
+        [Fact]
+        public void skip_true_include_false_omits_scalar()
+        {
+            AssertQuerySuccess("{a, b @skip(if: true) @include(if: false) }", "{a: 'a'}", null, _data);
+        }
+
+        [Fact]
+        public void skip_false_include_true_includes_scalar()
+        {
+            AssertQuerySuccess("{a, b @skip(if: false) @include(if: true) }", "{a: 'a', b: 'b'}", null, _data);
         }
     }
 

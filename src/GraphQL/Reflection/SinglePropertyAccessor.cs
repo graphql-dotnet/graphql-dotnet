@@ -6,7 +6,7 @@ namespace GraphQL.Reflection
 {
     internal class SinglePropertyAccessor : IAccessor
     {
-        private PropertyInfo _getter;
+        private readonly PropertyInfo _getter;
 
         public SinglePropertyAccessor(PropertyInfo getter)
         {

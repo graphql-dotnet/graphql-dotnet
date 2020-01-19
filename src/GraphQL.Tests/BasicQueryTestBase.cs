@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
-using GraphQL.Http;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
 using Shouldly;
@@ -22,8 +22,8 @@ namespace GraphQL.Tests
             string expected,
             Inputs inputs = null,
             object root = null,
-            object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            IDictionary<string, object> userContext = null,
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
@@ -67,8 +67,8 @@ namespace GraphQL.Tests
             ExecutionResult expectedExecutionResult,
             Inputs inputs,
             object root,
-            object userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            IDictionary<string, object> userContext = null,
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var runResult = Executer.ExecuteAsync(_ =>

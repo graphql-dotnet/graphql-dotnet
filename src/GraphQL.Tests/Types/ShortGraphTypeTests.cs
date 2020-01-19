@@ -44,7 +44,7 @@ namespace GraphQL.Tests.Types
     {
         protected readonly T type = new T();
 
-        protected void AssertException<T>(object value) where T : Exception =>
-            Assert.Throws<T>(() => type.ParseValue(value));
+        protected void AssertException<TArg>(object value) where TArg : Exception =>
+            Should.Throw<TArg>(() => type.ParseValue(value));
     }
 }

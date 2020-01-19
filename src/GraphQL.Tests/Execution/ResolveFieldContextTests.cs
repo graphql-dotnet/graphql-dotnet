@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Types;
+using GraphQL.NewtonsoftJson;
 using Shouldly;
 using Xunit;
-using System.Threading.Tasks;
 
 namespace GraphQL.Tests.Execution
 {
@@ -14,9 +15,11 @@ namespace GraphQL.Tests.Execution
 
         public ResolveFieldContextTests()
         {
-            _context = new ResolveFieldContext();
-            _context.Arguments = new Dictionary<string, object>();
-            _context.Errors = new ExecutionErrors();
+            _context = new ResolveFieldContext
+            {
+                Arguments = new Dictionary<string, object>(),
+                Errors = new ExecutionErrors()
+            };
         }
 
         [Fact]
@@ -42,7 +45,7 @@ namespace GraphQL.Tests.Execution
         {
             long val = 89429901947254093;
             _context.Arguments["a"] = val;
-            Assert.Throws<OverflowException>(() => _context.GetArgument<int>("a"));
+            Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
         }
 
         [Fact]
@@ -169,7 +172,7 @@ namespace GraphQL.Tests.Execution
             var exception = new Exception("Test");
             var result = await _context.TryAsyncResolve<int>(
                 c => throw exception);
-            result.ShouldBe(default(int));
+            result.ShouldBe(default);
             _context.Errors.First().InnerException.ShouldBe(exception);
         }
 
@@ -195,6 +198,51 @@ namespace GraphQL.Tests.Execution
                 c => Task.FromResult<object>("Test Result")
             );
             result.ShouldBe("Test Result");
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_when_null()
+        {
+            Should.Throw<ArgumentNullException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<object>(null);
+            });
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_if_invalid_type()
+        {
+            var context = new ResolveFieldContext() { Source = "test" };
+            Should.Throw<ArgumentException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources_ref()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<string>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources_nullable()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<int?>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_for_null_values()
+        {
+            var context = new ResolveFieldContext();
+            Should.Throw<ArgumentException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
         }
 
         enum SomeEnum

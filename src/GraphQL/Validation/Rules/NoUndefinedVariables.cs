@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -17,7 +18,9 @@ namespace GraphQL.Validation.Rules
                 ? $"Variable \"${varName}\" is not defined by operation \"{opName}\"."
                 : $"Variable \"${varName}\" is not defined.";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var variableNameDefined = new Dictionary<string, bool>();
 
@@ -32,8 +35,7 @@ namespace GraphQL.Validation.Rules
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;
-                            bool found;
-                            if (!variableNameDefined.TryGetValue(varName, out found))
+                            if (!variableNameDefined.TryGetValue(varName, out bool found))
                             {
                                 var error = new ValidationError(
                                     context.OriginalQuery,
@@ -45,7 +47,7 @@ namespace GraphQL.Validation.Rules
                             }
                         }
                     });
-            });
+            }).ToTask();
         }
     }
 }

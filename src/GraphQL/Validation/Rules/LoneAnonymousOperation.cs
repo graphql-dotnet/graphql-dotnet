@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -14,7 +15,9 @@ namespace GraphQL.Validation.Rules
         public Func<string> AnonOperationNotAloneMessage => () =>
             "This anonymous operation must be the only defined operation.";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var operationCount = context.Document.Operations.Count;
 
@@ -33,7 +36,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(error);
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

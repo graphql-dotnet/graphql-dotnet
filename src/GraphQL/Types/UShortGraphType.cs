@@ -4,16 +4,14 @@ namespace GraphQL.Types
 {
     public class UShortGraphType : ScalarGraphType
     {
-        public UShortGraphType() => Name = "UShort";
-
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            var ushortValue = value as UShortValue;
-            return ushortValue?.Value;
-        }
+            UShortValue ushortValue => ushortValue.Value,
+            IntValue intValue => ushort.MinValue <= intValue.Value && intValue.Value <= ushort.MaxValue ? (ushort?)intValue.Value : null,
+            _ => null
+        };
 
-        public override object ParseValue(object value) =>
-            ValueConverter.ConvertTo(value, typeof(ushort));
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(ushort));
 
         public override object Serialize(object value) => ParseValue(value);
     }

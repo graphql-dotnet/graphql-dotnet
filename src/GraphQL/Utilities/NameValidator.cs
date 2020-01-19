@@ -3,10 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
-    public class NameValidator
+    public static class NameValidator
     {
-        private static readonly string RESERVED_PREFIX = "__";
-        private static readonly string NAME_RX = @"^[_A-Za-z][_0-9A-Za-z]*$";
+        private const string RESERVED_PREFIX = "__";
+        private const string NAME_RX = @"^[_A-Za-z][_0-9A-Za-z]*$";
 
         public static void ValidateName(string name, string type = "field")
         {
@@ -16,7 +16,7 @@ namespace GraphQL.Utilities
                     $"A {type} name can not be null or empty.");
             }
 
-            if (name.Length > 1 && name.StartsWith(RESERVED_PREFIX))
+            if (name.Length > 1 && name.StartsWith(RESERVED_PREFIX, StringComparison.InvariantCulture))
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     $"A {type} name: {name} must not begin with \"__\", which is reserved by GraphQL introspection.");

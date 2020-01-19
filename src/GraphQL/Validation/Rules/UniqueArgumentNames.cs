@@ -1,8 +1,15 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Unique argument names
+    ///
+    /// A GraphQL field or directive is only valid if all supplied arguments at a given field
+    /// are uniquely named.
+    /// </summary>
     public class UniqueArgumentNames : IValidationRule
     {
         public string DuplicateArgMessage(string argName)
@@ -10,7 +17,9 @@ namespace GraphQL.Validation.Rules
             return $"There can be only one argument named \"{argName}\".";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var knownArgs = new Dictionary<string, Argument>();
 
@@ -36,7 +45,7 @@ namespace GraphQL.Validation.Rules
                         knownArgs[argName] = argument;
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

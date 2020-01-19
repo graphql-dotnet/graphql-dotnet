@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,17 @@ namespace GraphQL.Language.AST
 
         public void Add(FragmentDefinition fragment)
         {
-            _fragments.Add(fragment);
+            _fragments.Add(fragment ?? throw new ArgumentNullException(nameof(fragment)));
         }
 
         public FragmentDefinition FindDefinition(string name)
         {
-            return _fragments.FirstOrDefault(f => f.Name == name);
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var f in _fragments)
+                if (f.Name == name)
+                    return f;
+
+            return null;
         }
 
         public IEnumerator<FragmentDefinition> GetEnumerator()

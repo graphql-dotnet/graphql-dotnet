@@ -22,14 +22,19 @@ namespace GraphQL.Utilities
 
         public static string Capitalize(string str)
         {
-            str = str.ToLowerInvariant();
-            return str.Substring(0, 1).ToUpperInvariant() + str.Substring(1);
+            switch (str.Length)
+            {
+                case 0: return str;
+                case 1: return str.ToUpperInvariant();
+                default:
+                    str = str.ToLowerInvariant();
+                    return char.ToUpperInvariant(str[0]) + str.Substring(1);
+            }
         }
 
         public static string ToCamelCase(string str)
         {
-            return ChangeCase(str, "", (word, index) =>
-                (index == 0 ? word.ToLowerInvariant() : Capitalize(word)));
+            return ChangeCase(str, "", (word, index) => index == 0 ? word.ToLowerInvariant() : Capitalize(word));
         }
 
         public static string ToConstantCase(string str)
@@ -41,7 +46,6 @@ namespace GraphQL.Utilities
         {
             return ChangeCase(str, "", Capitalize);
         }
-
 
         public static string ChangeCase(string str, string sep, Func<string, string> composer)
         {
@@ -55,12 +59,11 @@ namespace GraphQL.Utilities
 
             foreach (string word in ToWords(str))
             {
-                result += ((index == 0 ? "" : sep) + composer(word, index++));
+                result += (index == 0 ? "" : sep) + composer(word, index++);
             }
 
             return result;
         }
-
 
         /// <summary>
         /// Given [ A, B, C ] return '"A", "B", or "C"'.
@@ -86,7 +89,7 @@ namespace GraphQL.Utilities
         {
             if (options == null)
             {
-                return new string[0];
+                return Array.Empty<string>();
             }
 
             var optionsByDistance = new Dictionary<string, int>();

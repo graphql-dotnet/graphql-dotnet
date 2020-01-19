@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -17,7 +18,7 @@ namespace GraphQL.Validation.Rules
             var message = $"Unknown argument \"{argName}\" on field \"{fieldName}\" of type \"{type}\".";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
-                message += $"Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
+                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
             }
             return message;
         }
@@ -27,12 +28,14 @@ namespace GraphQL.Validation.Rules
             var message = $"Unknown argument \"{argName}\" on directive \"{directiveName}\".";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
             {
-                message += $"Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
+                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
             }
             return message;
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -61,7 +64,8 @@ namespace GraphQL.Validation.Rules
                                     node));
                             }
                         }
-                    } else if (argumentOf is Directive)
+                    }
+                    else if (argumentOf is Directive)
                     {
                         var directive = context.TypeInfo.GetDirective();
                         if (directive != null)
@@ -81,7 +85,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

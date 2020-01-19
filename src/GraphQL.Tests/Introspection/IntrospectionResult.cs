@@ -6,7 +6,9 @@ namespace GraphQL.Tests.Introspection
 @"{
   ""data"": {
     ""__schema"": {
-      ""queryType"": null,
+      ""queryType"": {
+        ""name"": ""TestQuery""
+      },
       ""mutationType"": null,
       ""subscriptionType"": null,
       ""types"": [
@@ -113,6 +115,106 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""Decimal"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Uri"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Guid"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Short"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""UShort"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""UInt"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Long"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""BigInt"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""ULong"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""Byte"",
+          ""description"": null,
+          ""fields"": null,
+          ""inputFields"": null,
+          ""interfaces"": null,
+          ""enumValues"": null,
+          ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""SCALAR"",
+          ""name"": ""SByte"",
           ""description"": null,
           ""fields"": null,
           ""inputFields"": null,
@@ -438,7 +540,7 @@ namespace GraphQL.Tests.Introspection
             },
             {
               ""name"": ""ENUM"",
-              ""description"": ""Indicates this type is an num.  `enumValues` is a valid field."",
+              ""description"": ""Indicates this type is an enum.  `enumValues` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
@@ -675,7 +777,7 @@ namespace GraphQL.Tests.Introspection
                 ""name"": null,
                 ""ofType"": {
                   ""kind"": ""SCALAR"",
-                  ""name"": ""String"",
+                  ""name"": ""Boolean"",
                   ""ofType"": null
                 }
               },
@@ -957,6 +1059,16 @@ namespace GraphQL.Tests.Introspection
             }
           ],
           ""possibleTypes"": null
+        },
+        {
+          ""kind"": ""OBJECT"",
+          ""name"": ""TestQuery"",
+          ""description"": null,
+          ""fields"": [],
+          ""inputFields"": null,
+          ""interfaces"": [],
+          ""enumValues"": null,
+          ""possibleTypes"": null
         }
       ],
       ""directives"": [
@@ -981,7 +1093,7 @@ namespace GraphQL.Tests.Introspection
                   ""ofType"": null
                 }
               },
-              ""defaultValue"": ""null""
+              ""defaultValue"": null
             }
           ]
         },
@@ -1006,7 +1118,7 @@ namespace GraphQL.Tests.Introspection
                   ""ofType"": null
                 }
               },
-              ""defaultValue"": ""null""
+              ""defaultValue"": null
             }
           ]
         },
@@ -1032,22 +1144,7 @@ namespace GraphQL.Tests.Introspection
         }
       ]
     }
-  },
-  ""errors"": [
-    {
-      ""message"": ""Cannot return null for non-null type. Field: queryType, Type: __Type!."",
-      ""locations"": [
-        {
-          ""line"": 4,
-          ""column"": 7
-        }
-      ],
-      ""path"": [
-        ""__schema"",
-        ""queryType""
-      ]
-    }
-  ]
+  }
 }";
     }
 }

@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 
 namespace GraphQL.Tests.Validation
 {
@@ -56,17 +56,17 @@ namespace GraphQL.Tests.Validation
         {
             Field<StringGraphType>(
                 "name",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> {Name = "surname"}));
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "surname" }));
             Field<StringGraphType>("nickname");
             Field<BooleanGraphType>("barks");
             Field<IntGraphType>("barkVolume");
             Field<BooleanGraphType>(
                 "doesKnowCommand",
-                arguments: new QueryArguments(new QueryArgument<DogCommand> {Name = "dogCommand"}));
+                arguments: new QueryArguments(new QueryArgument<DogCommand> { Name = "dogCommand" }));
             Field<BooleanGraphType>(
                 "isHousetrained",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> {Name = "atOtherHomes", DefaultValue = true}));
+                    new QueryArgument<BooleanGraphType> { Name = "atOtherHomes", DefaultValue = true }));
             Interface<Being>();
             Interface<Pet>();
             Interface<Canine>();
@@ -90,7 +90,7 @@ namespace GraphQL.Tests.Validation
         {
             Field<StringGraphType>(
                 "name",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> {Name = "surname"}));
+                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "surname" }));
             Field<StringGraphType>("nickname");
             Field<BooleanGraphType>("meows");
             Field<IntGraphType>("meowVolume");
@@ -127,11 +127,11 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> {Name = "surname"}
+                    new QueryArgument<BooleanGraphType> { Name = "surname" }
                 ));
             Field<ListGraphType<Pet>>("pets");
             Field<ListGraphType<Human>>("relatives");
-            Field<IntGraphType>("iq");
+            Field<IntGraphType>("id");
 
             Interface<Being>();
             Interface<Intelligent>();
@@ -147,11 +147,11 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "name",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> {Name = "surname"}
+                    new QueryArgument<BooleanGraphType> { Name = "surname" }
                 ));
             Field<ListGraphType<Pet>>("pets");
             Field<ListGraphType<Human>>("relatives");
-            Field<IntGraphType>("iq");
+            Field<IntGraphType>("id");
             Field<IntGraphType>("numEyes");
 
             Interface<Being>();
@@ -201,42 +201,42 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "intArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType> {Name = "intArg"}
+                    new QueryArgument<IntGraphType> { Name = "intArg" }
                 ));
             Field<StringGraphType>(
                 "nonNullIntArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "nonNullIntArg"}
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "nonNullIntArg" }
                 ));
             Field<StringGraphType>(
                 "stringArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> {Name = "stringArg"}
+                    new QueryArgument<StringGraphType> { Name = "stringArg" }
                 ));
             Field<StringGraphType>(
                 "booleanArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<BooleanGraphType> {Name = "booleanArg"}
+                    new QueryArgument<BooleanGraphType> { Name = "booleanArg" }
                 ));
             Field<StringGraphType>(
                 "enumArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<FurColor> {Name = "enumArg"}
+                    new QueryArgument<FurColor> { Name = "enumArg" }
                 ));
             Field<StringGraphType>(
                 "floatArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<FloatGraphType> {Name = "floatArg"}
+                    new QueryArgument<FloatGraphType> { Name = "floatArg" }
                 ));
             Field<StringGraphType>(
                 "idArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<IdGraphType> {Name = "idArg"}
+                    new QueryArgument<IdGraphType> { Name = "idArg" }
                 ));
             Field<StringGraphType>(
                 "stringListArgField",
                 arguments: new QueryArguments(
-                    new QueryArgument<ListGraphType<StringGraphType>> {Name = "stringListArg"}
+                    new QueryArgument<ListGraphType<StringGraphType>> { Name = "stringListArg" }
                 ));
             Field<StringGraphType>(
                 "complexArgField",
@@ -246,22 +246,22 @@ namespace GraphQL.Tests.Validation
             Field<StringGraphType>(
                 "multipleReqs",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "req1"},
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "req2"}
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" }
                 ));
             Field<StringGraphType>(
                 "multipleOpts",
                 arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType> {Name = "req1", DefaultValue = 0},
-                    new QueryArgument<IntGraphType> {Name = "req2", DefaultValue = 0}
+                    new QueryArgument<IntGraphType> { Name = "req1", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "req2", DefaultValue = 0 }
                 ));
             Field<StringGraphType>(
                 "multipleOptAndReq",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "req1"},
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "req2"},
-                    new QueryArgument<IntGraphType> {Name = "req1", DefaultValue = 0},
-                    new QueryArgument<IntGraphType> {Name = "req2", DefaultValue = 0}
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" },
+                    new QueryArgument<IntGraphType> { Name = "req1", DefaultValue = 0 },
+                    new QueryArgument<IntGraphType> { Name = "req2", DefaultValue = 0 }
                 ));
         }
     }

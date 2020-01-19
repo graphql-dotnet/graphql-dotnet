@@ -1,3 +1,4 @@
+using GraphQL.NewtonsoftJson;
 using GraphQL.Tests.Execution;
 using Xunit;
 

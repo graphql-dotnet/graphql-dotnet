@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -15,7 +16,9 @@ namespace GraphQL.Validation.Rules
             return $"There can be only one variable named \"{variableName}\"";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly UniqueVariableNames Instance = new UniqueVariableNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             Dictionary<string, VariableDefinition> knownVariables = null;
 
@@ -42,7 +45,7 @@ namespace GraphQL.Validation.Rules
                         knownVariables[variableName] = variableDefinition;
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

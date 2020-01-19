@@ -1,10 +1,11 @@
-using System;
-using System.Linq;
-using GraphQL.Http;
 using GraphQL.Utilities;
+using GraphQL.NewtonsoftJson;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
-using Shouldly;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -55,7 +56,7 @@ namespace GraphQL.Tests.Utilities
                     .Select(x => x.InnerException.Message));
             }
 
-            writtenResult.ShouldBe(expectedResult, additionalInfo);
+            writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
 
             return runResult;
         }
@@ -68,6 +69,11 @@ namespace GraphQL.Tests.Utilities
                 expected = JObject.Parse(result);
             }
             return new ExecutionResult { Data = expected };
+        }
+
+        protected string ReadSchema(string fileName)
+        {
+            return File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
         }
     }
 

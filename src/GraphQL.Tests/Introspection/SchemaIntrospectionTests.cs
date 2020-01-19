@@ -1,5 +1,6 @@
-﻿using GraphQL.Http;
+using System.Threading.Tasks;
 using GraphQL.Introspection;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -9,31 +10,42 @@ namespace GraphQL.Tests.Introspection
     public class SchemaIntrospectionTests
     {
         [Fact]
-        public void validate_core_schema()
+        public async Task validate_core_schema()
         {
             var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
             {
-                _.Schema = new Schema();
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery()
+                };
                 _.Query = SchemaIntrospection.IntrospectionQuery;
-            }).GetAwaiter().GetResult();
+            });
 
-            var json = new DocumentWriter(true).WriteToStringAsync(executionResult).GetAwaiter().GetResult();
+            var json = await new DocumentWriter(true).WriteToStringAsync(executionResult);
 
             ShouldBe(json, IntrospectionResult.Data);
         }
 
+        public class TestQuery : ObjectGraphType
+        {
+            public TestQuery()
+            {
+                Name = "TestQuery";
+            }
+        }
+
         [Fact]
-        public void validate_non_null_schema()
+        public async Task validate_non_null_schema()
         {
             var documentExecuter = new DocumentExecuter();
-            var executionResult = documentExecuter.ExecuteAsync(_ =>
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
             {
                 _.Schema = new TestSchema();
                 _.Query = InputObjectBugQuery;
-            }).GetAwaiter().GetResult();
+            });
 
-            var json = new DocumentWriter(true).WriteToStringAsync(executionResult).GetAwaiter().GetResult();
+            var json = await new DocumentWriter(true).WriteToStringAsync(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             ShouldBe(json, InputObjectBugResult);

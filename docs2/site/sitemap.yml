@@ -16,10 +16,14 @@
             file: installation.md
           - title: GraphiQL
             file: graphiql.md
+          - title: Altair GraphQL
+            file: altair-graphql.md
           - title: Queries
             file: queries.md
           - title: Schema Types
             file: schema-types.md
+          - title: Custom Scalars
+            file: custom-scalars.md
           - title: Lists and Non-Null
             file: lists-non-null.md
           - title: Arguments

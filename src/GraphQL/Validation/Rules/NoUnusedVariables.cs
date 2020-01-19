@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -20,7 +21,9 @@ namespace GraphQL.Validation.Rules
               : $"Variable \"${varName}\" is never used.";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var variableDefs = new List<VariableDefinition>();
 
@@ -46,7 +49,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

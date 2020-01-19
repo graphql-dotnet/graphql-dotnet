@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -93,7 +94,14 @@ namespace GraphQL.Execution
 
             foreach (var kvp in SubFields)
             {
-                fields[kvp.Key] = kvp.Value.ToValue();
+                var value = kvp.Value.ToValue();
+
+                if (value == null && kvp.Value.FieldDefinition.ResolvedType is NonNullGraphType)
+                {
+                    return null;
+                }
+
+                fields[kvp.Key] = value;
             }
 
             return fields;
@@ -108,7 +116,7 @@ namespace GraphQL.Execution
     public class RootExecutionNode : ObjectExecutionNode
     {
         public RootExecutionNode(IObjectGraphType graphType)
-            : base(null, graphType, null, null, new string[0])
+            : base(null, graphType, null, null, Array.Empty<string>())
         {
 
         }
@@ -116,7 +124,7 @@ namespace GraphQL.Execution
 
     public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     {
-        public IList<ExecutionNode> Items { get; set; }
+        public List<ExecutionNode> Items { get; set; }
 
         public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path)
             : base(parent, graphType, field, fieldDefinition, path)
@@ -129,9 +137,27 @@ namespace GraphQL.Execution
             if (Items == null)
                 return null;
 
-            return Items
-                .Select(x => x.ToValue())
-                .ToList();
+            var items = new List<object>(Items.Count);
+            foreach (ExecutionNode item in Items)
+            {
+                var value = item.ToValue();
+
+                if (value == null)
+                {
+                    var listType = item.FieldDefinition.ResolvedType;
+                    if (listType is NonNullGraphType nonNull)
+                        listType = nonNull.ResolvedType;
+
+                    if (((ListGraphType)listType).ResolvedType is NonNullGraphType)
+                    {
+                        return null;
+                    }
+                }
+
+                items.Add(value);
+            }
+
+            return items;
         }
 
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes()

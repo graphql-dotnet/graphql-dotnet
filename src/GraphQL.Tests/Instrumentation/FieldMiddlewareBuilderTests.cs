@@ -18,16 +18,14 @@ namespace GraphQL.Tests.Instrumentation
         public FieldMiddlewareBuilderTests()
         {
             _builder = new FieldMiddlewareBuilder();
-            _context = new ResolveFieldContext();
-            _context.FieldName = "Name";
-            _context.FieldAst = new Field(null, new NameNode("Name"));
-            _context.Source = new Person
+            _context = new ResolveFieldContext
             {
-                Name = "Quinn"
+                FieldName = "Name",
+                FieldAst = new Field(null, new NameNode("Name")),
+                Source = new Person { Name = "Quinn" },
+                Errors = new ExecutionErrors(),
+                Metrics = new Metrics().Start(null)
             };
-            _context.Errors = new ExecutionErrors();
-
-            _context.Metrics = new Metrics();
         }
 
         [Fact]
@@ -80,7 +78,7 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.Finish().Skip(1).Single();
             record.Category.ShouldBe("test");
             record.Subject.ShouldBe("testing name");
         }
@@ -93,7 +91,7 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.Finish().Skip(1).Single();
             record.Category.ShouldBe("class");
             record.Subject.ShouldBe("from class");
         }
@@ -120,8 +118,8 @@ namespace GraphQL.Tests.Instrumentation
         {
             var additionalData = new Dictionary<string, string[]>
             {
-                ["errorCodes"] = new[] {"one", "two"},
-                ["otherErrorCodes"] = new[] {"one", "four"}
+                ["errorCodes"] = new[] { "one", "two" },
+                ["otherErrorCodes"] = new[] { "one", "four" }
             };
             _builder.Use(next =>
             {
@@ -152,7 +150,7 @@ namespace GraphQL.Tests.Instrumentation
 
         public class SimpleMiddleware
         {
-            public Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
+            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 using (context.Metrics.Subject("class", "from class"))
                 {

@@ -9,9 +9,6 @@ namespace GraphQL.Language.AST
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<Uri> other)
-        {
-            return Uri.Equals(Value, other.Value);
-        }
+        protected override bool Equals(ValueNode<Uri> other) => Equals(Value, other.Value);
     }
 }
