@@ -252,6 +252,42 @@ namespace GraphQL.DataLoader.Tests
         }
 
         [Fact]
+        public async Task Failing_DataLoaders_Only_Execute_Once()
+        {
+            var mock = new Mock<IUsersStore>();
+            var users = Fake.Users.Generate(2);
+
+            // Set duplicate user IDs
+            users.ForEach(u => u.UserId = 1);
+
+            mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(() => throw new ApplicationException());
+
+            var usersStore = mock.Object;
+
+            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+
+            // Start async tasks to load by ID
+            var task1 = loader.LoadAsync(1);
+            var task2 = loader.LoadAsync(2);
+
+            Exception ex = await Should.ThrowAsync<ApplicationException>(async () =>
+            {
+                // Now await tasks
+                var user1 = await task1.GetResultAsync();
+            });
+
+            Exception ex2 = await Should.ThrowAsync<ApplicationException>(async () =>
+            {
+                // Now await tasks
+                var user2 = await task2.GetResultAsync();
+            });
+
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default));
+            mock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task Keys_Are_DeDuped()
         {
             var mock = new Mock<IUsersStore>();
