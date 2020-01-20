@@ -28,7 +28,15 @@ namespace GraphQL.DataLoader
                 if (_result != null)
                     return _result;
 
-                return (_result = _loader(cancellationToken));
+                try
+                {
+                    return (_result = _loader(cancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    _result = Task.FromException<T>(ex);
+                    throw;
+                }
             }
         }
 

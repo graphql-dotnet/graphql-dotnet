@@ -37,7 +37,19 @@ namespace GraphQL.DataLoader
 
                     //return LoadingTask if already set,
                     //  or else start data loading, save the returned Task in LoadingTask, and return the Task
-                    return LoadingTask ?? (LoadingTask = _dataLoader.StartLoading(this, cancellationToken));
+
+                    if (LoadingTask != null)
+                        return LoadingTask;
+
+                    try
+                    {
+                        return (LoadingTask = _dataLoader.StartLoading(this, cancellationToken));
+                    }
+                    catch (Exception ex)
+                    {
+                        LoadingTask = Task.FromException(ex);
+                        throw;
+                    }
                 }
             }
         }
