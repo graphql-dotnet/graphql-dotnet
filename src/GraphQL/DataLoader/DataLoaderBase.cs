@@ -37,7 +37,7 @@ namespace GraphQL.DataLoader
                     if (_cachedList.TryGetValue(inputValue, out var ret2))
                         return ret2;
                 }
-                else if (_list != null)
+                if (_list != null)
                 {
                     if (_list.TryGetValue(inputValue, out var ret2))
                         return ret2;

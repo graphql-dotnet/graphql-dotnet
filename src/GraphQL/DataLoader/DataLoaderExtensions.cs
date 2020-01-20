@@ -4,6 +4,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Builders;
+using GraphQL.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.DataLoader
 {
@@ -69,6 +72,26 @@ namespace GraphQL.DataLoader
         public static IDataLoaderResult<TResult> Then<TOut, TResult>(this IDataLoaderResult<TOut> parent, Func<TOut, TResult> func)
         {
             return new ContinueWith<TOut, TResult>(parent, (value) => Task.FromResult(func(value)));
+        }
+
+        public static IDataLoaderResult<TResult> Then<TOut, TResult>(this IDataLoaderResult<TOut> parent, Func<TOut, CancellationToken, Task<TResult>> func)
+        {
+            return new ContinueWith<TOut, TResult>(parent, func);
+        }
+
+        public static IDataLoaderResult<TResult> Then<TOut, TResult>(this IDataLoaderResult<TOut> parent, Func<TOut, CancellationToken, TResult> func)
+        {
+            return new ContinueWith<TOut, TResult>(parent, (value, cancellationToken) => Task.FromResult(func(value, cancellationToken)));
+        }
+
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
+        {
+            return builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+        }
+
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
+        {
+            return builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
         }
     }
 }

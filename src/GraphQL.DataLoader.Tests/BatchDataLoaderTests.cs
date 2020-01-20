@@ -237,11 +237,12 @@ namespace GraphQL.DataLoader.Tests
             var task2 = loader.LoadAsync(2);
 
             // Dispatch loading
-            await loader.DispatchAsync();
-
+            //with new design, any errors would be thrown here; but this is not used by ExecutionStrategy anyway
+            //await loader.DispatchAsync();
 
             Exception ex = await Should.ThrowAsync<ArgumentException>(async () =>
             {
+
                 // Now await tasks
                 var user1 = await task1.GetResultAsync();
                 var user2 = await task2.GetResultAsync();

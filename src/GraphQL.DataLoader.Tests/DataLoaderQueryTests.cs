@@ -39,7 +39,7 @@ namespace GraphQL.DataLoader.Tests
             usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         }
 
-        [Fact(Skip = "Fails with deadlock due to listener executing before LoadAsync is called - issue #945")]
+        [Fact]
         public void SingleQueryRootWithDelay_Works()
         {
             var users = Fake.Users.Generate(2);
@@ -167,7 +167,7 @@ namespace GraphQL.DataLoader.Tests
             usersMock.VerifyNoOtherCalls();
         }
 
-        [Fact(Skip = "DataLoader does not batch results with SerialExecutionStrategy - issues #1191 and #837")]
+        [Fact]
         public void TwoLevel_MultipleResults_OperationsAreBatched_SerialExecution()
         {
             var users = Fake.Users.Generate(2);
@@ -220,7 +220,7 @@ mutation {
             usersMock.VerifyNoOtherCalls();
         }
 
-        [Fact(Skip = "Chaining dataloaders causes deadlock - issue #1042")]
+        [Fact]
         public void Chained_DataLoaders_Works()
         {
             var users = Fake.Users.Generate(2);

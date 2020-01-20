@@ -118,34 +118,40 @@ namespace GraphQL.Conversion
 }
 namespace GraphQL.DataLoader
 {
-    public class BatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<System.Collections.Generic.IDictionary<TKey, T>>, GraphQL.DataLoader.IDataLoader<TKey, T>
+    public class BatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<TKey, T>, GraphQL.DataLoader.IDataLoader<TKey, T>
     {
         public BatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> loader, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = null) { }
         public BatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> loader, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = null) { }
-        protected override System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>> FetchAsync(System.Threading.CancellationToken cancellationToken) { }
-        protected override bool IsFetchNeeded() { }
-        public System.Threading.Tasks.Task<T> LoadAsync(TKey key) { }
+        protected override System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken) { }
     }
-    public class CollectionBatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<System.Linq.ILookup<TKey, T>>, GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>>
+    public class CollectionBatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<TKey, System.Collections.Generic.IEnumerable<T>>, GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>>
     {
-        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> loader, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
-        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> loader, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
-        protected override System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>> FetchAsync(System.Threading.CancellationToken cancellationToken) { }
-        protected override bool IsFetchNeeded() { }
-        public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>> LoadAsync(TKey key) { }
+        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> loader, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = null) { }
+        public CollectionBatchDataLoader(System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> loader, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = null) { }
+        protected override System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, System.Collections.Generic.IEnumerable<T>>> list, System.Threading.CancellationToken cancellationToken) { }
     }
-    public abstract class DataLoaderBase<T> : GraphQL.DataLoader.IDataLoader
+    public sealed class ContinueWith<T, TResult> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<TResult>
     {
-        protected DataLoaderBase() { }
-        protected System.Threading.Tasks.Task<T> DataLoaded { get; }
+        public ContinueWith(GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.Tasks.Task<TResult>> func) { }
+        public ContinueWith(GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> func) { }
+        public System.Threading.Tasks.Task<TResult> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
+    }
+    public abstract class DataLoaderBase<TKey, T> : GraphQL.DataLoader.IDataLoader
+    {
+        protected readonly System.Collections.Generic.IEqualityComparer<TKey> EqualityComparer;
+        public DataLoaderBase() { }
+        public DataLoaderBase(bool caching) { }
+        public DataLoaderBase(System.Collections.Generic.IEqualityComparer<TKey> equalityComparer) { }
+        public DataLoaderBase(bool caching, System.Collections.Generic.IEqualityComparer<TKey> equalityComparer) { }
         public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        protected abstract System.Threading.Tasks.Task<T> FetchAsync(System.Threading.CancellationToken cancellationToken);
-        protected abstract bool IsFetchNeeded();
+        protected abstract System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken);
+        public virtual GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync(TKey inputValue) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(System.Threading.Tasks.Task<T> outputTask) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(T outputValue) { }
     }
     public class DataLoaderContext
     {
         public DataLoaderContext() { }
-        public System.Threading.Tasks.Task DispatchAllAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public TDataLoader GetOrAdd<TDataLoader>(string loaderKey, System.Func<TDataLoader> dataLoaderFactory)
             where TDataLoader : GraphQL.DataLoader.IDataLoader { }
     }
@@ -180,8 +186,30 @@ namespace GraphQL.DataLoader
     }
     public static class DataLoaderExtensions
     {
-        public static System.Threading.Tasks.Task<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, System.Collections.Generic.IEnumerable<TKey> keys) { }
-        public static System.Threading.Tasks.Task<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, params TKey[] keys) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, System.Collections.Generic.IEnumerable<TKey> keys) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, params TKey[] keys) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, GraphQL.DataLoader.IDataLoaderResult<TReturnType>> resolve) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>> resolve) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<TOut, TResult>(this GraphQL.DataLoader.IDataLoaderResult<TOut> parent, System.Func<TOut, System.Threading.Tasks.Task<TResult>> func) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<TOut, TResult>(this GraphQL.DataLoader.IDataLoaderResult<TOut> parent, System.Func<TOut, TResult> func) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<TOut, TResult>(this GraphQL.DataLoader.IDataLoaderResult<TOut> parent, System.Func<TOut, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> func) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<TResult> Then<TOut, TResult>(this GraphQL.DataLoader.IDataLoaderResult<TOut> parent, System.Func<TOut, System.Threading.CancellationToken, TResult> func) { }
+    }
+    public sealed class DataLoaderPair<TKey, T> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>
+    {
+        public DataLoaderPair(GraphQL.DataLoader.IDataLoader loader, TKey inputValue) { }
+        public bool IsResultSet { get; }
+        public TKey Key { get; }
+        public GraphQL.DataLoader.IDataLoader Loader { get; }
+        public T Result { get; }
+        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
+        public void SetResult(T value) { }
+    }
+    public class DataLoaderResult<T> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>
+    {
+        public DataLoaderResult(System.Threading.Tasks.Task<T> result) { }
+        public DataLoaderResult(T result) { }
+        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
     }
     public interface IDataLoader
     {
@@ -191,20 +219,28 @@ namespace GraphQL.DataLoader
     {
         GraphQL.DataLoader.DataLoaderContext Context { get; set; }
     }
+    public interface IDataLoaderResult
+    {
+        System.Threading.Tasks.Task<object> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
+    }
+    public interface IDataLoaderResult<T> : GraphQL.DataLoader.IDataLoaderResult
+    {
+        System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default);
+    }
     public interface IDataLoader<T>
     {
-        System.Threading.Tasks.Task<T> LoadAsync();
+        GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync();
     }
     public interface IDataLoader<TKey, T>
     {
-        System.Threading.Tasks.Task<T> LoadAsync(TKey key);
+        GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync(TKey key);
     }
-    public class SimpleDataLoader<T> : GraphQL.DataLoader.DataLoaderBase<T>, GraphQL.DataLoader.IDataLoader<T>
+    public class SimpleDataLoader<T> : GraphQL.DataLoader.IDataLoader, GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<T>, GraphQL.DataLoader.IDataLoader<T>
     {
         public SimpleDataLoader(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> loader) { }
-        protected override System.Threading.Tasks.Task<T> FetchAsync(System.Threading.CancellationToken cancellationToken) { }
-        protected override bool IsFetchNeeded() { }
-        public System.Threading.Tasks.Task<T> LoadAsync() { }
+        public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
+        public GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync() { }
     }
 }
 namespace GraphQL
@@ -525,6 +561,8 @@ namespace GraphQL.Execution
     public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
     {
         protected ExecutionStrategy() { }
+        protected virtual System.Threading.Tasks.Task<GraphQL.Execution.ExecutionNode> CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+        protected virtual void CompleteNode(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task<GraphQL.Execution.ExecutionNode> ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);

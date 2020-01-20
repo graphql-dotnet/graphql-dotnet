@@ -18,6 +18,8 @@ namespace GraphQL.DataLoader
 
         public Task<T> GetResultAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (_result != null)
                 return _result;
 

@@ -20,8 +20,11 @@ namespace GraphQL.DataLoader
 
             public Task DispatchAsync(CancellationToken cancellationToken = default)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (LoadingTask != null)
                     return LoadingTask;
+
                 lock (this) //external code cannot access "this"
                 {
                     //this lock depends on external code, as it should to prevent double execution

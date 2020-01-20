@@ -106,16 +106,6 @@ namespace GraphQL.Builders
             return Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
         }
 
-        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
-        {
-            return Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
-        }
-
-        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
-        {
-            return Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
-        }
-
         public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
             return new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
