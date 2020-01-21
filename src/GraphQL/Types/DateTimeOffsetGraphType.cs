@@ -7,7 +7,6 @@ namespace GraphQL.Types
     {
         public DateTimeOffsetGraphType()
         {
-            Name = "DateTimeOffset";
             Description =
                 "The `DateTimeOffset` scalar type represents a date, time and offset from UTC. `DateTimeOffset` expects timestamps " +
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
@@ -17,19 +16,11 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is DateTimeOffsetValue offsetValue)
-            {
-                return offsetValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
-        }
+            DateTimeOffsetValue offsetValue => offsetValue.Value,
+            StringValue stringValue => ParseValue(stringValue.Value),
+            _ => null
+        };
     }
 }

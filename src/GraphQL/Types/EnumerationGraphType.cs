@@ -2,7 +2,6 @@ using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -41,14 +40,14 @@ namespace GraphQL.Types
         public override object Serialize(object value)
         {
             var valueString = value.ToString();
-            var foundByName = Values.FirstOrDefault(v => v.Name.Equals(valueString, StringComparison.OrdinalIgnoreCase));
+            var foundByName = Values.FindByName(valueString);
             if (foundByName != null)
             {
                 return foundByName.Name;
             }
 
-            var found = Values.FirstOrDefault(v => v.Value.Equals(value));
-            return found?.Name;
+            var foundByValue = Values.FindByValue(value);
+            return foundByValue?.Name;
         }
 
         public override object ParseValue(object value)
@@ -58,8 +57,7 @@ namespace GraphQL.Types
                 return null;
             }
 
-            var found = Values.FirstOrDefault(v =>
-                StringComparer.OrdinalIgnoreCase.Equals(v.Name, value.ToString()));
+            var found = Values.FindByName(value.ToString());
             return found?.Value;
         }
 
@@ -91,9 +89,9 @@ namespace GraphQL.Types
                 deprecation: e.member.ObsoleteMessage()
             ));
 
-            Name = Name ?? StringUtils.ToPascalCase(type.Name);
-            Description = Description ?? typeof(TEnum).Description();
-            DeprecationReason = DeprecationReason ?? typeof(TEnum).ObsoleteMessage();
+            Name = StringUtils.ToPascalCase(type.Name);
+            Description ??= typeof(TEnum).Description();
+            DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
             foreach (var (name, value, description, deprecation) in enumGraphData)
             {
@@ -108,30 +106,40 @@ namespace GraphQL.Types
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
 
-        public EnumValueDefinition this[string name] => _values.FirstOrDefault(enumDef => enumDef.Name == name);
+        public EnumValueDefinition this[string name] => FindByName(name);
 
         public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
+
+        public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in _values)
+                if (def.Name.Equals(name, comparison))
+                    return def;
+
+            return null;
+        }
+
+        public EnumValueDefinition FindByValue(object value)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in _values)
+                if (def.Value.Equals(value))
+                    return def;
+
+            return null;
+        }
 
         public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class EnumValueDefinition : IProvideMetadata
+    public class EnumValueDefinition : MetadataProvider
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
         public object Value { get; set; }
-
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
-
-        public TType GetMetadata<TType>(string key, TType defaultValue = default)
-        {
-            var local = Metadata;
-            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValue;
-        }
-
-        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

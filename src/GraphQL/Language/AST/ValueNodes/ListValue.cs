@@ -10,13 +10,7 @@ namespace GraphQL.Language.AST
             Values = values;
         }
 
-        public object Value
-        {
-            get
-            {
-                return Values.Select(x => x.Value).ToList();
-            }
-        }
+        public object Value => Values.Select(x => x.Value).ToList();
 
         public IEnumerable<IValue> Values { get; }
 
@@ -29,7 +23,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 

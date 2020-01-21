@@ -1,14 +1,13 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Http;
 using GraphQL.Instrumentation;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Example
 {
@@ -21,12 +20,12 @@ namespace Example
 
         public GraphQLMiddleware(
             RequestDelegate next,
-            GraphQLSettings settings,
+            IOptions<GraphQLSettings> options,
             IDocumentExecuter executer,
             IDocumentWriter writer)
         {
             _next = next;
-            _settings = settings;
+            _settings = options.Value;
             _executer = executer;
             _writer = writer;
         }
@@ -44,7 +43,7 @@ namespace Example
 
         private bool IsGraphQLRequest(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments(_settings.Path)
+            return context.Request.Path.StartsWithSegments(_settings.GraphQLPath)
                 && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -54,18 +53,18 @@ namespace Example
 
             var request = Deserialize<GraphQLRequest>(context.Request.Body);
 
-            var result = await _executer.ExecuteAsync(_ =>
+            var result = await _executer.ExecuteAsync(options =>
             {
-                _.Schema = schema;
-                _.Query = request.Query;
-                _.OperationName = request.OperationName;
-                _.Inputs = request.Variables.ToInputs();
-                _.UserContext = _settings.BuildUserContext?.Invoke(context);
-                _.EnableMetrics = _settings.EnableMetrics;
-                _.ExposeExceptions = _settings.ExposeExceptions;
+                options.Schema = schema;
+                options.Query = request.Query;
+                options.OperationName = request.OperationName;
+                options.Inputs = request.Variables.ToInputs();
+                options.UserContext = _settings.BuildUserContext?.Invoke(context);
+                options.EnableMetrics = _settings.EnableMetrics;
+                options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
-                    _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                    options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                 }
             });
 
@@ -80,7 +79,7 @@ namespace Example
         private async Task WriteResponseAsync(HttpContext context, ExecutionResult result)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
+            context.Response.StatusCode = 200; // OK
 
             await _writer.WriteAsync(context.Response.Body, result);
         }

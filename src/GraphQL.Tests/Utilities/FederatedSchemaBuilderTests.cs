@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
 using Xunit;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -28,7 +29,9 @@ namespace GraphQL.Tests.Utilities
 
             var query = "{ _service { sdl } }";
 
-            var sdl = @"scalar Byte
+            var sdl = @"scalar BigInt
+
+scalar Byte
 
 scalar Date
 
@@ -39,6 +42,8 @@ scalar DateTimeOffset
 scalar Decimal
 
 scalar Guid
+
+scalar Long
 
 scalar Milliseconds
 
@@ -56,14 +61,14 @@ scalar UInt
 
 scalar ULong
 
+scalar UShort
+
 scalar Uri
 
 type User @key(fields: ""id"") {
   id: ID! @external
   username: String!
 }
-
-scalar UShort
 ";
 
             var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
@@ -90,10 +95,7 @@ scalar UShort
                 }
             ";
 
-            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
-            {
-                return Task.FromResult(new User { Id = "123", Username = "Quinn" });
-            });
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
 
             var query = @"
                 query ($_representations: [_Any!]!) {
@@ -115,6 +117,35 @@ scalar UShort
                 _.Variables = variables;
                 _.ExpectedResult = expected;
             });
+        }
+
+        [Fact]
+        public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
+        {
+            var definitions = @"
+                input UserInput {
+                    limit: Int!
+                    offset: Int
+                }
+
+                type Comment {
+                    id: ID!
+                }
+
+                type User @key(fields: ""id"") {
+                    id: ID! @external
+                }
+            ";
+
+            var query = "{ __schema { types { name kind possibleTypes { name } } } }";
+
+            var data = JObject.FromObject(Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Builder.Build(definitions);
+                _.Query = query;
+            }).Result.Data).SelectToken("$.__schema.types[?(@.name == '_Entity')].possibleTypes..name");
+            
+            Assert.Equal("User", data.ToString());
         }
     }
 }

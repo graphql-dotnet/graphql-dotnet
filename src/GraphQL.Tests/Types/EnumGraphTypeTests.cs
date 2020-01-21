@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using Xunit;
 
+#pragma warning disable 0618
+
 namespace GraphQL.Tests.Types
 {
     public class EnumGraphTypeTests
@@ -107,6 +109,18 @@ namespace GraphQL.Tests.Types
         public void parses_from_name()
         {
             type.ParseValue("RED").ShouldBe(Colors.Red);
+        }
+
+        [Fact]
+        public void parse_value_is_null_safe()
+        {
+            type.ParseValue(null).ShouldBe(null);
+        }
+
+        [Fact]
+        public void does_not_allow_nulls_to_be_added()
+        {
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
         }
     }
 }

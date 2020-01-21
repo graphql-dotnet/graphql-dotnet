@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -32,7 +33,9 @@ namespace GraphQL.Validation.Rules
             return message;
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -61,7 +64,8 @@ namespace GraphQL.Validation.Rules
                                     node));
                             }
                         }
-                    } else if (argumentOf is Directive)
+                    }
+                    else if (argumentOf is Directive)
                     {
                         var directive = context.TypeInfo.GetDirective();
                         if (directive != null)
@@ -81,7 +85,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

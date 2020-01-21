@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -15,7 +16,9 @@ namespace GraphQL.Validation.Rules
         public Func<string, string, string> UndefinedVarMessage = (variableName, typeName) =>
             $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -28,7 +31,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ValidationError(context.OriginalQuery, "5.7.3", UndefinedVarMessage(varDef.Name, type != null ? context.Print(type) : varDef.Type.Name()), varDef));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

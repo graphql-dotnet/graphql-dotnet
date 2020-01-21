@@ -1,6 +1,6 @@
 # Directives
 
-A directive can be attached to almost every part of the schema - field, query, enum, fragment inclusion etc. and can affect execution of the query in any way the server desires. The core GraphQL specification includes exactly three directives.
+A directive can be attached to almost every part of the schema - field, query, enum, fragment inclusion etc. and can affect execution of the query in any way the server desires. The core GraphQL [specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives) includes exactly three directives.
 
 * `@include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Only include this field in the result if the argument is true.
 * `@skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Skip this field if the argument is true.

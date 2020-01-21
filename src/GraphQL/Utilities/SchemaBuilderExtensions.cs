@@ -18,19 +18,12 @@ namespace GraphQL.Utilities
 
         public static bool AstTypeHasFields(this IProvideMetadata type)
         {
-            var ast = GetAstType<ASTNode>(type);
-            if (ast == null) return false;
-
-            switch (ast.Kind)
+            return GetAstType<ASTNode>(type) switch
             {
-                case ASTNodeKind.ObjectTypeDefinition:
-                    return ((GraphQLObjectTypeDefinition)ast).Fields.Any();
-
-                case ASTNodeKind.InterfaceTypeDefinition:
-                    return ((GraphQLInterfaceTypeDefinition)ast).Fields.Any();
-            }
-
-            return false;
+                GraphQLObjectTypeDefinition otd => otd.Fields.Any(),
+                GraphQLInterfaceTypeDefinition itd => itd.Fields.Any(),
+                _ => false
+            };
         }
 
         public static T GetAstType<T>(this IProvideMetadata type) where T : class
@@ -38,14 +31,13 @@ namespace GraphQL.Utilities
             return type.GetMetadata<T>(__AST_MetaField__);
         }
 
-        public static void SetAstType<T>(this IProvideMetadata type, T node) where T : ASTNode
-        {
-            type.Metadata[__AST_MetaField__] = node;
-        }
+        public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node)
+            where TMetadataProvider : IProvideMetadata
+            => provider.WithMetadata(__AST_MetaField__, node);
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
-            return GetExtensionAstTypes(type).Any();
+            return GetExtensionAstTypes(type).Count > 0;
         }
 
         public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode 
@@ -57,7 +49,7 @@ namespace GraphQL.Utilities
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(__EXTENSION_AST_MetaField__, new List<ASTNode>());
+            return type.GetMetadata(__EXTENSION_AST_MetaField__, () => new List<ASTNode>());
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode

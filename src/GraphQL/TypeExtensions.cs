@@ -1,15 +1,14 @@
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    using System.Collections;
-    using System.ComponentModel;
-
     public static class TypeExtensions
     {
         /// <summary>
@@ -93,7 +92,7 @@ namespace GraphQL
 
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
-            return typeName.EndsWith(nameof(Type))
+            return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
                 ? typeName.Remove(typeName.Length - nameof(Type).Length)
                 : typeName;
         }
@@ -104,7 +103,8 @@ namespace GraphQL
         /// <param name="type">The type for which a graph type is desired.</param>
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
-        /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
+        /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+        /// <example><see>IList<string></see> -> <see>ListGraphType<StringGraphType></see></example>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -165,7 +165,7 @@ namespace GraphQL
 
             var genericArgs = type.GetGenericArguments();
 
-            if (genericArgs.Any())
+            if (genericArgs.Length > 0)
             {
                 int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0)
@@ -177,7 +177,7 @@ namespace GraphQL
                 for (int i = 0; i < typeParameters.Length; ++i)
                 {
                     string typeParamName = GetFriendlyName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                    friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
                 friendlyName += ">";
             }

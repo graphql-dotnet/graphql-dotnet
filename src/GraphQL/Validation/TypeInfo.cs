@@ -235,7 +235,7 @@ namespace GraphQL.Validation
 
             if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)
             {
-                var complexType = (IComplexGraphType) parentType;
+                var complexType = (IComplexGraphType)parentType;
 
                 return complexType.GetField(field.Name);
             }

@@ -4,20 +4,16 @@ namespace GraphQL.Types
 {
     public class FloatGraphType : ScalarGraphType
     {
-        public FloatGraphType() => Name = "Float";
-
         public override object Serialize(object value) => ParseValue(value);
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(double));
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is FloatValue floatVal) return floatVal?.Value;
-
-            if (value is IntValue intVal) return intVal.Value;
-
-            var longVal = value as LongValue;
-            return longVal?.Value;
-        }
+            FloatValue floatVal => floatVal.Value,
+            IntValue intVal => intVal.Value,
+            LongValue longVal => longVal.Value,
+            _ => (object)null
+        };
     }
 }

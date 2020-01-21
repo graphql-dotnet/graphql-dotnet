@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\appveyor.yml = ..\appveyor.yml
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		Directory.Build.props = Directory.Build.props
 		NuGet.config = NuGet.config
+		..\README.md = ..\README.md
+		Tests.props = Tests.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
@@ -24,7 +28,56 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC80C071
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Harness.Tests", "GraphQL.Harness.Tests\GraphQL.Harness.Tests.csproj", "{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Dummy", "GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Dummy", "GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A87E-4E8B-B068-8B396D00945A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-started", "{587B3CCD-8B68-491B-9AC5-0E04DF3E9507}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\getting-started\aliases.md = ..\docs2\site\docs\getting-started\aliases.md
+		..\docs2\site\docs\getting-started\arguments.md = ..\docs2\site\docs\getting-started\arguments.md
+		..\docs2\site\docs\getting-started\authorization.md = ..\docs2\site\docs\getting-started\authorization.md
+		..\docs2\site\docs\getting-started\custom-scalars.md = ..\docs2\site\docs\getting-started\custom-scalars.md
+		..\docs2\site\docs\getting-started\databases.md = ..\docs2\site\docs\getting-started\databases.md
+		..\docs2\site\docs\getting-started\dependency-injection.md = ..\docs2\site\docs\getting-started\dependency-injection.md
+		..\docs2\site\docs\getting-started\directives.md = ..\docs2\site\docs\getting-started\directives.md
+		..\docs2\site\docs\getting-started\errors.md = ..\docs2\site\docs\getting-started\errors.md
+		..\docs2\site\docs\getting-started\field-middleware.md = ..\docs2\site\docs\getting-started\field-middleware.md
+		..\docs2\site\docs\getting-started\fields.md = ..\docs2\site\docs\getting-started\fields.md
+		..\docs2\site\docs\getting-started\fragments.md = ..\docs2\site\docs\getting-started\fragments.md
+		..\docs2\site\docs\getting-started\graphiql.md = ..\docs2\site\docs\getting-started\graphiql.md
+		..\docs2\site\docs\getting-started\installation.md = ..\docs2\site\docs\getting-started\installation.md
+		..\docs2\site\docs\getting-started\interfaces.md = ..\docs2\site\docs\getting-started\interfaces.md
+		..\docs2\site\docs\getting-started\introduction.md = ..\docs2\site\docs\getting-started\introduction.md
+		..\docs2\site\docs\getting-started\lists-non-null.md = ..\docs2\site\docs\getting-started\lists-non-null.md
+		..\docs2\site\docs\getting-started\malicious-queries.md = ..\docs2\site\docs\getting-started\malicious-queries.md
+		..\docs2\site\docs\getting-started\metadata.md = ..\docs2\site\docs\getting-started\metadata.md
+		..\docs2\site\docs\getting-started\metrics.md = ..\docs2\site\docs\getting-started\metrics.md
+		..\docs2\site\docs\getting-started\mutations.md = ..\docs2\site\docs\getting-started\mutations.md
+		..\docs2\site\docs\getting-started\queries.md = ..\docs2\site\docs\getting-started\queries.md
+		..\docs2\site\docs\getting-started\query-organization.md = ..\docs2\site\docs\getting-started\query-organization.md
+		..\docs2\site\docs\getting-started\query-validation.md = ..\docs2\site\docs\getting-started\query-validation.md
+		..\docs2\site\docs\getting-started\relay.md = ..\docs2\site\docs\getting-started\relay.md
+		..\docs2\site\docs\getting-started\schema-types.md = ..\docs2\site\docs\getting-started\schema-types.md
+		..\docs2\site\docs\getting-started\subscriptions.md = ..\docs2\site\docs\getting-started\subscriptions.md
+		..\docs2\site\docs\getting-started\unions.md = ..\docs2\site\docs\getting-started\unions.md
+		..\docs2\site\docs\getting-started\user-context.md = ..\docs2\site\docs\getting-started\user-context.md
+		..\docs2\site\docs\getting-started\variables.md = ..\docs2\site\docs\getting-started\variables.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks", "GraphQL.Benchmarks\GraphQL.Benchmarks.csproj", "{F08D07D5-1BD7-41A7-8F1B-FF655517A058}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F263-BCEB-4738-9111-C85139BC63A7}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
+		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
+		..\docs2\site\docs\guides\migration.md = ..\docs2\site\docs\guides\migration.md
+		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +113,18 @@ Global
 		{17CA647F-903F-4A0A-BF8F-E5123AAA2617}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17CA647F-903F-4A0A-BF8F-E5123AAA2617}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17CA647F-903F-4A0A-BF8F-E5123AAA2617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F08D07D5-1BD7-41A7-8F1B-FF655517A058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +134,9 @@ Global
 		{21FA4059-CF8D-4A5B-8C1B-D4DB645311B9} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{CB5C204A-FBE9-40CC-B4C7-A29E7E162DBE} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{17CA647F-903F-4A0A-BF8F-E5123AAA2617} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{587B3CCD-8B68-491B-9AC5-0E04DF3E9507} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
+		{F279F263-BCEB-4738-9111-C85139BC63A7} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

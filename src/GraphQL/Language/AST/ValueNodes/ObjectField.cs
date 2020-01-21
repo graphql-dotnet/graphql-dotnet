@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -30,14 +31,11 @@ namespace GraphQL.Language.AST
             return "ObjectField{{name='{0}', value={1}}}".ToFormat(Name, Value);
         }
 
-        protected bool Equals(ObjectField other)
-        {
-            return string.Equals(Name, other.Name);
-        }
+        protected bool Equals(ObjectField other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 
