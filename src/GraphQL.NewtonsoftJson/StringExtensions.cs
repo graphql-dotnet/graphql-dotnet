@@ -31,11 +31,11 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Converts a JSON formatted string into a the dictionary.
+        /// Converts a JSON formatted string into a dictionary.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
-        public static Dictionary<string, object> ToDictionary(this string json)
+        private static Dictionary<string, object> ToDictionary(this string json)
         {
             var values = JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings
@@ -51,7 +51,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="value">The object containing the value to extract.</param>
         /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
-        public static object GetValue(this object value)
+        private static object GetValue(this object value)
         {
             if (value is JObject objectValue)
             {

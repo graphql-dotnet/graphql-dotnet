@@ -1,11 +1,15 @@
 using GraphQL.Utilities;
-using GraphQL.NewtonsoftJson;
 using GraphQLParser.Exceptions;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+#if NETSTANDARD2_0
+using GraphQL.NewtonsoftJson;
+#else
+using GraphQL.SystemTextJson;
+#endif
 
 namespace GraphQL.Tests.Utilities
 {
