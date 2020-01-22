@@ -2,24 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
-using Shouldly;
 using Newtonsoft.Json.Linq;
+using Shouldly;
 
 namespace GraphQL.Tests
 {
     public class BasicQueryTestBase
     {
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
 
         public ExecutionResult AssertQuerySuccess(
             ISchema schema,
             string query,
             string expected,
+            IDocumentWriter writer,
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
@@ -27,21 +26,21 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(schema, query, queryResult, inputs, root, userContext, cancellationToken, rules);
+            return AssertQuery(schema, query, queryResult, inputs, root, writer, userContext, cancellationToken, rules);
         }
 
-        public ExecutionResult AssertQuerySuccess(Action<ExecutionOptions> options, string expected)
+        public ExecutionResult AssertQuerySuccess(Action<ExecutionOptions> options, string expected, IDocumentWriter writer)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(options, queryResult);
+            return AssertQuery(options, queryResult, writer);
         }
 
-        public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
+        public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult, IDocumentWriter writer)
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
+            var writtenResult = writer.WriteToStringAsync(runResult).Result;
+            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).Result;
 
 //#if DEBUG
 //            Console.WriteLine(writtenResult);
@@ -67,6 +66,7 @@ namespace GraphQL.Tests
             ExecutionResult expectedExecutionResult,
             Inputs inputs,
             object root,
+            IDocumentWriter writer,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
@@ -82,8 +82,8 @@ namespace GraphQL.Tests
                 _.ValidationRules = rules;
             }).GetAwaiter().GetResult();
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var writtenResult = writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
+            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
 //#if DEBUG
 //            Console.WriteLine(writtenResult);

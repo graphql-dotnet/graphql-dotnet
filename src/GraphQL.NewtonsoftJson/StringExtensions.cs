@@ -26,7 +26,7 @@ namespace GraphQL.NewtonsoftJson
         public static Inputs ToInputs(this JObject obj)
         {
             var variables = obj?.GetValue() as Dictionary<string, object>
-                            ?? new Dictionary<string, object>();
+                ?? new Dictionary<string, object>();
             return new Inputs(variables);
         }
 
@@ -35,7 +35,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
-        private static Dictionary<string, object> ToDictionary(this string json)
+        public static Dictionary<string, object> ToDictionary(this string json)
         {
             var values = JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings

@@ -1,5 +1,4 @@
 using Alba;
-using GraphQL.NewtonsoftJson;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 
@@ -9,17 +8,18 @@ namespace GraphQL.Harness.Tests
     {
         private readonly string _result;
         private readonly bool _ignoreExtensions;
+        private readonly IDocumentWriter _writer;
 
-        public SuccessResultAssertion(string result, bool ignoreExtensions)
+        public SuccessResultAssertion(string result, bool ignoreExtensions, IDocumentWriter writer)
         {
             _result = result;
             _ignoreExtensions = ignoreExtensions;
+            _writer = writer;
         }
 
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
-            var writer = new DocumentWriter();
-            var expectedResult = writer.WriteToStringAsync(CreateQueryResult(_result)).GetAwaiter().GetResult();
+            var expectedResult = _writer.WriteToStringAsync(CreateQueryResult(_result)).GetAwaiter().GetResult();
 
             var body = ex.ReadBody(context);
 

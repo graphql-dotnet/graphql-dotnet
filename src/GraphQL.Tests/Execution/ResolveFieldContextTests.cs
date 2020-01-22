@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using GraphQL.NewtonsoftJson;
 using Shouldly;
 using Xunit;
 

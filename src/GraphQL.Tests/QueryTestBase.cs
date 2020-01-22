@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
 using GraphQL.StarWars.IoC;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -28,7 +27,6 @@ namespace GraphQL.Tests
         {
             Services = new SimpleContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
-            Writer = new DocumentWriter(indent: true);
         }
 
         public ISimpleContainer Services { get; set; }
@@ -37,11 +35,10 @@ namespace GraphQL.Tests
 
         public IDocumentExecuter Executer { get; private set; }
 
-        public IDocumentWriter Writer { get; private set; }
-
         public ExecutionResult AssertQuerySuccess(
             string query,
             string expected,
+            IDocumentWriter writer,
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
@@ -50,12 +47,13 @@ namespace GraphQL.Tests
             IFieldNameConverter fieldNameConverter = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, fieldNameConverter);
+            return AssertQuery(query, queryResult, inputs, root, writer, userContext, cancellationToken, rules, null, fieldNameConverter);
         }
 
         public ExecutionResult AssertQueryWithErrors(
             string query,
             string expected,
+            IDocumentWriter writer,
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
@@ -68,6 +66,7 @@ namespace GraphQL.Tests
             return AssertQueryIgnoreErrors(
                 query,
                 queryResult,
+                writer,
                 inputs,
                 root,
                 userContext,
@@ -80,6 +79,7 @@ namespace GraphQL.Tests
         public ExecutionResult AssertQueryIgnoreErrors(
             string query,
             ExecutionResult expectedExecutionResult,
+            IDocumentWriter writer,
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
@@ -101,8 +101,8 @@ namespace GraphQL.Tests
 
             var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data };
 
-            var writtenResult = Writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var writtenResult = writer.WriteToStringAsync(renderResult).GetAwaiter().GetResult();
+            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
 
@@ -118,6 +118,7 @@ namespace GraphQL.Tests
             ExecutionResult expectedExecutionResult,
             Inputs inputs,
             object root,
+            IDocumentWriter writer,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
@@ -137,8 +138,8 @@ namespace GraphQL.Tests
                 options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var writtenResult = writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
+            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
             string additionalInfo = null;
 

@@ -6,8 +6,9 @@ namespace GraphQL.Tests.Bugs
 {
     public class Bug1156 : QueryTestBase<Bug1156Schema>
     {
-        [Fact]
-        public void duplicated_type_names_should_throw_error()
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public void duplicated_type_names_should_throw_error(IDocumentWriter writer)
         {
             var query = @"
 {
@@ -21,7 +22,7 @@ namespace GraphQL.Tests.Bugs
         field2B
     }
 }";
-            var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1);
+            var result = AssertQueryWithErrors(query, null, writer, expectedErrorCount: 1);
             result.Errors[0].Message.ShouldBe(@"Unable to register GraphType 'GraphQL.Tests.Bugs.Type2' with the name 'MyType';
 the name 'MyType' is already registered to 'GraphQL.Tests.Bugs.Type1'.");
         }

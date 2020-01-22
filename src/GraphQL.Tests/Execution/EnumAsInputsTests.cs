@@ -1,4 +1,4 @@
-using GraphQL.NewtonsoftJson;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Xunit;
 

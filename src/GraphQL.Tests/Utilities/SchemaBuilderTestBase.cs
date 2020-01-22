@@ -1,15 +1,10 @@
-using GraphQL.Utilities;
-using GraphQLParser.Exceptions;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-#if NETSTANDARD2_0
-using GraphQL.NewtonsoftJson;
-#else
-using GraphQL.SystemTextJson;
-#endif
+using GraphQL.Utilities;
+using GraphQLParser.Exceptions;
+using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -21,10 +16,9 @@ namespace GraphQL.Tests.Utilities
         }
 
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
         protected SchemaBuilder Builder { get; set; }
 
-        public ExecutionResult AssertQuery(Action<ExecuteConfig> configure)
+        public ExecutionResult AssertQuery(IDocumentWriter writer, Action<ExecuteConfig> configure)
         {
             var config = new ExecuteConfig();
             configure(config);
@@ -34,22 +28,25 @@ namespace GraphQL.Tests.Utilities
 
             var queryResult = CreateQueryResult(config.ExpectedResult);
 
-            return AssertQuery(_ =>
-            {
-                _.Schema = schema;
-                _.Query = config.Query;
-                _.Inputs = config.Variables.ToInputs();
-                _.Root = config.Root;
-                _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
-            }, queryResult);
+            return AssertQuery(
+                writer,
+                _ =>
+                {
+                    _.Schema = schema;
+                    _.Query = config.Query;
+                    _.Inputs = SystemTextJson.StringExtensions.ToInputs(config.Variables);
+                    _.Root = config.Root;
+                    _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
+                },
+                queryResult);
         }
 
-        public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
+        public ExecutionResult AssertQuery(IDocumentWriter writer, Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
+            var writtenResult = writer.WriteToStringAsync(runResult).Result;
+            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).Result;
 
             string additionalInfo = null;
 

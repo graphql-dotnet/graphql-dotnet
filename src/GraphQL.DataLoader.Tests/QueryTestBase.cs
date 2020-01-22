@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ namespace GraphQL.DataLoader.Tests
     public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new DocumentExecuter();
-        private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
 
         protected IServiceProvider Services { get; }
 
@@ -59,23 +57,24 @@ namespace GraphQL.DataLoader.Tests
         public ExecutionResult AssertQuerySuccess<TSchema>(
             string query,
             string expected,
+            IDocumentWriter writer,
             Inputs inputs = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery<TSchema>(query, queryResult, inputs, userContext, cancellationToken);
+            return AssertQuery<TSchema>(query, queryResult, writer, inputs, userContext, cancellationToken);
         }
 
-        public ExecutionResult AssertQuerySuccess<TSchema>(Action<ExecutionOptions> options, string expected)
+        public ExecutionResult AssertQuerySuccess<TSchema>(Action<ExecutionOptions> options, string expected, IDocumentWriter writer)
             where TSchema : ISchema
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery<TSchema>(options, queryResult);
+            return AssertQuery<TSchema>(options, queryResult, writer);
         }
 
-        public ExecutionResult AssertQuery<TSchema>(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
+        public ExecutionResult AssertQuery<TSchema>(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult, IDocumentWriter writer)
             where TSchema : ISchema
         {
             var schema = Services.GetRequiredService<TSchema>();
@@ -126,24 +125,28 @@ namespace GraphQL.DataLoader.Tests
         public ExecutionResult AssertQuery<TSchema>(
             string query,
             ExecutionResult expectedExecutionResult,
+            IDocumentWriter writer,
             Inputs inputs = null,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
-            return AssertQuery<TSchema>(opts =>
-            {
-                opts.Query = query;
-                opts.Inputs = inputs;
-                opts.UserContext = userContext;
-                opts.CancellationToken = cancellationToken;
-
-                foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+            return AssertQuery<TSchema>(
+                opts =>
                 {
-                    opts.Listeners.Add(listener);
-                }
+                    opts.Query = query;
+                    opts.Inputs = inputs;
+                    opts.UserContext = userContext;
+                    opts.CancellationToken = cancellationToken;
 
-            }, expectedExecutionResult);
+                    foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+                    {
+                        opts.Listeners.Add(listener);
+                    }
+
+                },
+                expectedExecutionResult,
+                writer);
         }
 
         public ExecutionResult CreateQueryResult(string result)
