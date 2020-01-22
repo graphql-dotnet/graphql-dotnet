@@ -43,6 +43,9 @@ http://graphql-dotnet.github.io
 
 https://github.com/graphql-dotnet/examples
 
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+It supports the popular IDEs for managing GraphQL requests - GraphQL Playground, GraphiQL and Altair.
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.
@@ -163,7 +166,7 @@ var json = await schema.ExecuteAsync(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](http://facebook.github.io/graphql/June2018/).
+- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](https://graphql.github.io/graphql-spec/June2018/).
 
 ### Operation Execution
 - [x] Scalars

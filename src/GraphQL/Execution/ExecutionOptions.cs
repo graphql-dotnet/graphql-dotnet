@@ -39,7 +39,7 @@ namespace GraphQL
 
         public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
-        public IList<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
+        public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 

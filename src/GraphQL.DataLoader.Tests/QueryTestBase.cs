@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
-using GraphQL.Http;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;

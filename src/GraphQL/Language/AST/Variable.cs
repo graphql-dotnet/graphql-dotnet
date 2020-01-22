@@ -52,7 +52,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
             return Equals((VariableDefinition)obj);
@@ -83,7 +83,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
             return Equals((VariableReference)obj);

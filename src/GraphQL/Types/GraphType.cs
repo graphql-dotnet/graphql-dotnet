@@ -49,7 +49,7 @@ namespace GraphQL.Types
                     NameValidator.ValidateName(name, "type");
 
                     if (IsTypeModifier)
-                        throw new ArgumentOutOfRangeException("A type modifier (List, NonNull) name must be null");
+                        throw new ArgumentOutOfRangeException(nameof(name), "A type modifier (List, NonNull) name must be null");
                 }
 
                 _name = name;
@@ -88,7 +88,7 @@ namespace GraphQL.Types
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
 

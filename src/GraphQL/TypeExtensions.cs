@@ -1,15 +1,14 @@
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    using System.Collections;
-    using System.ComponentModel;
-
     public static class TypeExtensions
     {
         /// <summary>
@@ -166,7 +165,7 @@ namespace GraphQL
 
             var genericArgs = type.GetGenericArguments();
 
-            if (genericArgs.Any())
+            if (genericArgs.Length > 0)
             {
                 int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0)
@@ -178,7 +177,7 @@ namespace GraphQL
                 for (int i = 0; i < typeParameters.Length; ++i)
                 {
                     string typeParamName = GetFriendlyName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                    friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
                 friendlyName += ">";
             }

@@ -1,5 +1,5 @@
 using Alba;
-using GraphQL.Http;
+using GraphQL.NewtonsoftJson;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 

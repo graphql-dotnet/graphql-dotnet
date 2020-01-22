@@ -6,34 +6,37 @@ namespace GraphQL.Language.AST
 {
     public class SelectionSet : AbstractNode
     {
-        private readonly List<ISelection> _selections;
-
         public SelectionSet()
         {
-            _selections = new List<ISelection>();
+            SelectionsList = new List<ISelection>();
         }
 
         private SelectionSet(List<ISelection> selections)
         {
-            _selections = selections;
+            SelectionsList = selections;
         }
 
-        public IList<ISelection> Selections => _selections;
-        public override IEnumerable<INode> Children => _selections;
+        //TODO: change to List<> ?
+        public IList<ISelection> Selections => SelectionsList;
+
+        // avoids List+Enumerator<ISelection> boxing on hot path
+        internal List<ISelection> SelectionsList { get; }
+
+        public override IEnumerable<INode> Children => SelectionsList;
 
         public void Prepend(ISelection selection)
         {
-            _selections.Insert(0, selection ?? throw new ArgumentNullException(nameof(selection)));
+            SelectionsList.Insert(0, selection ?? throw new ArgumentNullException(nameof(selection)));
         }
 
         public void Add(ISelection selection)
         {
-            _selections.Add(selection ?? throw new ArgumentNullException(nameof(selection)));
+            SelectionsList.Add(selection ?? throw new ArgumentNullException(nameof(selection)));
         }
 
         public SelectionSet Merge(SelectionSet otherSelection)
         {
-            var newSelection = _selections.Union(otherSelection.Selections).ToList();
+            var newSelection = SelectionsList.Union(otherSelection.SelectionsList).ToList();
             return new SelectionSet(newSelection);
         }
 
@@ -41,7 +44,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
             return Equals((SelectionSet)obj);
@@ -49,7 +52,7 @@ namespace GraphQL.Language.AST
 
         public override string ToString()
         {
-            var sel = string.Join(", ", _selections.Select(s => s.ToString()));
+            var sel = string.Join(", ", SelectionsList.Select(s => s.ToString()));
             return $"SelectionSet{{selections={sel}}}";
         }
     }

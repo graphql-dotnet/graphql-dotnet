@@ -1247,7 +1247,7 @@ namespace GraphQL.Tests.Introspection
                   ""ofType"": null
                 }
               },
-              ""defaultValue"": ""null""
+              ""defaultValue"": null
             }
           ]
         },
@@ -1272,7 +1272,7 @@ namespace GraphQL.Tests.Introspection
                   ""ofType"": null
                 }
               },
-              ""defaultValue"": ""null""
+              ""defaultValue"": null
             }
           ]
         },
