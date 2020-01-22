@@ -115,15 +115,7 @@ namespace GraphQL.Utilities
 
         public object Source { get; }
 
-        public TType SourceAs<TType>()
-        {
-            if (Source != null)
-            {
-                return (TType)Source;
-            }
-
-            return default;
-        }
+        public TType SourceAs<TType>() => Source == null ? default : (TType)Source;
     }
 
     public interface IValueResolver
