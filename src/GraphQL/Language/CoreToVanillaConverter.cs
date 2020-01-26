@@ -143,13 +143,13 @@ namespace GraphQL.Language
             return field;
         }
 
-        public Directives Directives(IEnumerable<GraphQLDirective> directives)
+        public Directives Directives(IEnumerable<GraphQLDirective> source)
         {
             Directives target = null;
 
-            if (directives != null)
+            if (source != null)
             {
-                foreach (var d in directives)
+                foreach (var d in source)
                 {
                     (target ?? (target = new Directives())).Add(Directive(d));
                 }
@@ -167,13 +167,16 @@ namespace GraphQL.Language
 
         public Arguments Arguments(IEnumerable<GraphQLArgument> source)
         {
-            var target = new Arguments();
+            Arguments target = null;
 
-            foreach (var s in source)
+            if (source != null)
             {
-                var arg = new Argument(Name(s.Name)).WithLocation(s.Name, _body);
-                arg.Value = Value(s.Value);
-                target.Add(arg);
+                foreach (var a in source)
+                {
+                    var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
+                    arg.Value = Value(a.Value);
+                    (target ?? (target = new Arguments())).Add(arg);
+                }
             }
 
             return target;
