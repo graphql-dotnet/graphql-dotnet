@@ -1,5 +1,6 @@
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
+using GraphQL.Types;
 using Moq;
 using Shouldly;
 using System;
@@ -154,6 +155,14 @@ namespace GraphQL.DataLoader.Tests
             var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync());
 
             ex.Message.ShouldBe("Immediate");
+        }
+
+        [Fact]
+        public void GetGraphTypeFromType_Works_With_IDataLoaderResult()
+        {
+            var type = typeof(IDataLoaderResult<int>);
+            var result = type.GetGraphTypeFromType(false);
+            result.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
         }
     }
 }
