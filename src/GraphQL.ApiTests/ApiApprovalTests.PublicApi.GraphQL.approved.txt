@@ -143,12 +143,6 @@ namespace GraphQL.DataLoader
         public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(System.Threading.Tasks.Task<T> result) { }
         public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(T result) { }
     }
-    public sealed class DataLoaderChainedResult<T, TResult> : GraphQL.DataLoader.IDataLoaderResult, GraphQL.DataLoader.IDataLoaderResult<TResult>
-    {
-        public DataLoaderChainedResult(GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
-        public DataLoaderChainedResult(GraphQL.DataLoader.IDataLoaderResult<T> parent, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<TResult>> chainedDelegate) { }
-        public System.Threading.Tasks.Task<TResult> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
-    }
     public class DataLoaderContext
     {
         public DataLoaderContext() { }

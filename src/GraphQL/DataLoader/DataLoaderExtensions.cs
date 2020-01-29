@@ -74,7 +74,11 @@ namespace GraphQL.DataLoader
         /// <returns>A pending data loader operation that can return a value once the data loader and the chained delegate finish</returns>
         public static IDataLoaderResult<TResult> Then<T, TResult>(this IDataLoaderResult<T> parent, Func<T, CancellationToken, Task<TResult>> chainedDelegate)
         {
-            return new DataLoaderChainedResult<T, TResult>(parent, chainedDelegate);
+            return new SimpleDataLoader<TResult>(async (cancellationToken) =>
+            {
+                var result = await parent.GetResultAsync(cancellationToken).ConfigureAwait(false);
+                return await chainedDelegate(result, cancellationToken).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -87,7 +91,11 @@ namespace GraphQL.DataLoader
         /// <returns>A pending data loader operation that can return a value once the data loader and the chained delegate finish</returns>
         public static IDataLoaderResult<TResult> Then<T, TResult>(this IDataLoaderResult<T> parent, Func<T, Task<TResult>> chainedDelegate)
         {
-            return new DataLoaderChainedResult<T, TResult>(parent, chainedDelegate);
+            return new SimpleDataLoader<TResult>(async (cancellationToken) =>
+            {
+                var result = await parent.GetResultAsync(cancellationToken).ConfigureAwait(false);
+                return await chainedDelegate(result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -100,7 +108,11 @@ namespace GraphQL.DataLoader
         /// <returns>A pending data loader operation that can return a value once the data loader and the chained delegate finish</returns>
         public static IDataLoaderResult<TResult> Then<T, TResult>(this IDataLoaderResult<T> parent, Func<T, TResult> chainedDelegate)
         {
-            return new DataLoaderChainedResult<T, TResult>(parent, (value) => Task.FromResult(chainedDelegate(value)));
+            return new SimpleDataLoader<TResult>(async (cancellationToken) =>
+            {
+                var result = await parent.GetResultAsync(cancellationToken).ConfigureAwait(false);
+                return chainedDelegate(result);
+            });
         }
 
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
