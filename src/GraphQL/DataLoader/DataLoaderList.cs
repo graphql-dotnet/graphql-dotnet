@@ -33,7 +33,7 @@ namespace GraphQL.DataLoader
                     //if two threads call DispatchAsync simultaneously, one will block until the Task is created
                     //  and then the created Task will be returned to both callers
                     //this will pass the cancellationToken from the first caller to DispatchAsync through to
-                    //  StartLoading; further calls to DispatchAsync cannot cancel the loading
+                    //  StartLoading; further calls to DispatchAsync cannot cancel the loading via another cancellationToken
 
                     //return LoadingTask if already set,
                     //  or else start data loading, save the returned Task in LoadingTask, and return the Task

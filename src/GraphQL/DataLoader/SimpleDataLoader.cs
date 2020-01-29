@@ -4,18 +4,34 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
+    /// <summary>
+    /// Provides an IDataLoader that always returns the same data
+    /// </summary>
+    /// <typeparam name="T">The type of data that is returned</typeparam>
     public class SimpleDataLoader<T> : IDataLoader, IDataLoader<T>, IDataLoaderResult<T>
     {
-        private readonly Func<CancellationToken, Task<T>> _loader;
+        private readonly Func<CancellationToken, Task<T>> _fetchDelegate;
         private Task<T> _result;
 
-        public SimpleDataLoader(Func<CancellationToken, Task<T>> loader)
+        /// <summary>
+        /// Initializes a new SimpleDataLoader with the given fetch delegate
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that accepts a cancellation token and returns data</param>
+        public SimpleDataLoader(Func<CancellationToken, Task<T>> fetchDelegate)
         {
-            _loader = loader;
+            _fetchDelegate = fetchDelegate;
         }
 
+        /// <summary>
+        /// Asynchronously executes the fetch delegate if it has not already been run
+        /// </summary>
+        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public Task DispatchAsync(CancellationToken cancellationToken = default) => GetResultAsync(cancellationToken);
 
+        /// <summary>
+        /// Asynchronously executes the fetch delegate if it has not already been run, then returns the data
+        /// </summary>
+        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
         public Task<T> GetResultAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -30,7 +46,7 @@ namespace GraphQL.DataLoader
 
                 try
                 {
-                    return (_result = _loader(cancellationToken));
+                    return (_result = _fetchDelegate(cancellationToken));
                 }
                 catch (Exception ex)
                 {
@@ -40,8 +56,14 @@ namespace GraphQL.DataLoader
             }
         }
 
+        /// <summary>
+        /// Asynchronously load data
+        /// </summary>
+        /// <returns>
+        /// An object representing a pending operation.
+        /// </returns>
         public IDataLoaderResult<T> LoadAsync() => this;
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken);
+        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

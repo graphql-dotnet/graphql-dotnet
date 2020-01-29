@@ -6,33 +6,51 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerable<T>>, IDataLoader<TKey, IEnumerable<T>>
+    /// <summary>
+    /// A data loader that returns a list of values for each given unique key
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key</typeparam>
+    /// <typeparam name="T">The type of the return value</typeparam>
+    public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerable<T>>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
         private readonly T _defaultValue;
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader,
+        /// <summary>
+        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns an ILookup of keys and values</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
                IEqualityComparer<TKey> keyComparer = null,
                T defaultValue = default) : base(keyComparer)
         {
-            _loader = loader;
+            _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
             _defaultValue = defaultValue;
         }
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
+        /// <summary>
+        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate and key selector
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
+        /// <param name="keySelector">A selector for the key from the returned object</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
             T defaultValue = default) : base(keyComparer)
         {
-            if (loader == null)
-                throw new ArgumentNullException(nameof(loader));
+            if (fetchDelegate == null)
+                throw new ArgumentNullException(nameof(fetchDelegate));
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
             _loader = async (keys, cancellationToken) =>
             {
-                var ret = await loader(keys, cancellationToken);
-                return ret.ToLookup(keySelector);
+                var ret = await fetchDelegate(keys, cancellationToken);
+                return ret.ToLookup(keySelector, keyComparer);
             };
             _defaultValue = defaultValue;
         }
