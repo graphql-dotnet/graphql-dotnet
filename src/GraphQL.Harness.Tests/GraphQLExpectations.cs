@@ -13,7 +13,7 @@ namespace GraphQL.Harness.Tests
 
         public GraphQLExpectations ShouldBeSuccess(string result, IDocumentWriter writer, bool ignoreExtensions = true)
         {
-            _scenario.AssertThat(new SuccessResultAssertion(result, ignoreExtensions, writer));
+            _scenario.AssertThat(new SuccessResultAssertion(result, ignoreExtensions));
             return this;
         }
     }

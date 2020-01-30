@@ -6,9 +6,8 @@ namespace GraphQL.Tests.Bugs
 {
     public class Bug118SpacesInTypeNameTests : QueryTestBase<MutationSchema>
     {
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void supports_partially_nullable_inputs_when_parent_non_null(IDocumentWriter writer)
+        [Fact]
+        public void supports_partially_nullable_inputs_when_parent_non_null()
         {
             var inputs = "{'input_0': {'id':'123', 'foo': null, 'bar': null} }".ToInputs();
             var query = @"
@@ -19,7 +18,7 @@ mutation M($input_0: MyInput!) {
             var expected = @"{
   ""run"": ""123""
 }";
-            AssertQuerySuccess(query, expected, writer, inputs);
+            AssertQuerySuccess(query, expected, inputs);
         }
     }
 

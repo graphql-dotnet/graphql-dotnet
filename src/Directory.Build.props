@@ -5,8 +5,4 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <IsNetCore3OnwardsTarget>$(TargetFramework.StartsWith('netcoreapp3.'))</IsNetCore3OnwardsTarget>
-  </PropertyGroup>
 </Project>

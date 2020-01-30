@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
-    public class InputConversionTests
+    public abstract class InputConversionTestsBase
     {
         public class MyInput
         {
@@ -64,7 +63,7 @@ namespace GraphQL.Tests.Execution
         public void converts_small_numbers_to_int()
         {
             var json = @"{""a"": 1}";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs["a"].ShouldBe(1);
             inputs["a"].GetType().ShouldBe(typeof(int));
         }
@@ -73,7 +72,7 @@ namespace GraphQL.Tests.Execution
         public void converts_large_numbers_to_long()
         {
             var json = @"{""a"": 1000000000000000001}";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs["a"].ShouldBe(1000000000000000001);
             inputs["a"].GetType().ShouldBe(typeof(long));
         }
@@ -83,7 +82,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": 1, ""b"": ""2""}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
             inputs["a"].ShouldBe(1);
@@ -101,7 +100,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""]}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
             inputs["a"].ShouldBe(1);
@@ -123,7 +122,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""], ""f"": [1,null]}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
             inputs["f"].ShouldBeOfType<List<object>>();
@@ -141,7 +140,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""], ""g"": [[1,null], [null, 1]]}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
             inputs["g"].ShouldBeOfType<List<object>>();
@@ -164,7 +163,7 @@ namespace GraphQL.Tests.Execution
         public void can_convert_json_to_input_object_with_nullable_int()
         {
             var json = @"{""a"": 1, ""b"": ""2"", ""d"": ""5""}";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
@@ -175,7 +174,7 @@ namespace GraphQL.Tests.Execution
         public void can_read_long()
         {
             var json = @"{""j"": 89429901947254093 }";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
@@ -186,7 +185,7 @@ namespace GraphQL.Tests.Execution
         public void can_convert_int_to_double()
         {
             var json = @"{""i"": 1 }";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
@@ -197,7 +196,7 @@ namespace GraphQL.Tests.Execution
         public void can_convert_json_to_input_object_with_guid()
         {
             var json = @"{""a"": 1, ""b"": ""2"", ""e"": ""920a1b6d-f75a-4594-8567-e2c457b29cc0""}";
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             inputs.ShouldNotBeNull();
             var myInput = inputs.ToObject<MyInput>();
             myInput.ShouldNotBeNull();
@@ -209,7 +208,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": ""three""}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
 
@@ -225,7 +224,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": ""Two""}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
 
@@ -240,7 +239,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": ""2""}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             inputs.ShouldNotBeNull();
 
@@ -256,7 +255,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": 2, ""b"": 2}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             var myInput = inputs.ToObject<EnumInput>();
 
@@ -269,7 +268,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{""a"": ""foo"", ""b"":[{""a"":'bar'}], ""c"": ""baz""}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             var myInput = inputs.ToObject<Parent>();
 
@@ -283,7 +282,7 @@ namespace GraphQL.Tests.Execution
         {
             var json = @"{ 'input': {""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}}";
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
 
             var myInput = inputs.ToObject<Parent2>();
 
@@ -298,7 +297,7 @@ namespace GraphQL.Tests.Execution
             var json = @"{ ""h"": ""2016-10-21T13:32:15.753Z"" }";
             var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15.753"), DateTimeKind.Utc);
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             var myInput = inputs.ToObject<MyInput>();
 
             myInput.ShouldNotBeNull();
@@ -311,11 +310,13 @@ namespace GraphQL.Tests.Execution
             var json = @"{ ""h"": ""2016-10-21T13:32:15"" }";
             var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15"), DateTimeKind.Unspecified);
 
-            var inputs = json.ToInputs();
+            var inputs = VariablesToInputs(json);
             var myInput = inputs.ToObject<MyInput>();
 
             myInput.ShouldNotBeNull();
             myInput.H.ShouldBe(expected);
         }
+
+        protected abstract Inputs VariablesToInputs(string variables);
     }
 }

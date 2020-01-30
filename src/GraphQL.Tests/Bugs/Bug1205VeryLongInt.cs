@@ -9,18 +9,17 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/1022
     public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     {
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void Very_Long_Number_Should_Return_Error_For_Int(IDocumentWriter writer)
+        [Fact]
+        public void Very_Long_Number_Should_Return_Error_For_Int()
         {
             var query = "{ int }";
             var expected = new ExecutionResult { Errors = new ExecutionErrors { new ExecutionError("Value was either too large or too small for an Int32.", new OverflowException()) } };
-            AssertQueryIgnoreErrors(query, expected, writer, renderErrors: true, expectedErrorCount: 1);
+            AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void Very_Long_Number_In_Input_Should_Return_Error_For_Int(IDocumentWriter writer)
+        public void Very_Long_Number_In_Input_Should_Return_Error_For_Int()
         {
             var query = "{ int_with_arg(in:636474637870330463) }";
             var expected = new ExecutionResult
@@ -35,29 +34,29 @@ namespace GraphQL.Tests.Bugs
             };
             expected.Errors[0].AddLocation(1, 16);
 
-            AssertQueryIgnoreErrors(query, expected, writer, renderErrors: true, expectedErrorCount: 1);
+            AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void Very_Long_Number_Should_Return_As_Is_For_Long(IDocumentWriter writer)
+        public void Very_Long_Number_Should_Return_As_Is_For_Long()
         {
             var query = "{ long }";
             var expected = @"{
   ""long"": 636474637870330463 
 }";
-            AssertQuerySuccess(query, expected, writer);
+            AssertQuerySuccess(query, expected);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void Very_Long_Number_In_Input_Should_Work_For_Long(IDocumentWriter writer)
+        public void Very_Long_Number_In_Input_Should_Work_For_Long()
         {
             var query = "{ long_with_arg(in:636474637870330463) }";
             var expected = @"{
   ""long_with_arg"": 636474637870330463 
 }";
-            AssertQuerySuccess(query, expected, writer);
+            AssertQuerySuccess(query, expected);
         }
 
         [Fact]

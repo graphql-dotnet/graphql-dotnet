@@ -11,9 +11,8 @@ namespace GraphQL.DataLoader.Tests
 {
     public class DataLoaderQueryTests : QueryTestBase
     {
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void SingleQueryRoot_Works(IDocumentWriter writer)
+        [Fact]
+        public void SingleQueryRoot_Works()
         {
             var users = Fake.Users.Generate(2);
 
@@ -35,15 +34,13 @@ namespace GraphQL.DataLoader.Tests
         firstName: """ + users[1].FirstName + @"""
     }
 ] }
-",
-                writer);
+");
 
             usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void TwoLevel_SingleResult_Works(IDocumentWriter writer)
+        [Fact]
+        public void TwoLevel_SingleResult_Works()
         {
             var users = Fake.Users.Generate(1);
 
@@ -80,8 +77,7 @@ namespace GraphQL.DataLoader.Tests
         }
     }
 }
-",
-                writer);
+");
 
             ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
             ordersMock.VerifyNoOtherCalls();
@@ -90,9 +86,8 @@ namespace GraphQL.DataLoader.Tests
             usersMock.VerifyNoOtherCalls();
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void TwoLevel_MultipleResults_OperationsAreBatched(IDocumentWriter writer)
+        [Fact]
+        public void TwoLevel_MultipleResults_OperationsAreBatched()
         {
             var users = Fake.Users.Generate(2);
             var orders = Fake.GenerateOrdersForUsers(users, 1);
@@ -135,8 +130,7 @@ namespace GraphQL.DataLoader.Tests
         }
     }]
 }
-",
-                writer);
+");
 
             ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
             ordersMock.VerifyNoOtherCalls();

@@ -51,9 +51,8 @@ namespace GraphQL.Tests.Utilities
             query.GetField("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public void can_execute_resolver(IDocumentWriter writer)
+        [Fact]
+        public void can_execute_resolver()
         {
             var defs = @"
                 type Post {
@@ -72,7 +71,7 @@ namespace GraphQL.Tests.Utilities
             var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
             var variables = "{ 'id': '1' }";
 
-            AssertQuery(writer, _ =>
+            AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
@@ -104,7 +103,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void can_execute_renamed_field(IDocumentWriter writer)
+        public void can_execute_renamed_field()
         {
             var defs = @"
                 type Post {
@@ -123,7 +122,7 @@ namespace GraphQL.Tests.Utilities
             var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
             var variables = "{ 'id': '1' }";
 
-            AssertQuery(writer, _ =>
+            AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
@@ -134,7 +133,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void can_execute_interfaces(IDocumentWriter writer)
+        public void can_execute_interfaces()
         {
             var defs = @"
                 enum PetKind {
@@ -168,7 +167,7 @@ namespace GraphQL.Tests.Utilities
             var query = @"{ pet { name } }";
             var expected = @"{ 'pet': { 'name' : 'Eli' } }";
 
-            AssertQuery(writer, _ =>
+            AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
@@ -178,7 +177,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task minimal_schema(IDocumentWriter writer)
+        public async Task minimal_schema()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -187,21 +186,21 @@ namespace GraphQL.Tests.Utilities
             ");
 
             var root = new { Hello = "Hello World!" };
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ hello }";
                 _.Root = root;
             });
 
             var expectedResult = CreateQueryResult("{ 'hello': 'Hello World!' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_source_without_params(IDocumentWriter writer)
+        public async Task can_use_source_without_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -212,21 +211,21 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ source }";
                 _.Root = new { Hello =  "World" };
             });
 
             var expectedResult = CreateQueryResult("{ 'source': true }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_resolvefieldcontext_without_params(IDocumentWriter writer)
+        public async Task can_use_resolvefieldcontext_without_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -234,21 +233,21 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ resolve }";
                 _.ExposeExceptions = true;
             });
 
             var expectedResult = CreateQueryResult("{ 'resolve': 'Resolved' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_resolvefieldcontext_with_params(IDocumentWriter writer)
+        public async Task can_use_resolvefieldcontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -256,17 +255,17 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(writer, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
             var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_usercontext(IDocumentWriter writer)
+        public async Task can_use_usercontext()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -277,21 +276,21 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_inherited_usercontext(IDocumentWriter writer)
+        public async Task can_use_inherited_usercontext()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -299,14 +298,14 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new ChildMyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
@@ -335,7 +334,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_usercontext_with_params(IDocumentWriter writer)
+        public async Task can_use_usercontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -343,21 +342,21 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ userContextWithParam(id: ""abcd"") }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
             var expectedResult = CreateQueryResult("{ 'userContextWithParam': 'Quinn abcd' }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_context_source_usercontext(IDocumentWriter writer)
+        public async Task can_use_context_source_usercontext()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -368,7 +367,7 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<ParametersType>();
             });
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ three }";
                 _.Root = new { Hello = "World" };
@@ -376,14 +375,14 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'three': true }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task can_use_context_source_usercontext_with_params(IDocumentWriter writer)
+        public async Task can_use_context_source_usercontext_with_params()
         {
             var schema = Schema.For(@"
                 type Query {
@@ -391,7 +390,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(writer, _ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ four(id: 123) }";
                 _.Root = new { Hello = "World" };
@@ -399,14 +398,14 @@ namespace GraphQL.Tests.Utilities
             });
 
             var expectedResult = CreateQueryResult("{ 'four': true }");
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void can_execute_complex_schema(IDocumentWriter writer)
+        public void can_execute_complex_schema()
         {
             var defs = @"
                 type Post {
@@ -429,7 +428,7 @@ namespace GraphQL.Tests.Utilities
             var expected = @"{ 'blog': { 'title': 'New blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
             var variables = "{ 'blogId': '1', 'postId': '1' }";
 
-            AssertQuery(writer, _ =>
+            AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
@@ -440,7 +439,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public void does_not_require_scalar_fields_to_be_defined(IDocumentWriter writer)
+        public void does_not_require_scalar_fields_to_be_defined()
         {
             var defs = @"
                 type Person {
@@ -458,7 +457,7 @@ namespace GraphQL.Tests.Utilities
             var query = @"{ me { name age } }";
             var expected = @"{ 'me': { 'name': 'Quinn', 'age': 100 } }";
 
-            AssertQuery(writer, _ =>
+            AssertQuery(_ =>
             {
                 _.Query = query;
                 _.Definitions = defs;
@@ -468,7 +467,7 @@ namespace GraphQL.Tests.Utilities
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task resolves_union_references_when_union_defined_first(IDocumentWriter writer)
+        public async Task resolves_union_references_when_union_defined_first()
         {
             var schema = Schema.For(@"
                 union Pet = Dog | Cat
@@ -496,11 +495,11 @@ namespace GraphQL.Tests.Utilities
                 _.Types.Include<PetQueryType>();
             });
 
-            var result = await schema.ExecuteAsync(writer, _ => _.Query = @"{ pet { ... on Dog { name } } }");
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ pet { ... on Dog { name } } }");
 
             var expected = @"{ 'pet': { 'name' : 'Eli' } }";
             var expectedResult = CreateQueryResult(expected);
-            var serializedExpectedResult = await writer.WriteToStringAsync(expectedResult);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
         }

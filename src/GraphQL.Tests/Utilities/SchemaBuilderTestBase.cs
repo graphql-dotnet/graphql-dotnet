@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using GraphQL.SystemTextJson;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
@@ -16,9 +17,10 @@ namespace GraphQL.Tests.Utilities
         }
 
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
+        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
         protected SchemaBuilder Builder { get; set; }
 
-        public ExecutionResult AssertQuery(IDocumentWriter writer, Action<ExecuteConfig> configure)
+        public ExecutionResult AssertQuery(Action<ExecuteConfig> configure)
         {
             var config = new ExecuteConfig();
             configure(config);
@@ -29,7 +31,6 @@ namespace GraphQL.Tests.Utilities
             var queryResult = CreateQueryResult(config.ExpectedResult);
 
             return AssertQuery(
-                writer,
                 _ =>
                 {
                     _.Schema = schema;
@@ -41,12 +42,12 @@ namespace GraphQL.Tests.Utilities
                 queryResult);
         }
 
-        public ExecutionResult AssertQuery(IDocumentWriter writer, Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
+        public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
         {
             var runResult = Executer.ExecuteAsync(options).Result;
 
-            var writtenResult = writer.WriteToStringAsync(runResult).Result;
-            var expectedResult = writer.WriteToStringAsync(expectedExecutionResult).Result;
+            var writtenResult = Writer.WriteToStringAsync(runResult).Result;
+            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
 
             string additionalInfo = null;
 

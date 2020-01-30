@@ -1,12 +1,12 @@
 using System.Linq;
 using GraphQL.Language.AST;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
-using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Execution
 {
