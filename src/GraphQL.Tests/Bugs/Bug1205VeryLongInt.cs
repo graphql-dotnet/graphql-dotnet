@@ -17,8 +17,7 @@ namespace GraphQL.Tests.Bugs
             AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void Very_Long_Number_In_Input_Should_Return_Error_For_Int()
         {
             var query = "{ int_with_arg(in:636474637870330463) }";
@@ -37,8 +36,7 @@ namespace GraphQL.Tests.Bugs
             AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void Very_Long_Number_Should_Return_As_Is_For_Long()
         {
             var query = "{ long }";
@@ -48,8 +46,7 @@ namespace GraphQL.Tests.Bugs
             AssertQuerySuccess(query, expected);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void Very_Long_Number_In_Input_Should_Work_For_Long()
         {
             var query = "{ long_with_arg(in:636474637870330463) }";

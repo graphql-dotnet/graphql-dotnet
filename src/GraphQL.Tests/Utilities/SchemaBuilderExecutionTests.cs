@@ -101,8 +101,7 @@ namespace GraphQL.Tests.Utilities
             field.Description.ShouldBe("A description");
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void can_execute_renamed_field()
         {
             var defs = @"
@@ -131,8 +130,7 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void can_execute_interfaces()
         {
             var defs = @"
@@ -175,8 +173,7 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task minimal_schema()
         {
             var schema = Schema.For(@"
@@ -198,8 +195,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_source_without_params()
         {
             var schema = Schema.For(@"
@@ -223,8 +219,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_resolvefieldcontext_without_params()
         {
             var schema = Schema.For(@"
@@ -245,8 +240,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_resolvefieldcontext_with_params()
         {
             var schema = Schema.For(@"
@@ -263,8 +257,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_usercontext()
         {
             var schema = Schema.For(@"
@@ -288,8 +281,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_inherited_usercontext()
         {
             var schema = Schema.For(@"
@@ -332,8 +324,7 @@ namespace GraphQL.Tests.Utilities
             type.GetField("homePlanet").DefaultValue.ShouldBeNull();
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_usercontext_with_params()
         {
             var schema = Schema.For(@"
@@ -354,8 +345,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_context_source_usercontext()
         {
             var schema = Schema.For(@"
@@ -380,8 +370,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task can_use_context_source_usercontext_with_params()
         {
             var schema = Schema.For(@"
@@ -403,8 +392,7 @@ namespace GraphQL.Tests.Utilities
             result.ShouldBe(serializedExpectedResult);
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void can_execute_complex_schema()
         {
             var defs = @"
@@ -437,8 +425,7 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public void does_not_require_scalar_fields_to_be_defined()
         {
             var defs = @"
@@ -465,8 +452,7 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
+        [Fact]
         public async Task resolves_union_references_when_union_defined_first()
         {
             var schema = Schema.For(@"
