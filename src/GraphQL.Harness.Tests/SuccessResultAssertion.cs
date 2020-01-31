@@ -1,41 +1,46 @@
+using System.Linq;
 using Alba;
 using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Harness.Tests
 {
     public class SuccessResultAssertion : GraphQLAssertion
     {
+        private static readonly string extensionsKey = nameof(ExecutionResult.Extensions).ToLower();
         private readonly string _result;
         private readonly bool _ignoreExtensions;
         private readonly IDocumentWriter _writer;
 
-        public SuccessResultAssertion(string result, bool ignoreExtensions)
+        public SuccessResultAssertion(string result, bool ignoreExtensions, IDocumentWriter writer)
         {
             _result = result;
             _ignoreExtensions = ignoreExtensions;
-            _writer = new DocumentWriter();
+            _writer = writer;
         }
 
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
-            var expectedResult = _writer.WriteToStringAsync(CreateQueryResult(_result)).GetAwaiter().GetResult();
+            var expectedResult = CreateQueryResult(_result);
+            var actualResultJson = ex.ReadBody(context);
 
-            var body = ex.ReadBody(context);
-
-            if (!body.Equals(expectedResult))
+            if (_ignoreExtensions)
             {
-                if (_ignoreExtensions)
-                {
-                    var json = JObject.Parse(body);
-                    json.Remove("extensions");
-                    var bodyWithoutExtensions = json.ToString(Newtonsoft.Json.Formatting.None);
-                    if (bodyWithoutExtensions.Equals(expectedResult))
-                        return;
-                }
+                expectedResult.Extensions = null;
 
-                ex.Add($"Expected '{expectedResult}' but got '{body}'");
+                var actualResult = actualResultJson.ToDictionary();
+                if (actualResult.ContainsKey(extensionsKey))
+                {
+                    actualResult.Remove(extensionsKey);
+                }
+                actualResultJson = _writer.WriteToStringAsync(actualResult).GetAwaiter().GetResult();
+            }
+
+            var expectedResultJson = _writer.WriteToStringAsync(expectedResult).GetAwaiter().GetResult();
+
+            if (!actualResultJson.Equals(expectedResultJson))
+            {
+                ex.Add($"Expected '{expectedResult}' but got '{actualResultJson}'");
             }
         }
     }

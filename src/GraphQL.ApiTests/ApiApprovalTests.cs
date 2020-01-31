@@ -1,5 +1,4 @@
 using System;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using PublicApiGenerator;
 using Shouldly;
@@ -12,7 +11,6 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
-        [InlineData(typeof(DocumentWriter))]
         public void PublicApi(Type type)
         {
             string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions

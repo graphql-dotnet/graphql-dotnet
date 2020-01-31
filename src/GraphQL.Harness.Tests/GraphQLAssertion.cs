@@ -1,6 +1,6 @@
 using Alba;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
+using GraphQL.SystemTextJson;
 
 namespace GraphQL.Harness.Tests
 {
@@ -13,7 +13,7 @@ namespace GraphQL.Harness.Tests
             object data = null;
             if (!string.IsNullOrWhiteSpace(result))
             {
-                data = JObject.Parse(result);
+                data = result.ToDictionary();
             }
 
             return new ExecutionResult { Data = data, Errors = errors };

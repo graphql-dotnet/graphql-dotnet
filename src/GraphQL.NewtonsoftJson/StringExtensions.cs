@@ -10,7 +10,7 @@ namespace GraphQL.NewtonsoftJson
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
-        /// <param name="json">A JSON formatted string.</param>
+        /// <param name="json">A JSON-formatted string.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
         {
@@ -95,5 +95,19 @@ namespace GraphQL.NewtonsoftJson
 
             return value;
         }
+
+        /// <summary>
+        /// Converts a JSON-formatted string into a JObject.
+        /// </summary>
+        /// <param name="json">A JSON-formatted string.</param>
+        /// <returns>A JObject</returns>
+        private static JObject ToJObject(this string json) => JObject.Parse(json);
+
+        /// <summary>
+        /// Converts a JSON-formatted string into an object.
+        /// </summary>
+        /// <param name="json">A JSON-formatted string.</param>
+        /// <returns>An object that can be set to <see cref="ExecutionResult.Data"/>.</returns>
+        public static object ToResult(this string json) => json.ToJObject() as object;
     }
 }

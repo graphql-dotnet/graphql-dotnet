@@ -11,7 +11,6 @@ using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
 
@@ -149,11 +148,7 @@ namespace GraphQL.DataLoader.Tests
 
         public ExecutionResult CreateQueryResult(string result)
         {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
+            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToDictionary();
             return new ExecutionResult { Data = expected };
         }
     }
