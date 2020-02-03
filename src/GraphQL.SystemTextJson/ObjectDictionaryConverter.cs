@@ -59,6 +59,8 @@ namespace GraphQL.SystemTextJson
                     case JsonValueKind.Number:
                         if (value.TryGetInt32(out var i))
                             resultValue = i;
+                        else if (value.TryGetInt64(out var l))
+                            resultValue = l;
                         else if (value.TryGetDouble(out var d))
                             resultValue = d;
                         else if (value.TryGetDecimal(out var dd))
