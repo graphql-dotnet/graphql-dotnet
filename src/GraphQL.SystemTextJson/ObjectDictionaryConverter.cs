@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -61,6 +62,8 @@ namespace GraphQL.SystemTextJson
                             resultValue = i;
                         else if (value.TryGetInt64(out var l))
                             resultValue = l;
+                        else if (BigInteger.TryParse(value.GetRawText(), out var bi))
+                            resultValue = bi;
                         else if (value.TryGetDouble(out var d))
                             resultValue = d;
                         else if (value.TryGetDecimal(out var dd))
