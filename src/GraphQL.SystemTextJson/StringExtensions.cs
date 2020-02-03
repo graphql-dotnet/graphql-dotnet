@@ -23,14 +23,6 @@ namespace GraphQL.SystemTextJson
             => json?.ToDictionary().ToInputs();
 
         /// <summary>
-        /// Converts a dictionary into an <see cref="Inputs"/>.
-        /// </summary>
-        /// <param name="json">A dictionary.</param>
-        /// <returns>Inputs.</returns>
-        public static Inputs ToInputs(this Dictionary<string, object> dictionary)
-            => dictionary == null ? new Inputs() : new Inputs(dictionary);
-
-        /// <summary>
         /// Converts a JSON formatted string into a dictionary of objects of their actual type.
         /// </summary>
         /// <param name="json">The json.</param>

@@ -16,12 +16,14 @@ namespace GraphQL.NewtonsoftJson
             => json?.ToDictionary().ToInputs();
 
         /// <summary>
-        /// Converts a dictionary into an <see cref="Inputs"/>.
+        /// Converts a JSON object into a dictionary.
         /// </summary>
-        /// <param name="json">A dictionary.</param>
-        /// <returns>Inputs.</returns>
-        public static Inputs ToInputs(this Dictionary<string, object> dictionary)
-            => dictionary == null ? new Inputs() : new Inputs(dictionary);
+        public static Inputs ToInputs(this JObject obj)
+        {
+            var variables = obj?.GetValue() as Dictionary<string, object>
+                ?? new Dictionary<string, object>();
+            return new Inputs(variables);
+        }
 
         /// <summary>
         /// Converts a JSON formatted string into a dictionary.
@@ -88,19 +90,5 @@ namespace GraphQL.NewtonsoftJson
 
             return value;
         }
-
-        /// <summary>
-        /// Converts a JSON-formatted string into a JObject.
-        /// </summary>
-        /// <param name="json">A JSON-formatted string.</param>
-        /// <returns>A JObject</returns>
-        private static JObject ToJObject(this string json) => JObject.Parse(json);
-
-        /// <summary>
-        /// Converts a JSON-formatted string into an object.
-        /// </summary>
-        /// <param name="json">A JSON-formatted string.</param>
-        /// <returns>An object that can be set to <see cref="ExecutionResult.Data"/>.</returns>
-        public static object ToResult(this string json) => json.ToJObject() as object;
     }
 }
