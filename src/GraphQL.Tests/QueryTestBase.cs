@@ -10,7 +10,6 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
-using Newtonsoft.Json.Linq;
 using Shouldly;
 
 namespace GraphQL.Tests
@@ -158,14 +157,6 @@ namespace GraphQL.Tests
         }
 
         public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
-        {
-            object data = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                data = JObject.Parse(result);
-            }
-
-            return new ExecutionResult { Data = data, Errors = errors };
-        }
+            => result.ToExecutionResult(errors);
     }
 }

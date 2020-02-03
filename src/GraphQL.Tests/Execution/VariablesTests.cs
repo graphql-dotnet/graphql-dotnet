@@ -240,7 +240,7 @@ namespace GraphQL.Tests.Execution
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
-            var inputs = "{'input': {'a':'foo', 'b':['bar'], 'c': 'baz'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": [""bar""], ""c"": ""baz"" } }".ToInputs();
 
             AssertQuerySuccess(_query, expected, inputs);
         }
@@ -250,7 +250,7 @@ namespace GraphQL.Tests.Execution
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
-            var inputs = "{'input': {'a':'foo', 'b':'bar', 'c': 'baz'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"" } }".ToInputs();
 
             AssertQuerySuccess(_query, expected, inputs);
         }
@@ -260,7 +260,7 @@ namespace GraphQL.Tests.Execution
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
 
-            var inputs = "{'input': {'a':'foo', 'b':['bar', 'qux'], 'c': 'baz'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": [""bar"", ""qux""], ""c"": ""baz"" } }".ToInputs();
 
             AssertQuerySuccess(_query, expected, inputs);
         }
@@ -284,7 +284,7 @@ namespace GraphQL.Tests.Execution
         {
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
 
-            var inputs = "{'input': {'c': 'foo', 'd': 'SerializedValue'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""c"": ""foo"", ""d"": ""SerializedValue"" } }".ToInputs();
 
             AssertQuerySuccess(_query, expected, inputs);
         }
@@ -294,7 +294,7 @@ namespace GraphQL.Tests.Execution
         {
             const string expected = null;
 
-            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': null} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": null } }".ToInputs();
 
             var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
@@ -309,7 +309,7 @@ namespace GraphQL.Tests.Execution
         {
             const string expected = null;
 
-            var inputs = "{'input': 'foo bar'}".ToInputs();
+            var inputs = @"{ ""input"": ""foo bar"" }".ToInputs();
 
             var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
@@ -326,7 +326,7 @@ namespace GraphQL.Tests.Execution
         {
             const string expected = null;
 
-            var inputs = "{'input': {'a': 'foo', 'b': 'bar'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"" } }".ToInputs();
 
             var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
@@ -341,7 +341,7 @@ namespace GraphQL.Tests.Execution
         {
             const string expected = null;
 
-            var inputs = "{'input': {'a': 'foo', 'b': 'bar', 'c': 'baz', 'e': 'dog'} }".ToInputs();
+            var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"", ""e"": ""dog"" } }".ToInputs();
 
             var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1);
 
@@ -362,7 +362,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
 
-            var inputs = "{'argB':['bar', 'qux'], 'argC': 'foo', 'argD': 'SerializedValue'}".ToInputs();
+            var inputs = @"{ ""argB"": [""bar"", ""qux""], ""argC"": ""foo"", ""argD"": ""SerializedValue"" }".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }

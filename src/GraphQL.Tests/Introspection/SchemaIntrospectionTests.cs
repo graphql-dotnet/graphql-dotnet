@@ -24,7 +24,11 @@ namespace GraphQL.Tests.Introspection
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
-            ShouldBe(json, IntrospectionResult.Data);
+            var expected = documentWriter is SystemTextJson.DocumentWriter
+                ? IntrospectionResult.DataWhenSystemTextJson
+                : IntrospectionResult.DataWhenNewtonsoftJson;
+
+            ShouldBe(json, expected);
         }
 
         public class TestQuery : ObjectGraphType

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
 using Xunit;
 using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -70,8 +71,8 @@ type User @key(fields: ""id"") {
   username: String!
 }
 ";
-
-            var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
+            
+            var expected = @"{ ""_service"": { ""sdl"" : """ + JsonEncodedText.Encode(sdl) + @""" } }";
 
             AssertQuery(_ =>
             {
@@ -107,8 +108,8 @@ type User @key(fields: ""id"") {
                     }
                 }";
 
-            var variables = "{ '_representations': [{ '__typename': 'User', 'id': '123' }] }";
-            var expected = @"{ '_entities': [{ '__typename': 'User', 'id' : '123', 'username': 'Quinn' }] }";
+            var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123"", ""username"": ""Quinn"" }] }";
 
             AssertQuery(_ =>
             {

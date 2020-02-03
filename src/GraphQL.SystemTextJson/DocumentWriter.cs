@@ -15,7 +15,7 @@ namespace GraphQL.SystemTextJson
         }
 
         public DocumentWriter(bool indent)
-            : this(new JsonSerializerOptions { WriteIndented = indent })
+            : this(new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
         {
         }
 

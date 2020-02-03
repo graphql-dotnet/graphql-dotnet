@@ -68,8 +68,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PostQueryType>();
 
             var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-            var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
-            var variables = "{ 'id': '1' }";
+            var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
+            var variables = @"{ ""id"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -118,8 +118,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PostQueryRenamedType>();
 
             var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-            var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
-            var variables = "{ 'id': '1' }";
+            var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
+            var variables = @"{ ""id"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -163,7 +163,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PetQueryType>();
 
             var query = @"{ pet { name } }";
-            var expected = @"{ 'pet': { 'name' : 'Eli' } }";
+            var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
 
             AssertQuery(_ =>
             {
@@ -189,7 +189,7 @@ namespace GraphQL.Tests.Utilities
                 _.Root = root;
             });
 
-            var expectedResult = CreateQueryResult("{ 'hello': 'Hello World!' }");
+            var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -213,7 +213,7 @@ namespace GraphQL.Tests.Utilities
                 _.Root = new { Hello =  "World" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'source': true }");
+            var expectedResult = CreateQueryResult(@"{ ""source"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -234,7 +234,7 @@ namespace GraphQL.Tests.Utilities
                 _.ExposeExceptions = true;
             });
 
-            var expectedResult = CreateQueryResult("{ 'resolve': 'Resolved' }");
+            var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -251,7 +251,7 @@ namespace GraphQL.Tests.Utilities
 
             var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
-            var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
+            var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -275,7 +275,7 @@ namespace GraphQL.Tests.Utilities
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -296,7 +296,7 @@ namespace GraphQL.Tests.Utilities
                 _.UserContext = new ChildMyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -339,7 +339,7 @@ namespace GraphQL.Tests.Utilities
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'userContextWithParam': 'Quinn abcd' }");
+            var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -364,7 +364,7 @@ namespace GraphQL.Tests.Utilities
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'three': true }");
+            var expectedResult = CreateQueryResult(@"{ ""three"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -386,7 +386,7 @@ namespace GraphQL.Tests.Utilities
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'four': true }");
+            var expectedResult = CreateQueryResult(@"{ ""four"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -413,8 +413,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<Blog>();
 
             var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
-            var expected = @"{ 'blog': { 'title': 'New blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
-            var variables = "{ 'blogId': '1', 'postId': '1' }";
+            var expected = @"{ ""blog"": { ""title"": ""New blog"", ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } } }";
+            var variables = @"{ ""blogId"": ""1"", ""postId"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -442,7 +442,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PersonQueryType>();
 
             var query = @"{ me { name age } }";
-            var expected = @"{ 'me': { 'name': 'Quinn', 'age': 100 } }";
+            var expected = @"{ ""me"": { ""name"": ""Quinn"", ""age"": 100 } }";
 
             AssertQuery(_ =>
             {
@@ -483,7 +483,7 @@ namespace GraphQL.Tests.Utilities
 
             var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ pet { ... on Dog { name } } }");
 
-            var expected = @"{ 'pet': { 'name' : 'Eli' } }";
+            var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
             var expectedResult = CreateQueryResult(expected);
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 

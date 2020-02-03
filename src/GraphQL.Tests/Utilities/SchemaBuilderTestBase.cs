@@ -5,7 +5,6 @@ using System.Reflection;
 using GraphQL.SystemTextJson;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
-using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -63,15 +62,7 @@ namespace GraphQL.Tests.Utilities
             return runResult;
         }
 
-        public ExecutionResult CreateQueryResult(string result)
-        {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
-            return new ExecutionResult { Data = expected };
-        }
+        public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 
         protected string ReadSchema(string fileName)
         {

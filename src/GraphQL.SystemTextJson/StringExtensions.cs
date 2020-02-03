@@ -32,5 +32,20 @@ namespace GraphQL.SystemTextJson
         /// <returns>Dictionary.</returns>
         public static Dictionary<string, object> ToDictionary(this string json)
             => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
+
+        /// <summary>
+        /// Converts a JSON formatted string into a dictionary of objects of their actual type.
+        /// </summary>
+        /// <param name="json">The json.</param>
+        /// <returns>Dictionary.</returns>
+        public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null)
+        {
+            object expected = null;
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                expected = json.ToDictionary();
+            }
+            return new ExecutionResult { Data = expected, Errors = errors };
+        }
     }
 }

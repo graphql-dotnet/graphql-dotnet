@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Bugs
                             }";
 
             var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"2017-01-27T15:19:53.000Z\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
-            var inputs = "{'input': {'a':'2017-01-27T15:19:53.000Z', 'b':['bar'], 'c': 'baz'} }".ToInputs();
+            var inputs = "{ \"input\": { \"a\": \"2017-01-27T15:19:53.000Z\", \"b\": [\"bar\"], \"c\": \"baz\"} }".ToInputs();
             AssertQuerySuccess(query, expected, inputs);
         }
     }

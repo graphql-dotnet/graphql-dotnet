@@ -75,7 +75,7 @@ namespace GraphQL.SystemTextJson
                         // default value is null
                         break;
                     case JsonValueKind.Array:
-                        resultValue = ReadArray(value, options).ToList();
+                        resultValue = ReadArray(value, options).ToArray();
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected value kind: {value.ValueKind}");
@@ -118,7 +118,7 @@ namespace GraphQL.SystemTextJson
                         yield return null;
                         break;
                     case JsonValueKind.Array:
-                        yield return ReadArray(item, options);
+                        yield return ReadArray(item, options).ToArray();
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected value kind: {item.ValueKind}");
