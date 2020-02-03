@@ -266,7 +266,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void can_convert_json_to_input_object_with_child_object_list()
         {
-            var json = @"{""a"": ""foo"", ""b"":[{""a"":'bar'}], ""c"": ""baz""}";
+            var json = @"{""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}";
 
             var inputs = VariablesToInputs(json);
 
@@ -280,7 +280,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void can_convert_json_to_input_object_with_child_object()
         {
-            var json = @"{ 'input': {""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}}";
+            var json = @"{ ""input"": {""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}}";
 
             var inputs = VariablesToInputs(json);
 

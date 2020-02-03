@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -381,7 +382,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
 {
-  'fieldWithNullableIntInput': 0
+  ""fieldWithNullableIntInput"": 0
 }
 ";
 
@@ -399,7 +400,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'null'
+              ""fieldWithNullableStringInput"": ""null""
             }
             ";
 
@@ -417,7 +418,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'null'
+              ""fieldWithNullableStringInput"": ""null""
             }
             ";
 
@@ -435,7 +436,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'null'
+              ""fieldWithNullableStringInput"": ""null""
             }
             ";
 
@@ -453,11 +454,11 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': 'null'
+              ""fieldWithNullableStringInput"": ""null""
             }
             ";
 
-            var inputs = "{'value':null}".ToInputs();
+            var inputs = @"{""value"": null}".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -471,13 +472,14 @@ namespace GraphQL.Tests.Execution
                 }
             ";
 
+            // value is: "a"
             var expected = @"
             {
-              'fieldWithNullableStringInput': '""a""'
+              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
             }
             ";
 
-            var inputs = "{'value':'a'}".ToInputs();
+            var inputs = @"{""value"": ""a""}".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -491,9 +493,10 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
+            // value is: "a"
             var expected = @"
             {
-              'fieldWithNullableStringInput': '""a""'
+              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
             }
             ";
 
@@ -533,7 +536,7 @@ namespace GraphQL.Tests.Execution
 
             string expected = null;
 
-            var inputs = "{'value':null}".ToInputs();
+            var inputs = @"{""value"": null}".ToInputs();
 
             var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1);
 
@@ -554,11 +557,11 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': '""a""'
+              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
             }
             ";
 
-            var inputs = "{'value':'a'}".ToInputs();
+            var inputs = @"{""value"": ""a""}".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -574,7 +577,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithNullableStringInput': '""a""'
+              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
             }
             ";
 
@@ -592,17 +595,14 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithCustomScalarInput': ""bear-cat, dog, bird""
+              ""fieldWithCustomScalarInput"": ""bear-cat, dog, bird""
             }
             ";
 
-            var jsonString = new JObject
-            {
-                ["stringProperty"] = "bear",
-                ["arrayProperty"] = new JArray {"cat", "dog", "bird"}
-            }.ToString();
+            var jsonInput = @"{ ""stringProperty"": ""bear"", ""arrayProperty"": [""cat"", ""dog"", ""bird""] }";
+            var jsonInputEncoded = JsonEncodedText.Encode(jsonInput);
 
-            var inputs = $"{{ 'input': '{jsonString}' }}".ToInputs();
+            var inputs = $@"{{ ""input"": ""{jsonInputEncoded}"" }}".ToInputs();
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -621,7 +621,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": '""Hello World""'
             }
             ";
 
@@ -639,7 +639,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": '""Hello World""'
             }
             ";
 
@@ -657,7 +657,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              'fieldWithDefaultArgumentValue': '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": '""Hello World""'
             }
             ";
 
