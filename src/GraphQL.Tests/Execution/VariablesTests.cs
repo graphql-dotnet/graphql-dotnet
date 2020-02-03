@@ -621,7 +621,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
             }
             ";
 
@@ -639,7 +639,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
             }
             ";
 
@@ -657,7 +657,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": '""Hello World""'
+              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
             }
             ";
 

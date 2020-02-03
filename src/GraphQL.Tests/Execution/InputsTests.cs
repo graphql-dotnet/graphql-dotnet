@@ -4,7 +4,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Execution
 {
-    public class EnumAsInputsTests : QueryTestBase<EnumMutationSchema>
+    public class InputsTests : QueryTestBase<EnumMutationSchema>
     {
         [Fact]
         public void mutation_input()
@@ -23,18 +23,18 @@ namespace GraphQL.Tests.Execution
                 }
                 ",
                 @"{
-                'createUser': {
-                  'id': 1,
-                  'gender': 'Female',
-                  'profileImage': 'myimage.png'
-                 }
+                  ""createUser"": {
+                    ""id"": 1,
+                    ""gender"": ""Female"",
+                    ""profileImage"": ""myimage.png""
+                  }
                 }");
         }
 
         [Fact]
         public void mutation_input_from_variables()
         {
-            var inputs = @"{ 'userInput': { 'profileImage': 'myimage.png', 'gender': 'Female' } }".ToInputs();
+            var inputs = @"{ ""userInput"": { ""profileImage"": ""myimage.png"", ""gender"": ""Female"" } }".ToInputs();
 
             AssertQuerySuccess(
                 @"
@@ -47,11 +47,11 @@ namespace GraphQL.Tests.Execution
                 }
                 ",
                 @"{
-                'createUser': {
-                  'id': 1,
-                  'gender': 'Female',
-                  'profileImage': 'myimage.png'
-                 }
+                  ""createUser"": {
+                    ""id"": 1,
+                    ""gender"": ""Female"",
+                    ""profileImage"": ""myimage.png""
+                   }
                 }", inputs);
         }
 
@@ -61,10 +61,10 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(
                 @"{ user { id, gender, printGender(g: Male) }}",
                 @"{
-                  'user': {
-                    'id': 1,
-                    'gender': 'Male',
-                    'printGender': 'gender: Male'
+                  ""user"": {
+                    ""id"": 1,
+                    ""gender"": ""Male"",
+                    ""printGender"": ""gender: Male""
                   }
                 }");
         }
@@ -72,13 +72,13 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void query_can_get_long_variable()
         {
-            var inputs = "{ 'userId': 1000000000000000001 }".ToInputs();
+            var inputs = @"{ ""userId"": 1000000000000000001 }".ToInputs();
 
             AssertQuerySuccess(
                 @"query aQuery($userId: Long!) { getLongUser(userId: $userId) { idLong }}",
                 @"{
-                  'getLongUser': {
-                    'idLong': 1000000000000000001
+                  ""getLongUser"": {
+                    ""idLong"": 1000000000000000001
                   }
                 }", inputs);
         }
@@ -89,8 +89,8 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(
                 @"query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
                 @"{
-                  'getLongUser': {
-                    'idLong': 1000000000000000001
+                  ""getLongUser"": {
+                    ""idLong"": 1000000000000000001
                   }
                 }");
         }
@@ -98,13 +98,13 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void query_can_get_int_variable()
         {
-            var inputs = "{ 'userId': 3 }".ToInputs();
+            var inputs = @"{ ""userId"": 3 }".ToInputs();
 
             AssertQuerySuccess(
                 @"query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
                 @"{
-                  'getIntUser': {
-                    'id': 3
+                  ""getIntUser"": {
+                    ""id"": 3
                   }
                 }", inputs);
         }
