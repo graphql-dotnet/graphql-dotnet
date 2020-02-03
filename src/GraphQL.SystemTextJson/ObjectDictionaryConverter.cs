@@ -20,16 +20,8 @@ namespace GraphQL.SystemTextJson
             JsonSerializerOptions options)
         {
             using var doc = JsonDocument.ParseValue(ref reader);
-            return ReadDictionary(doc.RootElement, options);
+            return ReadDictionary(doc.RootElement);
         }
-
-        private void EnsureTokenType(JsonTokenType actual, JsonTokenType expected)
-        {
-            if (actual != expected)
-                throw new InvalidOperationException(
-                    $"Unexpected token type '{actual}' expected '{expected}'");
-        }
-
 
         public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value,
             JsonSerializerOptions options)
@@ -43,7 +35,7 @@ namespace GraphQL.SystemTextJson
             JsonSerializer.Serialize(writer, value, internalOptions);
         }
 
-        private Dictionary<string, object> ReadDictionary(JsonElement element, JsonSerializerOptions options)
+        private Dictionary<string, object> ReadDictionary(JsonElement element)
         {
             var result = new Dictionary<string, object>();
             foreach (var property in element.EnumerateObject())
@@ -55,19 +47,10 @@ namespace GraphQL.SystemTextJson
                 switch (value.ValueKind)
                 {
                     case JsonValueKind.Object:
-                        resultValue = ReadDictionary(value, options);
+                        resultValue = ReadDictionary(value);
                         break;
                     case JsonValueKind.Number:
-                        if (value.TryGetInt32(out var i))
-                            resultValue = i;
-                        else if (value.TryGetInt64(out var l))
-                            resultValue = l;
-                        else if (BigInteger.TryParse(value.GetRawText(), out var bi))
-                            resultValue = bi;
-                        else if (value.TryGetDouble(out var d))
-                            resultValue = d;
-                        else if (value.TryGetDecimal(out var dd))
-                            resultValue = dd;
+                        resultValue = ReadNumber(value);
                         break;
                     case JsonValueKind.True:
                     case JsonValueKind.False:
@@ -80,7 +63,7 @@ namespace GraphQL.SystemTextJson
                         // default value is null
                         break;
                     case JsonValueKind.Array:
-                        resultValue = ReadArray(value, options).ToList();
+                        resultValue = ReadArray(value).ToList();
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected value kind: {value.ValueKind}");
@@ -95,22 +78,17 @@ namespace GraphQL.SystemTextJson
             return result;
         }
 
-        private IEnumerable<object> ReadArray(JsonElement value, JsonSerializerOptions options)
+        private IEnumerable<object> ReadArray(JsonElement value)
         {
             foreach (JsonElement item in value.EnumerateArray())
             {
                 switch (item.ValueKind)
                 {
                     case JsonValueKind.Object:
-                        yield return ReadDictionary(item, options);
+                        yield return ReadDictionary(item);
                         break;
                     case JsonValueKind.Number:
-                        if (item.TryGetInt32(out var i))
-                            yield return i;
-                        else if (item.TryGetDouble(out var d))
-                            yield return d;
-                        else if (item.TryGetDecimal(out var dd))
-                            yield return dd;
+                        yield return ReadNumber(item);
                         break;
                     case JsonValueKind.True:
                     case JsonValueKind.False:
@@ -123,12 +101,30 @@ namespace GraphQL.SystemTextJson
                         yield return null;
                         break;
                     case JsonValueKind.Array:
-                        yield return ReadArray(item, options).ToList();
+                        yield return ReadArray(item).ToList();
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected value kind: {item.ValueKind}");
                 }
             }
+        }
+
+        private object ReadNumber(JsonElement value)
+        {
+            if (value.TryGetInt32(out var i))
+                return i;
+            else if (value.TryGetInt64(out var l))
+                return l;
+            //else if (value.TryGetUInt64(out var ui))
+            //    resultValue = ui;
+            else if (BigInteger.TryParse(value.GetRawText(), out var bi))
+                return bi;
+            else if (value.TryGetDouble(out var d))
+                return d;
+            else if (value.TryGetDecimal(out var dd))
+                return dd;
+
+            throw new NotImplementedException($"Unexpected Number value. Raw text was: {value.GetRawText()}");
         }
 
         private void WriteDictionary(Utf8JsonWriter writer, Dictionary<string, object> dictionary,
