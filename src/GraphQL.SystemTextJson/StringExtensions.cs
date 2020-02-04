@@ -5,7 +5,7 @@ namespace GraphQL.SystemTextJson
 {
     public static class StringExtensions
     {
-        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions()
+        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters =

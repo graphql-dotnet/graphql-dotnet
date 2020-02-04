@@ -26,7 +26,7 @@ namespace GraphQL.Tests
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(schema, query, queryResult, inputs, root,  userContext, cancellationToken, rules);
+            return AssertQuery(schema, query, queryResult, inputs, root, userContext, cancellationToken, rules);
         }
 
         public ExecutionResult AssertQuerySuccess(Action<ExecutionOptions> options, string expected)

@@ -72,7 +72,6 @@ type User @key(fields: ""id"") {
   username: String!
 }
 ";
-            
             var expected = @"{ ""_service"": { ""sdl"" : """ + JsonEncodedText.Encode(sdl) + @""" } }";
 
             AssertQuery(_ =>
