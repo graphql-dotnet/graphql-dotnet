@@ -29,7 +29,6 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        public async Task WriteAsync<T>(Stream stream, T value)
-            => await JsonSerializer.SerializeAsync(stream, value, _options).ConfigureAwait(false);
+        public Task WriteAsync<T>(Stream stream, T value) => JsonSerializer.SerializeAsync(stream, value, _options);
     }
 }
