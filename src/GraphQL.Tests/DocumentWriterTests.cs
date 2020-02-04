@@ -14,7 +14,7 @@ namespace GraphQL.Tests
         [ClassData(typeof(DocumentWritersTestData))]
         public async void Can_Write_Execution_Result(IDocumentWriter writer)
         {
-            var executionResult = new ExecutionResult()
+            var executionResult = new ExecutionResult
             {
                 Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary(),
                 Errors = new ExecutionErrors
