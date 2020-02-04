@@ -26,7 +26,7 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Converts a JSON formatted string into a dictionary.
+        /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>

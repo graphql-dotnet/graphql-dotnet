@@ -23,7 +23,7 @@ namespace GraphQL.SystemTextJson
             => json?.ToDictionary().ToInputs();
 
         /// <summary>
-        /// Converts a JSON formatted string into a dictionary of objects of their actual type.
+        /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Dictionary.</returns>
@@ -31,7 +31,7 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
 
         /// <summary>
-        /// Converts a JSON formatted string into a dictionary of objects of their actual type.
+        /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Dictionary.</returns>
