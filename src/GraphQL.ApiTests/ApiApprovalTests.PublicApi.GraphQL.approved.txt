@@ -369,6 +369,10 @@ namespace GraphQL
         public Inputs() { }
         public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
     }
+    public static class InputsExtensions
+    {
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
+    }
     public static class Invariant
     {
         public static void Check(bool valid, string message) { }
