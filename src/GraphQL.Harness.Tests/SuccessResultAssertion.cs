@@ -10,13 +10,12 @@ namespace GraphQL.Harness.Tests
         private static readonly string extensionsKey = nameof(ExecutionResult.Extensions).ToLower();
         private readonly string _result;
         private readonly bool _ignoreExtensions;
-        private readonly IDocumentWriter _writer;
+        private readonly IDocumentWriter _writer = new DocumentWriter();
 
-        public SuccessResultAssertion(string result, bool ignoreExtensions, IDocumentWriter writer)
+        public SuccessResultAssertion(string result, bool ignoreExtensions)
         {
             _result = result;
             _ignoreExtensions = ignoreExtensions;
-            _writer = writer;
         }
 
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)

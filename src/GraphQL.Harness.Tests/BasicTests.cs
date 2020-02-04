@@ -7,9 +7,8 @@ namespace GraphQL.Harness.Tests
 {
     public class BasicTests : SystemTestBase<Startup>
     {
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task hero(IDocumentWriter writer)
+        [Fact]
+        public async Task hero()
         {
             await run(scenario =>
             {
@@ -19,7 +18,7 @@ namespace GraphQL.Harness.Tests
                 };
                 scenario.Post.Json(input).ToUrl("/graphql");
                 scenario.StatusCodeShouldBe(HttpStatusCode.OK);
-                scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}", writer);
+                scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
             });
         }
     }
