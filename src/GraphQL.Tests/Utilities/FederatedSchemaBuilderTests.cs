@@ -1,8 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
 using Xunit;
-using Newtonsoft.Json.Linq;
-using System.Text.Json;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -140,13 +141,21 @@ type User @key(fields: ""id"") {
 
             var query = "{ __schema { types { name kind possibleTypes { name } } } }";
 
-            var data = JObject.FromObject(Executer.ExecuteAsync(_ =>
+            var executionResult = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Builder.Build(definitions);
                 _.Query = query;
-            }).Result.Data).SelectToken("$.__schema.types[?(@.name == '_Entity')].possibleTypes..name");
+            }).GetAwaiter().GetResult();
+
+            var data = (Dictionary<string, object>)executionResult.Data;
+            var schema = (Dictionary<string, object>)data["__schema"];
+            var types = (List<object>)schema["types"];
+            var entityType = (Dictionary<string, object>)types.Single(t => (string)((Dictionary<string, object>)t)["name"] == "_Entity");
+            var possibleTypes = (List<object>)entityType["possibleTypes"];
+            var possibleType = (Dictionary<string, object>)possibleTypes[0];
+            var name = (string)possibleType["name"];
             
-            Assert.Equal("User", data.ToString());
+            Assert.Equal("User", name);
         }
     }
 }
