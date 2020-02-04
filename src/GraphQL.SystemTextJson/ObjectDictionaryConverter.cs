@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace GraphQL.SystemTextJson
 {
     /// <summary>
-    /// A custom JsonConverter for converting into a dictionary of objects of their real underlying type.
+    /// A custom JsonConverter for reading a dictionary of objects of their real underlying type.
     /// </summary>
     /// <remarks>
     /// Based on @pekkah's from tanka-graphql.
@@ -28,7 +28,8 @@ namespace GraphQL.SystemTextJson
         }
 
         public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
-            => throw new NotImplementedException();
+            => throw new NotImplementedException(
+                "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.");
 
         private Dictionary<string, object> ReadDictionary(JsonElement element)
         {
