@@ -5,7 +5,6 @@ namespace GraphQL.Harness.Tests
 {
     public class DocumentWritersTestData : IEnumerable<object[]>
     {
-
         private readonly List<object[]> _data = new List<object[]>
         {
             new object[] { new SystemTextJson.DocumentWriter() },
