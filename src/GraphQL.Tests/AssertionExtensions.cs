@@ -4,18 +4,18 @@ namespace GraphQL.Tests
 {
     public static class AssertionExtensions
     {
-        public static void ShouldBeCrossPlat(this string a, string b, string customMessage)
+        public static void ShouldBeCrossPlat(this string actual, string expected, string customMessage)
         {
-            var aa = a?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
-            var bb = b?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
-            aa.ShouldBe(bb, customMessage);
+            var actualNormalized = actual?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
+            var expectedNormalized = expected?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
+            actualNormalized.ShouldBe(expectedNormalized, customMessage);
         }
 
-        public static void ShouldBeCrossPlat(this string a, string b)
+        public static void ShouldBeCrossPlat(this string actual, string expected)
         {
-            var aa = a?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
-            var bb = b?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
-            aa.ShouldBe(bb);
+            var actualNormalized = actual?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
+            var expectedNormalized = expected?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
+            actualNormalized.ShouldBe(expectedNormalized);
         }
     }
 }

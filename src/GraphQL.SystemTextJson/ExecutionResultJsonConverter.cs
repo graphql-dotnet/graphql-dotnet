@@ -11,7 +11,7 @@ namespace GraphQL.SystemTextJson
         {
             writer.WriteStartObject();
 
-            // Important: Don't pass in options when recursively calling Serialize.
+            // Important: Don't pass the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
             WriteData(writer, value);
             WriteErrors(writer, value.Errors, value.ExposeExceptions);
@@ -50,8 +50,7 @@ namespace GraphQL.SystemTextJson
 
                 writer.WritePropertyName("message");
 
-                // check if return StackTrace, including all inner exceptions
-                // Don't pass in options when recursively calling Serialize.
+                // Check if return StackTrace, including all inner exceptions
                 JsonSerializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
 
                 if (error.Locations != null)
