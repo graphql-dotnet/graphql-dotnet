@@ -36,13 +36,6 @@ namespace GraphQL.SystemTextJson
         /// <param name="json">The json.</param>
         /// <returns>Dictionary.</returns>
         public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null)
-        {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(json))
-            {
-                expected = json.ToDictionary();
-            }
-            return new ExecutionResult { Data = expected, Errors = errors };
-        }
+            => new ExecutionResult { Data = string.IsNullOrWhiteSpace(json) ? null : json.ToDictionary(), Errors = errors };
     }
 }

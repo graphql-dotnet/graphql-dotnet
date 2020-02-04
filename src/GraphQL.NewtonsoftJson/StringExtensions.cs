@@ -46,7 +46,7 @@ namespace GraphQL.NewtonsoftJson
         /// </summary>
         /// <param name="value">The object containing the value to extract.</param>
         /// <remarks>If the value is a recognized type, it is returned unaltered.</remarks>
-        private static object GetValue(this object value)
+        public static object GetValue(this object value)
         {
             if (value is JObject objectValue)
             {

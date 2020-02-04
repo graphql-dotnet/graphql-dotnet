@@ -16,6 +16,11 @@ namespace GraphQL.SystemTextJson
     /// </remarks>
     public class ObjectDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {
+        private readonly JsonSerializerOptions _internalOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert,
             JsonSerializerOptions options)
         {
@@ -26,13 +31,7 @@ namespace GraphQL.SystemTextJson
         public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value,
             JsonSerializerOptions options)
         {
-            //WriteDictionary(writer, value, options);
-            var internalOptions = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            JsonSerializer.Serialize(writer, value, internalOptions);
+            JsonSerializer.Serialize(writer, value, _internalOptions);
         }
 
         private Dictionary<string, object> ReadDictionary(JsonElement element)
