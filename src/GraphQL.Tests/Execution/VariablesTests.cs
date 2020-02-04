@@ -1,11 +1,10 @@
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Shouldly;
 using Xunit;
 
@@ -59,32 +58,21 @@ namespace GraphQL.Tests.Execution
             Name = "JsonScalarReturningObject";
         }
 
-        public override object Serialize(object value)
-        {
-            return value;
-        }
+        public override object Serialize(object value) => value;
 
         public override object ParseValue(object value)
-        {
-            if (!(value is string stringValue))
-                return null;
-            return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue);
-        }
+            => !(value is string stringValue) ? null : JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue);
 
         public override object ParseLiteral(IValue value)
-        {
-            if (!(value is StringValue stringValue))
-                return null;
-            return JsonConvert.DeserializeObject<TestJsonScalarObject>(stringValue.Value);
-        }
+            => !(value is StringValue stringValue) ? null : JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value);
     }
 
     public class TestJsonScalarObject
     {
-        [JsonProperty("stringProperty")]
+        [JsonPropertyName("stringProperty")]
         public string StringProperty { get; set; }
 
-        [JsonProperty("arrayProperty")]
+        [JsonPropertyName("arrayProperty")]
         public string[] ArrayProperty { get; set; }
     }
 
@@ -113,7 +101,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
+                    var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                     return result;
                 });
 
@@ -125,7 +113,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var val = context.GetArgument<object>("input");
-                    var result = JsonConvert.SerializeObject(val);
+                    var result = JsonSerializer.Serialize(val);
                     return result;
                 });
 
@@ -137,7 +125,7 @@ namespace GraphQL.Tests.Execution
                 resolve: context =>
                 {
                     var val = context.GetArgument<int>("input");
-                    var result = JsonConvert.SerializeObject(val);
+                    var result = JsonSerializer.Serialize(val);
                     return result;
                 });
 
@@ -148,7 +136,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
+                    var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                     return result;
                 });
 
@@ -159,7 +147,7 @@ namespace GraphQL.Tests.Execution
                 ),
                 resolve: context =>
                 {
-                    var result = JsonConvert.SerializeObject(context.GetArgument<object>("input"));
+                    var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                     return result;
                 });
 
