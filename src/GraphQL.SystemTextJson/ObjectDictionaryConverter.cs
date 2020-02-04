@@ -50,26 +50,18 @@ namespace GraphQL.SystemTextJson
         }
 
         private object ReadValue(JsonElement value)
-        {
-            switch (value.ValueKind)
+            => value.ValueKind switch
             {
-                case JsonValueKind.Object:
-                    return ReadDictionary(value);
-                case JsonValueKind.Number:
-                    return ReadNumber(value);
-                case JsonValueKind.True:
-                case JsonValueKind.False:
-                    return value.GetBoolean();
-                case JsonValueKind.String:
-                    return value.GetString();
-                case JsonValueKind.Null:
-                    return null;
-                case JsonValueKind.Array:
-                    return ReadArray(value).ToList();
-                default:
-                    throw new InvalidOperationException($"Unexpected value kind: {value.ValueKind}");
-            }
-        }
+                JsonValueKind.Array => ReadArray(value).ToList(),
+                JsonValueKind.Object => ReadDictionary(value),
+                JsonValueKind.Number => ReadNumber(value),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.String => value.GetString(),
+                JsonValueKind.Null => null,
+                JsonValueKind.Undefined => null,
+                _ => throw new InvalidOperationException($"Unexpected value kind: {value.ValueKind}")
+            };
 
         private object ReadNumber(JsonElement value)
         {
