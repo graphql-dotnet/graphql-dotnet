@@ -31,10 +31,12 @@ namespace GraphQL.SystemTextJson
             => JsonSerializer.Deserialize<Dictionary<string, object>>(json, _jsonOptions);
 
         /// <summary>
-        /// Converts a JSON-formatted string into a dictionary of objects of their actual type.
+        /// Creates an <see cref="ExecutionResult"/> with it's <see cref="ExecutionResult.Data" />
+        /// property set to the strongly-typed representation of <paramref name="json"/>.
         /// </summary>
-        /// <param name="json">The json.</param>
-        /// <returns>Dictionary.</returns>
+        /// <param name="json">A json representation of the <see cref="ExecutionResult.Data"/> to be set.</param>
+        /// <param name="errors">Any errors.</param>
+        /// <returns>ExecutionResult.</returns>
         public static ExecutionResult ToExecutionResult(this string json, ExecutionErrors errors = null)
             => new ExecutionResult { Data = string.IsNullOrWhiteSpace(json) ? null : json.ToDictionary(), Errors = errors };
     }
