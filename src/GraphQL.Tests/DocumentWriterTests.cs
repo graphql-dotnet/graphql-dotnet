@@ -52,7 +52,65 @@ namespace GraphQL.Tests
 
             var actual = await writer.WriteToStringAsync(executionResult);
 
-            actual.ShouldBeCrossPlat(expected);
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Null_Errors(IDocumentWriter writer)
+        {
+            var executionResult = new ExecutionResult();
+
+            var expected = @"{
+              ""data"": null
+            }";
+
+            var actual = await writer.WriteToStringAsync(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_Correct_Execution_Result_With_Null_Data_And_Some_Errors(IDocumentWriter writer)
+        {
+            // "If an error was encountered before execution begins, the data entry should not be present in the result."
+            // Source: https://github.com/graphql/graphql-spec/blob/master/spec/Section%207%20--%20Response.md#data
+
+            var executionResult = new ExecutionResult
+            {
+                Errors = new ExecutionErrors
+                {
+                    new ExecutionError("some error 1"),
+                    new ExecutionError("some error 2"),
+                }
+            };
+
+            var expected = @"{
+              ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
+            }";
+
+            var actual = await writer.WriteToStringAsync(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_Correct_Execution_Result_With_Empty_Data_Errors_And_Extensions(IDocumentWriter writer)
+        {
+            var executionResult = new ExecutionResult
+            {
+                Data = new Dictionary<string, object>(),
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>()
+            };
+
+            var expected = @"{ ""data"": {} }";
+
+            var actual = await writer.WriteToStringAsync(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
         }
     }
 }
