@@ -22,6 +22,10 @@ namespace GraphQL.ApiTests
                 ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
             });
 
+            // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
+            // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,
+            // this call will try to launch a diff tool to help you out but that can fail on
+            // your machine if a diff tool isn't configured/setup. 
             publicApi.ShouldMatchApproved(options => options.WithDiscriminator(type.Assembly.GetName().Name));
         }
     }
