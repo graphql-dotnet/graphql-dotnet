@@ -1,6 +1,5 @@
 using Alba;
 using Microsoft.AspNetCore.Http;
-using GraphQL.SystemTextJson;
 
 namespace GraphQL.Harness.Tests
 {

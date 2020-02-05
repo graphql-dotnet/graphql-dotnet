@@ -12,5 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Harness\GraphQL.Harness.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\GraphQL.Tests\Shared\StringExtensions.cs" Link="Shared\StringExtensions.cs" />
+  </ItemGroup>
 
 </Project>
