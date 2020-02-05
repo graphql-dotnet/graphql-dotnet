@@ -61,10 +61,10 @@ namespace GraphQL.Tests.Execution
         public override object Serialize(object value) => value;
 
         public override object ParseValue(object value)
-            => !(value is string stringValue) ? null : JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue);
+            => value is string stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue) : null;
 
         public override object ParseLiteral(IValue value)
-            => !(value is StringValue stringValue) ? null : JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value);
+            => value is StringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue.Value) : null;
     }
 
     public class TestJsonScalarObject
