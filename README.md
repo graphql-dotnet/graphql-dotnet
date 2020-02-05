@@ -25,7 +25,7 @@ This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) orig
 > If errors occur, it is recommended that you first check the behavior on the latest available preview version before
 > reporting a issue.
 
-You can install the latest version via NuGet.
+You can install the latest stable version via NuGet.
 
 If you're targeting .NET Core 3+, you should use [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.SystemTextJson/).
 ```
