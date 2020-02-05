@@ -15,7 +15,7 @@ namespace GraphQL.Tests
         {
             foreach (var writer in AllWriters)
             {
-                yield return new object[] { new SystemTextJson.DocumentWriter(indent: true) };
+                yield return new object[] { writer };
             }
         }
 
