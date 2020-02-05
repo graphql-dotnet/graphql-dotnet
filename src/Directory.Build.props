@@ -4,5 +4,6 @@
     <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 </Project>
