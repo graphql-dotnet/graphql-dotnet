@@ -15,7 +15,7 @@ namespace GraphQL.NewtonsoftJson
         public static Inputs ToInputs(this string json)
         {
             var dictionary = json?.ToDictionary();
-            return dictionary == null ? new Inputs() : dictionary.ToInputs();
+            return dictionary.ToInputs();
         }
 
         /// <summary>

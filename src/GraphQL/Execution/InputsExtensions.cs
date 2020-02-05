@@ -10,6 +10,6 @@ namespace GraphQL
         /// <param name="json">A dictionary.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this Dictionary<string, object> dictionary)
-            => dictionary == null ? new Inputs() : new Inputs(dictionary);
+            => dictionary == null ? Inputs.Empty : new Inputs(dictionary);
     }
 }
