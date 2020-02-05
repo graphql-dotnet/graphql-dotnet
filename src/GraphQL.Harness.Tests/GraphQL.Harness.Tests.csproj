@@ -14,7 +14,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="..\GraphQL.Tests\Shared\StringExtensions.cs" Link="Shared\StringExtensions.cs" />
+    <Compile Include="..\GraphQL.Tests\Shared\**">
+      <Link>Shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
 </Project>
