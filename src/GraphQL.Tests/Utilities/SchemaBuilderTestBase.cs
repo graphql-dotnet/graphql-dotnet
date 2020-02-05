@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Utilities
                 {
                     _.Schema = schema;
                     _.Query = config.Query;
-                    _.Inputs = SystemTextJson.StringExtensions.ToInputs(config.Variables);
+                    _.Inputs = config.Variables.ToInputs();
                     _.Root = config.Root;
                     _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
                 },
@@ -65,9 +65,7 @@ namespace GraphQL.Tests.Utilities
         public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 
         protected string ReadSchema(string fileName)
-        {
-            return File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
-        }
+            => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
     }
 
     public class ExecuteConfig
