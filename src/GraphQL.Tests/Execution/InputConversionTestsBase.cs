@@ -8,6 +8,8 @@ namespace GraphQL.Tests.Execution
 {
     public abstract class InputConversionTestsBase
     {
+        #region Input Types
+
         public class MyInput
         {
             public int A { get; set; }
@@ -57,6 +59,15 @@ namespace GraphQL.Tests.Execution
         public class Child
         {
             public string A { get; set; }
+        }
+
+        #endregion
+
+        [Fact]
+        public void converts_null()
+        {
+            var inputs = VariablesToInputs(null);
+            inputs.Count.ShouldBe(0);
         }
 
         [Fact]

@@ -13,7 +13,10 @@ namespace GraphQL.NewtonsoftJson
         /// <param name="json">A JSON-formatted string.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
-            => json?.ToDictionary().ToInputs();
+        {
+            var dictionary = json?.ToDictionary();
+            return dictionary == null ? new Inputs() : dictionary.ToInputs();
+        }
 
         /// <summary>
         /// Converts a JSON object into a dictionary.
