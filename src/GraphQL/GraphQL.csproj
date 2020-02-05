@@ -7,9 +7,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>embedded</DebugType>
     <PackageTags>GraphQL;json;api</PackageTags>
-    <PackageProjectUrl>https://github.com/graphql-dotnet/graphql-dotnet</PackageProjectUrl>
-    <PackageIcon>logo.64x64.png</PackageIcon>
-    <PackageLicenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -22,14 +19,13 @@
 
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" />
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\"/>
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(Configuration) == 'Release'" />
-    <PackageReference Include="GraphQL-Parser" Version="4.2.2" />
+    <PackageReference Include="GraphQL-Parser" Version="5.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Buffers" Version="4.5.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="System.Reactive.Core" Version="4.0.0" />

@@ -916,6 +916,7 @@ scalar Uri
 }"
                 },
             };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]

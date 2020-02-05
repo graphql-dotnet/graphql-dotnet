@@ -115,7 +115,7 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            foreach (var selection in field.SelectionSet.Selections)
+            foreach (var selection in field.SelectionSet.SelectionsList)
             {
                 // TODO: check to see if the SelectionSet already has the __typename field?
 

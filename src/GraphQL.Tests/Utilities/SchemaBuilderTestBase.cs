@@ -1,5 +1,5 @@
-using GraphQL.Http;
 using GraphQL.Utilities;
+using GraphQL.NewtonsoftJson;
 using GraphQLParser.Exceptions;
 using Newtonsoft.Json.Linq;
 using System;

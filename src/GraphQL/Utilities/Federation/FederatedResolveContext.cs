@@ -5,7 +5,7 @@ namespace GraphQL.Utilities.Federation
 {
     public class FederatedResolveContext
     {
-        public ResolveFieldContext ParentFieldContext { get; set; }
+        public IResolveFieldContext ParentFieldContext { get; set; }
         public Dictionary<string, object> Arguments { get; set; }
     }
 }

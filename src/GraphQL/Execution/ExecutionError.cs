@@ -37,9 +37,9 @@ namespace GraphQL
 
         public string Code { get; set; }
 
-        internal bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
+        public bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
 
-        internal IEnumerable<string> Codes
+        public IEnumerable<string> Codes
         {
             get
             {

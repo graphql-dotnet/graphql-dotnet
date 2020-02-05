@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace GraphQL
@@ -30,7 +31,7 @@ namespace GraphQL
         public static bool IsLeafType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
-            return namedType is ScalarGraphType || namedType is EnumerationGraphType;
+            return namedType is ScalarGraphType;
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -38,7 +39,6 @@ namespace GraphQL
         {
             var namedType = type.GetNamedType();
             return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
-                   typeof(EnumerationGraphType).IsAssignableFrom(namedType) || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
                    typeof(IInputObjectGraphType).IsAssignableFrom(namedType);
         }
 
@@ -47,7 +47,6 @@ namespace GraphQL
         {
             var namedType = type.GetNamedType();
             return namedType is ScalarGraphType ||
-                   namedType is EnumerationGraphType || // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
                    namedType is IInputObjectGraphType;
         }
 
@@ -58,8 +57,7 @@ namespace GraphQL
             return typeof(ScalarGraphType).IsAssignableFrom(namedType) ||
                    typeof(IObjectGraphType).IsAssignableFrom(namedType) ||
                    typeof(IInterfaceGraphType).IsAssignableFrom(namedType) ||
-                   typeof(UnionGraphType).IsAssignableFrom(namedType) ||
-                   typeof(EnumerationGraphType).IsAssignableFrom(namedType); // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   typeof(UnionGraphType).IsAssignableFrom(namedType);
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
@@ -69,8 +67,7 @@ namespace GraphQL
             return namedType is ScalarGraphType ||
                    namedType is IObjectGraphType ||
                    namedType is IInterfaceGraphType ||
-                   namedType is UnionGraphType ||
-                   namedType is EnumerationGraphType; // EnumerationGraphType inherits ScalarGraphType, but for clarity let it be here
+                   namedType is UnionGraphType;
         }
 
         public static bool IsInputObjectType(this IGraphType type)
@@ -375,6 +372,8 @@ namespace GraphQL
             return false;
         }
 
+        private static readonly NullValue _null = new NullValue();
+
         public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
         {
             if (type is NonNullGraphType nonnull)
@@ -384,7 +383,7 @@ namespace GraphQL
 
             if (value == null || type == null)
             {
-                return new NullValue();
+                return _null;
             }
 
             // Convert IEnumerable to GraphQL list. If the GraphQLType is a list, but
@@ -441,6 +440,7 @@ namespace GraphQL
                 null => null,
                 bool b => new BooleanValue(b),
                 int i => new IntValue(i),
+                BigInteger bi => new BigIntValue(bi),
                 long l => new LongValue(l),
                 decimal @decimal => new DecimalValue(@decimal),
                 double d => new FloatValue(d),

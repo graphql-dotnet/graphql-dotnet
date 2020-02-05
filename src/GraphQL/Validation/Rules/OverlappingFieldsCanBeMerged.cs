@@ -19,10 +19,7 @@ namespace GraphQL.Validation.Rules
             {
                 return string.Join(
                     " and ",
-                    reasonMessage.Msgs.Select(x =>
-                    {
-                        return $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}";
-                    }).ToArray()
+                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
                 );
             }
             else
@@ -196,7 +193,7 @@ namespace GraphQL.Validation.Rules
 
             var areMutuallyExclusive =
                     parentFieldsAreMutuallyExclusive ||
-                    (parentType1 != parentType2 && isObjectType(parentType1) && isObjectType(parentType2));
+                    parentType1 != parentType2 && isObjectType(parentType1) && isObjectType(parentType2);
 
             // return type for each field.
             var type1 = def1?.ResolvedType;
@@ -639,8 +636,8 @@ namespace GraphQL.Validation.Rules
 
         private bool SameValue(Argument arg1, Argument arg2)
         {
-            return (arg1.Value == null && arg2.Value == null) ||
-                (AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value));
+            return arg1.Value == null && arg2.Value == null ||
+                AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
         }
 
         private CachedField GetFieldsAndFragmentNames(
@@ -879,7 +876,7 @@ namespace GraphQL.Validation.Rules
         }
     }
 
-    public static class ISelectionExtensions
+    internal static class ISelectionExtensions
     {
         public static string GetName(this ISelection selection)
         {
@@ -900,10 +897,10 @@ namespace GraphQL.Validation.Rules
         {
             if (selection is Field field)
             {
-                return field.Arguments;
+                return field.Arguments ?? Arguments.Empty;
             }
 
-            return new Arguments();
+            return Arguments.Empty;
         }
 
         public static SelectionSet GetSelectionSet(this ISelection selection)

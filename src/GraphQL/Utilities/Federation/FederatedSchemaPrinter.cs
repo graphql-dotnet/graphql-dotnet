@@ -43,7 +43,7 @@ namespace GraphQL.Utilities.Federation
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
             var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return "";
+            if (ast?.Directives == null) return "";
 
             var dirs = string.Join(
                 " ",
@@ -68,7 +68,7 @@ namespace GraphQL.Utilities.Federation
             var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
             var delimiter = " & ";
-            var implementedInterfaces = interfaces.Any()
+            var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 

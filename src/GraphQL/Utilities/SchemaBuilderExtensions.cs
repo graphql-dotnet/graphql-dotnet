@@ -37,7 +37,7 @@ namespace GraphQL.Utilities
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
-            return GetExtensionAstTypes(type).Any();
+            return GetExtensionAstTypes(type).Count > 0;
         }
 
         public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode 
@@ -54,7 +54,7 @@ namespace GraphQL.Utilities
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
         {
-            var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>();
+            var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
             return types.SelectMany(x => x.Directives);
         }
     }
