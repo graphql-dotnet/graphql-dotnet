@@ -43,7 +43,7 @@ namespace GraphQL.Utilities.Federation
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
             var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return "";
+            if (ast?.Directives == null) return "";
 
             var dirs = string.Join(
                 " ",

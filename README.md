@@ -15,15 +15,18 @@
 
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
-Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the [GraphQL Foundation](https://foundation.graphql.org/).
+Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the
+[GraphQL Foundation](https://foundation.graphql.org/).
 
-This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
+This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
+by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
 
 ## Installation
 
 > WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
 > If errors occur, it is recommended that you first check the behavior on the latest available preview version before
-> reporting a issue.
+> reporting a issue. Latest 3.0.0-preview-XXXX versions are **backwards incompatible** with latest stable 2.4.0 version.
+> You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1352/lib/netstandard2.0/diff/2.4.0/).
 
 You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 ```
@@ -98,7 +101,9 @@ Console.WriteLine(json);
 
 ### Schema First Approach
 
-This example uses the [Graphql schema language](https://graphql.org/learn/schema/#type-language).  See the [documentation](https://graphql-dotnet.github.io/docs/getting-started/introduction) for more examples and information.
+This example uses the [Graphql schema language](https://graphql.org/learn/schema/#type-language).
+See the [documentation](https://graphql-dotnet.github.io/docs/getting-started/introduction) for
+more examples and information.
 
 ```csharp
 public class Droid
@@ -260,7 +265,8 @@ publish nuget from MyGet
 ```
 
 ### Running on OSX with mono
-To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
+To run this project on OSX with mono you will need to add some configuration.
+Make sure mono is installed and add the following to your bash configuration:
 
 ```bash
 export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/

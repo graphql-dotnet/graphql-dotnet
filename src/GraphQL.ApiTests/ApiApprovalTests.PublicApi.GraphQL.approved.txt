@@ -1300,7 +1300,7 @@ namespace GraphQL.Language
         public void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         public GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
         public GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
-        public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> directives) { }
+        public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
         public GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
         public GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
         public GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
@@ -2681,12 +2681,6 @@ namespace GraphQL.Validation.Rules
         public string FragmentOnNonCompositeErrorMessage(string fragName, string type) { }
         public string InlineFragmentOnNonCompositeErrorMessage(string type) { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
-    }
-    public static class ISelectionExtensions
-    {
-        public static GraphQL.Language.AST.Arguments GetArguments(this GraphQL.Language.AST.ISelection selection) { }
-        public static string GetName(this GraphQL.Language.AST.ISelection selection) { }
-        public static GraphQL.Language.AST.SelectionSet GetSelectionSet(this GraphQL.Language.AST.ISelection selection) { }
     }
     public class KnownArgumentNames : GraphQL.Validation.IValidationRule
     {
