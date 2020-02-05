@@ -9,8 +9,8 @@ namespace GraphQL.Tests.Introspection
     public class SchemaIntrospectionTests
     {
         [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_core_schema(IDocumentWriter documentWriter)
+        [ClassData(typeof(SchemaIntrospectionDocumentWritersTestData))]
+        public async Task validate_core_schema(IDocumentWriter documentWriter, string expected)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -23,10 +23,6 @@ namespace GraphQL.Tests.Introspection
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
-
-            var expected = documentWriter is SystemTextJson.DocumentWriter
-                ? IntrospectionResult.DataWhenSystemTextJson
-                : IntrospectionResult.DataWhenNewtonsoftJson;
 
             ShouldBe(json, expected);
         }
