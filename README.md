@@ -43,7 +43,7 @@ We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.Syste
 ```
 > *Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
 > capabilities so writing to an ASP.NET Core 3.0 `HttpResponse.Body` will require you to set 
-> `AllowSynchronousIO` to `false` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
+> `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
 > which isn't recommended.*
 
 You can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json),
