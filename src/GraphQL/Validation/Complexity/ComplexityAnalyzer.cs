@@ -147,7 +147,7 @@ namespace GraphQL.Validation.Complexity
         private static double? GetImpactFromArgs(INode node)
         {
             double? newImpact = null;
-            if (!(node.Children.First(n => n is Arguments) is Arguments args)) return null;
+            if (!(node.Children.FirstOrDefault(n => n is Arguments) is Arguments args)) return null;
 
             if (args.ValueFor("id") != null) newImpact = 1;
             else

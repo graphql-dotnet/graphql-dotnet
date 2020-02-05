@@ -23,9 +23,12 @@ namespace GraphQL.Utilities
         {
             if (node is IProvideMetadata meta && meta.GetAstType<IHasDirectivesNode>() is IHasDirectivesNode ast)
             {
-                foreach (var visitor in BuildVisitors(ast.Directives))
+                if (ast.Directives != null)
                 {
-                    yield return visitor;
+                    foreach (var visitor in BuildVisitors(ast.Directives))
+                    {
+                        yield return visitor;
+                    }
                 }
             }
         }
@@ -36,7 +39,8 @@ namespace GraphQL.Utilities
             {
                 var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
                 visitor.Name = dir.Name.Value;
-                visitor.Arguments = ToArguments(dir.Arguments);
+                if (dir.Arguments != null)
+                    visitor.Arguments = ToArguments(dir.Arguments);
                 yield return visitor;
             }
         }
