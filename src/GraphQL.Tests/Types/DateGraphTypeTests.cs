@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                ((DateTime) _type.ParseValue("2015-11-21T19:59:32.987+0200")).Kind.ShouldBe(
+                ((DateTime) _type.ParseValue("2015-11-21")).Kind.ShouldBe(
                     DateTimeKind.Utc);
             });
         }
