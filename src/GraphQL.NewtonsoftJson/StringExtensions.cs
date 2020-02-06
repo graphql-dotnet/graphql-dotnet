@@ -21,11 +21,13 @@ namespace GraphQL.NewtonsoftJson
         /// <summary>
         /// Converts a JSON object into a dictionary.
         /// </summary>
+        /// <remarks>
+        /// Used by GraphQL.Transports.AspNetCore.NewtonsoftJson project in server repo.
+        /// </remarks>
         public static Inputs ToInputs(this JObject obj)
         {
-            var variables = obj?.GetValue() as Dictionary<string, object>
-                ?? new Dictionary<string, object>();
-            return new Inputs(variables);
+            var variables = obj?.GetValue() as Dictionary<string, object>;
+            return variables.ToInputs();
         }
 
         /// <summary>
