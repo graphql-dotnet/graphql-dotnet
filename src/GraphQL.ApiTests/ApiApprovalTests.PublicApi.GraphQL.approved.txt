@@ -364,10 +364,14 @@ namespace GraphQL
     {
         System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value);
     }
-    public class Inputs : System.Collections.Generic.Dictionary<string, object>
+    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object>
     {
-        public Inputs() { }
+        public static readonly GraphQL.Inputs Empty;
         public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
+    }
+    public static class InputsExtensions
+    {
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
     }
     public static class Invariant
     {

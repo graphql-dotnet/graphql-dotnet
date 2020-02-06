@@ -41,7 +41,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(
                 schema,
                 @"{ retail { catalog { products { name } } } }",
-                @"{ retail: { catalog: { products: [ { name: 'Book' }] } } }"
+                @"{ ""retail"": { ""catalog"": { ""products"": [ { ""name"": ""Book"" }] } } }"
             );
         }
 
@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Execution
             AssertQuerySuccess(
                 schema,
                 @"{ hero { name friends { name } } }",
-                @"{ hero: { name : 'Quinn', friends: [ { name: 'Jaime' }, { name: 'Joe' }] } }",
+                @"{ ""hero"": { ""name"": ""Quinn"", ""friends"": [ { ""name"": ""Jaime"" }, { ""name"": ""Joe"" }] } }",
                 root: new SomeObject { Name = "Quinn"});
         }
 
@@ -98,7 +98,7 @@ namespace GraphQL.Tests.Execution
                     ... on Person { name }
                     ... on Robot { name }
                 } }",
-                @"{ hero: { name : 'Quinn' }}",
+                @"{ ""hero"": { ""name"" : ""Quinn"" }}",
                 root: new SomeObject { Name = "Quinn"});
         }
 
