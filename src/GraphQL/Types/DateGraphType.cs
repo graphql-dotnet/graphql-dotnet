@@ -35,13 +35,16 @@ namespace GraphQL.Types
                 throw new FormatException($"Expected date to have no time component. Value: {value}");
             }
 
-            var valueAsString = (string)value;
-            if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
+            if (value is string valueAsString)
             {
-                return date;
+                if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None, out var date))
+                {
+                    return date;
+                }
+                throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
             }
 
-            throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
+            throw new FormatException($"Could not parse date. Expected either a string or a DateTime. Value: {value}");
         }
 
         public override object ParseLiteral(IValue value)
