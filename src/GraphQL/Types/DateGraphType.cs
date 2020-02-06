@@ -28,7 +28,11 @@ namespace GraphQL.Types
         {
             if (value is DateTime dateTime)
             {
-                return dateTime;
+                if (dateTime.TimeOfDay == TimeSpan.Zero)
+                {
+                    return dateTime;
+                }
+                throw new FormatException($"Expected date to have no time component. Value: {value}");
             }
 
             var valueAsString = (string)value;
