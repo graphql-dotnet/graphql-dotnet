@@ -3,12 +3,16 @@
 The `ExecutionResult` provides an `Errors` property which includes any errors encountered
 during execution. Errors are returned [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors),
 which means stack traces are excluded. The `ExecutionResult` is transformed to what the spec
-requires using one or the other `IDocumentWriter`. For example `GraphQL.NewtonsoftJson.DocumentWriter`
-uses JSON.NET and `GraphQL.SystemTextJson.DocumentWriter` uses new .NET Core memory optimized
-serializer from [`System.Text.Json`](https://docs.microsoft.com/en-us/dotnet/api/system.text.json).
-For JSON.NET you can change what information is provided by setting your values (`ContractResolver`,
-`Converters`, etc.) in `JsonSerializerSettings` passed to `DocumentWriter` constructor. Or you
-can implement your own `IDocumentWriter`.
+requires using one or the another `IDocumentWriter`.
+
+For example `GraphQL.NewtonsoftJson.DocumentWriter` uses [JSON.NET](https://www.nuget.org/packages/Newtonsoft.Json)
+and `GraphQL.SystemTextJson.DocumentWriter` uses new .NET Core memory optimized serializer from
+[`System.Text.Json`](https://docs.microsoft.com/en-us/dotnet/api/system.text.json). For JSON.NET you can change
+what information is provided by setting your values (`ContractResolver`, Converters`, etc.)
+in `JsonSerializerSettings` passed to `DocumentWriter` constructor. For `System.Text.Json`
+serializer you can configure `JsonSerializerOptions` passed to `DocumentWriter` constructor.
+
+You can also implement your own `IDocumentWriter`.
 
 To help debug errors, you can set `ExposeExceptions` on `ExecutionOptions` which will expose error stack traces.
 
