@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Conversion
                 _.Schema = build_schema();
                 _.Query = "{ peRsoN { name } }";
             },
-            "{ peRsoN: { name: \"Quinn\" } }");
+            @"{ ""peRsoN"": { ""name"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Conversion
                 _.Schema = build_schema();
                 _.Query = "{ peRsoN { Na: name } }";
             },
-            "{ peRsoN: { Na: \"Quinn\" } }");
+            @"{ ""peRsoN"": { ""Na"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace GraphQL.Tests.Conversion
                 _.Query = "{ PeRsoN { naME: Name } }";
                 _.FieldNameConverter = converter;
             },
-            "{ PeRsoN: { naME: \"Quinn\" } }");
+            @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Conversion
                 _.Query = "{ PeRsoN { naME: Name } }";
                 _.FieldNameConverter = converter;
             },
-            "{ PeRsoN: { naME: \"Quinn\" } }");
+            @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
 
         [Fact]

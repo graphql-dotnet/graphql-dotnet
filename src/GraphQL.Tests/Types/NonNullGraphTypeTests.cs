@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Types
         {
             AssertQuerySuccess(
                 "{ nullable { a b c } }",
-                "{ nullable: { a: 99, b: true, c: 'Hello world' } }",
+                @"{ ""nullable"": { ""a"": 99, ""b"": true, ""c"": ""Hello world"" } }",
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
@@ -20,8 +20,8 @@ namespace GraphQL.Tests.Types
         public void nullable_fields_without_values_never_complain()
         {
             AssertQuerySuccess(
-                "{ nullable { a b c } }",
-                "{ nullable: { a: null, b: null, c: null } }",
+                @"{ nullable { a b c } }",
+                @"{ ""nullable"": { ""a"": null, ""b"": null, ""c"": null } }",
                 root: new ExampleContext(null, null, null));
         }
 
@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Types
         {
             AssertQuerySuccess(
                 "{ nonNullable { a b c } }",
-                "{ nonNullable: { a: 99, b: true, c: 'Hello world' } }",
+                @"{ ""nonNullable"": { ""a"": 99, ""b"": true, ""c"": ""Hello world"" } }",
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Types
         {
             var result = AssertQueryWithErrors(
                 "{ nonNullable { a b c } }",
-                "{ nonNullable: null }",
+                @"{ ""nonNullable"": null }",
                 root: new ExampleContext(null, null, null),
                 expectedErrorCount: 3);
 

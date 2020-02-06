@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void throws_when_unable_to_determine_object_type()
         {
-            var result = AssertQueryWithErrors("{ pets { name } }", "{ 'pets': null }", expectedErrorCount: 1);
+            var result = AssertQueryWithErrors("{ pets { name } }", @"{ ""pets"": null }", expectedErrorCount: 1);
             var error = result.Errors.First();
             error.Message.ShouldBe("Abstract type Pet must resolve to an Object type at runtime for field Query.pets with value '{ name = Eli }', received 'null'.");
         }

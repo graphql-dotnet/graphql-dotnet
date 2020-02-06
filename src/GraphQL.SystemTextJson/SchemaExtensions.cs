@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Types;
 
-namespace GraphQL.NewtonsoftJson
+namespace GraphQL.SystemTextJson
 {
     public static class SchemaExtensions
     {

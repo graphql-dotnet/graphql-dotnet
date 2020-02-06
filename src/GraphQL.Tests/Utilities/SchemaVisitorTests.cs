@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Utilities
 
                 _.Query = "{ hello }";
                 _.Root = new { Hello = "Hello World!" };
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
             });
         }
 
@@ -61,7 +61,7 @@ namespace GraphQL.Tests.Utilities
                 ";
 
                 _.Query = "{ hello }";
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD2!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD2!"" }";
             });
         }
 

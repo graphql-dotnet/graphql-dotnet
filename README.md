@@ -28,15 +28,29 @@ by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.
 > reporting a issue. Latest 3.0.0-preview-XXXX versions are **backwards incompatible** with latest stable 2.4.0 version.
 > You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1352/lib/netstandard2.0/diff/2.4.0/).
 
-You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
-
+You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 ```
 > dotnet add package GraphQL
-> dotnet add package GraphQL -v 3.0.0-preview-1352
 ```
 
-Or you can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json).
+For serialized results, you'll need an `IDocumentWriter` implementation.
+We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.SystemTextJson/) for .NET Core 3+,
+[GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson/)
+(formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/)), or you can bring your own.
+```
+> dotnet add package GraphQL.SystemTextJson
+> dotnet add package GraphQL.NewtonsoftJson
+```
+> *Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
+> capabilities so writing to an ASP.NET Core 3.0 `HttpResponse.Body` will require you to set 
+> `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
+> which isn't recommended.*
 
+You can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json),
+where you may want to explicitly pull a certain version using `-v`.
+```
+> dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1448
+```
 
 ## Documentation
 

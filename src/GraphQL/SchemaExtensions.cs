@@ -8,6 +8,11 @@ namespace GraphQL
     {
         public static async Task<string> ExecuteAsync(this ISchema schema, IDocumentWriter documentWriter, Action<ExecutionOptions> configure)
         {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
             {
