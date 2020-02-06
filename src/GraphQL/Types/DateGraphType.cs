@@ -44,7 +44,7 @@ namespace GraphQL.Types
                 throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
             }
 
-            throw new FormatException($"Could not parse date. Expected either a string or a DateTime. Value: {value}");
+            throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}");
         }
 
         public override object ParseLiteral(IValue value)
