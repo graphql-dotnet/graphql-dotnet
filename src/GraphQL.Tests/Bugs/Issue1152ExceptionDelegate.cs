@@ -50,10 +50,7 @@ query {
         {
             Field<StringGraphType>(
                 "somefield",
-                resolve: ctx =>
-                {
-                    throw new InvalidTimeZoneException("Oops");
-                });
+                resolve: ctx => throw new InvalidTimeZoneException("Oops"));
         }
     }
 }

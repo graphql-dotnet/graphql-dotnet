@@ -1181,20 +1181,11 @@ enum __TypeKind {
                 Name = "Odd";
             }
 
-            public override object Serialize(object value)
-            {
-                return null;
-            }
+            public override object Serialize(object value) => null;
 
-            public override object ParseValue(object value)
-            {
-                return null;
-            }
+            public override object ParseValue(object value) => null;
 
-            public override object ParseLiteral(IValue value)
-            {
-                return null;
-            }
+            public override object ParseLiteral(IValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

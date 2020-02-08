@@ -37,10 +37,7 @@ namespace GraphQL.Tests.Instrumentation
         [Fact]
         public void middleware_can_override()
         {
-            _builder.Use(next =>
-            {
-                return context => Task.FromResult<object>("One");
-            });
+            _builder.Use(next => context => Task.FromResult<object>("One"));
 
             _builder.Build().Invoke(_context).Result.ShouldBe("One");
         }

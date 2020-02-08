@@ -202,10 +202,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   source: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -264,10 +261,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContext: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -352,10 +346,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   three: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -607,30 +598,15 @@ namespace GraphQL.Tests.Utilities
     [GraphQLMetadata("Query")]
     internal class ParametersType
     {
-        public bool Source(object source)
-        {
-            return source != null;
-        }
+        public bool Source(object source) => source != null;
 
-        public string Resolve(IResolveFieldContext context)
-        {
-            return "Resolved";
-        }
+        public string Resolve(IResolveFieldContext context) => "Resolved";
 
-        public string ResolveWithParam(IResolveFieldContext context, string id)
-        {
-            return $"Resolved {id}";
-        }
+        public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
-        public string UserContext(MyUserContext context)
-        {
-            return context.Name;
-        }
+        public string UserContext(MyUserContext context) => context.Name;
 
-        public string UserContextWithParam(MyUserContext context, string id)
-        {
-            return $"{context.Name} {id}";
-        }
+        public string UserContextWithParam(MyUserContext context, string id) => $"{context.Name} {id}";
 
         public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
         {

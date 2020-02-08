@@ -423,10 +423,7 @@ namespace GraphQL.Tests.Utilities
         internal class Movie
         {
             [GraphQLMetadata("movies", DeprecationReason = "my reason")]
-            public int Movies()
-            {
-                return 0;
-            }
+            public int Movies() => 0;
         }
 
         internal class CustomScalarType : ScalarGraphType
@@ -436,20 +433,11 @@ namespace GraphQL.Tests.Utilities
                 Name = "CustomScalar";
             }
 
-            public override object Serialize(object value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object Serialize(object value) => throw new System.NotImplementedException();
 
-            public override object ParseValue(object value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object ParseValue(object value) => throw new System.NotImplementedException();
 
-            public override object ParseLiteral(IValue value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();
         }
     }
 }
