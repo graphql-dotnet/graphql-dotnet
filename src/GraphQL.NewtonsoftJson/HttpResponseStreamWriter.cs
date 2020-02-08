@@ -17,7 +17,7 @@ namespace GraphQL.NewtonsoftJson
     /// </summary>
     internal class HttpResponseStreamWriter : TextWriter
     {
-        internal const int DefaultBufferSize = 16 * 1024;
+        internal const int DEFAULT_BUFFER_SIZE = 16 * 1024;
 
         private readonly Stream _stream;
         private readonly Encoder _encoder;
@@ -32,7 +32,7 @@ namespace GraphQL.NewtonsoftJson
         private bool _disposed;
 
         public HttpResponseStreamWriter(Stream stream, Encoding encoding)
-            : this(stream, encoding, DefaultBufferSize, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
+            : this(stream, encoding, DEFAULT_BUFFER_SIZE, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
         {
         }
 
