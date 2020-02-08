@@ -64,7 +64,7 @@ namespace GraphQL.Validation.Rules
             IGraphType parentType,
             SelectionSet selectionSet)
         {
-            List<Conflict> conflicts = new List<Conflict>();
+            var conflicts = new List<Conflict>();
 
             CachedField cachedField = GetFieldsAndFragmentNames(
                 context,
@@ -86,7 +86,7 @@ namespace GraphQL.Validation.Rules
             {
                 // (B) Then collect conflicts between these fields and those represented by
                 // each spread fragment name found.
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
                 for (int i = 0; i < fragmentNames.Count; i++)
                 {
                     CollectConflictsBetweenFieldsAndFragment(
@@ -292,7 +292,7 @@ namespace GraphQL.Validation.Rules
             IGraphType parentType2,
             SelectionSet selectionSet2)
         {
-            List<Conflict> conflicts = new List<Conflict>();
+            var conflicts = new List<Conflict>();
 
             var cachedField1 = GetFieldsAndFragmentNames(
                 context,
@@ -326,7 +326,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the second.
             if (fragmentNames2.Count != 0)
             {
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
 
                 for (var j = 0; j < fragmentNames2.Count; j++)
                 {
@@ -346,7 +346,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the first.
             if (fragmentNames1.Count != 0)
             {
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
 
                 for (var i = 0; i < fragmentNames1.Count; i++)
                 {
