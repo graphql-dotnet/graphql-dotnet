@@ -19,7 +19,7 @@ namespace GraphQL.NewtonsoftJson
     {
         internal const int DefaultBufferSize = 16 * 1024;
 
-        private Stream _stream;
+        private readonly Stream _stream;
         private readonly Encoder _encoder;
         private readonly ArrayPool<byte> _bytePool;
         private readonly ArrayPool<char> _charPool;

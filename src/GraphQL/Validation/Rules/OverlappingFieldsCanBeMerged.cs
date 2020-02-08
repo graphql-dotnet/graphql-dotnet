@@ -826,7 +826,7 @@ namespace GraphQL.Validation.Rules
 
         public class PairSet
         {
-            private ObjMap<ObjMap<bool>> _data;
+            private readonly ObjMap<ObjMap<bool>> _data;
 
             public PairSet()
             {

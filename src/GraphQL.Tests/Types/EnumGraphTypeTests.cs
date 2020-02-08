@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        private EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
+        private readonly EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
 
         [Fact]
         public void adds_values_from_enum()

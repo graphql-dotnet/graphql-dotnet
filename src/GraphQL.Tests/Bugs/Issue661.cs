@@ -55,7 +55,7 @@ namespace GraphQL.Tests.Bugs
 
     public class Issue661Query : ObjectGraphType
     {
-        private IDistributedCache _cache;
+        private readonly IDistributedCache _cache;
 
         public Issue661Query(IDistributedCache cache)
         {
