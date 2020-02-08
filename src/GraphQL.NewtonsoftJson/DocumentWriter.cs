@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -32,19 +33,20 @@ namespace GraphQL.NewtonsoftJson
             }
         }
 
-        public async Task WriteAsync<T>(Stream stream, T value)
+        public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
         {
-            using (var writer = new HttpResponseStreamWriter(stream, Utf8Encoding))
-            using (var jsonWriter = new JsonTextWriter(writer)
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using var writer = new HttpResponseStreamWriter(stream, Utf8Encoding);
+            using var jsonWriter = new JsonTextWriter(writer)
             {
                 ArrayPool = _jsonArrayPool,
                 CloseOutput = false,
                 AutoCompleteOnClose = false
-            })
-            {
-                _serializer.Serialize(jsonWriter, value);
-                await jsonWriter.FlushAsync().ConfigureAwait(false);
-            }
+            };
+            
+            _serializer.Serialize(jsonWriter, value);
+            await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }
