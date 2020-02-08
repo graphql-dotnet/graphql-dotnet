@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
             Mauve
         }
 
-        class ColorEnum : EnumerationGraphType<Colors>
+        private class ColorEnum : EnumerationGraphType<Colors>
         {
             public ColorEnum()
             {
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        class ColorEnumInverseCasing : EnumerationGraphType<Colors>
+        private class ColorEnumInverseCasing : EnumerationGraphType<Colors>
         {
             public ColorEnumInverseCasing()
             {

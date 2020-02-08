@@ -420,7 +420,7 @@ namespace GraphQL.Tests.Utilities
             type.Fields.Count().ShouldBe(2);
         }
 
-        class Movie
+        internal class Movie
         {
             [GraphQLMetadata("movies", DeprecationReason = "my reason")]
             public int Movies()
@@ -429,7 +429,7 @@ namespace GraphQL.Tests.Utilities
             }
         }
 
-        class CustomScalarType : ScalarGraphType
+        internal class CustomScalarType : ScalarGraphType
         {
             public CustomScalarType()
             {
