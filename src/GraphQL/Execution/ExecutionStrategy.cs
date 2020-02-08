@@ -200,15 +200,8 @@ namespace GraphQL.Execution
                 resolveContext = new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
-                var result = resolver.Resolve(resolveContext);
-
-                if (result is Task task)
-                {
-                    await task.ConfigureAwait(false);
-                    result = task.GetResult();
-                }
-
-                node.Result = result;
+                var taskResult = resolver.SetResultAsync(resolveContext);
+                await taskResult.ConfigureAwait(false);
 
                 ValidateNodeResult(context, node);
 

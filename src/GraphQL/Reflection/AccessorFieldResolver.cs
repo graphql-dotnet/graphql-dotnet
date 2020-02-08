@@ -1,10 +1,11 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
-    internal class AccessorFieldResolver : IFieldResolver
+    internal class AccessorFieldResolver : IFieldResolverInternal
     {
         private readonly IAccessor _accessor;
         private readonly IServiceProvider _serviceProvider;
@@ -15,7 +16,7 @@ namespace GraphQL.Reflection
             _serviceProvider = serviceProvider;
         }
 
-        public object Resolve(IResolveFieldContext context)
+        public Task SetResultAsync(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
@@ -29,7 +30,8 @@ namespace GraphQL.Reflection
                 throw new InvalidOperationException($"Could not resolve an instance of {_accessor.DeclaringType.Name} to execute {parentType}{context.FieldName}");
             }
 
-            return _accessor.GetValue(target, arguments);
+            context.Result = _accessor.GetValue(target, arguments);
+            return Task.CompletedTask;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace GraphQL.Instrumentation
 {
     public static class FieldResolverBuilderExtensions
     {
-        private const string InvokeMethodName = "Resolve";
+        private const string InvokeMethodName = "SetResultAsync";
 
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) where T : new() => Use(builder, typeof(T));
 
@@ -27,9 +27,9 @@ namespace GraphQL.Instrumentation
             }
 
             var methodInfo = invokeMethods[0];
-            if (!typeof(Task<object>).IsAssignableFrom(methodInfo.ReturnType))
+            if (!typeof(Task).IsAssignableFrom(methodInfo.ReturnType))
             {
-                throw new InvalidOperationException($"The {InvokeMethodName} method should return a Task<object>.");
+                throw new InvalidOperationException($"The {InvokeMethodName} method should return a Task.");
             }
 
             var parameters = methodInfo.GetParameters();
@@ -42,7 +42,7 @@ namespace GraphQL.Instrumentation
             {
                 var instance = Activator.CreateInstance(middleware);
 
-                return context => (Task<object>)methodInfo.Invoke(instance, new object[] { context, next });
+                return context => (Task)methodInfo.Invoke(instance, new object[] { context, next });
             });
         }
     }

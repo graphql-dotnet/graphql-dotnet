@@ -1,10 +1,11 @@
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver<TProperty>
+    public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolverInternal
     {
         private readonly Func<TSourceType, TProperty> _property;
 
@@ -13,14 +14,10 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public TProperty Resolve(IResolveFieldContext context)
+        public Task SetResultAsync(IResolveFieldContext context)
         {
-            return _property((TSourceType)context.Source);
-        }
-
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
+            context.Result = _property((TSourceType)context.Source);
+            return Task.CompletedTask;
         }
     }
 }

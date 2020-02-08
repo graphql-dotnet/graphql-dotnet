@@ -4,33 +4,24 @@ using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
-    public class MiddlewareResolver : IFieldResolver<Task<object>>
+    public class MiddlewareResolver : IFieldResolverInternal
     {
-        private readonly IFieldResolver _next;
+        private readonly FieldMiddlewareDelegate _func;
 
-        public MiddlewareResolver(IFieldResolver next)
+        public MiddlewareResolver(IFieldResolverInternal next)
         {
-            _next = next ?? NameFieldResolver.Instance;
+            next = next ?? NameFieldResolver.Instance;
+            _func = (context) => next.SetResultAsync(context);
         }
 
-        public async Task<object> Resolve(IResolveFieldContext context)
+        public MiddlewareResolver(FieldMiddlewareDelegate func)
         {
-            object result = _next.Resolve(context);
-
-            if (result is Task task)
-            {
-                await task.ConfigureAwait(false);
-                return task.GetResult();
-            }
-            else
-            {
-                return result;
-            }
+            _func = func;
         }
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
+        public Task SetResultAsync(IResolveFieldContext context)
         {
-            return Resolve(context);
+            return _func(context);
         }
     }
 }

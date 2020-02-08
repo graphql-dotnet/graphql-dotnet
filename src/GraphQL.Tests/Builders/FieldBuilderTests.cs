@@ -9,6 +9,14 @@ using Xunit;
 
 namespace GraphQL.Tests.Builders
 {
+    public static class IFieldResolverInternalExtensions
+    {
+        public static object Resolve(this Resolvers.IFieldResolverInternal fieldResolverInternal, IResolveFieldContext context)
+        {
+            fieldResolverInternal.SetResultAsync(context);
+            return context.Result;
+        }
+    }
     public class FieldBuilderTests
     {
         [Fact]

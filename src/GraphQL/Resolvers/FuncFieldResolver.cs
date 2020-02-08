@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
-    public class FuncFieldResolver<TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TReturnType> : IFieldResolverInternal
     {
         private readonly Func<IResolveFieldContext, TReturnType> _resolver;
 
@@ -12,18 +13,14 @@ namespace GraphQL.Resolvers
             _resolver = resolver;
         }
 
-        public TReturnType Resolve(IResolveFieldContext context)
+        public Task SetResultAsync(IResolveFieldContext context)
         {
-            return _resolver(context);
-        }
-
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
+            context.Result = _resolver(context);
+            return Task.CompletedTask;
         }
     }
 
-    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolverInternal
     {
         private readonly Func<IResolveFieldContext<TSourceType>, TReturnType> _resolver;
 
@@ -32,14 +29,10 @@ namespace GraphQL.Resolvers
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
-        public TReturnType Resolve(IResolveFieldContext context)
+        public Task SetResultAsync(IResolveFieldContext context)
         {
-            return _resolver(context.As<TSourceType>());
-        }
-
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
+            context.Result = _resolver(context.As<TSourceType>());
+            return Task.CompletedTask;
         }
     }
 }

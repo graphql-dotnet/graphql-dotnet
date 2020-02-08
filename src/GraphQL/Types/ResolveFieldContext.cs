@@ -51,6 +51,8 @@ namespace GraphQL.Types
         /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
+        public object Result { get; set; }
+
         public ResolveFieldContext() { }
 
         public ResolveFieldContext(IResolveFieldContext context)

@@ -2,10 +2,11 @@ using GraphQL.Types;
 using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace GraphQL.Resolvers
 {
-    public class NameFieldResolver : IFieldResolver
+    public class NameFieldResolver : IFieldResolverInternal
     {
         private static readonly ConcurrentDictionary<(Type targetType, string name), Func<object, object>> _delegates
             = new ConcurrentDictionary<(Type, string), Func<object, object>>();
@@ -13,8 +14,6 @@ namespace GraphQL.Resolvers
         private NameFieldResolver() { }
 
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
-
-        public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
 
         private static object Resolve(object source, string name)
         {
@@ -77,6 +76,14 @@ namespace GraphQL.Resolvers
                     throw new InvalidOperationException($"Expected to find property or method {name} on {target.Name} but it does not exist.");
                 }
             }
+        }
+
+        public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
+
+        public Task SetResultAsync(IResolveFieldContext context)
+        {
+            context.Result = Resolve(context?.Source, context?.FieldAst?.Name);
+            return Task.CompletedTask;
         }
     }
 }

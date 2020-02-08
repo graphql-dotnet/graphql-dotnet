@@ -69,5 +69,7 @@ namespace GraphQL.Types
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
 
         object IResolveFieldContext.Source => _executionNode.Source;
+
+        public object Result { get => _executionNode.Result; set => _executionNode.Result = value; }
     }
 }

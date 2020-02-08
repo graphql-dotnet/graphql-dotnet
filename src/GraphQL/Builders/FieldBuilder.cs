@@ -91,6 +91,15 @@ namespace GraphQL.Builders
 
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
         {
+            if (resolver is IFieldResolverInternal fieldResolverInternal)
+                FieldType.Resolver = fieldResolverInternal;
+            else
+                FieldType.Resolver = new FieldResolverWrapper(resolver);
+            return this;
+        }
+
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolverInternal resolver)
+        {
             FieldType.Resolver = resolver;
             return this;
         }

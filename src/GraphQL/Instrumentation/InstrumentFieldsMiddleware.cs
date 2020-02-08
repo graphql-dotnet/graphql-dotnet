@@ -7,7 +7,7 @@ namespace GraphQL.Instrumentation
 {
     public class InstrumentFieldsMiddleware
     {
-        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async Task SetResultAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             var metadata = new Dictionary<string, object>
             {
@@ -19,8 +19,7 @@ namespace GraphQL.Instrumentation
 
             using (context.Metrics.Subject("field", context.FieldName, metadata))
             {
-                var result = await next(context).ConfigureAwait(false);
-                return result;
+                await next(context).ConfigureAwait(false);
             }
         }
     }

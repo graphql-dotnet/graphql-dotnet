@@ -23,6 +23,6 @@ namespace GraphQL.Types
         public Type Type { get; set; }
         public IGraphType ResolvedType { get; set; }
         public QueryArguments Arguments { get; set; }
-        public IFieldResolver Resolver { get; set; }
+        public IFieldResolverInternal Resolver { get; set; }
     }
 }

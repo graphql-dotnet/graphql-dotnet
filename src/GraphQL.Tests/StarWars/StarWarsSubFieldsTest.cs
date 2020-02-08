@@ -106,7 +106,7 @@ namespace GraphQL.Tests.StarWars
         [Fact]
         public void subfields_is_not_null_for_single_InterfaceGraphType()
         {
-            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: ctx =>
+            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: async ctx =>
            {
                ctx.SubFields.ShouldNotBeNull();
                ctx.SubFields.Keys.ShouldContain("id");
