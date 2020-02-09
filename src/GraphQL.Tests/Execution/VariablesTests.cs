@@ -463,7 +463,7 @@ namespace GraphQL.Tests.Execution
             // value is: "a"
             var expected = @"
             {
-              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
+              ""fieldWithNullableStringInput"": ""\""a\""""
             }
             ";
 
@@ -484,7 +484,7 @@ namespace GraphQL.Tests.Execution
             // value is: "a"
             var expected = @"
             {
-              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
+              ""fieldWithNullableStringInput"": ""\""a\""""
             }
             ";
 
@@ -545,7 +545,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
+              ""fieldWithNullableStringInput"": ""\""a\""""
             }
             ";
 
@@ -565,7 +565,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithNullableStringInput"": ""\u0022a\u0022""
+              ""fieldWithNullableStringInput"": ""\""a\""""
             }
             ";
 
@@ -609,7 +609,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
+              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
             }
             ";
 
@@ -627,7 +627,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
+              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
             }
             ";
 
@@ -645,7 +645,7 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
             {
-              ""fieldWithDefaultArgumentValue"": ""\u0022Hello World\u0022""
+              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
             }
             ";
 

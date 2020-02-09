@@ -7,7 +7,12 @@ namespace GraphQL.Tests
     {
         public static readonly List<IDocumentWriter> AllWriters = new List<IDocumentWriter>
         {
-            new SystemTextJson.DocumentWriter(indent: true),
+            new SystemTextJson.DocumentWriter(new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
+            }),
             new NewtonsoftJson.DocumentWriter(indent: true)
         };
 
