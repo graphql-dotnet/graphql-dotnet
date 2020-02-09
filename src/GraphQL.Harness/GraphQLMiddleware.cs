@@ -53,7 +53,7 @@ namespace Example
             var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>
             (
                 context.Request.Body,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             );
 
             var result = await _executer.ExecuteAsync(options =>
