@@ -186,12 +186,12 @@ namespace GraphQL.Execution
         /// <remarks>
         /// Builds child nodes, but does not execute them
         /// </remarks>
-        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             if (node.IsResultSet)
-                return node;
+                return;
 
             IResolveFieldContext resolveContext = null;
 
@@ -253,8 +253,6 @@ namespace GraphQL.Execution
 
                 node.Result = null;
             }
-
-            return node;
         }
 
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
