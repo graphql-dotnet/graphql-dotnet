@@ -50,7 +50,11 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>(context.Request.Body);
+            var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>
+            (
+                context.Request.Body,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
 
             var result = await _executer.ExecuteAsync(options =>
             {
