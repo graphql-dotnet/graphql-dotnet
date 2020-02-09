@@ -14,7 +14,8 @@ namespace GraphQL.Execution
             var pendingNodes = new Queue<ExecutionNode>();
             pendingNodes.Enqueue(rootNode);
 
-            var currentTasks = new List<(Task, ExecutionNode)>();
+            var currentTasks = new List<Task>();
+            var currentNodes = new List<ExecutionNode>();
             while (pendingNodes.Count > 0)
             {
                 // Start executing pending nodes, while limiting the maximum number of parallel executed nodes to the set limit
@@ -26,7 +27,7 @@ namespace GraphQL.Execution
                     var pendingNodeTask = ExecuteNodeAsync(context, pendingNode);
                     if (pendingNodeTask.IsCompleted)
                     {
-                        //throw any caught exceptions
+                        // Throw any caught exceptions
                         await pendingNodeTask;
 
                         // Node completed synchronously, so no need to add it to the list of currently executing nodes
@@ -42,7 +43,8 @@ namespace GraphQL.Execution
                     else
                     {
                         // Node is actually asynchronous, so add it to the list of current tasks being executed in parallel
-                        currentTasks.Add((pendingNodeTask, pendingNode));
+                        currentTasks.Add(pendingNodeTask);
+                        currentNodes.Add(pendingNode);
                     }
 
                 }
@@ -51,11 +53,11 @@ namespace GraphQL.Execution
                     .ConfigureAwait(false);
 
                 // Await tasks for this execution step
-                await Task.WhenAll(currentTasks.Select(x => x.Item1))
+                await Task.WhenAll(currentTasks)
                     .ConfigureAwait(false);
 
                 // Add child nodes to pending nodes to execute the next level in parallel
-                foreach (var node in currentTasks.Select(x => x.Item2))
+                foreach (var node in currentNodes)
                     if (node is IParentExecutionNode p)
                 {
                     foreach (var childNode in p.GetChildNodes())
@@ -63,6 +65,7 @@ namespace GraphQL.Execution
                 }
 
                 currentTasks.Clear();
+                currentNodes.Clear();
             }
         }
     }
