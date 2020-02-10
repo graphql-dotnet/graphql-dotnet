@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.IO;
 using System.Text;
@@ -19,18 +20,36 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(bool indent)
-            : this(new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None })
+            : this(GetDefaultSerializerSettings(indent))
         {
         }
 
-        public DocumentWriter(JsonSerializerSettings settings)
+        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
         {
-            _serializer = JsonSerializer.CreateDefault(settings);
+            var serializerSettings = GetDefaultSerializerSettings(indent: false);
+            configureSerializerSettings?.Invoke(serializerSettings);
 
-            if (settings.ContractResolver == null)
+            _serializer = BuildSerializer(serializerSettings);
+        }
+
+        public DocumentWriter(JsonSerializerSettings serializerSettings)
+        {
+            _serializer = BuildSerializer(serializerSettings);
+        }
+
+        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent)
+            => new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None };
+
+        private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings)
+        {
+            var serializer = JsonSerializer.CreateDefault(serializerSettings);
+
+            if (serializerSettings.ContractResolver == null)
             {
-                _serializer.ContractResolver = new ExecutionResultContractResolver();
+                serializer.ContractResolver = new ExecutionResultContractResolver();
             }
+
+            return serializer;
         }
 
         public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)

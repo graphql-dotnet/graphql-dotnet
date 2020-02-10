@@ -3,7 +3,8 @@ namespace GraphQL.NewtonsoftJson
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
-        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings settings) { }
+        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
+        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
         public DocumentWriter(bool indent) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
