@@ -21,7 +21,7 @@ namespace GraphQL.SystemTextJson
         {
         }
 
-        public DocumentWriter(Action<JsonSerializerOptions> configureSerializerSettings)
+        public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
         {
             _options = GetDefaultSerializerSettings(indent: false);
             configureSerializerSettings?.Invoke(_options);
