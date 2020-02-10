@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -16,19 +17,35 @@ namespace GraphQL.SystemTextJson
         }
 
         public DocumentWriter(bool indent)
-            : this(new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+            : this(GetDefaultSerializerOptions(indent))
         {
         }
 
-        public DocumentWriter(JsonSerializerOptions options)
+        public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
         {
-            _options = options;
+            _options = GetDefaultSerializerOptions(indent: false);
+            configureSerializerOptions?.Invoke(_options);
 
+            ConfigureOptions();
+        }
+
+        public DocumentWriter(JsonSerializerOptions serializerOptions)
+        {
+            _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+
+            ConfigureOptions();
+        }
+
+        private void ConfigureOptions()
+        {
             if (!_options.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
                 _options.Converters.Add(new ExecutionResultJsonConverter());
             }
         }
+
+        private static JsonSerializerOptions GetDefaultSerializerOptions(bool indent)
+            => new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
             => JsonSerializer.SerializeAsync(stream, value, _options, cancellationToken);

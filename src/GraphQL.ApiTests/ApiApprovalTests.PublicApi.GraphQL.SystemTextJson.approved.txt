@@ -3,8 +3,9 @@ namespace GraphQL.SystemTextJson
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
+        public DocumentWriter(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
         public DocumentWriter(bool indent) { }
-        public DocumentWriter(System.Text.Json.JsonSerializerOptions options) { }
+        public DocumentWriter(System.Text.Json.JsonSerializerOptions serializerOptions) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class ExecutionResultJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionResult>

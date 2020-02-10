@@ -16,7 +16,8 @@ namespace GraphQL.Execution
             pendingNodes.Enqueue(rootNode);
             var pendingDataLoaders = new Queue<ExecutionNode>();
 
-            var currentTasks = new List<Task<ExecutionNode>>();
+            var currentTasks = new List<Task>();
+            var currentNodes = new List<ExecutionNode>();
             while (pendingNodes.Count > 0 || pendingDataLoaders.Count > 0 || currentTasks.Count > 0)
             {
                 while (pendingNodes.Count > 0 || currentTasks.Count > 0)
@@ -32,12 +33,12 @@ namespace GraphQL.Execution
                         {
                             // Node completed synchronously, so no need to add it to the list of currently executing nodes
                             // instead add any child nodes to the pendingNodes queue directly here
-                            var result = await pendingNodeTask;
-                            if (result.Result is IDataLoaderResult)
+                            await pendingNodeTask;
+                            if (pendingNode.Result is IDataLoaderResult)
                             {
                                 pendingDataLoaders.Enqueue(pendingNode);
                             }
-                            else if (result is IParentExecutionNode parentExecutionNode)
+                            else if (pendingNode is IParentExecutionNode parentExecutionNode)
                             {
                                 foreach (var childNode in parentExecutionNode.GetChildNodes())
                                 {
@@ -49,6 +50,7 @@ namespace GraphQL.Execution
                         {
                             // Node is actually asynchronous, so add it to the list of current tasks being executed in parallel
                             currentTasks.Add(pendingNodeTask);
+                            currentNodes.Add(pendingNode);
                         }
 
                     }
@@ -57,12 +59,11 @@ namespace GraphQL.Execution
                         .ConfigureAwait(false);
 
                     // Await tasks for this execution step
-                    var completedNodes = await Task.WhenAll(currentTasks)
+                    await Task.WhenAll(currentTasks)
                         .ConfigureAwait(false);
-                    currentTasks.Clear();
 
                     // Add child nodes to pending nodes to execute the next level in parallel
-                    foreach (var node in completedNodes)
+                    foreach (var node in currentNodes)
                     {
                         if (node.Result is IDataLoaderResult)
                         {
@@ -74,6 +75,9 @@ namespace GraphQL.Execution
                                 pendingNodes.Enqueue(childNode);
                         }
                     }
+
+                    currentTasks.Clear();
+                    currentNodes.Clear();
                 }
 
                 //run pending data loaders
@@ -81,6 +85,7 @@ namespace GraphQL.Execution
                 {
                     var dataLoaderNode = pendingDataLoaders.Dequeue();
                     currentTasks.Add(CompleteDataLoaderNodeAsync(context, dataLoaderNode));
+                    currentNodes.Add(dataLoaderNode);
                 }
             }
         }
