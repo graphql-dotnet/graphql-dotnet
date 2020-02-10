@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.SystemTextJson
@@ -29,6 +30,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        public Task WriteAsync<T>(Stream stream, T value) => JsonSerializer.SerializeAsync(stream, value, _options);
+        public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+            => JsonSerializer.SerializeAsync(stream, value, _options, cancellationToken);
     }
 }
