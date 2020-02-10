@@ -17,13 +17,13 @@ namespace GraphQL.SystemTextJson
         }
 
         public DocumentWriter(bool indent)
-            : this(GetDefaultSerializerSettings(indent))
+            : this(GetDefaultSerializerOptions(indent))
         {
         }
 
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
         {
-            _options = GetDefaultSerializerSettings(indent: false);
+            _options = GetDefaultSerializerOptions(indent: false);
             configureSerializerOptions?.Invoke(_options);
 
             ConfigureOptions();
@@ -44,7 +44,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        private static JsonSerializerOptions GetDefaultSerializerSettings(bool indent)
+        private static JsonSerializerOptions GetDefaultSerializerOptions(bool indent)
             => new JsonSerializerOptions { WriteIndented = indent, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         public Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
