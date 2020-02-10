@@ -52,14 +52,14 @@ namespace GraphQL.DataLoader.Tests
             AssertQuerySuccess<DataLoaderTestSchema>(
                 query: "{ usersWithDelay { userId firstName } }",
                 expected: @"
-{ usersWithDelay: [
+{ ""usersWithDelay"": [
     {
-        userId: 1,
-        firstName: """ + users[0].FirstName + @"""
+        ""userId"": 1,
+        ""firstName"": """ + users[0].FirstName + @"""
     },
     {
-        userId: 2,
-        firstName: """ + users[1].FirstName + @"""
+        ""userId"": 2,
+        ""firstName"": """ + users[1].FirstName + @"""
     }
 ] }
 ");
@@ -195,19 +195,19 @@ mutation {
 }",
                 expected: @"
 {
-    orders: [
+    ""orders"": [
     {
-        orderId: 1,
-        user: {
-            userId: 1,
-            firstName: """ + users[0].FirstName + @"""
+        ""orderId"": 1,
+        ""user"": {
+            ""userId"": 1,
+            ""firstName"": """ + users[0].FirstName + @"""
         }
     },
     {
-        orderId: 2,
-        user: {
-            userId: 2,
-            firstName: """ + users[1].FirstName + @"""
+        ""orderId"": 2,
+        ""user"": {
+            ""userId"": 2,
+            ""firstName"": """ + users[1].FirstName + @"""
         }
     }]
 }
@@ -250,36 +250,36 @@ mutation {
 }",
                 expected: @"
 {
-    users: [
+    ""users"": [
     {
-        orderedItems: [
+        ""orderedItems"": [
         {
-            orderItemId: 1
+            ""orderItemId"": 1
         },
         {
-            orderItemId: 2
+            ""orderItemId"": 2
         },
         {
-            orderItemId: 3
+            ""orderItemId"": 3
         },
         {
-            orderItemId: 4
-        }],
+            ""orderItemId"": 4
+        }]
     },
     {
-        orderedItems: [
+        ""orderedItems"": [
         {
-            orderItemId: 5
+            ""orderItemId"": 5
         },
         {
-            orderItemId: 6
+            ""orderItemId"": 6
         },
         {
-            orderItemId: 7
+            ""orderItemId"": 7
         },
         {
-            orderItemId: 8
-        }],
+            ""orderItemId"": 8
+        }]
     }]
 }
 ");
