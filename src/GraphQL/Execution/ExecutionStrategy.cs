@@ -244,11 +244,9 @@ namespace GraphQL.Execution
 
                 node.Result = null;
             }
-
-            return node;
         }
 
-        protected virtual async Task<ExecutionNode> CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             if (!node.IsResultSet)
                 throw new InvalidOperationException("This execution node has not yet been executed");
@@ -292,8 +290,6 @@ namespace GraphQL.Execution
 
                 node.Result = null;
             }
-
-            return node;
         }
 
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
