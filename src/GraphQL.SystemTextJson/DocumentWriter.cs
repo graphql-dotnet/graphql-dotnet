@@ -29,9 +29,9 @@ namespace GraphQL.SystemTextJson
             ConfigureOptions();
         }
 
-        public DocumentWriter(JsonSerializerOptions options)
+        public DocumentWriter(JsonSerializerOptions serializerOptions)
         {
-            _options = options;
+            _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
             ConfigureOptions();
         }

@@ -34,6 +34,11 @@ namespace GraphQL.NewtonsoftJson
 
         public DocumentWriter(JsonSerializerSettings serializerSettings)
         {
+            if (serializerSettings == null)
+            {
+                throw new ArgumentNullException(nameof(serializerSettings));
+            }
+
             _serializer = BuildSerializer(serializerSettings);
         }
 
