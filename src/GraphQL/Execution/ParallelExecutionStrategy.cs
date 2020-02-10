@@ -31,9 +31,11 @@ namespace GraphQL.Execution
                         var pendingNodeTask = ExecuteNodeAsync(context, pendingNode);
                         if (pendingNodeTask.IsCompleted)
                         {
+                            // Throw any caught exceptions
+                            await pendingNodeTask;
+
                             // Node completed synchronously, so no need to add it to the list of currently executing nodes
                             // instead add any child nodes to the pendingNodes queue directly here
-                            await pendingNodeTask;
                             if (pendingNode.Result is IDataLoaderResult)
                             {
                                 pendingDataLoaders.Enqueue(pendingNode);
