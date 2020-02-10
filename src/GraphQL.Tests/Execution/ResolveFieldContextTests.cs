@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using GraphQL.NewtonsoftJson;
 using Shouldly;
 using Xunit;
 
@@ -104,7 +104,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_list_from_array()
         {
-            _context.Arguments = "{a: ['one', 'two']}".ToInputs();
+            _context.Arguments = @"{ ""a"": [""one"", ""two""]}".ToInputs();
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
             result.Count.ShouldBe(2);

@@ -24,11 +24,11 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              'r2d2': {
-                name: 'R2-D2'
+              ""r2d2"": {
+                ""name"": ""R2-D2""
               },
-              'c3po': {
-                name: 'C-3PO'
+              ""c3po"": {
+                ""name"": ""C-3PO""
               }
             }";
 
@@ -49,9 +49,9 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              'r2d2': {
-                name: 'R2-D2'
-              },
+              ""r2d2"": {
+                ""name"": ""R2-D2""
+              }
             }";
 
             AssertQuerySuccess(query, expected);
@@ -71,9 +71,9 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              'r2d2': {
-                name: 'R2-D2'
-              },
+              ""r2d2"": {
+                ""name"": ""R2-D2""
+              }
             }";
 
             AssertQuerySuccess(query, expected);

@@ -12,5 +12,11 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Harness\GraphQL.Harness.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\GraphQL.Tests\Shared\**">
+      <Link>Shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
 
 </Project>

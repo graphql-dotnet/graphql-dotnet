@@ -391,12 +391,16 @@ namespace GraphQL
     }
     public interface IDocumentWriter
     {
-        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value);
+        System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default);
     }
-    public class Inputs : System.Collections.Generic.Dictionary<string, object>
+    public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object>
     {
-        public Inputs() { }
+        public static readonly GraphQL.Inputs Empty;
         public Inputs(System.Collections.Generic.IDictionary<string, object> dictionary) { }
+    }
+    public static class InputsExtensions
+    {
+        public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
     }
     public static class Invariant
     {
@@ -1327,7 +1331,7 @@ namespace GraphQL.Language
         public void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         public GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
         public GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
-        public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> directives) { }
+        public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
         public GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
         public GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
         public GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
@@ -2708,12 +2712,6 @@ namespace GraphQL.Validation.Rules
         public string FragmentOnNonCompositeErrorMessage(string fragName, string type) { }
         public string InlineFragmentOnNonCompositeErrorMessage(string type) { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
-    }
-    public static class ISelectionExtensions
-    {
-        public static GraphQL.Language.AST.Arguments GetArguments(this GraphQL.Language.AST.ISelection selection) { }
-        public static string GetName(this GraphQL.Language.AST.ISelection selection) { }
-        public static GraphQL.Language.AST.SelectionSet GetSelectionSet(this GraphQL.Language.AST.ISelection selection) { }
     }
     public class KnownArgumentNames : GraphQL.Validation.IValidationRule
     {

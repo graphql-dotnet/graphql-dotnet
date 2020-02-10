@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
 
@@ -131,28 +130,25 @@ namespace GraphQL.DataLoader.Tests
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
-            return AssertQuery<TSchema>(opts =>
-            {
-                opts.Query = query;
-                opts.Inputs = inputs;
-                opts.UserContext = userContext;
-                opts.CancellationToken = cancellationToken;
-
-                foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+            return AssertQuery<TSchema>(
+                opts =>
                 {
-                    opts.Listeners.Add(listener);
-                }
+                    opts.Query = query;
+                    opts.Inputs = inputs;
+                    opts.UserContext = userContext;
+                    opts.CancellationToken = cancellationToken;
 
-            }, expectedExecutionResult);
+                    foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+                    {
+                        opts.Listeners.Add(listener);
+                    }
+                },
+                expectedExecutionResult);
         }
 
         public ExecutionResult CreateQueryResult(string result)
         {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
+            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToDictionary();
             return new ExecutionResult { Data = expected };
         }
     }

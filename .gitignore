@@ -31,4 +31,4 @@ _NCrunch_*/
 bundle.js
 style.css
 
-ApiApprovalTests.PublicApi.received.txt
+*.received.txt

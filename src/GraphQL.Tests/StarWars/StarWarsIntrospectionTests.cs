@@ -9,7 +9,7 @@ namespace GraphQL.Tests.StarWars
         {
             var query = "{ hero { __typename name } }";
 
-            var expected = "{ hero: { __typename: 'Droid', name: 'R2-D2' } }";
+            var expected = @"{ ""hero"": { ""__typename"": ""Droid"", ""name"": ""R2-D2"" } }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -27,9 +27,9 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              __type: {
-                name: 'Droid',
-                kind: 'OBJECT'
+              ""__type"": {
+                ""name"": ""Droid"",
+                ""kind"": ""OBJECT""
               }
             }";
 
@@ -49,9 +49,9 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              __type: {
-                name: 'Character',
-                kind: 'INTERFACE'
+              ""__type"": {
+                ""name"": ""Character"",
+                ""kind"": ""INTERFACE""
               }
             }";
 
@@ -75,12 +75,12 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              __type: {
-                name: 'Character',
-                kind: 'INTERFACE',
-                possibleTypes: [
-                  { name: 'Human', kind: 'OBJECT' },
-                  { name: 'Droid', kind: 'OBJECT' },
+              ""__type"": {
+                ""name"": ""Character"",
+                ""kind"": ""INTERFACE"",
+                ""possibleTypes"": [
+                  { ""name"": ""Human"", ""kind"": ""OBJECT"" },
+                  { ""name"": ""Droid"", ""kind"": ""OBJECT"" }
                 ]
               }
             }";
@@ -107,49 +107,49 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-                __type: {
-                  name: 'Droid',
-                  fields: [
+                ""__type"": {
+                  ""name"": ""Droid"",
+                  ""fields"": [
                     {
-                      name: 'appearsIn',
-                      type: {
-                        name: null,
-                        kind: 'LIST'
+                      ""name"": ""appearsIn"",
+                      ""type"": {
+                        ""name"": null,
+                        ""kind"": ""LIST""
                       }
                     },
                     {
-                      name: 'friends',
-                      type: {
-                        name: null,
-                        kind: 'LIST'
+                      ""name"": ""friends"",
+                      ""type"": {
+                        ""name"": null,
+                        ""kind"": ""LIST""
                       }
                     },
                     {
-                      name: 'friendsConnection',
-                      type: {
-                        name: 'CharacterInterfaceConnection',
-                        kind: 'OBJECT'
+                      ""name"": ""friendsConnection"",
+                      ""type"": {
+                        ""name"": ""CharacterInterfaceConnection"",
+                        ""kind"": ""OBJECT""
                       }
                     },
                     {
-                      name: 'id',
-                      type: {
-                        name: null,
-                        kind: 'NON_NULL'
+                      ""name"": ""id"",
+                      ""type"": {
+                        ""name"": null,
+                        ""kind"": ""NON_NULL""
                       }
                     },
                     {
-                      name: 'name',
-                      type: {
-                        name: 'String',
-                        kind: 'SCALAR'
+                      ""name"": ""name"",
+                      ""type"": {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
                       }
                     },
                     {
-                      name: 'primaryFunction',
-                      type: {
-                        name: 'String',
-                        kind: 'SCALAR'
+                      ""name"": ""primaryFunction"",
+                      ""type"": {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
                       }
                     }
                   ]
@@ -171,10 +171,10 @@ namespace GraphQL.Tests.StarWars
             }
             ";
             var expected = @"{
-            '__type': {
-              'name': 'Droid',
-              'description': 'A mechanical creature in the Star Wars universe.'
-            }
+              ""__type"": {
+                ""name"": ""Droid"",
+                ""description"": ""A mechanical creature in the Star Wars universe.""
+              }
             }";
 
             AssertQuerySuccess(query, expected);
@@ -200,196 +200,196 @@ namespace GraphQL.Tests.StarWars
             }
             ";
             var expected = @"{
-            '__schema': {
-              'types': [
-                {
-                  'name': 'String',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Boolean',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Float',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Int',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'ID',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Date',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'DateTime',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'DateTimeOffset',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Seconds',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Milliseconds',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Decimal',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Uri',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'Guid',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Short',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'UShort',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'UInt',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Long',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'BigInt',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'ULong',
-                  'kind': 'SCALAR',
-                },
-                {
-                  'name': 'Byte',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': 'SByte',
-                  'kind': 'SCALAR'
-                },
-                {
-                  'name': '__Schema',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__Type',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__TypeKind',
-                  'kind': 'ENUM'
-                },
-                {
-                  'name': '__Field',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__InputValue',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__EnumValue',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__Directive',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': '__DirectiveLocation',
-                  'kind': 'ENUM'
-                },
-                {
-                  'name': 'Query',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'Character',
-                  'kind': 'INTERFACE'
-                },
-                {
-                  'name': 'CharacterInterfaceConnection',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'PageInfo',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'CharacterInterfaceEdge',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'Episode',
-                  'kind': 'ENUM'
-                },
-                {
-                  'name': 'Human',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'Droid',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'Mutation',
-                  'kind': 'OBJECT'
-                },
-                {
-                  'name': 'HumanInput',
-                  'kind': 'INPUT_OBJECT'
+                ""__schema"": {
+                    ""types"": [
+                    {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Boolean"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Float"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Int"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""ID"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Date"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""DateTime"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""DateTimeOffset"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Seconds"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Milliseconds"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Decimal"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Uri"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Guid"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Short"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""UShort"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""UInt"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Long"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""BigInt"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""ULong"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""Byte"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""SByte"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""__Schema"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__Type"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__TypeKind"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""__Field"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__InputValue"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__EnumValue"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__Directive"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""__DirectiveLocation"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""Query"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""Character"",
+                        ""kind"": ""INTERFACE""
+                    },
+                    {
+                        ""name"": ""CharacterInterfaceConnection"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""PageInfo"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""CharacterInterfaceEdge"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""Episode"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""Human"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""Droid"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""Mutation"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""HumanInput"",
+                        ""kind"": ""INPUT_OBJECT""
+                    }
+                    ],
+                    ""queryType"": {
+                      ""name"": ""Query"",
+                      ""kind"": ""OBJECT""
+                    },
+                    ""mutationType"": {
+                      ""name"": ""Mutation""
+                    },
+                    ""directives"": [
+                    {
+                        ""name"": ""include"",
+                        ""description"": ""Directs the executor to include this field or fragment only when the 'if' argument is true."",
+                        ""onOperation"": false,
+                        ""onFragment"": true,
+                        ""onField"": true
+                    },
+                    {
+                        ""name"": ""skip"",
+                        ""description"": ""Directs the executor to skip this field or fragment when the 'if' argument is true."",
+                        ""onOperation"": false,
+                        ""onFragment"": true,
+                        ""onField"": true
+                    },
+                    {
+                        ""name"": ""deprecated"",
+                        ""description"": ""Marks an element of a GraphQL schema as no longer supported."",
+                        ""onOperation"": false,
+                        ""onFragment"": false,
+                        ""onField"": false
+                    }
+                    ]
                 }
-              ],
-              'queryType': {
-                'name': 'Query',
-                'kind': 'OBJECT'
-              },
-              'mutationType': {
-                'name': 'Mutation'
-              },
-              'directives': [
-                {
-                  'name': 'include',
-                  'description': 'Directs the executor to include this field or fragment only when the \'if\' argument is true.',
-                  'onOperation': false,
-                  'onFragment': true,
-                  'onField': true
-                },
-                {
-                  'name': 'skip',
-                  'description': 'Directs the executor to skip this field or fragment when the \'if\' argument is true.',
-                  'onOperation': false,
-                  'onFragment': true,
-                  'onField': true
-                },
-                {
-                  'name': 'deprecated',
-                  'description': 'Marks an element of a GraphQL schema as no longer supported.',
-                  'onOperation': false,
-                  'onFragment': false,
-                  'onField': false
-                }
-              ]
-            }
             }";
 
             AssertQuerySuccess(query, expected);
@@ -423,52 +423,52 @@ namespace GraphQL.Tests.StarWars
             }
             ";
             var expected = @"{
-            '__schema': {
-              'queryType': {
-                'fields': [
-                  {
-                    'name': 'droid',
-                    'args': [
-                      {
-                        'name': 'id',
-                        'description': 'id of the droid',
-                        'type': {
-                          'name': null,
-                          'kind': 'NON_NULL',
-                          'ofType': {
-                            'name': 'String',
-                            'kind': 'SCALAR'
-                          }
-                        },
-                        'defaultValue': null
-                      }
-                    ]
-                  },
-                  {
-                    'name': 'hero',
-                    'args': []
-                  },
-                  {
-                    'name': 'human',
-                    'args': [
-                      {
-                        'name': 'id',
-                        'description': 'id of the human',
-                        'type': {
-                          'name': null,
-                          'kind': 'NON_NULL',
-                          'ofType': {
-                            'name': 'String',
-                            'kind': 'SCALAR'
-                          }
-                        },
-                        'defaultValue': null
-                      }
-                    ]
-                  }
-                ]
+              ""__schema"": {
+                ""queryType"": {
+                  ""fields"": [
+                    {
+                      ""name"": ""droid"",
+                      ""args"": [
+                        {
+                          ""name"": ""id"",
+                          ""description"": ""id of the droid"",
+                          ""type"": {
+                            ""name"": null,
+                            ""kind"": ""NON_NULL"",
+                            ""ofType"": {
+                              ""name"": ""String"",
+                              ""kind"": ""SCALAR""
+                            }
+                          },
+                          ""defaultValue"": null
+                        }
+                      ]
+                    },
+                    {
+                      ""name"": ""hero"",
+                      ""args"": []
+                    },
+                    {
+                      ""name"": ""human"",
+                      ""args"": [
+                        {
+                          ""name"": ""id"",
+                          ""description"": ""id of the human"",
+                          ""type"": {
+                            ""name"": null,
+                            ""kind"": ""NON_NULL"",
+                            ""ofType"": {
+                              ""name"": ""String"",
+                              ""kind"": ""SCALAR""
+                            }
+                          },
+                          ""defaultValue"": null
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
-            }
             }";
 
             AssertQuerySuccess(query, expected);
