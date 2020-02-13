@@ -8,7 +8,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public abstract class ExecutionNode : IResolveFieldContext
+    public abstract class ExecutionNode : IResolveFieldContext<object>
     {
         public ExecutionContext Context { get; }
         public ExecutionNode Parent { get; }
