@@ -33,7 +33,7 @@ namespace GraphQL.Execution
 
         public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
-            var root = new RootExecutionNode(rootType)
+            var root = new RootExecutionNode(context, rootType)
             {
                 Result = context.RootValue
             };
@@ -74,7 +74,7 @@ namespace GraphQL.Execution
                 if (fieldDefinition == null)
                     continue;
 
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
+                var node = BuildExecutionNode(context, parent, fieldDefinition.ResolvedType, field, fieldDefinition);
 
                 if (node == null)
                     continue;
@@ -108,7 +108,7 @@ namespace GraphQL.Execution
             {
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    var node = BuildExecutionNode(context, parent, itemType, parent.Field, parent.FieldDefinition, index++);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
@@ -136,7 +136,7 @@ namespace GraphQL.Execution
                         return;
                     }
 
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
+                    var valueExecutionNode = new ValueExecutionNode(context, parent, itemType, parent.Field, parent.FieldDefinition, index++)
                     {
                         Result = null
                     };
@@ -147,17 +147,17 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
             return graphType switch
             {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ListGraphType _ => new ArrayExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType _ => new ValueExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -175,14 +175,10 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return;
 
-            IResolveFieldContext resolveContext = null;
-
             try
             {
-                resolveContext = new ReadonlyResolveFieldContext(node, context);
-
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
-                var result = resolver.Resolve(resolveContext);
+                var result = resolver.Resolve(node);
 
                 if (result is Task task)
                 {
@@ -223,7 +219,7 @@ namespace GraphQL.Execution
                 UnhandledExceptionContext exceptionContext = null;
                 if (context.UnhandledExceptionDelegate != null)
                 {
-                    exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, node, ex);
                     context.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }

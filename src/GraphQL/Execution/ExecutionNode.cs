@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public abstract class ExecutionNode
+    public abstract class ExecutionNode : IResolveFieldContext
     {
+        public ExecutionContext Context { get; }
         public ExecutionNode Parent { get; }
         public IGraphType GraphType { get; }
-        public Field Field { get; }
+        public Language.AST.Field Field { get; }
         public FieldType FieldDefinition { get; }
         public int? IndexInParentNode { get; protected set; }
 
@@ -36,8 +39,9 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Language.AST.Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
+            Context = context;
             Parent = parent;
             GraphType = graphType;
             Field = field;
@@ -108,6 +112,44 @@ namespace GraphQL.Execution
             15 => "15",
             _ => index.ToString()
         };
+
+        string IResolveFieldContext.FieldName => Field.Name;
+
+        Language.AST.Field IResolveFieldContext.FieldAst => Field;
+
+        FieldType IResolveFieldContext.FieldDefinition => FieldDefinition;
+
+        IGraphType IResolveFieldContext.ReturnType => FieldDefinition.ResolvedType;
+
+        IObjectGraphType IResolveFieldContext.ParentType => GetParentType(Context.Schema);
+
+        private IDictionary<string, object> _arguments;
+        IDictionary<string, object> IResolveFieldContext.Arguments => _arguments ?? (_arguments = ExecutionHelper.GetArgumentValues(Context.Schema, FieldDefinition.Arguments, Field.Arguments, Context.Variables));
+
+        object IResolveFieldContext.RootValue => Context.RootValue;
+
+        object IResolveFieldContext.Source => Source;
+
+        ISchema IResolveFieldContext.Schema => Context.Schema;
+
+        Document IResolveFieldContext.Document => Context.Document;
+
+        Operation IResolveFieldContext.Operation => Context.Operation;
+
+        Fragments IResolveFieldContext.Fragments => Context.Fragments;
+
+        Variables IResolveFieldContext.Variables => Context.Variables;
+
+        CancellationToken IResolveFieldContext.CancellationToken => Context.CancellationToken;
+
+        Metrics IResolveFieldContext.Metrics => Context.Metrics;
+
+        ExecutionErrors IResolveFieldContext.Errors => Context.Errors;
+
+        private IDictionary<string, Language.AST.Field> _subFields;
+        IDictionary<string, Language.AST.Field> IResolveFieldContext.SubFields => _subFields ?? (_subFields = ExecutionHelper.SubFieldsFor(Context, FieldDefinition.ResolvedType, Field));
+
+        IDictionary<string, object> IProvideUserContext.UserContext => Context.UserContext;
     }
 
     public interface IParentExecutionNode
@@ -119,8 +161,8 @@ namespace GraphQL.Execution
     {
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
-        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ObjectExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Language.AST.Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(context, parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
 
@@ -164,8 +206,8 @@ namespace GraphQL.Execution
 
     public class RootExecutionNode : ObjectExecutionNode
     {
-        public RootExecutionNode(IObjectGraphType graphType)
-            : base(null, graphType, null, null, null)
+        public RootExecutionNode(ExecutionContext context, IObjectGraphType graphType)
+            : base(context, null, graphType, null, null, null)
         {
 
         }
@@ -175,8 +217,8 @@ namespace GraphQL.Execution
     {
         public List<ExecutionNode> Items { get; set; }
 
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ArrayExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Language.AST.Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(context, parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
@@ -217,8 +259,8 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ValueExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Language.AST.Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(context, parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
