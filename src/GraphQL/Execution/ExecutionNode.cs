@@ -64,17 +64,26 @@ namespace GraphQL.Execution
         {
             get
             {
-                var pathList = new List<string>();
                 var node = this;
+                var count = 0;
+                while (!(node is RootExecutionNode))
+                {
+                    node = node.Parent;
+                    ++count;
+                }
+
+                var pathList = new string[count];
+                var index = count;
+                node = this;
                 while (!(node is RootExecutionNode))
                 {
                     if (node.IndexInParentNode.HasValue)
-                        pathList.Add(GetStringIndex(node.IndexInParentNode.Value));
+                        pathList[--index] = GetStringIndex(node.IndexInParentNode.Value);
                     else
-                        pathList.Add(node.Field.Name);
+                        pathList[--index] = node.Field.Name;
                     node = node.Parent;
                 }
-                pathList.Reverse();
+
                 return pathList;
             }
         }
