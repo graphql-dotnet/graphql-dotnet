@@ -147,17 +147,17 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? pathIndex = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
             return graphType switch
             {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, pathIndex),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, pathIndex),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, pathIndex),
-                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, pathIndex),
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
