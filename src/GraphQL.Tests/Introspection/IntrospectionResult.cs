@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""Date"",
-          ""description"": ""The \u0060Date\u0060 scalar type represents a year, month and day in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
+          ""description"": ""The `Date` scalar type represents a year, month and day in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
           ""fields"": null,
           ""inputFields"": null,
           ""interfaces"": null,
@@ -75,7 +75,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""DateTime"",
-          ""description"": ""The \u0060DateTime\u0060 scalar type represents a date and time. \u0060DateTime\u0060 expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
+          ""description"": ""The `DateTime` scalar type represents a date and time. `DateTime` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
           ""fields"": null,
           ""inputFields"": null,
           ""interfaces"": null,
@@ -85,7 +85,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""DateTimeOffset"",
-          ""description"": ""The \u0060DateTimeOffset\u0060 scalar type represents a date, time and offset from UTC. \u0060DateTimeOffset\u0060 expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
+          ""description"": ""The `DateTimeOffset` scalar type represents a date, time and offset from UTC. `DateTimeOffset` expects timestamps to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."",
           ""fields"": null,
           ""inputFields"": null,
           ""interfaces"": null,
@@ -95,7 +95,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""Seconds"",
-          ""description"": ""The \u0060Seconds\u0060 scalar type represents a period of time represented as the total number of seconds."",
+          ""description"": ""The `Seconds` scalar type represents a period of time represented as the total number of seconds."",
           ""fields"": null,
           ""inputFields"": null,
           ""interfaces"": null,
@@ -105,7 +105,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""SCALAR"",
           ""name"": ""Milliseconds"",
-          ""description"": ""The \u0060Milliseconds\u0060 scalar type represents a period of time represented as the total number of milliseconds."",
+          ""description"": ""The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds."",
           ""fields"": null,
           ""inputFields"": null,
           ""interfaces"": null,
@@ -324,7 +324,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""OBJECT"",
           ""name"": ""__Type"",
-          ""description"": ""The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the \u0060__TypeKind\u0060 enum.\r\n\r\nDepending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name and description, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types."",
+          ""description"": ""The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.\r\n\r\nDepending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name and description, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types."",
           ""fields"": [
             {
               ""name"": ""description"",
@@ -522,43 +522,43 @@ namespace GraphQL.Tests.Introspection
             },
             {
               ""name"": ""OBJECT"",
-              ""description"": ""Indicates this type is an object.  \u0060fields\u0060 and \u0060possibleTypes\u0060 are valid fields."",
+              ""description"": ""Indicates this type is an object.  `fields` and `possibleTypes` are valid fields."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""INTERFACE"",
-              ""description"": ""Indicates this type is an interface.  \u0060fields\u0060 and \u0060possibleTypes\u0060 are valid fields."",
+              ""description"": ""Indicates this type is an interface.  `fields` and `possibleTypes` are valid fields."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""UNION"",
-              ""description"": ""Indicates this type is a union.  \u0060possibleTypes\u0060 is a valid field."",
+              ""description"": ""Indicates this type is a union.  `possibleTypes` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""ENUM"",
-              ""description"": ""Indicates this type is an enum.  \u0060enumValues\u0060 is a valid field."",
+              ""description"": ""Indicates this type is an enum.  `enumValues` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""INPUT_OBJECT"",
-              ""description"": ""Indicates this type is an input object.  \u0060inputFields\u0060 is a valid field."",
+              ""description"": ""Indicates this type is an input object.  `inputFields` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""LIST"",
-              ""description"": ""Indicates this type is a list.  \u0060ofType\u0060 is a valid field."",
+              ""description"": ""Indicates this type is a list.  `ofType` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             },
             {
               ""name"": ""NON_NULL"",
-              ""description"": ""Indicates this type is a non-null.  \u0060ofType\u0060 is a valid field."",
+              ""description"": ""Indicates this type is a non-null.  `ofType` is a valid field."",
               ""isDeprecated"": false,
               ""deprecationReason"": null
             }
@@ -809,7 +809,7 @@ namespace GraphQL.Tests.Introspection
         {
           ""kind"": ""OBJECT"",
           ""name"": ""__Directive"",
-          ""description"": ""A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\r\n\r\nIn some cases, you need to provide options to alter GraphQL\u0027s execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor."",
+          ""description"": ""A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\r\n\r\nIn some cases, you need to provide options to alter GraphQL's execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor."",
           ""fields"": [
             {
               ""name"": ""args"",
@@ -901,7 +901,7 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use \u0027locations\u0027.""
+              ""deprecationReason"": ""Use 'locations'.""
             },
             {
               ""name"": ""onFragment"",
@@ -917,7 +917,7 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use \u0027locations\u0027.""
+              ""deprecationReason"": ""Use 'locations'.""
             },
             {
               ""name"": ""onOperation"",
@@ -933,7 +933,7 @@ namespace GraphQL.Tests.Introspection
                 }
               },
               ""isDeprecated"": true,
-              ""deprecationReason"": ""Use \u0027locations\u0027.""
+              ""deprecationReason"": ""Use 'locations'.""
             }
           ],
           ""inputFields"": null,
@@ -1074,7 +1074,7 @@ namespace GraphQL.Tests.Introspection
       ""directives"": [
         {
           ""name"": ""include"",
-          ""description"": ""Directs the executor to include this field or fragment only when the \u0027if\u0027 argument is true."",
+          ""description"": ""Directs the executor to include this field or fragment only when the 'if' argument is true."",
           ""locations"": [
             ""FIELD"",
             ""FRAGMENT_SPREAD"",
@@ -1099,7 +1099,7 @@ namespace GraphQL.Tests.Introspection
         },
         {
           ""name"": ""skip"",
-          ""description"": ""Directs the executor to skip this field or fragment when the \u0027if\u0027 argument is true."",
+          ""description"": ""Directs the executor to skip this field or fragment when the 'if' argument is true."",
           ""locations"": [
             ""FIELD"",
             ""FRAGMENT_SPREAD"",
@@ -1138,7 +1138,7 @@ namespace GraphQL.Tests.Introspection
                 ""name"": ""String"",
                 ""ofType"": null
               },
-              ""defaultValue"": ""\u0022No longer supported\u0022""
+              ""defaultValue"": ""\""No longer supported\""""
             }
           ]
         }
@@ -1146,10 +1146,5 @@ namespace GraphQL.Tests.Introspection
     }
   }
 }";
-
-        public static readonly string DataWhenNewtonsoftJson = Data
-            .Replace(@"\u0060", "`")
-            .Replace(@"\u0027", "'")
-            .Replace(@"\u0022", @"\""");
     }
 }
