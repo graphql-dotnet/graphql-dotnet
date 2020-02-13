@@ -465,7 +465,7 @@ namespace GraphQL.Execution
 {
     public class ArrayExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path) { }
+        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? pathIndex) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public override object ToValue() { }
     }
@@ -498,7 +498,6 @@ namespace GraphQL.Execution
     }
     public static class ExecutionHelper
     {
-        public static string[] AppendPath(string[] path, string pathSegment) { }
         public static void AssertValidValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, object input, string fieldName) { }
         public static object CoerceValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue input, GraphQL.Language.AST.Variables variables = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFields(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
@@ -513,14 +512,15 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path) { }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? pathIndex) { }
         public GraphQL.Language.AST.Field Field { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
         public GraphQL.Types.IGraphType GraphType { get; }
         public bool IsResultSet { get; }
         public string Name { get; }
         public GraphQL.Execution.ExecutionNode Parent { get; }
-        public string[] Path { get; set; }
+        public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public int? PathIndex { get; set; }
         public object Result { get; set; }
         public object Source { get; set; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }
@@ -534,7 +534,7 @@ namespace GraphQL.Execution
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path = null) { }
+        public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? pathIndex = default) { }
         public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         public static void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
@@ -583,7 +583,7 @@ namespace GraphQL.Execution
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? pathIndex) { }
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ExecutionNode> SubFields { get; set; }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
         public override object ToValue() { }
@@ -620,7 +620,7 @@ namespace GraphQL.Execution
     }
     public class ValueExecutionNode : GraphQL.Execution.ExecutionNode
     {
-        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, string[] path) { }
+        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? pathIndex) { }
         public override object ToValue() { }
     }
 }
