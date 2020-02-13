@@ -444,16 +444,5 @@ namespace GraphQL.Execution
             }
             return CollectFields(context, fieldType, field.SelectionSet);
         }
-
-        public static string[] AppendPath(string[] path, string pathSegment)
-        {
-            var newPath = new string[path.Length + 1];
-
-            path.CopyTo(newPath, 0);
-
-            newPath[path.Length] = pathSegment;
-
-            return newPath;
-        }
     }
 }
