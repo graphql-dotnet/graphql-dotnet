@@ -445,5 +445,4 @@ namespace GraphQL.Execution
             return CollectFields(context, fieldType, field.SelectionSet);
         }
     }
-
 }
