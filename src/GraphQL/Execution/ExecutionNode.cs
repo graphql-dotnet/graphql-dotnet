@@ -12,7 +12,7 @@ namespace GraphQL.Execution
         public IGraphType GraphType { get; }
         public Field Field { get; }
         public FieldType FieldDefinition { get; }
-        public int? PathIndex { get; protected set; }
+        public int? IndexInParentNode { get; protected set; }
 
         public string Name => Field?.Alias ?? Field?.Name;
 
@@ -36,13 +36,13 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? pathIndex)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;
             Field = field;
             FieldDefinition = fieldDefinition;
-            PathIndex = pathIndex;
+            IndexInParentNode = indexInParentNode;
         }
 
         public abstract object ToValue();
@@ -68,8 +68,8 @@ namespace GraphQL.Execution
                 var node = this;
                 while (!(node is RootExecutionNode))
                 {
-                    if (node.PathIndex.HasValue)
-                        pathList.Add(GetStringIndex(node.PathIndex.Value));
+                    if (node.IndexInParentNode.HasValue)
+                        pathList.Add(GetStringIndex(node.IndexInParentNode.Value));
                     else
                         pathList.Add(node.Field.Name);
                     node = node.Parent;
@@ -110,8 +110,8 @@ namespace GraphQL.Execution
     {
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
-        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? pathIndex)
-            : base(parent, graphType, field, fieldDefinition, pathIndex)
+        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
 
@@ -166,8 +166,8 @@ namespace GraphQL.Execution
     {
         public List<ExecutionNode> Items { get; set; }
 
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? pathIndex)
-            : base(parent, graphType, field, fieldDefinition, pathIndex)
+        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
@@ -208,8 +208,8 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? pathIndex)
-            : base(parent, graphType, field, fieldDefinition, pathIndex)
+        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
