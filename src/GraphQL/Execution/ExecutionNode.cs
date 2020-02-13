@@ -21,7 +21,7 @@ namespace GraphQL.Execution
         private object _result;
         public object Result
         {
-            get { return _result; }
+            get => _result;
             set
             {
                 IsResultSet = true;

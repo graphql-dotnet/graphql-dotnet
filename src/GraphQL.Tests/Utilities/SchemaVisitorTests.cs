@@ -67,10 +67,7 @@ namespace GraphQL.Tests.Utilities
 
         public class Query
         {
-            public Task<string> Hello()
-            {
-                return Task.FromResult("Hello World2!");
-            }
+            public Task<string> Hello() => Task.FromResult("Hello World2!");
         }
 
         public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor

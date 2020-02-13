@@ -245,7 +245,7 @@ namespace GraphQL.Tests.Execution
             });
         }
 
-        enum SomeEnum
+        private enum SomeEnum
         {
             One,
             Two

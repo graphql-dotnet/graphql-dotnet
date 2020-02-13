@@ -34,7 +34,7 @@ namespace GraphQL.Types
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
-            get { return _resolvedInterfaces; }
+            get => _resolvedInterfaces;
             set
             {
                 _resolvedInterfaces.Clear();
@@ -49,7 +49,7 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> Interfaces
         {
-            get { return _interfaces; }
+            get => _interfaces;
             set
             {
                 _interfaces.Clear();

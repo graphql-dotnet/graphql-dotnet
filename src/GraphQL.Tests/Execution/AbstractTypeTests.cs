@@ -30,10 +30,7 @@ namespace GraphQL.Tests.Execution
         public AbstractQueryType()
         {
             Name = "Query";
-            Field<PetInterfaceType>("pets", resolve: ctx =>
-            {
-                return new { name = "Eli" };
-            });
+            Field<PetInterfaceType>("pets", resolve: ctx => new { name = "Eli" });
         }
     }
 
