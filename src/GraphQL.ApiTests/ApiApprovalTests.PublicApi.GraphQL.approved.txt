@@ -699,7 +699,7 @@ namespace GraphQL.Instrumentation
         void ApplyTo(GraphQL.Types.ISchema schema);
         GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
     }
-    public class InstrumentFieldsMiddleware
+    public class InstrumentFieldsMiddleware : GraphQL.Instrumentation.IFieldMiddleware
     {
         public InstrumentFieldsMiddleware() { }
         public System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
