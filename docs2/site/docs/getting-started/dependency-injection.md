@@ -46,7 +46,7 @@ How you integrate this into your system will depend on the dependency injection 
 
 [See this example.](https://github.com/graphql-dotnet/examples/blob/8d5b7544006902f45b818010585b1ffa86ef446b/src/AspNetCoreCustom/Example/Startup.cs#L16-L34)
 
-`Microsoft.Extensions.DependencyInjection` package used in ASP.NET Core already has support for `IServiceProvider` interface so no additional settings are required - just add your required dependencies:
+`Microsoft.Extensions.DependencyInjection` package used in ASP.NET Core already has support for resolving `IServiceProvider` interface so no additional settings are required - just add your required dependencies:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)

@@ -24,6 +24,7 @@ namespace GraphQL.Tests.Instrumentation
                 FieldAst = new Field(null, new NameNode("Name")),
                 Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
+                Schema = new Schema(),
                 Metrics = new Metrics().Start(null)
             };
         }

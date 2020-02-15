@@ -678,9 +678,9 @@ namespace GraphQL.Instrumentation
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
     public static class FieldResolverBuilderExtensions
     {
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
-            where T : new() { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
     }
     public class FieldStat
     {
@@ -689,6 +689,10 @@ namespace GraphQL.Instrumentation
         public string Name { get; set; }
         public string ReturnType { get; set; }
         public void AddLatency(double duration) { }
+    }
+    public interface IFieldMiddleware
+    {
+        System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next);
     }
     public interface IFieldMiddlewareBuilder
     {
