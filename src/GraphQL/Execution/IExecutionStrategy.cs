@@ -2,6 +2,9 @@ using System.Threading.Tasks;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Processes a given parsed GraphQL request, resolve all the nodes and return the result; exceptions are unhandled
+    /// </summary>
     public interface IExecutionStrategy
     {
         /// <summary>
