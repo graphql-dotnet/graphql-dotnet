@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Processes a GraphQL request and returns the result
+    /// </summary>
     public interface IDocumentExecuter
     {
         /// <summary>
