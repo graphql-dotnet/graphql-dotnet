@@ -4,7 +4,8 @@ namespace GraphQL.Execution
 {
     /// <summary>
     /// Processes a parsed GraphQL request, resolving all the nodes and returning the result; exceptions
-    /// are unhandled.  Should not run any DocumentExecutionListeners except for 'BeforeExecutionStepAwaitedAsync'.
+    /// are unhandled. Should not run any <see cref="IDocumentExecutionListener">IDocumentExecutionListener</see>s except
+    /// for <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(object, System.Threading.CancellationToken)">BeforeExecutionStepAwaitedAsync</see>.
     /// </summary>
     public interface IExecutionStrategy
     {
