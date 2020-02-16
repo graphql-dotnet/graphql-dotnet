@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace GraphQL
 {
     /// <summary>
-    /// Processes an entire GraphQL request, given an input GraphQL request string.  This is intended to
+    /// Processes an entire GraphQL request, given an input GraphQL request string. This is intended to
     /// be called by user code to process a query.<br/>
     /// <br/>
     /// Typical implementation starts metrics if enabled, relies on IDocumentBuilder to parse the query,
