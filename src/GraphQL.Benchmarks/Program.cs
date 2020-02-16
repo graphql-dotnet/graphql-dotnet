@@ -11,7 +11,7 @@ namespace GraphQL.Benchmarks
         private static void Main(string[] args)
         {
             if (args.Length == 0)
-                BenchmarkRunner.Run<ExecutionBenchmark>();
+                BenchmarkRunner.Run<SerializationBenchmark>();
             else
                 RunMemoryProfilerPayload();
         }
