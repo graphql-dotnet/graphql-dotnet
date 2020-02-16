@@ -17,6 +17,15 @@ namespace GraphQL.Instrumentation
 
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
+            static Exception NotSupported(ISchema schema) => new NotSupportedException($"{schema.GetType().FullName} should implement IServiceProvider interface");
+
+            static T CheckNotNull<T>(T instance, System.Type type)
+            {
+                if (instance == null)
+                    throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in schema.Services.");
+                return instance;
+            }
+
             // if IFieldMiddleware interface is supported, then just call its Resolve method
             if (typeof(IFieldMiddleware).IsAssignableFrom(middleware))
             {
@@ -24,9 +33,9 @@ namespace GraphQL.Instrumentation
                 {
                     return context =>
                     {
-                        return context.Schema is Schema schema
-                            ? CheckNotNull((IFieldMiddleware)schema.Services.GetService(middleware), middleware).Resolve(context, next)
-                            : throw new NotSupportedException();
+                        return context.Schema is IServiceProvider provider
+                            ? CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware).Resolve(context, next)
+                            : throw NotSupported(context.Schema);
                     };
                 });
             }
@@ -61,19 +70,12 @@ namespace GraphQL.Instrumentation
                 {
                     return context =>
                     {
-                        return context.Schema is Schema schema
-                            ? (Task<object>)methodInfo.Invoke(CheckNotNull(schema.Services.GetService(middleware), middleware), new object[] { context, next })
-                            : throw new NotSupportedException();
+                        return context.Schema is IServiceProvider provider
+                            ? (Task<object>)methodInfo.Invoke(CheckNotNull(provider.GetService(middleware), middleware), new object[] { context, next })
+                            : throw NotSupported(context.Schema);
                     };
                 });
             }
-        }
-
-        private static T CheckNotNull<T>(T instance, System.Type type)
-        {
-            if (instance == null)
-                throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in schema.Services.");
-            return instance;
         }
     }
 }

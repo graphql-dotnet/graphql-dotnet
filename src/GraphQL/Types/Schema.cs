@@ -7,8 +7,9 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema : MetadataProvider, ISchema
+    public class Schema : MetadataProvider, ISchema, IServiceProvider
     {
+        private IServiceProvider _services;
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
@@ -22,7 +23,7 @@ namespace GraphQL.Types
 
         public Schema(IServiceProvider services)
         {
-            Services = services;
+            _services = services;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -66,7 +67,19 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
-        public IServiceProvider Services { get; set; }
+        /// <summary>
+        /// Gets the service object of the specified type.
+        /// 
+        /// Explicit implementation of the <see cref="IServiceProvider.GetService"/> method makes this method
+        /// less visible to the calling code, which reduces the likelihood of using it as ServiceLocator.
+        /// However, in some advanced scenarios this may be necessary.
+        /// </summary>
+        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
+        /// <returns>
+        /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
+        /// object of type serviceType.
+        /// </returns>
+        object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types.
@@ -194,7 +207,7 @@ namespace GraphQL.Types
             {
                 if (_lookup != null)
                 {
-                    Services = null;
+                    _services = null;
                     Query = null;
                     Mutation = null;
                     Subscription = null;
@@ -257,12 +270,12 @@ namespace GraphQL.Types
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)Services.GetRequiredService(type.GetNamedType())));
+                .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => (IGraphType)Services.GetRequiredService(type),
+                type => (IGraphType)_services.GetRequiredService(type),
                 FieldNameConverter,
                 seal: true);
         }
