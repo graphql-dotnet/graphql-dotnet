@@ -102,7 +102,34 @@ General recommendations for lifetimes are:
 | singleton | singleton  | singleton  | the safest and the most performant option recommended by default |
 | scoped    | scoped     | singleton  | much less performant option |
 | scoped    | scoped     | scoped     | the least performant option |
-| scoped    | singleton  | scoped     | DO NOT DO THAT! |
+| scoped    | singleton  | scoped     | DO NOT DO THAT! Explanation above. |
+| singleton | singleton  | scoped     | DO NOT DO THAT! InvalidOperationException: Cannot resolve scoped service from root provider |
+
+If your Field Middleware has scoped dependencies but your Schema and Graph Types are singletons
+(which is recommended for them) you can make Field Middleware singleton too and obtain the necessary
+dependencies right in the `Resolve` method. Here is an example of such an approach:
+
+```csharp
+public class MyFieldMiddleware : IFieldMiddleware
+{
+  private readonly IHttpContextAccessor _accessor;
+  private readonly IMySingletonService _service;
+
+  public MyFieldMiddleware(IHttpContextAccessor accessor, IMySingletonService service)
+  {
+    _accessor = accessor;
+    _service = service;
+  }
+
+  public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+  {
+    var scopedDependency1 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService1>();
+    var scopedDependency2 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService2>();
+    ...
+    return next(context);
+  }
+}
+```
 
 Options are also possible using transient lifetime, but are not given here (not recommended).
 
