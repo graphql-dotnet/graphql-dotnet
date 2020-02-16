@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Processes a given parsed GraphQL request, resolve all the nodes and return the result; exceptions are unhandled
+    /// Processes a parsed GraphQL request, resolving all the nodes and returning the result; exceptions
+    /// are unhandled.  Should not run any DocumentExecutionListeners except for 'BeforeExecutionStepAwaitedAsync'.
     /// </summary>
     public interface IExecutionStrategy
     {
