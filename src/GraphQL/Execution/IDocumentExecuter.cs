@@ -9,7 +9,7 @@ namespace GraphQL
     /// <br/>
     /// Typical implementation starts metrics if enabled, relies on IDocumentBuilder to parse the query,
     /// executes document listeners if attached, selects an execution strategy, and executes the query
-    /// via IExecutionStrategy.  Unhandled exceptions are handled as appropriate for the selected options.
+    /// via IExecutionStrategy. Unhandled exceptions are handled as appropriate for the selected options.
     /// </summary>
     public interface IDocumentExecuter
     {
