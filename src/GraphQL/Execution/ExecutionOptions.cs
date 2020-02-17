@@ -24,7 +24,7 @@ namespace GraphQL
         /// <summary>GraphQL query to parse and execute; required</summary>
         public string Query { get; set; }
 
-        /// <summary>GraphQL query operation name; defaults to first operation defined in query</summary>
+        /// <summary>GraphQL query operation name; optional, defaults to first (if any) operation defined in query</summary>
         public string OperationName { get; set; }
 
         /// <summary>Parsed GraphQL request; will parse <see cref="Query"/> if not set</summary>
