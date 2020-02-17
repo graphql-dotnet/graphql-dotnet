@@ -63,7 +63,7 @@ namespace GraphQL
         /// <summary>Field and argument names are sanitized by the provided <see cref="IFieldNameConverter"/>; defaults to <see cref="CamelCaseFieldNameConverter"/></summary>
         public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
 
-        /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json; defaults to only <see cref="Exception.Message"/></summary>
+        /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
         public bool ExposeExceptions { get; set; }
 
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
