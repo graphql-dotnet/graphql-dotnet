@@ -81,6 +81,12 @@ those that do not accept a `IFieldMiddleware` instance or a middleware delegate)
 middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
 the Field Middleware constructor, provided that you have registered them correctly in DI.
 
+Also, the middleware itself should be registered in DI:
+
+```csharp
+services.AddSingleton<InstrumentFieldsMiddleware>();
+```
+
 ## Known issues
 
 Perhaps the most important thing with Field Middlewares that you should be aware of is that the

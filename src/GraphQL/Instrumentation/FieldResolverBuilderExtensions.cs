@@ -33,6 +33,7 @@ namespace GraphQL.Instrumentation
                 {
                     return context =>
                     {
+                        // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
                         return context.Schema is IServiceProvider provider
                             ? CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware).Resolve(context, next)
                             : throw NotSupported(context.Schema);
@@ -70,6 +71,7 @@ namespace GraphQL.Instrumentation
                 {
                     return context =>
                     {
+                        // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
                         return context.Schema is IServiceProvider provider
                             ? (Task<object>)methodInfo.Invoke(CheckNotNull(provider.GetService(middleware), middleware), new object[] { context, next })
                             : throw NotSupported(context.Schema);
