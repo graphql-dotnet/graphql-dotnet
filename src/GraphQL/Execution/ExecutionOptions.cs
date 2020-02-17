@@ -40,7 +40,7 @@ namespace GraphQL
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
 
         /// <summary>
-        /// User-defined variables to be passed to the field resolvers.<br/>
+        /// User-defined context to be passed to the field resolvers.<br/>
         /// <br/>
         /// A custom implementation of <see cref="IDictionary{TKey, TValue}">IDictionary</see> may be
         /// used in place of the default <see cref="Dictionary{TKey, TValue}">Dictionary</see>.
