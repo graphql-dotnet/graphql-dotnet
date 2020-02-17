@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using GraphQL.Introspection;
 using GraphQL.StarWars;
@@ -52,7 +53,7 @@ namespace GraphQL.Benchmarks
             _nsjWriterIndented = new NewtonsoftJson.DocumentWriter(indent: true);
 
             _result = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
-            _stream = new NullStream();
+            _stream = Stream.Null;
         }
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query)
@@ -65,15 +66,15 @@ namespace GraphQL.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public void NewtonsoftJson() => _nsjWriter.WriteAsync(_stream, _result).Wait();
+        public Task NewtonsoftJson() => _nsjWriter.WriteAsync(_stream, _result);
 
         [Benchmark]
-        public void NewtonsoftJsonIndented() => _nsjWriterIndented.WriteAsync(_stream, _result).Wait();
+        public Task NewtonsoftJsonIndented() => _nsjWriterIndented.WriteAsync(_stream, _result);
 
         [Benchmark]
-        public void SystemTextJson() => _stjWriter.WriteAsync(_stream, _result).Wait();
+        public Task SystemTextJson() => _stjWriter.WriteAsync(_stream, _result);
 
         [Benchmark]
-        public void SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, _result).Wait();
+        public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, _result);
     }
 }
