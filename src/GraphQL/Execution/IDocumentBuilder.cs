@@ -3,7 +3,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Creates a <see cref="Document">Document</see> representing a GraphQL query from a GraphQL request string
+    /// Creates a <see cref="Document">Document</see> representing a GraphQL AST from a plain GraphQL query string
     /// </summary>
     public interface IDocumentBuilder
     {
