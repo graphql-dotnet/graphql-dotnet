@@ -30,7 +30,8 @@ namespace GraphQL
         /// <summary>
         /// Parsed GraphQL request; will parse <see cref="Query"/> if not set.<br/>
         /// <br/>
-        /// Can be used when implementing a cache of parsed GraphQL requests (a <see cref="Language.AST.Document"/>)</summary>
+        /// Can be used when implementing a cache of parsed GraphQL requests (a <see cref="Language.AST.Document"/>)
+        /// </summary>
         public Document Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
