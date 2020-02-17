@@ -53,7 +53,7 @@ namespace GraphQL
         /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
 
-        /// <summary>Configuration options for <see cref="IComplexityAnalyzer"/> to use validating maximum query complexity</summary>
+        /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
         public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
