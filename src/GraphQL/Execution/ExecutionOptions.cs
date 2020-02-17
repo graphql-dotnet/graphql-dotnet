@@ -12,6 +12,7 @@ using GraphQL.Validation.Complexity;
 
 namespace GraphQL
 {
+    /// <summary>Configuration options to be passed to <see cref="IDocumentExecuter"/> to execute a query</summary>
     public class ExecutionOptions : IProvideUserContext
     {
         /// <summary>Schema of graph to use; required<br/><br/>Schema will be initialized if has not yet been initialized.</summary>
