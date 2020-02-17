@@ -33,7 +33,7 @@ namespace GraphQL
         /// <summary>Input variables to GraphQL request</summary>
         public Inputs Inputs { get; set; }
 
-        /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> of request; optional</summary>
+        /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }
 
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
