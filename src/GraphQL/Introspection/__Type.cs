@@ -40,7 +40,7 @@ namespace GraphQL.Introspection
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
-                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                        var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
                         var type = context.Source as IComplexGraphType;
                         var fields = !includeDeprecated
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
@@ -78,7 +78,7 @@ namespace GraphQL.Introspection
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
-                        var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                        var includeDeprecated = (bool)context.Arguments["includeDeprecated"];
                         var values = !includeDeprecated
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();

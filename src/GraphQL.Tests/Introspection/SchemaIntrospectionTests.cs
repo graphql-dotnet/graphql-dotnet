@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -20,6 +21,27 @@ namespace GraphQL.Tests.Introspection
                     Query = new TestQuery()
                 };
                 _.Query = SchemaIntrospection.IntrospectionQuery;
+            });
+
+            var json = await documentWriter.WriteToStringAsync(executionResult);
+
+            ShouldBe(json, IntrospectionResult.Data);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema_pascal_case(IDocumentWriter documentWriter)
+        {
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery(),
+                };
+                _.FieldNameConverter = PascalCaseFieldNameConverter.Instance;
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+                //_.Query = @"{  __type (name: ""__Directive"") {    fields (includeDeprecated: true) {      name    }  }}";
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
