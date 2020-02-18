@@ -41,7 +41,6 @@ namespace GraphQL.Tests.Introspection
                 };
                 _.FieldNameConverter = PascalCaseFieldNameConverter.Instance;
                 _.Query = SchemaIntrospection.IntrospectionQuery;
-                //_.Query = @"{  __type (name: ""__Directive"") {    fields (includeDeprecated: true) {      name    }  }}";
             });
 
             var json = await documentWriter.WriteToStringAsync(executionResult);
