@@ -1799,7 +1799,7 @@ namespace GraphQL.Types
     {
         TSource Source { get; }
     }
-    public interface ISchema : System.IDisposable
+    public interface ISchema
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }

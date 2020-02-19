@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema : MetadataProvider, ISchema
+    public class Schema : MetadataProvider, ISchema, IDisposable
     {
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;

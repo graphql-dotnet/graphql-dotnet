@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
-    public interface ISchema : IDisposable
+    public interface ISchema
     {
         bool Initialized { get; }
 
