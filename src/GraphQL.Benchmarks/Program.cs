@@ -18,13 +18,13 @@ namespace GraphQL.Benchmarks
 
         private static void RunMemoryProfilerPayload()
         {
-            var bench = new ExecutionBenchmark();
+            var bench = new SerializationBenchmark();
             bench.GlobalSetup();
 
             int count = 0;
             while (true)
             {
-                bench.Hero();
+                bench.SystemTextJson().Wait();
 
                 Thread.Sleep(10);
 

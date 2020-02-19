@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -29,8 +30,64 @@ namespace GraphQL.SystemTextJson
                 return;
             }
 
-            writer.WritePropertyName("data");
-            JsonSerializer.Serialize(writer, data);
+            WriteDataRecursively(writer, "data", data);
+        }
+
+        private void WriteDataRecursively(Utf8JsonWriter writer, string name, object data)
+        {
+            if (name != null)
+            {
+                if (data == null)
+                {
+                    writer.WriteNull(name);
+                    return;
+                }
+
+                if (data is string s)
+                {
+                    writer.WriteString(name, s);
+                    return;
+                }
+
+                if (data is bool b)
+                {
+                    writer.WriteBoolean(name, b);
+                    return;
+                }
+
+                writer.WritePropertyName(name);
+            }
+
+            if (data is Dictionary<string, object> dictionary)
+            {
+                writer.WriteStartObject();
+
+                foreach (var kvp in dictionary)
+                    WriteDataRecursively(writer, kvp.Key, kvp.Value);
+
+                writer.WriteEndObject();
+            }
+            else if (data is List<object> list)
+            {
+                writer.WriteStartArray();
+
+                foreach (object item in list)
+                {
+                    if (item is null)
+                        writer.WriteNullValue();
+                    else if (item is string s)
+                        writer.WriteStringValue(s);
+                    else
+                        WriteDataRecursively(writer, null, item);
+                }
+
+                writer.WriteEndArray();
+            }
+            else
+            {
+                // Need to avoid this call by all means! The question remains open - why this API so expensive?
+                JsonSerializer.Serialize(writer, data);
+            }
         }
 
         private void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions)
