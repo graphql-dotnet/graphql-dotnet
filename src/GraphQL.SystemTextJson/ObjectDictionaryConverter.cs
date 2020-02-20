@@ -15,7 +15,7 @@ namespace GraphQL.SystemTextJson
     {
         public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
             => throw new NotImplementedException(
-            "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.");
+                "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.");
 
         public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => ReadDictionary(ref reader);
 
