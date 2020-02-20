@@ -12,12 +12,16 @@ namespace GraphQL.Execution
     {
         /// <summary>Executes after document validation is complete. Can be used to log validation failures.</summary>
         Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token);
+
         /// <summary>Executes after document validation passes, before calling <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/>.</summary>
         Task BeforeExecutionAsync(object userContext, CancellationToken token);
+
         /// <summary>Executes before the <see cref="IDocumentExecuter"/> awaits the <see cref="Task"/> returned by <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/></summary>
         Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token);
+
         /// <summary>Executes after the <see cref="IExecutionStrategy"/> has completed executing the request</summary>
         Task AfterExecutionAsync(object userContext, CancellationToken token);
+
         /// <summary>Executes before each time the <see cref="IExecutionStrategy"/> awaits the <see cref="Task{TResult}"/> returned by <see cref="IFieldResolver.Resolve"/></summary>
         Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token);
     }
@@ -27,12 +31,16 @@ namespace GraphQL.Execution
     {
         /// <inheritdoc cref="IDocumentExecutionListener.AfterValidationAsync(object, IValidationResult, CancellationToken)"/>
         Task AfterValidationAsync(T userContext, IValidationResult validationResult, CancellationToken token);
+
         /// <inheritdoc cref="IDocumentExecutionListener.BeforeExecutionAsync(object, CancellationToken)"/>
         Task BeforeExecutionAsync(T userContext, CancellationToken token);
+
         /// <inheritdoc cref="IDocumentExecutionListener.BeforeExecutionAwaitedAsync(object, CancellationToken)"/>
         Task BeforeExecutionAwaitedAsync(T userContext, CancellationToken token);
+
         /// <inheritdoc cref="IDocumentExecutionListener.AfterExecutionAsync(object, CancellationToken)"/>
         Task AfterExecutionAsync(T userContext, CancellationToken token);
+
         /// <inheritdoc cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(object, CancellationToken)"/>
         Task BeforeExecutionStepAwaitedAsync(T userContext, CancellationToken token);
     }
