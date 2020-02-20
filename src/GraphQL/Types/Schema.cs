@@ -18,7 +18,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
-        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required instances of graph types
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
         /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
@@ -27,7 +27,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
-        /// to create required instances of graph types
+        /// to create required objects
         /// </summary>
         public Schema(IServiceProvider services)
         {
@@ -76,7 +76,7 @@ namespace GraphQL.Types
         public IObjectGraphType Subscription { get; set; }
 
         /// <summary>
-        /// The service provider used to create instances of graph types during initialization of the schema
+        /// The service provider used to create objects during initialization of the schema
         /// </summary>
         public IServiceProvider Services { get; set; }
 
