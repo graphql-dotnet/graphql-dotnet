@@ -52,20 +52,25 @@ namespace GraphQL.Types
         /// <summary>The operation type (i.e. query, mutation, or subscription) of the current GraphQL request</summary>
         Operation Operation { get; }
 
+        /// <summary>Returns the query fragments associated with the current GraphQL request</summary>
         Fragments Fragments { get; }
 
         /// <summary>The input variables of the current GraphQL request</summary>
         Variables Variables { get; }
 
-        /// <inheritdoc cref="GraphQL.Execution.ExecutionOptions.CancellationToken"/>
+        /// <summary>A <see cref="System.Threading.CancellationToken">CancellationToken</see> to indicate if and when the request has been canceled</summary>
         CancellationToken CancellationToken { get; }
 
+        /// <summary>Allows logging of performance metrics</summary>
         Metrics Metrics { get; }
 
+        /// <summary>Can be used to return specific errors back to the GraphQL request caller</summary>
         ExecutionErrors Errors { get; }
 
+        /// <summary>The path of the current field resolver</summary>
         IEnumerable<string> Path { get; }
 
+        /// <summary>Returns a list of child fields requested of the current field</summary>
         IDictionary<string, Field> SubFields { get; }
     }
 
