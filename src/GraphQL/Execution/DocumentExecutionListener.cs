@@ -12,7 +12,6 @@ namespace GraphQL.Execution
     {
         /// <summary>Executes after document validation is complete. Can be used to log validation failures.</summary>
         Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token);
-
         /// <summary>Executes after document validation passes, before calling <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/>.</summary>
         Task BeforeExecutionAsync(object userContext, CancellationToken token);
 
