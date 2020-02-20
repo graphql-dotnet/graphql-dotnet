@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
-using System.IO;
 using BenchmarkDotNet.Attributes;
+using GraphQL.Tests.Introspection;
 
 namespace GraphQL.Benchmarks
 {
@@ -8,43 +9,52 @@ namespace GraphQL.Benchmarks
     [RPlotExporter, CsvMeasurementsExporter]
     public class DeserializationBenchmark
     {
-        private string _json;
-
-        private static readonly System.Text.Json.JsonSerializerOptions _jsonOptionsOld = new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new SystemTextJson.ObjectDictionaryConverterOld()
-            }
-        };
+        private const string SHORT_JSON = @"{
+  ""key0"": null,
+  ""key1"": true,
+  ""key2"": 1.2,
+  ""key3"": 10,
+  ""dict"": { },
+  ""key4"": ""value"",
+  ""arr"": [1,2,3],
+  ""key5"": {
+    ""inner1"": null,
+    ""inner2"": 14
+  }
+}";
 
         private static readonly System.Text.Json.JsonSerializerOptions _jsonOptions = new System.Text.Json.JsonSerializerOptions
         {
             PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
             Converters =
             {
-                new SystemTextJson.ObjectDictionaryConverter()
+                new SystemTextJson.ObjectDictionaryConverter(),
+                new SystemTextJson.JsonConverterBigInteger(),
             }
         };
 
         [GlobalSetup]
         public void GlobalSetup()
         {
-            _json = File.ReadAllText("data.json");
-
-            //var a = NewtonsoftJson();
-            //var b = SystemTextJsonOld();
-            //var c = SystemTextJson();
         }
 
+        public IEnumerable<string> Texts => new[] { "Empty", "Short", "Introspection" };
+
+        [ParamsSource(nameof(Texts))]
+        public string Code { get; set; }
+
+        private string Json => Code switch
+        {
+            "Empty" => "{}",
+            "Short" => SHORT_JSON,
+            "Introspection" => IntrospectionResult.Data,
+            _ => throw new NotSupportedException()
+        };
+
         [Benchmark(Baseline = true)]
-        public Dictionary<string, object> NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToDictionary(_json);
+        public Dictionary<string, object> NewtonsoftJson() => GraphQL.NewtonsoftJson.StringExtensions.ToDictionary(Json);
 
         [Benchmark]
-        public Dictionary<string, object> SystemTextJsonOld() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(_json, _jsonOptionsOld);
-
-        [Benchmark]
-        public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(_json, _jsonOptions);
+        public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
     }
 }

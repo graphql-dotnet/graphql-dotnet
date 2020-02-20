@@ -1,5 +1,7 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -34,6 +36,7 @@ namespace GraphQL.SystemTextJson
 
                 string key = reader.GetString();
 
+                // move to property value
                 if (!reader.Read())
                     throw new JsonException();
 
@@ -82,11 +85,40 @@ namespace GraphQL.SystemTextJson
             else if (reader.TryGetInt64(out long l))
                 return l;
             else if (reader.TryGetDouble(out double d))
-                return d;
-            else if (reader.TryGetDecimal(out decimal dm))
-                return dm;
+            {
+                // the idea is to see if there is a loss of accuracy of value
 
-            throw new NotImplementedException($"Unexpected Number value. Raw text was: {Encoding.UTF8.GetString(reader.ValueSpan.ToArray())}");
+                // example:
+                // value from json       : 636474637870330463636474637870330463636474637870330463
+                // successfully parsed d : 6.3647463787033043E+53
+                // new BigInteger(d)     : 636474637870330432588044308848152942336795574685138944
+                if (TryGetBigInteger(ref reader, out var bi))
+                {
+                    if (bi != new BigInteger(d))
+                        return bi;
+                }
+                return d;
+            }
+            else if (reader.TryGetDecimal(out decimal dm))
+            {
+                // the idea is to see if there is a loss of accuracy of value
+                if (TryGetBigInteger(ref reader, out var bi))
+                {
+                    if (bi != new BigInteger(dm))
+                        return bi;
+                }
+                return dm;
+            }
+
+            throw new NotImplementedException($"Unexpected Number value. Raw text was: {Encoding.UTF8.GetString(reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan)}");
+        }
+
+        private static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
+        {
+            var byteSpan = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
+            Span<char> chars = stackalloc char[byteSpan.Length];
+            Encoding.UTF8.GetChars(reader.ValueSpan, chars);
+            return BigInteger.TryParse(chars, out bi);
         }
     }
 }

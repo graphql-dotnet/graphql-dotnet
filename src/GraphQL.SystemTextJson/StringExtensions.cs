@@ -10,7 +10,8 @@ namespace GraphQL.SystemTextJson
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters =
             {
-                new ObjectDictionaryConverter()
+                new ObjectDictionaryConverter(),
+                new JsonConverterBigInteger(),
             }
         };
 

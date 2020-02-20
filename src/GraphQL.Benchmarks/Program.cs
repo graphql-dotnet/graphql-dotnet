@@ -1,6 +1,6 @@
-using BenchmarkDotNet.Running;
 using System;
 using System.Threading;
+using BenchmarkDotNet.Running;
 
 namespace GraphQL.Benchmarks
 {
