@@ -33,7 +33,7 @@ namespace GraphQL.Types
         /// A dictionary of arguments passed to the field. It is recommended to use the
         /// <see cref="GraphQL.ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
-        /// functions rather than this dictionary, so the names can be converted by the selected <see cref="IFieldNameConverter"/>.
+        /// methods rather than this dictionary, so the names can be converted by the selected <see cref="IFieldNameConverter"/>.
         /// </summary>
         IDictionary<string, object> Arguments { get; }
 
