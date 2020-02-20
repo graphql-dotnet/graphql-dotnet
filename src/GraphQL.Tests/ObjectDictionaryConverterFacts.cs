@@ -36,7 +36,7 @@ namespace GraphQL.Tests
 
             string roundtrip = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
 
-            roundtrip.ShouldBe(json);
+            roundtrip.ShouldBeCrossPlatJson(json);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace GraphQL.Tests
 
             string json = JsonSerializer.Serialize(source, _options);
 
-            json.ShouldBe(
+            json.ShouldBeCrossPlatJson(
                 @"{
   ""value1"": null,
   ""dictionary"": null,
