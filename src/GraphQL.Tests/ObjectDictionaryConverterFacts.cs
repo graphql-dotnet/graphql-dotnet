@@ -206,7 +206,7 @@ namespace GraphQL.Tests
         {
             var source = new Nested
             {
-                Dictionary = new Dictionary<string, object>()
+                Dictionary = new Dictionary<string, object>
                 {
                     ["int"] = 123,
                     ["string"] = "string"
@@ -233,7 +233,7 @@ namespace GraphQL.Tests
         {
             var source = new Nested
             {
-                Dictionary = new Dictionary<string, object>()
+                Dictionary = new Dictionary<string, object>
                 {
                     ["string"] = null
                 },
@@ -256,13 +256,13 @@ namespace GraphQL.Tests
         [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
         public void Serialize_Nested_ComplexValues()
         {
-            var source = new Nested()
+            var source = new Nested
             {
-                Dictionary = new Dictionary<string, object>()
+                Dictionary = new Dictionary<string, object>
                 {
                     ["int"] = 123,
                     ["string"] = "string",
-                    ["complex"] = new Dictionary<string, object>()
+                    ["complex"] = new Dictionary<string, object>
                     {
                         ["double"] = 1.123d
                     }
