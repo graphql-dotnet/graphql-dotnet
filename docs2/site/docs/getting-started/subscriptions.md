@@ -35,12 +35,12 @@ public class ChatSubscriptions : ObjectGraphType
     });
   }
 
-  private Message ResolveMessage(ResolveFieldContext context)
+  private Message ResolveMessage(IResolveFieldContext context)
   {
     return context.Source as Message;
   }
 
-  private IObservable<Message> Subscribe(ResolveEventStreamContext context)
+  private IObservable<Message> Subscribe(IResolveEventStreamContext context)
   {
     return _chat.Messages();
   }

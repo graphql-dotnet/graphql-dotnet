@@ -15,7 +15,10 @@ namespace GraphQL
         /// Initializes a new instance of the <see cref="FuncServiceProvider"/> class.
         /// </summary>
         /// <param name="resolver">The resolver function.</param>
-        public FuncServiceProvider(Func<Type, object> resolver) => _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+        public FuncServiceProvider(Func<Type, object> resolver)
+        {
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+        }
 
         /// <summary>
         /// Gets an instance of the specified type. May return null. Also you can use GetRequiredService extension method.

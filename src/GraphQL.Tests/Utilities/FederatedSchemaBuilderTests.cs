@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL.Utilities.Federation;
 using Xunit;
@@ -69,8 +72,7 @@ type User @key(fields: ""id"") {
   username: String!
 }
 ";
-
-            var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
+            var expected = @"{ ""_service"": { ""sdl"" : """ + JsonEncodedText.Encode(sdl) + @""" } }";
 
             AssertQuery(_ =>
             {
@@ -94,10 +96,7 @@ type User @key(fields: ""id"") {
                 }
             ";
 
-            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
-            {
-                return Task.FromResult(new User { Id = "123", Username = "Quinn" });
-            });
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
 
             var query = @"
                 query ($_representations: [_Any!]!) {
@@ -109,8 +108,8 @@ type User @key(fields: ""id"") {
                     }
                 }";
 
-            var variables = "{ '_representations': [{ '__typename': 'User', 'id': '123' }] }";
-            var expected = @"{ '_entities': [{ '__typename': 'User', 'id' : '123', 'username': 'Quinn' }] }";
+            var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123"", ""username"": ""Quinn"" }] }";
 
             AssertQuery(_ =>
             {
@@ -119,6 +118,43 @@ type User @key(fields: ""id"") {
                 _.Variables = variables;
                 _.ExpectedResult = expected;
             });
+        }
+
+        [Fact]
+        public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
+        {
+            var definitions = @"
+                input UserInput {
+                    limit: Int!
+                    offset: Int
+                }
+
+                type Comment {
+                    id: ID!
+                }
+
+                type User @key(fields: ""id"") {
+                    id: ID! @external
+                }
+            ";
+
+            var query = "{ __schema { types { name kind possibleTypes { name } } } }";
+
+            var executionResult = Executer.ExecuteAsync(_ =>
+            {
+                _.Schema = Builder.Build(definitions);
+                _.Query = query;
+            }).GetAwaiter().GetResult();
+
+            var data = (Dictionary<string, object>)executionResult.Data;
+            var schema = (Dictionary<string, object>)data["__schema"];
+            var types = (List<object>)schema["types"];
+            var entityType = (Dictionary<string, object>)types.Single(t => (string)((Dictionary<string, object>)t)["name"] == "_Entity");
+            var possibleTypes = (List<object>)entityType["possibleTypes"];
+            var possibleType = (Dictionary<string, object>)possibleTypes[0];
+            var name = (string)possibleType["name"];
+            
+            Assert.Equal("User", name);
         }
     }
 }

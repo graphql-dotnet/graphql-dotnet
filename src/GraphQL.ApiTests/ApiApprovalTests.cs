@@ -1,7 +1,7 @@
+using System;
 using GraphQL.Types;
 using PublicApiGenerator;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.ApiTests
@@ -11,15 +11,22 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
+        [InlineData(typeof(SystemTextJson.DocumentWriter))]
+        [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
         public void PublicApi(Type type)
         {
-            string publicApi = ApiGenerator.GeneratePublicApi(
-                type.Assembly,
-                shouldIncludeAssemblyAttributes: false,
-                //whitelistedNamespacePrefixes: new[] { "Microsoft.Extensions.DependencyInjection" },
-                excludeAttributes: new[] { "System.Diagnostics.DebuggerDisplayAttribute" });
+            string publicApi = type.Assembly.GeneratePublicApi(new ApiGeneratorOptions
+            {
+                IncludeAssemblyAttributes = false,
+                //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
+                ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute" }
+            });
 
-            publicApi.ShouldMatchApproved();
+            // See: https://shouldly.readthedocs.io/en/latest/assertions/shouldMatchApproved.html
+            // Note: If the AssemblyName.approved.txt file doesn't match the latest publicApi value,
+            // this call will try to launch a diff tool to help you out but that can fail on
+            // your machine if a diff tool isn't configured/setup. 
+            publicApi.ShouldMatchApproved(options => options.WithDiscriminator(type.Assembly.GetName().Name));
         }
     }
 }

@@ -1,8 +1,9 @@
+using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.Language.AST;
+
 namespace GraphQL.Validation.Rules
 {
-    using GraphQL.Language.AST;
-    using System.Linq;
-
     /// <summary>
     /// Subscription operations must have exactly one root field.
     /// </summary>
@@ -12,7 +13,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(config =>
             {
@@ -32,10 +33,10 @@ namespace GraphQL.Validation.Rules
                                 context.OriginalQuery,
                                 RuleCode,
                                 InvalidNumberOfRootFieldMessage(operation.Name),
-                                operation.SelectionSet.Selections.Skip(1).ToArray()));
+                                operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
                     }
 
-                    var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
+                    var fragment = operation.SelectionSet.SelectionsList.FirstOrDefault(IsFragment);
 
                     if (fragment == null)
                     {
@@ -63,7 +64,7 @@ namespace GraphQL.Validation.Rules
                     }
 
                 });
-            });
+            }).ToTask();
         }
 
         public static string InvalidNumberOfRootFieldMessage(string name)
@@ -72,10 +73,8 @@ namespace GraphQL.Validation.Rules
             return $"{prefix} must select only one top level field.";
         }
 
-        private static bool IsSubscription(Operation operation) =>
-            operation.OperationType == OperationType.Subscription;
+        private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
 
-        private static bool IsFragment(ISelection selection) =>
-            (selection is FragmentSpread) || (selection is InlineFragment);
+        private static bool IsFragment(ISelection selection) => selection is FragmentSpread || selection is InlineFragment;
     }
 }

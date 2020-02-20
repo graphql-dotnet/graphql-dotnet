@@ -1,5 +1,6 @@
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -24,7 +25,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -58,7 +59,7 @@ namespace GraphQL.Validation.Rules
                             node));
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private IGraphType getFragmentType(ValidationContext context, string name)

@@ -222,7 +222,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments)
+            foreach (var arg in definitionArguments.ArgumentsList)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -314,7 +314,7 @@ namespace GraphQL.Execution
         {
             if (selectionSet != null)
             {
-                foreach (var selection in selectionSet.Selections)
+                foreach (var selection in selectionSet.SelectionsList)
                 {
                     if (selection is Field field)
                     {
@@ -357,7 +357,6 @@ namespace GraphQL.Execution
 
                         CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
-
                 }
             }
 
@@ -444,17 +443,6 @@ namespace GraphQL.Execution
                 return null;
             }
             return CollectFields(context, fieldType, field.SelectionSet);
-        }
-
-        public static string[] AppendPath(string[] path, string pathSegment)
-        {
-            var newPath = new string[path.Length + 1];
-
-            path.CopyTo(newPath, 0);
-
-            newPath[path.Length] = pathSegment;
-
-            return newPath;
         }
     }
 }

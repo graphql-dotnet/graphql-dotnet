@@ -23,13 +23,13 @@ namespace GraphQL.Tests.Utilities
 
                 _.Query = "{ hello }";
                 _.Root = new { Hello = "Hello World!" };
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
             });
         }
 
         public class UppercaseDirectiveVisitor : SchemaDirectiveVisitor
         {
-            public override void VisitField(FieldType field)
+            public override void VisitFieldDefinition(FieldType field)
             {
                 var inner = field.Resolver ?? NameFieldResolver.Instance;
                 field.Resolver = new FuncFieldResolver<object>(context =>
@@ -61,21 +61,18 @@ namespace GraphQL.Tests.Utilities
                 ";
 
                 _.Query = "{ hello }";
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD2!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD2!"" }";
             });
         }
 
         public class Query
         {
-            public Task<string> Hello()
-            {
-                return Task.FromResult("Hello World2!");
-            }
+            public Task<string> Hello() => Task.FromResult("Hello World2!");
         }
 
         public class AsyncUppercaseDirectiveVisitor : SchemaDirectiveVisitor
         {
-            public override void VisitField(FieldType field)
+            public override void VisitFieldDefinition(FieldType field)
             {
                 var inner = WrapResolver(field.Resolver);
                 field.Resolver = new AsyncFieldResolver<object>(async context =>

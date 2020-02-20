@@ -27,13 +27,14 @@ namespace GraphQL.Types
         {
             if (!_resolvedInterfaces.Contains(graphType))
             {
+                graphType.IsValidInterfaceFor(this, throwError: true);
                 _resolvedInterfaces.Add(graphType ?? throw new ArgumentNullException(nameof(graphType)));
             }
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
-            get { return _resolvedInterfaces; }
+            get => _resolvedInterfaces;
             set
             {
                 _resolvedInterfaces.Clear();
@@ -48,7 +49,7 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> Interfaces
         {
-            get { return _interfaces; }
+            get => _interfaces;
             set
             {
                 _interfaces.Clear();

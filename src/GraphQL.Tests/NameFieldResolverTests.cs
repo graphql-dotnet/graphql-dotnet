@@ -16,6 +16,7 @@ namespace GraphQL.Tests
         [InlineData("naMe", "Anyone")]
         [InlineData("FullInfo", "Anyone 20")]
         [InlineData("fullInfo", "Anyone 20")]
+        [InlineData(null, null)]
         [InlineData("unknown", "", true)]
         [InlineData("FullInfoWithParam", "", true)]
         public void resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)

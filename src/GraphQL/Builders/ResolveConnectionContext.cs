@@ -3,11 +3,11 @@ using GraphQL.Types;
 
 namespace GraphQL.Builders
 {
-    public class ResolveConnectionContext<T> : ResolveFieldContext<T>
+    public class ResolveConnectionContext<T> : ResolveFieldContext<T>, IResolveConnectionContext<T>
     {
         private readonly int? _defaultPageSize;
 
-        public ResolveConnectionContext(ResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
+        public ResolveConnectionContext(IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
                 : base(context)
         {
             IsUnidirectional = isUnidirectional;
@@ -34,7 +34,7 @@ namespace GraphQL.Builders
         {
             get
             {
-                var first = GetArgument<int?>("first");
+                var first = this.GetArgument<int?>("first");
                 return first.HasValue ? (int?)Math.Abs(first.Value) : null;
             }
         }
@@ -43,25 +43,16 @@ namespace GraphQL.Builders
         {
             get
             {
-                var last = GetArgument<int?>("last");
+                var last = this.GetArgument<int?>("last");
                 return last.HasValue ? (int?)Math.Abs(last.Value) : null;
             }
         }
 
-        public string After
-        {
-            get { return GetArgument<string>("after"); }
-        }
+        public string After => this.GetArgument<string>("after");
 
-        public string Before
-        {
-            get { return GetArgument<string>("before"); }
-        }
+        public string Before => this.GetArgument<string>("before");
 
-        public int? PageSize
-        {
-            get { return First ?? Last ?? _defaultPageSize; }
-        }
+        public int? PageSize => First ?? Last ?? _defaultPageSize;
 
         public int? NumberOfSkippedEntries { get; set; }
 

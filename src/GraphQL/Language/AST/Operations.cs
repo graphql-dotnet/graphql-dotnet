@@ -9,10 +9,7 @@ namespace GraphQL.Language.AST
     {
         private readonly List<Operation> _operations = new List<Operation>();
 
-        public int Count
-        {
-            get { return _operations.Count; }
-        }
+        public int Count => _operations.Count;
 
         public void Add(Operation operation)
         {

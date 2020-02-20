@@ -64,7 +64,7 @@ namespace GraphQL
         /// </summary>
         public Func<TKey, TValue> OnMissing
         {
-            set { _onMissing = value; }
+            set => _onMissing = value;
         }
 
         public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };

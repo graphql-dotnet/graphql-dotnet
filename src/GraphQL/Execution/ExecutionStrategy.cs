@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
@@ -78,7 +79,7 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
-                subFields[kvp.Key] = node;
+                subFields[name] = node;
             }
 
             parent.SubFields = subFields;
@@ -105,11 +106,9 @@ namespace GraphQL.Execution
 
             foreach (var d in data)
             {
-                var path = AppendPath(parent.Path, (index++).ToString());
-
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
@@ -132,12 +131,12 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = path;
+                        error.Path = parent.Path.Append(index.ToString());
                         context.Errors.Add(error);
                         return;
                     }
 
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
+                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
                     {
                         Result = null
                     };
@@ -148,30 +147,19 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
-            path = path ?? AppendPath(parent.Path, field.Name);
-
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
-            switch (graphType)
+            return graphType switch
             {
-                case ListGraphType listGraphType:
-                    return new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IObjectGraphType objectGraphType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IAbstractGraphType abstractType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case ScalarGraphType scalarType:
-                    return new ValueExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                default:
-                    throw new InvalidOperationException($"Unexpected type: {graphType}");
-            }
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
         }
 
         /// <summary>
@@ -180,42 +168,18 @@ namespace GraphQL.Execution
         /// <remarks>
         /// Builds child nodes, but does not execute them
         /// </remarks>
-        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             if (node.IsResultSet)
-                return node;
+                return;
 
-            ResolveFieldContext resolveContext = null;
+            IResolveFieldContext resolveContext = null;
 
             try
             {
-                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
-                var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
-
-                resolveContext = new ResolveFieldContext
-                {
-                    FieldName = node.Field.Name,
-                    FieldAst = node.Field,
-                    FieldDefinition = node.FieldDefinition,
-                    ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GetParentType(context.Schema),
-                    Arguments = arguments,
-                    Source = node.Source,
-                    Schema = context.Schema,
-                    Document = context.Document,
-                    Fragments = context.Fragments,
-                    RootValue = context.RootValue,
-                    UserContext = context.UserContext,
-                    Operation = context.Operation,
-                    Variables = context.Variables,
-                    CancellationToken = context.CancellationToken,
-                    Metrics = context.Metrics,
-                    Errors = context.Errors,
-                    Path = node.Path,
-                    SubFields = subFields
-                };
+                resolveContext = new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -271,8 +235,6 @@ namespace GraphQL.Execution
 
                 node.Result = null;
             }
-
-            return node;
         }
 
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
@@ -324,11 +286,12 @@ namespace GraphQL.Execution
 
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
-            foreach (var listener in context.Listeners)
-            {
-                await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
-                    .ConfigureAwait(false);
-            }
+            if (context.Listeners != null)
+                foreach (var listener in context.Listeners)
+                {
+                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                        .ConfigureAwait(false);
+                }
         }
     }
 }

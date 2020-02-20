@@ -9,19 +9,11 @@ namespace GraphQL.Types
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
 
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is UriValue uriValue)
-            {
-                return uriValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
-        }
+            UriValue uriValue => uriValue.Value,
+            StringValue stringValue => ParseValue(stringValue.Value),
+            _ => null
+        };
     }
 }

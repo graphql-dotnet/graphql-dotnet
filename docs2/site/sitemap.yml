@@ -16,6 +16,8 @@
             file: installation.md
           - title: GraphiQL
             file: graphiql.md
+          - title: Altair GraphQL
+            file: altair-graphql.md
           - title: Queries
             file: queries.md
           - title: Schema Types

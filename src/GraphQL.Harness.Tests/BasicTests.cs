@@ -16,7 +16,7 @@ namespace GraphQL.Harness.Tests
                 {
                     Query = @"{ hero { name} }"
                 };
-                scenario.Post.Json(input).ToUrl("/api/graphql");
+                scenario.Post.Json(input).ToUrl("/graphql");
                 scenario.StatusCodeShouldBe(HttpStatusCode.OK);
                 scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
             });

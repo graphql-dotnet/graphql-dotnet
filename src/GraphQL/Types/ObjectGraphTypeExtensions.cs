@@ -12,7 +12,7 @@ namespace GraphQL.Types
             IGraphType type,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext, object> resolve = null)
+            Func<IResolveFieldContext, object> resolve = null)
         {
             var field = new FieldType
             {
@@ -31,7 +31,7 @@ namespace GraphQL.Types
             IGraphType type,
             string description = null,
             QueryArguments arguments = null,
-            Func<ResolveFieldContext, Task<object>> resolve = null)
+            Func<IResolveFieldContext, Task<object>> resolve = null)
         {
             var field = new FieldType
             {

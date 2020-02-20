@@ -13,12 +13,12 @@ namespace GraphQL.Utilities
             _inner = inner;
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public object Resolve(IResolveFieldContext context)
         {
             return ResolveAsync(context);
         }
 
-        public async Task<object> ResolveAsync(ResolveFieldContext context)
+        public async Task<object> ResolveAsync(IResolveFieldContext context)
         {
             var result = _inner.Resolve(context);
 

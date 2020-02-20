@@ -6,16 +6,9 @@ namespace GraphQL.Language.AST
     public class Operation : AbstractNode, IDefinition, IHaveSelectionSet
     {
         public Operation(NameNode name)
-            : this()
         {
             NameNode = name;
-        }
-
-        public Operation()
-        {
             OperationType = OperationType.Query;
-            Directives = new Directives();
-            Variables = new VariableDefinitions();
         }
 
         public string Name => NameNode?.Name;
@@ -34,14 +27,20 @@ namespace GraphQL.Language.AST
         {
             get
             {
-                foreach (var variable in Variables)
+                if (Variables != null)
                 {
-                    yield return variable;
+                    foreach (var variable in Variables)
+                    {
+                        yield return variable;
+                    }
                 }
 
-                foreach (var directive in Directives)
+                if (Directives != null)
                 {
-                    yield return directive;
+                    foreach (var directive in Directives)
+                    {
+                        yield return directive;
+                    }
                 }
 
                 yield return SelectionSet;
@@ -61,7 +60,7 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode node)
         {
-            if (ReferenceEquals(null, node)) return false;
+            if (node is null) return false;
             if (ReferenceEquals(this, node)) return true;
             if (node.GetType() != GetType()) return false;
             return Equals((Operation)node);

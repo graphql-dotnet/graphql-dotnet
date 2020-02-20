@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Types;
 using GraphQL.Language.AST;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -20,12 +21,10 @@ namespace GraphQL.Validation.Rules
 
         public static readonly ScalarLeafs Instance = new ScalarLeafs();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context));
-            });
+            return new EnterLeaveListener(_ => _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context)))
+                .ToTask();
         }
 
         private void Field(IGraphType type, Field field, ValidationContext context)

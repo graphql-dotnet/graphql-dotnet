@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -83,32 +83,32 @@ namespace GraphQL.Tests.Execution
             ";
 
             var expected = @"{
-                Named: {
-                  kind: 'INTERFACE',
-                  name: 'Named',
-                  fields: [
-                    { name: 'name' }
+                ""Named"": {
+                  ""kind"": ""INTERFACE"",
+                  ""name"": ""Named"",
+                  ""fields"": [
+                    { ""name"": ""name"" }
                   ],
-                  interfaces: null,
-                  possibleTypes: [
-                    { name: 'Dog' },
-                    { name: 'Cat' },
-                    { name: 'Person' }
+                  ""interfaces"": null,
+                  ""possibleTypes"": [
+                    { ""name"": ""Dog"" },
+                    { ""name"": ""Cat"" },
+                    { ""name"": ""Person"" }
                   ],
-                  enumValues: null,
-                  inputFields: null
+                  ""enumValues"": null,
+                  ""inputFields"": null
                 },
-                Pet: {
-                  kind: 'UNION',
-                  name: 'Pet',
-                  fields: null,
-                  interfaces: null,
-                  possibleTypes: [
-                    { name: 'Dog' },
-                    { name: 'Cat' }
+                ""Pet"": {
+                  ""kind"": ""UNION"",
+                  ""name"": ""Pet"",
+                  ""fields"": null,
+                  ""interfaces"": null,
+                  ""possibleTypes"": [
+                    { ""name"": ""Dog"" },
+                    { ""name"": ""Cat"" }
                   ],
-                  enumValues: null,
-                  inputFields: null
+                  ""enumValues"": null,
+                  ""inputFields"": null
                 }
             }";
 
@@ -135,11 +135,11 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  __typename: 'Person',
-                  name: 'John',
-                  pets: [
-                    { __typename:  'Cat', name: 'Garfield', meows: false },
-                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ""__typename"": ""Person"",
+                  ""name"": ""John"",
+                  ""pets"": [
+                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
+                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
                   ]
                 }
             ";
@@ -172,11 +172,11 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  __typename: 'Person',
-                  name: 'John',
-                  pets: [
-                    { __typename:  'Cat', name: 'Garfield', meows: false },
-                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ""__typename"": ""Person"",
+                  ""name"": ""John"",
+                  ""pets"": [
+                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
+                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
                   ]
                 }
             ";
@@ -204,11 +204,11 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  __typename: 'Person',
-                  name: 'John',
-                  friends: [
-                    { __typename:  'Person', name: 'Liz' },
-                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ""__typename"": ""Person"",
+                  ""name"": ""John"",
+                  ""friends"": [
+                    { ""__typename"":  ""Person"", ""name"": ""Liz"" },
+                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
                   ]
                 }
             ";
@@ -251,15 +251,15 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  __typename: 'Person',
-                  name: 'John',
-                  pets: [
-                    { __typename:  'Cat', name: 'Garfield', meows: false },
-                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ""__typename"": ""Person"",
+                  ""name"": ""John"",
+                  ""pets"": [
+                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
+                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
                   ],
-                  friends: [
-                    { __typename:  'Person', name: 'Liz' },
-                    { __typename:  'Dog', name: 'Odie', barks: true }
+                  ""friends"": [
+                    { ""__typename"":  ""Person"", ""name"": ""Liz"" },
+                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
                   ]
                 }
             ";
@@ -316,8 +316,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("barks");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Dog;
         }
     }
 
@@ -331,8 +329,6 @@ namespace GraphQL.Tests.Execution
             Field<BooleanGraphType>("meows");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Cat;
         }
     }
 
@@ -358,8 +354,6 @@ namespace GraphQL.Tests.Execution
             Field<ListGraphType<NamedType>>("friends");
 
             Interface<NamedType>();
-
-            IsTypeOf = value => value is Person;
         }
     }
 

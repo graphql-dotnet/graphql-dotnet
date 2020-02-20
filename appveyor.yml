@@ -5,7 +5,7 @@ skip_tags: true
 skip_branch_with_pr: false
 test: off
 
-os: Visual Studio 2017
+os: Visual Studio 2019
 
 environment:
   CI: true
@@ -17,7 +17,7 @@ nuget:
 
 install:
   - ps: Install-Product node LTS
-  - ps: choco install dotnetcore-sdk --no-progress --confirm --version 2.2.401
+  - ps: choco install dotnetcore-sdk --no-progress --confirm --version 3.1.101
   - node --version
   - npm --version
   - dotnet --version
@@ -25,7 +25,6 @@ install:
 build_script:
 - cmd: >-
     yarn build-ci
-
 
 artifacts:
   - path: 'artifacts\*.nupkg'

@@ -30,11 +30,11 @@ namespace GraphQL
             {
                 string stringValue = (string)value;
                 if (string.CompareOrdinal(stringValue, "1") == 0)
-                    return true;
+                    return BoolBox.True;
                 else if (string.CompareOrdinal(stringValue, "0") == 0)
-                    return false;
+                    return BoolBox.False;
 
-                return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo);
+                return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed();
             });
             Register(typeof(string), typeof(Guid), value => Guid.Parse((string)value));
 
@@ -46,7 +46,7 @@ namespace GraphQL
             Register(typeof(int), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo));
+            Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed());
             Register(typeof(int), typeof(uint), value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(long), value => (long)(int)value);
             Register(typeof(int), typeof(ulong), value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));

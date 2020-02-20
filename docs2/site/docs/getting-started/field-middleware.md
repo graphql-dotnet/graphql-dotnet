@@ -3,7 +3,7 @@
 You can write middleware for fields to provide additional behaviors during field resolution.  The following example is how Metrics are captured.  You register Field Middleware in the `ExecutionOptions`.
 
 ```csharp
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
@@ -16,7 +16,7 @@ You can write a class that has a `Resolve` method or you can register a middlewa
 public class InstrumentFieldsMiddleware
 {
   public async Task<object> Resolve(
-    ResolveFieldContext context,
+    IResolveFieldContext context,
     FieldMiddlewareDelegate next)
   {
     var metadata = new Dictionary<string, object>
@@ -36,7 +36,7 @@ public class InstrumentFieldsMiddleware
 The middleware delegate is defined as:
 
 ``` csharp
-public delegate Task<object> FieldMiddlewareDelegate(ResolveFieldContext context);
+public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext context);
 ```
 
 ```csharp

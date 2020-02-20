@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
@@ -25,7 +26,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly KnownTypeNames Instance = new KnownTypeNames();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -39,7 +40,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ValidationError(context.OriginalQuery, "5.4.1.2", UnknownTypeMessage(node.Name, suggestionList), node));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

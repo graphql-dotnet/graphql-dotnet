@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -28,7 +29,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -53,7 +54,7 @@ namespace GraphQL.Validation.Rules
                     if (inputType != null && defaultValue != null)
                     {
                         var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
-                        if (errors.Any())
+                        if (errors.Count > 0)
                         {
                             context.ReportError(new ValidationError(
                                 context.OriginalQuery,
@@ -67,7 +68,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

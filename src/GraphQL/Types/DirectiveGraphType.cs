@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -62,20 +63,22 @@ namespace GraphQL.Types
         public static readonly SkipDirective Skip = new SkipDirective();
         public static readonly GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
 
-        private readonly List<DirectiveLocation> _directiveLocations = new List<DirectiveLocation>();
-
         public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
         {
             Name = name;
-            _directiveLocations.AddRange(locations);
+            Locations.AddRange(locations);
+
+            if (Locations.Count == 0)
+                throw new ArgumentException("Directive must have locations", nameof(locations));
         }
 
         public string Name { get; set; }
+
         public string Description { get; set; }
 
         public QueryArguments Arguments { get; set; }
 
-        public IEnumerable<DirectiveLocation> Locations => _directiveLocations;
+        public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
     }
 
     /// <summary>

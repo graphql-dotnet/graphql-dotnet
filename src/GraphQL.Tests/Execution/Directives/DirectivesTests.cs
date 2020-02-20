@@ -42,55 +42,55 @@ namespace GraphQL.Tests.Execution.Directives
         [Fact]
         public void works_without_directives()
         {
-            AssertQuerySuccess("{a, b}", "{a: 'a', b: 'b'}", null, _data);
+            AssertQuerySuccess("{a, b}", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
         public void works_on_scalars()
         {
-            AssertQuerySuccess("{a, b @include(if: true) }", "{a: 'a', b: 'b'}", null, _data);
+            AssertQuerySuccess("{a, b @include(if: true) }", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
         public void if_false_omits_on_scalar()
         {
-            AssertQuerySuccess("{a, b @include(if: false) }", "{a: 'a'}", null, _data);
+            AssertQuerySuccess("{a, b @include(if: false) }", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
         public void skip_false_includes_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: false) }", "{a: 'a', b: 'b'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: false) }", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
         public void skip_true_omits_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: true) }", "{a: 'a'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: true) }", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
         public void skip_true_include_true_omits_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: true) @include(if: true) }", "{a: 'a'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: true) @include(if: true) }", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
         public void skip_false_include_false_omits_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: false) @include(if: false) }", "{a: 'a'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: false) @include(if: false) }", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
         public void skip_true_include_false_omits_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: true) @include(if: false) }", "{a: 'a'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: true) @include(if: false) }", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
         public void skip_false_include_true_includes_scalar()
         {
-            AssertQuerySuccess("{a, b @skip(if: false) @include(if: true) }", "{a: 'a', b: 'b'}", null, _data);
+            AssertQuerySuccess("{a, b @skip(if: false) @include(if: true) }", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
     }
 
@@ -109,7 +109,8 @@ namespace GraphQL.Tests.Execution.Directives
             fragment Frag on TestType {
               b
             }
-            ", "{a: 'a'}", null, _data);
+            ",
+            @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
@@ -123,7 +124,7 @@ namespace GraphQL.Tests.Execution.Directives
             fragment Frag on TestType {
               b
             }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -137,7 +138,7 @@ namespace GraphQL.Tests.Execution.Directives
             fragment Frag on TestType {
               b
             }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -151,7 +152,7 @@ namespace GraphQL.Tests.Execution.Directives
             fragment Frag on TestType {
               b
             }
-            ", "{a: 'a'}", null, _data);
+            ", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
@@ -164,7 +165,7 @@ namespace GraphQL.Tests.Execution.Directives
                 b
               }
             }
-            ", "{a: 'a'}", null, _data);
+            ", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
@@ -177,7 +178,7 @@ namespace GraphQL.Tests.Execution.Directives
                 b
               }
             }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -190,7 +191,7 @@ namespace GraphQL.Tests.Execution.Directives
                 b
               }
             }
-            ", "{a: 'a'}", null, _data);
+            ", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
@@ -203,7 +204,7 @@ namespace GraphQL.Tests.Execution.Directives
                 b
               }
             }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -217,7 +218,7 @@ namespace GraphQL.Tests.Execution.Directives
                 fragment Frag on TestType {
                   b
                 }
-            ", "{a: 'a'}", null, _data);
+            ", @"{""a"": ""a""}", null, _data);
         }
 
         [Fact]
@@ -231,7 +232,7 @@ namespace GraphQL.Tests.Execution.Directives
                 fragment Frag on TestType {
                   b
                 }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -245,7 +246,7 @@ namespace GraphQL.Tests.Execution.Directives
                 fragment Frag on TestType {
                   b
                 }
-            ", "{a: 'a', b: 'b'}", null, _data);
+            ", @"{""a"": ""a"", ""b"": ""b""}", null, _data);
         }
 
         [Fact]
@@ -259,7 +260,7 @@ namespace GraphQL.Tests.Execution.Directives
                 fragment Frag on TestType {
                   b
                 }
-            ", "{a: 'a'}", null, _data);
+            ", @"{""a"": ""a""}", null, _data);
         }
     }
 }
