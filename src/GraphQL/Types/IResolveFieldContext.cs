@@ -67,7 +67,7 @@ namespace GraphQL.Types
         /// <summary>Can be used to return specific errors back to the GraphQL request caller</summary>
         ExecutionErrors Errors { get; }
 
-        /// <summary>The path of the current field resolver</summary>
+        /// <summary>The path to the current executing field from the request root</summary>
         IEnumerable<string> Path { get; }
 
         /// <summary>Returns a list of child fields requested of the current field</summary>
