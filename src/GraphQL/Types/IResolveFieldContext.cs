@@ -70,7 +70,7 @@ namespace GraphQL.Types
         /// <summary>The path to the current executing field from the request root</summary>
         IEnumerable<string> Path { get; }
 
-        /// <summary>Returns a list of child fields requested of the current field</summary>
+        /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }
     }
 
