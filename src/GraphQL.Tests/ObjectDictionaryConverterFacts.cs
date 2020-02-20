@@ -14,7 +14,7 @@ namespace GraphQL.Tests
 
         public ObjectDictionaryConverterFacts()
         {
-            _options = new JsonSerializerOptions()
+            _options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
@@ -34,7 +34,11 @@ namespace GraphQL.Tests
 
             var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json, _options);
 
-            string roundtrip = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            string roundtrip = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
 
             roundtrip.ShouldBeCrossPlatJson(json);
         }
@@ -213,7 +217,7 @@ namespace GraphQL.Tests
 
             string json = JsonSerializer.Serialize(source, _options);
 
-            json.ShouldBe(
+            json.ShouldBeCrossPlatJson(
                 @"{
   ""value1"": ""string"",
   ""dictionary"": {
@@ -239,7 +243,7 @@ namespace GraphQL.Tests
 
             string json = JsonSerializer.Serialize(source, _options);
 
-            json.ShouldBe(
+            json.ShouldBeCrossPlatJson(
                 @"{
   ""value1"": ""string"",
   ""dictionary"": {
@@ -269,7 +273,7 @@ namespace GraphQL.Tests
 
             string json = JsonSerializer.Serialize(source, _options);
 
-            json.ShouldBe(
+            json.ShouldBeCrossPlatJson(
                 @"{
   ""value1"": ""string"",
   ""dictionary"": {
