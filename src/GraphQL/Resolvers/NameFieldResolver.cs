@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 
 namespace GraphQL.Resolvers
 {
+    /// <summary>
+    /// Attempts to return a value for a field from the graph's source object, matching the name of the field to a property on the source object
+    /// </summary>
     public class NameFieldResolver : IFieldResolver
     {
         private static readonly ConcurrentDictionary<(Type targetType, string name), Func<object, object>> _delegates

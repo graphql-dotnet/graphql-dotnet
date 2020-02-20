@@ -4,6 +4,10 @@ using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
+    /// <summary>
+    /// When resolving a field, this implementation calls a predefined <see cref="Func{T, TResult}"/> and returns the result.
+    /// The returned value must be of an <see cref="Task{TResult}"/> type.
+    /// </summary>
     public class AsyncFieldResolver<TReturnType> : IFieldResolver<Task<TReturnType>>
     {
         private readonly Func<IResolveFieldContext, Task<TReturnType>> _resolver;
@@ -24,6 +28,7 @@ namespace GraphQL.Resolvers
         }
     }
 
+    /// <inheritdoc cref="AsyncFieldResolver{TReturnType}"/>
     public class AsyncFieldResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
     {
         private readonly Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> _resolver;
