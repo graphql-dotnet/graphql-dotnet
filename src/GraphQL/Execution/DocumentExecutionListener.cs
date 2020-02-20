@@ -22,6 +22,7 @@ namespace GraphQL.Execution
         Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token);
     }
 
+
     /// <inheritdoc cref="IDocumentExecutionListener"/>
     public interface IDocumentExecutionListener<in T>
     {
