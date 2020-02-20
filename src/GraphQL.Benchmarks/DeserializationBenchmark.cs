@@ -38,9 +38,9 @@ namespace GraphQL.Benchmarks
         {
         }
 
-        public IEnumerable<string> Texts => new[] { "Empty", "Short", "Introspection" };
+        public IEnumerable<string> Codes => new[] { "Empty", "Short", "Introspection" };
 
-        [ParamsSource(nameof(Texts))]
+        [ParamsSource(nameof(Codes))]
         public string Code { get; set; }
 
         private string Json => Code switch
