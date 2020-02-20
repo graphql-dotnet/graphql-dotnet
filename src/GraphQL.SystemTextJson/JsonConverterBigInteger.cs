@@ -9,7 +9,7 @@ namespace GraphQL.SystemTextJson
 {
     /// <summary>
     /// Json converter for reading and writing <see cref="BigInteger"/> values.
-    /// While it is not able to correctly record very large numbers.
+    /// While it is not able to correctly write very large numbers.
     /// </summary>
     public sealed class JsonConverterBigInteger : JsonConverter<BigInteger>
     {

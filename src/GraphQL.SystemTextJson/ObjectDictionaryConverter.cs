@@ -10,6 +10,7 @@ namespace GraphQL.SystemTextJson
 {
     /// <summary>
     /// A custom JsonConverter for reading a dictionary of objects of their real underlying type.
+    /// Does not support write.
     /// </summary>
     public class ObjectDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {
@@ -17,7 +18,8 @@ namespace GraphQL.SystemTextJson
             => throw new NotImplementedException(
                 "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.");
 
-        public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => ReadDictionary(ref reader);
+        public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => ReadDictionary(ref reader);
 
         private static Dictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
         {
@@ -46,6 +48,20 @@ namespace GraphQL.SystemTextJson
             return result;
         }
 
+        private static object ReadValue(ref Utf8JsonReader reader)
+            => reader.TokenType switch
+            {
+                JsonTokenType.StartArray => ReadArray(ref reader),
+                JsonTokenType.StartObject => ReadDictionary(ref reader),
+                JsonTokenType.Number => ReadNumber(ref reader),
+                JsonTokenType.True => BoolBox.True,
+                JsonTokenType.False => BoolBox.False,
+                JsonTokenType.String => reader.GetString(),
+                JsonTokenType.Null => null,
+                JsonTokenType.None => null,
+                _ => throw new InvalidOperationException($"Unexpected token type: {reader.TokenType}")
+            };
+
         private static List<object> ReadArray(ref Utf8JsonReader reader)
         {
             if (reader.TokenType != JsonTokenType.StartArray)
@@ -63,20 +79,6 @@ namespace GraphQL.SystemTextJson
 
             return result;
         }
-
-        private static object ReadValue(ref Utf8JsonReader reader)
-            => reader.TokenType switch
-            {
-                JsonTokenType.StartArray => ReadArray(ref reader),
-                JsonTokenType.StartObject => ReadDictionary(ref reader),
-                JsonTokenType.Number => ReadNumber(ref reader),
-                JsonTokenType.True => BoolBox.True,
-                JsonTokenType.False => BoolBox.False,
-                JsonTokenType.String => reader.GetString(),
-                JsonTokenType.Null => null,
-                JsonTokenType.None => null,
-                _ => throw new InvalidOperationException($"Unexpected token type: {reader.TokenType}")
-            };
 
         private static object ReadNumber(ref Utf8JsonReader reader)
         {
