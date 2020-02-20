@@ -76,7 +76,11 @@ namespace GraphQL.Types
         public IObjectGraphType Subscription { get; set; }
 
         /// <summary>
-        /// The service provider used to create objects during initialization of the schema
+        /// The service provider used to create objects, such as graph types, requested by the schema.<br/>
+        /// <br/>
+        /// Note that most objects are created during schema initialization, which then have the same lifetime as the schema's lifetime.<br/>
+        /// <br/>
+        /// Other types created by the service provider include directives, middleware, validation rules, and name converters, among others.
         /// </summary>
         public IServiceProvider Services { get; set; }
 
