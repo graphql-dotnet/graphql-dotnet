@@ -24,9 +24,10 @@ namespace GraphQL
                 : defaultValue;
         }
 
-        private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
+        internal static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
         {
-            var argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
@@ -53,7 +54,12 @@ namespace GraphQL
             return true;
         }
 
-        public static bool HasArgument(this IResolveFieldContext context, string argumentName) => context.Arguments?.ContainsKey(argumentName) ?? false;
+        public static bool HasArgument(this IResolveFieldContext context, string argumentName)
+        {
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentNameConverted = isIntrospection ? argumentName : (context.Schema?.NameConverter.NameForArgument(argumentName, context.ParentType, context.FieldDefinition) ?? argumentName);
+            return context.Arguments?.ContainsKey(argumentNameConverted) ?? false;
+        }
 
         internal static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
         {

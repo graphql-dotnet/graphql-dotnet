@@ -69,7 +69,7 @@ The `DateGraphType` has been split into multiple types.  [See the GitHub issue](
 
 Fields, enumerations, and arguments all now have their names validated according to the GraphQL spec, which is `/[_A-Za-z][_0-9A-Za-z]*/`.
 
-`QueryArgument` names are now run through the `IFieldNameConverter` set on the `Schema`.
+`QueryArgument` names are now run through the `INameConverter` set on the `Schema`.
 
 ### SchemaPrinter
 

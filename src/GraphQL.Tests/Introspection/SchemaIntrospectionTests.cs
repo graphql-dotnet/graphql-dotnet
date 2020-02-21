@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -25,6 +27,53 @@ namespace GraphQL.Tests.Introspection
             var json = await documentWriter.WriteToStringAsync(executionResult);
 
             ShouldBe(json, IntrospectionResult.Data);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema_pascal_case(IDocumentWriter documentWriter)
+        {
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery(),
+                };
+                _.NameConverter = PascalCaseNameConverter.Instance;
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+            });
+
+            var json = await documentWriter.WriteToStringAsync(executionResult);
+
+            ShouldBe(json, IntrospectionResult.Data);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema_doesnt_use_nameconverter(IDocumentWriter documentWriter)
+        {
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery(),
+                };
+                _.NameConverter = new TestNameConverter();
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+            });
+
+            var json = await documentWriter.WriteToStringAsync(executionResult);
+
+            ShouldBe(json, IntrospectionResult.Data);
+        }
+
+        public class TestNameConverter : INameConverter
+        {
+            public string NameForArgument(string argumentName, IComplexGraphType graphType, FieldType field) => throw new Exception();
+
+            public string NameForField(string fieldName, IComplexGraphType graphType) => throw new Exception();
         }
 
         public class TestQuery : ObjectGraphType

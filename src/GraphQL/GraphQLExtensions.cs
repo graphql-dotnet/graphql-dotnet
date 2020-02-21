@@ -76,6 +76,16 @@ namespace GraphQL
             return namedType is IInputObjectGraphType;
         }
 
+        /// <summary>
+        /// Determines if this graph type is an introspection type
+        /// </summary>
+        public static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
+
+        /// <summary>
+        /// Determines if this field is an introspection type
+        /// </summary>
+        public static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
+
         public static IGraphType GetNamedType(this IGraphType type)
         {
             return type switch

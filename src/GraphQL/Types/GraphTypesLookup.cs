@@ -15,8 +15,16 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
-        public GraphTypesLookup()
+        public GraphTypesLookup() : this(CamelCaseNameConverter.Instance) { }
+
+        public GraphTypesLookup(INameConverter nameConverter)
         {
+            if (nameConverter == null)
+                throw new ArgumentNullException(nameof(nameConverter));
+
+            // introspection fields use camelcase
+            NameConverter = CamelCaseNameConverter.Instance;
+
             // standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
             AddType<StringGraphType>();
             AddType<BooleanGraphType>();
@@ -50,6 +58,8 @@ namespace GraphQL.Types
             AddType<__EnumValue>();
             AddType<__InputValue>();
             AddType<__TypeKind>();
+
+            NameConverter = nameConverter;
         }
 
         private void CheckSealed()
@@ -62,13 +72,10 @@ namespace GraphQL.Types
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
-            IFieldNameConverter fieldNameConverter,
+            INameConverter nameConverter,
             bool seal = false)
         {
-            var lookup = new GraphTypesLookup
-            {
-                FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance
-            };
+            var lookup = nameConverter != null ? new GraphTypesLookup(nameConverter) : new GraphTypesLookup();
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
@@ -83,11 +90,10 @@ namespace GraphQL.Types
                 lookup.AddType(type, ctx);
             }
 
-            var introspectionType = typeof(SchemaIntrospection);
-
-            lookup.HandleField(introspectionType, SchemaIntrospection.SchemaMeta, ctx);
-            lookup.HandleField(introspectionType, SchemaIntrospection.TypeMeta, ctx);
-            lookup.HandleField(introspectionType, SchemaIntrospection.TypeNameMeta, ctx);
+            // these fields must not have their field names translated by INameConverter; see HandleField
+            lookup.HandleField(null, SchemaIntrospection.SchemaMeta, ctx, false);
+            lookup.HandleField(null, SchemaIntrospection.TypeMeta, ctx, false);
+            lookup.HandleField(null, SchemaIntrospection.TypeNameMeta, ctx, false);
 
             foreach (var directive in directives)
             {
@@ -115,7 +121,7 @@ namespace GraphQL.Types
             return lookup;
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        public INameConverter NameConverter { get; set; }
 
         internal void Clear(bool internalCall)
         {
@@ -239,7 +245,7 @@ namespace GraphQL.Types
             {
                 foreach (var field in complexType.Fields)
                 {
-                    HandleField(type.GetType(), field, context);
+                    HandleField(complexType, field, context, true);
                 }
             }
 
@@ -310,9 +316,23 @@ namespace GraphQL.Types
             }
         }
 
-        private void HandleField(Type parentType, FieldType field, TypeCollectionContext context)
+        private void HandleField(IComplexGraphType parentType, FieldType field, TypeCollectionContext context, bool applyNameConverter)
         {
-            field.Name = FieldNameConverter.NameFor(field.Name, parentType);
+            // applyNameConverter will be false while processing the three root introspection query fields: __schema, __type, and __typename
+            //
+            // During processing of those three root fields, the NameConverter will be set to the schema's selected NameConverter,
+            //   and the field names must not be processed by the NameConverter
+            //
+            // For other introspection types and fields, the NameConverter will be set to CamelCaseNameConverter at the time this
+            //   code executes, and applyNameConverter will be true
+            //
+            // For any other fields, the NameConverter will be set to the schema's selected NameConverter at the time this code
+            //   executes, and applyNameConverter will be true
+
+            if (applyNameConverter)
+            {
+                field.Name = NameConverter.NameForField(field.Name, parentType);
+            }
 
             if (field.ResolvedType == null)
             {
@@ -329,7 +349,10 @@ namespace GraphQL.Types
 
             foreach (var arg in field.Arguments)
             {
-                arg.Name = FieldNameConverter.NameFor(arg.Name, null);
+                if (applyNameConverter)
+                {
+                    arg.Name = NameConverter.NameForArgument(arg.Name, parentType, field);
+                }
 
                 if (arg.ResolvedType != null)
                 {
