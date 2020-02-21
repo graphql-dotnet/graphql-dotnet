@@ -17,6 +17,9 @@ namespace GraphQL.Resolvers
             _resolver = resolver;
         }
 
+        /// <summary>
+        /// Asynchronously returns an object or null for the specified field.
+        /// </summary>
         public Task<TReturnType> Resolve(IResolveFieldContext context)
         {
             return _resolver(context);
@@ -28,7 +31,12 @@ namespace GraphQL.Resolvers
         }
     }
 
-    /// <inheritdoc cref="AsyncFieldResolver{TReturnType}"/>
+    /// <summary>
+    /// When resolving a field, this implementation calls a predefined <see cref="Func{T, TResult}"/> and returns the result.
+    /// The returned value must be of an <see cref="Task{TResult}"/> type.<br/>
+    /// <br/>
+    /// This implementation provides a typed <see cref="IResolveFieldContext{TSource}"/> to the resolver function.
+    /// </summary>
     public class AsyncFieldResolver<TSourceType, TReturnType> : IFieldResolver<Task<TReturnType>>
     {
         private readonly Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> _resolver;
@@ -38,6 +46,9 @@ namespace GraphQL.Resolvers
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
+        /// <summary>
+        /// Asynchronously returns an object or null for the specified field.
+        /// </summary>
         public Task<TReturnType> Resolve(IResolveFieldContext context)
         {
             return _resolver(context.As<TSourceType>());

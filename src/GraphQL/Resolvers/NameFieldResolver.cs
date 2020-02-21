@@ -15,6 +15,9 @@ namespace GraphQL.Resolvers
 
         private NameFieldResolver() { }
 
+        /// <summary>
+        /// Returns the static instance of the <see cref="NameFieldResolver"/> class.
+        /// </summary>
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
         public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);

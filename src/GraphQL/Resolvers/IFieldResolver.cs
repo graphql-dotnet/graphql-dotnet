@@ -24,7 +24,7 @@ namespace GraphQL.Resolvers
     public interface IFieldResolver
     {
         /// <summary>
-        /// Returns an object, null, or a <see cref="Task{TResult}"/> for the specified field. If the task is returned, then this task will be awaited to obtain the actual object.
+        /// Returns an object, null, or a <see cref="Task{TResult}"/> for the specified field. If a task is returned, then this task will be awaited to obtain the actual object.
         /// </summary>
         object Resolve(IResolveFieldContext context);
     }
@@ -33,7 +33,7 @@ namespace GraphQL.Resolvers
     public interface IFieldResolver<out T> : IFieldResolver
     {
         /// <summary>
-        /// Returns an object or null for the specified field
+        /// Returns an object or null for the specified field. If <see cref="T"/> is a <see cref="Task{TResult}"/>, then this task will be awaited to obtain the actual object.
         /// </summary>
         new T Resolve(IResolveFieldContext context);
     }
