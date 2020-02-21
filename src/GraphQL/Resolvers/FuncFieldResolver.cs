@@ -28,7 +28,7 @@ namespace GraphQL.Resolvers
 
     /// <summary>
     /// When resolving a field, this implementation calls a predefined <see cref="Func{T, TResult}"/> and returns the result.
-    /// <br/>
+    /// <br/><br/>
     /// This implementation provides a typed <see cref="IResolveFieldContext{TSource}"/> to the resolver function.
     /// </summary>
     public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>

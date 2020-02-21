@@ -17,7 +17,7 @@ namespace GraphQL
     {
         /// <summary>
         /// Schema of graph to use; required
-        /// <br/>
+        /// <br/><br/>
         /// Schema will be initialized if it has not yet been initialized.
         /// </summary>
         public ISchema Schema { get; set; }

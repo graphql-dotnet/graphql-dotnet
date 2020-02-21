@@ -7,9 +7,9 @@ namespace GraphQL.Types
 {
     /// <summary>
     /// The schema for the GraphQL request. Contains references to the 'query', 'mutation', and 'subscription' base graph types.
-    /// <br/>
+    /// <br/><br/>
     /// Also allows for adding custom directives, additional graph types, and custom value converters.
-    /// <br/>
+    /// <br/><br/>
     /// <see cref="Schema"/> only requires the <see cref="Schema.Query">Query</see> property to be set; although commonly the <see cref="Schema.Mutation">Mutation</see> and/or <see cref="Schema.Subscription">Subscription</see> properties are also set.
     /// </summary>
     public interface ISchema
@@ -21,7 +21,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Initializes the schema. Called by <see cref="IDocumentExecuter"/> before validating or executing the request.
-        /// <br/>
+        /// <br/><br/>
         /// Note that middleware cannot be applied once the schema has been initialized. See <see cref="ExecutionOptions.FieldMiddleware"/>.
         /// </summary>
         void Initialize();
@@ -48,10 +48,10 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Returns a list of directives supported by the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
-        /// <br/>
+        /// <br/><br/>
         /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
         /// </summary>
         IEnumerable<DirectiveGraphType> Directives { get; set; }
@@ -78,7 +78,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add a specific instance of an <see cref="IGraphType"/> to the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
@@ -86,7 +86,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add specific instances of <see cref="IGraphType"/>s to the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
@@ -94,7 +94,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add specific graph types to the schema. Each type must implement <see cref="IGraphType"/>.
-        /// <br/>
+        /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
@@ -102,7 +102,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add a specific graph type to the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
@@ -110,7 +110,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add a specific directive to the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// </summary>
@@ -118,7 +118,7 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Add specific directives to the schema.
-        /// <br/>
+        /// <br/><br/>
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// </summary>
