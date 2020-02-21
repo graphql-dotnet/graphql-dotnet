@@ -76,10 +76,10 @@ namespace GraphQL
         public bool EnableMetrics { get; set; }
         public bool ExposeExceptions { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
         public object Root { get; set; }
@@ -129,6 +129,8 @@ namespace GraphQL
         public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this System.Type type) { }
+        public static bool IsIntrospectionField(this GraphQL.Types.FieldType fieldType) { }
+        public static bool IsIntrospectionType(this GraphQL.Types.IGraphType graphType) { }
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
@@ -354,27 +356,31 @@ namespace GraphQL.Builders
 }
 namespace GraphQL.Conversion
 {
-    public class CamelCaseFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class CamelCaseNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.CamelCaseFieldNameConverter Instance;
-        public CamelCaseFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.CamelCaseNameConverter Instance;
+        public CamelCaseNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
     }
-    public class DefaultFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class DefaultNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.DefaultFieldNameConverter Instance;
-        public DefaultFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.DefaultNameConverter Instance;
+        public DefaultNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
     }
-    public interface IFieldNameConverter
+    public interface INameConverter
     {
-        string NameFor(string field, System.Type parentType);
+        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field);
+        string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType);
     }
-    public class PascalCaseFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.PascalCaseFieldNameConverter Instance;
-        public PascalCaseFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.PascalCaseNameConverter Instance;
+        public PascalCaseNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
     }
 }
 namespace GraphQL.DataLoader
@@ -1700,9 +1706,10 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         public GraphTypesLookup() { }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
+        public GraphTypesLookup(GraphQL.Conversion.INameConverter nameConverter) { }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public void AddType(GraphQL.Types.IGraphType type, GraphQL.Types.TypeCollectionContext context) { }
         public void AddType<TType>()
             where TType : GraphQL.Types.IGraphType, new () { }
@@ -1712,7 +1719,7 @@ namespace GraphQL.Types
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
         public void Clear() { }
-        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter, bool seal = false) { }
+        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter, bool seal = false) { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1811,10 +1818,10 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        GraphQL.Conversion.INameConverter NameConverter { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
         GraphQL.Types.DirectiveGraphType FindDirective(string name);
@@ -2022,10 +2029,10 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public System.IServiceProvider Services { get; set; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
