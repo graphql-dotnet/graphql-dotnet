@@ -8,6 +8,9 @@ using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// A mutable implementation of <see cref="IResolveFieldContext"/>
+    /// </summary>
     public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
     {
         public string FieldName { get; set; }
@@ -46,13 +49,13 @@ namespace GraphQL.Types
 
         public IEnumerable<string> Path { get; set; }
 
-        /// <summary>
-        /// Queried sub fields
-        /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
         public ResolveFieldContext() { }
 
+        /// <summary>
+        /// Clone the specified <see cref="IResolveFieldContext"/>
+        /// </summary>
         public ResolveFieldContext(IResolveFieldContext context)
         {
             Source = context.Source;
@@ -77,12 +80,14 @@ namespace GraphQL.Types
         }
     }
 
+    /// <inheritdoc cref="ResolveFieldContext"/>
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
         public ResolveFieldContext()
         {
         }
 
+        /// <inheritdoc cref="ResolveFieldContext.ResolveFieldContext(IResolveFieldContext)"/>
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
             if (context.Source != null && !(context.Source is TSource))
@@ -95,6 +100,16 @@ namespace GraphQL.Types
             set => base.Source = value;
         }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="ResolveFieldContext{TSource}"/> based on the specified <see cref="Execution.ExecutionContext"/> and other specified parameters
+        /// </summary>
+        /// <param name="context">The current <see cref="Execution.ExecutionContext"/> containing a number of parameters relating to the current GraphQL request</param>
+        /// <param name="field">The field AST derived from the query request</param>
+        /// <param name="type">The <see cref="FieldType"/> definition specified in the parent graph type</param>
+        /// <param name="source">The value of the parent object in the graph</param>
+        /// <param name="parentType">The field's parent graph type</param>
+        /// <param name="arguments">A dictionary of arguments passed to the field</param>
+        /// <param name="path">The path to the current executing field from the request root</param>
         public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
         {
             Source = source;

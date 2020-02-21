@@ -8,6 +8,7 @@ namespace GraphQL
 {
     public static class ResolveFieldContextExtensions
     {
+        /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
         public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
         {
             bool exists = context.TryGetArgument(typeof(TType), name, out object result);
@@ -16,6 +17,7 @@ namespace GraphQL
                 : defaultValue;
         }
 
+        /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
         public static object GetArgument(this IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null)
         {
             bool exists = context.TryGetArgument(argumentType, name, out object result);
@@ -54,6 +56,7 @@ namespace GraphQL
             return true;
         }
 
+        /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
         public static bool HasArgument(this IResolveFieldContext context, string argumentName)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
