@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
+    /// <inheritdoc cref="ISchema"/>
     public class Schema : MetadataProvider, ISchema, IDisposable
     {
         private Lazy<GraphTypesLookup> _lookup;
@@ -15,11 +16,19 @@ namespace GraphQL.Types
         private readonly List<DirectiveGraphType> _directives;
         private readonly List<IAstFromValueConverter> _converters;
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
+        /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
         {
         }
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
+        /// to create required objects
+        /// </summary>
         public Schema(IServiceProvider services)
         {
             Services = services;
@@ -66,11 +75,15 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
+        /// <summary>
+        /// The service provider used to create objects, such as graph types, requested by the schema.<br/>
+        /// <br/>
+        /// Note that most objects are created during schema initialization, which then have the same lifetime as the schema's lifetime.<br/>
+        /// <br/>
+        /// Other types created by the service provider may include directives, middleware, validation rules, and name converters, among others.
+        /// </summary>
         public IServiceProvider Services { get; set; }
 
-        /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types.
-        /// </summary>
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         public IEnumerable<DirectiveGraphType> Directives
