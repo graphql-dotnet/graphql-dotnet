@@ -22,9 +22,6 @@ namespace GraphQL.Types
             if (nameConverter == null)
                 throw new ArgumentNullException(nameof(nameConverter));
 
-            // introspection fields use camelcase
-            NameConverter = CamelCaseNameConverter.Instance;
-
             // standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
             AddType<StringGraphType>();
             AddType<BooleanGraphType>();
@@ -50,7 +47,9 @@ namespace GraphQL.Types
             AddType<ByteGraphType>();
             AddType<SByteGraphType>();
 
-            // introspection types
+            // Add introspection types.  Note that introspection types rely on the
+            //   CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
+            NameConverter = CamelCaseNameConverter.Instance;
             AddType<__Schema>();
             AddType<__Type>();
             AddType<__Directive>();
@@ -59,6 +58,7 @@ namespace GraphQL.Types
             AddType<__InputValue>();
             AddType<__TypeKind>();
 
+            // set the name converter properly
             NameConverter = nameConverter;
         }
 
