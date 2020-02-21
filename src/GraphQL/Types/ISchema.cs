@@ -72,7 +72,7 @@ namespace GraphQL.Types
         DirectiveGraphType FindDirective(string name);
 
         /// <summary>
-        /// A list of additional graph types manually added to the schema
+        /// A list of additional graph types manually added to the schema by RegisterType call.
         /// </summary>
         IEnumerable<Type> AdditionalTypes { get; }
 
