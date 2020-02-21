@@ -216,6 +216,8 @@ namespace GraphQL
     }
     public static class ResolveFieldContextExtensions
     {
+        public static GraphQL.Subscription.IResolveEventStreamContext<T> As<T>(this GraphQL.Subscription.IResolveEventStreamContext context) { }
+        public static GraphQL.Types.IResolveFieldContext<TSourceType> As<TSourceType>(this GraphQL.Types.IResolveFieldContext context) { }
         public static object GetArgument(this GraphQL.Types.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.Types.IResolveFieldContext context, string name, TType defaultValue = null) { }
         public static bool HasArgument(this GraphQL.Types.IResolveFieldContext context, string argumentName) { }

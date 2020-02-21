@@ -58,7 +58,8 @@ namespace GraphQL
         /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
         public static bool HasArgument(this IResolveFieldContext context, string argumentName) => context.Arguments?.ContainsKey(argumentName) ?? false;
 
-        internal static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
+        /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
+        public static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
         {
             if (context is IResolveFieldContext<TSourceType> typedContext)
                 return typedContext;
@@ -66,7 +67,8 @@ namespace GraphQL
             return new ResolveFieldContextAdapter<TSourceType>(context);
         }
 
-        internal static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
+        /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
+        public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
             if (context is IResolveEventStreamContext<T> typedContext)
                 return typedContext;
