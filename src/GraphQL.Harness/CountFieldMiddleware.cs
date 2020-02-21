@@ -12,7 +12,7 @@ namespace Example
     /// <summary>
     /// Example of Field Middleware with dependencies. When configured as singleton in DI
     /// counts fields execution for the entire application lifetime. When configured as
-    /// scoped counts how many fields were executed when processing the single request.
+    /// scoped (with a scoped schema), counts how many fields were executed when processing the single request.
     /// </summary>
     public sealed class CountFieldMiddleware : IFieldMiddleware, IDisposable
     {
