@@ -90,7 +90,7 @@ services.AddSingleton<InstrumentFieldsMiddleware>();
 ## Known issues
 
 Perhaps the most important thing with Field Middlewares that you should be aware of is that the
-default `DocumentExecuter` applies middlewares to the schema only once before the schema is
+default `DocumentExecuter` applies middlewares to the schema only once while the schema is being
 initialized. After this, calling any `IFieldMiddlewareBuilder.Use` methods has no effect.
 
 Field Middleware, when applying the schema, **modifies** the resolver of each field. Therefore,
