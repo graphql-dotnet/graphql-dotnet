@@ -94,7 +94,7 @@ namespace GraphQL.SystemTextJson
                 // value from json       : 636474637870330463636474637870330463636474637870330463
                 // successfully parsed d : 6.3647463787033043E+53
                 // new BigInteger(d)     : 636474637870330432588044308848152942336795574685138944
-                if (TryGetBigInteger(ref reader, out var bi))
+                if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
                 {
                     if (bi != new BigInteger(d))
                         return bi;
@@ -103,8 +103,8 @@ namespace GraphQL.SystemTextJson
             }
             else if (reader.TryGetDecimal(out decimal dm))
             {
-                // the idea is to see if there is a loss of accuracy of value
-                if (TryGetBigInteger(ref reader, out var bi))
+                // the same idea as for a double value above
+                if (JsonConverterBigInteger.TryGetBigInteger(ref reader, out var bi))
                 {
                     if (bi != new BigInteger(dm))
                         return bi;
@@ -113,14 +113,6 @@ namespace GraphQL.SystemTextJson
             }
 
             throw new NotImplementedException($"Unexpected Number value. Raw text was: {Encoding.UTF8.GetString(reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan)}");
-        }
-
-        private static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
-        {
-            var byteSpan = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-            Span<char> chars = stackalloc char[byteSpan.Length];
-            Encoding.UTF8.GetChars(reader.ValueSpan, chars);
-            return BigInteger.TryParse(chars, out bi);
         }
     }
 }
