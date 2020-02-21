@@ -80,7 +80,7 @@ namespace GraphQL.Types
         /// <br/>
         /// Note that most objects are created during schema initialization, which then have the same lifetime as the schema's lifetime.<br/>
         /// <br/>
-        /// Other types created by the service provider include directives, middleware, validation rules, and name converters, among others.
+        /// Other types created by the service provider may include directives, middleware, validation rules, and name converters, among others.
         /// </summary>
         public IServiceProvider Services { get; set; }
 
