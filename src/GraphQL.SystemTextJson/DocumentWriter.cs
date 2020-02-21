@@ -42,6 +42,11 @@ namespace GraphQL.SystemTextJson
             {
                 _options.Converters.Add(new ExecutionResultJsonConverter());
             }
+
+            if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))
+            {
+                _options.Converters.Add(new JsonConverterBigInteger());
+            }
         }
 
         private static JsonSerializerOptions GetDefaultSerializerOptions(bool indent)

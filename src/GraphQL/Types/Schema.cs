@@ -7,7 +7,8 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema : MetadataProvider, ISchema, IServiceProvider
+    /// <inheritdoc cref="ISchema"/>
+    public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         private IServiceProvider _services;
         private Lazy<GraphTypesLookup> _lookup;
@@ -16,11 +17,19 @@ namespace GraphQL.Types
         private readonly List<DirectiveGraphType> _directives;
         private readonly List<IAstFromValueConverter> _converters;
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
+        /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
         {
         }
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
+        /// to create required objects
+        /// </summary>
         public Schema(IServiceProvider services)
         {
             _services = services;
@@ -68,11 +77,18 @@ namespace GraphQL.Types
         public IObjectGraphType Subscription { get; set; }
 
         /// <summary>
-        /// Gets the service object of the specified type.
-        /// 
+        /// Gets the service object of the specified type. Schema itself acts as a service provider used to
+        /// create objects, such as graph types, requested by the schema.
+        /// <br/>
+        /// Note that most objects are created during schema initialization, which then have the same lifetime
+        /// as the schema's lifetime.
+        /// <br/>
+        /// Other types created by the service provider may include directive visitors, middlewares, validation
+        /// rules, and name converters, among others.
+        /// <br/>
         /// Explicit implementation of the <see cref="IServiceProvider.GetService"/> method makes this method
-        /// less visible to the calling code, which reduces the likelihood of using it as ServiceLocator.
-        /// However, in some advanced scenarios this may be necessary.
+        /// less visible to the calling code, which reduces the likelihood of using it as so called ServiceLocator
+        /// anti-pattern. However, in some advanced scenarios this may be necessary.
         /// </summary>
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>
@@ -82,8 +98,14 @@ namespace GraphQL.Types
         object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
         /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// The service provider used to create objects, such as graph types, requested by the schema.
+        /// <br/>
+        /// Note that most objects are created during schema initialization, which then have the same lifetime as the schema's lifetime.
+        /// <br/>
+        /// Other types created by the service provider may include directives, middleware, validation rules, and name converters, among others.
         /// </summary>
+        public IServiceProvider Services { get; set; }
+
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         public IEnumerable<DirectiveGraphType> Directives
