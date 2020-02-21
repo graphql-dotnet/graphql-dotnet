@@ -137,6 +137,8 @@ namespace GraphQL.Types
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types. This is set by <see cref="IDocumentExecuter"/>
         /// to the filter passed to it within <see cref="ExecutionOptions.SchemaFilter"/>. By default, no types are hidden.
+        /// Note that this filter in fact does not prohibit the execution of queries that contain hidden types. To limit
+        /// access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; set; }
     }
