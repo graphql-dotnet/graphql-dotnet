@@ -120,7 +120,7 @@ namespace GraphQL.Types
         /// Add specific directives to the schema.<br/>
         /// <br/>
         /// Directives are used by the GraphQL runtime as a way of modifying execution
-        /// behavior. Type system creators will usually not create these directly.
+        /// behavior. Type system creators do not usually create them directly.
         /// </summary>
         void RegisterDirectives(params DirectiveGraphType[] directives);
 
