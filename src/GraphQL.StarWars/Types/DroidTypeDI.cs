@@ -42,7 +42,7 @@ namespace GraphQL.StarWars.Types
 
         [GraphType(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>))] //not required when using GraphTypeTypeRegistry
         [Description("A list of a character's friends.")]
-        public Connection<StarWarsCharacter> FriendsConnection(ResolveFieldContext context, [FromSource] Droid droid, int? first, int? last, string after, string before)
+        public Connection<StarWarsCharacter> FriendsConnection(IResolveFieldContext context, [FromSource] Droid droid, int? first, int? last, string after, string before)
         {
             //for convenience, a typed [FromSource] is used, rather than the ResolveFieldContext
             //a typed ResolveFieldContext<> could be used, and the typed source argument eliminated, but
