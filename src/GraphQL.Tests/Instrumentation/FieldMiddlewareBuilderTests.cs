@@ -86,7 +86,7 @@ namespace GraphQL.Tests.Instrumentation
         {
             _builder.Use<SimpleMiddleware>();
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.Build(_context.Schema).Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();

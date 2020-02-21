@@ -13,6 +13,9 @@ namespace GraphQL.Instrumentation
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, IFieldMiddleware middleware)
             => builder.Use(next => context => middleware.Resolve(context, next));
 
+        public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+            => builder.Use((_, next) => middleware(next));
+
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
 
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
@@ -22,22 +25,28 @@ namespace GraphQL.Instrumentation
             static T CheckNotNull<T>(T instance, System.Type type)
             {
                 if (instance == null)
-                    throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in schema.Services.");
+                    throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in DI container.");
                 return instance;
+            }
+
+            static ISchema CheckSchemaNotNull(ISchema schema)
+            {
+                if (schema == null)
+                    throw new InvalidOperationException("Schema is null. Schema required for resolving middlewares from DI container.");
+                return schema;
             }
 
             // if IFieldMiddleware interface is supported, then just call its Resolve method
             if (typeof(IFieldMiddleware).IsAssignableFrom(middleware))
             {
-                return builder.Use(next =>
+                return builder.Use((schema, next) =>
                 {
-                    return context =>
-                    {
-                        // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
-                        return context.Schema is IServiceProvider provider
-                            ? CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware).Resolve(context, next)
-                            : throw NotSupported(context.Schema);
-                    };
+                    // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
+                    var instance = CheckSchemaNotNull(schema) is IServiceProvider provider
+                        ? CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware)
+                        : throw NotSupported(schema);
+
+                    return context => instance.Resolve(context, next);
                 });
             }
             // otherwise, we first find this method on the type and then call it through reflection
@@ -67,15 +76,14 @@ namespace GraphQL.Instrumentation
                     throw new InvalidOperationException($"The {INVOKE_METHOD_NAME} method of middleware should take a parameter of type {nameof(IResolveFieldContext)} as the first parameter and a parameter of type {nameof(FieldMiddlewareDelegate)} as the second parameter.");
                 }
 
-                return builder.Use(next =>
+                return builder.Use((schema, next) =>
                 {
-                    return context =>
-                    {
-                        // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
-                        return context.Schema is IServiceProvider provider
-                            ? (Task<object>)methodInfo.Invoke(CheckNotNull(provider.GetService(middleware), middleware), new object[] { context, next })
-                            : throw NotSupported(context.Schema);
-                    };
+                    // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
+                    object instance = CheckSchemaNotNull(schema) is IServiceProvider provider
+                        ? CheckNotNull(provider.GetService(middleware), middleware)
+                        : throw NotSupported(schema);
+
+                    return context => (Task<object>)methodInfo.Invoke(instance, new object[] { context, next });
                 });
             }
         }

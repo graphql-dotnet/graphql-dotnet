@@ -9,17 +9,17 @@ namespace GraphQL.Instrumentation
 {
     public interface IFieldMiddlewareBuilder
     {
-        IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
+        IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
 
         void ApplyTo(ISchema schema);
     }
 
     public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
     {
-        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleComponent;
-        private IList<Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _components;
+        private Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleComponent;
+        private IList<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _components;
 
-        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
             middleware = middleware ?? throw new ArgumentNullException(nameof(middleware));
 
@@ -30,7 +30,7 @@ namespace GraphQL.Instrumentation
             }
             else if (_components == null)
             {
-                _components = new List<Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
+                _components = new List<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
                 {
                     _singleComponent,
                     middleware
@@ -44,7 +44,7 @@ namespace GraphQL.Instrumentation
             return this;
         }
 
-        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
+        public FieldMiddlewareDelegate Build(ISchema schema = null, FieldMiddlewareDelegate start = null)
         {
             var app = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 
@@ -52,12 +52,12 @@ namespace GraphQL.Instrumentation
             {
                 foreach (var component in _components.Reverse())
                 {
-                    app = component(app);
+                    app = component(schema, app);
                 }
             }
             else if (_singleComponent != null)
             {
-                app = _singleComponent(app);
+                app = _singleComponent(schema, app);
             }
 
             return app;
@@ -76,7 +76,7 @@ namespace GraphQL.Instrumentation
                     {
                         var resolver = new MiddlewareResolver(field.Resolver);
 
-                        FieldMiddlewareDelegate app = Build(resolver.Resolve);
+                        FieldMiddlewareDelegate app = Build(schema, resolver.Resolve);
 
                         field.Resolver = new FuncFieldResolver<object>(app.Invoke);
                     }
