@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Bugs
 
         public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
         {
-            return overriddenBuilder.Build(null, start);
+            return overriddenBuilder.Build(start);
         }
 
         public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)

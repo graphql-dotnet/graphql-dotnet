@@ -44,7 +44,7 @@ namespace GraphQL.Instrumentation
             return this;
         }
 
-        public FieldMiddlewareDelegate Build(ISchema schema = null, FieldMiddlewareDelegate start = null)
+        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null, ISchema schema = null)
         {
             var app = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 
@@ -76,7 +76,7 @@ namespace GraphQL.Instrumentation
                     {
                         var resolver = new MiddlewareResolver(field.Resolver);
 
-                        FieldMiddlewareDelegate app = Build(schema, resolver.Resolve);
+                        FieldMiddlewareDelegate app = Build(resolver.Resolve, schema);
 
                         field.Resolver = new FuncFieldResolver<object>(app.Invoke);
                     }
