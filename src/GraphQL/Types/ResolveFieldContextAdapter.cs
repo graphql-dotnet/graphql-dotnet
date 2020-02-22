@@ -10,6 +10,10 @@ namespace GraphQL.Types
     {
         private readonly IResolveFieldContext _baseContext;
 
+        /// <summary>
+        /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
