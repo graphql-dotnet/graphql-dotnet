@@ -63,8 +63,9 @@ public interface IFieldMiddleware
 ```
 
 It doesn’t have to be implemented on your middleware. Then a search will be made for such a method
-with a suitable signature. Nevertheless, to improve performance, it is recommended to implement
-this interface.
+with a suitable signature.
+
+Nevertheless, **to improve performance, it is recommended to implement this interface.**
 
 The middleware delegate is defined as:
 
@@ -93,7 +94,7 @@ Perhaps the most important thing with Field Middlewares that you should be aware
 default `DocumentExecuter` applies middlewares to the schema only once while the schema is being
 initialized. After this, calling any `IFieldMiddlewareBuilder.Use` methods has no effect.
 
-Field Middleware, when applying the schema, **modifies** the resolver of each field. Therefore,
+Field Middleware, when applying to the schema, **modifies** the resolver of each field. Therefore,
 you should be careful when using different lifetimes (singleton, scoped, transient) for your
 GraphTypes, Schema and Field Middleware. You **can** use any of lifetime, but for example in
 case of using singleton lifetime for some GraphType and scoped lifetime for Field Middleware

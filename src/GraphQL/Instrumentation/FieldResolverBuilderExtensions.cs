@@ -20,12 +20,13 @@ namespace GraphQL.Instrumentation
 
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
-            static Exception NotSupported(ISchema schema) => new NotSupportedException($"{schema.GetType().FullName} should implement IServiceProvider interface");
+            static Exception NotSupported(ISchema schema) => new NotSupportedException($"'{schema.GetType().FullName}' should implement 'IServiceProvider' interface for resolving middlewares.");
 
             static T CheckNotNull<T>(T instance, System.Type type)
             {
                 if (instance == null)
-                    throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in DI container.");
+                    throw new InvalidOperationException(@$"Field middleware of type '{type.FullName}' must be registered in DI container.
+If you called 'FieldMiddlewareBuilder.Build()' manually set the 'schema' parameter.");
                 return instance;
             }
 
