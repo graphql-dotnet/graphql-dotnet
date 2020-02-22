@@ -6,18 +6,51 @@ using System.Threading.Tasks;
 
 namespace GraphQL.Instrumentation
 {
-    public static class FieldResolverBuilderExtensions
+    /// <summary>
+    /// Extension methods for <see cref="IFieldMiddlewareBuilder"/> to add middlewares.
+    /// These methods are built on top of <see cref="IFieldMiddlewareBuilder.Use(Func{ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate})"/>.
+    /// </summary>
+    public static class FieldMiddlewareBuilderExtensions
     {
         private const string INVOKE_METHOD_NAME = "Resolve";
 
+        /// <summary>
+        /// Adds middleware to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="middleware">Middleware instance.</param>
+        /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, IFieldMiddleware middleware)
             => builder.Use(next => context => middleware.Resolve(context, next));
 
+        /// <summary>
+        /// Adds the specified delegate to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
+        /// <br/><br/>
+        /// This is a compatibility shim when compiling delegates without schema specified. https://github.com/graphql-dotnet/graphql-dotnet/pull/1537#issuecomment-589798669
+        /// </summary>
+        /// <param name="middleware">Middleware delegate.</param>
+        /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
             => builder.Use((_, next) => middleware(next));
 
+        /// <summary>
+        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
+        /// <br/><br/>
+        /// Middleware will be created using DI container.
+        /// </summary>
+        /// <typeparam name="T">Middleware type.</typeparam>
+        /// <param name="builder"></param>
+        /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
 
+        /// <summary>
+        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
+        /// <br/><br/>
+        /// Middleware will be created using DI container.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="middleware">Middleware type.</param>
+        /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
             static Exception NotSupported(ISchema schema) => new NotSupportedException($"'{schema.GetType().FullName}' should implement 'IServiceProvider' interface for resolving middlewares.");

@@ -682,14 +682,14 @@ namespace GraphQL.Instrumentation
         public GraphQL.Instrumentation.FieldMiddlewareDelegate Build(GraphQL.Instrumentation.FieldMiddlewareDelegate start = null, GraphQL.Types.ISchema schema = null) { }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
-    public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
-    public static class FieldResolverBuilderExtensions
+    public static class FieldMiddlewareBuilderExtensions
     {
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
     }
+    public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
     public class FieldStat
     {
         public FieldStat() { }

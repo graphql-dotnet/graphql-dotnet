@@ -10,8 +10,10 @@ namespace GraphQL.Instrumentation
     {
         /// <summary>
         /// Adds the specified delegate to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
+        /// <br/><br/>
+        /// The delegate is used to unify the different ways of specifying middleware. See additional methods in <see cref="FieldMiddlewareBuilderExtensions"/>.
         /// </summary>
-        /// <param name="middleware"></param>
+        /// <param name="middleware">Middleware delegate.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
 
