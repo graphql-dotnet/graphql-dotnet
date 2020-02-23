@@ -84,8 +84,8 @@ namespace GraphQL.Tests.Bugs
             Name = "ProgramStepInput";
             Field(x => x.ProgramStepDefinitionId);
             Field(x => x.SequenceOrder);
-            Field("properties", x => x.PropertyValues,
-                type: typeof(ListGraphType<ProgramStepPropertyValueInputType>));//.Name("properties");
+            Field("properties", x => x.PropertyValues, // Here is a field with a name different from the name of the class property
+                type: typeof(ListGraphType<ProgramStepPropertyValueInputType>));
         }
     }
 
