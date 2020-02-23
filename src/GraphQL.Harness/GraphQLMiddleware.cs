@@ -67,7 +67,9 @@ namespace Example
                 options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
-                    options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                    options.FieldMiddleware
+                        .Use<CountFieldMiddleware>()
+                        .Use<InstrumentFieldsMiddleware>();
                 }
             });
 

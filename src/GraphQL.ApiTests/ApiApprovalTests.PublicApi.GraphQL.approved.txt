@@ -681,16 +681,16 @@ namespace GraphQL.Instrumentation
     {
         public FieldMiddlewareBuilder() { }
         public void ApplyTo(GraphQL.Types.ISchema schema) { }
-        public GraphQL.Instrumentation.FieldMiddlewareDelegate Build(GraphQL.Instrumentation.FieldMiddlewareDelegate start = null) { }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+    }
+    public static class FieldMiddlewareBuilderExtensions
+    {
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
+        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder) { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.Types.IResolveFieldContext context);
-    public static class FieldResolverBuilderExtensions
-    {
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
-            where T : new() { }
-    }
     public class FieldStat
     {
         public FieldStat() { }
@@ -699,12 +699,16 @@ namespace GraphQL.Instrumentation
         public string ReturnType { get; set; }
         public void AddLatency(double duration) { }
     }
+    public interface IFieldMiddleware
+    {
+        System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next);
+    }
     public interface IFieldMiddlewareBuilder
     {
         void ApplyTo(GraphQL.Types.ISchema schema);
-        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
+        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
     }
-    public class InstrumentFieldsMiddleware
+    public class InstrumentFieldsMiddleware : GraphQL.Instrumentation.IFieldMiddleware
     {
         public InstrumentFieldsMiddleware() { }
         public System.Threading.Tasks.Task<object> Resolve(GraphQL.Types.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
@@ -2017,7 +2021,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
