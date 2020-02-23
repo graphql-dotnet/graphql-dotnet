@@ -2033,7 +2033,7 @@ namespace GraphQL.Types
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
-        public System.IServiceProvider Services { get; set; }
+        public System.IServiceProvider Services { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }

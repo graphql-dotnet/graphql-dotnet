@@ -104,7 +104,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// Other types created by the service provider may include directives, middleware, validation rules, and name converters, among others.
         /// </summary>
-        public IServiceProvider Services { get; set; }
+        public IServiceProvider Services => _services;
 
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
