@@ -14,7 +14,7 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        private const string DirectivesMetadataKey = "directives";
+        private const string DIRECTIVES_METADATA_KEY = "directives";
 
         private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
@@ -530,14 +530,14 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(directive));
             
             Dictionary<string, SchemaDirectiveVisitor> directives;
-            if (metadataProvider.HasMetadata(DirectivesMetadataKey))
+            if (metadataProvider.HasMetadata(DIRECTIVES_METADATA_KEY))
             {
-                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DirectivesMetadataKey);
+                directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DIRECTIVES_METADATA_KEY);
             }
             else
             {
                 directives = new Dictionary<string, SchemaDirectiveVisitor>();
-                metadataProvider.Metadata.Add(DirectivesMetadataKey, directives);
+                metadataProvider.Metadata.Add(DIRECTIVES_METADATA_KEY, directives);
             }
 
             directives[directive.Name] = directive;
@@ -549,7 +549,7 @@ namespace GraphQL
         /// <param name="metadataProvider"> Metadata. </param>
         public static IEnumerable<SchemaDirectiveVisitor> GetDirectives(this IProvideMetadata metadataProvider)
         {
-            var directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DirectivesMetadataKey);
+            var directives = metadataProvider.GetMetadata<Dictionary<string, SchemaDirectiveVisitor>>(DIRECTIVES_METADATA_KEY);
 
             if (directives == null)
                 return Array.Empty<SchemaDirectiveVisitor>();
