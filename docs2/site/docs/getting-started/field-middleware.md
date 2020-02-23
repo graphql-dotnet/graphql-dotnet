@@ -84,6 +84,7 @@ If you use `IFieldMiddlewareBuilder.Use` overloads which accept type parameter (
 those that do not accept a `IFieldMiddleware` instance or a middleware delegate) then your
 middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
 the Field Middleware constructor, provided that you have registered them correctly in DI.
+Note that it is required to have a schema that inherits from `Schema` or implements `IServiceProvider`.
 
 Also, the middleware itself should be registered in DI:
 
