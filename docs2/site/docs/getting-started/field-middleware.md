@@ -53,7 +53,7 @@ _.FieldMiddleware.Use(next =>
 });
 ```
 
-Also you can implement `IFieldMiddleware` interface in your Field Middleware:
+Also, you can implement the `IFieldMiddleware` interface in your Field Middleware class:
 
 ```csharp
 public interface IFieldMiddleware
