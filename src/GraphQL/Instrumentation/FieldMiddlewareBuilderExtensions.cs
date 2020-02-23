@@ -26,7 +26,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Adds the specified delegate to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
         /// <br/><br/>
-        /// This is a compatibility shim when compiling delegates without schema specified. https://github.com/graphql-dotnet/graphql-dotnet/pull/1537#issuecomment-589798669
+        /// This is a compatibility shim when compiling delegates without schema specified.
         /// </summary>
         /// <param name="middleware">Middleware delegate.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
