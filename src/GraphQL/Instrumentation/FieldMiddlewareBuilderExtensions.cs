@@ -46,7 +46,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
         /// <br/><br/>
-        /// Middleware will be created using DI container.
+        /// Middleware will be created using the DI container obtained from the <see cref="Schema"/>.
         /// </summary>
         /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <param name="middleware">Middleware type.</param>
