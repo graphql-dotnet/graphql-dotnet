@@ -17,7 +17,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Adds middleware to the list of delegates that will be applied to the schema when invoking <see cref="ApplyTo(ISchema)"/>.
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <param name="middleware">Middleware instance.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, IFieldMiddleware middleware)
@@ -39,7 +39,7 @@ namespace GraphQL.Instrumentation
         /// Middleware will be created using DI container.
         /// </summary>
         /// <typeparam name="T">Middleware type.</typeparam>
-        /// <param name="builder"></param>
+        /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) => Use(builder, typeof(T));
 
@@ -48,7 +48,7 @@ namespace GraphQL.Instrumentation
         /// <br/><br/>
         /// Middleware will be created using DI container.
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <param name="middleware">Middleware type.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
