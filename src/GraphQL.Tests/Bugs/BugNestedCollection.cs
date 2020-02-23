@@ -29,9 +29,9 @@ namespace GraphQL.Tests.Bugs
                         ]  }}"
                     .ToInputs();
 
-            string query = @"mutation createProgram($program: ProgramInput!) {  createProgram(program: $program)}";
+            string query = @"mutation createProgram($program: ProgramInput!) { createProgram(program: $program) }";
 
-            string expected = @"  {    ""createProgram"": true  }";
+            string expected = @"{ ""createProgram"": true }";
 
             AssertQuerySuccess(query, expected, inputs);
         }

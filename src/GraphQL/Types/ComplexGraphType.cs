@@ -309,11 +309,15 @@ namespace GraphQL.Types
 
             var builder = FieldBuilder.Create<TSourceType, TProperty>(type)
                 .Name(name)
-                .Metadata(FieldType.ORIGINAL_EXPRESSION_PROPERTY_NAME, expression.TryNameOf(), ignoreNull: true)
                 .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
+
+            if (expression.Body is MemberExpression expr)
+            {
+                builder.FieldType.Metadata[FieldType.ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+            }
 
             AddField(builder.FieldType);
             return builder;

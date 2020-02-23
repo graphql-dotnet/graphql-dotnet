@@ -89,13 +89,6 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Metadata(string key, object value, bool ignoreNull = false)
-        {
-            if (value != null || !ignoreNull)
-                FieldType.Metadata[key] = value;
-            return this;
-        }
-
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
         {
             FieldType.Resolver = resolver;
