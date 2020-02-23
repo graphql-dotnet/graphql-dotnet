@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -14,7 +15,9 @@ namespace GraphQL.Validation.Rules
         public Func<string, string> DuplicateOperationNameMessage => opName =>
             $"There can only be one operation named {opName}.";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var frequency = new HashSet<string>();
 
@@ -42,7 +45,7 @@ namespace GraphQL.Validation.Rules
                             context.ReportError(error);
                         }
                     });
-            });
+            }).ToTask();
         }
     }
 }

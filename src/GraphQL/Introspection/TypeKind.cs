@@ -21,4 +21,16 @@ namespace GraphQL.Introspection
         [Description("Indicates this type is a non-null. `ofType` is a valid field.")]
         NON_NULL = 7
     }
+
+    internal static class TypeKindBoxed
+    {
+        public static readonly object SCALAR = TypeKind.SCALAR;
+        public static readonly object OBJECT = TypeKind.OBJECT;
+        public static readonly object INTERFACE = TypeKind.INTERFACE;
+        public static readonly object UNION = TypeKind.UNION;
+        public static readonly object ENUM = TypeKind.ENUM;
+        public static readonly object INPUT_OBJECT = TypeKind.INPUT_OBJECT;
+        public static readonly object LIST = TypeKind.LIST;
+        public static readonly object NON_NULL = TypeKind.NON_NULL;
+    }
 }

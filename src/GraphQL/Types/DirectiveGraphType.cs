@@ -1,11 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Directives must only be used in the locations they are declared to belong in.
+    /// https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives
+    /// </summary>
     public enum DirectiveLocation
     {
-        // Operations
+        // ExecutableDirectiveLocation
+
         [Description("Location adjacent to a query operation.")]
         Query,
         [Description("Location adjacent to a mutation operation.")]
@@ -20,7 +26,9 @@ namespace GraphQL.Types
         FragmentSpread,
         [Description("Location adjacent to an inline fragment.")]
         InlineFragment,
-        // Schema Definitions
+
+        // TypeSystemDirectiveLocation
+
         [Description("Location adjacent to a schema definition.")]
         Schema,
         [Description("Location adjacent to a scalar definition.")]
@@ -51,24 +59,26 @@ namespace GraphQL.Types
     /// </summary>
     public class DirectiveGraphType : INamedType
     {
-        public static IncludeDirective Include = new IncludeDirective();
-        public static SkipDirective Skip = new SkipDirective();
-        public static GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
-
-        private readonly List<DirectiveLocation> _directiveLocations = new List<DirectiveLocation>();
+        public static readonly IncludeDirective Include = new IncludeDirective();
+        public static readonly SkipDirective Skip = new SkipDirective();
+        public static readonly GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
 
         public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
         {
             Name = name;
-            _directiveLocations.AddRange(locations);
+            Locations.AddRange(locations);
+
+            if (Locations.Count == 0)
+                throw new ArgumentException("Directive must have locations", nameof(locations));
         }
 
         public string Name { get; set; }
+
         public string Description { get; set; }
 
         public QueryArguments Arguments { get; set; }
 
-        public IEnumerable<DirectiveLocation> Locations => _directiveLocations;
+        public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
     }
 
     /// <summary>

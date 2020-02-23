@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -15,7 +16,9 @@ namespace GraphQL.Validation.Rules
             return $"There can only be one fragment named \"{fragName}\"";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly UniqueFragmentNames Instance = new UniqueFragmentNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var knownFragments = new Dictionary<string, FragmentDefinition>();
 
@@ -39,7 +42,7 @@ namespace GraphQL.Validation.Rules
                         knownFragments[fragmentName] = fragmentDefinition;
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

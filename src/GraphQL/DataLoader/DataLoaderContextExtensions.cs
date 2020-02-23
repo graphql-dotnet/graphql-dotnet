@@ -8,7 +8,7 @@ namespace GraphQL.DataLoader
 {
     public static class DataLoaderContextExtensions
     {
-        public static Func<CancellationToken, TResult> WrapNonCancellableFunc<TResult>(Func<TResult> func) => (cancellationToken) => func();
+        public static Func<CancellationToken, TResult> WrapNonCancellableFunc<TResult>(Func<TResult> func) => cancellationToken => func();
 
         public static Func<T, CancellationToken, TResult> WrapNonCancellableFunc<T, TResult>(Func<T, TResult> func) => (arg, cancellationToken) => func(arg);
 

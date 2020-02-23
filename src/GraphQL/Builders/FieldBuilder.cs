@@ -22,13 +22,11 @@ namespace GraphQL.Builders
 
     public class FieldBuilder<TSourceType, TReturnType>
     {
-        private readonly EventStreamFieldType _fieldType;
-
-        public EventStreamFieldType FieldType => _fieldType;
+        public EventStreamFieldType FieldType { get; }
 
         private FieldBuilder(EventStreamFieldType fieldType)
         {
-            _fieldType = fieldType;
+            FieldType = fieldType;
         }
 
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
@@ -53,80 +51,80 @@ namespace GraphQL.Builders
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Type(IGraphType type)
+        public virtual FieldBuilder<TSourceType, TReturnType> Type(IGraphType type)
         {
-            _fieldType.ResolvedType = type;
+            FieldType.ResolvedType = type;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Name(string name)
+        public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
             NameValidator.ValidateName(name);
 
-            _fieldType.Name = name;
+            FieldType.Name = name;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Description(string description)
+        public virtual FieldBuilder<TSourceType, TReturnType> Description(string description)
         {
-            _fieldType.Description = description;
+            FieldType.Description = description;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason)
+        public virtual FieldBuilder<TSourceType, TReturnType> DeprecationReason(string deprecationReason)
         {
-            _fieldType.DeprecationReason = deprecationReason;
+            FieldType.DeprecationReason = deprecationReason;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default)
+        public virtual FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType defaultValue = default)
         {
-            _fieldType.DefaultValue = defaultValue;
+            FieldType.DefaultValue = defaultValue;
             return this;
         }
 
         internal FieldBuilder<TSourceType, TReturnType> DefaultValue(object defaultValue)
         {
-            _fieldType.DefaultValue = defaultValue;
+            FieldType.DefaultValue = defaultValue;
             return this;
         }
 
         public FieldBuilder<TSourceType, TReturnType> Metadata(string key, object value, bool ignoreNull = false)
         {
             if (value != null || !ignoreNull)
-                _fieldType.Metadata[key] = value;
+                FieldType.Metadata[key] = value;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver resolver)
         {
-            _fieldType.Resolver = resolver;
+            FieldType.Resolver = resolver;
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Resolve(Func<ResolveFieldContext<TSourceType>, TReturnType> resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
         {
             return Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
         }
 
-        public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<ResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
+        public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
         {
             return Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
         }
 
-        public FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+        public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
         {
             return new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
             => Argument<TArgumentGraphType>(name, arg =>
             {
                 arg.Description = description;
                 configure?.Invoke(arg);
             });
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default, Action<QueryArgument> configure = null)
             => Argument<TArgumentGraphType>(name, arg =>
             {
@@ -135,30 +133,30 @@ namespace GraphQL.Builders
                 configure?.Invoke(arg);
             });
 
-        public FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument> configure = null)
         {
             var arg = new QueryArgument(typeof(TArgumentGraphType))
             {
                 Name = name,
             };
             configure?.Invoke(arg);
-            _fieldType.Arguments.Add(arg);
+            FieldType.Arguments.Add(arg);
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
+        public virtual FieldBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
         {
             configure(FieldType);
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> Subscribe(Func<ResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> subscribe)
+        public virtual FieldBuilder<TSourceType, TReturnType> Subscribe(Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> subscribe)
         {
             FieldType.Subscriber = new EventStreamResolver<TSourceType, TReturnType>(subscribe);
             return this;
         }
 
-        public FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<ResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType>>> subscribeAsync)
+        public virtual FieldBuilder<TSourceType, TReturnType> SubscribeAsync(Func<IResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType>>> subscribeAsync)
         {
             FieldType.AsyncSubscriber = new AsyncEventStreamResolver<TSourceType, TReturnType>(subscribeAsync);
             return this;

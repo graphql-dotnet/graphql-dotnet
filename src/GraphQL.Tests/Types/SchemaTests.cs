@@ -128,6 +128,20 @@ namespace GraphQL.Tests.Types
             DoesNotContainTypeNames(schema, "ASchemaType!");
         }
 
+        [Fact]
+        public void handles_cycle_field_type()
+        {
+            var schema = new SimpleCycleSchema();
+            schema.FindType("CycleType").ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void handles_stackoverflow_exception_for_cycle_field_type()
+        {
+            var schema = new ACyclingDerivingSchema(new FuncServiceProvider(t => t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null));
+            Should.Throw<InvalidOperationException>(() => schema.FindType("abcd"));
+        }
+
         private void ContainsTypeNames(ISchema schema, params string[] typeNames)
         {
             typeNames.Apply(typeName =>
@@ -301,7 +315,7 @@ namespace GraphQL.Tests.Types
             Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new QueryArgument[] { new QueryArgument<DInputType> {Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()} }),
+                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()}),
                 resolve: ctx => new {id = "id"});
             Field<ListGraphType<DListType>>("alist");
         }
@@ -366,5 +380,49 @@ namespace GraphQL.Tests.Types
         public WithoutIsTypeOf2Type()
         {
         }
+    }
+
+    public class SimpleCycleSchema : Schema
+    {
+        public SimpleCycleSchema()
+        {
+            Query = new CycleType();
+        }
+    }
+
+    public class CycleType : ObjectGraphType
+    {
+        public CycleType()
+        {
+            Field<CycleType>();
+        }
+    }
+
+    public class ACyclingDerivingSchema : Schema
+    {
+        public ACyclingDerivingSchema(IServiceProvider provider) : base(provider)
+        {
+            Query = new CyclingQueryType();
+        }
+    }
+
+    public class CyclingQueryType : ObjectGraphType
+    {
+        public CyclingQueryType()
+        {
+            Field<AbstractGraphType>();
+        }
+    }
+
+    public abstract class AbstractGraphType : ObjectGraphType
+    {
+        public AbstractGraphType()
+        {
+            Field<AbstractGraphType>();
+        }
+    }
+
+    public class ConcreteGraphType : AbstractGraphType
+    {
     }
 }

@@ -4,12 +4,12 @@
 
 A GraphQL object type has a name and fields, but at some point those fields have to resolve to some concrete data. That's where the scalar types come in: they represent the leaves of the query.
 
-These are the scalars provided by the GraphQL Specification.
+These are the scalars provided by the [GraphQL Specification](https://graphql.github.io/graphql-spec/June2018/#sec-Scalars).
 
 | GraphQL     | GraphQL .NET        | .NET                    |
 |-------------|---------------------|-------------------------|
 | `String`    | `StringGraphType`   | `string`                |
-| `Int`       | `IntGraphType`      | `int` `long`            |
+| `Int`       | `IntGraphType`      | `int`                   |
 | `Float`     | `FloatGraphType`    | `double`                |
 | `Boolean`   | `BooleanGraphType`  | `bool`                  |
 | `ID`        | `IdGraphType`       | `int`, `long`, `string` |
@@ -31,9 +31,11 @@ These are additional scalars provided by this project.
 | `Short` | `ShortGraphType` | `short` |
 | `UShort` | `UShortGraphType` | `ushort` |
 | `UInt` | `UIntGraphType` | `uint` |
+| `Long` | `LongGraphType` | `long` |
 | `ULong` | `ULongGraphType` | `ulong` |
 | `Byte` | `ByteGraphType` | `byte` |
-| `SByte` | `SByteGraphType` | `sbyte` 
+| `SByte` | `SByteGraphType` | `sbyte`
+| `BigInt` | `BigIntGraphType` | `BigInteger`
 
 Lists of data are also supported with any Scalar or Object types.
 

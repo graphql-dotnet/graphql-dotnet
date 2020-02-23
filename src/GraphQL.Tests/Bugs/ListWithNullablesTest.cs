@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Bugs
                 }";
             var expected = @"
                 {
-                    'list': [{ value: ""one""}, null, { value: ""three"" }]
+                    ""list"": [{ ""value"": ""one""}, null, { ""value"": ""three"" }]
                 }";
             AssertQuerySuccess(query, expected);
         }

@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Types
         internal class ComplexType<T> : ComplexGraphType<T> {
             public ComplexType()
             {
-                Name = typeof(T).GetFriendlyName();
+                Name = typeof(T).GetFriendlyName().Replace("<", "Of").Replace(">", "");
             }
         }
 
@@ -38,6 +38,9 @@ namespace GraphQL.Tests.Types
             public bool someBoolean { get; set; }
             [DefaultValue(typeof(DateTime), "2019/03/14")]
             public DateTime someDate { get; set; }
+            /// <summary>
+            /// Description from xml comment
+            /// </summary>
             public short someShort { get; set; }
             public ushort someUShort { get; set; }
             public ulong someULong { get; set; }
@@ -66,17 +69,21 @@ namespace GraphQL.Tests.Types
         internal enum Direction
         {
             Asc,
+            /// <summary>
+            /// Descending Order
+            /// </summary>
             Desc,
             [Obsolete("Do not use Random. This makes no sense!")]
             Random
         }
 
         [Fact]
-        public void auto_register()
+        public void auto_register_object_graph_type()
         {
             GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
             type.Fields.Count().ShouldBe(18);
@@ -87,6 +94,7 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+            type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from xml comment");
             type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
             type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
@@ -97,6 +105,39 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
+            enumType.Values["DESC"].Description.ShouldBe("Descending Order");
+            enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
+        }
+
+        [Fact]
+        public void auto_register_input_object_graph_type()
+        {
+            GraphTypeTypeRegistry.Register<Money, AutoRegisteringInputObjectGraphType<Money>>();
+
+            var type = new AutoRegisteringInputObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            type.Name.ShouldBe(nameof(TestObject));
+            type.Description.ShouldBe("Object for test");
+            type.DeprecationReason.ShouldBe("Obsolete for test");
+            type.Fields.Count().ShouldBe(18);
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(IntGraphType));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
+            type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
+            type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from xml comment");
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringInputObjectGraphType<Money>));
+
+            var enumType = new EnumerationGraphType<Direction>();
+            enumType.Values["DESC"].Description.ShouldBe("Descending Order");
             enumType.Values["RANDOM"].DeprecationReason.ShouldBe("Do not use Random. This makes no sense!");
         }
 
@@ -239,7 +280,7 @@ namespace GraphQL.Tests.Types
 
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
-            exception.ParamName.ShouldBe("Type");
+            exception.ParamName.ShouldBe("fieldType");
             exception.Message.ShouldStartWith("The declared field 'name' on 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
@@ -257,8 +298,8 @@ namespace GraphQL.Tests.Types
 
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
-            exception.ParamName.ShouldBe("Type");
-            exception.Message.ShouldStartWith("The declared field 'genericname' on 'List<Droid>' requires a field 'Type' when no 'ResolvedType' is provided.");
+            exception.ParamName.ShouldBe("fieldType");
+            exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
         [Theory]
@@ -292,7 +333,7 @@ namespace GraphQL.Tests.Types
             var type = new ComplexType<TestObject>();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Theory]
@@ -303,7 +344,7 @@ namespace GraphQL.Tests.Types
             var type = new ComplexType<TestObject>();
             var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>().Name(fieldName));
 
-            exception.Message.ShouldStartWith($"A field name can not be null or empty.");
+            exception.Message.ShouldStartWith("A field name can not be null or empty.");
         }
 
         [Theory]

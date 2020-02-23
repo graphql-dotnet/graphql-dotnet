@@ -1,15 +1,14 @@
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
-    using System.Collections;
-    using System.ComponentModel;
-
     public static class TypeExtensions
     {
         /// <summary>
@@ -50,20 +49,12 @@ namespace GraphQL
             return type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
-        /// <summary>
-        /// Returns the first non-null value from executing the func against the enumerable
-        /// </summary>
-        /// <returns><c>null</c> is all values were null.</returns>
-        public static TReturn FirstValue<TItem, TReturn>(this IEnumerable<TItem> enumerable, Func<TItem, TReturn> func)
-            where TReturn : class
+        public static bool IsPrimitive(this Type type)
         {
-            foreach (TItem item in enumerable)
-            {
-                TReturn @object = func(item);
-                if (@object != null) return @object;
-            }
-
-            return null;
+            return type.IsPrimitive
+                || type == typeof(string)
+                || type == typeof(DateTime)
+                || type == typeof(DateTimeOffset);
         }
 
         /// <summary>
@@ -101,7 +92,7 @@ namespace GraphQL
 
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
-            return typeName.EndsWith(nameof(Type))
+            return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
                 ? typeName.Remove(typeName.Length - nameof(Type).Length)
                 : typeName;
         }
@@ -112,7 +103,8 @@ namespace GraphQL
         /// <param name="type">The type for which a graph type is desired.</param>
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
-        /// <remarks>This can handle arrays and lists, but not other collection types.</remarks>
+        /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
+        /// <example><see>IList<string></see> -> <see>ListGraphType<StringGraphType></see></example>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -173,7 +165,7 @@ namespace GraphQL
 
             var genericArgs = type.GetGenericArguments();
 
-            if (genericArgs.Any())
+            if (genericArgs.Length > 0)
             {
                 int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0)
@@ -185,7 +177,7 @@ namespace GraphQL
                 for (int i = 0; i < typeParameters.Length; ++i)
                 {
                     string typeParamName = GetFriendlyName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                    friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
                 friendlyName += ">";
             }
@@ -245,7 +237,7 @@ namespace GraphQL
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
 
-        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description;
+        public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
 
         public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }

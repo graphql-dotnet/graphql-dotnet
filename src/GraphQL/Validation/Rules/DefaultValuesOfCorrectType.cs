@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -14,19 +15,21 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class DefaultValuesOfCorrectType : IValidationRule
     {
-        public Func<string, string, string, string> BadValueForNonNullArgMessage =
+        public readonly Func<string, string, string, string> BadValueForNonNullArgMessage =
             (varName, type, guessType) => $"Variable \"{varName}\" of type \"{type}\" is required and" +
                                           " will not use default value. " +
                                           $"Perhaps you mean to use type \"{guessType}\"?";
 
-        public Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
+        public readonly Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
             (varName, type, value, verboseErrors) =>
             {
                 var message = verboseErrors != null ? "\n" + string.Join("\n", verboseErrors) : "";
                 return $"Variable \"{varName}\" of type \"{type}\" has invalid default value {value}.{message}";
             };
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -51,7 +54,7 @@ namespace GraphQL.Validation.Rules
                     if (inputType != null && defaultValue != null)
                     {
                         var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
-                        if (errors.Any())
+                        if (errors.Count > 0)
                         {
                             context.ReportError(new ValidationError(
                                 context.OriginalQuery,
@@ -65,7 +68,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

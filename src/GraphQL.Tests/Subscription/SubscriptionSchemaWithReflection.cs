@@ -7,9 +7,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
 {
-    public class SubscriptionSchemaWithReflection
+    public static class SubscriptionSchemaWithReflection
     {
-        public static string TypeDefs = @"
+        private const string TypeDefs = @"
             type MessageFrom {
                 id: String
                 displayName: String
@@ -38,10 +38,7 @@ namespace GraphQL.Tests.Subscription
             Chat = chat;
             Schema = GraphQL.Types.Schema.For(
                 TypeDefs,
-                (config) =>
-                {
-                    config.Types.Include<Subscription>();
-                });
+                config => config.Types.Include<Subscription>());
         }
     }
 

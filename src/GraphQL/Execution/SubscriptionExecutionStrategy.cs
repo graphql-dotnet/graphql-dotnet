@@ -16,7 +16,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -35,10 +35,10 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var node = kvp.Value;
 
-                if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
+                if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
-                streams[name] = await ResolveEventStreamAsync(context, node);
+                streams[name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
             }
 
             return streams;
@@ -93,7 +93,7 @@ namespace GraphQL.Execution
                 }
                 else if (eventStreamField?.AsyncSubscriber != null)
                 {
-                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext);
+                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else
                 {
@@ -103,26 +103,28 @@ namespace GraphQL.Execution
                 return subscription
                     .Select(value =>
                     {
-                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.Path);
+                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
                         executionNode.Source = value;
                         return executionNode;
                     })
                     .SelectMany(async executionNode =>
                     {
-                        foreach (var listener in context.Listeners)
-                        {
-                            await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
-                                .ConfigureAwait(false);
-                        }
+                        if (context.Listeners != null)
+                            foreach (var listener in context.Listeners)
+                            {
+                                await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
+                                    .ConfigureAwait(false);
+                            }
 
                         // Execute the whole execution tree and return the result
                         await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
-                        foreach (var listener in context.Listeners)
-                        {
-                            await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
-                                .ConfigureAwait(false);
-                        }
+                        if (context.Listeners != null)
+                            foreach (var listener in context.Listeners)
+                            {
+                                await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
+                                    .ConfigureAwait(false);
+                            }
 
                         return new ExecutionResult
                         {

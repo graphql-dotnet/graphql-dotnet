@@ -1,4 +1,5 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -21,7 +22,9 @@ namespace GraphQL.Validation.Rules
             return $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -50,7 +53,7 @@ namespace GraphQL.Validation.Rules
                             node.Type));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

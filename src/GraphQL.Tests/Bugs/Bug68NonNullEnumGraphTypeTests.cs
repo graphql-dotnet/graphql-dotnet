@@ -131,17 +131,17 @@ namespace GraphQL.Tests.Bugs
             return found?.Value;
         }
 
-        static string PureValue(object value)
+        private static string PureValue(object value)
         {
             return value.ToString().Replace("\"", "").Replace("'", "").Replace("_", "");
         }
 
-        static string DeriveGraphQlName(string name)
+        private static string DeriveGraphQlName(string name)
         {
             return $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
         }
 
-        static string DeriveEnumValueName(string name)
+        private static string DeriveEnumValueName(string name)
         {
             return Regex
               .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")

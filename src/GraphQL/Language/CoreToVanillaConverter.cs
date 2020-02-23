@@ -5,6 +5,7 @@ using GraphQLParser;
 using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
+using System.Numerics;
 
 namespace GraphQL.Language
 {
@@ -12,7 +13,7 @@ namespace GraphQL.Language
     {
         private readonly ISource _body;
 
-        private CoreToVanillaConverter(string body)
+        internal CoreToVanillaConverter(string body)
         {
             _body = new Source(body);
         }
@@ -80,15 +81,16 @@ namespace GraphQL.Language
 
         public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
-            var defs = new VariableDefinitions();
+            VariableDefinitions defs = null;
 
             if (source != null)
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    defs.Add(def);
+                    (defs ?? (defs = new VariableDefinitions())).Add(def);
                 }
             }
+
             return defs;
         }
 
@@ -123,26 +125,13 @@ namespace GraphQL.Language
             return set;
         }
 
-        public ISelection Selection(ASTNode source)
+        public ISelection Selection(ASTNode source) => source.Kind switch
         {
-            switch (source.Kind)
-            {
-                case ASTNodeKind.Field:
-                {
-                    return Field((GraphQLFieldSelection) source);
-                }
-                case ASTNodeKind.FragmentSpread:
-                {
-                    return FragmentSpread((GraphQLFragmentSpread) source);
-                }
-                case ASTNodeKind.InlineFragment:
-                {
-                    return InlineFragment((GraphQLInlineFragment) source);
-                }
-            }
-
-            throw new ExecutionError($"Unmapped selection {source.Kind}");
-        }
+            ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
+            ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
+            ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
+            _ => throw new ExecutionError($"Unmapped selection {source.Kind}")
+        };
 
         public Field Field(GraphQLFieldSelection source)
         {
@@ -154,32 +143,40 @@ namespace GraphQL.Language
             return field;
         }
 
-        public Directives Directives(IEnumerable<GraphQLDirective> directives)
+        public Directives Directives(IEnumerable<GraphQLDirective> source)
         {
-            var target = new Directives();
+            Directives target = null;
 
-            if (directives != null)
+            if (source != null)
             {
-                foreach (var d in directives)
+                foreach (var d in source)
                 {
-                    var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
-                    dir.Arguments = Arguments(d.Arguments);
-                    target.Add(dir);
+                    (target ?? (target = new Directives())).Add(Directive(d));
                 }
             }
 
             return target;
         }
 
+        public Directive Directive(GraphQLDirective d)
+        {
+            var dir = new Directive(Name(d.Name)).WithLocation(d, _body);
+            dir.Arguments = Arguments(d.Arguments);
+            return dir;
+        }
+
         public Arguments Arguments(IEnumerable<GraphQLArgument> source)
         {
-            var target = new Arguments();
+            Arguments target = null;
 
-            foreach (var s in source)
+            if (source != null)
             {
-                var arg = new Argument(Name(s.Name)).WithLocation(s.Name, _body);
-                arg.Value = Value(s.Value);
-                target.Add(arg);
+                foreach (var a in source)
+                {
+                    var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
+                    arg.Value = Value(a.Value);
+                    (target ?? (target = new Arguments())).Add(arg);
+                }
             }
 
             return target;
@@ -207,6 +204,12 @@ namespace GraphQL.Language
                     if (long.TryParse(str.Value, out var longResult))
                     {
                         return new LongValue(longResult).WithLocation(str, _body);
+                    }
+
+                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    {
+                        return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
                     throw new ExecutionError($"Invalid number {str.Value}");
@@ -269,19 +272,19 @@ namespace GraphQL.Language
             {
                 case ASTNodeKind.NamedType:
                 {
-                    var name = (GraphQLNamedType) type;
+                    var name = (GraphQLNamedType)type;
                     return new NamedType(Name(name.Name)).WithLocation(name, _body);
                 }
 
                 case ASTNodeKind.NonNullType:
                 {
-                    var nonNull = (GraphQLNonNullType) type;
+                    var nonNull = (GraphQLNonNullType)type;
                     return new NonNullType(Type(nonNull.Type)).WithLocation(nonNull, _body);
                 }
 
                 case ASTNodeKind.ListType:
                 {
-                    var list = (GraphQLListType) type;
+                    var list = (GraphQLListType)type;
                     return new ListType(Type(list.Type)).WithLocation(list, _body);
                 }
             }
@@ -294,22 +297,13 @@ namespace GraphQL.Language
             return new NameNode(name.Value).WithLocation(name, _body);
         }
 
-        public static OperationType ToOperationType(OperationTypeParser type)
+        public static OperationType ToOperationType(OperationTypeParser type) => type switch
         {
-            switch (type)
-            {
-                case OperationTypeParser.Query:
-                    return OperationType.Query;
-
-                case OperationTypeParser.Mutation:
-                    return OperationType.Mutation;
-
-                case OperationTypeParser.Subscription:
-                    return OperationType.Subscription;
-            }
-
-            throw new ExecutionError($"Unmapped operation type {type}");
-        }
+            OperationTypeParser.Query => OperationType.Query,
+            OperationTypeParser.Mutation => OperationType.Mutation,
+            OperationTypeParser.Subscription => OperationType.Subscription,
+            _ => throw new ExecutionError($"Unmapped operation type {type}")
+        };
     }
 
     public static class AstNodeExtensions

@@ -74,7 +74,7 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = typeof(TConnectionType),
-                Arguments = new QueryArguments(new QueryArgument[0]),
+                Arguments = new QueryArguments(),
             };
             return new ConnectionBuilder<TSourceType>(fieldType, false, false, null)
                 .Unidirectional();
@@ -172,7 +172,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public void Resolve(Func<ResolveConnectionContext<TSourceType>, object> resolver)
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
@@ -182,7 +182,7 @@ namespace GraphQL.Builders
             });
         }
 
-        public void ResolveAsync(Func<ResolveConnectionContext<TSourceType>, Task<object>> resolver)
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object>> resolver)
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
@@ -192,7 +192,7 @@ namespace GraphQL.Builders
             });
         }
 
-        private void CheckForErrors(ResolveConnectionContext<TSourceType> args)
+        private void CheckForErrors(IResolveConnectionContext<TSourceType> args)
         {
             if (args.First.HasValue && args.Last.HasValue)
             {

@@ -1,5 +1,7 @@
 using System.Linq;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -10,26 +12,26 @@ namespace GraphQL.Tests.Bugs
         public void supports_nested_objects()
         {
             var inputs =
-               @"{  'program':
-                    {   'name': 'TEST Program',
-                        'modifiedBy': 'TEST',
-                        'isActive': true,
-                        'description': 'Testing from graphql explorer',
-                        'messageNamespace': 'http://foo.bar',
-                        'messageRoot': 'Foo',
-                        'steps': [
-                                    { 'programStepDefinitionId': 1,
-                                      'sequenceOrder': 1,
-                                      'properties': [ {'stepPropertyId': 1, 'propertyValue': '60' } ] },
-                                    { 'programStepDefinitionId': 2,
-                                      'sequenceOrder': 2,
-                                      'properties': [] }
+               @"{  ""program"":
+                    {   ""name"": ""TEST Program"",
+                        ""modifiedBy"": ""TEST"",
+                        ""isActive"": true,
+                        ""description"": ""Testing from graphql explorer"",
+                        ""messageNamespace"": ""http://foo.bar"",
+                        ""messageRoot"": ""Foo"",
+                        ""steps"": [
+                                    { ""programStepDefinitionId"": 1,
+                                      ""sequenceOrder"": 1,
+                                      ""properties"": [ {""stepPropertyId"": 1, ""propertyValue"": ""60"" } ] },
+                                    { ""programStepDefinitionId"": 2,
+                                      ""sequenceOrder"": 2,
+                                      ""properties"": [] }
                         ]  }}"
                     .ToInputs();
 
-            var query = @"mutation createProgram($program: ProgramInput!) {  createProgram(program: $program)}";
+            string query = @"mutation createProgram($program: ProgramInput!) {  createProgram(program: $program)}";
 
-            var expected = @"  {    'createProgram': true  }";
+            string expected = @"  {    ""createProgram"": true  }";
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -53,8 +55,8 @@ namespace GraphQL.Tests.Bugs
                 { Name = "program" }),
                 resolve: context =>
                 {
-                    var Program = context.GetArgument<Program>("program");
-                    Assert.True(Program.Steps.Any(step => step.PropertyValues.Count > 0));
+                    var program = context.GetArgument<Program>("program");
+                    program.Steps.Any(step => step.PropertyValues.Count > 0).ShouldBeTrue();
                     return true;
                 });
         }
@@ -83,7 +85,7 @@ namespace GraphQL.Tests.Bugs
             Field(x => x.ProgramStepDefinitionId);
             Field(x => x.SequenceOrder);
             Field("properties", x => x.PropertyValues,
-                type: typeof(ListGraphType<ProgramStepPropertyValueInputType>)).Name("properties");
+                type: typeof(ListGraphType<ProgramStepPropertyValueInputType>));//.Name("properties");
         }
     }
 

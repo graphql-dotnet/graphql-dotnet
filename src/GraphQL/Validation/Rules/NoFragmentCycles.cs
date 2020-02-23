@@ -1,21 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
     /// No fragment cycles
+    ///
+    /// A GraphQL document is only valid if it does not contain fragment cycles.
     /// </summary>
     public class NoFragmentCycles : IValidationRule
     {
         public string CycleErrorMessage(string fragName, string[] spreadNames)
         {
-            var via = spreadNames.Any() ? " via " + string.Join(", ", spreadNames) : "";
+            var via = spreadNames.Length > 0 ? " via " + string.Join(", ", spreadNames) : "";
             return $"Cannot spread fragment \"{fragName}\" within itself{via}.";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             // Tracks already visited fragments to maintain O(N) and to ensure that cycles
             // are not redundantly reported.
@@ -36,7 +41,7 @@ namespace GraphQL.Validation.Rules
                         detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private void detectCycleRecursive(

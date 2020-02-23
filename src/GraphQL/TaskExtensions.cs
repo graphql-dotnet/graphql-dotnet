@@ -1,3 +1,7 @@
+using Microsoft.CSharp.RuntimeBinder;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GraphQL
@@ -5,7 +9,7 @@ namespace GraphQL
     /// <summary>
     /// Task extensions.
     /// </summary>
-    public static class TaskExtensions
+    internal static class TaskExtensions
     {
         /// <summary>
         /// Gets the result of a completed <see cref="Task&lt;TResult&gt;"/> when TResult is not known
@@ -25,9 +29,29 @@ namespace GraphQL
             }
             else
             {
-                // Using dynamic is over 10x faster than reflection
-                return ((dynamic)task).Result;
+                // Using dynamic is over 10x faster than reflection but works only for public types (or with InternalsVisibleTo attribute) 
+                try
+                {
+                    return ((dynamic)task).Result;
+                }
+                catch (RuntimeBinderException)
+                {
+                    // it won't be any worse
+                    return task.GetType().GetProperty("Result").GetValue(task, null);
+                }
             }
+        }
+
+        internal static async Task<IEnumerable<T>> WhereAsync<T>(this IEnumerable<T> items, Func<T, Task<bool>> predicate)
+        {
+            if (items == null)
+            {
+                return Enumerable.Empty<T>();
+            }
+
+            var itemTaskList = items.Select(item => new { Item = item, PredTask = predicate.Invoke(item) }).ToList();
+            await Task.WhenAll(itemTaskList.Select(x => x.PredTask)).ConfigureAwait(false);
+            return itemTaskList.Where(x => x.PredTask.Result).Select(x => x.Item);
         }
     }
 }

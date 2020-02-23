@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -8,7 +8,7 @@ namespace GraphQL.Utilities
 {
     public class DirectiveVisitorSelector : IVisitorSelector
     {
-        private IDictionary<string, Type> _directiveVisitors;
+        private readonly IDictionary<string, Type> _directiveVisitors;
         private readonly Func<Type, SchemaDirectiveVisitor> _typeResolver;
 
         public DirectiveVisitorSelector(
@@ -21,25 +21,26 @@ namespace GraphQL.Utilities
 
         public IEnumerable<ISchemaNodeVisitor> Select(object node)
         {
-            if (node is IProvideMetadata meta)
+            if (node is IProvideMetadata meta && meta.GetAstType<IHasDirectivesNode>() is IHasDirectivesNode ast)
             {
-                var ast = meta.GetAstType<IHasDirectivesNode>();
-                if (ast == null) yield break;
-                foreach (var visitor in BuildVisitors(ast.Directives))
+                if (ast.Directives != null)
                 {
-                    yield return visitor;
+                    foreach (var visitor in BuildVisitors(ast.Directives))
+                    {
+                        yield return visitor;
+                    }
                 }
             }
         }
 
         private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
         {
-            var filtered = directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)).ToList();
-            foreach(var dir in filtered)
+            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)))
             {
                 var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
                 visitor.Name = dir.Name.Value;
-                visitor.Arguments = ToArguments(dir.Arguments);
+                if (dir.Arguments != null)
+                    visitor.Arguments = ToArguments(dir.Arguments);
                 yield return visitor;
             }
         }

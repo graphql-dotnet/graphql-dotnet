@@ -5,7 +5,7 @@ namespace GraphQL.Tests
 {
     public class SimpleContainerAdapter : IServiceProvider
     {
-        private ISimpleContainer _container;
+        private readonly ISimpleContainer _container;
 
         public SimpleContainerAdapter(ISimpleContainer container)
         {

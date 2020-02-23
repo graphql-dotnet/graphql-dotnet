@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GraphQL.Types
 {
+    [DebuggerDisplay("ref {TypeName,nq}")]
     public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         public GraphQLTypeReference(string typeName)
         {
-            Name = "__GraphQLTypeReference";
+            SetName("__GraphQLTypeReference", validate: false);
             TypeName = typeName;
         }
 
@@ -33,7 +35,8 @@ namespace GraphQL.Types
             set => throw Invalid();
         }
 
-        private Exception Invalid() => new InvalidOperationException("This is just a reference. Resolve the real type first.");
+        private InvalidOperationException Invalid() => new InvalidOperationException(
+            $"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         public override bool Equals(object obj)
         {

@@ -12,21 +12,18 @@ namespace GraphQL.Tests.Conversion
         {
             var schema = new Schema
             {
-                FieldNameConverter = converter ?? new CamelCaseFieldNameConverter()
+                FieldNameConverter = converter ?? CamelCaseFieldNameConverter.Instance
             };
 
-            var person = new ObjectGraphType {Name = "Person"};
+            var person = new ObjectGraphType { Name = "Person" };
             person.Field("Name", new StringGraphType());
 
-            var query = new ObjectGraphType {Name = "Query"};
+            var query = new ObjectGraphType { Name = "Query" };
             query.Field(
                 "PeRsoN",
                 person,
                 arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
-                resolve: ctx =>
-                {
-                    return new Person{ Name = "Quinn" };
-                });
+                resolve: ctx => new Person { Name = "Quinn" });
 
             schema.Query = query;
             return schema;
@@ -40,7 +37,7 @@ namespace GraphQL.Tests.Conversion
                 _.Schema = build_schema();
                 _.Query = "{ peRsoN { name } }";
             },
-            "{ peRsoN: { name: \"Quinn\" } }");
+            @"{ ""peRsoN"": { ""name"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -51,7 +48,7 @@ namespace GraphQL.Tests.Conversion
                 _.Schema = build_schema();
                 _.Query = "{ peRsoN { Na: name } }";
             },
-            "{ peRsoN: { Na: \"Quinn\" } }");
+            @"{ ""peRsoN"": { ""Na"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -65,7 +62,7 @@ namespace GraphQL.Tests.Conversion
                 _.Query = "{ PeRsoN { naME: Name } }";
                 _.FieldNameConverter = converter;
             },
-            "{ PeRsoN: { naME: \"Quinn\" } }");
+            @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
 
         [Fact]
@@ -78,7 +75,7 @@ namespace GraphQL.Tests.Conversion
                 _.Query = "{ PeRsoN { naME: Name } }";
                 _.FieldNameConverter = converter;
             },
-            "{ PeRsoN: { naME: \"Quinn\" } }");
+            @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using GraphQL.Types;
+using GraphQL.SystemTextJson;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -8,15 +9,13 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void supports_partially_nullable_inputs_when_parent_non_null()
         {
-            var inputs = "{'input_0': {'id':'123', 'foo': null, 'bar': null} }".ToInputs();
+            var inputs = @"{ ""input_0"": { ""id"": ""123"", ""foo"": null, ""bar"": null } }".ToInputs();
             var query = @"
 mutation M($input_0: MyInput!) {
   run(input: $input_0)
 }
 ";
-            var expected = @"{
-  ""run"": ""123""
-}";
+            var expected = @"{ ""run"": ""123"" }";
             AssertQuerySuccess(query, expected, inputs);
         }
     }
@@ -33,10 +32,9 @@ mutation M($input_0: MyInput!) {
     {
         public MyMutation()
         {
-            Name = "MyMutation";
             Field<StringGraphType>(
                 "run",
-                arguments: new QueryArguments(new QueryArgument<MyInput> {Name = "input"}),
+                arguments: new QueryArguments(new QueryArgument<MyInput> { Name = "input" }),
                 resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
         }
     }
@@ -52,7 +50,7 @@ mutation M($input_0: MyInput!) {
     {
         public MyInput()
         {
-            Name = "MyInput ";
+            Name = "MyInput"; // changed from "MyInput "
             Field<NonNullGraphType<StringGraphType>>("id");
             Field<StringGraphType>("foo");
             Field<StringGraphType>("bar");

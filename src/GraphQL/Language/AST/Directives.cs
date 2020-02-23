@@ -6,14 +6,20 @@ namespace GraphQL.Language.AST
 {
     public class Directives : AbstractNode, IEnumerable<Directive>
     {
-        private readonly List<Directive> _directives = new List<Directive>();
+        private List<Directive> _directives;
         private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
 
         public override IEnumerable<INode> Children => _directives;
 
         public void Add(Directive directive)
         {
-            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
+            if (directive == null)
+                throw new ArgumentNullException(nameof(directive));
+
+            if (_directives == null)
+                _directives = new List<Directive>();
+
+            _directives.Add(directive);
 
             if (!_unique.ContainsKey(directive.Name))
             {
@@ -21,37 +27,30 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public Directive Find(string name)
-        {
-            _unique.TryGetValue(name, out Directive value);
-            return value;
-        }
+        public Directive Find(string name) => _unique.TryGetValue(name, out Directive value) ? value : null;
 
-        public int Count => _directives.Count;
+        public int Count => _directives?.Count ?? 0;
 
-        public bool HasDuplicates => _directives.Count != _unique.Count;
+        public bool HasDuplicates => _directives?.Count != _unique.Count;
 
         public IEnumerator<Directive> GetEnumerator()
         {
+            if (_directives == null)
+                return System.Linq.Enumerable.Empty<Directive>().GetEnumerator();
+
             return _directives.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected bool Equals(Directives directives)
-        {
-            return false;
-        }
+        protected bool Equals(Directives directives) => false;
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Directives) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Directives)obj);
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
@@ -15,7 +16,9 @@ namespace GraphQL.Validation.Rules
         public Func<string, string> DuplicateInputField =
             fieldName => $"There can be only one input field named {fieldName}.";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly UniqueInputFieldNames Instance = new UniqueInputFieldNames();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var knownNameStack = new Stack<Dictionary<string, IValue>>();
             var knownNames = new Dictionary<string, IValue>();
@@ -50,7 +53,7 @@ namespace GraphQL.Validation.Rules
                             knownNames[objField.Name] = objField.Value;
                         }
                     });
-            });
+            }).ToTask();
         }
     }
 }

@@ -24,45 +24,44 @@ namespace GraphQL.Introspection
                 "exposes all available types and directives on the server, as well as " +
                 "the entry points for query, mutation, and subscription operations.";
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
                 "types",
                 "A list of all types supported by this server.",
-                resolve: context =>
-                {
-                    return context.Schema.AllTypes;
-                });
+                resolve: async context => await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false));
 
             Field<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",
-                resolve: context =>
-                {
-                    return context.Schema.Query;
-                });
+                resolve: context => context.Schema.Query);
 
-            Field<__Type>(
+            FieldAsync<__Type>(
                 "mutationType",
                 "If this server supports mutation, the type that mutation operations will be rooted at.",
-                resolve: context =>
+                resolve: async context =>
                 {
-                    return context.Schema.Mutation;
+                    if (await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false))
+                    {
+                        return context.Schema.Mutation;
+                    }
+                    return null;
                 });
 
-            Field<__Type>(
+            FieldAsync<__Type>(
                 "subscriptionType",
                 "If this server supports subscription, the type that subscription operations will be rooted at.",
-                resolve: context =>
+                resolve: async context =>
                 {
-                    return context.Schema.Subscription;
+                    if (await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false))
+                    {
+                        return context.Schema.Subscription;
+                    }
+                    return null;
                 });
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
+            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
                 "directives",
                 "A list of all directives supported by this server.",
-                resolve: context =>
-                {
-                    return context.Schema.Directives;
-                });
+                resolve: async context => await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false));
         }
     }
 }

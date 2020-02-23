@@ -3,12 +3,15 @@ using GraphQL.Language.AST;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Field = GraphQL.Language.AST.Field;
+using GraphQL.Execution;
 
 namespace GraphQL.Types
 {
-    public class ResolveFieldContext<TSource>
+    /// <summary>
+    /// A mutable implementation of <see cref="IResolveFieldContext"/>
+    /// </summary>
+    public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
     {
         public string FieldName { get; set; }
 
@@ -20,13 +23,13 @@ namespace GraphQL.Types
 
         public IObjectGraphType ParentType { get; set; }
 
-        public Dictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, object> Arguments { get; set; }
 
         public object RootValue { get; set; }
 
         public IDictionary<string, object> UserContext { get; set; }
 
-        public TSource Source { get; set; }
+        public object Source { get; set; }
 
         public ISchema Schema { get; set; }
 
@@ -46,16 +49,16 @@ namespace GraphQL.Types
 
         public IEnumerable<string> Path { get; set; }
 
-        /// <summary>
-        /// Queried sub fields
-        /// </summary>
         public IDictionary<string, Field> SubFields { get; set; }
 
         public ResolveFieldContext() { }
 
-        public ResolveFieldContext(ResolveFieldContext context)
+        /// <summary>
+        /// Clone the specified <see cref="IResolveFieldContext"/>
+        /// </summary>
+        public ResolveFieldContext(IResolveFieldContext context)
         {
-            Source = (TSource)context.Source;
+            Source = context.Source;
             FieldName = context.FieldName;
             FieldAst = context.FieldAst;
             FieldDefinition = context.FieldDefinition;
@@ -75,82 +78,42 @@ namespace GraphQL.Types
             SubFields = context.SubFields;
             Path = context.Path;
         }
-
-        public TType GetArgument<TType>(string name, TType defaultValue = default)
-        {
-            return (TType)GetArgument(typeof(TType), name, defaultValue);
-        }
-
-        public object GetArgument(System.Type argumentType, string name, object defaultValue = null)
-        {
-            var argumentName = Schema?.FieldNameConverter.NameFor(name, null) ?? name;
-
-            if (Arguments == null || !Arguments.TryGetValue(argumentName, out var arg))
-            {
-                return defaultValue;
-            }
-
-            if (arg is Dictionary<string, object> inputObject)
-            {
-                var type = argumentType;
-                if (type.Namespace?.StartsWith("System") == true)
-                {
-                    return arg;
-                }
-
-                return inputObject.ToObject(type, FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
-            }
-
-            return arg.GetPropertyValue(argumentType);
-        }
-
-        public bool HasArgument(string argumentName) => Arguments?.ContainsKey(argumentName) ?? false;
-
-        public Task<object> TryAsyncResolve(Func<ResolveFieldContext<TSource>, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-        {
-            return TryAsyncResolve<object>(resolve, error);
-        }
-
-        public async Task<TResult> TryAsyncResolve<TResult>(Func<ResolveFieldContext<TSource>, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
-        {
-            try
-            {
-                return await resolve(this);
-            }
-            catch (Exception ex)
-            {
-                if (error == null)
-                {
-                    var er = new ExecutionError(ex.Message, ex);
-                    er.AddLocation(FieldAst, Document);
-                    er.Path = Path;
-                    Errors.Add(er);
-                    return default;
-                }
-                else
-                {
-                    var result = error(Errors);
-                    return result == null ? default : await result;
-                }
-            }
-        }
     }
 
-    public class ResolveFieldContext : ResolveFieldContext<object>
+    /// <inheritdoc cref="ResolveFieldContext"/>
+    public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
-        internal ResolveFieldContext<TSourceType> As<TSourceType>()
-        {
-            if (this is ResolveFieldContext<TSourceType> typedContext)
-                return typedContext;
-
-            return new ResolveFieldContext<TSourceType>(this);
-        }
-
         public ResolveFieldContext()
         {
         }
 
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, object source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
+        /// <summary>
+        /// Clone the specified <see cref="IResolveFieldContext"/>
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <see cref="TSource"/></exception>
+        public ResolveFieldContext(IResolveFieldContext context) : base(context)
+        {
+            if (context.Source != null && !(context.Source is TSource))
+                throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
+        }
+
+        public new TSource Source
+        {
+            get => (TSource)base.Source;
+            set => base.Source = value;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="ResolveFieldContext{TSource}"/> based on the specified <see cref="Execution.ExecutionContext"/> and other specified parameters
+        /// </summary>
+        /// <param name="context">The current <see cref="Execution.ExecutionContext"/> containing a number of parameters relating to the current GraphQL request</param>
+        /// <param name="field">The field AST derived from the query request</param>
+        /// <param name="type">The <see cref="FieldType"/> definition specified in the parent graph type</param>
+        /// <param name="source">The value of the parent object in the graph</param>
+        /// <param name="parentType">The field's parent graph type</param>
+        /// <param name="arguments">A dictionary of arguments passed to the field</param>
+        /// <param name="path">The path to the current executing field from the request root</param>
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
         {
             Source = source;
             FieldName = field.Name;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -5,17 +6,12 @@ namespace GraphQL.Language.AST
     public class FragmentSpread : AbstractNode, IFragment
     {
         public FragmentSpread(NameNode node)
-            : this()
         {
             NameNode = node;
         }
 
-        public FragmentSpread()
-        {
-            Directives = new Directives();
-        }
-
         public string Name => NameNode?.Name;
+
         public NameNode NameNode { get; }
 
         public Directives Directives { get; set; }
@@ -29,15 +25,15 @@ namespace GraphQL.Language.AST
 
         protected bool Equals(FragmentSpread other)
         {
-            return string.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
         }
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((FragmentSpread) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((FragmentSpread)obj);
         }
     }
 }

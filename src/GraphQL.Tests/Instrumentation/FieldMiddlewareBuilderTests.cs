@@ -22,9 +22,10 @@ namespace GraphQL.Tests.Instrumentation
             {
                 FieldName = "Name",
                 FieldAst = new Field(null, new NameNode("Name")),
-                Source = new Person {Name = "Quinn"},
+                Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
-                Metrics = new Metrics()
+                Schema = new Schema(),
+                Metrics = new Metrics().Start(null)
             };
         }
 
@@ -37,10 +38,7 @@ namespace GraphQL.Tests.Instrumentation
         [Fact]
         public void middleware_can_override()
         {
-            _builder.Use(next =>
-            {
-                return context => Task.FromResult<object>("One");
-            });
+            _builder.Use(next => context => Task.FromResult<object>("One"));
 
             _builder.Build().Invoke(_context).Result.ShouldBe("One");
         }
@@ -78,7 +76,7 @@ namespace GraphQL.Tests.Instrumentation
             var result = _builder.Build().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.Finish().Skip(1).Single();
             record.Category.ShouldBe("test");
             record.Subject.ShouldBe("testing name");
         }
@@ -88,10 +86,10 @@ namespace GraphQL.Tests.Instrumentation
         {
             _builder.Use<SimpleMiddleware>();
 
-            var result = _builder.Build().Invoke(_context).Result;
+            var result = _builder.Build(start: null, schema: _context.Schema).Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
-            var record = _context.Metrics.AllRecords.Single();
+            var record = _context.Metrics.Finish().Skip(1).Single();
             record.Category.ShouldBe("class");
             record.Subject.ShouldBe("from class");
         }
@@ -118,8 +116,8 @@ namespace GraphQL.Tests.Instrumentation
         {
             var additionalData = new Dictionary<string, string[]>
             {
-                ["errorCodes"] = new[] {"one", "two"},
-                ["otherErrorCodes"] = new[] {"one", "four"}
+                ["errorCodes"] = new[] { "one", "two" },
+                ["otherErrorCodes"] = new[] { "one", "four" }
             };
             _builder.Use(next =>
             {
@@ -150,7 +148,7 @@ namespace GraphQL.Tests.Instrumentation
 
         public class SimpleMiddleware
         {
-            public Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
+            public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
                 using (context.Metrics.Subject("class", "from class"))
                 {
@@ -158,5 +156,10 @@ namespace GraphQL.Tests.Instrumentation
                 }
             }
         }
+    }
+
+    internal static class TestExtensions
+    {
+        public static FieldMiddlewareDelegate Build(this FieldMiddlewareBuilder builder) => builder.Build(null, null);
     }
 }

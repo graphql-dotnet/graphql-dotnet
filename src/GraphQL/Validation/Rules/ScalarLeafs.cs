@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Types;
 using GraphQL.Language.AST;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,18 +13,18 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ScalarLeafs : IValidationRule
     {
-        public Func<string, string, string> NoSubselectionAllowedMessage = (field, type) =>
+        public readonly Func<string, string, string> NoSubselectionAllowedMessage = (field, type) =>
             $"Field {field} of type {type} must not have a sub selection";
 
-        public Func<string, string, string> RequiredSubselectionMessage = (field, type) =>
+        public readonly Func<string, string, string> RequiredSubselectionMessage = (field, type) =>
             $"Field {field} of type {type} must have a sub selection";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly ScalarLeafs Instance = new ScalarLeafs();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context));
-            });
+            return new EnterLeaveListener(_ => _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context)))
+                .ToTask();
         }
 
         private void Field(IGraphType type, Field field, ValidationContext context)

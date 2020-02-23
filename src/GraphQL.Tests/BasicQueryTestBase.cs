@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using GraphQL.Http;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
 using Shouldly;
-using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Tests
 {
@@ -23,7 +22,7 @@ namespace GraphQL.Tests
             Inputs inputs = null,
             object root = null,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var queryResult = CreateQueryResult(expected);
@@ -68,7 +67,7 @@ namespace GraphQL.Tests
             Inputs inputs,
             object root,
             IDictionary<string, object> userContext = null,
-            CancellationToken cancellationToken = default(CancellationToken),
+            CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null)
         {
             var runResult = Executer.ExecuteAsync(_ =>
@@ -103,14 +102,6 @@ namespace GraphQL.Tests
             return runResult;
         }
 
-        public ExecutionResult CreateQueryResult(string result)
-        {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
-            return new ExecutionResult { Data = expected };
-        }
+        public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
     }
 }
