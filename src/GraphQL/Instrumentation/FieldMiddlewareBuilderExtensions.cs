@@ -58,15 +58,15 @@ namespace GraphQL.Instrumentation
             static T CheckNotNull<T>(T instance, System.Type type)
             {
                 if (instance == null)
-                    throw new InvalidOperationException(@$"Field middleware of type '{type.FullName}' must be registered in DI container.
-If you called 'FieldMiddlewareBuilder.Build()' manually set the 'schema' parameter.");
+                    throw new InvalidOperationException($"Field middleware of type '{type.FullName}' must be registered in DI container.");
                 return instance;
             }
 
             static ISchema CheckSchemaNotNull(ISchema schema)
             {
                 if (schema == null)
-                    throw new InvalidOperationException("Schema is null. Schema required for resolving middlewares from DI container.");
+                    throw new InvalidOperationException(@"Schema is null. Schema required for resolving middlewares from DI container.
+If you called 'FieldMiddlewareBuilder.Build()' manually set the 'schema' parameter.");
                 return schema;
             }
 
