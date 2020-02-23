@@ -62,7 +62,7 @@ public interface IFieldMiddleware
 }
 ```
 
-It doesn’t have to be implemented on your middleware. Then a search will be made for such a method
+It doesn’t have to be implemented on your middleware. If you do not, a search will be made for a method named `Resolve`
 with a suitable signature.
 
 Nevertheless, **to improve performance, it is recommended to implement this interface.**
