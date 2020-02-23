@@ -5,7 +5,7 @@ calculating the field value. You can write middleware for fields to provide addi
 during field resolution. After connecting the middleware to the schema, it is applied to all
 fields of all schema types. You can connect several middlewares to the schema. In this case,
 they will be called sequentially along the chain where the previous middleware decides to call
-the next one. This process is very similar to how middlewares work in ASP.NET Core HTTP request
+the next one. This process is very similar to how middlewares work in the ASP.NET Core HTTP request
 pipeline.
 
 The following example is how Metrics are captured. You register Field Middleware in the `ExecutionOptions`.
