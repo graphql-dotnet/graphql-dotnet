@@ -202,10 +202,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   source: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -264,10 +261,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContext: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -352,10 +346,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   three: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
@@ -569,29 +560,29 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    abstract class Pet
+    internal abstract class Pet
     {
         public string Name { get; set; }
     }
 
-    class Dog : Pet
+    internal class Dog : Pet
     {
         public bool Barks { get; set; }
     }
 
-    class Cat : Pet
+    internal class Cat : Pet
     {
         public bool Meows { get; set; }
     }
 
-    enum PetKind
+    internal enum PetKind
     {
         Cat,
         Dog
     }
 
     [GraphQLMetadata("Query")]
-    class PetQueryType
+    internal class PetQueryType
     {
         public Pet Pet(PetKind type)
         {
@@ -605,32 +596,17 @@ namespace GraphQL.Tests.Utilities
     }
 
     [GraphQLMetadata("Query")]
-    class ParametersType
+    internal class ParametersType
     {
-        public bool Source(object source)
-        {
-            return source != null;
-        }
+        public bool Source(object source) => source != null;
 
-        public string Resolve(IResolveFieldContext context)
-        {
-            return "Resolved";
-        }
+        public string Resolve(IResolveFieldContext context) => "Resolved";
 
-        public string ResolveWithParam(IResolveFieldContext context, string id)
-        {
-            return $"Resolved {id}";
-        }
+        public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
-        public string UserContext(MyUserContext context)
-        {
-            return context.Name;
-        }
+        public string UserContext(MyUserContext context) => context.Name;
 
-        public string UserContextWithParam(MyUserContext context, string id)
-        {
-            return $"{context.Name} {id}";
-        }
+        public string UserContextWithParam(MyUserContext context, string id) => $"{context.Name} {id}";
 
         public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
         {
@@ -643,11 +619,11 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    class MyUserContext: Dictionary<string, object>
+    internal class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
     }
-    class ChildMyUserContext: MyUserContext
+    internal class ChildMyUserContext: MyUserContext
     {
     }
 }

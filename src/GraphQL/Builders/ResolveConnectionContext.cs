@@ -48,20 +48,11 @@ namespace GraphQL.Builders
             }
         }
 
-        public string After
-        {
-            get { return this.GetArgument<string>("after"); }
-        }
+        public string After => this.GetArgument<string>("after");
 
-        public string Before
-        {
-            get { return this.GetArgument<string>("before"); }
-        }
+        public string Before => this.GetArgument<string>("before");
 
-        public int? PageSize
-        {
-            get { return First ?? Last ?? _defaultPageSize; }
-        }
+        public int? PageSize => First ?? Last ?? _defaultPageSize;
 
         public int? NumberOfSkippedEntries { get; set; }
 

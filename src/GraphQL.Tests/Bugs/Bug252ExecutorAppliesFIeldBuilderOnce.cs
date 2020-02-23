@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Bugs
     public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
     {
         public int AppliedCount;
-        private FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
+        private readonly FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
 
         public void ApplyTo(ISchema schema)
         {
@@ -21,15 +21,8 @@ namespace GraphQL.Tests.Bugs
             overriddenBuilder.ApplyTo(schema);
         }
 
-        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
-        {
-            return overriddenBuilder.Build(start);
-        }
-
-        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
-        {
-            return overriddenBuilder.Use(middleware);
-        }
+        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+            => overriddenBuilder.Use(middleware);
     }
 
     public class Bug252ExecutorAppliesBuilderOnceTests

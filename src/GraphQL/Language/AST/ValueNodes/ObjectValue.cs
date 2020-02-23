@@ -22,10 +22,7 @@ namespace GraphQL.Language.AST
 
         public IEnumerable<ObjectField> ObjectFields { get; }
 
-        public IEnumerable<string> FieldNames
-        {
-            get { return ObjectFields.Select(x => x.Name).ToList(); }
-        }
+        public IEnumerable<string> FieldNames => ObjectFields.Select(x => x.Name).ToList();
 
         public override IEnumerable<INode> Children => ObjectFields;
 
