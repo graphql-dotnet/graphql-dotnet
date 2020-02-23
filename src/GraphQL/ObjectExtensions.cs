@@ -28,8 +28,13 @@ namespace GraphQL
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
-        /// <param name="graphType">Optional type from schema mapped to <paramref name="type"/> for proper property definition.</param>
-        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType graphType = null)
+        /// <param name="mappedType">
+        /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
+        /// GraphType contains information about this matching in Metadata property.
+        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// </param>
+        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters
             var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
@@ -61,19 +66,22 @@ namespace GraphQL
 
             var obj = targetCtor.Invoke(ctorArguments);
 
+            var complexType = mappedType.GetNamedType() as IComplexGraphType;
+
             foreach (var item in source)
             {
                 // these parameters have already been used in the constructor
                 if (ctorParameters.Any(p => p.Name == item.Key))
                     continue;
 
-                var mappedField = (graphType.GetNamedType() as IInputObjectGraphType)?.GetField(item.Key);
-                string propertyName = mappedField?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
+                // type may not contain mapping information
+                var field = complexType?.GetField(item.Key);
+                string propertyName = field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
 
                 var propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType, mappedField?.ResolvedType);
+                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
@@ -86,9 +94,14 @@ namespace GraphQL
         /// </summary>
         /// <param name="propertyValue">The value to be converted.</param>
         /// <param name="fieldType">The desired type.</param>
-        /// <param name="graphType">Optional type from schema mapped to <paramref name="fieldType"/> for proper property definition.</param>
+        /// <param name="mappedType">
+        /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
+        /// GraphType contains information about this matching in Metadata property.
+        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType graphType = null)
+        public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType mappedType = null)
         {
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
@@ -135,14 +148,14 @@ namespace GraphQL
                     for (int i = 0; i < propertyValueAsIList.Count; ++i)
                     {
                         var listItem = propertyValueAsIList[i];
-                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, graphType.GetNamedType());
+                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType);
                     }
                 }
                 else
                 {
                     foreach (var listItem in valueList)
                     {
-                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, graphType.GetNamedType()));
+                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
                     }
                 }
 
@@ -166,7 +179,7 @@ namespace GraphQL
 
             if (propertyValue is Dictionary<string, object> objects)
             {
-                return ToObject(objects, fieldType, graphType.GetNamedType());
+                return ToObject(objects, fieldType, mappedType);
             }
 
             if (fieldType.IsEnum)
