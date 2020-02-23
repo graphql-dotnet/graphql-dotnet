@@ -1,6 +1,6 @@
 # Field Middleware
 
-Field Middleware is a component connected to the schema, which is embedded in the process of
+Field Middleware is a component connected to the schema, which is embedded into the process of
 calculating the field value. You can write middleware for fields to provide additional behaviors
 during field resolution. After connecting the middleware to the schema, it is applied to all
 fields of all schema types. You can connect several middlewares to the schema. In this case,
