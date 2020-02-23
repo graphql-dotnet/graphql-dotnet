@@ -16,7 +16,6 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class FieldType : MetadataProvider, IFieldType
     {
-        internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }

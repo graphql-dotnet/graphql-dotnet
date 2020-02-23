@@ -68,7 +68,7 @@ namespace GraphQL
                     continue;
 
                 var mappedField = (graphType.GetNamedType() as IInputObjectGraphType)?.GetField(item.Key);
-                string propertyName = mappedField?.GetMetadata(FieldType.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
+                string propertyName = mappedField?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
 
                 var propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo != null && propertyInfo.CanWrite)
