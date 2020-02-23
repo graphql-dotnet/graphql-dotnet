@@ -7,8 +7,8 @@ namespace GraphQL.Resolvers
 {
     /// <summary>
     /// Attempts to return a value for a field from the graph's source object, matching the name of
-    /// the field to a property or a method with the same name on the source object.<br/>
-    /// <br/>
+    /// the field to a property or a method with the same name on the source object.
+    /// <br/><br/>
     /// Call <see cref="NameFieldResolver.Instance"/> to retrieve an instance of this class.
     /// </summary>
     public class NameFieldResolver : IFieldResolver

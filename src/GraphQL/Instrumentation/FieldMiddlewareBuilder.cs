@@ -7,63 +7,59 @@ using System.Threading.Tasks;
 
 namespace GraphQL.Instrumentation
 {
-    public interface IFieldMiddlewareBuilder
-    {
-        IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
-
-        void ApplyTo(ISchema schema);
-    }
-
+    /// <summary>
+    /// Default implementation of <see cref="IFieldMiddlewareBuilder"/>.
+    /// </summary>
     public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
     {
-        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleComponent;
-        private IList<Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _components;
+        private Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleMiddleware;
+        private IList<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _middlewares;
 
-        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
             middleware = middleware ?? throw new ArgumentNullException(nameof(middleware));
 
-            if (_singleComponent == null)
+            if (_singleMiddleware == null)
             {
                 // allocation free optimization for single middleware (InstrumentFieldsMiddleware)
-                _singleComponent = middleware;
+                _singleMiddleware = middleware;
             }
-            else if (_components == null)
+            else if (_middlewares == null)
             {
-                _components = new List<Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
+                _middlewares = new List<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>>
                 {
-                    _singleComponent,
+                    _singleMiddleware,
                     middleware
                 };
             }
             else
             {
-                _components.Add(middleware);
+                _middlewares.Add(middleware);
             }
 
             return this;
         }
 
-        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
+        internal FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start, ISchema schema)
         {
-            var app = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
+            var middlewareDelegate = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 
-            if (_components != null)
+            if (_middlewares != null)
             {
-                foreach (var component in _components.Reverse())
+                foreach (var middleware in _middlewares.Reverse())
                 {
-                    app = component(app);
+                    middlewareDelegate = middleware(schema, middlewareDelegate);
                 }
             }
-            else if (_singleComponent != null)
+            else if (_singleMiddleware != null)
             {
-                app = _singleComponent(app);
+                middlewareDelegate = _singleMiddleware(schema, middlewareDelegate);
             }
 
-            return app;
+            return middlewareDelegate;
         }
 
-        private bool Empty => _singleComponent == null;
+        private bool Empty => _singleMiddleware == null;
 
         public void ApplyTo(ISchema schema)
         {
@@ -76,9 +72,9 @@ namespace GraphQL.Instrumentation
                     {
                         var resolver = new MiddlewareResolver(field.Resolver);
 
-                        FieldMiddlewareDelegate app = Build(resolver.Resolve);
+                        var fieldMiddlewareDelegate = Build(resolver.Resolve, schema);
 
-                        field.Resolver = new FuncFieldResolver<object>(app.Invoke);
+                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                     }
                 }
             }
