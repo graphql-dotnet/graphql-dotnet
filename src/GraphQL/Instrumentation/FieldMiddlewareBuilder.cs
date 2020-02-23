@@ -40,7 +40,7 @@ namespace GraphQL.Instrumentation
             return this;
         }
 
-        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null, ISchema schema = null)
+        internal FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start, ISchema schema)
         {
             var middlewareDelegate = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 

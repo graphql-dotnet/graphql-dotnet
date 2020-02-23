@@ -21,15 +21,8 @@ namespace GraphQL.Tests.Bugs
             overriddenBuilder.ApplyTo(schema);
         }
 
-        public FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start = null)
-        {
-            return overriddenBuilder.Build(start);
-        }
-
         public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
-        {
-            return overriddenBuilder.Use(middleware);
-        }
+            => overriddenBuilder.Use(middleware);
     }
 
     public class Bug252ExecutorAppliesBuilderOnceTests

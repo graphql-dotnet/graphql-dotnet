@@ -679,7 +679,6 @@ namespace GraphQL.Instrumentation
     {
         public FieldMiddlewareBuilder() { }
         public void ApplyTo(GraphQL.Types.ISchema schema) { }
-        public GraphQL.Instrumentation.FieldMiddlewareDelegate Build(GraphQL.Instrumentation.FieldMiddlewareDelegate start = null, GraphQL.Types.ISchema schema = null) { }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
     public static class FieldMiddlewareBuilderExtensions

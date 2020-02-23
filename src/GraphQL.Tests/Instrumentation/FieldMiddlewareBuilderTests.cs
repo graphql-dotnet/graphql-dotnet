@@ -86,7 +86,7 @@ namespace GraphQL.Tests.Instrumentation
         {
             _builder.Use<SimpleMiddleware>();
 
-            var result = _builder.Build(schema: _context.Schema).Invoke(_context).Result;
+            var result = _builder.Build(start: null, schema: _context.Schema).Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -156,5 +156,10 @@ namespace GraphQL.Tests.Instrumentation
                 }
             }
         }
+    }
+
+    internal static class TestExtensions
+    {
+        public static FieldMiddlewareDelegate Build(this FieldMiddlewareBuilder builder) => builder.Build(null, null);
     }
 }

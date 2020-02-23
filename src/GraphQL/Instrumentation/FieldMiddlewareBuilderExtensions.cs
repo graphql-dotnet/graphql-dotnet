@@ -65,8 +65,7 @@ namespace GraphQL.Instrumentation
             static ISchema CheckSchemaNotNull(ISchema schema)
             {
                 if (schema == null)
-                    throw new InvalidOperationException(@"Schema is null. Schema required for resolving middlewares from DI container.
-If you called 'FieldMiddlewareBuilder.Build()' manually set the 'schema' parameter.");
+                    throw new InvalidOperationException("Schema is null. Schema required for resolving middlewares from DI container.");
                 return schema;
             }
 
