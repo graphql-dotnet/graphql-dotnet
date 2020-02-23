@@ -8,7 +8,7 @@ they will be called sequentially along the chain where the previous middleware d
 the next one. This process is very similar to how middlewares work in the ASP.NET Core HTTP request
 pipeline.
 
-The following example is how Metrics are captured. You register Field Middleware in the `ExecutionOptions`.
+The following example is how Metrics are captured. You register Field Middleware in `ExecutionOptions`.
 
 ```csharp
 await schema.ExecuteAsync(_ =>
