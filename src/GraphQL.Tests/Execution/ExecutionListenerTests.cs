@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation;
 using Xunit;
 
 namespace GraphQL.Tests.Execution
@@ -43,14 +44,22 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestExecutionListener : DocumentExecutionListenerBase<TestContext>
+        public class TestExecutionListener : IDocumentExecutionListener
         {
-            public override Task BeforeExecutionAwaitedAsync(TestContext userContext, CancellationToken token)
+            public Task AfterExecutionAsync(IDictionary<string, object> userContext, CancellationToken token) => Task.CompletedTask;
+
+            public Task AfterValidationAsync(IDictionary<string, object> userContext, IValidationResult validationResult, CancellationToken token) => Task.CompletedTask;
+
+            public Task BeforeExecutionAsync(IDictionary<string, object> userContext, CancellationToken token) => Task.CompletedTask;
+
+            public Task BeforeExecutionAwaitedAsync(IDictionary<string, object> userContext, CancellationToken token)
             {
-                userContext.Complete("bar");
+                ((TestContext)userContext).Complete("bar");
 
                 return Task.CompletedTask;
             }
+
+            public Task BeforeExecutionStepAwaitedAsync(IDictionary<string, object> userContext, CancellationToken token) => Task.CompletedTask;
         }
 
         public class TestContext: Dictionary<string, object>

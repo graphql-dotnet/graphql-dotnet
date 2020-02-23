@@ -514,11 +514,11 @@ namespace GraphQL.DataLoader
     public class DataLoaderDocumentListener : GraphQL.Execution.IDocumentExecutionListener
     {
         public DataLoaderDocumentListener(GraphQL.DataLoader.IDataLoaderContextAccessor accessor) { }
-        public System.Threading.Tasks.Task AfterExecutionAsync(object userContext, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task AfterValidationAsync(object userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionAsync(object userContext, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(object userContext, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(object userContext, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task AfterExecutionAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task AfterValidationAsync(System.Collections.Generic.IDictionary<string, object> userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task BeforeExecutionAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token) { }
     }
     public static class DataLoaderExtensions
     {
@@ -556,15 +556,6 @@ namespace GraphQL.Execution
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public override object ToValue() { }
-    }
-    public abstract class DocumentExecutionListenerBase<T> : GraphQL.Execution.IDocumentExecutionListener, GraphQL.Execution.IDocumentExecutionListener<T>
-    {
-        protected DocumentExecutionListenerBase() { }
-        public virtual System.Threading.Tasks.Task AfterExecutionAsync(T userContext, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task AfterValidationAsync(T userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionAsync(T userContext, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(T userContext, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(T userContext, System.Threading.CancellationToken token) { }
     }
     public class ExecutionContext : GraphQL.Execution.IProvideUserContext
     {
@@ -639,19 +630,11 @@ namespace GraphQL.Execution
     }
     public interface IDocumentExecutionListener
     {
-        System.Threading.Tasks.Task AfterExecutionAsync(object userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task AfterValidationAsync(object userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAsync(object userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(object userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(object userContext, System.Threading.CancellationToken token);
-    }
-    public interface IDocumentExecutionListener<in T>
-    {
-        System.Threading.Tasks.Task AfterExecutionAsync(T userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task AfterValidationAsync(T userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAsync(T userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(T userContext, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(T userContext, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task AfterExecutionAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task AfterValidationAsync(System.Collections.Generic.IDictionary<string, object> userContext, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task BeforeExecutionAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(System.Collections.Generic.IDictionary<string, object> userContext, System.Threading.CancellationToken token);
     }
     public interface IExecutionStrategy
     {

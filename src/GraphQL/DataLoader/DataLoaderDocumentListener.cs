@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -18,12 +19,12 @@ namespace GraphQL.DataLoader
             _accessor = accessor;
         }
 
-        public Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token)
+        public Task AfterValidationAsync(IDictionary<string, object> userContext, IValidationResult validationResult, CancellationToken token)
         {
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionAsync(IDictionary<string, object> userContext, CancellationToken token)
         {
             if (_accessor.Context == null)
                 _accessor.Context = new DataLoaderContext();
@@ -31,19 +32,19 @@ namespace GraphQL.DataLoader
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionAwaitedAsync(IDictionary<string, object> userContext, CancellationToken token)
         {
             return Task.CompletedTask;
         }
 
-        public Task AfterExecutionAsync(object userContext, CancellationToken token)
+        public Task AfterExecutionAsync(IDictionary<string, object> userContext, CancellationToken token)
         {
             _accessor.Context = null;
 
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionStepAwaitedAsync(IDictionary<string, object> userContext, CancellationToken token)
         {
             var context = _accessor.Context;
             return context.DispatchAllAsync(token);
