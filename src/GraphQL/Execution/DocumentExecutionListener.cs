@@ -22,7 +22,7 @@ namespace GraphQL.Execution
         /// <summary>Executes after the <see cref="IExecutionStrategy"/> has completed executing the request</summary>
         Task AfterExecutionAsync(object userContext, CancellationToken token);
 
-        /// <summary>Executes before each time the <see cref="IExecutionStrategy"/> awaits the <see cref="Task{TResult}"/> returned by <see cref="IFieldResolver.Resolve"/></summary>
+        /// <summary>Executes before each time the <see cref="IExecutionStrategy"/> awaits the <see cref="Task{TResult}"/> returned by <see cref="IFieldResolver.Resolve"/>. For parallel resolvers, this may execute a single time prior to awaiting multiple tasks.</summary>
         Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token);
     }
 
