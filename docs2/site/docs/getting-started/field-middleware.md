@@ -48,7 +48,10 @@ _.FieldMiddleware.Use(next =>
 {
   return context =>
   {
-    return next(context);
+    // your code here
+    var result = next(context);
+    // your code here
+    return result;
   };
 });
 ```
