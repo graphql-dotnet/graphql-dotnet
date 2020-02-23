@@ -280,6 +280,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             field.Arguments = ToQueryArguments(fieldDef.Arguments);
             field.DeprecationReason = fieldConfig.DeprecationReason;
+
             field.SetAstType(fieldDef);
 
             VisitNode(field, v => v.VisitFieldDefinition(field));
