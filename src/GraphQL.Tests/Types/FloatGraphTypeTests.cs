@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Types
 {
     public class FloatGraphTypeTests
     {
-        private FloatGraphType type = new FloatGraphType();
+        private readonly FloatGraphType type = new FloatGraphType();
 
         [Fact]
         public void coerces_null_to_null()

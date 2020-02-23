@@ -1,13 +1,12 @@
+using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.NewtonsoftJson;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Example
 {
@@ -51,7 +50,11 @@ namespace Example
         {
             var start = DateTime.UtcNow;
 
-            var request = Deserialize<GraphQLRequest>(context.Request.Body);
+            var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>
+            (
+                context.Request.Body,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
 
             var result = await _executer.ExecuteAsync(options =>
             {
@@ -64,7 +67,9 @@ namespace Example
                 options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
-                    options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                    options.FieldMiddleware
+                        .Use<CountFieldMiddleware>()
+                        .Use<InstrumentFieldsMiddleware>();
                 }
             });
 
@@ -82,16 +87,6 @@ namespace Example
             context.Response.StatusCode = 200; // OK
 
             await _writer.WriteAsync(context.Response.Body, result);
-        }
-
-        public static T Deserialize<T>(Stream s)
-        {
-            using (var reader = new StreamReader(s))
-            using (var jsonReader = new JsonTextReader(reader))
-            {
-                var ser = new JsonSerializer();
-                return ser.Deserialize<T>(jsonReader);
-            }
         }
     }
 }

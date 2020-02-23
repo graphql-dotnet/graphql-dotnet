@@ -1,6 +1,8 @@
+using System;
 using System.Buffers;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -18,33 +20,57 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(bool indent)
-            : this(new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None })
+            : this(GetDefaultSerializerSettings(indent))
         {
         }
 
-        public DocumentWriter(JsonSerializerSettings settings)
+        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
         {
-            _serializer = JsonSerializer.CreateDefault(settings);
+            var serializerSettings = GetDefaultSerializerSettings(indent: false);
+            configureSerializerSettings?.Invoke(serializerSettings);
 
-            if (settings.ContractResolver == null)
+            _serializer = BuildSerializer(serializerSettings);
+        }
+
+        public DocumentWriter(JsonSerializerSettings serializerSettings)
+        {
+            if (serializerSettings == null)
             {
-                _serializer.ContractResolver = new ExecutionResultContractResolver();
+                throw new ArgumentNullException(nameof(serializerSettings));
             }
+
+            _serializer = BuildSerializer(serializerSettings);
         }
 
-        public async Task WriteAsync<T>(Stream stream, T value)
+        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent)
+            => new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None };
+
+        private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings)
         {
-            using (var writer = new HttpResponseStreamWriter(stream, Utf8Encoding))
-            using (var jsonWriter = new JsonTextWriter(writer)
+            var serializer = JsonSerializer.CreateDefault(serializerSettings);
+
+            if (serializerSettings.ContractResolver == null)
+            {
+                serializer.ContractResolver = new ExecutionResultContractResolver();
+            }
+
+            return serializer;
+        }
+
+        public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using var writer = new HttpResponseStreamWriter(stream, Utf8Encoding);
+            using var jsonWriter = new JsonTextWriter(writer)
             {
                 ArrayPool = _jsonArrayPool,
                 CloseOutput = false,
                 AutoCompleteOnClose = false
-            })
-            {
-                _serializer.Serialize(jsonWriter, value);
-                await jsonWriter.FlushAsync().ConfigureAwait(false);
-            }
+            };
+            
+            _serializer.Serialize(jsonWriter, value);
+            await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

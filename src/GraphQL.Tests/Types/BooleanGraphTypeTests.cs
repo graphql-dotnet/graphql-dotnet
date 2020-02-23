@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Types
 {
     public class BooleanGraphTypeTests
     {
-        private BooleanGraphType type = new BooleanGraphType();
+        private readonly BooleanGraphType type = new BooleanGraphType();
 
         [Fact]
         public void coerces_0_to_false()

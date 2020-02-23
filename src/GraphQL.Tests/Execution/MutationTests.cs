@@ -303,20 +303,20 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  'first': {
-                    'theNumber': 1
+                  ""first"": {
+                    ""theNumber"": 1
                   },
-                  'second': {
-                    'theNumber': 2
+                  ""second"": {
+                    ""theNumber"": 2
                   },
-                  'third': {
-                    'theNumber': 3
+                  ""third"": {
+                    ""theNumber"": 3
                   },
-                  'fourth': {
-                    'theNumber': 4
+                  ""fourth"": {
+                    ""theNumber"": 4
                   },
-                  'fifth': {
-                    'theNumber': 5
+                  ""fifth"": {
+                    ""theNumber"": 5
                   }
                 }";
 
@@ -351,20 +351,20 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  'first': {
-                    'theNumber': 1
+                  ""first"": {
+                    ""theNumber"": 1
                   },
-                  'second': {
-                    'theNumber': 2
+                  ""second"": {
+                    ""theNumber"": 2
                   },
-                  'third': null,
-                  'fourth': {
-                    'theNumber': 4
+                  ""third"": null,
+                  ""fourth"": {
+                    ""theNumber"": 4
                   },
-                  'fifth': {
-                    'theNumber': 5
+                  ""fifth"": {
+                    ""theNumber"": 5
                   },
-                  'sixth': null
+                  ""sixth"": null
                 }";
 
             var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
@@ -398,20 +398,20 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  'first': {
-                    'theDateTime': ""2017-01-27T15:19:53.123Z""
+                  ""first"": {
+                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
                   },
-                  'second': {
-                    'theDateTime': ""2017-02-27T15:19:53.123Z""
+                  ""second"": {
+                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
                   },
-                  'third': {
-                    'theDateTime': ""2017-03-27T15:19:53.123Z""
+                  ""third"": {
+                    ""theDateTime"": ""2017-03-27T15:19:53.123Z""
                   },
-                  'fourth': {
-                    'theDateTime': ""2017-04-27T20:19:53.123Z""
+                  ""fourth"": {
+                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
                   },
-                  'fifth': {
-                    'theDateTime': ""2017-05-27T13:19:53.123Z""
+                  ""fifth"": {
+                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
                   }
                 }";
 
@@ -446,20 +446,20 @@ namespace GraphQL.Tests.Execution
 
             var expected = @"
                 {
-                  'first': {
-                    'theDateTime': ""2017-01-27T15:19:53.123Z""
+                  ""first"": {
+                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
                   },
-                  'second': {
-                    'theDateTime': ""2017-02-27T15:19:53.123Z""
+                  ""second"": {
+                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
                   },
-                  'third': null,
-                  'fourth': {
-                    'theDateTime': ""2017-04-27T20:19:53.123Z""
+                  ""third"": null,
+                  ""fourth"": {
+                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
                   },
-                  'fifth': {
-                    'theDateTime': ""2017-05-27T13:19:53.123Z""
+                  ""fifth"": {
+                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
                   },
-                  'sixth': null
+                  ""sixth"": null
                 }";
 
             var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);

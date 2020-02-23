@@ -242,11 +242,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
             fields.Apply(f => type.AddField(f));
 
-            var interfaces = astType
-                .Interfaces
-                .Select(i => new GraphQLTypeReference(i.Name.Value))
-                .ToList();
-            interfaces.Apply(type.AddResolvedInterface);
+            if (astType.Interfaces != null)
+            {
+                astType.Interfaces
+                    .Select(i => new GraphQLTypeReference(i.Name.Value))
+                    .Apply(type.AddResolvedInterface);
+            }
 
             if (isExtensionType)
             {
@@ -277,8 +278,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(field, fieldConfig);
 
-            var args = fieldDef.Arguments.Select(ToArguments);
-            field.Arguments = new QueryArguments(args);
+            field.Arguments = ToQueryArguments(fieldDef.Arguments);
             field.DeprecationReason = fieldConfig.DeprecationReason;
             field.SetAstType(fieldDef);
 
@@ -305,8 +305,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(field, fieldConfig);
 
-            var args = fieldDef.Arguments.Select(ToArguments);
-            field.Arguments = new QueryArguments(args);
+            field.Arguments = ToQueryArguments(fieldDef.Arguments);
+
             field.SetAstType(fieldDef);
 
             VisitNode(field, v => v.VisitFieldDefinition(field));
@@ -418,8 +418,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 Description = directiveDef.Comment?.Text
             };
 
-            var arguments = directiveDef.Arguments.Select(ToArguments);
-            directive.Arguments = new QueryArguments(arguments);
+            directive.Arguments = ToQueryArguments(directiveDef.Arguments);
 
             return directive;
         }
@@ -509,6 +508,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     action(visitor);
                 }
             }
+        }
+
+        private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition> arguments)
+        {
+            return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(ToArguments));
         }
     }
 

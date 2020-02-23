@@ -24,7 +24,7 @@ namespace GraphQL.Tests.Utilities
 
                 _.Query = "{ hello }";
                 _.Root = new { Hello = "Hello World!" };
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
             });
         }
 
@@ -43,16 +43,13 @@ namespace GraphQL.Tests.Utilities
                 ";
 
                 _.Query = "{ hello }";
-                _.ExpectedResult = "{ 'hello': 'HELLO WORLD2!' }";
+                _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD2!"" }";
             });
         }
 
         public class Query
         {
-            public Task<string> Hello()
-            {
-                return Task.FromResult("Hello World2!");
-            }
+            public Task<string> Hello() => Task.FromResult("Hello World2!");
         }
 
         [Fact]
@@ -69,7 +66,7 @@ namespace GraphQL.Tests.Utilities
             directives.Count.ShouldBe(1, "Only 1 directive should be added");
             directives.Any(d => d.Name == "upper").ShouldBeTrue();
 
-            var queryResult = CreateQueryResult("{ 'hello': 'HELLO WORLD!' }");
+            var queryResult = CreateQueryResult(@"{ ""hello"": ""HELLO WORLD!"" }");
             var schema = new Schema { Query = objectType };
 
             AssertQuery(_ =>

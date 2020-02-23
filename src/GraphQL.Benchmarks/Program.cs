@@ -1,6 +1,6 @@
-using BenchmarkDotNet.Running;
 using System;
 using System.Threading;
+using BenchmarkDotNet.Running;
 
 namespace GraphQL.Benchmarks
 {
@@ -11,20 +11,20 @@ namespace GraphQL.Benchmarks
         private static void Main(string[] args)
         {
             if (args.Length == 0)
-                BenchmarkRunner.Run<ExecutionBenchmark>();
+                BenchmarkRunner.Run<DeserializationBenchmark>();
             else
                 RunMemoryProfilerPayload();
         }
 
         private static void RunMemoryProfilerPayload()
         {
-            var bench = new ExecutionBenchmark();
+            var bench = new DeserializationBenchmark();
             bench.GlobalSetup();
 
             int count = 0;
             while (true)
             {
-                bench.Hero();
+                bench.SystemTextJson();
 
                 Thread.Sleep(10);
 

@@ -11,7 +11,7 @@ namespace GraphQL.Types
 
         public IEnumerable<IObjectGraphType> PossibleTypes
         {
-            get { return _possibleTypes ?? Enumerable.Empty<IObjectGraphType>(); }
+            get => _possibleTypes ?? Enumerable.Empty<IObjectGraphType>();
             set
             {
                 EnsurePossibleTypes();
@@ -35,7 +35,7 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> Types
         {
-            get { return _types ?? Enumerable.Empty<Type>(); }
+            get => _types ?? Enumerable.Empty<Type>();
             set
             {
                 EnsureTypes();
