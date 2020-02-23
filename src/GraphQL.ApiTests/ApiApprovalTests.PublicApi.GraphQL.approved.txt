@@ -802,9 +802,6 @@ namespace GraphQL.Introspection
     public static class SchemaIntrospection
     {
         public static readonly string IntrospectionQuery;
-        public static readonly GraphQL.Introspection.SchemaMetaFieldType SchemaMeta;
-        public static readonly GraphQL.Introspection.TypeMetaFieldType TypeMeta;
-        public static readonly GraphQL.Introspection.TypeNameMetaFieldType TypeNameMeta;
     }
     public class SchemaMetaFieldType : GraphQL.Types.FieldType
     {
@@ -1709,6 +1706,9 @@ namespace GraphQL.Types
         public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
+        public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        public GraphQL.Types.FieldType TypeMetaFieldType { get; }
+        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void AddType(GraphQL.Types.IGraphType type, GraphQL.Types.TypeCollectionContext context) { }
         public void AddType<TType>()
             where TType : GraphQL.Types.IGraphType, new () { }
@@ -1822,7 +1822,10 @@ namespace GraphQL.Types
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
+        GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        GraphQL.Types.FieldType TypeMetaFieldType { get; }
+        GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         GraphQL.Types.DirectiveGraphType FindDirective(string name);
         GraphQL.Types.IGraphType FindType(string name);
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
@@ -2033,7 +2036,10 @@ namespace GraphQL.Types
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
+        public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
+        public GraphQL.Types.FieldType TypeMetaFieldType { get; }
+        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public GraphQL.Types.DirectiveGraphType FindDirective(string name) { }

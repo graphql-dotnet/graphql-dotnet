@@ -85,9 +85,9 @@ namespace GraphQL.Types
 
             var introspectionType = typeof(SchemaIntrospection);
 
-            lookup.HandleField(introspectionType, SchemaIntrospection.SchemaMeta, ctx);
-            lookup.HandleField(introspectionType, SchemaIntrospection.TypeMeta, ctx);
-            lookup.HandleField(introspectionType, SchemaIntrospection.TypeNameMeta, ctx);
+            lookup.HandleField(introspectionType, lookup.SchemaMetaFieldType, ctx);
+            lookup.HandleField(introspectionType, lookup.TypeMetaFieldType, ctx);
+            lookup.HandleField(introspectionType, lookup.TypeNameMetaFieldType, ctx);
 
             foreach (var directive in directives)
             {
@@ -308,6 +308,7 @@ namespace GraphQL.Types
                     union.AddPossibleType(objType);
                 }
             }
+
         }
 
         private void HandleField(Type parentType, FieldType field, TypeCollectionContext context)
@@ -525,5 +526,11 @@ the name '{typeName}' is already registered to '{existingGraphType.GetType().Ful
                 _types.Add(typeName, type);
             }
         }
+
+        public FieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
+
+        public FieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
+
+        public FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
     }
 }

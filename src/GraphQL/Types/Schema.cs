@@ -121,6 +121,12 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
+        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+
+        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+
+        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
+
         public void RegisterType(IGraphType type)
         {
             CheckDisposed();

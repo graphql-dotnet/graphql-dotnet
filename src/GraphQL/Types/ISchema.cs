@@ -141,5 +141,20 @@ namespace GraphQL.Types
         /// access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the __schema introspection field available on the query graph type
+        /// </summary>
+        FieldType SchemaMetaFieldType { get; }
+
+        /// <summary>
+        /// Returns a reference to the __type introspection field available on the query graph type
+        /// </summary>
+        FieldType TypeMetaFieldType { get; }
+
+        /// <summary>
+        /// Returns a reference to the __typename introspection field available on any graph type
+        /// </summary>
+        FieldType TypeNameMetaFieldType { get; }
     }
 }
