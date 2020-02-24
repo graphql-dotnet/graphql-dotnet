@@ -21,7 +21,8 @@ namespace GraphQL.Utilities
                 [typeof(bool)] = typeof(BooleanGraphType),
                 [typeof(DateTime)] = typeof(DateGraphType),
                 [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
-                [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType)
+                [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
+                [typeof(Guid)] = typeof(IdGraphType)
             };
         }
 
