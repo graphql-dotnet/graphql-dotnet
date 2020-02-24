@@ -30,8 +30,7 @@ namespace GraphQL.DataLoader.Tests.Types
 
             Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
                 .Name("OrderedItems")
-                .Returns<IDataLoaderResult<IDataLoaderResult<IEnumerable<OrderItem>>>>()
-                .Resolve(ctx =>
+                .ResolveAsync(ctx =>
                 {
                     //obtain a reference to the GetOrdersByUserId batch loader
                     var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",

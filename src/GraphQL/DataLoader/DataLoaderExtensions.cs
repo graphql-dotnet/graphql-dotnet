@@ -43,11 +43,10 @@ namespace GraphQL.DataLoader
             }
 
             public Task<T[]> GetResultAsync(CancellationToken cancellationToken = default)
-            {
-                return Task.WhenAll(_dataLoaderResults.Select(x => x.GetResultAsync(cancellationToken)));
-            }
+                => Task.WhenAll(_dataLoaderResults.Select(x => x.GetResultAsync(cancellationToken)));
 
-            async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
+            async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+                => await GetResultAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -60,9 +59,7 @@ namespace GraphQL.DataLoader
         /// or a completed task if the results are already cached.
         /// </returns>
         public static IDataLoaderResult<T[]> LoadAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, params TKey[] keys)
-        {
-            return dataLoader.LoadAsync(keys.AsEnumerable());
-        }
+            => dataLoader.LoadAsync(keys.AsEnumerable());
 
         /// <summary>
         /// Chains post-processing to a pending data loader operation
@@ -116,13 +113,23 @@ namespace GraphQL.DataLoader
         }
 
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>> resolve)
-        {
-            return builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
-        }
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
 
         public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<TReturnType>>> resolve)
-        {
-            return builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
-        }
+            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<TReturnType>>(resolve));
+
+        // chained data loaders
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<TReturnType>>> resolve)
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve));
+
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
+            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<TReturnType>>>(resolve));
+
+        // chain of 3 data loaders
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>> resolve)
+            => builder.Resolve(new FuncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve));
+
+        public static FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>> resolve)
+            => builder.Resolve(new AsyncFieldResolver<TSourceType, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>>(resolve));
     }
 }
