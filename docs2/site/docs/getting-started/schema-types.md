@@ -106,12 +106,38 @@ Compare the two implementations. GraphQL does not specify backing values for mem
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can manually create the `EnumerationGraphType`. Advantages of this method:
+You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.  The `Name` will default to the .NET Type name, which you can override in the constructor.  The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.  The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type.  By default, the name of each enum member will be converted to upper case.  Override `ChangeEnumCase` to change this behavior.  Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.  Apply an `ObsoleteAttribute` to an enum member to set the GraphQL deprecation reason.
 
-- The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties
-- Allows descriptions of enum members
-- Allows deprecation of enum members
-- Backing values may be any primitive type or string
+```csharp
+
+[Description("The Star Wars movies.")]
+[Obsolete("Optional. Sets the GraphQL DeprecationReason for the whole enum.")]
+public enum Episodes
+{
+    [Description("Episode 1: The Phantom Menace")]
+    [Obsolete("Optional. Sets the GraphQL DeprecationReason for this member.")]
+    PHANTOMMENACE = 1,
+
+    [Description("Episode 4: A New Hope")]
+    NEWHOPE  = 4,
+
+    [Description("Episode 5: The Empire Strikes Back")]
+    EMPIRE  = 5,
+
+    [Description("Episode 6: Return of the Jedi")]
+    JEDI  = 6
+}
+
+public class EpisodeEnum : EnumerationGraphType<Episodes>
+{
+}
+```
+
+You can also manually create the `EnumerationGraphType`.  Advantages of this method:
+
+- The GraphQL enum need not map to a specific .NET `enum`.  You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
+- You can manually add description and deprecation reasons.  This may be useful if you do not control the source code for the enum.
+- Backing values may be any primitive type or string.
 
 ```csharp
 public class EpisodeEnum : EnumerationGraphType
@@ -124,14 +150,6 @@ public class EpisodeEnum : EnumerationGraphType
         AddValue("EMPIRE", "Released in 1980.", 5);
         AddValue("JEDI", "Released in 1983.", 6);
     }
-}
-```
-
-You can also use the generic version by passing it a .NET `enum` which will populate the values for you (excluding description).  The `Name` will default to the .NET Type name, which you can override in the constructor. By default, the name of each enum member will be converted to upper case. This behavior can be changed by overriding `ChangeEnumCase`.
-
-```csharp
-public class EpisodeEnum : EnumerationGraphType<Episodes>
-{
 }
 ```
 
