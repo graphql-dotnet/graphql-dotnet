@@ -210,7 +210,6 @@ public class UserType : ObjectGraphType<User>
 
         Field<ListGraphType<ItemType>, IEnumerable<Item>>()
             .Name("OrderedItems")
-            .Returns<IDataLoaderResult<IDataLoaderResult<Item[]>>>()
             .ResolveAsync(async context =>
             {
                 // Asynchronously authenticate
