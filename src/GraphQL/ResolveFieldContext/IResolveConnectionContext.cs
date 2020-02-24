@@ -1,5 +1,3 @@
-using GraphQL.Types;
-
 namespace GraphQL.Builders
 {
     public interface IResolveConnectionContext : IResolveFieldContext
