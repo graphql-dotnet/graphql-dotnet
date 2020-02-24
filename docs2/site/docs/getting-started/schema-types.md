@@ -105,7 +105,7 @@ Consider the equivalent `enum` in .NET:
 ```csharp
 public enum Episodes
 {
-    NEWHOPE  = 4,
+    NEWHOPE = 4,
     EMPIRE  = 5,
     JEDI  = 6
 }
