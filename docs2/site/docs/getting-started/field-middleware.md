@@ -18,10 +18,10 @@ await schema.ExecuteAsync(_ =>
 });
 ```
 
-You can write a class that has a `Resolve` method:
+And write a class that implements `IFieldMiddleware`:
 
 ```csharp
-public class InstrumentFieldsMiddleware
+public class InstrumentFieldsMiddleware : IFieldMiddleware
 {
   public async Task<object> Resolve(
     IResolveFieldContext context,
@@ -41,10 +41,10 @@ public class InstrumentFieldsMiddleware
 }
 ```
 
-Or you can register a middleware delegate directly:
+Or, you can register a middleware delegate directly:
 
 ```csharp
-_.FieldMiddleware.Use(next =>
+_.FieldMiddleware.Use((schema, next) =>
 {
   return context =>
   {
@@ -56,7 +56,7 @@ _.FieldMiddleware.Use(next =>
 });
 ```
 
-Also, you can implement the `IFieldMiddleware` interface in your Field Middleware class:
+The middleware interface is defined as:
 
 ```csharp
 public interface IFieldMiddleware
@@ -64,11 +64,6 @@ public interface IFieldMiddleware
   Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next);
 }
 ```
-
-It doesn’t have to be implemented on your middleware. If you do not, a search will be made for a method named `Resolve`
-with a suitable signature, as shown above.
-
-Nevertheless, **to improve performance, it is recommended to implement this interface.**
 
 The middleware delegate is defined as:
 
