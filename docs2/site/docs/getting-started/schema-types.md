@@ -245,8 +245,11 @@ When GraphQL.NET receives an enum member name as a query argument, the queried f
                     //episode = 4
                     var episode = context.GetArgument<int>("appearsIn");
 
+                    //Alternatively, get the argument as an enum. episodeFromEnum = Episodes.NEWHOPE
+                    var episodeFromEnum = context.GetArgument<Episodes>("appearsIn");
+
                     //full implementation would access data store to get humans by episode.
-                    return default(Human);                
+                    return default(Human);
                 }
             );
         }
