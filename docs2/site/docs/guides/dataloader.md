@@ -237,7 +237,7 @@ public class UserType : ObjectGraphType<User>
 
                     var itemsResults = itemsLoader.LoadAsync(orderIds);
 
-                    // itemsResults is of type IDataLoaderResult<IEnumerable<Item[]>> so the array needs to be flattened
+                    // itemsResults is of type IDataLoaderResult<IEnumerable<Item>[]> so the array needs to be flattened
                     //   before returning it back to the query
                     return itemsResults.Then(itemResultSet =>
                     {
