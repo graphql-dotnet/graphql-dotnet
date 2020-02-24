@@ -15,7 +15,11 @@ namespace GraphQL
     /// <summary>Configuration options to be passed to <see cref="IDocumentExecuter"/> to execute a query</summary>
     public class ExecutionOptions : IProvideUserContext
     {
-        /// <summary>Schema of graph to use; required<br/><br/>Schema will be initialized if has not yet been initialized.</summary>
+        /// <summary>
+        /// Schema of graph to use; required
+        /// <br/><br/>
+        /// Schema will be initialized if it has not yet been initialized.
+        /// </summary>
         public ISchema Schema { get; set; }
 
         /// <summary>Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers</summary>
@@ -44,7 +48,7 @@ namespace GraphQL
         /// <summary>
         /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
         /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
-        /// at the beginning of the first call to DocumentExecuter.ExecuteAsync.
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(Action{ExecutionOptions})">ExecuteAsync</see>.
         /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
 

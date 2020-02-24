@@ -243,7 +243,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.ListValue:
                 {
                     var list = (GraphQLListValue)source;
-                    var values = list.Values.Select(Value);
+                    var values = list.Values?.Select(Value);
                     return new ListValue(values).WithLocation(list, _body);
                 }
                 case ASTNodeKind.NullValue:

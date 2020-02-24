@@ -8,8 +8,8 @@ namespace GraphQL.Execution
     public interface IProvideUserContext
     {
         /// <summary>
-        /// Mutable user-defined context to be passed to and shared by all field resolvers.<br/>
-        /// <br/>
+        /// Mutable user-defined context to be passed to and shared by all field resolvers.
+        /// <br/><br/>
         /// A custom implementation of <see cref="IDictionary{TKey, TValue}">IDictionary</see> may be
         /// used in place of the default <see cref="Dictionary{TKey, TValue}">Dictionary</see>.
         /// </summary>

@@ -14,11 +14,14 @@ namespace GraphQL.SystemTextJson
     public sealed class JsonConverterBigInteger : JsonConverter<BigInteger>
     {
         public override BigInteger Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => TryGetBigInteger(ref reader, out var bi) ? bi : throw new JsonException();
+
+        public static bool TryGetBigInteger(ref Utf8JsonReader reader, out BigInteger bi)
         {
             var byteSpan = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
             Span<char> chars = stackalloc char[byteSpan.Length];
             Encoding.UTF8.GetChars(reader.ValueSpan, chars);
-            return BigInteger.Parse(chars);
+            return BigInteger.TryParse(chars, out bi);
         }
 
         public override void Write(Utf8JsonWriter writer, BigInteger value, JsonSerializerOptions options)

@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Types;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
     internal class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
         private readonly IResolveFieldContext _baseContext;
 
+        /// <summary>
+        /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
