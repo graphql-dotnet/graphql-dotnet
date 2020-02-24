@@ -71,13 +71,19 @@ var result = executer.ExecuteAsync(opts => {
 
 First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
-Then use the `Context` property on the accessor to get the current `DataLoaderContext`. Each request will have its own context instance.
+Then use the `Context` property on the accessor to get the current `DataLoaderContext`. The `DataLoaderDocumentListener` configured above ensures that each request will have its own context instance.
 
 Use one of the "GetOrAddLoader" methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
 
-Call `LoadAsync()` on the data loader. This will queue the request and return a `Task<T>`. If the result has already been cached, the task returned will already be completed.
+Call `LoadAsync()` on the data loader. This will queue the request and return a `IDataLoaderResult<T>`. If the result has already been cached, the task returned will already be completed.
 
-The `DataLoaderDocumentListener` configured in the set up steps above automatically handles dispatching all pending data loader operations at each step of the document execution.
+If your code requires an asynchronous call prior to queuing the data loader, use the `ResolveAsync` field builder method to return a
+`Task<IDataLoaderResult<T>>`. The execution strategy will execute the asynchronous code prior to queuing the data loader.
+
+To execute code within the resolver after the data loader has retrieved the data, pass a delegate to the `Then` extension
+method of the returned `IDataLoaderResult<T>`. You can use a synchronous or asynchronous delegate, and it can return another
+`IDataLoaderResult<T>` if you wish to chain dataloaders together. This may result in the field builder's Resolve delegate
+signature looking like `IDataLoaderResult<IDataLoaderResult<T>>`, which is correct and will be handled properly by the execution strategy.
 
 ## Examples
 
@@ -100,7 +106,9 @@ public class OrderType : ObjectGraphType<Order>
                 var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersById", users.GetUsersByIdAsync);
 
                 // Add this UserId to the pending keys to fetch
-                // The task will complete once the GetUsersByIdAsync() returns with the batched results
+                // The execution strategy will trigger the data loader to fetch the data via GetUsersByIdAsync() at the
+                //   appropriate time, and the field will be resolved with an instance of User once GetUsersByIdAsync()
+                //   returns with the batched results
                 return loader.LoadAsync(context.Source.UserId);
             });
     }
@@ -135,7 +143,9 @@ public class UserType : ObjectGraphType<User>
                     orders.GetOrdersByUserIdAsync);
 
                 // Add this UserId to the pending keys to fetch data for
-                // The task will complete with an IEnumberable<Order> once the fetch delegate has returned
+                // The execution strategy will trigger the data loader to fetch the data via GetOrdersByUserId() at the
+                //   appropriate time, and the field will be resolved with an instance of IEnumerable<User> once
+                //   GetOrdersByUserId() returns with the batched results
                 return ordersLoader.LoadAsync(ctx.Source.UserId);
             });
     }
@@ -184,4 +194,74 @@ public interface IUsersStore
 }
 ```
 
+This is an example of using two chained DataLoaders to batch requests together, with asynchronous code before the data loaders execute, and post-processing afterwards.
+
+``` csharp
+public class UserType : ObjectGraphType<User>
+{
+    // Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
+    public UserType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders, IItemsStore items)
+    {
+        ...
+
+        Field<ListGraphType<ItemType>, IEnumerable<Item>>()
+            .Name("OrderedItems")
+            .Returns<IDataLoaderResult<IDataLoaderResult<Item[]>>>()
+            .ResolveAsync(async context =>
+            {
+                // Asynchronously authenticate
+                var valid = await users.CanViewOrders(context.Source.UserId);
+                if (!valid) return null;
+                
+                // Get or add a collection batch loader with the key "GetOrdersByUserId"
+                // The loader will call GetOrdersByUserIdAsync with a batch of keys
+                var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
+                    orders.GetOrdersByUserIdAsync);
+
+                var ordersResult = ordersLoader.LoadAsync(context.Source.UserId);
+
+                // Once the orders have been retrieved by the first data loader, feed the order IDs into
+                //   the second data loader
+                return ordersResult.Then((orders, cancellationToken) =>
+                {
+                    // Collect all of the order IDs
+                    var orderIds = orders.Select(o => o.Id);
+
+                    // Get or add a collection batch loader with the key "GetItemsByOrderId"
+                    // The loader will call GetItemsByOrderId with a batch of keys
+                    var itemsLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Item>("GetItemsByOrderId",
+                        items.GetItemsByOrderIdAsync);
+
+                    var itemsResults = itemsLoader.LoadAsync(orderIds);
+
+                    // itemsResults is of type IDataLoaderResult<IEnumerable<Item[]>> so the array needs to be flattened
+                    //   before returning it back to the query
+                    return itemsResults.Then(itemResultSet =>
+                    {
+                        // Flatten the results after the second dataloader has finished
+                        return flattenedResults = itemResultSet.SelectMany(x => x);
+                    });
+                });
+            });
+    }
+}
+
+public interface IUsersStore
+{
+    // This will be called for each call to OrderedItems, prior to any data loader execution
+    Task<bool> CanViewOrders(int userId);
+}
+public interface IOrdersStore
+{
+    // This will be called by the "order" loader for all pending keys
+    // Note that fetch delegates can accept a CancellationToken parameter or not
+    Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+}
+public interface IItemsStore
+{
+    // This will be called by the "item" loader for all pending keys
+    // Note that fetch delegates can accept a CancellationToken parameter or not
+    Task<ILookup<int, Item>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds, CancellationToken cancellationToken);
+}
+```
 > See this [blog series](https://github.com/fiyazbinhasan/GraphQLCore/tree/Part_X_DataLoader) for an in depth example using Entity Framework.
