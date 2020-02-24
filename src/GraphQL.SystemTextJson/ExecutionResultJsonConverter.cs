@@ -21,7 +21,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndObject();
         }
 
-        private void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
+        private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             var data = result.Data;
 
@@ -30,67 +30,101 @@ namespace GraphQL.SystemTextJson
                 return;
             }
 
-            WriteDataRecursively(writer, "data", data, options);
+            WriteProperty(writer, "data", data, options);
         }
 
-        private void WriteDataRecursively(Utf8JsonWriter writer, string name, object data, JsonSerializerOptions options)
+        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
         {
-            if (name != null)
+            writer.WritePropertyName(propertyName);
+            WriteValue(writer, propertyValue, options);
+        }
+
+        private static void WriteValue(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            switch (value)
             {
-                if (data == null)
+                case null:
                 {
-                    writer.WriteNull(name);
-                    return;
+                    writer.WriteNullValue();
+                    break;
                 }
-
-                if (data is string s)
+                case string s:
                 {
-                    writer.WriteString(name, s);
-                    return;
+                    writer.WriteStringValue(s);
+                    break;
                 }
-
-                if (data is bool b)
+                case bool b:
                 {
-                    writer.WriteBoolean(name, b);
-                    return;
+                    writer.WriteBooleanValue(b);
+                    break;
                 }
-
-                writer.WritePropertyName(name);
-            }
-
-            if (data is Dictionary<string, object> dictionary)
-            {
-                writer.WriteStartObject();
-
-                foreach (var kvp in dictionary)
-                    WriteDataRecursively(writer, kvp.Key, kvp.Value, options);
-
-                writer.WriteEndObject();
-            }
-            else if (data is List<object> list)
-            {
-                writer.WriteStartArray();
-
-                foreach (object item in list)
+                case int i:
                 {
-                    if (item is null)
-                        writer.WriteNullValue();
-                    else if (item is string s)
-                        writer.WriteStringValue(s);
-                    else
-                        WriteDataRecursively(writer, null, item, options);
+                    writer.WriteNumberValue(i);
+                    break;
                 }
+                case long l:
+                {
+                    writer.WriteNumberValue(l);
+                    break;
+                }
+                case float f:
+                {
+                    writer.WriteNumberValue(f);
+                    break;
+                }
+                case double d:
+                {
+                    writer.WriteNumberValue(d);
+                    break;
+                }
+                case decimal dm:
+                {
+                    writer.WriteNumberValue(dm);
+                    break;
+                }
+                case uint ui:
+                {
+                    writer.WriteNumberValue(ui);
+                    break;
+                }
+                case ulong ul:
+                {
+                    writer.WriteNumberValue(ul);
+                    break;
+                }
+                case Dictionary<string, object> dictionary:
+                {
+                    writer.WriteStartObject();
 
-                writer.WriteEndArray();
-            }
-            else
-            {
-                // Need to avoid this call by all means! The question remains open - why this API so expensive?
-                JsonSerializer.Serialize(writer, data, options);
+                    foreach (var kvp in dictionary)
+                        WriteProperty(writer, kvp.Key, kvp.Value, options);
+
+                    writer.WriteEndObject();
+
+                    break;
+                }
+                case List<object> list:
+                {
+                    writer.WriteStartArray();
+
+                    foreach (object item in list)
+                        WriteValue(writer, item, options);
+
+                    writer.WriteEndArray();
+
+                    break;
+                }
+                default:
+                {
+                    // Need to avoid this call by all means! The question remains open - why this API so expensive?
+                    JsonSerializer.Serialize(writer, value, options);
+                    break;
+                }
             }
         }
 
-        private void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -140,7 +174,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndArray();
         }
 
-        private void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
+        private static void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
         {
             if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
             {
@@ -179,7 +213,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndObject();
         }
 
-        private void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
+        private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             if (result.Extensions?.Count > 0)
             {
