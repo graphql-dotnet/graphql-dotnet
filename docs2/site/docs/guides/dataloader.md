@@ -272,7 +272,8 @@ public interface IItemsStore
 ## Exceptions
 
 Exceptions within data loaders' fetch delegates are passed back to the execution strategy for all associated fields.
-If you have a need to capture exceptions raised by the fetch delegate, create a `new SimpleDataLoader` within
+If you have a need to capture exceptions raised by the fetch delegate, create a `new SimpleDataLoader<T>` within
 your field resolver (do not use the `IDataLoaderContextAccessor` for this) and have its fetch delegate await the
 `IDataLoaderResult<T>.GetResultAsync` method of the result obtained from the first data loader within a try/catch
-block. The data loader will still load at the appropriate time, and you can handle exceptions as desired.
+block. Return the result of the simple data loader's `LoadAsync()` function to the field resolver.  The data loader
+will still load at the appropriate time, and you can handle exceptions as desired.
