@@ -143,7 +143,7 @@ public class EpisodeEnum : EnumerationGraphType<Episodes>
 }
 ```
 
-You can also manually create the `EnumerationGraphType`.  Advantages of this method:
+You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
 - The GraphQL enum need not map to a specific .NET `enum`.  You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
 - You can manually add description and deprecation reasons.  This may be useful if you do not control the source code for the enum.
