@@ -100,7 +100,6 @@ enum Episode {
 
 **.NET**
 
-
 Consider the equivalent `enum` in .NET:
 
 ```csharp
