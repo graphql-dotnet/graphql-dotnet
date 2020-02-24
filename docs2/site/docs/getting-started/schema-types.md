@@ -147,7 +147,7 @@ You can also manually create the `EnumerationGraphType`. Advantages of this meth
 
 - The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
 - You can manually add descriptions and deprecation reasons. This may be useful if you do not control the source code for the enum.
-- Backing values may be any primitive type or string.
+- Backing enum values may be of any type, primitive or not.
 
 ```csharp
 public class EpisodeEnum : EnumerationGraphType
