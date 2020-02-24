@@ -75,10 +75,14 @@ Then use the `Context` property on the accessor to get the current `DataLoaderCo
 
 Use one of the "GetOrAddLoader" methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
 
-Call `LoadAsync()` on the data loader. This will queue the request and return a `IDataLoaderResult<T>`. If the result has already been cached, the task returned will already be completed.
+Call `LoadAsync()` on the data loader. This will queue the request and return a `IDataLoaderResult<T>`. If the result has already been cached, the returned value will be pulled from the cache.
+
+The `ExecutionStrategy` will dispatch queued data loaders after all other pending fields have been resolved.
 
 If your code requires an asynchronous call prior to queuing the data loader, use the `ResolveAsync` field builder method to return a
-`Task<IDataLoaderResult<T>>`. The execution strategy will execute the asynchronous code prior to queuing the data loader.
+`Task<IDataLoaderResult<T>>`. The execution strategy will start executing the asynchronous code as soon as the field resolver executes.
+Once the `IDataLoaderResult<T>` is retrieved from the asynchronous task, the data loader will be queued to be dispatched once all
+other pending fields have been resolved.
 
 To execute code within the resolver after the data loader has retrieved the data, pass a delegate to the `Then` extension
 method of the returned `IDataLoaderResult<T>`. You can use a synchronous or asynchronous delegate, and it can return another
@@ -265,3 +269,11 @@ public interface IItemsStore
 }
 ```
 > See this [blog series](https://github.com/fiyazbinhasan/GraphQLCore/tree/Part_X_DataLoader) for an in depth example using Entity Framework.
+
+## Exceptions
+
+Exceptions within data loaders' fetch delegates are passed back to the execution strategy for all associated fields.
+If you have a need to capture exceptions raised by the fetch delegate, create a `new SimpleDataLoader` within
+your field resolver (do not use the `IDataLoaderContextAccessor` for this) and have its fetch delegate await the
+`IDataLoaderResult<T>.GetResultAsync` method of the result obtained from the first data loader within a try/catch
+block. The data loader will still load at the appropriate time, and you can handle exceptions as desired.
