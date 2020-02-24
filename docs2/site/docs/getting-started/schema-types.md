@@ -210,7 +210,7 @@ public class HumanIntType: ObjectGraphType<HumanInt>
 Enumerations can be used as arguments in GraphQL queries. Consider a query which gets the humans appearing in a specific film:
 
 ```graphql
-query HumansAppearingIn($episode: Episode){
+query HumansAppearingIn($episode: Episode!){
     humans(appearsIn: $episode){
         id
         name
