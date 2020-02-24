@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -20,7 +21,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndObject();
         }
 
-        private void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
+        private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             var data = result.Data;
 
@@ -29,11 +30,101 @@ namespace GraphQL.SystemTextJson
                 return;
             }
 
-            writer.WritePropertyName("data");
-            JsonSerializer.Serialize(writer, data, options);
+            WriteProperty(writer, "data", data, options);
         }
 
-        private void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
+        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
+        {
+            writer.WritePropertyName(propertyName);
+            WriteValue(writer, propertyValue, options);
+        }
+
+        private static void WriteValue(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            switch (value)
+            {
+                case null:
+                {
+                    writer.WriteNullValue();
+                    break;
+                }
+                case string s:
+                {
+                    writer.WriteStringValue(s);
+                    break;
+                }
+                case bool b:
+                {
+                    writer.WriteBooleanValue(b);
+                    break;
+                }
+                case int i:
+                {
+                    writer.WriteNumberValue(i);
+                    break;
+                }
+                case long l:
+                {
+                    writer.WriteNumberValue(l);
+                    break;
+                }
+                case float f:
+                {
+                    writer.WriteNumberValue(f);
+                    break;
+                }
+                case double d:
+                {
+                    writer.WriteNumberValue(d);
+                    break;
+                }
+                case decimal dm:
+                {
+                    writer.WriteNumberValue(dm);
+                    break;
+                }
+                case uint ui:
+                {
+                    writer.WriteNumberValue(ui);
+                    break;
+                }
+                case ulong ul:
+                {
+                    writer.WriteNumberValue(ul);
+                    break;
+                }
+                case Dictionary<string, object> dictionary:
+                {
+                    writer.WriteStartObject();
+
+                    foreach (var kvp in dictionary)
+                        WriteProperty(writer, kvp.Key, kvp.Value, options);
+
+                    writer.WriteEndObject();
+
+                    break;
+                }
+                case List<object> list:
+                {
+                    writer.WriteStartArray();
+
+                    foreach (object item in list)
+                        WriteValue(writer, item, options);
+
+                    writer.WriteEndArray();
+
+                    break;
+                }
+                default:
+                {
+                    // Need to avoid this call by all means! The question remains open - why this API so expensive?
+                    JsonSerializer.Serialize(writer, value, options);
+                    break;
+                }
+            }
+        }
+
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -83,7 +174,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndArray();
         }
 
-        private void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
+        private static void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
         {
             if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
             {
@@ -122,7 +213,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndObject();
         }
 
-        private void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
+        private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             if (result.Extensions?.Count > 0)
             {
