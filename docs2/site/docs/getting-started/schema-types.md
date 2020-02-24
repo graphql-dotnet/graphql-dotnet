@@ -236,7 +236,7 @@ When GraphQL.NET receives an enum member name as a query argument, the queried f
             Field<ListGraphType<HumanType>>(
                 "humans",
                 arguments: new QueryArguments(
-                    new QueryArgument<EpisodeEnum> 
+                    new QueryArgument<NonNullGraphType<EpisodeEnum>>
                         { 
                             Name = "appearsIn", 
                             Description = "An episode the human appears in." 
