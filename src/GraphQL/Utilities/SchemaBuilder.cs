@@ -603,7 +603,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     var list = source as GraphQLListValue;
                     Debug.Assert(list != null, nameof(list) + " != null");
-                    var values = list.Values.Select(ToValue).ToArray();
+
+                    if (list.Values == null)
+                        return Array.Empty<object>();
+
+                    object[] values = list.Values.Select(ToValue).ToArray();
                     return values;
                 }
                 default:
