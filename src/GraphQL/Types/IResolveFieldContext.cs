@@ -3,6 +3,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Field = GraphQL.Language.AST.Field;
@@ -72,6 +73,9 @@ namespace GraphQL.Types
 
         /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }
+
+        /// <summary>The service provider for the executing request</summary>
+        IServiceProvider RequestServices { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

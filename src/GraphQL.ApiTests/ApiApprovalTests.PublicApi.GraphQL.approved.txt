@@ -82,6 +82,7 @@ namespace GraphQL
         public int? MaxParallelExecutionCount { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
@@ -498,6 +499,7 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
@@ -1801,6 +1803,7 @@ namespace GraphQL.Types
         GraphQL.Language.AST.Operation Operation { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
         System.Collections.Generic.IEnumerable<string> Path { get; }
+        System.IServiceProvider RequestServices { get; }
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
@@ -1822,6 +1825,7 @@ namespace GraphQL.Types
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
+        System.IServiceProvider Services { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
         GraphQL.Types.DirectiveGraphType FindDirective(string name);
         GraphQL.Types.IGraphType FindType(string name);
@@ -1968,6 +1972,7 @@ namespace GraphQL.Types
         public GraphQL.Language.AST.Operation Operation { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
         public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public System.IServiceProvider RequestServices { get; }
         public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
@@ -1992,6 +1997,7 @@ namespace GraphQL.Types
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
         public System.Collections.Generic.IEnumerable<string> Path { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -2004,7 +2010,7 @@ namespace GraphQL.Types
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.Types.IResolveFieldContext context) { }
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path, System.IServiceProvider requestServices) { }
         public new TSource Source { get; set; }
     }
     public class SByteGraphType : GraphQL.Types.ScalarGraphType
@@ -2021,7 +2027,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public abstract object Serialize(object value);
     }
-    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -2033,6 +2039,7 @@ namespace GraphQL.Types
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
+        public System.IServiceProvider Services { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }

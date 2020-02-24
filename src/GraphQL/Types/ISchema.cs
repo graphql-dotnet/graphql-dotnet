@@ -141,5 +141,10 @@ namespace GraphQL.Types
         /// access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; set; }
+
+        /// <summary>
+        /// The service provider for the schema
+        /// </summary>
+        IServiceProvider Services { get; }
     }
 }

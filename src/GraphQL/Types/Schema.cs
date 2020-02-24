@@ -8,9 +8,8 @@ using System.Linq;
 namespace GraphQL.Types
 {
     /// <inheritdoc cref="ISchema"/>
-    public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
+    public class Schema : MetadataProvider, ISchema, IDisposable
     {
-        private IServiceProvider _services;
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
@@ -32,7 +31,7 @@ namespace GraphQL.Types
         /// </summary>
         public Schema(IServiceProvider services)
         {
-            _services = services;
+            Services = services;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -76,26 +75,7 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
-        /// <summary>
-        /// Gets the service object of the specified type. Schema itself acts as a service provider used to
-        /// create objects, such as graph types, requested by the schema.
-        /// <br/><br/>
-        /// Note that most objects are created during schema initialization, which then have the same lifetime
-        /// as the schema's lifetime.
-        /// <br/><br/>
-        /// Other types created by the service provider may include directive visitors, middlewares, validation
-        /// rules, and name converters, among others.
-        /// <br/><br/>
-        /// Explicit implementation of the <see cref="IServiceProvider.GetService"/> method makes this method
-        /// less visible to the calling code, which reduces the likelihood of using it as so called ServiceLocator
-        /// anti-pattern. However, in some advanced scenarios this may be necessary.
-        /// </summary>
-        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
-        /// <returns>
-        /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
-        /// object of type serviceType.
-        /// </returns>
-        object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
+        public IServiceProvider Services { get; private set; }
 
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
@@ -220,7 +200,7 @@ namespace GraphQL.Types
             {
                 if (_lookup != null)
                 {
-                    _services = null;
+                    Services = null;
                     Query = null;
                     Mutation = null;
                     Subscription = null;
@@ -283,12 +263,12 @@ namespace GraphQL.Types
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
+                .Union(_additionalTypes.Select(type => (IGraphType)Services.GetRequiredService(type.GetNamedType())));
 
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => (IGraphType)_services.GetRequiredService(type),
+                type => (IGraphType)Services.GetRequiredService(type),
                 FieldNameConverter,
                 seal: true);
         }

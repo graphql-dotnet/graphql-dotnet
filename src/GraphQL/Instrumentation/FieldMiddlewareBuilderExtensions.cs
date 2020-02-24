@@ -53,8 +53,6 @@ namespace GraphQL.Instrumentation
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
-            static Exception NotSupported(ISchema schema) => new NotSupportedException($"'{schema.GetType().FullName}' should implement 'IServiceProvider' interface for resolving middlewares.");
-
             static T CheckNotNull<T>(T instance, System.Type type)
             {
                 if (instance == null)
@@ -74,10 +72,8 @@ namespace GraphQL.Instrumentation
             {
                 return builder.Use((schema, next) =>
                 {
-                    // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
-                    var instance = CheckSchemaNotNull(schema) is IServiceProvider provider
-                        ? CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware)
-                        : throw NotSupported(schema);
+                    var provider = CheckSchemaNotNull(schema).Services;
+                    var instance = CheckNotNull((IFieldMiddleware)provider.GetService(middleware), middleware);
 
                     return context => instance.Resolve(context, next);
                 });
@@ -111,10 +107,8 @@ namespace GraphQL.Instrumentation
 
                 return builder.Use((schema, next) =>
                 {
-                    // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
-                    object instance = CheckSchemaNotNull(schema) is IServiceProvider provider
-                        ? CheckNotNull(provider.GetService(middleware), middleware)
-                        : throw NotSupported(schema);
+                    var provider = CheckSchemaNotNull(schema).Services;
+                    object instance = CheckNotNull(provider.GetService(middleware), middleware);
 
                     return context => (Task<object>)methodInfo.Invoke(instance, new object[] { context, next });
                 });

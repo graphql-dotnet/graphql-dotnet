@@ -1,0 +1,24 @@
+namespace GraphQL.Extensions.DI.Microsoft
+{
+    public class ScopedAsyncFieldResolver<TReturnType> : GraphQL.Resolvers.AsyncFieldResolver<TReturnType>
+    {
+        public ScopedAsyncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+    }
+    public class ScopedAsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.AsyncFieldResolver<TSourceType, TReturnType>
+    {
+        public ScopedAsyncFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+    }
+    public static class ScopedFieldBuilderExtensions
+    {
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsyncScoped<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolver) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, TReturnType> resolver) { }
+    }
+    public class ScopedFieldResolver<TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
+    {
+        public ScopedFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext, TReturnType> resolver) { }
+    }
+    public class ScopedFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TSourceType, TReturnType>
+    {
+        public ScopedFieldResolver(System.Func<GraphQL.Types.IResolveFieldContext<TSourceType>, TReturnType> resolver) { }
+    }
+}

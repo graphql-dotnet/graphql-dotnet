@@ -83,6 +83,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.SystemTextJson", "G
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serialization", "Serialization", "{7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Extensions.DI.Microsoft", "GraphQL.Extensions.DI.Microsoft\GraphQL.Extensions.DI.Microsoft.csproj", "{806E7A14-668C-46A9-9C68-E98A49400E08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "DependencyInjection", "{2EA5354E-F4EF-4469-86AE-F1D36C7F8977}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +137,10 @@ Global
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{806E7A14-668C-46A9-9C68-E98A49400E08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{806E7A14-668C-46A9-9C68-E98A49400E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{806E7A14-668C-46A9-9C68-E98A49400E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{806E7A14-668C-46A9-9C68-E98A49400E08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +155,7 @@ Global
 		{F279F263-BCEB-4738-9111-C85139BC63A7} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 		{55968205-5F9A-4646-AFE4-F29913570DBA} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
+		{806E7A14-668C-46A9-9C68-E98A49400E08} = {2EA5354E-F4EF-4469-86AE-F1D36C7F8977}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

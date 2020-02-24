@@ -51,6 +51,8 @@ namespace GraphQL.Types
 
         public IDictionary<string, Field> SubFields { get; set; }
 
+        public IServiceProvider RequestServices { get; set; }
+
         public ResolveFieldContext() { }
 
         /// <summary>
@@ -77,6 +79,7 @@ namespace GraphQL.Types
             Errors = context.Errors;
             SubFields = context.SubFields;
             Path = context.Path;
+            RequestServices = context.RequestServices;
         }
     }
 
@@ -113,7 +116,7 @@ namespace GraphQL.Types
         /// <param name="parentType">The field's parent graph type</param>
         /// <param name="arguments">A dictionary of arguments passed to the field</param>
         /// <param name="path">The path to the current executing field from the request root</param>
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path, IServiceProvider requestServices)
         {
             Source = source;
             FieldName = field.Name;
@@ -133,6 +136,7 @@ namespace GraphQL.Types
             Metrics = context.Metrics;
             Errors = context.Errors;
             Path = path;
+            RequestServices = requestServices;
         }
     }
 }

@@ -1,38 +1,36 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Types;
 
-namespace GraphQL.Types
+namespace GraphQL.Extensions.DI.Microsoft
 {
-    internal class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
+    internal class ScopedResolveFieldContextAdapter<TSource> : ScopedResolveFieldContextAdapter, IResolveFieldContext<TSource>
+    {
+        private readonly IResolveFieldContext<TSource> _baseContext;
+
+        public ScopedResolveFieldContextAdapter(IResolveFieldContext<TSource> context, IServiceProvider serviceProvider) : base(context, serviceProvider)
+        {
+            _baseContext = context;
+        }
+
+        TSource IResolveFieldContext<TSource>.Source => _baseContext.Source;
+    }
+
+    internal class ScopedResolveFieldContextAdapter : IResolveFieldContext
     {
         private readonly IResolveFieldContext _baseContext;
 
-        /// <summary>
-        /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
-        public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
+        public ScopedResolveFieldContextAdapter(IResolveFieldContext context, IServiceProvider serviceProvider)
         {
-            _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
-
-            try
-            {
-                Source = (T)baseContext.Source;
-            }
-            catch (InvalidCastException)
-            {
-                throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
-            }
-            catch (NullReferenceException)
-            {
-                throw new ArgumentException("baseContext.Source is null and cannot be cast to non-nullable value type " + typeof(T).Name, nameof(baseContext));
-            }
+            _baseContext = context;
+            RequestServices = serviceProvider;
         }
 
-        public T Source { get; }
+        public object Source => _baseContext.Source;
 
         public string FieldName => _baseContext.FieldName;
 
@@ -68,10 +66,10 @@ namespace GraphQL.Types
 
         public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
 
+        public IServiceProvider RequestServices { get; }
+
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 
-        object IResolveFieldContext.Source => Source;
-
-        public IServiceProvider RequestServices => _baseContext.RequestServices;
+        object IResolveFieldContext.Source => _baseContext.Source;
     }
 }
