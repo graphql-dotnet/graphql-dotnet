@@ -1,6 +1,6 @@
 # Variables
 
-You can pass variables recieved from the client to the execution engine by using the `Inputs` property.
+You can pass variables received from the client to the execution engine by using the `Inputs` property.
 
 > See the [official GraphQL documentation on variables](http://graphql.org/learn/queries/#variables)
 
@@ -33,7 +33,7 @@ var variablesJson = // get from request
 // `ToInputs` extension method converts the json to the `Inputs` class
 var inputs = variablesJson.ToInputs();
 
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.Inputs = inputs;

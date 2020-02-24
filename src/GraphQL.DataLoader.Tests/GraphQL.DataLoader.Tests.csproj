@@ -1,24 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="../Tests.props" />
+  
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp2.0</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <LangVersion>7.3</LangVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="Bogus" Version="23.0.2" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-      <PackageReference Include="Moq" Version="4.9.0" />
-      <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0-pre-05" />
-      <PackageReference Include="Shouldly" Version="2.8.3" />
-      <PackageReference Include="xunit" Version="2.3.1" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-      <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="Bogus" Version="28.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
+    <PackageReference Include="Moq" Version="4.12.0" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 

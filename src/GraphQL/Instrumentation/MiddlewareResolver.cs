@@ -10,10 +10,10 @@ namespace GraphQL.Instrumentation
 
         public MiddlewareResolver(IFieldResolver next)
         {
-            _next = next ?? new NameFieldResolver();
+            _next = next ?? NameFieldResolver.Instance;
         }
 
-        public async Task<object> Resolve(ResolveFieldContext context)
+        public async Task<object> Resolve(IResolveFieldContext context)
         {
             object result = _next.Resolve(context);
 
@@ -28,7 +28,7 @@ namespace GraphQL.Instrumentation
             }
         }
 
-        object IFieldResolver.Resolve(ResolveFieldContext context)
+        object IFieldResolver.Resolve(IResolveFieldContext context)
         {
             return Resolve(context);
         }

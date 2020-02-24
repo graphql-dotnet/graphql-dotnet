@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -25,14 +24,14 @@ namespace GraphQL.DataLoader.Tests
             AssertQuerySuccess<DataLoaderTestSchema>(
                 query: "{ users { userId firstName } }",
                 expected: @"
-{ users: [
+{ ""users"": [
     {
-        userId: 1,
-        firstName: """ + users[0].FirstName + @"""
+        ""userId"": 1,
+        ""firstName"": """ + users[0].FirstName + @"""
     },
     {
-        userId: 2,
-        firstName: """ + users[1].FirstName + @"""
+        ""userId"": 2,
+        ""firstName"": """ + users[1].FirstName + @"""
     }
 ] }
 ");
@@ -70,11 +69,11 @@ namespace GraphQL.DataLoader.Tests
 }",
                 expected: @"
 {
-    order: {
-        orderId: 1,
-        user: {
-            userId: 1,
-            firstName: """ + users[0].FirstName + @"""
+    ""order"": {
+        ""orderId"": 1,
+        ""user"": {
+            ""userId"": 1,
+            ""firstName"": """ + users[0].FirstName + @"""
         }
     }
 }
@@ -115,19 +114,19 @@ namespace GraphQL.DataLoader.Tests
 }",
                 expected: @"
 {
-    orders: [
+    ""orders"": [
     {
-        orderId: 1,
-        user: {
-            userId: 1,
-            firstName: """ + users[0].FirstName + @"""
+        ""orderId"": 1,
+        ""user"": {
+            ""userId"": 1,
+            ""firstName"": """ + users[0].FirstName + @"""
         }
     },
     {
-        orderId: 2,
-        user: {
-            userId: 2,
-            firstName: """ + users[1].FirstName + @"""
+        ""orderId"": 2,
+        ""user"": {
+            ""userId"": 2,
+            ""firstName"": """ + users[1].FirstName + @"""
         }
     }]
 }

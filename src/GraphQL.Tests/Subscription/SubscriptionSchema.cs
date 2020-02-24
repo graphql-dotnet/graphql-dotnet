@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -64,9 +65,25 @@ namespace GraphQL.Tests.Subscription
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
                 AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)
             });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "messageGetAll",
+                Type = typeof(ListGraphType<MessageType>),
+                Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
+                Subscriber = new EventStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
+            });
+
+            AddField(new EventStreamFieldType
+            {
+                Name = "newMessageContent",
+                Type = typeof(StringGraphType),
+                Resolver = new FuncFieldResolver<string>(context => context.Source as string),
+                Subscriber = new EventStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
+            });
         }
 
-        private IObservable<Message> SubscribeById(ResolveEventStreamContext context)
+        private IObservable<Message> SubscribeById(IResolveEventStreamContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -75,7 +92,7 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private async Task<IObservable<Message>> SubscribeByIdAsync(ResolveEventStreamContext context)
+        private async Task<IObservable<Message>> SubscribeByIdAsync(IResolveEventStreamContext context)
         {
             var id = context.GetArgument<string>("id");
 
@@ -83,19 +100,19 @@ namespace GraphQL.Tests.Subscription
             return messages.Where(message => message.From.Id == id);
         }
 
-        private Message ResolveMessage(ResolveFieldContext context)
+        private Message ResolveMessage(IResolveFieldContext context)
         {
             var message = context.Source as Message;
 
             return message;
         }
 
-        private IObservable<Message> Subscribe(ResolveEventStreamContext context)
+        private IObservable<Message> Subscribe(IResolveEventStreamContext context)
         {
             return _chat.Messages();
         }
 
-        private Task<IObservable<Message>> SubscribeAsync(ResolveEventStreamContext context)
+        private Task<IObservable<Message>> SubscribeAsync(IResolveEventStreamContext context)
         {
             return _chat.MessagesAsync();
         }
@@ -135,7 +152,7 @@ namespace GraphQL.Tests.Subscription
             Field(o => o.From, false, typeof(MessageFromType)).Resolve(ResolveFrom);
         }
 
-        private MessageFrom ResolveFrom(ResolveFieldContext<Message> context)
+        private MessageFrom ResolveFrom(IResolveFieldContext<Message> context)
         {
             var message = context.Source;
             return message.From;
@@ -193,6 +210,7 @@ namespace GraphQL.Tests.Subscription
         Message AddMessage(Message message);
 
         IObservable<Message> Messages();
+        IObservable<List<Message>> MessagesGetAll();
 
         Message AddMessage(ReceivedMessage message);
 
@@ -202,7 +220,7 @@ namespace GraphQL.Tests.Subscription
     public class Chat : IChat
     {
         private readonly ISubject<Message> _messageStream = new ReplaySubject<Message>(1);
-
+        private readonly ISubject<List<Message>> _allMessageStream = new ReplaySubject<List<Message>>(1);
 
         public Chat()
         {
@@ -244,6 +262,14 @@ namespace GraphQL.Tests.Subscription
             return Messages();
         }
 
+        public List<Message> AddMessageGetAll(Message message)
+        {
+            AllMessages.Push(message);
+            var l = new List<Message>(AllMessages);
+            _allMessageStream.OnNext(l);
+            return l;
+        }
+
         public Message AddMessage(Message message)
         {
             AllMessages.Push(message);
@@ -254,6 +280,11 @@ namespace GraphQL.Tests.Subscription
         public IObservable<Message> Messages()
         {
             return _messageStream.AsObservable();
+        }
+
+        public IObservable<List<Message>> MessagesGetAll()
+        {
+            return _allMessageStream.AsObservable();
         }
 
         public void AddError(Exception exception)

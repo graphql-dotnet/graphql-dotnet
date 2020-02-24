@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.StarWars
@@ -17,8 +17,8 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              hero: {
-                name: 'R2-D2'
+              ""hero"": {
+                ""name"": ""R2-D2""
               }
             }";
 
@@ -37,8 +37,8 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              hero: {
-                name: 'R2-D2'
+              ""hero"": {
+                ""name"": ""R2-D2""
               }
             }";
 
@@ -61,16 +61,16 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              hero: {
-                id: '3',
-                name: 'R2-D2',
-                friends: [
+              ""hero"": {
+                ""id"": ""3"",
+                ""name"": ""R2-D2"",
+                ""friends"": [
                   {
-                    name: 'Luke',
+                    ""name"": ""Luke""
                   },
                   {
-                    name: 'C-3PO',
-                  },
+                    ""name"": ""C-3PO""
+                  }
                 ]
               }
             }";
@@ -91,9 +91,9 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              human: {
-                name: 'Luke',
-                homePlanet: 'Tatooine'
+              ""human"": {
+                ""name"": ""Luke"",
+                ""homePlanet"": ""Tatooine""
               }
             }";
 
@@ -116,14 +116,79 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              human: {
-                name: 'Luke',
-                friends: [
-                  {name:'R2-D2', appearsIn:['NEWHOPE','EMPIRE','JEDI']},
-                  {name:'C-3PO', appearsIn:['NEWHOPE','EMPIRE','JEDI']}
+              ""human"": {
+                ""name"": ""Luke"",
+                ""friends"": [
+                  {""name"":""R2-D2"", ""appearsIn"":[""NEWHOPE"",""EMPIRE"",""JEDI""]},
+                  {""name"":""C-3PO"", ""appearsIn"":[""NEWHOPE"",""EMPIRE"",""JEDI""]}
                 ]
               }
             }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void can_query_for_connected_friends_of_humans()
+        {
+            var query = @"
+               {
+                  human(id: ""1"") {
+                    name
+                    friendsConnection {
+                      totalCount
+                      edges {
+                        node {
+                          name
+                          appearsIn
+                        }
+                        cursor
+                      },
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+                ""human"": {
+                  ""name"": ""Luke"",
+                  ""friendsConnection"": {
+                    ""totalCount"": 2,
+                    ""edges"": [
+                      {
+                        ""node"": {
+                          ""name"": ""R2-D2"",
+                          ""appearsIn"": [
+                            ""NEWHOPE"",
+                            ""EMPIRE"",
+                            ""JEDI""
+                          ]
+                        },
+                        ""cursor"": ""Mw==""
+                      },
+                      {
+                        ""node"": {
+                          ""name"": ""C-3PO"",
+                          ""appearsIn"": [
+                            ""NEWHOPE"",
+                            ""EMPIRE"",
+                            ""JEDI""
+                          ]
+                        },
+                        ""cursor"": ""NA==""
+                      }
+                    ],
+                    ""pageInfo"": {
+                      ""endCursor"": ""NA=="",
+                      ""hasNextPage"": false
+                    }
+                  }
+                }
+              }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -140,10 +205,64 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              droid: {
-                name: 'C-3PO'
+              ""droid"": {
+                ""name"": ""C-3PO""
               }
             }";
+
+            AssertQuerySuccess(query, expected);
+        }
+
+        [Fact]
+        public void can_query_for_connected_friends_of_droids_second_page()
+        {
+            var query = @"
+               {
+                  droid(id: ""3"") {
+                    name
+                    friendsConnection(first: 1, after: ""NA=="") {
+                      totalCount
+                      edges {
+                        node {
+                          name
+                          appearsIn
+                        }
+                        cursor
+                      }
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
+                    }
+                  }
+               }
+            ";
+
+            var expected = @"{
+                ""droid"": {
+                  ""name"": ""R2-D2"",
+                  ""friendsConnection"": {
+                    ""totalCount"": 1,
+                    ""edges"": [
+                      {
+                        ""node"": {
+                          ""name"": ""C-3PO"",
+                          ""appearsIn"": [
+                            ""NEWHOPE"",
+                            ""EMPIRE"",
+                            ""JEDI""
+                          ]
+                        },
+                        ""cursor"": ""NA==""
+                      }
+                    ],
+                    ""pageInfo"": {
+                      ""endCursor"": ""NA=="",
+                      ""hasNextPage"": false
+                    }
+                  }
+                }
+              }";
 
             AssertQuerySuccess(query, expected);
         }
@@ -160,13 +279,13 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              human: {
-                name: 'Luke'
+              ""human"": {
+                ""name"": ""Luke""
               }
             }
             ";
 
-            var inputs = new Inputs {{"id", "1"}};
+            var inputs = new Inputs(new Dictionary<string, object>() {{"id", "1"}});
 
             AssertQuerySuccess(query, expected, inputs);
         }
@@ -187,11 +306,11 @@ namespace GraphQL.Tests.StarWars
             ";
 
             var expected = @"{
-              'r2d2': {
-                name: 'R2-D2'
+              ""r2d2"": {
+                ""name"": ""R2-D2""
               },
-              'c3po': {
-                name: 'C-3PO'
+              ""c3po"": {
+                ""name"": ""C-3PO""
               }
             }";
 
@@ -204,18 +323,23 @@ namespace GraphQL.Tests.StarWars
             var mutation = @"mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
 
             var expected = @"{
-              'createHuman': {
-                'name': 'Boba Fett',
-                'homePlanet': 'Kamino'
+              ""createHuman"": {
+                ""name"": ""Boba Fett"",
+                ""homePlanet"": ""Kamino""
               }
             }";
 
-            var data = new Dictionary<string, object>();
-            data.Add("human", new Dictionary<string, object>
+            var data = new Dictionary<string, object>
             {
-                {"name", "Boba Fett"},
-                {"homePlanet", "Kamino"}
-            });
+                {
+                    "human",
+                    new Dictionary<string, object>
+                    {
+                        {"name", "Boba Fett"},
+                        {"homePlanet", "Kamino"}
+                    }
+                }
+            };
 
             var variables = new Inputs(data);
 

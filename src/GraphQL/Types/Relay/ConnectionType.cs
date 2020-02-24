@@ -1,13 +1,14 @@
-﻿namespace GraphQL.Types.Relay
+namespace GraphQL.Types.Relay
 {
-    public class ConnectionType<TTo> : ObjectGraphType<object>
-        where TTo : IGraphType
+    public class ConnectionType<TNodeType, TEdgeType> : ObjectGraphType<object>
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
     {
         public ConnectionType()
         {
-            Name = string.Format("{0}Connection", typeof(TTo).GraphQLName());
+            Name = string.Format("{0}Connection", typeof(TNodeType).GraphQLName());
             Description = string.Format("A connection from an object to a list of objects of type `{0}`.",
-                typeof(TTo).GraphQLName());
+                typeof(TNodeType).GraphQLName());
 
             Field<IntGraphType>()
                 .Name("totalCount")
@@ -22,11 +23,11 @@
                 .Name("pageInfo")
                 .Description("Information to aid in pagination.");
 
-            Field<ListGraphType<EdgeType<TTo>>>()
+            Field<ListGraphType<TEdgeType>>()
                 .Name("edges")
                 .Description("Information to aid in pagination.");
 
-            Field<ListGraphType<TTo>>()
+            Field<ListGraphType<TNodeType>>()
                 .Name("items")
                 .Description(
                     "A list of all of the objects returned in the connection. This is a convenience field provided " +
@@ -35,5 +36,11 @@
                     "the \"cursor\" field on the edge to enable efficient pagination, this shortcut cannot be used, " +
                     "and the full \"{ edges { node } } \" version should be used instead.");
         }
+    }
+
+    public class ConnectionType<TNodeType> : ConnectionType<TNodeType, EdgeType<TNodeType>>
+        where TNodeType : IGraphType
+    {
+
     }
 }

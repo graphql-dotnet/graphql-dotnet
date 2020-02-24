@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace GraphQL.Tests
 {
-    public class CultureTestHelper
+    public static class CultureTestHelper
     {
         public static IEnumerable<CultureInfo> Cultures => new[]
         {

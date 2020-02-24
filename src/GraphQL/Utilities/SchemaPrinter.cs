@@ -1,18 +1,17 @@
+using GraphQL.Introspection;
+using GraphQL.Types;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using GraphQL.Introspection;
-using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
     public class SchemaPrinter : IDisposable
     {
-        private ISchema _schema;
-
-        private readonly SchemaPrinterOptions _options;
+        protected SchemaPrinterOptions Options { get; }
 
         private readonly List<string> _scalars = new List<string>(
             new[]
@@ -28,16 +27,16 @@ namespace GraphQL.Utilities
             ISchema schema,
             SchemaPrinterOptions options = null)
         {
-            _schema = schema;
-            _options = options ?? new SchemaPrinterOptions();
+            Schema = schema;
+            Options = options ?? new SchemaPrinterOptions();
 
-            if (_options.CustomScalars?.Count > 0)
+            if (Options.CustomScalars?.Count > 0)
             {
-                _scalars.AddRange(_options.CustomScalars);
+                _scalars.AddRange(Options.CustomScalars);
             }
         }
 
-        private ISchema Schema => _schema;
+        private ISchema Schema { get; set; }
 
         public string Print()
         {
@@ -56,10 +55,10 @@ namespace GraphQL.Utilities
                 Schema.Initialize();
             }
 
-            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).ToList();
+            var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
                 .Where(t => typeFilter(t.Name))
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.Name, StringComparer.Ordinal)
                 .ToList();
 
             var result = new[]
@@ -74,14 +73,14 @@ namespace GraphQL.Utilities
             return string.Join(Environment.NewLine + Environment.NewLine, result) + Environment.NewLine;
         }
 
-        public bool IsDefinedType(string typeName)
+        public virtual bool IsDefinedType(string typeName)
         {
             return !IsIntrospectionType(typeName) && !IsBuiltInScalar(typeName);
         }
 
         public bool IsIntrospectionType(string typeName)
         {
-            return typeName.StartsWith("__");
+            return typeName.StartsWith("__", StringComparison.InvariantCulture);
         }
 
         public bool IsBuiltInScalar(string typeName)
@@ -199,50 +198,51 @@ namespace GraphQL.Utilities
 
         public string PrintScalar(ScalarGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             return description + "scalar {0}".ToFormat(type.Name);
         }
 
-        public string PrintObject(IObjectGraphType type)
+        public virtual string PrintObject(IObjectGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
 
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
-            var implementedInterfaces = interfaces.Any()
-                ? " implements {0}".ToFormat(string.Join(", ", interfaces))
+            var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
+            var implementedInterfaces = interfaces.Count > 0
+                ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
             return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
         }
 
-        public string PrintInterface(IInterfaceGraphType type)
+        public virtual string PrintInterface(IInterfaceGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             return description + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
 
         public string PrintUnion(UnionGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var possibleTypes = string.Join(" | ", type.PossibleTypes.Select(x => x.Name));
             return description + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var values = string.Join(Environment.NewLine, type.Values.Select(x => "  " + x.Name));
             return description + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
-            var description = PrintDescription(type.Description);
+            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var fields = type.Fields.Select(x => "  " + PrintInputValue(x));
             return description + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
-        public string PrintFields(IComplexGraphType type)
+        public virtual string PrintFields(IComplexGraphType type)
         {
             var fields = type?.Fields
                 .Select(x =>
@@ -251,8 +251,8 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = _options.IncludeDescriptions ? PrintDescription(type.Description, "  ") : string.Empty,
-                    Deprecation = _options.IncludeDeprecationReasons ? PrintDeprecation(type.DeprecationReason) : string.Empty,
+                    Description = Options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
+                    Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(
@@ -261,7 +261,7 @@ namespace GraphQL.Utilities
 
         public string PrintArgs(FieldType field)
         {
-            if (field.Arguments == null || !field.Arguments.Any())
+            if (field.Arguments == null || field.Arguments.Count == 0)
             {
                 return string.Empty;
             }
@@ -298,20 +298,23 @@ namespace GraphQL.Utilities
         public string PrintDirective(DirectiveGraphType directive)
         {
             var builder = new StringBuilder();
-            builder.Append(PrintDescription(directive.Description));
+            if (Options.IncludeDescriptions)
+            {
+                builder.Append(PrintDescription(directive.Description));
+            }
             builder.AppendLine($"directive @{directive.Name}(");
-            builder.AppendLine(formatDirectiveArguments(directive.Arguments));
-            builder.Append($") on {formatDirectiveLocationList(directive.Locations)}");
+            builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
+            builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
             return builder.ToString().TrimStart();
         }
 
-        private string formatDirectiveArguments(QueryArguments arguments)
+        private string FormatDirectiveArguments(QueryArguments arguments)
         {
-            if (arguments == null || !arguments.Any()) return null;
+            if (arguments == null || arguments.Count == 0) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 
-        private string formatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
+        private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
         {
             var enums = new __DirectiveLocation();
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
@@ -326,7 +329,7 @@ namespace GraphQL.Utilities
 
             if (value is bool)
             {
-                return value.ToString().ToLower();
+                return value.ToString().ToLower(CultureInfo.InvariantCulture);
             }
 
             if (IsEnumType(graphType))
@@ -371,7 +374,7 @@ namespace GraphQL.Utilities
         {
             if (string.IsNullOrWhiteSpace(description)) return "";
 
-            indentation = indentation ?? "";
+            indentation ??= "";
 
             // normalize newlines
             description = description.Replace("\r", "");
@@ -391,10 +394,7 @@ namespace GraphQL.Utilities
                     // For > 120 character long lines, cut at space boundaries into sublines
                     // of ~80 chars.
                     var sublines = BreakLine(line, 120 - indentation.Length);
-                    sublines.Apply(sub =>
-                    {
-                        desc += $"{indentation}# {sub}{Environment.NewLine}";
-                    });
+                    sublines.Apply(sub => desc += $"{indentation}# {sub}{Environment.NewLine}");
                 }
             });
 
@@ -414,12 +414,12 @@ namespace GraphQL.Utilities
         {
             if (line.Length < len + 5)
             {
-                return new[] {line};
+                return new[] { line };
             }
             var parts = Regex.Split(line, $"((?: |^).{{15,{len - 40}}}(?= |$))");
             if (parts.Length < 4)
             {
-                return new[] {line};
+                return new[] { line };
             }
             var sublines = new List<string>
             {
@@ -434,7 +434,7 @@ namespace GraphQL.Utilities
 
         public void Dispose()
         {
-            _schema = null;
+            Schema = null;
         }
     }
 }

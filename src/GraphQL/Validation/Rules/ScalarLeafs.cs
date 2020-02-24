@@ -1,7 +1,7 @@
 using System;
 using GraphQL.Types;
-using System.Linq;
 using GraphQL.Language.AST;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,18 +13,18 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ScalarLeafs : IValidationRule
     {
-        public Func<string, string, string> NoSubselectionAllowedMessage = (field, type) =>
+        public readonly Func<string, string, string> NoSubselectionAllowedMessage = (field, type) =>
             $"Field {field} of type {type} must not have a sub selection";
 
-        public Func<string, string, string> RequiredSubselectionMessage = (field, type) =>
+        public readonly Func<string, string, string> RequiredSubselectionMessage = (field, type) =>
             $"Field {field} of type {type} must have a sub selection";
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly ScalarLeafs Instance = new ScalarLeafs();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context));
-            });
+            return new EnterLeaveListener(_ => _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context)))
+                .ToTask();
         }
 
         private void Field(IGraphType type, Field field, ValidationContext context)
@@ -42,7 +42,7 @@ namespace GraphQL.Validation.Rules
                     context.ReportError(error);
                 }
             }
-            else if(field.SelectionSet == null || field.SelectionSet.Selections.Count == 0)
+            else if (field.SelectionSet == null || field.SelectionSet.Selections.Count == 0)
             {
                 var error = new ValidationError(context.OriginalQuery, "5.2.3", RequiredSubselectionMessage(field.Name, context.Print(type)), field);
                 context.ReportError(error);

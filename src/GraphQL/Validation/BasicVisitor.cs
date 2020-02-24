@@ -1,5 +1,5 @@
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
@@ -30,9 +30,15 @@ namespace GraphQL.Validation
                 _visitors[i].Enter(node);
             }
 
-            if (node.Children != null)
+            var children = node.Children;
+            if (children != null)
             {
-                foreach (var child in node.Children)
+                if (children is IList list)
+                {
+                    for (int i = 0; i < list.Count; ++i)
+                        Visit((INode)list[i]);
+                }
+                else foreach (var child in children)
                 {
                     Visit(child);
                 }

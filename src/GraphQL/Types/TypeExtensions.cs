@@ -12,7 +12,7 @@ namespace GraphQL.Types
             if (type is NonNullType nonnull)
             {
                 var ofType = GraphTypeFromType(nonnull.Type, schema);
-                if(ofType == null)
+                if (ofType == null)
                 {
                     return null;
                 }
@@ -25,7 +25,7 @@ namespace GraphQL.Types
             if (type is ListType list)
             {
                 var ofType = GraphTypeFromType(list.Type, schema);
-                if(ofType == null)
+                if (ofType == null)
                 {
                     return null;
                 }
@@ -58,19 +58,11 @@ namespace GraphQL.Types
             return ((NamedType)type).Name;
         }
 
-        public static string FullName(this IType type)
+        public static string FullName(this IType type) => type switch
         {
-            if (type is NonNullType nonnull)
-            {
-                return "{0}!".ToFormat(FullName(nonnull.Type));
-            }
-
-            if (type is ListType list)
-            {
-                return "[{0}]".ToFormat(FullName(list.Type));
-            }
-
-            return ((NamedType)type).Name;
-        }
+            NonNullType nonnull => "{0}!".ToFormat(FullName(nonnull.Type)),
+            ListType list => "[{0}]".ToFormat(FullName(list.Type)),
+            _ => ((NamedType)type).Name
+        };
     }
 }

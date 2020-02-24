@@ -12,48 +12,28 @@ namespace GraphQL.Types
                 "The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.";
         }
 
-        public override object Serialize(object value)
+        public override object Serialize(object value) => value switch
         {
-            if (value is TimeSpan timeSpan)
-            {
-                return (long)timeSpan.TotalMilliseconds;
-            }
+            TimeSpan timeSpan => (long)timeSpan.TotalMilliseconds,
+            int i => i,
+            long l => l,
+            _ => (object)null
+        };
 
-            return null;
-        }
-
-        public override object ParseValue(object value)
+        public override object ParseValue(object value) => value switch
         {
-            if (value is int i)
-            {
-                return TimeSpan.FromMilliseconds(i);
-            }
-            else if (value is long l)
-            {
-                return TimeSpan.FromMilliseconds(l);
-            }
+            int i => TimeSpan.FromMilliseconds(i),
+            long l => TimeSpan.FromMilliseconds(l),
+            TimeSpan t => t,
+            _ => (object)null
+        };
 
-            return null;
-        }
-
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            if (value is TimeSpanValue spanValue)
-            {
-                return ParseValue(spanValue.Value);
-            }
-
-            if (value is LongValue longValue)
-            {
-                return ParseValue(longValue.Value);
-            }
-
-            if (value is IntValue intValue)
-            {
-                return ParseValue(intValue.Value);
-            }
-
-            return null;
-        }
+            TimeSpanValue spanValue => ParseValue(spanValue.Value),
+            LongValue longValue => ParseValue(longValue.Value),
+            IntValue intValue => ParseValue(intValue.Value),
+            _ => null
+        };
     }
 }

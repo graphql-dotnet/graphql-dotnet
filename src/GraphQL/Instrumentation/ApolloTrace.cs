@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace GraphQL.Instrumentation
 {
-    [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class ApolloTrace
     {
         public ApolloTrace(DateTime start, double durationMs)
         {
-            this.StartTime = start;
-            this.EndTime = start.AddMilliseconds(durationMs);
-            this.Duration = ConvertTime(durationMs);
+            StartTime = start;
+            EndTime = start.AddMilliseconds(durationMs);
+            Duration = ConvertTime(durationMs);
         }
 
         public int Version => 1;
@@ -31,7 +28,6 @@ namespace GraphQL.Instrumentation
 
         public static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
 
-        [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
         public class OperationTrace
         {
             public long StartOffset { get; set; }
@@ -39,7 +35,6 @@ namespace GraphQL.Instrumentation
             public long Duration { get; set; }
         }
 
-        [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
         public class ExecutionTrace
         {
             public List<ResolverTrace> Resolvers { get; } = new List<ResolverTrace>();

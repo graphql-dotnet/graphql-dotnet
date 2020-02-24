@@ -14,34 +14,16 @@ namespace GraphQL.Types
             //    "as `\"4\"`) or integer (such as `4`) input value will be accepted as an `ID`.";
         }
 
-        public override object Serialize(object value)
+        public override object Serialize(object value) => value?.ToString();
+
+        public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
+
+        public override object ParseLiteral(IValue value) => value switch
         {
-            return value?.ToString();
-        }
-
-        public override object ParseValue(object value)
-        {
-            return value?.ToString().Trim(' ', '"');
-        }
-
-        public override object ParseLiteral(IValue value)
-        {
-            if (value is StringValue str)
-            {
-                return ParseValue(str.Value);
-            }
-
-            if (value is IntValue num)
-            {
-                return num.Value;
-            }
-
-            if (value is LongValue longVal)
-            {
-                return longVal.Value;
-            }
-
-            return null;
-        }
+            StringValue str => ParseValue(str.Value),
+            IntValue num => num.Value,
+            LongValue longVal => longVal.Value,
+            _ => null,
+        };
     }
 }

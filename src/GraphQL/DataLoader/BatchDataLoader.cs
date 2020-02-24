@@ -15,11 +15,11 @@ namespace GraphQL.DataLoader
 
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
 
-            keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
+            keyComparer ??= EqualityComparer<TKey>.Default;
 
             _pendingKeys = new HashSet<TKey>(keyComparer);
             _cache = new Dictionary<TKey, T>(keyComparer);
@@ -29,7 +29,7 @@ namespace GraphQL.DataLoader
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default(T))
+            T defaultValue = default)
         {
             if (loader == null)
                 throw new ArgumentNullException(nameof(loader));
@@ -37,7 +37,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
+            keyComparer ??= EqualityComparer<TKey>.Default;
 
             async Task<IDictionary<TKey, T>> LoadAndMapToDictionary(IEnumerable<TKey> keys, CancellationToken cancellationToken)
             {
@@ -68,7 +68,7 @@ namespace GraphQL.DataLoader
                 }
             }
 
-            var result = await DataLoaded;
+            var result = await DataLoaded.ConfigureAwait(false);
 
             if (result.TryGetValue(key, out T value))
             {

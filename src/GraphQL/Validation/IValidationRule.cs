@@ -1,7 +1,9 @@
-﻿namespace GraphQL.Validation
+using System.Threading.Tasks;
+
+namespace GraphQL.Validation
 {
     public interface IValidationRule
     {
-        INodeVisitor Validate(ValidationContext context);
+        Task<INodeVisitor> ValidateAsync(ValidationContext context);
     }
 }

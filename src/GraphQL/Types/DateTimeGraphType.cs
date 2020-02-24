@@ -1,5 +1,5 @@
-using System;
 using GraphQL.Language.AST;
+using System;
 
 namespace GraphQL.Types
 {
@@ -7,27 +7,20 @@ namespace GraphQL.Types
     {
         public DateTimeGraphType()
         {
-            Name = "DateTime";
             Description =
                 "The `DateTime` scalar type represents a date and time. `DateTime` expects timestamps " +
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
-        public override object Serialize(object value)
-        {
-            return ParseValue(value);
-        }
+        public override object Serialize(object value) => ParseValue(value);
 
-        public override object ParseValue(object value)
-        {
-            return ValueConverter.ConvertTo(value, typeof(DateTime));
-        }
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
 
         public override object ParseLiteral(IValue value)
         {
             if (value is DateTimeValue timeValue)
             {
-                return ParseValue(timeValue.Value);
+                return timeValue.Value;
             }
 
             if (value is StringValue stringValue)

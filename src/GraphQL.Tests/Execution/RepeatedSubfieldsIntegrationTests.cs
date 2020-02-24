@@ -30,27 +30,23 @@ namespace GraphQL.Tests.Execution
         {
             var schema = new Schema();
 
-            var address = new ObjectGraphType();
-            address.Name = "Address";
+            var address = new ObjectGraphType { Name = "Address" };
             address.Field("id", new IdGraphType());
             address.Field("street", new StringGraphType());
             address.Field("city", new StringGraphType());
             address.Field("state", new StringGraphType());
 
-            var business = new ObjectGraphType();
-            business.Name = "Business";
+            var business = new ObjectGraphType { Name = "Business" };
             business.Field("id", new IdGraphType());
             business.Field("name", new StringGraphType());
             business.Field("address", address);
 
-            var person = new ObjectGraphType();
-            person.Name = "Person";
+            var person = new ObjectGraphType { Name = "Person" };
             person.Field("id", new StringGraphType());
             person.Field("name", new StringGraphType());
             person.Field("business", business);
 
-            var query = new ObjectGraphType();
-            query.Name = "Query";
+            var query = new ObjectGraphType { Name = "Query" };
             query.Field(
                 "person",
                 person,
@@ -93,7 +89,20 @@ namespace GraphQL.Tests.Execution
                   }
                 }";
             },
-            "{ person: { business: { id: \"4\", name: \"Stuntman Express\", address: { id: \"123\", street: \"Las Vegas Blvd\", city: \"Las Vegas\", state: \"NV\"  } } } }");
+            @"{
+              ""person"": {
+                ""business"": {
+                  ""id"": ""4"",
+                  ""name"": ""Stuntman Express"",
+                  ""address"": {
+                    ""id"": ""123"",
+                    ""street"": ""Las Vegas Blvd"",
+                    ""city"": ""Las Vegas"",
+                    ""state"": ""NV""
+                  }
+                }
+              }
+            }");
         }
     }
 }

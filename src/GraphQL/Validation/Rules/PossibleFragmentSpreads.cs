@@ -1,5 +1,6 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 using GraphQL.Types;
+using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -22,7 +23,9 @@ namespace GraphQL.Validation.Rules
             return $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
         }
 
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -56,7 +59,7 @@ namespace GraphQL.Validation.Rules
                             node));
                     }
                 });
-            });
+            }).ToTask();
         }
 
         private IGraphType getFragmentType(ValidationContext context, string name)

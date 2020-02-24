@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -11,8 +12,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void BeforeExecutionAwaited_Called_Correctly()
         {
-            var schema = new Schema();
-            schema.Query = new AsyncGraphType();
+            var schema = new Schema {Query = new AsyncGraphType()};
 
             var userContext = new TestContext();
 
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Execution
                 opts.UserContext = userContext;
                 opts.Listeners.Add(new TestExecutionListener());
                 opts.ExposeExceptions = true;
-            }, @"{ foo: ""bar"" }");
+            }, @"{ ""foo"": ""bar"" }");
 
             breaker.Dispose();
         }
@@ -49,11 +49,11 @@ namespace GraphQL.Tests.Execution
             {
                 userContext.Complete("bar");
 
-                return TaskExtensions.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 
-        public class TestContext
+        public class TestContext: Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 

@@ -188,10 +188,7 @@ namespace GraphQL.Tests.Utilities
 
             var customScalar = new CustomScalarType();
 
-            var schema = Schema.For(definitions, _ =>
-            {
-                _.RegisterType(customScalar);
-            });
+            var schema = Schema.For(definitions, _ => _.RegisterType(customScalar));
 
             schema.Initialize();
 
@@ -348,24 +345,6 @@ namespace GraphQL.Tests.Utilities
         }
 
         [Fact]
-        public void default_deprecation_on_interface_field()
-        {
-            var definitions = @"
-                interface Movie {
-                  stars: Int @deprecated
-                }
-            ";
-
-            var schema = Schema.For(definitions);
-            schema.Initialize();
-
-            var type = schema.FindType("Movie") as IInterfaceGraphType;
-            type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
-            type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
-        }
-
-        [Fact]
         public void deprecate_enum_value()
         {
             var definitions = @"
@@ -383,24 +362,6 @@ namespace GraphQL.Tests.Utilities
 
             var cat = type.Values.Single(x => x.Name == "CAT");
             cat.DeprecationReason.ShouldBe("dogs rule");
-        }
-
-        [Fact]
-        public void default_deprecation_on_input_field()
-        {
-            var definitions = @"
-                input MovieInput {
-                  stars: Int @deprecated
-                }
-            ";
-
-            var schema = Schema.For(definitions);
-            schema.Initialize();
-
-            var type = schema.FindType("MovieInput") as IInputObjectGraphType;
-            type.ShouldNotBeNull();
-            type.Fields.Count().ShouldBe(1);
-            type.Fields.Single().DeprecationReason.ShouldBe("No longer supported");
         }
 
         [Fact]
@@ -459,36 +420,24 @@ namespace GraphQL.Tests.Utilities
             type.Fields.Count().ShouldBe(2);
         }
 
-        class Movie
+        internal class Movie
         {
             [GraphQLMetadata("movies", DeprecationReason = "my reason")]
-            public int Movies()
-            {
-                return 0;
-            }
+            public int Movies() => 0;
         }
 
-        class CustomScalarType : ScalarGraphType
+        internal class CustomScalarType : ScalarGraphType
         {
             public CustomScalarType()
             {
                 Name = "CustomScalar";
             }
 
-            public override object Serialize(object value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object Serialize(object value) => throw new System.NotImplementedException();
 
-            public override object ParseValue(object value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object ParseValue(object value) => throw new System.NotImplementedException();
 
-            public override object ParseLiteral(IValue value)
-            {
-                throw new System.NotImplementedException();
-            }
+            public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();
         }
     }
 }

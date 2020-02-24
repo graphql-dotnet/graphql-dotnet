@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -94,7 +94,7 @@ namespace GraphQL.Tests.Bugs
     {
         public EnumType()
         {
-            if (!typeof(T).GetTypeInfo().IsEnum)
+            if (!typeof(T).IsEnum) //TODO: remove it in favor of enum constraint in C# 7.3
             {
                 throw new ArgumentException($"{typeof(T).Name} must be of type enum");
             }
@@ -102,7 +102,7 @@ namespace GraphQL.Tests.Bugs
             var type = typeof(T);
             Name = DeriveGraphQlName(type.Name);
 
-            foreach (var enumName in type.GetTypeInfo().GetEnumNames())
+            foreach (var enumName in type.GetEnumNames())
             {
                 var enumMember = type
                   .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -131,17 +131,17 @@ namespace GraphQL.Tests.Bugs
             return found?.Value;
         }
 
-        static string PureValue(object value)
+        private static string PureValue(object value)
         {
             return value.ToString().Replace("\"", "").Replace("'", "").Replace("_", "");
         }
 
-        static string DeriveGraphQlName(string name)
+        private static string DeriveGraphQlName(string name)
         {
             return $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
         }
 
-        static string DeriveEnumValueName(string name)
+        private static string DeriveEnumValueName(string name)
         {
             return Regex
               .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")

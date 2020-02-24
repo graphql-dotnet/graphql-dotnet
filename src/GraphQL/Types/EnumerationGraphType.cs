@@ -1,10 +1,10 @@
+using GraphQL.Language.AST;
+using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Language.AST;
-using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -28,6 +28,9 @@ namespace GraphQL.Types
 
         public void AddValue(EnumValueDefinition value)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
             NameValidator.ValidateName(value.Name, "enum");
             Values.Add(value);
         }
@@ -37,14 +40,14 @@ namespace GraphQL.Types
         public override object Serialize(object value)
         {
             var valueString = value.ToString();
-            var foundByName = Values.FirstOrDefault(v => v.Name.Equals(valueString, StringComparison.OrdinalIgnoreCase));
+            var foundByName = Values.FindByName(valueString);
             if (foundByName != null)
             {
                 return foundByName.Name;
             }
 
-            var found = Values.FirstOrDefault(v => v.Value.Equals(value));
-            return found?.Name;
+            var foundByValue = Values.FindByValue(value);
+            return foundByValue?.Name;
         }
 
         public override object ParseValue(object value)
@@ -54,8 +57,7 @@ namespace GraphQL.Types
                 return null;
             }
 
-            var found = Values.FirstOrDefault(v =>
-                StringComparer.OrdinalIgnoreCase.Equals(v.Name, value.ToString()));
+            var found = Values.FindByName(value.ToString());
             return found?.Value;
         }
 
@@ -65,51 +67,75 @@ namespace GraphQL.Types
         }
     }
 
-    public class EnumerationGraphType<TEnum> : EnumerationGraphType
+    /// <summary>
+    /// Allows you to automatically register the necessary enumeration members for the specified enum.
+    /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
+    /// Also it can get descriptions for enum fields from the xml comments.
+    /// </summary>
+    /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
+    public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
         public EnumerationGraphType()
         {
             var type = typeof(TEnum);
+            var names = Enum.GetNames(type);
+            var enumMembers = names.Select(n => (name: n, member: type
+                    .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .First()));
+            var enumGraphData = enumMembers.Select(e => (
+                name: ChangeEnumCase(e.name),
+                value: Enum.Parse(type, e.name),
+                description: e.member.Description(),
+                deprecation: e.member.ObsoleteMessage()
+            ));
 
-            Name = Name ?? StringUtils.ToPascalCase(type.Name);
+            Name = StringUtils.ToPascalCase(type.Name);
+            Description ??= typeof(TEnum).Description();
+            DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
-            foreach (var enumName in Enum.GetNames(type))
+            foreach (var (name, value, description, deprecation) in enumGraphData)
             {
-                var enumMember = type
-                    .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                    .First();
-
-                AddValue(ChangeEnumCase(enumMember.Name), null, Enum.Parse(type, enumName));
+                AddValue(name, description, value, deprecation);
             }
         }
 
-        protected virtual string ChangeEnumCase(string val)
-        {
-            return StringUtils.ToConstantCase(val);
-        }
+        protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
     }
 
     public class EnumValues : IEnumerable<EnumValueDefinition>
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
 
-        public void Add(EnumValueDefinition value)
+        public EnumValueDefinition this[string name] => FindByName(name);
+
+        public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
+
+        public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
-            _values.Add(value);
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in _values)
+                if (def.Name.Equals(name, comparison))
+                    return def;
+
+            return null;
         }
 
-        public IEnumerator<EnumValueDefinition> GetEnumerator()
+        public EnumValueDefinition FindByValue(object value)
         {
-            return _values.GetEnumerator();
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var def in _values)
+                if (def.Value.Equals(value))
+                    return def;
+
+            return null;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class EnumValueDefinition
+    public class EnumValueDefinition : MetadataProvider
     {
         public string Name { get; set; }
         public string Description { get; set; }

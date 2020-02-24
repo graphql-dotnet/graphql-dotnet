@@ -1,5 +1,3 @@
-﻿using System;
-using GraphQL;
 using GraphQL.Types;
 using Xunit;
 
@@ -30,7 +28,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<Query>();
 
             var query = @"{ hero { id name friend { name } } }";
-            var expected = @"{ 'hero': { 'id' : '1', 'name': 'R2-D2', 'friend': { 'name': 'C3-PO' } } }";
+            var expected = @"{ ""hero"": { ""id"" : ""1"", ""name"": ""R2-D2"", ""friend"": { ""name"": ""C3-PO"" } } }";
 
             AssertQuery(_ =>
             {
@@ -64,7 +62,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<Query>();
 
             var query = @"{ hero { id name friend { name } } }";
-            var expected = @"{ 'hero': { 'id' : '1', 'name': 'R2-D2', 'friend': { 'name': 'C3-PO' } } }";
+            var expected = @"{ ""hero"": { ""id"" : ""1"", ""name"": ""R2-D2"", ""friend"": { ""name"": ""C3-PO"" } } }";
 
             AssertQuery(_ =>
             {

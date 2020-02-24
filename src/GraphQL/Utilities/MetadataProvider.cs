@@ -1,6 +1,7 @@
+using System;
+using GraphQL.Types;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
@@ -8,24 +9,17 @@ namespace GraphQL.Utilities
     {
         public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public TType GetMetadata<TType>(string key, TType defaultValue = default(TType))
+        public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {
-            if (!HasMetadata(key))
-            {
-                return defaultValue;
-            }
-
-            if (Metadata.TryGetValue(key, out var item))
-            {
-                return (TType) item;
-            }
-
-            return defaultValue;
+            return GetMetadata(key, () => defaultValue);
         }
 
-        public bool HasMetadata(string key)
+        public TType GetMetadata<TType>(string key, Func<TType> defaultValueFactory)
         {
-            return Metadata.ContainsKey(key);
+            var local = Metadata;
+            return local != null && local.TryGetValue(key, out var item) ? (TType)item : defaultValueFactory();
         }
+
+        public bool HasMetadata(string key) => Metadata?.ContainsKey(key) ?? false;
     }
 }

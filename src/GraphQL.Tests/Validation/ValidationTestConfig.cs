@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Types;
 using GraphQL.Validation;
 
 namespace GraphQL.Tests.Validation
@@ -9,6 +10,7 @@ namespace GraphQL.Tests.Validation
         private readonly List<IValidationRule> _rules = new List<IValidationRule>();
         private readonly List<ValidationErrorAssertion> _assertions = new List<ValidationErrorAssertion>();
 
+        public ISchema Schema { get; set; }
         public string Query { get; set; }
         public IList<IValidationRule> Rules => _rules;
         public IList<ValidationErrorAssertion> Assertions => _assertions;

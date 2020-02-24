@@ -1,21 +1,32 @@
-﻿using System;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
 
 namespace GraphQL.Utilities
 {
     public class TypeSettings
     {
         private readonly LightweightCache<string, TypeConfig> _typeConfigurations;
+        private readonly List<Action<TypeConfig>> _forAllTypesConfigurationDelegates;
 
         public TypeSettings()
         {
-            _typeConfigurations =
-                new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
+            _typeConfigurations = new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
+            _forAllTypesConfigurationDelegates = new List<Action<TypeConfig>>();
         }
 
         public TypeConfig For(string typeName)
         {
-            return _typeConfigurations[typeName];
+            var exists = _typeConfigurations.Has(typeName);
+            var typeConfig = _typeConfigurations[typeName];
+            if (!exists)
+                _forAllTypesConfigurationDelegates.Apply(a => a.Invoke(typeConfig));
+            return typeConfig;
+        }
+
+        public TypeSettings ForAll(Action<TypeConfig> configure)
+        {
+            _forAllTypesConfigurationDelegates.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
+            return this;
         }
 
         public void Include<TType>()
@@ -51,7 +62,7 @@ namespace GraphQL.Utilities
 
         public void Include(Type type, Type typeOfType)
         {
-            var name = type.GraphQLName();
+            var name = (type ?? throw new ArgumentNullException(nameof(type))).GraphQLName();
             Include(name, type, typeOfType);
         }
 

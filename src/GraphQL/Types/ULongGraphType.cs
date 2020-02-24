@@ -1,18 +1,18 @@
-using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
     public class ULongGraphType : ScalarGraphType
     {
-        public override object ParseLiteral(IValue value)
+        public override object ParseLiteral(IValue value) => value switch
         {
-            var ulongValue = value as ULongValue;
-            return ulongValue?.Value;
-        }
+            ULongValue ulongValue => ulongValue.Value,
+            IntValue intValue => intValue.Value >= 0 ? (ulong?)intValue.Value : null,
+            LongValue longValue => longValue.Value >= 0 ? (ulong?)longValue.Value : null,
+            _ => null
+        };
 
-        public override object ParseValue(object value) =>
-            ValueConverter.ConvertTo(value, typeof(ulong));
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(ulong));
 
         public override object Serialize(object value) => ParseValue(value);
     }

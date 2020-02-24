@@ -26,20 +26,19 @@ namespace GraphQL.Utilities
 
     public class AstPrintConfig
     {
-        private readonly List<AstPrintFieldDefinition> _fields = new List<AstPrintFieldDefinition>();
-
-        public IEnumerable<AstPrintFieldDefinition> Fields => _fields;
+        internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
+        public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
         public Func<INode, bool> Matches { get; set; }
         public Func<IDictionary<string, object>, object> PrintAst { get; set; }
 
         public void Field(AstPrintFieldDefinition field)
         {
-            if (_fields.Exists(x => x.Name == field.Name))
+            if (FieldsList.Exists(x => x.Name == field.Name))
             {
                 throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
             }
 
-            _fields.Add(field);
+            FieldsList.Add(field);
         }
     }
 
@@ -60,7 +59,7 @@ namespace GraphQL.Utilities
 
         public TVal Arg<TVal>(string key)
         {
-            return (TVal) Arg(key);
+            return (TVal)Arg(key);
         }
 
         public object Arg<TProperty>(Expression<Func<T, TProperty>> argument)
@@ -93,7 +92,7 @@ namespace GraphQL.Utilities
 
         public void Print(Func<PrintFormat<T>, object> configure)
         {
-            PrintAst = (args) =>
+            PrintAst = args =>
             {
                 var f = new PrintFormat<T>(args);
                 return configure(f);
@@ -107,29 +106,34 @@ namespace GraphQL.Utilities
         public IValueResolver Resolver { get; set; }
     }
 
-    public class ResolveValueContext
+    public readonly struct ResolveValueContext
     {
-        public object Source { get; set; }
+        public ResolveValueContext(object source)
+        {
+            Source = source;
+        }
+
+        public object Source { get; }
 
         public TType SourceAs<TType>()
         {
             if (Source != null)
             {
-                return (TType) Source;
+                return (TType)Source;
             }
 
-            return default(TType);
+            return default;
         }
     }
 
     public interface IValueResolver
     {
-        object Resolve(ResolveValueContext context);
+        object Resolve(in ResolveValueContext context);
     }
 
     public interface IValueResolver<T> : IValueResolver
     {
-        new T Resolve(ResolveValueContext context);
+        new T Resolve(in ResolveValueContext context);
     }
 
     public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
@@ -141,12 +145,12 @@ namespace GraphQL.Utilities
             _property = property.Compile();
         }
 
-        public TProperty Resolve(ResolveValueContext context)
+        public TProperty Resolve(in ResolveValueContext context)
         {
             return _property(context.SourceAs<TObject>());
         }
 
-        object IValueResolver.Resolve(ResolveValueContext context)
+        object IValueResolver.Resolve(in ResolveValueContext context)
         {
             return Resolve(context);
         }
@@ -164,10 +168,10 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Fragments);
                 c.Print(p =>
                 {
-                    var ops = join(p.ArgArray(x => x.Operations), "\n\n");
-                    var frags = join(p.ArgArray(x => x.Fragments), "\n\n");
+                    var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
+                    var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
 
-                    var result = join(new[] {ops, frags}, "\n\n") + "\n";
+                    var result = Join(new[] {ops, frags}, "\n\n") + "\n";
                     return result;
                 });
             });
@@ -181,17 +185,17 @@ namespace GraphQL.Utilities
                 c.Field(x => x.SelectionSet);
                 c.Print(p =>
                 {
-                    var op = p.Arg(x => x.OperationType).ToString().ToLower();
+                    var op = p.Arg(x => x.OperationType).ToString().ToLower(CultureInfo.InvariantCulture);
                     var name = p.Arg(x => x.Name)?.ToString();
-                    var variables = wrap("(", join(p.ArgArray(x => x.Variables), ", "), ")");
-                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var variables = Wrap("(", Join(p.ArgArray(x => x.Variables), ", "), ")");
+                    var directives = Join(p.ArgArray(x => x.Directives), " ");
                     var selectionSet = p.Arg(x => x.SelectionSet);
 
                     return string.IsNullOrWhiteSpace(name)
                            && string.IsNullOrWhiteSpace(directives)
                            && string.IsNullOrWhiteSpace(variables)
                         ? selectionSet
-                        : join(new[] {op, join(new[] {name, variables}, ""), directives, selectionSet}, " ");
+                        : Join(new[] {op, Join(new[] {name, variables}, ""), directives, selectionSet}, " ");
                 });
             });
 
@@ -202,16 +206,14 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Type);
                 c.Print(p =>
                 {
-                    var directives = join(p.ArgArray(x => x.Directives), " ");
+                    var directives = Join(p.ArgArray(x => x.Directives), " ");
                     var selectionSet = p.Arg(x => x.SelectionSet);
                     var typename = p.Arg(x => x.Type);
                     var body = string.IsNullOrWhiteSpace(directives)
                         ? selectionSet
-                        : join(new[] { directives, selectionSet }, " ");
+                        : Join(new[] { directives, selectionSet }, " ");
 
                     return $"... on {typename} {body}";
-
-
                 });
             });
 
@@ -220,19 +222,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Field(x => x.Type);
                 c.Field(x => x.DefaultValue);
-                c.Print(p =>
-                {
-                    return $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}";
-                });
+                c.Print(p => $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}");
             });
 
             Config<SelectionSet>(c =>
             {
-                c.Field(x => x.Selections);
-                c.Print(p =>
-                {
-                    return block(p.ArgArray(x => x.Selections));
-                });
+                c.Field(x => x.SelectionsList);
+                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)));
             });
 
             Config<Arguments>(c =>
@@ -263,13 +259,13 @@ namespace GraphQL.Utilities
                 {
                     var alias = n.Arg(x => x.Alias);
                     var name = n.Arg(x => x.Name);
-                    var args = join(n.ArgArray(x => x.Arguments), ", ");
-                    var directives = join(n.ArgArray(x => x.Directives), " ");
+                    var args = Join(n.ArgArray(x => x.Arguments), ", ");
+                    var directives = Join(n.ArgArray(x => x.Directives), " ");
                     var selectionSet = n.Arg(x => x.SelectionSet);
 
-                    var result = join(new []
+                    var result = Join(new []
                     {
-                        wrap("", alias, ": ") + name + wrap("(", args, ")"),
+                        Wrap("", alias, ": ") + name + Wrap("(", args, ")"),
                         directives,
                         selectionSet
                     }, " ");
@@ -291,16 +287,20 @@ namespace GraphQL.Utilities
                 c.Print(f => f.Arg(x => x.Value));
             });
 
-            Config<NullValue>(c =>
-            {
-                c.Print(f => "null");
-            });
+            Config<NullValue>(c => c.Print(f => "null"));
 
             Config<LongValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f => f.Arg(x => x.Value));
             });
+
+            Config<BigIntValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f => f.Arg(x => x.Value));
+            });
+
             Config<FloatValue>(c =>
             {
                 c.Field(x => x.Value);
@@ -310,52 +310,70 @@ namespace GraphQL.Utilities
                     return val.ToString("0.0##############", CultureInfo.InvariantCulture);
                 });
             });
+
             Config<StringValue>(c =>
             {
                 c.Field(x => x.Value);
                 c.Print(f =>
                 {
                     var val = f.Arg(x => x.Value);
-                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\""))
+                    if (!string.IsNullOrWhiteSpace(val?.ToString()) && !val.ToString().StartsWith("\"", StringComparison.InvariantCulture))
                     {
                         val = $"\"{val}\"";
                     }
                     return val;
                 });
             });
+
             Config<BooleanValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(f => f.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
+
             Config<EnumValue>(c =>
             {
                 c.Field(x => x.Name);
                 c.Print(p => p.Arg(x => x.Name));
             });
+
             Config<ListValue>(c =>
             {
                 c.Field(x => x.Values);
-                c.Print(p => $"[{join(p.ArgArray(x => x.Values), ", ")}]");
+                c.Print(p => $"[{Join(p.ArgArray(x => x.Values), ", ")}]");
             });
+
             Config<ObjectValue>(c =>
             {
                 c.Field(x => x.ObjectFields);
-                c.Print(p => $"{{{join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
+                c.Print(p => $"{{{Join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
             });
+
             Config<ObjectField>(c =>
             {
                 c.Field(x => x.Name);
                 c.Field(x => x.Value);
                 c.Print(p => $"{p.Arg(x => x.Name)}: {p.Arg(x => x.Value)}");
             });
+
             Config<UriValue>(c =>
             {
                 c.Field(x => x.Value);
-                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower());
+                c.Print(p => p.Arg(x => x.Value)?.ToString().ToLower(CultureInfo.InvariantCulture));
             });
 
             // Directive
+            Config<Directive>(c =>
+            {
+                c.Field(x => x.Name);
+                c.Field(x => x.Arguments);
+                c.Print(n =>
+                {
+                    var name = n.Arg(x => x.Name);
+                    var args = Join(n.ArgArray(x => x.Arguments), ", ");
+                    return $"@{name}" + Wrap("(", args, ")");
+                });
+            });
 
             // Type
             Config<NamedType>(c =>
@@ -363,11 +381,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Print(p => p.Arg(x => x.Name));
             });
+
             Config<ListType>(c =>
             {
                 c.Field(x => x.Type);
                 c.Print(p => $"[{p.Arg(x => x.Type)}]");
             });
+
             Config<NonNullType>(c =>
             {
                 c.Field(x => x.Type);
@@ -380,13 +400,15 @@ namespace GraphQL.Utilities
         public void Config<T>(Action<AstPrintConfig<T>> configure)
             where T : INode
         {
-            var config = new AstPrintConfig<T>();
-            config.Matches = n => n is T;
+            var config = new AstPrintConfig<T>
+            {
+                Matches = n => n is T
+            };
             configure(config);
             _configs.Add(config);
         }
 
-        private string join(IEnumerable<object> nodes, string separator)
+        private string Join(IEnumerable<object> nodes, string separator)
         {
             return nodes != null
                 ? string.Join(
@@ -397,15 +419,15 @@ namespace GraphQL.Utilities
                 : "";
         }
 
-        private string block(IEnumerable<object> nodes)
+        private string Block(IEnumerable<object> nodes)
         {
             var list = nodes.ToList();
-            return list.Any()
-                ? indent($"{{\n{join(list, "\n")}") + "\n}"
+            return list.Count > 0
+                ? Indent($"{{\n{Join(list, "\n")}") + "\n}"
                 : "";
         }
 
-        private string wrap(string start, object middle, string end)
+        private string Wrap(string start, object middle, string end)
         {
             var m = middle?.ToString() ?? "";
             return !string.IsNullOrWhiteSpace(m)
@@ -413,7 +435,7 @@ namespace GraphQL.Utilities
                 : "";
         }
 
-        private string indent(string str)
+        private string Indent(string str)
         {
             return Regex.Replace(str, "\n", "\n  ");
         }
@@ -425,27 +447,24 @@ namespace GraphQL.Utilities
 
         public object ApplyConfig(INode node)
         {
-            var config = _configs.SingleOrDefault(c => c.Matches(node));
+            var config = FindFor(node);
 
             if (config != null)
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.Fields.Apply(f =>
+                config.FieldsList.Apply(f =>
                 {
-                    var ctx = new ResolveValueContext
-                    {
-                        Source = node
-                    };
+                    var ctx = new ResolveValueContext(node);
 
                     var result = f.Resolver.Resolve(ctx);
-                    if (result is INode)
+                    if (result is INode nodeResult)
                     {
-                        result = ApplyConfig(result as INode);
+                        result = ApplyConfig(nodeResult);
                     }
-                    else if (result is IEnumerable && !(result is string))
+                    else if (!(result is string) && result is IEnumerable enumerable)
                     {
-                        result = GetListResult(result as IEnumerable);
+                        result = GetListResult(enumerable);
                     }
 
                     vals[f.Name] = result;
@@ -453,6 +472,16 @@ namespace GraphQL.Utilities
 
                 return config.PrintAst(vals);
             }
+
+            return null;
+        }
+
+        private AstPrintConfig FindFor(INode node)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var c in _configs)
+                if (c.Matches(node))
+                    return c;
 
             return null;
         }
