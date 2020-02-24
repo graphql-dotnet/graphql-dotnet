@@ -245,7 +245,7 @@ When GraphQL.NET receives an enum member name as a query argument, the queried f
                     // episode = 4
                     var episode = context.GetArgument<int>("appearsIn");
 
-                    //full implementation would access data store to get humans by episode.
+                    // full implementation would access data store to get humans by episode.
                     return default(Human);                
                 }
             );
