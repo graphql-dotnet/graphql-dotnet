@@ -1,12 +1,13 @@
-using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Field = GraphQL.Language.AST.Field;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using Field = GraphQL.Language.AST.Field;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>

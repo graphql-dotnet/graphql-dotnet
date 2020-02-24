@@ -285,8 +285,7 @@ namespace GraphQL.Types
             return builder;
         }
 
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
-            => Field<TGraphType, object>();
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
 
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,

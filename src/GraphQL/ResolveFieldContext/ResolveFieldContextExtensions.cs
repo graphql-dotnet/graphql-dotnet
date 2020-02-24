@@ -1,8 +1,7 @@
-using GraphQL.Subscription;
-using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GraphQL.Subscription;
 
 namespace GraphQL
 {
@@ -28,7 +27,7 @@ namespace GraphQL
 
         private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
         {
-            var argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
+            string argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
@@ -79,9 +78,7 @@ namespace GraphQL
         }
 
         public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-        {
-            return TryAsyncResolve<object>(context, resolve, error);
-        }
+            => TryAsyncResolve<object>(context, resolve, error);
 
         public static async Task<TResult> TryAsyncResolve<TResult>(this IResolveFieldContext context, Func<IResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
         {

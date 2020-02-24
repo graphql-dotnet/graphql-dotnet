@@ -1,14 +1,15 @@
+using System.Collections.Generic;
+using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
+using GraphQL.Types;
 using System;
-using System.Collections.Generic;
-using System.Threading;
 using Field = GraphQL.Language.AST.Field;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
     /// <summary>
     /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>

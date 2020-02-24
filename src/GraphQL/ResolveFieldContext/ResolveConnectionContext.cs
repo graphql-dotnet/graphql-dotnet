@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Types;
 
 namespace GraphQL.Builders
 {
@@ -8,7 +7,7 @@ namespace GraphQL.Builders
         private readonly int? _defaultPageSize;
 
         public ResolveConnectionContext(IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
-                : base(context)
+            : base(context)
         {
             IsUnidirectional = isUnidirectional;
             _defaultPageSize = defaultPageSize;
@@ -60,5 +59,4 @@ namespace GraphQL.Builders
 
         public bool IsPartial { get; set; }
     }
-
 }
