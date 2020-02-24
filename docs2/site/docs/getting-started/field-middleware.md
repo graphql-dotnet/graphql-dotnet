@@ -34,10 +34,10 @@ public class InstrumentFieldsMiddleware : IFieldMiddleware
 Then register your Field Middleware in `ExecutionOptions`.
 
 ```csharp
-await schema.ExecuteAsync(_ =>
+await schema.ExecuteAsync(options =>
 {
-  _.Query = "...";
-  _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+  options.Query = "...";
+  options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
 });
 ```
 
