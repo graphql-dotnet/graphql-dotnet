@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Types;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
     internal class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {

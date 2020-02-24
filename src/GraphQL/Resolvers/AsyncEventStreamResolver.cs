@@ -16,10 +16,7 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<T>> SubscribeAsync(IResolveEventStreamContext context)
-        {
-            return _subscriber(context);
-        }
+        public Task<IObservable<T>> SubscribeAsync(IResolveEventStreamContext context) => _subscriber(context);
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
         {
@@ -38,10 +35,7 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<TReturnType>> SubscribeAsync(IResolveEventStreamContext context)
-        {
-            return _subscriber(context.As<TSourceType>());
-        }
+        public Task<IObservable<TReturnType>> SubscribeAsync(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
         {
