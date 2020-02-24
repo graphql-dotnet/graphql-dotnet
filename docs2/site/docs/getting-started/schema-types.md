@@ -169,7 +169,7 @@ Note that although GraphQL has no use for backing values for enum members, Graph
 
 **Resolving Enumerations**
 
-Fields typed as enumerations are resolved by returning either the name or backing value of one or more of the enum members. In the below examples, notice the identical implementations of the `appearsIn` field for both human graph types. In both implementations, the client receives the enum member names in response to queries on the `appearsIn` field.
+Fields typed as enumerations are resolved by returning either the name or backing value of one of the enum members. Lists of enumerations are resolved by returning collections of enum members. In the below examples, notice the identical implementations of the `appearsIn` field for both human graph types. In both implementations, the client receives the GraphQL enum member names in response to queries on the `appearsIn` field.
 
 If the field resolves a value which cannot be mapped to one of the enum's legal values, GraphQL.NET will return `null` to the client in the data for the field.
 
@@ -192,7 +192,7 @@ public class HumanStringType: ObjectGraphType<HumanString>
 public class HumanInt
 {
     //i.e. 4, 5, 6
-    public int AppearsIn { get; set; }
+    public int[] AppearsIn { get; set; }
 }
 
 public class HumanIntType: ObjectGraphType<HumanInt>
