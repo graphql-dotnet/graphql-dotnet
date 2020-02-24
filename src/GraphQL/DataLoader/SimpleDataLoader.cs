@@ -64,6 +64,7 @@ namespace GraphQL.DataLoader
         /// </returns>
         public IDataLoaderResult<T> LoadAsync() => this;
 
-        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken).ConfigureAwait(false);
+        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+            => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

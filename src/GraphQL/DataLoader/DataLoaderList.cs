@@ -11,7 +11,7 @@ namespace GraphQL.DataLoader
         private class DataLoaderList : Dictionary<TKey, DataLoaderPair<TKey, T>>, IDataLoader
         {
             protected readonly DataLoaderBase<TKey, T> _dataLoader;
-            private Task LoadingTask;
+            private Task _loadingTask;
 
             public DataLoaderList(DataLoaderBase<TKey, T> delayLoader) : base(delayLoader.EqualityComparer)
             {
@@ -22,8 +22,8 @@ namespace GraphQL.DataLoader
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (LoadingTask != null)
-                    return LoadingTask;
+                if (_loadingTask != null)
+                    return _loadingTask;
 
                 lock (this) //external code cannot access "this"
                 {
@@ -38,16 +38,16 @@ namespace GraphQL.DataLoader
                     //return LoadingTask if already set,
                     //  or else start data loading, save the returned Task in LoadingTask, and return the Task
 
-                    if (LoadingTask != null)
-                        return LoadingTask;
+                    if (_loadingTask != null)
+                        return _loadingTask;
 
                     try
                     {
-                        return (LoadingTask = _dataLoader.StartLoading(this, cancellationToken));
+                        return (_loadingTask = _dataLoader.StartLoading(this, cancellationToken));
                     }
                     catch (Exception ex)
                     {
-                        LoadingTask = Task.FromException(ex);
+                        _loadingTask = Task.FromException(ex);
                         throw;
                     }
                 }
