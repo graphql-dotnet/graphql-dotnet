@@ -117,7 +117,7 @@ Compare the two implementations. GraphQL does not specify backing values for mem
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in the constructor.  The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.  The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type.  By default, the name of each enum member will be converted to upper case.  Override `ChangeEnumCase` to change this behavior.  Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.  Apply an `ObsoleteAttribute` to an enum member to set the GraphQL deprecation reason.
+You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type. By default, the name of each enum member will be converted to CONSTANT_CASE. Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL deprecation reason.
 
 ```csharp
 
