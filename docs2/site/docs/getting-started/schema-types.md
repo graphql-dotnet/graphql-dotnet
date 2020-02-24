@@ -118,7 +118,7 @@ Compare the two implementations. GraphQL does not specify backing values for mem
 
 GraphQL.NET provides two methods of defining GraphQL enums.
 
-You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`.  The `Name` will default to the .NET Type name, which you can override in the constructor.  The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type.  The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type.  By default, the name of each enum member will be converted to upper case.  Override `ChangeEnumCase` to change this behavior.  Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`.  Apply an `ObsoleteAttribute` to an enum member to set the GraphQL deprecation reason.
+You can use `EnumerationGraphType<TEnum>` to automatically generate values by providing a .NET `enum` for `TEnum`. The `Name` will default to the .NET Type name, which you can override in the constructor. The `Description` will default to any `System.ComponentModel.DescriptionAttribute` applied to the enum type. The `DeprecationReason` will default to any `System.ObsoleteAttribute` applied to the enum type. By default, the name of each enum member will be converted to upper case.  Override `ChangeEnumCase` to change this behavior. Apply a `DescriptionAttribute` to an enum member to set the GraphQL `Description`. Apply an `ObsoleteAttribute` to an enum member to set the GraphQL deprecation reason.
 
 ```csharp
 
@@ -145,10 +145,10 @@ public class EpisodeEnum : EnumerationGraphType<Episodes>
 }
 ```
 
-You can also manually create the `EnumerationGraphType`.  Advantages of this method:
+You can also manually create the `EnumerationGraphType`. Advantages of this method:
 
-- The GraphQL enum need not map to a specific .NET `enum`.  You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
-- You can manually add description and deprecation reasons.  This may be useful if you do not control the source code for the enum.
+- The GraphQL enum need not map to a specific .NET `enum`. You could, for instance, build the enum from one of the alternate methods of defining discrete sets of values in .NET, such as classes of constants or static properties.
+- You can manually add description and deprecation reasons. This may be useful if you do not control the source code for the enum.
 - Backing values may be any primitive type or string.
 
 ```csharp
