@@ -52,7 +52,7 @@ namespace GraphQL.Instrumentation
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, System.Type middleware)
         {
             if (!typeof(IFieldMiddleware).IsAssignableFrom(middleware))
-                throw new ArgumentException($"Field middleware of type '{middleware.FullName}' must implement {nameof(IFieldMiddleware)}", nameof(middleware));
+                throw new ArgumentException($"Field middleware of type '{middleware.FullName}' must implement the {nameof(IFieldMiddleware)} interface", nameof(middleware));
 
             return builder.Use((schema, next) =>
             {
