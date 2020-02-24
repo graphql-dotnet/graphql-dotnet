@@ -8,17 +8,7 @@ they will be called sequentially along the chain where the previous middleware d
 the next one. This process is very similar to how middlewares work in the ASP.NET Core HTTP request
 pipeline.
 
-The following example is how Metrics are captured. You register Field Middleware in `ExecutionOptions`.
-
-```csharp
-await schema.ExecuteAsync(_ =>
-{
-  _.Query = "...";
-  _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-});
-```
-
-And write a class that implements `IFieldMiddleware`:
+The following example is how Metrics are captured. You write a class that implements `IFieldMiddleware`:
 
 ```csharp
 public class InstrumentFieldsMiddleware : IFieldMiddleware
@@ -39,6 +29,16 @@ public class InstrumentFieldsMiddleware : IFieldMiddleware
     }
   }
 }
+```
+
+Then register your Field Middleware in `ExecutionOptions`.
+
+```csharp
+await schema.ExecuteAsync(_ =>
+{
+  _.Query = "...";
+  _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+});
 ```
 
 Or, you can register a middleware delegate directly:
