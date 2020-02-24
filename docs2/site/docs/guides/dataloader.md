@@ -96,7 +96,7 @@ This is an example of using a DataLoader to batch requests for loading items by 
 ``` csharp
 public class OrderType : ObjectGraphType<Order>
 {
-	// Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
+    // Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
     public OrderType(IDataLoaderContextAccessor accessor, IUsersStore users)
     {
         ...
@@ -105,8 +105,8 @@ public class OrderType : ObjectGraphType<Order>
             .Name("User")
             .ResolveAsync(context =>
             {
-            	// Get or add a batch loader with the key "GetUsersById"
-            	// The loader will call GetUsersByIdAsync for each batch of keys
+                // Get or add a batch loader with the key "GetUsersById"
+                // The loader will call GetUsersByIdAsync for each batch of keys
                 var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersById", users.GetUsersByIdAsync);
 
                 // Add this UserId to the pending keys to fetch
@@ -120,9 +120,9 @@ public class OrderType : ObjectGraphType<Order>
 
 public interface IUsersStore
 {
-	// This will be called by the loader for all pending keys
-	// Note that fetch delegates can accept a CancellationToken parameter or not
-	Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+    // This will be called by the loader for all pending keys
+    // Note that fetch delegates can accept a CancellationToken parameter or not
+    Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
 }
 ```
 
@@ -132,7 +132,7 @@ This is an example of using a DataLoader to batch requests for loading a collect
 ``` csharp
 public class UserType : ObjectGraphType<User>
 {
-	// Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
+    // Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
     public UserType(IDataLoaderContextAccessor accessor, IOrdersStore orders)
     {
         ...
@@ -141,8 +141,8 @@ public class UserType : ObjectGraphType<User>
             .Name("Orders")
             .ResolveAsync(ctx =>
             {
-            	// Get or add a collection batch loader with the key "GetOrdersByUserId"
-            	// The loader will call GetOrdersByUserIdAsync with a batch of keys
+                // Get or add a collection batch loader with the key "GetOrdersByUserId"
+                // The loader will call GetOrdersByUserIdAsync with a batch of keys
                 var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
                     orders.GetOrdersByUserIdAsync);
 
@@ -173,7 +173,7 @@ This is an example of using a DataLoader without batching. This could be useful 
 ``` csharp
 public class QueryType : ObjectGraphType
 {
-	// Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
+    // Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
     public QueryType(IDataLoaderContextAccessor accessor, IUsersStore users)
     {
         Field<ListGraphType<UserType>, IEnumerable<User>>()
@@ -181,7 +181,7 @@ public class QueryType : ObjectGraphType
             .Description("Get all Users")
             .ResolveAsync(ctx =>
             {
-            	// Get or add a loader with the key "GetAllUsers"
+                // Get or add a loader with the key "GetAllUsers"
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
                     () => users.GetAllUsersAsync());
 
