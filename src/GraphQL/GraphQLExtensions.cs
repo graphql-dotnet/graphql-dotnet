@@ -16,11 +16,11 @@ namespace GraphQL
     {
         private const string DIRECTIVES_METADATA_KEY = "directives";
 
-        private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
+        private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
         public static string TrimGraphQLTypes(this string name)
         {
-            return TrimPattern.Replace(name, string.Empty).Trim();
+            return _trimPattern.Replace(name, string.Empty).Trim();
         }
 
         public static bool IsCompositeType(this IGraphType type)

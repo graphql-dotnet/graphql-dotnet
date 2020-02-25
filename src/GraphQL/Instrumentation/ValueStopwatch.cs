@@ -6,7 +6,7 @@ namespace GraphQL.Instrumentation
     /// <summary> This is already familiar <see cref="Stopwatch"/> but readonly struct. Doesn't allocate memory on the managed heap. </summary>
     public readonly struct ValueStopwatch
     {
-        private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
+        private static readonly double _timestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
         private readonly long _startTimestamp;
 
@@ -30,7 +30,7 @@ namespace GraphQL.Instrumentation
 
                 long end = Stopwatch.GetTimestamp();
                 long timestampDelta = end - _startTimestamp;
-                long ticks = (long)(TimestampToTicks * timestampDelta);
+                long ticks = (long)(_timestampToTicks * timestampDelta);
                 return new TimeSpan(ticks);
             }
         }
