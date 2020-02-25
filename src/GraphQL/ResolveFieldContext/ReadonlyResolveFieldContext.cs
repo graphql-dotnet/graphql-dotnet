@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Types;
 using Field = GraphQL.Language.AST.Field;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
+    /// <summary>
+    /// A readonly implementation of <see cref="IResolveFieldContext{object}"/>
+    /// </summary>
     public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {
         private readonly ExecutionNode _executionNode;
@@ -21,14 +25,10 @@ namespace GraphQL.Types
         }
 
         private IDictionary<string, Field> GetSubFields()
-        {
-            return ExecutionHelper.SubFieldsFor(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field);
-        }
+            => ExecutionHelper.SubFieldsFor(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field);
 
         private IDictionary<string, object> GetArguments()
-        {
-            return ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
-        }
+            => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
 
         public object Source => _executionNode.Source;
 

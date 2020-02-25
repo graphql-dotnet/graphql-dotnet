@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
@@ -20,15 +19,9 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Asynchronously returns an object or null for the specified field.
         /// </summary>
-        public Task<TReturnType> Resolve(IResolveFieldContext context)
-        {
-            return _resolver(context);
-        }
+        public Task<TReturnType> Resolve(IResolveFieldContext context) => _resolver(context);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
+        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 
     /// <summary>
@@ -49,14 +42,8 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Asynchronously returns an object or null for the specified field.
         /// </summary>
-        public Task<TReturnType> Resolve(IResolveFieldContext context)
-        {
-            return _resolver(context.As<TSourceType>());
-        }
+        public Task<TReturnType> Resolve(IResolveFieldContext context) => _resolver(context.As<TSourceType>());
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
+        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 }
