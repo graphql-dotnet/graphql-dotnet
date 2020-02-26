@@ -114,6 +114,11 @@ namespace GraphQL
             Register(typeof(double), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
 
             Register(typeof(string), typeof(Uri), value => value is string s ? new Uri(s) : (Uri)value);
+            // registering such a default conversion for string->byte[] seems useful
+            Register(typeof(string), typeof(byte[]), value => Convert.FromBase64String((string)value));
+
+            Register(typeof(char), typeof(byte), value => Convert.ToByte((char)value));
+            Register(typeof(char), typeof(int), value => Convert.ToInt32((char)value));
         }
 
         public static object ConvertTo(object value, Type targetType)
@@ -140,15 +145,22 @@ namespace GraphQL
             throw new InvalidOperationException($"Could not find conversion from '{valueType.FullName}' to '{targetType.FullName}'");
         }
 
+        /// <summary>
+        /// Allows you to register your own conversion method from one type to another.
+        /// If the conversion from valueType to targetType is already registered, then it will be overwritten.
+        /// </summary>
+        /// <param name="valueType">Type of original value.</param>
+        /// <param name="targetType">Converted value type. </param>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
-            if (conversion == null)
-                throw new ArgumentNullException(nameof(conversion));
-
             if (!_valueConversions.TryGetValue(valueType, out var conversions))
                 _valueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
 
-            conversions[targetType] = conversion;
+            if (conversion == null)
+                conversions.Remove(targetType);
+            else
+                conversions[targetType] = conversion;
         }
     }
 }
