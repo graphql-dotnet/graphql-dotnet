@@ -806,11 +806,6 @@ namespace GraphQL.Instrumentation
             public void Dispose() { }
         }
     }
-    public class MiddlewareResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<System.Threading.Tasks.Task<object>>
-    {
-        public MiddlewareResolver(GraphQL.Resolvers.IFieldResolver next) { }
-        public System.Threading.Tasks.Task<object> Resolve(GraphQL.IResolveFieldContext context) { }
-    }
     public class PerfRecord
     {
         public PerfRecord(string category, string subject, double start, System.Collections.Generic.Dictionary<string, object> metadata = null) { }
@@ -1480,6 +1475,10 @@ namespace GraphQL.Resolvers
     {
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
         public TProperty Resolve(GraphQL.IResolveFieldContext context) { }
+    }
+    public static class FieldResolverExtensions
+    {
+        public static System.Threading.Tasks.Task<object> ResolveAsync(this GraphQL.Resolvers.IFieldResolver resolver, GraphQL.IResolveFieldContext context) { }
     }
     public class FuncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
@@ -2238,7 +2237,6 @@ namespace GraphQL.Utilities
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
         public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType union) { }
-        protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
@@ -2427,12 +2425,6 @@ namespace GraphQL.Utilities
         public static string ToConstantCase(string str) { }
         public static string ToPascalCase(string str) { }
         public static System.Collections.Generic.IEnumerable<string> ToWords(string str) { }
-    }
-    public sealed class SyncToAsyncResolverAdapter : GraphQL.Resolvers.IFieldResolver
-    {
-        public SyncToAsyncResolverAdapter(GraphQL.Resolvers.IFieldResolver inner) { }
-        public object Resolve(GraphQL.IResolveFieldContext context) { }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {

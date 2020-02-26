@@ -1,9 +1,9 @@
-using GraphQL.Resolvers;
-using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
@@ -70,9 +70,7 @@ namespace GraphQL.Instrumentation
                 {
                     foreach (var field in complex.Fields)
                     {
-                        var resolver = new MiddlewareResolver(field.Resolver);
-
-                        var fieldMiddlewareDelegate = Build(resolver.Resolve, schema);
+                        var fieldMiddlewareDelegate = Build(context => (field.Resolver ?? NameFieldResolver.Instance).ResolveAsync(context), schema);
 
                         field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                     }
