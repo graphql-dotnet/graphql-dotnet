@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 
@@ -7,8 +7,8 @@ namespace GraphQL
 {
     public static class ValueConverter
     {
-        private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _valueConversions
-            = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
+            = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
 
         static ValueConverter()
         {
@@ -188,10 +188,11 @@ namespace GraphQL
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
             if (!_valueConversions.TryGetValue(valueType, out var conversions))
-                _valueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
+                if (!_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
+                    conversions = _valueConversions[valueType];
 
             if (conversion == null)
-                conversions.Remove(targetType);
+                conversions.TryRemove(targetType, out var _);
             else
                 conversions[targetType] = conversion;
         }
