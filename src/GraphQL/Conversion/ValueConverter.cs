@@ -121,28 +121,61 @@ namespace GraphQL
             Register(typeof(char), typeof(int), value => Convert.ToInt32((char)value));
         }
 
-        public static object ConvertTo(object value, Type targetType)
-        {
-            if (value == null || targetType.IsInstanceOfType(value))
-                return value;
-
-            var conversion = GetConversion(value.GetType(), targetType);
-            return conversion(value);
-        }
-
         public static T ConvertTo<T>(object value)
         {
-            var v = ConvertTo(value, typeof(T));
+            object v = ConvertTo(value, typeof(T));
 
             return v == null ? default : (T)v;
         }
 
+        public static object ConvertTo(object value, Type targetType)
+        {
+            if (!TryConvertTo(value, targetType, out object result))
+                throw new InvalidOperationException($"Could not find conversion from '{value.GetType().FullName}' to '{targetType.FullName}'");
+
+            return result;
+        }
+
+        public static bool TryConvertTo<T>(object value, out T result)
+        {
+            if (TryConvertTo(value, typeof(T), out object v))
+            {
+                result = (T)v;
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        }
+
+        public static bool TryConvertTo(object value, Type targetType, out object result)
+        {
+            if (value == null || targetType.IsInstanceOfType(value))
+            {
+                result = value;
+                return true;
+            }
+
+            var conversion = GetConversion(value.GetType(), targetType);
+            if (conversion == null)
+            {
+                result = null;
+                return false;
+            }
+            else
+            {
+                result = conversion(value);
+                return true;
+            }
+        }
+
         private static Func<object, object> GetConversion(Type valueType, Type targetType)
         {
-            if (_valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
-                return conversion;
-
-            throw new InvalidOperationException($"Could not find conversion from '{valueType.FullName}' to '{targetType.FullName}'");
+            return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
+                ? conversion
+                : null;
         }
 
         /// <summary>

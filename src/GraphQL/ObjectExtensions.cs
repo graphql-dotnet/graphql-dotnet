@@ -103,28 +103,20 @@ namespace GraphQL
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
         public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType mappedType = null)
         {
-            bool SkipEnumerable()
-            {
-                if (fieldType == typeof(string))
-                    return true;
-
-                if (fieldType == typeof(byte[]) && propertyValue is string)
-                    return true;
-
-                return false;
-            }
-
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
             {
                 return propertyValue;
             }
 
+            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object result))
+                return result;
+
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (enumerableInterface != null && !SkipEnumerable())
+            if (fieldType != typeof(string) && enumerableInterface != null)
             {
                 IList newCollection;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
