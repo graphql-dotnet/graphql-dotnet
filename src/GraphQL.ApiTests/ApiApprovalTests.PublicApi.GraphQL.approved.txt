@@ -338,6 +338,8 @@ namespace GraphQL
         public static object ConvertTo(object value, System.Type targetType) { }
         public static T ConvertTo<T>(object value) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object> conversion) { }
+        public static bool TryConvertTo(object value, System.Type targetType, out object result) { }
+        public static bool TryConvertTo<T>(object value, out T result) { }
     }
 }
 namespace GraphQL.Builders
