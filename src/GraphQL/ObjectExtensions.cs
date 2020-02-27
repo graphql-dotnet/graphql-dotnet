@@ -16,10 +16,8 @@ namespace GraphQL
         /// <param name="source">The source of values.</param>
         /// <returns>T.</returns>
         public static T ToObject<T>(this IDictionary<string, object> source)
-            where T : class, new()
-        {
-            return (T)ToObject(source, typeof(T));
-        }
+            where T : class
+            => (T)ToObject(source, typeof(T));
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -36,6 +34,9 @@ namespace GraphQL
         /// </param>
         public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
+            if (ValueConverter.TryConvertToObject(source, type, out var result))
+                return result;
+
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters
             var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
 
@@ -184,7 +185,7 @@ namespace GraphQL
                 fieldType = nullableFieldType;
             }
 
-            if (propertyValue is Dictionary<string, object> objects)
+            if (propertyValue is IDictionary<string, object> objects)
             {
                 return ToObject(objects, fieldType, mappedType);
             }
