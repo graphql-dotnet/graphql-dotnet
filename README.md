@@ -5,6 +5,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
 [![Nuget](https://img.shields.io/nuget/vpre/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json)
 [![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
 
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
@@ -52,6 +53,11 @@ where you may want to explicitly pull a certain version using `-v`.
 > dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1448
 ```
 
+[MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) is the primary source of packages
+where you can find all preview versions built from the `master` branch. Periodically (usually once every
+few months) the latest preview version is published to NuGet manually. This is due to fairly frequent
+changes. Publication of each preview version to NuGet would create only unnecessary noise.
+
 ## Documentation
 
 http://graphql-dotnet.github.io
@@ -61,7 +67,11 @@ http://graphql-dotnet.github.io
 https://github.com/graphql-dotnet/examples
 
 You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
-It supports the popular IDEs for managing GraphQL requests - GraphQL Playground, GraphiQL and Altair.
+It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
+- [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+- [GraphiQL](https://github.com/graphql/graphiql)
+- [Altair](https://github.com/imolorhe/altair)
+- [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
 ## Training
 
@@ -70,6 +80,7 @@ It supports the popular IDEs for managing GraphQL requests - GraphQL Playground,
 
 ## Upgrade Guides
 
+* 2.4.0 to 3.0 - under development
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
