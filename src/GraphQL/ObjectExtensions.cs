@@ -109,14 +109,16 @@ namespace GraphQL
                 return propertyValue;
             }
 
+            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object result))
+                return result;
+
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (fieldType != typeof(string)
-                && enumerableInterface != null)
+            if (fieldType != typeof(string) && enumerableInterface != null)
             {
-                IList newArray;
+                IList newCollection;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var fieldTypeImplementsIList = fieldType.GetInterface("IList") != null;
@@ -126,40 +128,45 @@ namespace GraphQL
                 // Custom container
                 if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
-                    newArray = (IList)Activator.CreateInstance(fieldType);
+                    newCollection = (IList)Activator.CreateInstance(fieldType);
                 }
-                // Array
+                // Array of known size is created immediately
                 else if (fieldType.IsArray && propertyValueAsIList != null)
                 {
-                    newArray = Array.CreateInstance(elementType, propertyValueAsIList.Count);
+                    newCollection = Array.CreateInstance(elementType, propertyValueAsIList.Count);
                 }
                 // List<T>
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
-                    newArray = (IList)Activator.CreateInstance(genericListType);
+                    newCollection = (IList)Activator.CreateInstance(genericListType);
                 }
 
                 if (!(propertyValue is IEnumerable valueList))
-                    return newArray;
+                    return newCollection;
 
+                // Array of known size is populated in-place
                 if (fieldType.IsArray && propertyValueAsIList != null)
                 {
                     for (int i = 0; i < propertyValueAsIList.Count; ++i)
                     {
                         var listItem = propertyValueAsIList[i];
-                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType);
+                        newCollection[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType);
                     }
                 }
+                // Array of unknown size is created only after populating list
                 else
                 {
                     foreach (var listItem in valueList)
                     {
-                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
+                        newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
                     }
+                   
+                    if (fieldType.IsArray)
+                        newCollection = ((dynamic)newCollection).ToArray();
                 }
 
-                return newArray;
+                return newCollection;
             }
 
             var value = propertyValue;
@@ -199,12 +206,7 @@ namespace GraphQL
                 value = Enum.Parse(fieldType, str, true);
             }
 
-            return ConvertValue(value, fieldType);
-        }
-
-        private static object ConvertValue(object value, Type targetType)
-        {
-            return ValueConverter.ConvertTo(value, targetType);
+            return ValueConverter.ConvertTo(value, fieldType);
         }
 
         /// <summary>

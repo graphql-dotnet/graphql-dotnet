@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PublicApiGenerator" Version="10.0.1" />
+    <PackageReference Include="PublicApiGenerator" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>

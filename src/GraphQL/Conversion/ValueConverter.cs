@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 
@@ -7,8 +7,8 @@ namespace GraphQL
 {
     public static class ValueConverter
     {
-        private static readonly Dictionary<Type, Dictionary<Type, Func<object, object>>> _valueConversions
-            = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
+            = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
 
         static ValueConverter()
         {
@@ -114,41 +114,87 @@ namespace GraphQL
             Register(typeof(double), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
 
             Register(typeof(string), typeof(Uri), value => value is string s ? new Uri(s) : (Uri)value);
-        }
+            // registering such a default conversion for string->byte[] seems useful
+            Register(typeof(string), typeof(byte[]), value => Convert.FromBase64String((string)value));
 
-        public static object ConvertTo(object value, Type targetType)
-        {
-            if (value == null || targetType.IsInstanceOfType(value))
-                return value;
-
-            var conversion = GetConversion(value.GetType(), targetType);
-            return conversion(value);
+            Register(typeof(char), typeof(byte), value => Convert.ToByte((char)value));
+            Register(typeof(char), typeof(int), value => Convert.ToInt32((char)value));
         }
 
         public static T ConvertTo<T>(object value)
         {
-            var v = ConvertTo(value, typeof(T));
+            object v = ConvertTo(value, typeof(T));
 
             return v == null ? default : (T)v;
         }
 
-        private static Func<object, object> GetConversion(Type valueType, Type targetType)
+        public static object ConvertTo(object value, Type targetType)
         {
-            if (_valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion))
-                return conversion;
+            if (!TryConvertTo(value, targetType, out object result))
+                throw new InvalidOperationException($"Could not find conversion from '{value.GetType().FullName}' to '{targetType.FullName}'");
 
-            throw new InvalidOperationException($"Could not find conversion from '{valueType.FullName}' to '{targetType.FullName}'");
+            return result;
         }
 
+        public static bool TryConvertTo<T>(object value, out T result)
+        {
+            if (TryConvertTo(value, typeof(T), out object v))
+            {
+                result = (T)v;
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        }
+
+        public static bool TryConvertTo(object value, Type targetType, out object result)
+        {
+            if (value == null || targetType.IsInstanceOfType(value))
+            {
+                result = value;
+                return true;
+            }
+
+            var conversion = GetConversion(value.GetType(), targetType);
+            if (conversion == null)
+            {
+                result = null;
+                return false;
+            }
+            else
+            {
+                result = conversion(value);
+                return true;
+            }
+        }
+
+        private static Func<object, object> GetConversion(Type valueType, Type targetType)
+        {
+            return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
+                ? conversion
+                : null;
+        }
+
+        /// <summary>
+        /// Allows you to register your own conversion method from one type to another.
+        /// If the conversion from valueType to targetType is already registered, then it will be overwritten.
+        /// </summary>
+        /// <param name="valueType">Type of original value.</param>
+        /// <param name="targetType">Converted value type. </param>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
-            if (conversion == null)
-                throw new ArgumentNullException(nameof(conversion));
-
             if (!_valueConversions.TryGetValue(valueType, out var conversions))
-                _valueConversions.Add(valueType, conversions = new Dictionary<Type, Func<object, object>>());
+                if (!_valueConversions.TryAdd(valueType, conversions = new ConcurrentDictionary<Type, Func<object, object>>()))
+                    conversions = _valueConversions[valueType];
 
-            conversions[targetType] = conversion;
+            if (conversion == null)
+                conversions.TryRemove(targetType, out var _);
+            else
+                conversions[targetType] = conversion;
         }
     }
 }
