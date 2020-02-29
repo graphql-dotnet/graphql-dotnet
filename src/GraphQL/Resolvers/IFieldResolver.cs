@@ -1,5 +1,5 @@
-using GraphQL.Types;
 using System.Threading.Tasks;
+using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
