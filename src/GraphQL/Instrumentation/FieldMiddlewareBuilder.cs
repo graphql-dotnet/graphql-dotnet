@@ -70,7 +70,9 @@ namespace GraphQL.Instrumentation
                 {
                     foreach (var field in complex.Fields)
                     {
-                        var fieldMiddlewareDelegate = Build(context => (field.Resolver ?? NameFieldResolver.Instance).ResolveAsync(context), schema);
+                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+
+                        var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
 
                         field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                     }
