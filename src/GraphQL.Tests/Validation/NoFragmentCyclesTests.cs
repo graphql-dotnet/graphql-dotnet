@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Validation
 {
     public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, ValidationSchema>
     {
-       // [Fact]
+        [Fact]
         public void single_reference_is_valid()
         {
             ShouldPassRule(@"
