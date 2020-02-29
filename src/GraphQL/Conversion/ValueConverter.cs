@@ -6,14 +6,23 @@ using System.Numerics;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// This class provides value conversions between objects of different types.
+    /// Conversions are registered in a static thread safe dictionary and are used for all schemas in the application.
+    /// <br/><br/>
+    /// Each ScalarGraphType calls <see cref="ConvertTo(object, Type)">ConvertTo</see> method to return correct value
+    /// type from its <see cref=" GraphQL.Types.ScalarGraphType.ParseValue(object)">ParseValue</see> method.
+    /// Also conversions may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+    /// use cases when deserialization from the values dictionary to the complex input argument is required.
+    /// </summary>
     public static class ValueConverter
     {
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
             = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
 
-        private static readonly ConcurrentDictionary<Type, Func<IDictionary<string, object>, object>> _objectConversions
-            = new ConcurrentDictionary<Type, Func<IDictionary<string, object>, object>>();
-
+        /// <summary>
+        /// Register built-in conversions. This list is expected to grow over time.
+        /// </summary>
         static ValueConverter()
         {
             Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
@@ -140,21 +149,7 @@ namespace GraphQL
             return result;
         }
 
-        public static bool TryConvertTo<T>(object value, out T result)
-        {
-            if (TryConvertTo(value, typeof(T), out object v))
-            {
-                result = (T)v;
-                return true;
-            }
-            else
-            {
-                result = default;
-                return false;
-            }
-        }
-
-        public static bool TryConvertTo(object value, Type targetType, out object result)
+        internal static bool TryConvertTo(object value, Type targetType, out object result, Type sourceType = null)
         {
             if (value == null || targetType.IsInstanceOfType(value))
             {
@@ -162,7 +157,7 @@ namespace GraphQL
                 return true;
             }
 
-            var conversion = GetConversion(value.GetType(), targetType);
+            var conversion = GetConversion(sourceType ?? value.GetType(), targetType);
             if (conversion == null)
             {
                 result = null;
@@ -175,20 +170,6 @@ namespace GraphQL
             }
         }
 
-        internal static bool TryConvertToObject(IDictionary<string, object> value, Type targetType, out object result)
-        {
-            if (_objectConversions.TryGetValue(targetType, out var conversion))
-            {
-                result = conversion(value);
-                return true;
-            }
-            else
-            {
-                result = null;
-                return false;
-            }
-        }
-
         private static Func<object, object> GetConversion(Type valueType, Type targetType)
         {
             return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
@@ -197,11 +178,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Allows you to register your own conversion method from one type to another.
+        /// Allows you to register your own conversion delegate from one type to another.
+        /// <br/><br/>
         /// If the conversion from valueType to targetType is already registered, then it will be overwritten.
         /// </summary>
         /// <param name="valueType">Type of original value.</param>
-        /// <param name="targetType">Converted value type. </param>
+        /// <param name="targetType">Converted value type.</param>
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
@@ -215,16 +197,29 @@ namespace GraphQL
                 conversions[targetType] = conversion;
         }
 
+        /// <summary>
+        /// Allows you to register your own conversion delegate from one type to another.
+        /// <br/><br/>
+        /// If the conversion from TSource to TTarget is already registered, then it will be overwritten.
+        /// </summary>
+        /// <typeparam name="TSource">Type of original value.</typeparam>
+        /// <typeparam name="TTarget">Converted value type.</typeparam>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register<TSource, TTarget>(Func<TSource, TTarget> conversion)
-            => Register(typeof(TSource), typeof(TTarget), v => conversion((TSource)v));
+            => Register(typeof(TSource), typeof(TTarget), conversion == null ? (Func<object, object>)null : v => conversion((TSource)v));
 
-        public static void RegisterObject<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
+        /// <summary>
+        /// Allows you to register your own conversion delegate from dictionary to some complex object.
+        /// <br/><br/>
+        /// This method may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// use cases when deserialization from the values dictionary to the complex input argument is required.
+        /// <br/><br/>
+        /// If the conversion from dictionary to TTarget is already registered, then it will be overwritten.
+        /// </summary>
+        /// <typeparam name="TTarget">Converted value type.</typeparam>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
             where TTarget : class
-        {
-            if (conversion == null)
-                _objectConversions.TryRemove(typeof(TTarget), out var _);
-            else
-                _objectConversions[typeof(TTarget)] = conversion;
-        }
+            => Register<IDictionary<string, object>, TTarget>(conversion == null ? (Func<IDictionary<string, object>, TTarget>)null : v => conversion(v));
     }
 }

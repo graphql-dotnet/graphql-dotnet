@@ -8,7 +8,7 @@ namespace GraphQL.Types
         {
             LongValue longValue => longValue.Value,
             IntValue intValue => (long)intValue.Value,
-            _ => (object)null
+            _ => null
         };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(long));

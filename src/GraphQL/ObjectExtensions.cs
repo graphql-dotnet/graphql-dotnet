@@ -37,7 +37,8 @@ namespace GraphQL
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            if (ValueConverter.TryConvertToObject(source, type, out object result))
+            // force sourceType to be IDictionary<string, object>
+            if (ValueConverter.TryConvertTo(source, type, out object result, typeof(IDictionary<string, object>)))
                 return result;
 
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters
@@ -206,7 +207,7 @@ namespace GraphQL
                     throw new ExecutionError($"Unknown value '{value}' for enum '{fieldType.Name}'.");
                 }
 
-                var str = value.ToString();
+                string str = value.ToString();
                 value = Enum.Parse(fieldType, str, true);
             }
 
