@@ -50,6 +50,8 @@ namespace GraphQL
                 return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed();
             });
             Register<string, Guid>(value => Guid.Parse(value));
+            Register<string, Uri>(value => new Uri(value));
+            Register<string, byte[]>(value => Convert.FromBase64String(value)); // such a built-in conversion for string->byte[] seems useful
 
             Register<DateTime, DateTimeOffset>(value => value);
             Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
@@ -125,10 +127,6 @@ namespace GraphQL
             Register<float, BigInteger>(value => new BigInteger(value));
 
             Register<double, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
-
-            Register<string, Uri>(value => new Uri(value));
-            // registering such a default conversion for string->byte[] seems useful
-            Register<string, byte[]>(value => Convert.FromBase64String(value));
 
             Register<char, byte>(value => Convert.ToByte(value));
             Register<char, int>(value => Convert.ToInt32(value));
