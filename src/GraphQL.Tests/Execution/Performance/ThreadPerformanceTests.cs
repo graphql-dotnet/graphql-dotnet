@@ -66,7 +66,7 @@ namespace GraphQL.Tests.Execution.Performance
             }
         }
 
-       // [Fact(Skip = "May fail on a single processor machine.")]
+        [Fact(Skip = "May fail on a single processor machine.")]
         // [Fact]
         public void Executes_IsQuickerThanTotalTaskTime()
         {

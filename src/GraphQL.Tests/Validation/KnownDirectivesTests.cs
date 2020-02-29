@@ -155,7 +155,7 @@ namespace GraphQL.Tests.Validation
             ");
         }
 
-       // [Fact(Skip = "This is not yet supported")]
+        [Fact(Skip = "This is not yet supported")]
         public void within_schema_language_with_misplaced_directives()
         {
             ShouldFailRule(_ =>

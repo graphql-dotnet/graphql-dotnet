@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output = output;
         }
 
-       // [Fact(Skip = "Benchmarks only, these numbers are machine dependent.")]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependent.")]
         // [Fact]
         public void Executes_StarWarsBasicQuery_Performant()
         {

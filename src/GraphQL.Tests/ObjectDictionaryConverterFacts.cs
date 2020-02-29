@@ -201,7 +201,7 @@ namespace GraphQL.Tests
 }".Trim());
         }
 
-       // [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
         public void Serialize_Nested_SimpleValues()
         {
             var source = new Nested
@@ -228,7 +228,7 @@ namespace GraphQL.Tests
 }".Trim());
         }
 
-       // [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
         public void Serialize_Nested_Simple_Null()
         {
             var source = new Nested
@@ -253,7 +253,7 @@ namespace GraphQL.Tests
 }".Trim());
         }
 
-       // [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
+        [Fact(Skip = "This converter currently is only intended to be used to read a JSON object into a strongly-typed representation.")]
         public void Serialize_Nested_ComplexValues()
         {
             var source = new Nested
