@@ -34,7 +34,10 @@ namespace GraphQL
         /// </param>
         public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
-            if (ValueConverter.TryConvertToObject(source, type, out var result))
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            if (ValueConverter.TryConvertToObject(source, type, out object result))
                 return result;
 
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters

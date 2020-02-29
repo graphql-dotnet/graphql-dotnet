@@ -177,9 +177,6 @@ namespace GraphQL
 
         internal static bool TryConvertToObject(IDictionary<string, object> value, Type targetType, out object result)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             if (_objectConversions.TryGetValue(targetType, out var conversion))
             {
                 result = conversion(value);
