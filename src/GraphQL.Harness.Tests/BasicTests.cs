@@ -7,7 +7,7 @@ namespace GraphQL.Harness.Tests
 {
     public class BasicTests : SystemTestBase<Startup>
     {
-      //  [Fact]
+        [Fact]
         public async Task hero()
         {
             await run(scenario =>
