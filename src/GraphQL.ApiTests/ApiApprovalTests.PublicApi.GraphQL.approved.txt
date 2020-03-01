@@ -879,10 +879,6 @@ namespace GraphQL.Introspection
         System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field);
         System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type);
     }
-    public static class SchemaIntrospection
-    {
-        public static readonly string IntrospectionQuery;
-    }
     public class SchemaMetaFieldType : GraphQL.Types.FieldType
     {
         public SchemaMetaFieldType() { }
