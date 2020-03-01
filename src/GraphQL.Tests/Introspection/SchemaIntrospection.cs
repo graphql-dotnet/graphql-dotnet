@@ -1,4 +1,4 @@
-namespace GraphQL.Introspection
+namespace GraphQL.Tests.Introspection
 {
     public static class SchemaIntrospection
     {
