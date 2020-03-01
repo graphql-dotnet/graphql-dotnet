@@ -19,7 +19,7 @@ namespace GraphQL.Conversion
         string NameForField(string fieldName, IComplexGraphType graphType);
 
         /// <summary>
-        /// Santizes an argument name for a specified parent graph type and field definition; returns the updated field name
+        /// Sanitizes an argument name for a specified parent graph type and field definition; returns the updated field name
         /// </summary>
         string NameForArgument(string argumentName, IComplexGraphType graphType, FieldType field);
     }
