@@ -129,8 +129,6 @@ namespace GraphQL
         public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this System.Type type) { }
-        public static bool IsIntrospectionField(this GraphQL.Types.FieldType fieldType) { }
-        public static bool IsIntrospectionType(this GraphQL.Types.IGraphType graphType) { }
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }

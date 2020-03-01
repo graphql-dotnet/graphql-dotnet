@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -62,6 +63,17 @@ namespace GraphQL
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
             return context.Arguments?.ContainsKey(argumentName) ?? false;
         }
+
+
+        /// <summary>
+        /// Determines if this graph type is an introspection type
+        /// </summary>
+        private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
+
+        /// <summary>
+        /// Determines if this field is an introspection field
+        /// </summary>
+        private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
