@@ -27,9 +27,9 @@ namespace GraphQL.Types
         void Initialize();
 
         /// <summary>
-        /// The <see cref="IFieldNameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.FieldNameConverter"/>.
+        /// The <see cref="INameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.NameConverter"/>.
         /// </summary>
-        IFieldNameConverter FieldNameConverter { get; set; }
+        INameConverter NameConverter { get; set; }
 
         /// <summary>
         /// The 'query' base graph type; required

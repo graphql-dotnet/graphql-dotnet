@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -27,7 +28,8 @@ namespace GraphQL
 
         private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
         {
-            string argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
@@ -55,7 +57,22 @@ namespace GraphQL
         }
 
         /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
-        public static bool HasArgument(this IResolveFieldContext context, string argumentName) => context.Arguments?.ContainsKey(argumentName) ?? false;
+        public static bool HasArgument(this IResolveFieldContext context, string name)
+        {
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
+            return context.Arguments?.ContainsKey(argumentName) ?? false;
+        }
+
+        /// <summary>
+        /// Determines if this graph type is an introspection type
+        /// </summary>
+        private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
+
+        /// <summary>
+        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
+        /// </summary>
+        private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>

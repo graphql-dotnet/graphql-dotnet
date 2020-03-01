@@ -45,11 +45,11 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            IFieldNameConverter fieldNameConverter = null,
+            INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, fieldNameConverter, writer);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, nameConverter, writer);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -121,7 +121,7 @@ namespace GraphQL.Tests
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
-            IFieldNameConverter fieldNameConverter = null,
+            INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
@@ -134,7 +134,7 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
-                options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
+                options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;
