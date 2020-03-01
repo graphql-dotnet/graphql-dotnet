@@ -64,7 +64,6 @@ namespace GraphQL
             return context.Arguments?.ContainsKey(argumentName) ?? false;
         }
 
-
         /// <summary>
         /// Determines if this graph type is an introspection type
         /// </summary>
