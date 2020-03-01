@@ -294,7 +294,7 @@ namespace GraphQL
         public static GraphQL.Subscription.IResolveEventStreamContext<T> As<T>(this GraphQL.Subscription.IResolveEventStreamContext context) { }
         public static object GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = null) { }
-        public static bool HasArgument(this GraphQL.IResolveFieldContext context, string argumentName) { }
+        public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
         public static System.Threading.Tasks.Task<object> TryAsyncResolve(this GraphQL.IResolveFieldContext context, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
         public static System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(this GraphQL.IResolveFieldContext context, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
     }
@@ -441,27 +441,27 @@ namespace GraphQL.Conversion
     {
         public static readonly GraphQL.Conversion.CamelCaseNameConverter Instance;
         public CamelCaseNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
-        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
     public class DefaultNameConverter : GraphQL.Conversion.INameConverter
     {
         public static readonly GraphQL.Conversion.DefaultNameConverter Instance;
         public DefaultNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
-        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
     public interface INameConverter
     {
-        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field);
-        string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType);
+        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field);
+        string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType);
     }
     public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
         public static readonly GraphQL.Conversion.PascalCaseNameConverter Instance;
         public PascalCaseNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType graphType, GraphQL.Types.FieldType field) { }
-        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType graphType) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
 }
 namespace GraphQL.DataLoader
