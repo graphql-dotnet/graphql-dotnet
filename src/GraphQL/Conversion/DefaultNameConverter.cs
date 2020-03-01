@@ -16,11 +16,11 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Returns the field name without modification
         /// </summary>
-        public string NameForField(string fieldName, IComplexGraphType graphType) => fieldName;
+        public string NameForField(string fieldName, IComplexGraphType parentGraphType) => fieldName;
 
         /// <summary>
         /// Returns the argument name without modification
         /// </summary>
-        public string NameForArgument(string argumentName, IComplexGraphType graphType, FieldType field) => argumentName;
+        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => argumentName;
     }
 }

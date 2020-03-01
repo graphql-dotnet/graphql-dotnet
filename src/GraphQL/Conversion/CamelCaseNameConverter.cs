@@ -17,11 +17,11 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Returns the field name converted to camelCase.
         /// </summary>
-        public string NameForField(string fieldName, IComplexGraphType graphType) => fieldName.ToCamelCase();
+        public string NameForField(string fieldName, IComplexGraphType parentGraphType) => fieldName.ToCamelCase();
 
         /// <summary>
         /// Returns the argument name converted to camelCase.
         /// </summary>
-        public string NameForArgument(string argumentName, IComplexGraphType graphType, FieldType field) => argumentName.ToCamelCase();
+        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => argumentName.ToCamelCase();
     }
 }

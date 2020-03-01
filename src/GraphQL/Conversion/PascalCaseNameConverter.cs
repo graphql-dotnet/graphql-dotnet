@@ -16,11 +16,11 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Returns the field name converted to PascalCase.
         /// </summary>
-        public string NameForField(string fieldName, IComplexGraphType graphType) => fieldName.ToPascalCase();
+        public string NameForField(string fieldName, IComplexGraphType parentGraphType) => fieldName.ToPascalCase();
 
         /// <summary>
         /// Returns the argument name converted to PascalCase.
         /// </summary>
-        public string NameForArgument(string argumentName, IComplexGraphType graphType, FieldType field) => argumentName.ToPascalCase();
+        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => argumentName.ToPascalCase();
     }
 }
