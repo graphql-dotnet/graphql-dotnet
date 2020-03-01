@@ -56,11 +56,11 @@ namespace GraphQL
         }
 
         /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
-        public static bool HasArgument(this IResolveFieldContext context, string argumentName)
+        public static bool HasArgument(this IResolveFieldContext context, string name)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
-            var argumentNameConverted = isIntrospection ? argumentName : (context.Schema?.NameConverter.NameForArgument(argumentName, context.ParentType, context.FieldDefinition) ?? argumentName);
-            return context.Arguments?.ContainsKey(argumentNameConverted) ?? false;
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
+            return context.Arguments?.ContainsKey(argumentName) ?? false;
         }
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
