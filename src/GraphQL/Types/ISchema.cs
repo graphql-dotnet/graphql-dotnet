@@ -153,7 +153,7 @@ namespace GraphQL.Types
         FieldType TypeMetaFieldType { get; }
 
         /// <summary>
-        /// Returns a reference to the __typename introspection field available on any graph type
+        /// Returns a reference to the __typename introspection field available on object, interface, or union graph types
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
     }
