@@ -75,7 +75,7 @@ namespace GraphQL.Types
             INameConverter nameConverter,
             bool seal = false)
         {
-            var lookup = nameConverter != null ? new GraphTypesLookup(nameConverter) : new GraphTypesLookup();
+            var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
