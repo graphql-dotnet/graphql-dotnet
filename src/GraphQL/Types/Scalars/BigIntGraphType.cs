@@ -10,7 +10,7 @@ namespace GraphQL.Types
             BigIntValue bigIntValue => bigIntValue.Value,
             LongValue longValue => new BigInteger(longValue.Value),
             IntValue intValue => new BigInteger(intValue.Value),
-            _ => (object)null
+            _ => null
         };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));

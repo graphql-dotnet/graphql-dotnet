@@ -1,31 +1,44 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// This class provides value conversions between objects of different types.
+    /// Conversions are registered in a static thread safe dictionary and are used for all schemas in the application.
+    /// <br/><br/>
+    /// Each ScalarGraphType calls <see cref="ConvertTo(object, Type)">ConvertTo</see> method to return correct value
+    /// type from its <see cref=" GraphQL.Types.ScalarGraphType.ParseValue(object)">ParseValue</see> method.
+    /// Also conversions may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+    /// use cases when deserialization from the values dictionary to the complex input argument is required.
+    /// </summary>
     public static class ValueConverter
     {
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions
             = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>>();
 
+        /// <summary>
+        /// Register built-in conversions. This list is expected to grow over time.
+        /// </summary>
         static ValueConverter()
         {
-            Register(typeof(string), typeof(sbyte), value => sbyte.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(byte), value => byte.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(short), value => short.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(ushort), value => ushort.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(int), value => int.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(uint), value => uint.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(long), value => long.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(ulong), value => ulong.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(BigInteger), value => BigInteger.Parse((string)value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(float), value => float.Parse((string)value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(double), value => double.Parse((string)value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(decimal), value => decimal.Parse((string)value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
-            Register(typeof(string), typeof(DateTime), value => DateTimeOffset.Parse((string)value, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal).UtcDateTime);
-            Register(typeof(string), typeof(DateTimeOffset), value => DateTimeOffset.Parse((string)value, DateTimeFormatInfo.InvariantInfo));
+            Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, byte>(value => byte.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, short>(value => short.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, ushort>(value => ushort.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, int>(value => int.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, uint>(value => uint.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, long>(value => long.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, ulong>(value => ulong.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, BigInteger>(value => BigInteger.Parse(value, NumberFormatInfo.InvariantInfo));
+            Register<string, float>(value => float.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<string, double>(value => double.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<string, decimal>(value => decimal.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<string, DateTime>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal).UtcDateTime);
+            Register<string, DateTimeOffset>(value => DateTimeOffset.Parse(value, DateTimeFormatInfo.InvariantInfo));
             Register(typeof(string), typeof(bool), value =>
             {
                 string stringValue = (string)value;
@@ -36,89 +49,87 @@ namespace GraphQL
 
                 return Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed();
             });
-            Register(typeof(string), typeof(Guid), value => Guid.Parse((string)value));
+            Register<string, Guid>(value => Guid.Parse(value));
+            Register<string, Uri>(value => new Uri(value));
+            Register<string, byte[]>(value => Convert.FromBase64String(value)); // such a built-in conversion for string->byte[] seems useful
 
-            Register(typeof(DateTime), typeof(DateTimeOffset), value => (DateTimeOffset)(DateTime)value);
-            Register(typeof(DateTimeOffset), typeof(DateTime), value => ((DateTimeOffset)value).UtcDateTime);
-            Register(typeof(TimeSpan), typeof(long), value => ((TimeSpan)value).TotalSeconds);
+            Register<DateTime, DateTimeOffset>(value => value);
+            Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
+            Register<TimeSpan, long>(value => (long)value.TotalSeconds);
 
-            Register(typeof(int), typeof(sbyte), value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
+            Register<int, sbyte>(value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
+            Register<int, byte>(value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
+            Register<int, short>(value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
+            Register<int, ushort>(value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
             Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed());
-            Register(typeof(int), typeof(uint), value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(long), value => (long)(int)value);
-            Register(typeof(int), typeof(ulong), value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(BigInteger), value => new BigInteger((int)value));
-            Register(typeof(int), typeof(double), value => Convert.ToDouble(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(int), typeof(TimeSpan), value => TimeSpan.FromSeconds((int)value));
+            Register<int, uint>(value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
+            Register<int, long>(value => value);
+            Register<int, ulong>(value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
+            Register<int, BigInteger>(value => new BigInteger(value));
+            Register<int, double>(value => Convert.ToDouble(value, NumberFormatInfo.InvariantInfo));
+            Register<int, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<int, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register(typeof(long), typeof(sbyte), value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(byte), value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(short), value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(ushort), value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(int), value => Convert.ToInt32(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(uint), value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(ulong), value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(long), typeof(BigInteger), value => new BigInteger((long)value));
-            Register(typeof(long), typeof(double), value => (double)(long)value);
-            Register(typeof(long), typeof(decimal), value => (decimal)(long)value);
-            Register(typeof(long), typeof(TimeSpan), value => TimeSpan.FromSeconds((long)value));
+            Register<long, sbyte>(value => Convert.ToSByte(value, NumberFormatInfo.InvariantInfo));
+            Register<long, byte>(value => Convert.ToByte(value, NumberFormatInfo.InvariantInfo));
+            Register<long, short>(value => Convert.ToInt16(value, NumberFormatInfo.InvariantInfo));
+            Register<long, ushort>(value => Convert.ToUInt16(value, NumberFormatInfo.InvariantInfo));
+            Register<long, int>(value => Convert.ToInt32(value, NumberFormatInfo.InvariantInfo));
+            Register<long, uint>(value => Convert.ToUInt32(value, NumberFormatInfo.InvariantInfo));
+            Register<long, ulong>(value => Convert.ToUInt64(value, NumberFormatInfo.InvariantInfo));
+            Register<long, BigInteger>(value => new BigInteger(value));
+            Register<long, double>(value => value);
+            Register<long, decimal>(value => value);
+            Register<long, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register(typeof(BigInteger), typeof(sbyte), value => (sbyte)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(byte), value => (byte)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(decimal), value => (decimal)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(double), value => (double)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(short), value => (short)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(long), value => (long)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(sbyte), value => (sbyte)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(ushort), value => (ushort)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(uint), value => (uint)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(ulong), value => (ulong)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(int), value => (int)(BigInteger)value);
-            Register(typeof(BigInteger), typeof(float), value => (float)(BigInteger)value);
+            Register<BigInteger, sbyte>(value => (sbyte)value);
+            Register<BigInteger, byte>(value => (byte)value);
+            Register<BigInteger, decimal>(value => (decimal)value);
+            Register<BigInteger, double>(value => (double)value);
+            Register<BigInteger, short>(value => (short)value);
+            Register<BigInteger, long>(value => (long)value);
+            Register<BigInteger, sbyte>(value => (sbyte)value);
+            Register<BigInteger, ushort>(value => (ushort)value);
+            Register<BigInteger, uint>(value => (uint)value);
+            Register<BigInteger, ulong>(value => (ulong)value);
+            Register<BigInteger, int>(value => (int)value);
+            Register<BigInteger, float>(value => (float)value);
 
-            Register(typeof(uint), typeof(sbyte), value => (sbyte)(uint)value);
-            Register(typeof(uint), typeof(byte), value => (byte)(uint)value);
-            Register(typeof(uint), typeof(int), value => (int)(uint)value);
-            Register(typeof(uint), typeof(long), value => (long)(uint)value);
-            Register(typeof(uint), typeof(ulong), value => (ulong)(uint)value);
-            Register(typeof(uint), typeof(short), value => (short)(uint)value);
-            Register(typeof(uint), typeof(ushort), value => (ushort)(uint)value);
-            Register(typeof(uint), typeof(BigInteger), value => new BigInteger((uint)value));
+            Register<uint, sbyte>(value => (sbyte)value);
+            Register<uint, byte>(value => (byte)value);
+            Register<uint, int>(value => (int)value);
+            Register<uint, long>(value => value);
+            Register<uint, ulong>(value => value);
+            Register<uint, short>(value => (short)value);
+            Register<uint, ushort>(value => (ushort)value);
+            Register<uint, BigInteger>(value => new BigInteger(value));
 
-            Register(typeof(ulong), typeof(BigInteger), value => new BigInteger((ulong)value));
+            Register<ulong, BigInteger>(value => new BigInteger(value));
 
-            Register(typeof(byte), typeof(sbyte), value => (sbyte)(byte)value);
-            Register(typeof(byte), typeof(int), value => (int)(byte)value);
-            Register(typeof(byte), typeof(long), value => (long)(byte)value);
-            Register(typeof(byte), typeof(ulong), value => (ulong)(byte)value);
-            Register(typeof(byte), typeof(short), value => (short)(byte)value);
-            Register(typeof(byte), typeof(ushort), value => (ushort)(byte)value);
-            Register(typeof(byte), typeof(BigInteger), value => new BigInteger((byte)value));
+            Register<byte, sbyte>(value => (sbyte)value);
+            Register<byte, int>(value => value);
+            Register<byte, long>(value => value);
+            Register<byte, ulong>(value => value);
+            Register<byte, short>(value => value);
+            Register<byte, ushort>(value => value);
+            Register<byte, BigInteger>(value => new BigInteger(value));
 
-            Register(typeof(sbyte), typeof(byte), value => (byte)(sbyte)value);
-            Register(typeof(sbyte), typeof(int), value => (int)(sbyte)value);
-            Register(typeof(sbyte), typeof(long), value => (long)(sbyte)value);
-            Register(typeof(sbyte), typeof(ulong), value => (ulong)(sbyte)value);
-            Register(typeof(sbyte), typeof(short), value => (short)(sbyte)value);
-            Register(typeof(sbyte), typeof(ushort), value => (ushort)(sbyte)value);
-            Register(typeof(sbyte), typeof(BigInteger), value => new BigInteger((sbyte)value));
+            Register<sbyte, byte>(value => (byte)value);
+            Register<sbyte, int>(value => value);
+            Register<sbyte, long>(value => value);
+            Register<sbyte, ulong>(value => (ulong)value);
+            Register<sbyte, short>(value => value);
+            Register<sbyte, ushort>(value => (ushort)value);
+            Register<sbyte, BigInteger>(value => new BigInteger(value));
 
-            Register(typeof(float), typeof(double), value => (double)(float)value);
-            Register(typeof(float), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
-            Register(typeof(float), typeof(BigInteger), value => new BigInteger((float)value));
+            Register<float, double>(value => (double)value);
+            Register<float, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<float, BigInteger>(value => new BigInteger(value));
 
-            Register(typeof(double), typeof(decimal), value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
+            Register<double, decimal>(value => Convert.ToDecimal(value, NumberFormatInfo.InvariantInfo));
 
-            Register(typeof(string), typeof(Uri), value => value is string s ? new Uri(s) : (Uri)value);
-            // registering such a default conversion for string->byte[] seems useful
-            Register(typeof(string), typeof(byte[]), value => Convert.FromBase64String((string)value));
-
-            Register(typeof(char), typeof(byte), value => Convert.ToByte((char)value));
-            Register(typeof(char), typeof(int), value => Convert.ToInt32((char)value));
+            Register<char, byte>(value => Convert.ToByte(value));
+            Register<char, int>(value => Convert.ToInt32(value));
         }
 
         public static T ConvertTo<T>(object value)
@@ -136,21 +147,7 @@ namespace GraphQL
             return result;
         }
 
-        public static bool TryConvertTo<T>(object value, out T result)
-        {
-            if (TryConvertTo(value, typeof(T), out object v))
-            {
-                result = (T)v;
-                return true;
-            }
-            else
-            {
-                result = default;
-                return false;
-            }
-        }
-
-        public static bool TryConvertTo(object value, Type targetType, out object result)
+        internal static bool TryConvertTo(object value, Type targetType, out object result, Type sourceType = null)
         {
             if (value == null || targetType.IsInstanceOfType(value))
             {
@@ -158,7 +155,7 @@ namespace GraphQL
                 return true;
             }
 
-            var conversion = GetConversion(value.GetType(), targetType);
+            var conversion = GetConversion(sourceType ?? value.GetType(), targetType);
             if (conversion == null)
             {
                 result = null;
@@ -179,11 +176,12 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Allows you to register your own conversion method from one type to another.
+        /// Allows you to register your own conversion delegate from one type to another.
+        /// <br/><br/>
         /// If the conversion from valueType to targetType is already registered, then it will be overwritten.
         /// </summary>
         /// <param name="valueType">Type of original value.</param>
-        /// <param name="targetType">Converted value type. </param>
+        /// <param name="targetType">Converted value type.</param>
         /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object> conversion)
         {
@@ -196,5 +194,30 @@ namespace GraphQL
             else
                 conversions[targetType] = conversion;
         }
+
+        /// <summary>
+        /// Allows you to register your own conversion delegate from one type to another.
+        /// <br/><br/>
+        /// If the conversion from TSource to TTarget is already registered, then it will be overwritten.
+        /// </summary>
+        /// <typeparam name="TSource">Type of original value.</typeparam>
+        /// <typeparam name="TTarget">Converted value type.</typeparam>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        public static void Register<TSource, TTarget>(Func<TSource, TTarget> conversion)
+            => Register(typeof(TSource), typeof(TTarget), conversion == null ? (Func<object, object>)null : v => conversion((TSource)v));
+
+        /// <summary>
+        /// Allows you to register your own conversion delegate from dictionary to some complex object.
+        /// <br/><br/>
+        /// This method may be useful in advanced <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// use cases when deserialization from the values dictionary to the complex input argument is required.
+        /// <br/><br/>
+        /// If the conversion from dictionary to TTarget is already registered, then it will be overwritten.
+        /// </summary>
+        /// <typeparam name="TTarget">Converted value type.</typeparam>
+        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget> conversion)
+            where TTarget : class
+            => Register<IDictionary<string, object>, TTarget>(conversion == null ? (Func<IDictionary<string, object>, TTarget>)null : v => conversion(v));
     }
 }

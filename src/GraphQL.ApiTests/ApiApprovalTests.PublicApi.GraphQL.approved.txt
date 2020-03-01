@@ -237,7 +237,7 @@ namespace GraphQL
         public static bool IsDefinedEnumValue(System.Type type, object value) { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object> source, System.Type type, GraphQL.Types.IGraphType mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)
-            where T :  class, new () { }
+            where T :  class { }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
@@ -338,8 +338,9 @@ namespace GraphQL
         public static object ConvertTo(object value, System.Type targetType) { }
         public static T ConvertTo<T>(object value) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object> conversion) { }
-        public static bool TryConvertTo(object value, System.Type targetType, out object result) { }
-        public static bool TryConvertTo<T>(object value, out T result) { }
+        public static void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget> conversion)
+            where TTarget :  class { }
+        public static void Register<TSource, TTarget>(System.Func<TSource, TTarget> conversion) { }
     }
 }
 namespace GraphQL.Builders

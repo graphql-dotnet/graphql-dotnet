@@ -13,7 +13,7 @@ namespace GraphQL.Types
             FloatValue floatVal => floatVal.Value,
             IntValue intVal => intVal.Value,
             LongValue longVal => longVal.Value,
-            _ => (object)null
+            _ => null
         };
     }
 }
