@@ -91,9 +91,9 @@ namespace GraphQL.Types
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
-            lookup.HandleField(null, SchemaIntrospection.SchemaMeta, ctx, false);
-            lookup.HandleField(null, SchemaIntrospection.TypeMeta, ctx, false);
-            lookup.HandleField(null, SchemaIntrospection.TypeNameMeta, ctx, false);
+            lookup.HandleField(null, lookup.SchemaMetaFieldType, ctx, false);
+            lookup.HandleField(null, lookup.TypeMetaFieldType, ctx, false);
+            lookup.HandleField(null, lookup.TypeNameMetaFieldType, ctx, false);
 
             foreach (var directive in directives)
             {
@@ -314,6 +314,7 @@ namespace GraphQL.Types
                     union.AddPossibleType(objType);
                 }
             }
+
         }
 
         private void HandleField(IComplexGraphType parentType, FieldType field, TypeCollectionContext context, bool applyNameConverter)
@@ -548,5 +549,11 @@ the name '{typeName}' is already registered to '{existingGraphType.GetType().Ful
                 _types.Add(typeName, type);
             }
         }
+
+        public FieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
+
+        public FieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
+
+        public FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
     }
 }

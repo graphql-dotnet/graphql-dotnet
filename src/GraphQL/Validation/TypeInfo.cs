@@ -216,21 +216,21 @@ namespace GraphQL.Validation
         {
             var name = field.Name;
 
-            if (name == SchemaIntrospection.SchemaMeta.Name
+            if (name == schema.SchemaMetaFieldType.Name
                 && Equals(schema.Query, parentType))
             {
-                return SchemaIntrospection.SchemaMeta;
+                return schema.SchemaMetaFieldType;
             }
 
-            if (name == SchemaIntrospection.TypeMeta.Name
+            if (name == schema.TypeMetaFieldType.Name
                 && Equals(schema.Query, parentType))
             {
-                return SchemaIntrospection.TypeMeta;
+                return schema.TypeMetaFieldType;
             }
 
-            if (name == SchemaIntrospection.TypeNameMeta.Name && parentType.IsCompositeType())
+            if (name == schema.TypeNameMetaFieldType.Name && parentType.IsCompositeType())
             {
-                return SchemaIntrospection.TypeNameMeta;
+                return schema.TypeNameMetaFieldType;
             }
 
             if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)
