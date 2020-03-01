@@ -1,6 +1,7 @@
 using GraphQL.Types;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,8 @@ namespace GraphQL
 {
     public static class ObjectExtensions
     {
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
+
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// </summary>
@@ -34,6 +37,39 @@ namespace GraphQL
         /// </param>
         public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
+            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"  
+            string GetPropertyName(string key, out FieldType field)
+            {
+                var complexType = mappedType.GetNamedType() as IComplexGraphType;
+
+                // type may not contain mapping information
+                field = complexType?.GetField(key);
+                return field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
+            }
+
+            // Returns keys from source that match constructor signature
+            string[] MatchSourceKeys(ParameterInfo[] parameters)
+            {
+                // parameterless constructors are the most common use case
+                if (parameters.Length == 0)
+                    return Array.Empty<string>();
+
+                // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
+                List<string> keys = null;
+                if (parameters.All(p => source.Any(keyValue =>
+                {
+                    bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
+                    if (matched)
+                        (keys ??= new List<string>()).Add(keyValue.Key);
+                    return matched;
+                })))
+                {
+                    return keys.ToArray();
+                }
+
+                return null;
+            }
+
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
@@ -41,16 +77,18 @@ namespace GraphQL
             if (ValueConverter.TryConvertTo(source, type, out object result, typeof(IDictionary<string, object>)))
                 return result;
 
-            // attempt to use the most specific constructor sorting in decreasing order of number of parameters
-            var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
+            // attempt to use the most specific constructor sorting in decreasing order of parameters number
+            var ctorCandidates = _types.GetOrAdd(type, t => t.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray());
 
             ConstructorInfo targetCtor = null;
             ParameterInfo[] ctorParameters = null;
+            string[] matchedKeys = null;
 
             foreach (var ctor in ctorCandidates)
             {
                 var parameters = ctor.GetParameters();
-                if (parameters.All(p => source.ContainsKey(p.Name)))
+                matchedKeys = MatchSourceKeys(parameters);
+                if (matchedKeys != null)
                 {
                     targetCtor = ctor;
                     ctorParameters = parameters;
@@ -65,28 +103,23 @@ namespace GraphQL
 
             for (int i = 0; i < ctorParameters.Length; ++i)
             {
-                var arg = GetPropertyValue(source[ctorParameters[i].Name], ctorParameters[i].ParameterType);
+                object arg = GetPropertyValue(source[matchedKeys[i]], ctorParameters[i].ParameterType);
                 ctorArguments[i] = arg;
             }
 
-            var obj = targetCtor.Invoke(ctorArguments);
-
-            var complexType = mappedType.GetNamedType() as IComplexGraphType;
+            object obj = targetCtor.Invoke(ctorArguments);
 
             foreach (var item in source)
             {
-                // these parameters have already been used in the constructor
-                if (ctorParameters.Any(p => p.Name == item.Key))
+                // these parameters have already been used in the constructor, no need to set property
+                if (matchedKeys.Length > 0 && matchedKeys.Any(k => k == item.Key))
                     continue;
 
-                // type may not contain mapping information
-                var field = complexType?.GetField(item.Key);
-                string propertyName = field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
-
+                string propertyName = GetPropertyName(item.Key, out var field);
                 var propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
+                    object value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
