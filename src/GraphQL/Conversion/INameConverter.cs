@@ -14,7 +14,7 @@ namespace GraphQL.Conversion
     public interface INameConverter
     {
         /// <summary>
-        /// Santizes a field name for a specified parent graph type; returns the updated field name
+        /// Sanitizes a field name for a specified parent graph type; returns the updated field name
         /// </summary>
         string NameForField(string fieldName, IComplexGraphType graphType);
 
