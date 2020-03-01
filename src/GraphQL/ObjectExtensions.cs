@@ -1,3 +1,4 @@
+using GraphQL.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,7 +28,13 @@ namespace GraphQL
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
-        public static object ToObject(this IDictionary<string, object> source, Type type)
+        /// <param name="mappedType">
+        /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
+        /// GraphType contains information about this matching in Metadata property.
+        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// </param>
+        public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
             // attempt to use the most specific constructor sorting in decreasing order of number of parameters
             var ctorCandidates = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length);
@@ -59,16 +66,22 @@ namespace GraphQL
 
             var obj = targetCtor.Invoke(ctorArguments);
 
+            var complexType = mappedType.GetNamedType() as IComplexGraphType;
+
             foreach (var item in source)
             {
                 // these parameters have already been used in the constructor
                 if (ctorParameters.Any(p => p.Name == item.Key))
                     continue;
 
-                var propertyInfo = type.GetProperty(item.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                // type may not contain mapping information
+                var field = complexType?.GetField(item.Key);
+                string propertyName = field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, item.Key) ?? item.Key;
+
+                var propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType);
+                    var value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
             }
@@ -81,8 +94,14 @@ namespace GraphQL
         /// </summary>
         /// <param name="propertyValue">The value to be converted.</param>
         /// <param name="fieldType">The desired type.</param>
+        /// <param name="mappedType">
+        /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
+        /// GraphType contains information about this matching in Metadata property.
+        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object GetPropertyValue(this object propertyValue, Type fieldType)
+        public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType mappedType = null)
         {
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
@@ -90,14 +109,16 @@ namespace GraphQL
                 return propertyValue;
             }
 
+            if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object result))
+                return result;
+
             var enumerableInterface = fieldType.Name == "IEnumerable`1"
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (fieldType != typeof(string)
-                && enumerableInterface != null)
+            if (fieldType != typeof(string) && enumerableInterface != null)
             {
-                IList newArray;
+                IList newCollection;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
                 var fieldTypeImplementsIList = fieldType.GetInterface("IList") != null;
@@ -107,40 +128,45 @@ namespace GraphQL
                 // Custom container
                 if (fieldTypeImplementsIList && !fieldType.IsArray)
                 {
-                    newArray = (IList)Activator.CreateInstance(fieldType);
+                    newCollection = (IList)Activator.CreateInstance(fieldType);
                 }
-                // Array
+                // Array of known size is created immediately
                 else if (fieldType.IsArray && propertyValueAsIList != null)
                 {
-                    newArray = Array.CreateInstance(elementType, propertyValueAsIList.Count);
+                    newCollection = Array.CreateInstance(elementType, propertyValueAsIList.Count);
                 }
                 // List<T>
                 else
                 {
                     var genericListType = typeof(List<>).MakeGenericType(elementType);
-                    newArray = (IList)Activator.CreateInstance(genericListType);
+                    newCollection = (IList)Activator.CreateInstance(genericListType);
                 }
 
                 if (!(propertyValue is IEnumerable valueList))
-                    return newArray;
+                    return newCollection;
 
+                // Array of known size is populated in-place
                 if (fieldType.IsArray && propertyValueAsIList != null)
                 {
                     for (int i = 0; i < propertyValueAsIList.Count; ++i)
                     {
                         var listItem = propertyValueAsIList[i];
-                        newArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType);
+                        newCollection[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType);
                     }
                 }
+                // Array of unknown size is created only after populating list
                 else
                 {
                     foreach (var listItem in valueList)
                     {
-                        newArray.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType));
+                        newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
                     }
+                   
+                    if (fieldType.IsArray)
+                        newCollection = ((dynamic)newCollection).ToArray();
                 }
 
-                return newArray;
+                return newCollection;
             }
 
             var value = propertyValue;
@@ -160,7 +186,7 @@ namespace GraphQL
 
             if (propertyValue is Dictionary<string, object> objects)
             {
-                return ToObject(objects, fieldType);
+                return ToObject(objects, fieldType, mappedType);
             }
 
             if (fieldType.IsEnum)
@@ -180,12 +206,7 @@ namespace GraphQL
                 value = Enum.Parse(fieldType, str, true);
             }
 
-            return ConvertValue(value, fieldType);
-        }
-
-        private static object ConvertValue(object value, Type targetType)
-        {
-            return ValueConverter.ConvertTo(value, targetType);
+            return ValueConverter.ConvertTo(value, fieldType);
         }
 
         /// <summary>

@@ -24,6 +24,7 @@ namespace GraphQL.Types
 
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
+        internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
         private readonly List<FieldType> _fields = new List<FieldType>();
 
         protected ComplexGraphType()
@@ -285,8 +286,7 @@ namespace GraphQL.Types
             return builder;
         }
 
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
-            => Field<TGraphType, object>();
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
 
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
@@ -313,6 +313,11 @@ namespace GraphQL.Types
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
+
+            if (expression.Body is MemberExpression expr)
+            {
+                builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+            }
 
             AddField(builder.FieldType);
             return builder;

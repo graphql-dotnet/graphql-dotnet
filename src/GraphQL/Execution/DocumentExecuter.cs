@@ -65,7 +65,7 @@ namespace GraphQL
 
             var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
-            options.Schema.FieldNameConverter = options.FieldNameConverter;
+            options.Schema.NameConverter = options.NameConverter;
             options.Schema.Filter = options.SchemaFilter;
 
             ExecutionResult result = null;

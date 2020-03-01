@@ -1,13 +1,14 @@
+using System.Collections.Generic;
+using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
-using System.Collections.Generic;
-using System.Threading;
+using GraphQL.Types;
 using Field = GraphQL.Language.AST.Field;
 
-namespace GraphQL.Types
+namespace GraphQL
 {
     /// <summary>
     /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>
@@ -33,7 +34,7 @@ namespace GraphQL.Types
         /// A dictionary of arguments passed to the field. It is recommended to use the
         /// <see cref="GraphQL.ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
-        /// methods rather than this dictionary, so the names can be converted by the selected <see cref="IFieldNameConverter"/>.
+        /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
         IDictionary<string, object> Arguments { get; }
 
