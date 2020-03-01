@@ -8,20 +8,10 @@ they will be called sequentially along the chain where the previous middleware d
 the next one. This process is very similar to how middlewares work in the ASP.NET Core HTTP request
 pipeline.
 
-The following example is how Metrics are captured. You register Field Middleware in `ExecutionOptions`.
+The following example is how Metrics are captured. You write a class that implements `IFieldMiddleware`:
 
 ```csharp
-await schema.ExecuteAsync(_ =>
-{
-  _.Query = "...";
-  _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-});
-```
-
-You can write a class that has a `Resolve` method:
-
-```csharp
-public class InstrumentFieldsMiddleware
+public class InstrumentFieldsMiddleware : IFieldMiddleware
 {
   public async Task<object> Resolve(
     IResolveFieldContext context,
@@ -41,10 +31,20 @@ public class InstrumentFieldsMiddleware
 }
 ```
 
-Or you can register a middleware delegate directly:
+Then register your Field Middleware in `ExecutionOptions`.
 
 ```csharp
-_.FieldMiddleware.Use(next =>
+await schema.ExecuteAsync(options =>
+{
+  options.Query = "...";
+  options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+});
+```
+
+Or, you can register a middleware delegate directly:
+
+```csharp
+_.FieldMiddleware.Use((schema, next) =>
 {
   return context =>
   {
@@ -56,7 +56,7 @@ _.FieldMiddleware.Use(next =>
 });
 ```
 
-Also, you can implement the `IFieldMiddleware` interface in your Field Middleware class:
+The middleware interface is defined as:
 
 ```csharp
 public interface IFieldMiddleware
@@ -64,11 +64,6 @@ public interface IFieldMiddleware
   Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next);
 }
 ```
-
-It doesn’t have to be implemented on your middleware. If you do not, a search will be made for a method named `Resolve`
-with a suitable signature, as shown above.
-
-Nevertheless, **to improve performance, it is recommended to implement this interface.**
 
 The middleware delegate is defined as:
 
