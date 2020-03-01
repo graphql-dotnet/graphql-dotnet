@@ -71,7 +71,7 @@ namespace GraphQL
         private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
 
         /// <summary>
-        /// Determines if this field is an introspection field
+        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
         /// </summary>
         private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
