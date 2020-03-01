@@ -76,10 +76,10 @@ namespace GraphQL
         public bool EnableMetrics { get; set; }
         public bool ExposeExceptions { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
         public object Root { get; set; }
@@ -292,7 +292,7 @@ namespace GraphQL
         public static GraphQL.Subscription.IResolveEventStreamContext<T> As<T>(this GraphQL.Subscription.IResolveEventStreamContext context) { }
         public static object GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
-        public static bool HasArgument(this GraphQL.IResolveFieldContext context, string argumentName) { }
+        public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
         public static System.Threading.Tasks.Task<object> TryAsyncResolve(this GraphQL.IResolveFieldContext context, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<object>> error = null) { }
         public static System.Threading.Tasks.Task<TResult> TryAsyncResolve<TResult>(this GraphQL.IResolveFieldContext context, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<TResult>> resolve, System.Func<GraphQL.ExecutionErrors, System.Threading.Tasks.Task<TResult>> error = null) { }
     }
@@ -438,27 +438,31 @@ namespace GraphQL.Builders
 }
 namespace GraphQL.Conversion
 {
-    public class CamelCaseFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class CamelCaseNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.CamelCaseFieldNameConverter Instance;
-        public CamelCaseFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.CamelCaseNameConverter Instance;
+        public CamelCaseNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
-    public class DefaultFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class DefaultNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.DefaultFieldNameConverter Instance;
-        public DefaultFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.DefaultNameConverter Instance;
+        public DefaultNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
-    public interface IFieldNameConverter
+    public interface INameConverter
     {
-        string NameFor(string field, System.Type parentType);
+        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field);
+        string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType);
     }
-    public class PascalCaseFieldNameConverter : GraphQL.Conversion.IFieldNameConverter
+    public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
-        public static readonly GraphQL.Conversion.PascalCaseFieldNameConverter Instance;
-        public PascalCaseFieldNameConverter() { }
-        public string NameFor(string field, System.Type parentType) { }
+        public static readonly GraphQL.Conversion.PascalCaseNameConverter Instance;
+        public PascalCaseNameConverter() { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
 }
 namespace GraphQL.DataLoader
@@ -808,11 +812,6 @@ namespace GraphQL.Instrumentation
             public Marker(GraphQL.Instrumentation.PerfRecord record, GraphQL.Instrumentation.ValueStopwatch stopwatch) { }
             public void Dispose() { }
         }
-    }
-    public class MiddlewareResolver : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<System.Threading.Tasks.Task<object>>
-    {
-        public MiddlewareResolver(GraphQL.Resolvers.IFieldResolver next) { }
-        public System.Threading.Tasks.Task<object> Resolve(GraphQL.IResolveFieldContext context) { }
     }
     public class PerfRecord
     {
@@ -1484,6 +1483,10 @@ namespace GraphQL.Resolvers
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
         public TProperty Resolve(GraphQL.IResolveFieldContext context) { }
     }
+    public static class FieldResolverExtensions
+    {
+        public static System.Threading.Tasks.Task<object> ResolveAsync(this GraphQL.Resolvers.IFieldResolver resolver, GraphQL.IResolveFieldContext context) { }
+    }
     public class FuncFieldResolver<TReturnType> : GraphQL.Resolvers.IFieldResolver, GraphQL.Resolvers.IFieldResolver<TReturnType>
     {
         public FuncFieldResolver(System.Func<GraphQL.IResolveFieldContext, TReturnType> resolver) { }
@@ -1788,9 +1791,10 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         public GraphTypesLookup() { }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
+        public GraphTypesLookup(GraphQL.Conversion.INameConverter nameConverter) { }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public void AddType(GraphQL.Types.IGraphType type, GraphQL.Types.TypeCollectionContext context) { }
         public void AddType<TType>()
             where TType : GraphQL.Types.IGraphType, new () { }
@@ -1800,7 +1804,7 @@ namespace GraphQL.Types
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
         public void Clear() { }
-        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.IFieldNameConverter fieldNameConverter, bool seal = false) { }
+        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter, bool seal = false) { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -1874,10 +1878,10 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        GraphQL.Conversion.INameConverter NameConverter { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
         GraphQL.Types.DirectiveGraphType FindDirective(string name);
@@ -2031,10 +2035,10 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        public GraphQL.Conversion.IFieldNameConverter FieldNameConverter { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
+        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public void Dispose() { }
@@ -2241,7 +2245,6 @@ namespace GraphQL.Utilities
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType scalar) { }
         public virtual void VisitSchema(GraphQL.Types.Schema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType union) { }
-        protected GraphQL.Utilities.SyncToAsyncResolverAdapter WrapResolver(GraphQL.Resolvers.IFieldResolver resolver) { }
     }
     public class DeprecatedDirectiveVisitor : GraphQL.Utilities.SchemaDirectiveVisitor
     {
@@ -2430,12 +2433,6 @@ namespace GraphQL.Utilities
         public static string ToConstantCase(string str) { }
         public static string ToPascalCase(string str) { }
         public static System.Collections.Generic.IEnumerable<string> ToWords(string str) { }
-    }
-    public sealed class SyncToAsyncResolverAdapter : GraphQL.Resolvers.IFieldResolver
-    {
-        public SyncToAsyncResolverAdapter(GraphQL.Resolvers.IFieldResolver inner) { }
-        public object Resolve(GraphQL.IResolveFieldContext context) { }
-        public System.Threading.Tasks.Task<object> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {

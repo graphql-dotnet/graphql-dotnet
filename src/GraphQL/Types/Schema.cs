@@ -59,7 +59,7 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         public bool Initialized => _lookup?.IsValueCreated == true;
 
@@ -289,7 +289,7 @@ namespace GraphQL.Types
                 types,
                 _directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                FieldNameConverter,
+                NameConverter,
                 seal: true);
         }
     }
