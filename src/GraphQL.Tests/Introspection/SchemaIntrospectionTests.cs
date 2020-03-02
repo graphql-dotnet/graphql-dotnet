@@ -71,7 +71,7 @@ namespace GraphQL.Tests.Introspection
 
         public class TestNameConverter : INameConverter
         {
-            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => throw new Exception();
+            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, IFieldType field) => throw new Exception();
 
             public string NameForField(string fieldName, IComplexGraphType parentGraphType) => throw new Exception();
         }

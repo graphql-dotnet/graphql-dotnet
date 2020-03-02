@@ -22,6 +22,6 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Returns the argument name converted to camelCase.
         /// </summary>
-        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => argumentName.ToCamelCase();
+        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, IFieldType field) => argumentName.ToCamelCase();
     }
 }

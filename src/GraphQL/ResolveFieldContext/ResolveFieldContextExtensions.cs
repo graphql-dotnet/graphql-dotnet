@@ -72,7 +72,7 @@ namespace GraphQL
         /// <summary>
         /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
         /// </summary>
-        private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
+        private static bool IsIntrospectionField(this IFieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>

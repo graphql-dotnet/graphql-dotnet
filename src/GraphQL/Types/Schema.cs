@@ -121,11 +121,20 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
-        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+        /// <summary>
+        /// Returns a reference to the __schema introspection field available on the query graph type
+        /// </summary>
+        public IFieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
 
-        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+        /// <summary>
+        /// Returns a reference to the __type introspection field available on the query graph type
+        /// </summary>
+        public IFieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
 
-        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
+        /// <summary>
+        /// Returns a reference to the __typename introspection field available on any graph type
+        /// </summary>
+        public IFieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
         public void RegisterType(IGraphType type)
         {

@@ -22,7 +22,7 @@ namespace GraphQL
         Field FieldAst { get; }
 
         /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type</summary>
-        FieldType FieldDefinition { get; }
+        IFieldType FieldDefinition { get; }
 
         /// <summary>The return value's graph type</summary>
         IGraphType ReturnType { get; }

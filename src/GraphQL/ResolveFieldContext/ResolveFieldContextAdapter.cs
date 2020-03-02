@@ -39,7 +39,7 @@ namespace GraphQL
 
         public Language.AST.Field FieldAst => _baseContext.FieldAst;
 
-        public FieldType FieldDefinition => _baseContext.FieldDefinition;
+        public IFieldType FieldDefinition => _baseContext.FieldDefinition;
 
         public IGraphType ReturnType => _baseContext.ReturnType;
 

@@ -138,7 +138,7 @@ namespace GraphQL
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string TrimGraphQLTypes(this string name) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
-            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+            where TMetadataProvider : GraphQL.Utilities.MetadataProvider { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All)]
     public sealed class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
@@ -169,7 +169,7 @@ namespace GraphQL
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
         GraphQL.Language.AST.Field FieldAst { get; }
-        GraphQL.Types.FieldType FieldDefinition { get; }
+        GraphQL.Types.IFieldType FieldDefinition { get; }
         string FieldName { get; }
         GraphQL.Language.AST.Fragments Fragments { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
@@ -247,7 +247,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Document Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
         public GraphQL.Language.AST.Field FieldAst { get; }
-        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public GraphQL.Types.IFieldType FieldDefinition { get; }
         public string FieldName { get; }
         public GraphQL.Language.AST.Fragments Fragments { get; }
         public GraphQL.Instrumentation.Metrics Metrics { get; }
@@ -271,7 +271,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Language.AST.Field FieldAst { get; set; }
-        public GraphQL.Types.FieldType FieldDefinition { get; set; }
+        public GraphQL.Types.IFieldType FieldDefinition { get; set; }
         public string FieldName { get; set; }
         public GraphQL.Language.AST.Fragments Fragments { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
@@ -442,26 +442,26 @@ namespace GraphQL.Conversion
     {
         public static readonly GraphQL.Conversion.CamelCaseNameConverter Instance;
         public CamelCaseNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.IFieldType field) { }
         public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
     public class DefaultNameConverter : GraphQL.Conversion.INameConverter
     {
         public static readonly GraphQL.Conversion.DefaultNameConverter Instance;
         public DefaultNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.IFieldType field) { }
         public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
     public interface INameConverter
     {
-        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field);
+        string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.IFieldType field);
         string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType);
     }
     public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
         public static readonly GraphQL.Conversion.PascalCaseNameConverter Instance;
         public PascalCaseNameConverter() { }
-        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
+        public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.IFieldType field) { }
         public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
 }
@@ -560,7 +560,7 @@ namespace GraphQL.Execution
 {
     public class ArrayExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.IFieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode> Items { get; set; }
         public override object ToValue() { }
     }
@@ -598,7 +598,7 @@ namespace GraphQL.Execution
         public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFields(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public static bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
         public static System.Collections.Generic.Dictionary<string, object> GetArgumentValues(GraphQL.Types.ISchema schema, GraphQL.Types.QueryArguments definitionArguments, GraphQL.Language.AST.Arguments astArguments, GraphQL.Language.AST.Variables variables) { }
-        public static GraphQL.Types.FieldType GetFieldDefinition(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
+        public static GraphQL.Types.IFieldType GetFieldDefinition(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
         public static GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.Operation operation) { }
         public static object GetVariableValue(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinition variable, object input) { }
         public static GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions variableDefinitions, GraphQL.Inputs inputs) { }
@@ -607,9 +607,9 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.IFieldType fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Language.AST.Field Field { get; }
-        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public GraphQL.Types.IFieldType FieldDefinition { get; }
         public GraphQL.Types.IGraphType GraphType { get; }
         public int? IndexInParentNode { get; set; }
         public bool IsResultSet { get; }
@@ -629,7 +629,7 @@ namespace GraphQL.Execution
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-        public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
+        public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.IFieldType fieldDefinition, int? indexInParentNode = default) { }
         public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         public static void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
@@ -678,7 +678,7 @@ namespace GraphQL.Execution
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.IFieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ExecutionNode> SubFields { get; set; }
         public GraphQL.Types.IObjectGraphType GetObjectGraphType(GraphQL.Types.ISchema schema) { }
         public override object ToValue() { }
@@ -715,7 +715,7 @@ namespace GraphQL.Execution
     }
     public class ValueExecutionNode : GraphQL.Execution.ExecutionNode
     {
-        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.IFieldType fieldDefinition, int? indexInParentNode) { }
         public override object ToValue() { }
     }
 }
@@ -1736,7 +1736,7 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
+    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
@@ -1828,17 +1828,15 @@ namespace GraphQL.Types
         GraphQL.Types.FieldType GetField(string name);
         bool HasField(string name);
     }
-    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
+    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
-        GraphQL.Types.QueryArguments Arguments { get; set; }
-        string DeprecationReason { get; set; }
-        string Description { get; set; }
-        string Name { get; set; }
+        GraphQL.Types.QueryArguments Arguments { get; }
+        string DeprecationReason { get; }
+        GraphQL.Resolvers.IFieldResolver Resolver { get; }
     }
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
-        string DeprecationReason { get; set; }
-        string Description { get; set; }
+        string DeprecationReason { get; }
         string CollectTypes(GraphQL.Types.TypeCollectionContext context);
     }
     public interface IHaveDefaultValue
@@ -1856,7 +1854,8 @@ namespace GraphQL.Types
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata { }
     public interface INamedType
     {
-        string Name { get; set; }
+        string Description { get; }
+        string Name { get; }
     }
     public interface IObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
@@ -1865,7 +1864,7 @@ namespace GraphQL.Types
     }
     public interface IProvideMetadata
     {
-        System.Collections.Generic.IDictionary<string, object> Metadata { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, object> Metadata { get; }
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
@@ -1880,10 +1879,10 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
         GraphQL.Conversion.INameConverter NameConverter { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
-        GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        GraphQL.Types.IFieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
-        GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        GraphQL.Types.IFieldType TypeMetaFieldType { get; }
+        GraphQL.Types.IFieldType TypeNameMetaFieldType { get; }
         GraphQL.Types.DirectiveGraphType FindDirective(string name);
         GraphQL.Types.IGraphType FindType(string name);
         GraphQL.Types.IAstFromValueConverter FindValueConverter(object value, GraphQL.Types.IGraphType type);
@@ -2040,10 +2039,10 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
-        public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        public GraphQL.Types.IFieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
-        public GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        public GraphQL.Types.IFieldType TypeMetaFieldType { get; }
+        public GraphQL.Types.IFieldType TypeNameMetaFieldType { get; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public GraphQL.Types.DirectiveGraphType FindDirective(string name) { }
@@ -2316,7 +2315,7 @@ namespace GraphQL.Utilities
     public class MetadataProvider : GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
-        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; }
+        public System.Collections.Concurrent.ConcurrentDictionary<string, object> Metadata { get; set; }
         public TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory) { }
         public TType GetMetadata<TType>(string key, TType defaultValue = default) { }
         public bool HasMetadata(string key) { }
@@ -2348,7 +2347,7 @@ namespace GraphQL.Utilities
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.ISchema Build(string[] typeDefinitions) { }
         public virtual GraphQL.Types.ISchema Build(string typeDefinitions) { }
-        protected virtual void CopyMetadata(GraphQL.Types.IProvideMetadata target, GraphQL.Types.IProvideMetadata source) { }
+        protected virtual void CopyMetadata(GraphQL.Utilities.MetadataProvider target, GraphQL.Types.IProvideMetadata source) { }
         protected virtual GraphQL.Types.IGraphType GetType(string name) { }
         protected virtual void PreConfigure(GraphQL.Types.Schema schema) { }
         public GraphQL.Utilities.SchemaBuilder RegisterDirectiveVisitor<T>(string name)
@@ -2592,7 +2591,7 @@ namespace GraphQL.Validation
         public GraphQL.Language.AST.INode[] GetAncestors() { }
         public GraphQL.Types.QueryArgument GetArgument() { }
         public GraphQL.Types.DirectiveGraphType GetDirective() { }
-        public GraphQL.Types.FieldType GetFieldDef() { }
+        public GraphQL.Types.IFieldType GetFieldDef() { }
         public GraphQL.Types.IGraphType GetInputType() { }
         public GraphQL.Types.IGraphType GetLastType() { }
         public GraphQL.Types.IGraphType GetParentType() { }

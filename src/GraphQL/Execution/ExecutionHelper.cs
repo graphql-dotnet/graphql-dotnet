@@ -50,19 +50,23 @@ namespace GraphQL.Execution
             return type;
         }
 
-        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        public static IFieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
-            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
+            var schemaMeta = schema.SchemaMetaFieldType;
+            var typeMeta = schema.TypeMetaFieldType;
+            var typeNameMeta = schema.TypeNameMetaFieldType;
+
+            if (field.Name == schemaMeta.Name && schema.Query == parentType)
             {
-                return schema.SchemaMetaFieldType;
+                return schemaMeta;
             }
-            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
+            if (field.Name == typeMeta.Name && schema.Query == parentType)
             {
-                return schema.TypeMetaFieldType;
+                return typeMeta;
             }
-            if (field.Name == schema.TypeNameMetaFieldType.Name)
+            if (field.Name == typeNameMeta.Name)
             {
-                return schema.TypeNameMetaFieldType;
+                return typeNameMeta;
             }
 
             if (parentType == null)

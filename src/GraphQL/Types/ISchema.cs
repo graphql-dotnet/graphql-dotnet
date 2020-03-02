@@ -145,16 +145,16 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a reference to the __schema introspection field available on the query graph type
         /// </summary>
-        FieldType SchemaMetaFieldType { get; }
+        IFieldType SchemaMetaFieldType { get; }
 
         /// <summary>
         /// Returns a reference to the __type introspection field available on the query graph type
         /// </summary>
-        FieldType TypeMetaFieldType { get; }
+        IFieldType TypeMetaFieldType { get; }
 
         /// <summary>
         /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type
         /// </summary>
-        FieldType TypeNameMetaFieldType { get; }
+        IFieldType TypeNameMetaFieldType { get; }
     }
 }

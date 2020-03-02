@@ -21,6 +21,6 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Returns the argument name converted to PascalCase.
         /// </summary>
-        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => argumentName.ToPascalCase();
+        public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, IFieldType field) => argumentName.ToPascalCase();
     }
 }

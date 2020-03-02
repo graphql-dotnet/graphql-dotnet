@@ -1,14 +1,15 @@
-﻿namespace GraphQL.Types
+namespace GraphQL.Types
 {
     public interface INamedType
     {
-        string Name { get; set; }
+        string Name { get; }
+
+        string Description { get; }
     }
 
     public interface IGraphType : IProvideMetadata, INamedType
     {
-        string Description { get; set; }
-        string DeprecationReason { get; set; }
+        string DeprecationReason { get; }
 
         string CollectTypes(TypeCollectionContext context);
     }

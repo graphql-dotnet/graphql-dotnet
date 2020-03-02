@@ -1,13 +1,13 @@
+using GraphQL.Resolvers;
+
 namespace GraphQL.Types
 {
-    public interface IFieldType : IHaveDefaultValue, IProvideMetadata
+    public interface IFieldType : IHaveDefaultValue, IProvideMetadata, INamedType
     {
-        string Name { get; set; }
+        string DeprecationReason { get; }
 
-        string Description { get; set; }
+        QueryArguments Arguments { get; }
 
-        string DeprecationReason { get; set; }
-
-        QueryArguments Arguments { get; set; }
+        IFieldResolver Resolver { get; }
     }
 }

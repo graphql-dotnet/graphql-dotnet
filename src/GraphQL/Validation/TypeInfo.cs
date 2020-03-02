@@ -12,7 +12,7 @@ namespace GraphQL.Validation
         private readonly Stack<IGraphType> _typeStack = new Stack<IGraphType>();
         private readonly Stack<IGraphType> _inputTypeStack = new Stack<IGraphType>();
         private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
-        private readonly Stack<FieldType> _fieldDefStack = new Stack<FieldType>();
+        private readonly Stack<IFieldType> _fieldDefStack = new Stack<IFieldType>();
         private readonly Stack<INode> _ancestorStack = new Stack<INode>();
         private DirectiveGraphType _directive;
         private QueryArgument _argument;
@@ -42,7 +42,7 @@ namespace GraphQL.Validation
             return _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
         }
 
-        public FieldType GetFieldDef()
+        public IFieldType GetFieldDef()
         {
             return _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
         }
@@ -212,25 +212,28 @@ namespace GraphQL.Validation
             }
         }
 
-        private FieldType GetFieldDef(ISchema schema, IGraphType parentType, Field field)
+        private IFieldType GetFieldDef(ISchema schema, IGraphType parentType, Field field)
         {
             var name = field.Name;
+            var schemaMeta = schema.SchemaMetaFieldType;
+            var typeMeta = schema.TypeMetaFieldType;
+            var typeNameMeta = schema.TypeNameMetaFieldType;
 
-            if (name == schema.SchemaMetaFieldType.Name
+            if (name == schemaMeta.Name
                 && Equals(schema.Query, parentType))
             {
-                return schema.SchemaMetaFieldType;
+                return schemaMeta;
             }
 
-            if (name == schema.TypeMetaFieldType.Name
+            if (name == typeMeta.Name
                 && Equals(schema.Query, parentType))
             {
-                return schema.TypeMetaFieldType;
+                return typeMeta;
             }
 
-            if (name == schema.TypeNameMetaFieldType.Name && parentType.IsCompositeType())
+            if (name == typeNameMeta.Name && parentType.IsCompositeType())
             {
-                return schema.TypeNameMetaFieldType;
+                return typeNameMeta;
             }
 
             if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)

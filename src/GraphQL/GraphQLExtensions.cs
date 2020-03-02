@@ -277,7 +277,7 @@ namespace GraphQL
         }
 
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : MetadataProvider
         {
             provider.Metadata[key] = value;
             return provider;

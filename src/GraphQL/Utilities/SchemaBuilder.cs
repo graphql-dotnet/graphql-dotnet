@@ -495,7 +495,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
-        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
+        protected virtual void CopyMetadata(MetadataProvider target, IProvideMetadata source)
         {
             source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
         }
