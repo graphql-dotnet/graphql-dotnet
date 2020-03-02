@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using Microsoft.Extensions.ObjectPool;
 
 namespace GraphQL.Execution
 {
     public class ExecutionContext : IProvideUserContext
     {
+        internal ObjectPool<ReadonlyResolveFieldContext> Pool { get; set; }
+
         public Document Document { get; set; }
 
         public ISchema Schema { get; set; }

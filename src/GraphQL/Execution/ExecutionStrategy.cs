@@ -175,11 +175,12 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return;
 
-            IResolveFieldContext resolveContext = null;
+            ReadonlyResolveFieldContext resolveContext = null;
+            var pool = context.Pool;
 
             try
             {
-                resolveContext = new ReadonlyResolveFieldContext(node, context);
+                resolveContext = pool == null ? new ReadonlyResolveFieldContext(node, context) : pool.Get().Initialize(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -234,6 +235,11 @@ namespace GraphQL.Execution
                 context.Errors.Add(error);
 
                 node.Result = null;
+            }
+            finally
+            {
+                if (pool != null && resolveContext != null)
+                    pool.Return(resolveContext);
             }
         }
 

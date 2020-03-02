@@ -13,15 +13,35 @@ namespace GraphQL
     /// </summary>
     public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {
-        private readonly ExecutionNode _executionNode;
-        private readonly ExecutionContext _executionContext;
+        private ExecutionNode _executionNode;
+        private ExecutionContext _executionContext;
         private IDictionary<string, object> _arguments;
         private IDictionary<string, Field> _subFields;
+
+        internal ReadonlyResolveFieldContext()
+        {
+        }
 
         public ReadonlyResolveFieldContext(ExecutionNode node, ExecutionContext context)
         {
             _executionNode = node ?? throw new ArgumentNullException(nameof(node));
             _executionContext = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
+        internal ReadonlyResolveFieldContext Initialize(ExecutionNode node, ExecutionContext context)
+        {
+            _executionNode = node;
+            _executionContext = context;
+
+            return this;
+        }
+
+        internal void Clear()
+        {
+            _executionNode = null;
+            _executionContext = null;
+            _arguments = null;
+            _subFields = null;
         }
 
         private IDictionary<string, Field> GetSubFields()

@@ -9,14 +9,16 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using Microsoft.Extensions.ObjectPool;
 using static GraphQL.Execution.ExecutionHelper;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
-
     public class DocumentExecuter : IDocumentExecuter
     {
+        private static readonly DefaultObjectPool<ReadonlyResolveFieldContext> _pool = new DefaultObjectPool<ReadonlyResolveFieldContext>(new ReadonlyResolveFieldContextPolicy());
+
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
@@ -247,6 +249,7 @@ namespace GraphQL
         {
             var context = new ExecutionContext
             {
+                Pool = _pool,
                 Document = document,
                 Schema = schema,
                 RootValue = root,
