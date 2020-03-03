@@ -112,7 +112,7 @@ namespace GraphQL.Execution
                         if (context.Listeners != null)
                             foreach (var listener in context.Listeners)
                             {
-                                await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
+                                await listener.BeforeExecutionAsync(context, context.CancellationToken)
                                     .ConfigureAwait(false);
                             }
 
@@ -122,7 +122,7 @@ namespace GraphQL.Execution
                         if (context.Listeners != null)
                             foreach (var listener in context.Listeners)
                             {
-                                await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
+                                await listener.AfterExecutionAsync(context, context.CancellationToken)
                                     .ConfigureAwait(false);
                             }
 

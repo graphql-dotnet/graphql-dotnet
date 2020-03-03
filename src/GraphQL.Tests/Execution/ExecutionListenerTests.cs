@@ -43,11 +43,12 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestExecutionListener : DocumentExecutionListenerBase<TestContext>
+        public class TestExecutionListener : DocumentExecutionListenerBase
         {
-            public override Task BeforeExecutionAwaitedAsync(TestContext userContext, CancellationToken token)
+            public override Task BeforeExecutionAwaitedAsync(IExecutionContext context, CancellationToken token)
             {
-                userContext.Complete("bar");
+                var testContext = context.UserContext as TestContext;
+                testContext.Complete("bar");
 
                 return Task.CompletedTask;
             }

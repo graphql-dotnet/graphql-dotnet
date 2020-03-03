@@ -18,12 +18,12 @@ namespace GraphQL.DataLoader
             _accessor = accessor;
         }
 
-        public Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token)
+        public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult, CancellationToken token)
         {
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionAsync(IExecutionContext context, CancellationToken token)
         {
             if (_accessor.Context == null)
                 _accessor.Context = new DataLoaderContext();
@@ -31,22 +31,23 @@ namespace GraphQL.DataLoader
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionAwaitedAsync(IExecutionContext context, CancellationToken token)
         {
             return Task.CompletedTask;
         }
 
-        public Task AfterExecutionAsync(object userContext, CancellationToken token)
+        public Task AfterExecutionAsync(IExecutionContext context, CancellationToken token)
         {
             _accessor.Context = null;
 
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
+        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context, CancellationToken token)
         {
-            var context = _accessor.Context;
-            return context.DispatchAllAsync(token);
+            var dataLoaderContext = _accessor.Context;
+
+            return dataLoaderContext.DispatchAllAsync(token);
         }
     }
 }
