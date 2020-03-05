@@ -5,7 +5,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public class QueryArguments : IEnumerable<QueryArgument>
+    public class QueryArguments : IReadOnlyCollection<QueryArgument>, ICollection
     {
         public QueryArguments(params QueryArgument[] args)
         {
@@ -44,6 +44,10 @@ namespace GraphQL.Types
 
         public int Count => ArgumentsList?.Count ?? 0;
 
+        bool ICollection.IsSynchronized => false;
+
+        object ICollection.SyncRoot => this;
+
         public void Add(QueryArgument argument)
         {
             if (argument == null)
@@ -79,5 +83,7 @@ namespace GraphQL.Types
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        void ICollection.CopyTo(Array array, int index) => ((ICollection)ArgumentsList)?.CopyTo(array, index);
     }
 }

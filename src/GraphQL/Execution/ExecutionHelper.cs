@@ -213,7 +213,7 @@ namespace GraphQL.Execution
             return scalar.ParseValue(input);
         }
 
-        public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static Dictionary<string, object> GetArgumentValues(ISchema schema, IReadOnlyCollection<QueryArgument> definitionArguments, Arguments astArguments, Variables variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
@@ -222,7 +222,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.ArgumentsList)
+            foreach (var arg in definitionArguments)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
