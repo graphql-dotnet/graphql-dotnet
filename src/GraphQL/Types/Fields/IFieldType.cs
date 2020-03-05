@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace GraphQL.Types
 {
     public interface IFieldType : IHaveDefaultValue, IProvideMetadata
@@ -8,6 +10,6 @@ namespace GraphQL.Types
 
         string DeprecationReason { get; set; }
 
-        QueryArguments Arguments { get; set; }
+        IList<QueryArgument> Arguments { get; set; }
     }
 }

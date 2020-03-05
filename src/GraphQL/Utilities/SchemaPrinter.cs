@@ -261,10 +261,8 @@ namespace GraphQL.Utilities
 
         public string PrintArgs(FieldType field)
         {
-            if (field.Arguments == null || field.Arguments.Count == 0)
-            {
+            if (field.Arguments.None())
                 return string.Empty;
-            }
 
             return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue)));
         }
@@ -308,9 +306,9 @@ namespace GraphQL.Utilities
             return builder.ToString().TrimStart();
         }
 
-        private string FormatDirectiveArguments(QueryArguments arguments)
+        private string FormatDirectiveArguments(IEnumerable<QueryArgument> arguments)
         {
-            if (arguments == null || arguments.Count == 0) return null;
+            if (arguments.None()) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 

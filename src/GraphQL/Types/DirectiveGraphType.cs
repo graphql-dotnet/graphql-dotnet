@@ -76,7 +76,7 @@ namespace GraphQL.Types
 
         public string Description { get; set; }
 
-        public QueryArguments Arguments { get; set; }
+        public IEnumerable<QueryArgument> Arguments { get; set; }
 
         public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
     }

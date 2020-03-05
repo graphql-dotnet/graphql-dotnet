@@ -106,7 +106,7 @@ namespace GraphQL.Types
             Type type,
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
         {
@@ -126,7 +126,7 @@ namespace GraphQL.Types
         public FieldType Field<TGraphType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
@@ -147,7 +147,7 @@ namespace GraphQL.Types
         public FieldType FieldDelegate<TGraphType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Delegate resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
@@ -169,7 +169,7 @@ namespace GraphQL.Types
             Type type,
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
             string deprecationReason = null)
         {
@@ -189,7 +189,7 @@ namespace GraphQL.Types
         public FieldType FieldAsync<TGraphType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, Task<object>> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
@@ -210,7 +210,7 @@ namespace GraphQL.Types
         public FieldType FieldAsync<TGraphType, TReturnType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve = null,
             string deprecationReason = null)
             where TGraphType : IGraphType
@@ -231,7 +231,7 @@ namespace GraphQL.Types
         public FieldType FieldSubscribe<TGraphType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             Func<IResolveEventStreamContext, IObservable<object>> subscribe = null,
             string deprecationReason = null)
@@ -256,7 +256,7 @@ namespace GraphQL.Types
         public FieldType FieldSubscribeAsync<TGraphType>(
             string name,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext<TSourceType>, object> resolve = null,
             Func<IResolveEventStreamContext, Task<IObservable<object>>> subscribeAsync = null,
             string deprecationReason = null)

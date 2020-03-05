@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 
@@ -11,7 +12,7 @@ namespace GraphQL.Types
             string name,
             IGraphType type,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext, object> resolve = null)
         {
             var field = new FieldType
@@ -30,7 +31,7 @@ namespace GraphQL.Types
             string name,
             IGraphType type,
             string description = null,
-            QueryArguments arguments = null,
+            IList<QueryArgument> arguments = null,
             Func<IResolveFieldContext, Task<object>> resolve = null)
         {
             var field = new FieldType

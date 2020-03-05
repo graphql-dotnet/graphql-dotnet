@@ -5,79 +5,99 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public class QueryArguments : IEnumerable<QueryArgument>
+    public static class QueryArgumentsExtensions
     {
-        public QueryArguments(params QueryArgument[] args)
+        public static QueryArgument Find(this IEnumerable<QueryArgument> list, string name)
         {
-            foreach (var arg in args)
-            {
-                Add(arg);
-            }
-        }
-
-        public QueryArguments(IEnumerable<QueryArgument> list)
-        {
-            foreach (var arg in list)
-            {
-                Add(arg);
-            }
-        }
-
-        public QueryArgument this[int index]
-        {
-            get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
-            set
-            {
-                if (value != null)
-                {
-                    NameValidator.ValidateName(value.Name, "argument");
-                }
-
-                if (ArgumentsList == null)
-                    throw new IndexOutOfRangeException();
-
-                ArgumentsList[index] = value;
-            }
-        }
-
-        internal List<QueryArgument> ArgumentsList { get; private set; }
-
-        public int Count => ArgumentsList?.Count ?? 0;
-
-        public void Add(QueryArgument argument)
-        {
-            if (argument == null)
-                throw new ArgumentNullException(nameof(argument));
-
-            NameValidator.ValidateName(argument.Name, "argument");
-
-            if (ArgumentsList == null)
-                ArgumentsList = new List<QueryArgument>();
-
-            ArgumentsList.Add(argument);
-        }
-
-        public QueryArgument Find(string name)
-        {
-            if (ArgumentsList == null)
+            //short-circuit evaluation for people utilizing the QueryArguments class
+            if (list.None())
                 return null;
 
-            // DO NOT USE LINQ ON HOT PATH
-            foreach (var arg in ArgumentsList)
+            foreach (var arg in list)
                 if (arg.Name == name)
                     return arg;
 
             return null;
         }
 
-        public IEnumerator<QueryArgument> GetEnumerator()
-        {
-            if (ArgumentsList == null)
-                return System.Linq.Enumerable.Empty<QueryArgument>().GetEnumerator();
+        /// <summary>
+        /// Returns true if the list is null or known to have no elements via short-circuit evaluation
+        /// </summary>
+        internal static bool None(this IEnumerable<QueryArgument> list)
+            => list == null || (list is ICollection queryArguments && queryArguments.Count == 0);
+    }
 
-            return ArgumentsList.GetEnumerator();
+    public class QueryArguments : List<QueryArgument>
+    {
+        public QueryArguments(params QueryArgument[] args) : base(args) { }
+
+        public QueryArguments(IEnumerable<QueryArgument> list) : base(list) { }
+
+        public new QueryArgument this[int index]
+        {
+            get => base[index];
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+
+                NameValidator.ValidateName(value.Name, "argument");
+
+                base[index] = value;
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public new int Count { get; }
+
+        public new void Add(QueryArgument argument)
+        {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
+            NameValidator.ValidateName(argument.Name, "argument");
+
+            base.Add(argument);
+        }
+
+        public new void AddRange(IEnumerable<QueryArgument> arguments)
+        {
+            foreach (var argument in arguments)
+                Add(argument);
+        }
+
+        public new void Insert(int index, QueryArgument argument)
+        {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
+            NameValidator.ValidateName(argument.Name, "argument");
+
+            base.Insert(index, argument);
+        }
+
+        public new void InsertRange(int index, IEnumerable<QueryArgument> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                if (argument == null)
+                    throw new ArgumentNullException(nameof(argument), "One of the arguments in the collection was null");
+
+                NameValidator.ValidateName(argument.Name, "argument");
+            }
+
+            base.InsertRange(index, arguments);
+        }
+
+        public QueryArgument Find(string name)
+        {
+            if (Count == 0)
+                return null;
+
+            foreach (var arg in this)
+                if (arg.Name == name)
+                    return arg;
+
+            return null;
+        }
     }
 }
