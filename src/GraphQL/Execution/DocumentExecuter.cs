@@ -14,7 +14,11 @@ using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
-
+    /// <summary>
+    /// <inheritdoc cref="IDocumentExecuter"/>
+    /// <br/><br/>
+    /// Default implementation for <see cref="IDocumentExecuter"/>.
+    /// </summary>
     public class DocumentExecuter : IDocumentExecuter
     {
         private readonly IDocumentBuilder _documentBuilder;
@@ -31,16 +35,6 @@ namespace GraphQL
             _documentBuilder = documentBuilder;
             _documentValidator = documentValidator;
             _complexityAnalyzer = complexityAnalyzer;
-        }
-
-        public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure)
-        {
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-
-            var options = new ExecutionOptions();
-            configure(options);
-            return ExecuteAsync(options);
         }
 
         private void ValidateOptions(ExecutionOptions options)

@@ -17,9 +17,12 @@ namespace GraphQL
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
-        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(System.Action<GraphQL.ExecutionOptions> configure) { }
         protected virtual GraphQL.Language.AST.Operation GetOperation(string operationName, GraphQL.Language.AST.Document document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
+    }
+    public static class DocumentExecuterExtensions
+    {
+        public static System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(this GraphQL.IDocumentExecuter executer, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
     public static class DocumentWriterExtensions
     {
@@ -156,7 +159,6 @@ namespace GraphQL
     public interface IDocumentExecuter
     {
         System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options);
-        System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(System.Action<GraphQL.ExecutionOptions> configure);
     }
     public interface IDocumentWriter
     {
