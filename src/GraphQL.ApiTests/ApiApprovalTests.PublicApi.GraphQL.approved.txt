@@ -867,7 +867,7 @@ namespace GraphQL.Introspection
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
         public DefaultSchemaFilter() { }
-        public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument) { }
+        public virtual System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.IQueryArgument argument) { }
         public virtual System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive) { }
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
@@ -875,7 +875,7 @@ namespace GraphQL.Introspection
     }
     public interface ISchemaFilter
     {
-        System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.QueryArgument argument);
+        System.Threading.Tasks.Task<bool> AllowArgument(GraphQL.Types.IFieldType field, GraphQL.Types.IQueryArgument argument);
         System.Threading.Tasks.Task<bool> AllowDirective(GraphQL.Types.DirectiveGraphType directive);
         System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue);
         System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field);
@@ -1870,6 +1870,7 @@ namespace GraphQL.Types
         TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
     }
+    public interface IQueryArgument : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata { }
     public interface ISchema
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
@@ -1989,7 +1990,7 @@ namespace GraphQL.Types
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
     }
-    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue
+    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata, GraphQL.Types.IQueryArgument
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
@@ -2237,7 +2238,7 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
-        public virtual void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        public virtual void VisitArgumentDefinition(GraphQL.Types.IQueryArgument argument) { }
         public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value) { }
         public virtual void VisitFieldDefinition(GraphQL.Types.FieldType field) { }
@@ -2289,7 +2290,7 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
-        void VisitArgumentDefinition(GraphQL.Types.QueryArgument argument);
+        void VisitArgumentDefinition(GraphQL.Types.IQueryArgument argument);
         void VisitEnum(GraphQL.Types.EnumerationGraphType type);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value);
         void VisitFieldDefinition(GraphQL.Types.FieldType field);

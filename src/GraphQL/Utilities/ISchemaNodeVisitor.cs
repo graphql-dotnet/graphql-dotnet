@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
 
         void VisitFieldDefinition(FieldType field);
 
-        void VisitArgumentDefinition(QueryArgument argument);
+        void VisitArgumentDefinition(IQueryArgument argument);
 
         void VisitInterface(InterfaceGraphType iface);
 
@@ -46,7 +46,7 @@ namespace GraphQL.Utilities
         {
         }
 
-        public virtual void VisitArgumentDefinition(QueryArgument argument)
+        public virtual void VisitArgumentDefinition(IQueryArgument argument)
         {
         }
 

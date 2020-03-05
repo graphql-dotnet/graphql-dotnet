@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     {
         Task<bool> AllowType(IGraphType type);
         Task<bool> AllowField(IGraphType parent, IFieldType field);
-        Task<bool> AllowArgument(IFieldType field, QueryArgument argument);
+        Task<bool> AllowArgument(IFieldType field, IQueryArgument argument);
         Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue);
         Task<bool> AllowDirective(DirectiveGraphType directive);
     }
@@ -24,7 +24,7 @@ namespace GraphQL.Introspection
             return Task.FromResult(true);
         }
 
-        public virtual Task<bool> AllowArgument(IFieldType field, QueryArgument argument)
+        public virtual Task<bool> AllowArgument(IFieldType field, IQueryArgument argument)
         {
             return Task.FromResult(true);
         }

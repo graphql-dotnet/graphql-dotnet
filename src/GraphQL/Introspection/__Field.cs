@@ -39,7 +39,7 @@ namespace GraphQL.Introspection
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
                 resolve: async context =>
                 {
-                    var arguments = context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
+                    var arguments = context.Source.Arguments ?? Enumerable.Empty<IQueryArgument>();
                     return await arguments.WhereAsync(x => context.Schema.Filter.AllowArgument(context.Source, x)).ConfigureAwait(false);
                 });
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
