@@ -13,7 +13,7 @@ namespace GraphQL.Types
 
     public class NonNullGraphType : GraphType
     {
-        public NonNullGraphType(IGraphType type)
+        public NonNullGraphType(GraphType type)
         {
             if (type is NonNullGraphType)
             {
@@ -35,13 +35,13 @@ namespace GraphQL.Types
 
         public Type Type { get; private set; }
 
-        public IGraphType ResolvedType { get; set; }
+        public GraphType ResolvedType { get; set; }
 
         public override string CollectTypes(TypeCollectionContext context)
         {
             var innerType = context.ResolveType(Type);
-            ResolvedType = innerType;
-            var name = innerType.CollectTypes(context);
+            ResolvedType = (GraphType)innerType; //ugly hack
+            var name = ResolvedType.CollectTypes(context);
             context.AddType(name, innerType, context);
             return "{0}!".ToFormat(name);
         }

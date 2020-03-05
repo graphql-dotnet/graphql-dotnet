@@ -5,79 +5,90 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    public class QueryArguments : IEnumerable<QueryArgument>
+    public static class QueryArgumentsExtensions
     {
-        public QueryArguments(params QueryArgument[] args)
+        public static IQueryArgument Find(this IEnumerable<IQueryArgument> list, string name)
         {
-            foreach (var arg in args)
-            {
-                Add(arg);
-            }
-        }
+            if (list == null || (list is IReadOnlyCollection<IQueryArgument> queryArguments && queryArguments.Count == 0))
+                return null;
 
-        public QueryArguments(IEnumerable<QueryArgument> list)
-        {
             foreach (var arg in list)
-            {
-                Add(arg);
-            }
-        }
+                if (arg.Name == name)
+                    return arg;
 
-        public QueryArgument this[int index]
+            return null;
+        }
+    }
+
+    public class QueryArguments : List<QueryArgument>
+    {
+        public QueryArguments(params QueryArgument[] args) : base(args) { }
+
+        public QueryArguments(IEnumerable<QueryArgument> list) : base(list) { }
+
+        public new QueryArgument this[int index]
         {
-            get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
+            get => base[index];
             set
             {
-                if (value != null)
-                {
-                    NameValidator.ValidateName(value.Name, "argument");
-                }
+                if (value == null)
+                    throw new ArgumentNullException();
 
-                if (ArgumentsList == null)
-                    throw new IndexOutOfRangeException();
+                NameValidator.ValidateName(value.Name, "argument");
 
-                ArgumentsList[index] = value;
+                base[index] = value;
             }
         }
 
-        internal List<QueryArgument> ArgumentsList { get; private set; }
-
-        public int Count => ArgumentsList?.Count ?? 0;
-
-        public void Add(QueryArgument argument)
+        public new void Add(QueryArgument argument)
         {
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
             NameValidator.ValidateName(argument.Name, "argument");
 
-            if (ArgumentsList == null)
-                ArgumentsList = new List<QueryArgument>();
+            base.Add(argument);
+        }
 
-            ArgumentsList.Add(argument);
+        public new void AddRange(IEnumerable<QueryArgument> arguments)
+        {
+            foreach (var argument in arguments)
+                Add(argument);
+        }
+
+        public new void Insert(int index, QueryArgument argument)
+        {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
+            NameValidator.ValidateName(argument.Name, "argument");
+
+            base.Insert(index, argument);
+        }
+
+        public new void InsertRange(int index, IEnumerable<QueryArgument> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                if (argument == null)
+                    throw new ArgumentNullException(nameof(argument), "One of the arguments in the collection was null");
+
+                NameValidator.ValidateName(argument.Name, "argument");
+            }
+
+            base.InsertRange(index, arguments);
         }
 
         public QueryArgument Find(string name)
         {
-            if (ArgumentsList == null)
+            if (Count == 0)
                 return null;
 
-            // DO NOT USE LINQ ON HOT PATH
-            foreach (var arg in ArgumentsList)
+            foreach (var arg in this)
                 if (arg.Name == name)
                     return arg;
 
             return null;
         }
-
-        public IEnumerator<QueryArgument> GetEnumerator()
-        {
-            if (ArgumentsList == null)
-                return System.Linq.Enumerable.Empty<QueryArgument>().GetEnumerator();
-
-            return ArgumentsList.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

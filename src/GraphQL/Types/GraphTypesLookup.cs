@@ -235,7 +235,8 @@ namespace GraphQL.Types
                 throw new ExecutionError("Only add root types.");
             }
 
-            var name = type.CollectTypes(context).TrimGraphQLTypes();
+            var graphType = (GraphType)type; //ugly hack
+            var name = graphType.CollectTypes(context).TrimGraphQLTypes();
             lock (_lock)
             {
                 SetGraphType(name, type);
@@ -500,13 +501,13 @@ Make sure that your ServiceProvider is configured correctly.");
         {
             if (type is NonNullGraphType nonNull)
             {
-                nonNull.ResolvedType = ConvertTypeReference(parentType, nonNull.ResolvedType);
+                nonNull.ResolvedType = (GraphType)ConvertTypeReference(parentType, nonNull.ResolvedType); //ugly hack
                 return nonNull;
             }
 
             if (type is ListGraphType list)
             {
-                list.ResolvedType = ConvertTypeReference(parentType, list.ResolvedType);
+                list.ResolvedType = (GraphType)ConvertTypeReference(parentType, list.ResolvedType); //ugly hack
                 return list;
             }
 

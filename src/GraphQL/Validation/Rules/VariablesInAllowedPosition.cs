@@ -82,7 +82,7 @@ namespace GraphQL.Validation.Rules
             var genericType = typeof(NonNullGraphType<>).MakeGenericType(type);
 
             var nonNull = (NonNullGraphType)Activator.CreateInstance(genericType);
-            nonNull.ResolvedType = varType;
+            nonNull.ResolvedType = (GraphType)varType; //ugly hack
             return nonNull;
         }
     }

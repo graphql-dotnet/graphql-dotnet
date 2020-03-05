@@ -36,7 +36,7 @@ namespace GraphQL
 
         public Language.AST.Field FieldAst => _executionNode.Field;
 
-        public FieldType FieldDefinition => _executionNode.FieldDefinition;
+        public IFieldType FieldDefinition => _executionNode.FieldDefinition;
 
         public IGraphType ReturnType => _executionNode.FieldDefinition.ResolvedType;
 

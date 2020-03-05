@@ -18,7 +18,7 @@ namespace GraphQL
 
         public Field FieldAst { get; set; }
 
-        public FieldType FieldDefinition { get; set; }
+        public IFieldType FieldDefinition { get; set; }
 
         public IGraphType ReturnType { get; set; }
 

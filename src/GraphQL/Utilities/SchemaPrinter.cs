@@ -308,9 +308,9 @@ namespace GraphQL.Utilities
             return builder.ToString().TrimStart();
         }
 
-        private string FormatDirectiveArguments(QueryArguments arguments)
+        private string FormatDirectiveArguments(IEnumerable<QueryArgument> arguments)
         {
-            if (arguments == null || arguments.Count == 0) return null;
+            if (arguments == null || arguments.Count() == 0) return null;
             return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
         }
 

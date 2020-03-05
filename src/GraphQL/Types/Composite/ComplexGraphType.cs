@@ -341,7 +341,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TSourceType> Connection<TNodeType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
             AddField(builder.FieldType);
@@ -349,7 +349,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
         {
             var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>();
@@ -358,7 +358,7 @@ namespace GraphQL.Types
         }
 
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {

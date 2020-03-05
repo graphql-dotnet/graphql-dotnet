@@ -18,7 +18,7 @@ namespace GraphQL.Types
                 }
                 var nonnullGraphType = typeof(NonNullGraphType<>).MakeGenericType(ofType.GetType());
                 var instance = (NonNullGraphType)Activator.CreateInstance(nonnullGraphType);
-                instance.ResolvedType = ofType;
+                instance.ResolvedType = (GraphType)ofType; //ugly hack
                 return instance;
             }
 
@@ -31,7 +31,7 @@ namespace GraphQL.Types
                 }
                 var listGraphType = typeof(ListGraphType<>).MakeGenericType(ofType.GetType());
                 var instance = (ListGraphType)Activator.CreateInstance(listGraphType);
-                instance.ResolvedType = ofType;
+                instance.ResolvedType = (GraphType)ofType; //ugly hack
                 return instance;
             }
 

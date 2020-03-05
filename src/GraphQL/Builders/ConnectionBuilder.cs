@@ -9,20 +9,20 @@ namespace GraphQL.Builders
     public static class ConnectionBuilder
     {
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
         {
             return ConnectionBuilder<TSourceType>.Create<TNodeType>();
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
         {
             return ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
@@ -53,20 +53,20 @@ namespace GraphQL.Builders
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
         {
             return Create<TNodeType, EdgeType<TNodeType>>(name);
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
         {
             return Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
-            where TNodeType : IGraphType
+            where TNodeType : GraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {

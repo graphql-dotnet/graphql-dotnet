@@ -29,22 +29,22 @@ namespace GraphQL.Types
         /// <summary>
         /// The <see cref="INameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.NameConverter"/>.
         /// </summary>
-        INameConverter NameConverter { get; set; }
+        INameConverter NameConverter { get; }
 
         /// <summary>
         /// The 'query' base graph type; required
         /// </summary>
-        IObjectGraphType Query { get; set; }
+        IObjectGraphType Query { get; }
 
         /// <summary>
         /// The 'mutation' base graph type; optional
         /// </summary>
-        IObjectGraphType Mutation { get; set; }
+        IObjectGraphType Mutation { get; }
 
         /// <summary>
         /// The 'subscription' base graph type; optional
         /// </summary>
-        IObjectGraphType Subscription { get; set; }
+        IObjectGraphType Subscription { get; }
 
         /// <summary>
         /// Returns a list of directives supported by the schema.
@@ -54,7 +54,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
         /// </summary>
-        IEnumerable<DirectiveGraphType> Directives { get; set; }
+        IEnumerable<DirectiveGraphType> Directives { get; }
 
         /// <summary>
         /// Returns a list of all the graph types utilized by this schema
@@ -77,59 +77,6 @@ namespace GraphQL.Types
         IEnumerable<Type> AdditionalTypes { get; }
 
         /// <summary>
-        /// Add a specific instance of an <see cref="IGraphType"/> to the schema.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterType(IGraphType type);
-
-        /// <summary>
-        /// Add specific instances of <see cref="IGraphType"/>s to the schema.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterTypes(params IGraphType[] types);
-
-        /// <summary>
-        /// Add specific graph types to the schema. Each type must implement <see cref="IGraphType"/>.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterTypes(params Type[] types);
-
-        /// <summary>
-        /// Add a specific graph type to the schema.
-        /// <br/><br/>
-        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
-        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
-        /// </summary>
-        void RegisterType<T>() where T : IGraphType;
-
-        /// <summary>
-        /// Add a specific directive to the schema.
-        /// <br/><br/>
-        /// Directives are used by the GraphQL runtime as a way of modifying execution
-        /// behavior. Type system creators do not usually create them directly.
-        /// </summary>
-        void RegisterDirective(DirectiveGraphType directive);
-
-        /// <summary>
-        /// Add specific directives to the schema.
-        /// <br/><br/>
-        /// Directives are used by the GraphQL runtime as a way of modifying execution
-        /// behavior. Type system creators do not usually create them directly.
-        /// </summary>
-        void RegisterDirectives(params DirectiveGraphType[] directives);
-
-        /// <summary>
-        /// Register a custom value converter to the schema.
-        /// </summary>
-        void RegisterValueConverter(IAstFromValueConverter converter);
-
-        /// <summary>
         /// Search the schema for a <see cref="IAstFromValueConverter"/> that matches the provided object and graph type, and return the converter.
         /// </summary>
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
@@ -145,16 +92,16 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a reference to the __schema introspection field available on the query graph type
         /// </summary>
-        FieldType SchemaMetaFieldType { get; }
+        IFieldType SchemaMetaFieldType { get; }
 
         /// <summary>
         /// Returns a reference to the __type introspection field available on the query graph type
         /// </summary>
-        FieldType TypeMetaFieldType { get; }
+        IFieldType TypeMetaFieldType { get; }
 
         /// <summary>
         /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type
         /// </summary>
-        FieldType TypeNameMetaFieldType { get; }
+        IFieldType TypeNameMetaFieldType { get; }
     }
 }

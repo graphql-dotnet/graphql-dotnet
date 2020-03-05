@@ -4,6 +4,10 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    public interface IQueryArgument : IProvideMetadata, IHaveDefaultValue, INamedType
+    {
+    }
+
     public class QueryArgument<TType> : QueryArgument
         where TType : IGraphType
     {
@@ -14,7 +18,7 @@ namespace GraphQL.Types
     }
 
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class QueryArgument : MetadataProvider, IHaveDefaultValue
+    public class QueryArgument : MetadataProvider, IHaveDefaultValue, IQueryArgument
     {
         private Type _type;
         private IGraphType _resolvedType;

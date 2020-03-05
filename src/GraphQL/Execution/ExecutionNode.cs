@@ -11,7 +11,7 @@ namespace GraphQL.Execution
         public ExecutionNode Parent { get; }
         public IGraphType GraphType { get; }
         public Field Field { get; }
-        public FieldType FieldDefinition { get; }
+        public IFieldType FieldDefinition { get; }
         public int? IndexInParentNode { get; protected set; }
 
         public string Name => Field?.Alias ?? Field?.Name;
@@ -36,7 +36,7 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, IFieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;
@@ -119,7 +119,7 @@ namespace GraphQL.Execution
     {
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
-        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, IFieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
@@ -175,7 +175,7 @@ namespace GraphQL.Execution
     {
         public List<ExecutionNode> Items { get; set; }
 
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, IFieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
@@ -217,7 +217,7 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, IFieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 

@@ -50,19 +50,25 @@ namespace GraphQL.Execution
             return type;
         }
 
-        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        public static IFieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
-            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
+            if (schema.Query == parentType)
             {
-                return schema.SchemaMetaFieldType;
+                var schemaMeta = schema.SchemaMetaFieldType;
+                if (field.Name == schemaMeta.Name && schema.Query == parentType)
+                {
+                    return schemaMeta;
+                }
+                var typeMeta = schema.TypeMetaFieldType;
+                if (field.Name == typeMeta.Name && schema.Query == parentType)
+                {
+                    return typeMeta;
+                }
             }
-            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
+            var typeNameMeta = schema.TypeNameMetaFieldType;
+            if (field.Name == typeNameMeta.Name)
             {
-                return schema.TypeMetaFieldType;
-            }
-            if (field.Name == schema.TypeNameMetaFieldType.Name)
-            {
-                return schema.TypeNameMetaFieldType;
+                return typeNameMeta;
             }
 
             if (parentType == null)
@@ -213,16 +219,16 @@ namespace GraphQL.Execution
             return scalar.ParseValue(input);
         }
 
-        public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static Dictionary<string, object> GetArgumentValues(ISchema schema, IEnumerable<IQueryArgument> definitionArguments, Arguments astArguments, Variables variables)
         {
-            if (definitionArguments == null || definitionArguments.Count == 0)
+            if (definitionArguments == null || definitionArguments.Count() == 0)
             {
                 return null;
             }
 
-            var values = new Dictionary<string, object>(definitionArguments.Count);
+            var values = new Dictionary<string, object>(definitionArguments.Count());
 
-            foreach (var arg in definitionArguments.ArgumentsList)
+            foreach (var arg in definitionArguments)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;

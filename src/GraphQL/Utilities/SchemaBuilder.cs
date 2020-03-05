@@ -48,12 +48,12 @@ namespace GraphQL.Utilities
             types.Apply(t => _types[t.Name] = t);
         }
 
-        public virtual ISchema Build(string[] typeDefinitions)
+        public virtual Schema Build(string[] typeDefinitions)
         {
             return Build(string.Join(Environment.NewLine, typeDefinitions));
         }
 
-        public virtual ISchema Build(string typeDefinitions)
+        public virtual Schema Build(string typeDefinitions)
         {
             var document = Parse(typeDefinitions);
             Validate(document);
@@ -78,7 +78,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return parser.Parse(new Source(document));
         }
 
-        private ISchema BuildSchemaFrom(GraphQLDocument document)
+        private Schema BuildSchemaFrom(GraphQLDocument document)
         {
             if (Directives.Count > 0)
             {
@@ -414,12 +414,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
             var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
-            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations)
-            {
-                Description = directiveDef.Comment?.Text
-            };
-
-            directive.Arguments = ToQueryArguments(directiveDef.Arguments);
+            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations.ToList(), directiveDef.Comment?.Text, ToQueryArguments(directiveDef.Arguments));
 
             return directive;
         }
@@ -474,13 +469,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 case ASTNodeKind.NonNullType:
                 {
                     var type = ToGraphType(((GraphQLNonNullType)astType).Type);
-                    return new NonNullGraphType(type);
+                    return new NonNullGraphType((GraphType)type); //ugly hack
                 }
 
                 case ASTNodeKind.ListType:
                 {
                     var type = ToGraphType(((GraphQLListType)astType).Type);
-                    return new ListGraphType(type);
+                    return new ListGraphType((GraphType)type); //ugly hack
                 }
 
                 case ASTNodeKind.NamedType:
@@ -495,7 +490,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
-        protected virtual void CopyMetadata(IProvideMetadata target, IProvideMetadata source)
+        protected virtual void CopyMetadata(MetadataProvider target, IProvideMetadata source)
         {
             source.Metadata.Apply(kv => target.Metadata[kv.Key] = kv.Value);
         }

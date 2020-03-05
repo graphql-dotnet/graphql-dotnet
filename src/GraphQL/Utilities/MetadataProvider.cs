@@ -7,7 +7,9 @@ namespace GraphQL.Utilities
 {
     public class MetadataProvider : IProvideMetadata
     {
-        public IDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+        public ConcurrentDictionary<string, object> Metadata { get; set; } = new ConcurrentDictionary<string, object>();
+
+        IReadOnlyDictionary<string, object> IProvideMetadata.Metadata => Metadata;
 
         public TType GetMetadata<TType>(string key, TType defaultValue = default)
         {

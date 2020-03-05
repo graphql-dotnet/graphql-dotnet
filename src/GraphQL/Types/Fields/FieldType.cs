@@ -2,6 +2,7 @@ using GraphQL.Resolvers;
 using System;
 using System.Diagnostics;
 using GraphQL.Utilities;
+using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
@@ -23,5 +24,7 @@ namespace GraphQL.Types
         public QueryArguments Arguments { get; set; }
 
         public IFieldResolver Resolver { get; set; }
+
+        IEnumerable<IQueryArgument> IFieldType.Arguments => Arguments;
     }
 }

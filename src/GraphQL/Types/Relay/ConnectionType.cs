@@ -1,7 +1,7 @@
 namespace GraphQL.Types.Relay
 {
     public class ConnectionType<TNodeType, TEdgeType> : ObjectGraphType<object>
-        where TNodeType : IGraphType
+        where TNodeType : GraphType
         where TEdgeType : EdgeType<TNodeType>
     {
         public ConnectionType()
@@ -39,7 +39,7 @@ namespace GraphQL.Types.Relay
     }
 
     public class ConnectionType<TNodeType> : ConnectionType<TNodeType, EdgeType<TNodeType>>
-        where TNodeType : IGraphType
+        where TNodeType : GraphType
     {
 
     }

@@ -134,14 +134,14 @@ namespace GraphQL
                 if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
                 {
                     var nonNull = (NonNullGraphType)Activator.CreateInstance(type);
-                    nonNull.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    nonNull.ResolvedType = (GraphType)BuildNamedType(type.GenericTypeArguments[0], resolve); //ugly hack
                     return nonNull;
                 }
 
                 if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
                 {
                     var list = (ListGraphType)Activator.CreateInstance(type);
-                    list.ResolvedType = BuildNamedType(type.GenericTypeArguments[0], resolve);
+                    list.ResolvedType = (GraphType)BuildNamedType(type.GenericTypeArguments[0], resolve); //ugly hack
                     return list;
                 }
             }
@@ -277,7 +277,7 @@ namespace GraphQL
         }
 
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : MetadataProvider
         {
             provider.Metadata[key] = value;
             return provider;

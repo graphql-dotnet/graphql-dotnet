@@ -40,7 +40,7 @@ namespace GraphQL.Utilities.Federation
         {
         }
 
-        public override ISchema Build(string typeDefinitions)
+        public override Schema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
             schema.RegisterType(BuildEntityGraphType(schema));
@@ -55,7 +55,7 @@ namespace GraphQL.Utilities.Federation
             schema.RegisterValueConverter(new AnyValueConverter());
         }
 
-        private void AddRootEntityFields(ISchema schema)
+        private void AddRootEntityFields(Schema schema)
         {
             var query = schema.Query;
 

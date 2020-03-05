@@ -121,11 +121,11 @@ namespace GraphQL.Types
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
-        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+        public IFieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
 
-        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+        public IFieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
 
-        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
+        public IFieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
         public void RegisterType(IGraphType type)
         {
@@ -134,6 +134,12 @@ namespace GraphQL.Types
             _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
+        /// <summary>
+        /// Add specific instances of <see cref="IGraphType"/>s to the schema.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
+        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
         public void RegisterTypes(params IGraphType[] types)
         {
             CheckDisposed();
@@ -142,6 +148,12 @@ namespace GraphQL.Types
                 RegisterType(type);
         }
 
+        /// <summary>
+        /// Add specific graph types to the schema. Each type must implement <see cref="IGraphType"/>.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
+        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
         public void RegisterTypes(params Type[] types)
         {
             CheckDisposed();
@@ -157,6 +169,12 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Add a specific graph type to the schema.
+        /// <br/><br/>
+        /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
+        /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
+        /// </summary>
         public void RegisterType<T>() where T : IGraphType
         {
             CheckDisposed();
@@ -164,6 +182,12 @@ namespace GraphQL.Types
             RegisterType(typeof(T));
         }
 
+        /// <summary>
+        /// Add a specific directive to the schema.
+        /// <br/><br/>
+        /// Directives are used by the GraphQL runtime as a way of modifying execution
+        /// behavior. Type system creators do not usually create them directly.
+        /// </summary>
         public void RegisterDirective(DirectiveGraphType directive)
         {
             CheckDisposed();
@@ -171,6 +195,12 @@ namespace GraphQL.Types
             _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
+        /// <summary>
+        /// Add specific directives to the schema.
+        /// <br/><br/>
+        /// Directives are used by the GraphQL runtime as a way of modifying execution
+        /// behavior. Type system creators do not usually create them directly.
+        /// </summary>
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
         {
             CheckDisposed();
@@ -179,6 +209,12 @@ namespace GraphQL.Types
                 RegisterDirective(directive);
         }
 
+        /// <summary>
+        /// Add specific directives to the schema.
+        /// <br/><br/>
+        /// Directives are used by the GraphQL runtime as a way of modifying execution
+        /// behavior. Type system creators do not usually create them directly.
+        /// </summary>
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
             CheckDisposed();
@@ -192,6 +228,9 @@ namespace GraphQL.Types
             return _directives.FirstOrDefault(x => x.Name == name);
         }
 
+        /// <summary>
+        /// Register a custom value converter to the schema.
+        /// </summary>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
             CheckDisposed();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace GraphQL.Types
 {
@@ -63,22 +64,24 @@ namespace GraphQL.Types
         public static readonly SkipDirective Skip = new SkipDirective();
         public static readonly GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
 
-        public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
+        public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations, string description = null, IEnumerable<QueryArgument> arguments = null)
         {
-            Name = name;
-            Locations.AddRange(locations);
-
-            if (Locations.Count == 0)
+            if (locations.Count() == 0)
                 throw new ArgumentException("Directive must have locations", nameof(locations));
+
+            Name = name;
+            Locations = locations;
+            Description = description;
+            Arguments = arguments;
         }
 
-        public string Name { get; set; }
+        public virtual string Name { get; protected set; }
 
-        public string Description { get; set; }
+        public virtual string Description { get; protected set; }
 
-        public QueryArguments Arguments { get; set; }
+        public virtual IEnumerable<QueryArgument> Arguments { get; protected set; }
 
-        public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
+        public virtual IEnumerable<DirectiveLocation> Locations { get; protected set; }
     }
 
     /// <summary>
