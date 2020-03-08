@@ -38,15 +38,5 @@ namespace GraphQL.Execution
         public virtual Task AfterExecutionAsync(IExecutionContext context, CancellationToken token) => Task.CompletedTask;
 
         public virtual Task BeforeExecutionStepAwaitedAsync(IExecutionContext context, CancellationToken token) => Task.CompletedTask;
-
-        Task IDocumentExecutionListener.AfterValidationAsync(IExecutionContext context, IValidationResult validationResult, CancellationToken token) => AfterValidationAsync(context, validationResult, token);
-
-        Task IDocumentExecutionListener.BeforeExecutionAsync(IExecutionContext context, CancellationToken token) => BeforeExecutionAsync(context, token);
-
-        Task IDocumentExecutionListener.BeforeExecutionAwaitedAsync(IExecutionContext context, CancellationToken token) => BeforeExecutionAwaitedAsync(context, token);
-
-        Task IDocumentExecutionListener.AfterExecutionAsync(IExecutionContext context, CancellationToken token) => AfterExecutionAsync(context, token);
-
-        Task IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext context, CancellationToken token) => BeforeExecutionStepAwaitedAsync(context, token);
     }
 }
