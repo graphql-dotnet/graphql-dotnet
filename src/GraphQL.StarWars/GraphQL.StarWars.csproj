@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SteroidsDI.Core" Version="0.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 

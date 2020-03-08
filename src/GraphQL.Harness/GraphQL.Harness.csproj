@@ -9,10 +9,11 @@
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.5.0-alpha0060" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.5.0-alpha0060" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.5.0-alpha0060" />
+    <PackageReference Include="SteroidsDI" Version="0.0.1" />
+    <PackageReference Include="SteroidsDI.AspNetCore" Version="0.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DependencyInjection.AspNetCore\DependencyInjection.AspNetCore.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
   </ItemGroup>
