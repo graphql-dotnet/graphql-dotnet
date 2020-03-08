@@ -6,7 +6,7 @@ namespace GraphQL.Utilities
     {
         protected static readonly string DeprecatedDefaultValue = DirectiveGraphType.Deprecated.Arguments.Find("reason").DefaultValue.ToString();
 
-        public override void VisitField(FieldType field)
+        public override void VisitFieldDefinition(FieldType field)
         {
             // if a value has already been set, prefer that
             if (!string.IsNullOrWhiteSpace(field.DeprecationReason)) return;

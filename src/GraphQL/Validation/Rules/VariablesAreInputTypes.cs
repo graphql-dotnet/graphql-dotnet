@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -17,7 +18,7 @@ namespace GraphQL.Validation.Rules
 
         public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -30,7 +31,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ValidationError(context.OriginalQuery, "5.7.3", UndefinedVarMessage(varDef.Name, type != null ? context.Print(type) : varDef.Type.Name()), varDef));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

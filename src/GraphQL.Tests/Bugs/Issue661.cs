@@ -1,10 +1,10 @@
-using GraphQL.Http;
+using System;
+using System.Collections.Generic;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -55,7 +55,7 @@ namespace GraphQL.Tests.Bugs
 
     public class Issue661Query : ObjectGraphType
     {
-        private IDistributedCache _cache;
+        private readonly IDistributedCache _cache;
 
         public Issue661Query(IDistributedCache cache)
         {

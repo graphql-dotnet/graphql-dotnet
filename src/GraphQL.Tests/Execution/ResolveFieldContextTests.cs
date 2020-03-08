@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
-using System.Threading.Tasks;
 
 namespace GraphQL.Tests.Execution
 {
@@ -103,7 +104,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_list_from_array()
         {
-            _context.Arguments = "{a: ['one', 'two']}".ToInputs();
+            _context.Arguments = @"{ ""a"": [""one"", ""two""]}".ToInputs();
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
             result.Count.ShouldBe(2);
@@ -199,7 +200,52 @@ namespace GraphQL.Tests.Execution
             result.ShouldBe("Test Result");
         }
 
-        enum SomeEnum
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_when_null()
+        {
+            Should.Throw<ArgumentNullException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<object>(null);
+            });
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_if_invalid_type()
+        {
+            var context = new ResolveFieldContext() { Source = "test" };
+            Should.Throw<ArgumentException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources_ref()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<string>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_accepts_null_sources_nullable()
+        {
+            var context = new ResolveFieldContext();
+            var adapter = new ResolveFieldContextAdapter<int?>(context);
+            adapter.Source.ShouldBe(null);
+        }
+
+        [Fact]
+        public void resolveFieldContextAdapter_throws_error_for_null_values()
+        {
+            var context = new ResolveFieldContext();
+            Should.Throw<ArgumentException>(() =>
+            {
+                var adapter = new ResolveFieldContextAdapter<int>(context);
+            });
+        }
+
+        private enum SomeEnum
         {
             One,
             Two

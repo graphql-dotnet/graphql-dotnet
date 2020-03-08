@@ -9,9 +9,9 @@ namespace GraphQL.Utilities.Federation
 {
     public class FederatedSchemaBuilder : SchemaBuilder
     {
-        internal const string ResolverMetadataField = "__FedResolver__";
+        internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
 
-        private const string FederatedSDL = @"
+        private const string FEDERATED_SDL = @"
             scalar _Any
             # scalar _FieldSet
 
@@ -42,7 +42,7 @@ namespace GraphQL.Utilities.Federation
 
         public override ISchema Build(string typeDefinitions)
         {
-            var schema = base.Build($"{FederatedSDL}{Environment.NewLine}{typeDefinitions}");
+            var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
             schema.RegisterType(BuildEntityGraphType(schema));
             AddRootEntityFields(schema);
             return schema;
@@ -86,7 +86,7 @@ namespace GraphQL.Utilities.Federation
                         if(type != null)
                         {
                             // execute resolver
-                            var resolver = type.GetMetadata<IFederatedResolver>(ResolverMetadataField);
+                            var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
                             if (resolver != null)
                             {
                                 var resolveContext = new FederatedResolveContext
@@ -115,7 +115,7 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            foreach (var selection in field.SelectionSet.Selections)
+            foreach (var selection in field.SelectionSet.SelectionsList)
             {
                 // TODO: check to see if the SelectionSet already has the __typename field?
 

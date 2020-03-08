@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphQL.Execution
 {
@@ -52,17 +52,17 @@ namespace GraphQL.Execution
 
         public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
-            if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.SchemaMeta;
+                return schema.SchemaMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.TypeMeta;
+                return schema.TypeMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
+            if (field.Name == schema.TypeNameMetaFieldType.Name)
             {
-                return SchemaIntrospection.TypeNameMeta;
+                return schema.TypeNameMetaFieldType;
             }
 
             if (parentType == null)
@@ -222,7 +222,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments)
+            foreach (var arg in definitionArguments.ArgumentsList)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -314,7 +314,7 @@ namespace GraphQL.Execution
         {
             if (selectionSet != null)
             {
-                foreach (var selection in selectionSet.Selections)
+                foreach (var selection in selectionSet.SelectionsList)
                 {
                     if (selection is Field field)
                     {
@@ -357,7 +357,6 @@ namespace GraphQL.Execution
 
                         CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
-
                 }
             }
 
@@ -372,6 +371,10 @@ namespace GraphQL.Execution
             return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
+        // Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
+        // directives are provided on the same field or fragment, it must be queried only if the @skip condition
+        // is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
+        // if either the @skip condition is true or the @include condition is false.
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
         {
             if (directives != null)
@@ -385,9 +388,8 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    values.TryGetValue("if", out object ifObj);
-
-                    return !(bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal);
+                    if (values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
+                        return false;
                 }
 
                 directive = directives.Find(DirectiveGraphType.Include.Name);
@@ -399,8 +401,7 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    values.TryGetValue("if", out object ifObj);
-                    return bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
+                    return values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
                 }
             }
 
@@ -442,17 +443,6 @@ namespace GraphQL.Execution
                 return null;
             }
             return CollectFields(context, fieldType, field.SelectionSet);
-        }
-
-        public static string[] AppendPath(string[] path, string pathSegment)
-        {
-            var newPath = new string[path.Length + 1];
-
-            path.CopyTo(newPath, 0);
-
-            newPath[path.Length] = pathSegment;
-
-            return newPath;
         }
     }
 }

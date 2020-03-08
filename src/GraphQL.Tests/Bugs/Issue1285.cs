@@ -53,6 +53,7 @@ query {
                     arg.IntsList2.Count.ShouldBe(20);
 
                     arg.ValueProp.ShouldBe(0);
+                    arg.ReadOnlyProp.ShouldBe(7);
                     arg.PrivateSetProp.ShouldBe(3);
 
                     return arg.Ints;
@@ -62,9 +63,9 @@ query {
 
     public class ArrayInput
     {
-        private ArrayInput(int readOnlyProp)
+        private ArrayInput(int readOnlyProP)
         {
-            ReadOnlyProp = readOnlyProp;
+            ReadOnlyProp = readOnlyProP;
         }
 
         public int[] Ints { get; set; }

@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
             Mauve
         }
 
-        class ColorEnum : EnumerationGraphType<Colors>
+        private class ColorEnum : EnumerationGraphType<Colors>
         {
             public ColorEnum()
             {
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        class ColorEnumInverseCasing : EnumerationGraphType<Colors>
+        private class ColorEnumInverseCasing : EnumerationGraphType<Colors>
         {
             public ColorEnumInverseCasing()
             {
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        private EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
+        private readonly EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
 
         [Fact]
         public void adds_values_from_enum()
@@ -109,6 +109,18 @@ namespace GraphQL.Tests.Types
         public void parses_from_name()
         {
             type.ParseValue("RED").ShouldBe(Colors.Red);
+        }
+
+        [Fact]
+        public void parse_value_is_null_safe()
+        {
+            type.ParseValue(null).ShouldBe(null);
+        }
+
+        [Fact]
+        public void does_not_allow_nulls_to_be_added()
+        {
+            Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().AddValue(null));
         }
     }
 }

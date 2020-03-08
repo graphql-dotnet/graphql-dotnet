@@ -1,19 +1,22 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Http;
 using GraphQL.Types;
 
 namespace GraphQL
 {
     public static class SchemaExtensions
     {
-        public static string Execute(this ISchema schema, Action<ExecutionOptions> configure)
+        /// <summary>
+        /// Executes a GraphQL request with the default <see cref="DocumentExecuter"/>, serializes the result using the specified <see cref="IDocumentWriter"/>, and returns the result
+        /// </summary>
+        /// <param name="configure">A delegate which configures the execution options</param>
+        public static async Task<string> ExecuteAsync(this ISchema schema, IDocumentWriter documentWriter, Action<ExecutionOptions> configure)
         {
-            return ExecuteAsync(schema, configure).GetAwaiter().GetResult();
-        }
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
 
-        public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
-        {
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
             {
@@ -21,7 +24,7 @@ namespace GraphQL
                 configure(options);
             }).ConfigureAwait(false);
 
-            return await new DocumentWriter(indent: true).WriteToStringAsync(result).ConfigureAwait(false);
+            return await documentWriter.WriteToStringAsync(result).ConfigureAwait(false);
         }
     }
 }

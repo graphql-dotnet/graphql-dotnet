@@ -131,7 +131,7 @@ namespace GraphQL.Tests.Validation
                 ));
             Field<ListGraphType<Pet>>("pets");
             Field<ListGraphType<Human>>("relatives");
-            Field<IntGraphType>("iq");
+            Field<IntGraphType>("id");
 
             Interface<Being>();
             Interface<Intelligent>();
@@ -151,7 +151,7 @@ namespace GraphQL.Tests.Validation
                 ));
             Field<ListGraphType<Pet>>("pets");
             Field<ListGraphType<Human>>("relatives");
-            Field<IntGraphType>("iq");
+            Field<IntGraphType>("id");
             Field<IntGraphType>("numEyes");
 
             Interface<Being>();

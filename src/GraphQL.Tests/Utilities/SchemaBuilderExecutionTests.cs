@@ -1,9 +1,8 @@
-using GraphQL.Http;
-using GraphQL.Types;
-using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities
@@ -69,8 +68,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PostQueryType>();
 
             var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-            var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
-            var variables = "{ 'id': '1' }";
+            var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
+            var variables = @"{ ""id"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -119,8 +118,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PostQueryRenamedType>();
 
             var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-            var expected = @"{ 'post': { 'id' : '1', 'title': 'Post One' } }";
-            var variables = "{ 'id': '1' }";
+            var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
+            var variables = @"{ ""id"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -164,7 +163,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PetQueryType>();
 
             var query = @"{ pet { name } }";
-            var expected = @"{ 'pet': { 'name' : 'Eli' } }";
+            var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
 
             AssertQuery(_ =>
             {
@@ -184,13 +183,13 @@ namespace GraphQL.Tests.Utilities
             ");
 
             var root = new { Hello = "Hello World!" };
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ hello }";
                 _.Root = root;
             });
 
-            var expectedResult = CreateQueryResult("{ 'hello': 'Hello World!' }");
+            var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -203,18 +202,15 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   source: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ source }";
                 _.Root = new { Hello =  "World" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'source': true }");
+            var expectedResult = CreateQueryResult(@"{ ""source"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -227,18 +223,15 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolve: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ resolve }";
                 _.ExposeExceptions = true;
             });
 
-            var expectedResult = CreateQueryResult("{ 'resolve': 'Resolved' }");
+            var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -251,17 +244,11 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   resolveWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
-            {
-                _.Query = @"{ resolveWithParam(id: ""abcd"") }";
-            });
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }");
 
-            var expectedResult = CreateQueryResult("{ 'resolveWithParam': 'Resolved abcd' }");
+            var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -274,18 +261,36 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContext: String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ userContext }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'userContext': 'Quinn' }");
+            var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
+        }
+
+        [Fact]
+        public async Task can_use_inherited_usercontext()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                  userContext: String
+                }
+            ", _ => _.Types.Include<ParametersType>());
+
+            var result = await schema.ExecuteAsync(Writer, _ =>
+            {
+                _.Query = @"{ userContext }";
+                _.UserContext = new ChildMyUserContext { Name = "Quinn" };
+            });
+
+            var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -300,10 +305,17 @@ namespace GraphQL.Tests.Utilities
                   homePlanet: String = null
                 }
 
+                type Human {
+                  id: String!
+                }
+
                 type Mutation {
                   createHuman(human: HumanInput!): Human
                 }
             ");
+
+            var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
+            type.GetField("homePlanet").DefaultValue.ShouldBeNull();
         }
 
         [Fact]
@@ -313,18 +325,15 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   userContextWithParam(id: String): String
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ userContextWithParam(id: ""abcd"") }";
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'userContextWithParam': 'Quinn abcd' }");
+            var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -337,19 +346,16 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   three: Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ three }";
                 _.Root = new { Hello = "World" };
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'three': true }");
+            var expectedResult = CreateQueryResult(@"{ ""three"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -362,19 +368,16 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                   four(id: Int): Boolean
                 }
-            ", _=>
-            {
-                _.Types.Include<ParametersType>();
-            });
+            ", _ => _.Types.Include<ParametersType>());
 
-            var result = schema.Execute(_ =>
+            var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = @"{ four(id: 123) }";
                 _.Root = new { Hello = "World" };
                 _.UserContext = new MyUserContext { Name = "Quinn" };
             });
 
-            var expectedResult = CreateQueryResult("{ 'four': true }");
+            var expectedResult = CreateQueryResult(@"{ ""four"": true }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
 
             result.ShouldBe(serializedExpectedResult);
@@ -401,8 +404,8 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<Blog>();
 
             var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
-            var expected = @"{ 'blog': { 'title': 'New blog', 'post': { 'id' : '1', 'title': 'Post One' } } }";
-            var variables = "{ 'blogId': '1', 'postId': '1' }";
+            var expected = @"{ ""blog"": { ""title"": ""New blog"", ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } } }";
+            var variables = @"{ ""blogId"": ""1"", ""postId"": ""1"" }";
 
             AssertQuery(_ =>
             {
@@ -430,7 +433,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<PersonQueryType>();
 
             var query = @"{ me { name age } }";
-            var expected = @"{ 'me': { 'name': 'Quinn', 'age': 100 } }";
+            var expected = @"{ ""me"": { ""name"": ""Quinn"", ""age"": 100 } }";
 
             AssertQuery(_ =>
             {
@@ -438,6 +441,44 @@ namespace GraphQL.Tests.Utilities
                 _.Definitions = defs;
                 _.ExpectedResult = expected;
             });
+        }
+
+        [Fact]
+        public async Task resolves_union_references_when_union_defined_first()
+        {
+            var schema = Schema.For(@"
+                union Pet = Dog | Cat
+
+                enum PetKind {
+                    CAT
+                    DOG
+                }
+
+                type Query {
+                    pet(type: PetKind = DOG): Pet
+                }
+
+                type Dog {
+                    name: String!
+                }
+
+                type Cat {
+                    name: String!
+                }
+            ", _=>
+            {
+                _.Types.For("Dog").IsTypeOf<Dog>();
+                _.Types.For("Cat").IsTypeOf<Cat>();
+                _.Types.Include<PetQueryType>();
+            });
+
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = @"{ pet { ... on Dog { name } } }");
+
+            var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
+            var expectedResult = CreateQueryResult(expected);
+            var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
+
+            result.ShouldBe(serializedExpectedResult);
         }
     }
 
@@ -519,29 +560,29 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    abstract class Pet
+    internal abstract class Pet
     {
         public string Name { get; set; }
     }
 
-    class Dog : Pet
+    internal class Dog : Pet
     {
         public bool Barks { get; set; }
     }
 
-    class Cat : Pet
+    internal class Cat : Pet
     {
         public bool Meows { get; set; }
     }
 
-    enum PetKind
+    internal enum PetKind
     {
         Cat,
         Dog
     }
 
     [GraphQLMetadata("Query")]
-    class PetQueryType
+    internal class PetQueryType
     {
         public Pet Pet(PetKind type)
         {
@@ -555,46 +596,34 @@ namespace GraphQL.Tests.Utilities
     }
 
     [GraphQLMetadata("Query")]
-    class ParametersType
+    internal class ParametersType
     {
-        public bool Source(object source)
-        {
-            return source != null;
-        }
+        public bool Source(object source) => source != null;
 
-        public string Resolve(ResolveFieldContext context)
-        {
-            return "Resolved";
-        }
+        public string Resolve(IResolveFieldContext context) => "Resolved";
 
-        public string ResolveWithParam(ResolveFieldContext context, string id)
-        {
-            return $"Resolved {id}";
-        }
+        public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
-        public string UserContext(MyUserContext context)
-        {
-            return context.Name;
-        }
+        public string UserContext(MyUserContext context) => context.Name;
 
-        public string UserContextWithParam(MyUserContext context, string id)
-        {
-            return $"{context.Name} {id}";
-        }
+        public string UserContextWithParam(MyUserContext context, string id) => $"{context.Name} {id}";
 
-        public bool Three(ResolveFieldContext resolveContext, object source, MyUserContext context)
+        public bool Three(IResolveFieldContext resolveContext, object source, MyUserContext context)
         {
             return resolveContext != null && context != null && source != null;
         }
 
-        public bool Four(ResolveFieldContext resolveContext, object source, MyUserContext context, int id)
+        public bool Four(IResolveFieldContext resolveContext, object source, MyUserContext context, int id)
         {
             return resolveContext != null && context != null && source != null && id != 0;
         }
     }
 
-    class MyUserContext: Dictionary<string, object>
+    internal class MyUserContext: Dictionary<string, object>
     {
         public string Name { get; set; }
+    }
+    internal class ChildMyUserContext: MyUserContext
+    {
     }
 }

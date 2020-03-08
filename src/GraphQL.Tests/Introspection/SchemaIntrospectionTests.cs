@@ -1,5 +1,6 @@
+using System;
 using System.Threading.Tasks;
-using GraphQL.Http;
+using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
@@ -9,8 +10,9 @@ namespace GraphQL.Tests.Introspection
 {
     public class SchemaIntrospectionTests
     {
-        [Fact]
-        public async Task validate_core_schema()
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema(IDocumentWriter documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -22,18 +24,69 @@ namespace GraphQL.Tests.Introspection
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             });
 
-            var json = await new DocumentWriter(true).WriteToStringAsync(executionResult);
+            var json = await documentWriter.WriteToStringAsync(executionResult);
 
             ShouldBe(json, IntrospectionResult.Data);
         }
 
-        public class TestQuery : ObjectGraphType
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema_pascal_case(IDocumentWriter documentWriter)
         {
-            public TestQuery() => Name = "TestQuery";
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery(),
+                };
+                _.NameConverter = PascalCaseNameConverter.Instance;
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+            });
+
+            var json = await documentWriter.WriteToStringAsync(executionResult);
+
+            ShouldBe(json, IntrospectionResult.Data);
         }
 
-        [Fact]
-        public async Task validate_non_null_schema()
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_core_schema_doesnt_use_nameconverter(IDocumentWriter documentWriter)
+        {
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = new TestQuery(),
+                };
+                _.NameConverter = new TestNameConverter();
+                _.Query = SchemaIntrospection.IntrospectionQuery;
+            });
+
+            var json = await documentWriter.WriteToStringAsync(executionResult);
+
+            ShouldBe(json, IntrospectionResult.Data);
+        }
+
+        public class TestNameConverter : INameConverter
+        {
+            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field) => throw new Exception();
+
+            public string NameForField(string fieldName, IComplexGraphType parentGraphType) => throw new Exception();
+        }
+
+        public class TestQuery : ObjectGraphType
+        {
+            public TestQuery()
+            {
+                Name = "TestQuery";
+            }
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_non_null_schema(IDocumentWriter documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -42,7 +95,7 @@ namespace GraphQL.Tests.Introspection
                 _.Query = InputObjectBugQuery;
             });
 
-            var json = await new DocumentWriter(true).WriteToStringAsync(executionResult);
+            var json = await documentWriter.WriteToStringAsync(executionResult);
             executionResult.Errors.ShouldBeNull();
 
             ShouldBe(json, InputObjectBugResult);

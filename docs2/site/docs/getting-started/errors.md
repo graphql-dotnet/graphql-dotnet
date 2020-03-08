@@ -1,6 +1,18 @@
 # Error Handling
 
-The `ExecutionResult` provides an `Errors` property which includes any errors encountered during execution.  Errors are returned [according to the spec](http://facebook.github.io/graphql/June2018/#sec-Errors), which means stack traces are excluded.  The `ExecutionResult` is transformed to what the spec requires using JSON.NET.  You can change what information is provided by overriding the JSON Converter.
+The `ExecutionResult` provides an `Errors` property which includes any errors encountered
+during execution. Errors are returned [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors),
+which means stack traces are excluded. The `ExecutionResult` is transformed to what the spec
+requires using one or the another `IDocumentWriter`.
+
+For example `GraphQL.NewtonsoftJson.DocumentWriter` uses [JSON.NET](https://www.nuget.org/packages/Newtonsoft.Json)
+and `GraphQL.SystemTextJson.DocumentWriter` uses new .NET Core memory optimized serializer from
+[`System.Text.Json`](https://docs.microsoft.com/en-us/dotnet/api/system.text.json). For JSON.NET you can change
+what information is provided by setting your values (`ContractResolver`, Converters`, etc.)
+in `JsonSerializerSettings` passed to `DocumentWriter` constructor. For `System.Text.Json`
+serializer you can configure `JsonSerializerOptions` passed to `DocumentWriter` constructor.
+
+You can also implement your own `IDocumentWriter`.
 
 To help debug errors, you can set `ExposeExceptions` on `ExecutionOptions` which will expose error stack traces.
 
@@ -13,7 +25,8 @@ ExecutionResult result = await executor.ExecuteAsync(_ =>
 });
 ```
 
-You can throw an `ExecutionError` error in your resolver and it will be caught and displayed.  You can also add errors to the `ResolveFieldContext.Errors` directly.
+You can throw an `ExecutionError` error in your resolver and it will be caught
+and displayed. You can also add errors to the `ResolveFieldContext.Errors` directly.
 
 ```csharp
 Field<DroidType>(
@@ -26,5 +39,10 @@ Field<DroidType>(
   resolve: context => throw new ExecutionError("Error Message")
 );
 ```
+
+Also `ExecutionOptions.UnhandledExceptionDelegate` allows you to override, hide,
+modify or just log the unhandled exception from your resolver before wrap it into
+`ExecutionError`. This can be useful for hiding error messages that reveal server
+implementation details.
 
 You can provide additional error handling or logging for fields by adding Field Middleware.

@@ -15,31 +15,30 @@ namespace GraphQL.Utilities
         // was killing the performance of introspection queries (20-30% of the call time)
         // because of continually re-running its constructor lambdas
         // so we cache one copy of it here - it's not changed ever anyway
-        private static readonly AstPrintVisitor Visitor = new AstPrintVisitor();
+        private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
         public static string Print(INode node)
         {
-            var result = Visitor.Visit(node);
+            var result = _visitor.Visit(node);
             return result?.ToString() ?? string.Empty;
         }
     }
 
     public class AstPrintConfig
     {
-        private readonly List<AstPrintFieldDefinition> _fields = new List<AstPrintFieldDefinition>();
-
-        public IEnumerable<AstPrintFieldDefinition> Fields => _fields;
+        internal List<AstPrintFieldDefinition> FieldsList { get; } = new List<AstPrintFieldDefinition>();
+        public IEnumerable<AstPrintFieldDefinition> Fields => FieldsList;
         public Func<INode, bool> Matches { get; set; }
         public Func<IDictionary<string, object>, object> PrintAst { get; set; }
 
         public void Field(AstPrintFieldDefinition field)
         {
-            if (_fields.Exists(x => x.Name == field.Name))
+            if (FieldsList.Exists(x => x.Name == field.Name))
             {
                 throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
             }
 
-            _fields.Add(field);
+            FieldsList.Add(field);
         }
     }
 
@@ -107,9 +106,14 @@ namespace GraphQL.Utilities
         public IValueResolver Resolver { get; set; }
     }
 
-    public class ResolveValueContext
+    public readonly struct ResolveValueContext
     {
-        public object Source { get; set; }
+        public ResolveValueContext(object source)
+        {
+            Source = source;
+        }
+
+        public object Source { get; }
 
         public TType SourceAs<TType>()
         {
@@ -124,12 +128,12 @@ namespace GraphQL.Utilities
 
     public interface IValueResolver
     {
-        object Resolve(ResolveValueContext context);
+        object Resolve(in ResolveValueContext context);
     }
 
     public interface IValueResolver<T> : IValueResolver
     {
-        new T Resolve(ResolveValueContext context);
+        new T Resolve(in ResolveValueContext context);
     }
 
     public class ExpressionValueResolver<TObject, TProperty> : IValueResolver<TProperty>
@@ -141,12 +145,12 @@ namespace GraphQL.Utilities
             _property = property.Compile();
         }
 
-        public TProperty Resolve(ResolveValueContext context)
+        public TProperty Resolve(in ResolveValueContext context)
         {
             return _property(context.SourceAs<TObject>());
         }
 
-        object IValueResolver.Resolve(ResolveValueContext context)
+        object IValueResolver.Resolve(in ResolveValueContext context)
         {
             return Resolve(context);
         }
@@ -218,19 +222,13 @@ namespace GraphQL.Utilities
                 c.Field(x => x.Name);
                 c.Field(x => x.Type);
                 c.Field(x => x.DefaultValue);
-                c.Print(p =>
-                {
-                    return $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}";
-                });
+                c.Print(p => $"${p.Arg(x => x.Name)}: {p.Arg(x => x.Type)}");
             });
 
             Config<SelectionSet>(c =>
             {
-                c.Field(x => x.Selections);
-                c.Print(p =>
-                {
-                    return Block(p.ArgArray(x => x.Selections));
-                });
+                c.Field(x => x.SelectionsList);
+                c.Print(p => Block(p.ArgArray(x => x.SelectionsList)));
             });
 
             Config<Arguments>(c =>
@@ -289,10 +287,7 @@ namespace GraphQL.Utilities
                 c.Print(f => f.Arg(x => x.Value));
             });
 
-            Config<NullValue>(c =>
-            {
-                c.Print(f => "null");
-            });
+            Config<NullValue>(c => c.Print(f => "null"));
 
             Config<LongValue>(c =>
             {
@@ -427,7 +422,7 @@ namespace GraphQL.Utilities
         private string Block(IEnumerable<object> nodes)
         {
             var list = nodes.ToList();
-            return list.Any()
+            return list.Count > 0
                 ? Indent($"{{\n{Join(list, "\n")}") + "\n}"
                 : "";
         }
@@ -452,18 +447,15 @@ namespace GraphQL.Utilities
 
         public object ApplyConfig(INode node)
         {
-            var config = _configs.SingleOrDefault(c => c.Matches(node));
+            var config = FindFor(node);
 
             if (config != null)
             {
                 var vals = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-                config.Fields.Apply(f =>
+                config.FieldsList.Apply(f =>
                 {
-                    var ctx = new ResolveValueContext
-                    {
-                        Source = node
-                    };
+                    var ctx = new ResolveValueContext(node);
 
                     var result = f.Resolver.Resolve(ctx);
                     if (result is INode nodeResult)
@@ -480,6 +472,16 @@ namespace GraphQL.Utilities
 
                 return config.PrintAst(vals);
             }
+
+            return null;
+        }
+
+        private AstPrintConfig FindFor(INode node)
+        {
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var c in _configs)
+                if (c.Matches(node))
+                    return c;
 
             return null;
         }

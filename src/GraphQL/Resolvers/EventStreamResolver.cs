@@ -7,44 +7,32 @@ namespace GraphQL.Resolvers
 {
     public class EventStreamResolver<T> : IEventStreamResolver<T>
     {
-        private readonly Func<ResolveEventStreamContext, IObservable<T>> _subscriber;
+        private readonly Func<IResolveEventStreamContext, IObservable<T>> _subscriber;
 
         public EventStreamResolver(
-            Func<ResolveEventStreamContext, IObservable<T>> subscriber)
+            Func<IResolveEventStreamContext, IObservable<T>> subscriber)
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<T> Subscribe(ResolveEventStreamContext context)
-        {
-            return _subscriber(context);
-        }
+        public IObservable<T> Subscribe(IResolveEventStreamContext context) => _subscriber(context);
 
-        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }
 
     public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
     {
-        private readonly Func<ResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> _subscriber;
+        private readonly Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> _subscriber;
 
         public EventStreamResolver(
-            Func<ResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> subscriber)
+            Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> subscriber)
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<TReturnType> Subscribe(ResolveEventStreamContext context)
-        {
-            return _subscriber(context.As<TSourceType>());
-        }
+        public IObservable<TReturnType> Subscribe(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
 
-        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }
 
     public class EventStreamResolver : IEventStreamResolver
@@ -58,17 +46,14 @@ namespace GraphQL.Resolvers
             _serviceProvider = serviceProvider;
         }
 
-        public IObservable<object> Subscribe(ResolveEventStreamContext context)
+        public IObservable<object> Subscribe(IResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;
-            var arguments = ReflectionHelper.BuildArguments(parameters, context);
-            var target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
+            object[] arguments = ReflectionHelper.BuildArguments(parameters, context);
+            object target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
             return (IObservable<object>)_accessor.GetValue(target, arguments);
         }
 
-        IObservable<object> IEventStreamResolver.Subscribe(ResolveEventStreamContext context)
-        {
-            return Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => Subscribe(context);
     }
 }

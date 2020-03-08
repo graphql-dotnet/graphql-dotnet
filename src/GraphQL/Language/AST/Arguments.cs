@@ -1,34 +1,58 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Language.AST
 {
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
-        private readonly List<Argument> _arguments = new List<Argument>();
+        private List<Argument> _arguments;
+        // for internal use only, do not modify this instance
+        internal static readonly Arguments Empty = new Arguments();
 
         public override IEnumerable<INode> Children => _arguments;
 
         public void Add(Argument arg)
         {
-            _arguments.Add(arg ?? throw new ArgumentNullException(nameof(arg)));
+            if (arg == null)
+                throw new ArgumentNullException(nameof(arg));
+
+            if (_arguments == null)
+                _arguments = new List<Argument>();
+
+            _arguments.Add(arg);
         }
 
-        public IValue ValueFor(string name) => _arguments.FirstOrDefault(x => x.Name == name)?.Value;
+        public IValue ValueFor(string name)
+        {
+            if (_arguments == null)
+                return null;
+
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var x in _arguments)
+                if (x.Name == name)
+                    return x.Value;
+
+            return null;
+        }
 
         protected bool Equals(Arguments args) => false;
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
             return Equals((Arguments)obj);
         }
 
-        public IEnumerator<Argument> GetEnumerator() => _arguments.GetEnumerator();
+        public IEnumerator<Argument> GetEnumerator()
+        {
+            if (_arguments == null)
+                return System.Linq.Enumerable.Empty<Argument>().GetEnumerator();
+
+            return _arguments.GetEnumerator();
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

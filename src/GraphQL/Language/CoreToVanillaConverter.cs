@@ -81,15 +81,16 @@ namespace GraphQL.Language
 
         public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
-            var defs = new VariableDefinitions();
+            VariableDefinitions defs = null;
 
             if (source != null)
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    defs.Add(def);
+                    (defs ?? (defs = new VariableDefinitions())).Add(def);
                 }
             }
+
             return defs;
         }
 
@@ -124,26 +125,13 @@ namespace GraphQL.Language
             return set;
         }
 
-        public ISelection Selection(ASTNode source)
+        public ISelection Selection(ASTNode source) => source.Kind switch
         {
-            switch (source.Kind)
-            {
-                case ASTNodeKind.Field:
-                {
-                    return Field((GraphQLFieldSelection)source);
-                }
-                case ASTNodeKind.FragmentSpread:
-                {
-                    return FragmentSpread((GraphQLFragmentSpread)source);
-                }
-                case ASTNodeKind.InlineFragment:
-                {
-                    return InlineFragment((GraphQLInlineFragment)source);
-                }
-            }
-
-            throw new ExecutionError($"Unmapped selection {source.Kind}");
-        }
+            ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
+            ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
+            ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
+            _ => throw new ExecutionError($"Unmapped selection {source.Kind}")
+        };
 
         public Field Field(GraphQLFieldSelection source)
         {
@@ -155,15 +143,15 @@ namespace GraphQL.Language
             return field;
         }
 
-        public Directives Directives(IEnumerable<GraphQLDirective> directives)
+        public Directives Directives(IEnumerable<GraphQLDirective> source)
         {
-            var target = new Directives();
+            Directives target = null;
 
-            if (directives != null)
+            if (source != null)
             {
-                foreach (var d in directives)
+                foreach (var d in source)
                 {
-                    target.Add(Directive(d));
+                    (target ?? (target = new Directives())).Add(Directive(d));
                 }
             }
 
@@ -179,13 +167,16 @@ namespace GraphQL.Language
 
         public Arguments Arguments(IEnumerable<GraphQLArgument> source)
         {
-            var target = new Arguments();
+            Arguments target = null;
 
-            foreach (var s in source)
+            if (source != null)
             {
-                var arg = new Argument(Name(s.Name)).WithLocation(s.Name, _body);
-                arg.Value = Value(s.Value);
-                target.Add(arg);
+                foreach (var a in source)
+                {
+                    var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
+                    arg.Value = Value(a.Value);
+                    (target ?? (target = new Arguments())).Add(arg);
+                }
             }
 
             return target;
@@ -252,7 +243,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.ListValue:
                 {
                     var list = (GraphQLListValue)source;
-                    var values = list.Values.Select(Value);
+                    var values = list.Values?.Select(Value);
                     return new ListValue(values).WithLocation(list, _body);
                 }
                 case ASTNodeKind.NullValue:
@@ -306,22 +297,13 @@ namespace GraphQL.Language
             return new NameNode(name.Value).WithLocation(name, _body);
         }
 
-        public static OperationType ToOperationType(OperationTypeParser type)
+        public static OperationType ToOperationType(OperationTypeParser type) => type switch
         {
-            switch (type)
-            {
-                case OperationTypeParser.Query:
-                    return OperationType.Query;
-
-                case OperationTypeParser.Mutation:
-                    return OperationType.Mutation;
-
-                case OperationTypeParser.Subscription:
-                    return OperationType.Subscription;
-            }
-
-            throw new ExecutionError($"Unmapped operation type {type}");
-        }
+            OperationTypeParser.Query => OperationType.Query,
+            OperationTypeParser.Mutation => OperationType.Mutation,
+            OperationTypeParser.Subscription => OperationType.Subscription,
+            _ => throw new ExecutionError($"Unmapped operation type {type}")
+        };
     }
 
     public static class AstNodeExtensions

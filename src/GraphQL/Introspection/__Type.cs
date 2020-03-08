@@ -27,10 +27,7 @@ namespace GraphQL.Introspection
 
                 throw new ExecutionError($"Unknown kind of type: {context.Source}");
             });
-            Field<StringGraphType>("name", resolve: context =>
-            {
-                return ((IGraphType)context.Source).Name;
-            });
+            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
             Field<StringGraphType>("description");
             FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
@@ -49,7 +46,7 @@ namespace GraphQL.Introspection
                             ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
                             : type?.Fields;
 
-                        fields = fields ?? Enumerable.Empty<FieldType>();
+                        fields ??= Enumerable.Empty<FieldType>();
                         fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f)).ConfigureAwait(false);
 
                         return fields.OrderBy(f => f.Name);
@@ -115,29 +112,17 @@ namespace GraphQL.Introspection
             });
         }
 
-        private TypeKind KindForInstance(IGraphType type)
+        private static object KindForInstance(IGraphType type) => type switch
         {
-            switch (type)
-            {
-                case EnumerationGraphType _:
-                    return TypeKind.ENUM;
-                case ScalarGraphType _:
-                    return TypeKind.SCALAR;
-                case IObjectGraphType _:
-                    return TypeKind.OBJECT;
-                case IInterfaceGraphType _:
-                    return TypeKind.INTERFACE;
-                case UnionGraphType _:
-                    return TypeKind.UNION;
-                case IInputObjectGraphType _:
-                    return TypeKind.INPUT_OBJECT;
-                case ListGraphType _:
-                    return TypeKind.LIST;
-                case NonNullGraphType _:
-                    return TypeKind.NON_NULL;
-                default:
-                    throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type));
-            }
-        }
+            EnumerationGraphType _ => TypeKindBoxed.ENUM,
+            ScalarGraphType _ => TypeKindBoxed.SCALAR,
+            IObjectGraphType _ => TypeKindBoxed.OBJECT,
+            IInterfaceGraphType _ => TypeKindBoxed.INTERFACE,
+            UnionGraphType _ => TypeKindBoxed.UNION,
+            IInputObjectGraphType _ => TypeKindBoxed.INPUT_OBJECT,
+            ListGraphType _ => TypeKindBoxed.LIST,
+            NonNullGraphType _ => TypeKindBoxed.NON_NULL,
+            _ => throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type))
+        };
     }
 }

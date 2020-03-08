@@ -1,23 +1,62 @@
 # GraphQL for .NET
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/graphql-dotnet/graphql-dotnet?branch=master&svg=true)](https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet)
-[![NuGet](https://img.shields.io/nuget/v/GraphQL.svg)](https://www.nuget.org/packages/GraphQL/)
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![Nuget](https://img.shields.io/nuget/vpre/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json)
+[![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
+
+![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
+![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
+![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
+
+![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
 
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
-This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.  Thank you Marek!
+Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the
+[GraphQL Foundation](https://foundation.graphql.org/).
+
+This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
+by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
 
 ## Installation
 
-You can install the latest version via [NuGet](https://www.nuget.org/packages/GraphQL/).
+> WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
+> If errors occur, it is recommended that you first check the behavior on the latest available preview version before
+> reporting a issue. Latest 3.0.0-preview-XXXX versions are **backwards incompatible** with latest stable 2.4.0 version.
+> You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1352/lib/netstandard2.0/diff/2.4.0/).
 
+You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 ```
-PM> Install-Package GraphQL
+> dotnet add package GraphQL
 ```
 
-Or you can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json).
+For serialized results, you'll need an `IDocumentWriter` implementation.
+We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.SystemTextJson/) for .NET Core 3+,
+[GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson/)
+(formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/)), or you can bring your own.
+```
+> dotnet add package GraphQL.SystemTextJson
+> dotnet add package GraphQL.NewtonsoftJson
+```
+> *Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
+> capabilities so writing to an ASP.NET Core 3.0 `HttpResponse.Body` will require you to set 
+> `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
+> which isn't recommended.*
 
+You can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json),
+where you may want to explicitly pull a certain version using `-v`.
+```
+> dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1448
+```
+
+[MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) is the primary source of packages
+where you can find all preview versions built from the `master` branch. Periodically (usually once every
+few months) the latest preview version is published to NuGet manually. This is due to fairly frequent
+changes. Publication of each preview version to NuGet would create only unnecessary noise.
 
 ## Documentation
 
@@ -27,12 +66,21 @@ http://graphql-dotnet.github.io
 
 https://github.com/graphql-dotnet/examples
 
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
+- [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+- [GraphiQL](https://github.com/graphql/graphiql)
+- [Altair](https://github.com/imolorhe/altair)
+- [Voyager](https://github.com/APIs-guru/graphql-voyager)
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL .NET framework to build a fully functional GraphQL endpoint.
+* [Building GraphQL APIs with ASP.NET Core](https://app.pluralsight.com/library/courses/building-graphql-apis-aspdotnet-core/table-of-contents) by [Roland Guijt](https://github.com/RolandGuijt)
 
 ## Upgrade Guides
 
+* 2.4.0 to 3.0 - under development
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)
@@ -53,7 +101,7 @@ var schema = Schema.For(@"
 ");
 
 var root = new { Hello = "Hello World!" };
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ hello }";
   _.Root = root;
@@ -64,7 +112,9 @@ Console.WriteLine(json);
 
 ### Schema First Approach
 
-This example uses the [Graphql schema language](https://graphql.org/learn/schema/#type-language).  See the [documentation](https://graphql-dotnet.github.io/docs/getting-started/introduction) for more examples and information.
+This example uses the [Graphql schema language](https://graphql.org/learn/schema/#type-language).
+See the [documentation](https://graphql-dotnet.github.io/docs/getting-started/introduction) for
+more examples and information.
 
 ```csharp
 public class Droid
@@ -95,7 +145,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ droid { id name } }";
 });
@@ -137,7 +187,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = $"{{ droid(id: \"123\") {{ id name }} }}";
 });
@@ -146,7 +196,7 @@ var json = schema.Execute(_ =>
 ## Roadmap
 
 ### Grammar / AST
-- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](http://facebook.github.io/graphql/June2018/).
+- Grammar and AST for the GraphQL language should be compatible with the [June 2018 specification](https://graphql.github.io/graphql-spec/June2018/).
 
 ### Operation Execution
 - [x] Scalars
@@ -226,7 +276,8 @@ publish nuget from MyGet
 ```
 
 ### Running on OSX with mono
-To run this project on OSX with mono you will need to add some configuration.  Make sure mono is installed and add the following to your bash configuration:
+To run this project on OSX with mono you will need to add some configuration.
+Make sure mono is installed and add the following to your bash configuration:
 
 ```bash
 export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/

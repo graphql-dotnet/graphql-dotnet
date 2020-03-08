@@ -11,37 +11,61 @@ namespace GraphQL.Execution
 
         protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
-            var pendingNodes = new List<ExecutionNode>
-            {
-                rootNode
-            };
+            var pendingNodes = new Queue<ExecutionNode>();
+            pendingNodes.Enqueue(rootNode);
 
+            var currentTasks = new List<Task>();
+            var currentNodes = new List<ExecutionNode>();
             while (pendingNodes.Count > 0)
             {
-                var currentTasks = new Task<ExecutionNode>[pendingNodes.Count];
-
-                // Start executing all pending nodes
-                for (int i = 0; i < pendingNodes.Count; i++)
+                // Start executing pending nodes, while limiting the maximum number of parallel executed nodes to the set limit
+                while ((context.MaxParallelExecutionCount == null || currentTasks.Count < context.MaxParallelExecutionCount)
+                    && pendingNodes.Count > 0)
                 {
                     context.CancellationToken.ThrowIfCancellationRequested();
-                    currentTasks[i] = ExecuteNodeAsync(context, pendingNodes[i]);
-                }
+                    var pendingNode = pendingNodes.Dequeue();
+                    var pendingNodeTask = ExecuteNodeAsync(context, pendingNode);
+                    if (pendingNodeTask.IsCompleted)
+                    {
+                        // Throw any caught exceptions
+                        await pendingNodeTask;
 
-                pendingNodes.Clear();
+                        // Node completed synchronously, so no need to add it to the list of currently executing nodes
+                        // instead add any child nodes to the pendingNodes queue directly here
+                        if (pendingNode is IParentExecutionNode parentExecutionNode)
+                        {
+                            foreach (var childNode in parentExecutionNode.GetChildNodes())
+                            {
+                                pendingNodes.Enqueue(childNode);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Node is actually asynchronous, so add it to the list of current tasks being executed in parallel
+                        currentTasks.Add(pendingNodeTask);
+                        currentNodes.Add(pendingNode);
+                    }
+
+                }
 
                 await OnBeforeExecutionStepAwaitedAsync(context)
                     .ConfigureAwait(false);
 
                 // Await tasks for this execution step
-                var completedNodes = await Task.WhenAll(currentTasks)
+                await Task.WhenAll(currentTasks)
                     .ConfigureAwait(false);
 
                 // Add child nodes to pending nodes to execute the next level in parallel
-                var childNodes = completedNodes
-                    .OfType<IParentExecutionNode>()
-                    .SelectMany(x => x.GetChildNodes());
+                foreach (var node in currentNodes)
+                    if (node is IParentExecutionNode p)
+                {
+                    foreach (var childNode in p.GetChildNodes())
+                        pendingNodes.Enqueue(childNode);
+                }
 
-                pendingNodes.AddRange(childNodes);
+                currentTasks.Clear();
+                currentNodes.Clear();
             }
         }
     }

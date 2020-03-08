@@ -1,4 +1,3 @@
-using GraphQL.Types;
 using System;
 
 namespace GraphQL.Execution
@@ -8,7 +7,7 @@ namespace GraphQL.Execution
     /// </summary>
     public class UnhandledExceptionContext
     {
-        public UnhandledExceptionContext(ExecutionContext context, ResolveFieldContext fieldContext, Exception originalException)
+        public UnhandledExceptionContext(ExecutionContext context, IResolveFieldContext fieldContext, Exception originalException)
         {
             Context = context;
             FieldContext = fieldContext;
@@ -19,12 +18,14 @@ namespace GraphQL.Execution
         public ExecutionContext Context { get; }
 
         /// <summary>
-        /// Field context whose resolver generated an error. Can be null if the error came from DocumentExecuter.
+        /// Field context whose resolver generated an error. Will be <c>null</c> if the error came from
+        /// <see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)"/>, for example, validation stage.
+        /// Also will be <c>null</c> between resolvers execution if <c>cancellationToken</c> is canceled.
         /// </summary>
-        public ResolveFieldContext FieldContext { get; }
+        public IResolveFieldContext FieldContext { get; }
 
         /// <summary>
-        /// Original exception from field resolver or DocumentExecuter.
+        /// Original exception from field resolver or <see cref="DocumentExecuter"/>.
         /// </summary>
         public Exception OriginalException { get; }
 

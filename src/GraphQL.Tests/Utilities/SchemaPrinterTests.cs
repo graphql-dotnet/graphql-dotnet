@@ -539,6 +539,8 @@ interface Baaz {
 type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -618,6 +620,8 @@ interface Baaz {
 type Bar implements IFoo, Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -698,6 +702,8 @@ interface Baaz {
 type Bar implements IFoo & Baaz {
   # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
 scalar BigInt
@@ -910,6 +916,7 @@ scalar Uri
 }"
                 },
             };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]
@@ -1129,6 +1136,9 @@ enum __TypeKind {
                 Field<StringGraphType>(
                     name: "str",
                     description: "This is of type String");
+                Field<IntGraphType>(
+                  name: "int",
+                  description: "This is of type Integer");
                 Interface<FooInterfaceType>();
                 Interface<BaazInterfaceType>();
             }
@@ -1171,20 +1181,11 @@ enum __TypeKind {
                 Name = "Odd";
             }
 
-            public override object Serialize(object value)
-            {
-                return null;
-            }
+            public override object Serialize(object value) => null;
 
-            public override object ParseValue(object value)
-            {
-                return null;
-            }
+            public override object ParseValue(object value) => null;
 
-            public override object ParseLiteral(IValue value)
-            {
-                return null;
-            }
+            public override object ParseLiteral(IValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

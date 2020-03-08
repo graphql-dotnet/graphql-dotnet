@@ -16,7 +16,12 @@ namespace GraphQL.Language.AST
 
         public FragmentDefinition FindDefinition(string name)
         {
-            return _fragments.FirstOrDefault(f => f.Name == name);
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var f in _fragments)
+                if (f.Name == name)
+                    return f;
+
+            return null;
         }
 
         public IEnumerator<FragmentDefinition> GetEnumerator()
@@ -24,9 +29,6 @@ namespace GraphQL.Language.AST
             return _fragments.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

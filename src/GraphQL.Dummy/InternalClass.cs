@@ -1,6 +1,6 @@
 namespace GraphQL.Dummy
 {
-    class InternalClass
+    internal class InternalClass
     {
     }
 }

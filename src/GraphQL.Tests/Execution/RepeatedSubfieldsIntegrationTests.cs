@@ -89,7 +89,20 @@ namespace GraphQL.Tests.Execution
                   }
                 }";
             },
-            "{ person: { business: { id: \"4\", name: \"Stuntman Express\", address: { id: \"123\", street: \"Las Vegas Blvd\", city: \"Las Vegas\", state: \"NV\"  } } } }");
+            @"{
+              ""person"": {
+                ""business"": {
+                  ""id"": ""4"",
+                  ""name"": ""Stuntman Express"",
+                  ""address"": {
+                    ""id"": ""123"",
+                    ""street"": ""Las Vegas Blvd"",
+                    ""city"": ""Las Vegas"",
+                    ""state"": ""NV""
+                  }
+                }
+              }
+            }");
         }
     }
 }

@@ -7,22 +7,32 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
-    public class Schema : ISchema
+    /// <inheritdoc cref="ISchema"/>
+    public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
+        private IServiceProvider _services;
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
         private readonly List<DirectiveGraphType> _directives;
         private readonly List<IAstFromValueConverter> _converters;
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
+        /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects
+        /// </summary>
         public Schema()
             : this(new DefaultServiceProvider())
         {
         }
 
+        /// <summary>
+        /// Create an instance of <see cref="Schema"/> with a specified <see cref="IServiceProvider"/>, used
+        /// to create required objects
+        /// </summary>
         public Schema(IServiceProvider services)
         {
-            Services = services;
+            _services = services;
 
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
@@ -49,7 +59,7 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         public bool Initialized => _lookup?.IsValueCreated == true;
 
@@ -66,11 +76,27 @@ namespace GraphQL.Types
 
         public IObjectGraphType Subscription { get; set; }
 
-        public IServiceProvider Services { get; set; }
-
         /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types.
+        /// Gets the service object of the specified type. Schema itself acts as a service provider used to
+        /// create objects, such as graph types, requested by the schema.
+        /// <br/><br/>
+        /// Note that most objects are created during schema initialization, which then have the same lifetime
+        /// as the schema's lifetime.
+        /// <br/><br/>
+        /// Other types created by the service provider may include directive visitors, middlewares, validation
+        /// rules, and name converters, among others.
+        /// <br/><br/>
+        /// Explicit implementation of the <see cref="IServiceProvider.GetService"/> method makes this method
+        /// less visible to the calling code, which reduces the likelihood of using it as so called ServiceLocator
+        /// anti-pattern. However, in some advanced scenarios this may be necessary.
         /// </summary>
+        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
+        /// <returns>
+        /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
+        /// object of type serviceType.
+        /// </returns>
+        object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
+
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         public IEnumerable<DirectiveGraphType> Directives
@@ -94,6 +120,12 @@ namespace GraphQL.Types
                 .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+
+        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+
+        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+
+        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
         public void RegisterType(IGraphType type)
         {
@@ -194,7 +226,7 @@ namespace GraphQL.Types
             {
                 if (_lookup != null)
                 {
-                    Services = null;
+                    _services = null;
                     Query = null;
                     Mutation = null;
                     Subscription = null;
@@ -257,13 +289,13 @@ namespace GraphQL.Types
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
-                .Union(_additionalTypes.Select(type => (IGraphType)Services.GetRequiredService(type.GetNamedType())));
+                .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => (IGraphType)Services.GetRequiredService(type),
-                FieldNameConverter,
+                type => (IGraphType)_services.GetRequiredService(type),
+                NameConverter,
                 seal: true);
         }
     }

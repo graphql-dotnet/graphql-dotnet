@@ -1,11 +1,10 @@
-using GraphQL.Http;
-using GraphQL.Utilities;
-using GraphQLParser.Exceptions;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using GraphQL.SystemTextJson;
+using GraphQL.Utilities;
+using GraphQLParser.Exceptions;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -30,14 +29,16 @@ namespace GraphQL.Tests.Utilities
 
             var queryResult = CreateQueryResult(config.ExpectedResult);
 
-            return AssertQuery(_ =>
-            {
-                _.Schema = schema;
-                _.Query = config.Query;
-                _.Inputs = config.Variables.ToInputs();
-                _.Root = config.Root;
-                _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
-            }, queryResult);
+            return AssertQuery(
+                _ =>
+                {
+                    _.Schema = schema;
+                    _.Query = config.Query;
+                    _.Inputs = config.Variables.ToInputs();
+                    _.Root = config.Root;
+                    _.ThrowOnUnhandledException = config.ThrowOnUnhandledException;
+                },
+                queryResult);
         }
 
         public ExecutionResult AssertQuery(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
@@ -61,20 +62,10 @@ namespace GraphQL.Tests.Utilities
             return runResult;
         }
 
-        public ExecutionResult CreateQueryResult(string result)
-        {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
-            return new ExecutionResult { Data = expected };
-        }
+        public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 
         protected string ReadSchema(string fileName)
-        {
-            return File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
-        }
+            => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
     }
 
     public class ExecuteConfig

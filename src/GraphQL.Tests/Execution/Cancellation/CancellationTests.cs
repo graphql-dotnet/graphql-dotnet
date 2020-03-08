@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             Field<StringGraphType>("two", resolve: GetTwoAsync);
         }
 
-        public Task<string> GetOneAsync(ResolveFieldContext<object> context)
+        public Task<string> GetOneAsync(IResolveFieldContext<object> context)
         {
             if (!context.CancellationToken.CanBeCanceled)
             {
@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Execution.Cancellation
             return Task.FromResult("one");
         }
 
-        public Task<string> GetTwoAsync(ResolveFieldContext<object> context)
+        public Task<string> GetTwoAsync(IResolveFieldContext<object> context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -51,7 +51,7 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             using (var tokenSource = new CancellationTokenSource())
             {
-                AssertQuerySuccess("{one}", "{one: 'one'}", cancellationToken: tokenSource.Token);
+                AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
             }
         }
 
