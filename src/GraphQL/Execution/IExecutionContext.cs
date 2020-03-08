@@ -9,18 +9,18 @@ namespace GraphQL.Execution
 {
     public interface IExecutionContext : IProvideUserContext
     {
-        CancellationToken CancellationToken { get; set; }
-        Document Document { get; set; }
-        ExecutionErrors Errors { get; set; }
-        Fragments Fragments { get; set; }
-        List<IDocumentExecutionListener> Listeners { get; set; }
-        int? MaxParallelExecutionCount { get; set; }
-        Metrics Metrics { get; set; }
-        Operation Operation { get; set; }
-        object RootValue { get; set; }
-        ISchema Schema { get; set; }
-        bool ThrowOnUnhandledException { get; set; }
-        Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
-        Variables Variables { get; set; }
+        CancellationToken CancellationToken { get; }
+        Document Document { get; }
+        ExecutionErrors Errors { get; }
+        Fragments Fragments { get; }
+        List<IDocumentExecutionListener> Listeners { get; }
+        int? MaxParallelExecutionCount { get; }
+        Metrics Metrics { get; }
+        Operation Operation { get; }
+        object RootValue { get; }
+        ISchema Schema { get; }
+        bool ThrowOnUnhandledException { get; }
+        Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
+        Variables Variables { get; }
     }
 }
