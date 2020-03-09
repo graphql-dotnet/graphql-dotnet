@@ -523,11 +523,11 @@ namespace GraphQL.DataLoader
     public class DataLoaderDocumentListener : GraphQL.Execution.IDocumentExecutionListener
     {
         public DataLoaderDocumentListener(GraphQL.DataLoader.IDataLoaderContextAccessor accessor) { }
-        public System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
+        public System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        public System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
+        public System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        public System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
+        public System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
     public static class DataLoaderExtensions
     {
@@ -569,11 +569,11 @@ namespace GraphQL.Execution
     public abstract class DocumentExecutionListenerBase : GraphQL.Execution.IDocumentExecutionListener
     {
         protected DocumentExecutionListenerBase() { }
-        public virtual System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
-        public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token) { }
+        public virtual System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        public virtual System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
+        public virtual System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
+        public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
     {
@@ -648,11 +648,11 @@ namespace GraphQL.Execution
     }
     public interface IDocumentExecutionListener
     {
-        System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token);
-        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context, System.Threading.CancellationToken token);
+        System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context);
+        System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult);
+        System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context);
+        System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
+        System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {

@@ -129,10 +129,7 @@ namespace GraphQL
 
                 foreach (var listener in options.Listeners)
                 {
-                    await listener.AfterValidationAsync(
-                            context,
-                            validationResult,
-                            options.CancellationToken)
+                    await listener.AfterValidationAsync(context, validationResult)
                         .ConfigureAwait(false);
                 }
 
@@ -161,7 +158,7 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
-                            await listener.BeforeExecutionAsync(context, context.CancellationToken)
+                            await listener.BeforeExecutionAsync(context)
                                 .ConfigureAwait(false);
                         }
 
@@ -176,7 +173,7 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
-                            await listener.BeforeExecutionAwaitedAsync(context, context.CancellationToken)
+                            await listener.BeforeExecutionAwaitedAsync(context)
                                 .ConfigureAwait(false);
                         }
 
@@ -185,7 +182,7 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
-                            await listener.AfterExecutionAsync(context, context.CancellationToken)
+                            await listener.AfterExecutionAsync(context)
                                 .ConfigureAwait(false);
                         }
                 }

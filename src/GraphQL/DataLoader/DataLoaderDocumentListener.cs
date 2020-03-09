@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Validation;
@@ -18,12 +17,12 @@ namespace GraphQL.DataLoader
             _accessor = accessor;
         }
 
-        public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult, CancellationToken token)
+        public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
         {
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAsync(IExecutionContext context, CancellationToken token)
+        public Task BeforeExecutionAsync(IExecutionContext context)
         {
             if (_accessor.Context == null)
                 _accessor.Context = new DataLoaderContext();
@@ -31,23 +30,23 @@ namespace GraphQL.DataLoader
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionAwaitedAsync(IExecutionContext context, CancellationToken token)
+        public Task BeforeExecutionAwaitedAsync(IExecutionContext context)
         {
             return Task.CompletedTask;
         }
 
-        public Task AfterExecutionAsync(IExecutionContext context, CancellationToken token)
+        public Task AfterExecutionAsync(IExecutionContext context)
         {
             _accessor.Context = null;
 
             return Task.CompletedTask;
         }
 
-        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context, CancellationToken token)
+        public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context)
         {
             var dataLoaderContext = _accessor.Context;
 
-            return dataLoaderContext.DispatchAllAsync(token);
+            return dataLoaderContext.DispatchAllAsync(context.CancellationToken);
         }
     }
 }

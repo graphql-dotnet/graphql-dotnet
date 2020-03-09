@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Execution
 
         public class TestExecutionListener : DocumentExecutionListenerBase
         {
-            public override Task BeforeExecutionAwaitedAsync(IExecutionContext context, CancellationToken token)
+            public override Task BeforeExecutionAwaitedAsync(IExecutionContext context)
             {
                 var testContext = context.UserContext as TestContext;
                 testContext.Complete("bar");
@@ -54,7 +54,7 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestContext: Dictionary<string, object>
+        public class TestContext : Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 
