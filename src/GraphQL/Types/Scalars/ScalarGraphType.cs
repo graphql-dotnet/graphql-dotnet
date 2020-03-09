@@ -4,7 +4,7 @@ namespace GraphQL.Types
 {
     public abstract class ScalarGraphType : GraphType
     {
-        public abstract object Serialize(object value);
+        public virtual object Serialize(object value) => ParseValue(value);
 
         public abstract object ParseValue(object value);
 

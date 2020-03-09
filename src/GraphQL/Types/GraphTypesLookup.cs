@@ -314,7 +314,6 @@ namespace GraphQL.Types
                     union.AddPossibleType(objType);
                 }
             }
-
         }
 
         private void HandleField(IComplexGraphType parentType, FieldType field, TypeCollectionContext context, bool applyNameConverter)
