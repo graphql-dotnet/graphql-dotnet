@@ -35,7 +35,7 @@ namespace GraphQL.Execution
         List<IDocumentExecutionListener> Listeners { get; }
 
         /// <summary>
-        /// If set, limits the maximum number of nodes executed in parallel
+        /// If set, limits the maximum number of nodes (in other words GraphQL fields) executed in parallel
         /// </summary>
         int? MaxParallelExecutionCount { get; }
 
