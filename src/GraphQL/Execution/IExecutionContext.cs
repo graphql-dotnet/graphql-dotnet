@@ -60,8 +60,8 @@ namespace GraphQL.Execution
         ISchema Schema { get; }
 
         /// <summary>
-        /// When false, <see cref="DocumentExecuter"/> and <see cref="ExecutionStrategy"/> captures unhandled
-        /// exceptions and stores them within <see cref="Errors">Errors</see>
+        /// When <c>false</c>, <see cref="DocumentExecuter"/> and <see cref="ExecutionStrategy"/> capture unhandled
+        /// exceptions and store them within <see cref="Errors">Errors</see>
         /// </summary>
         bool ThrowOnUnhandledException { get; }
 
