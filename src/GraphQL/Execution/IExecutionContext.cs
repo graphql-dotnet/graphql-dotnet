@@ -34,6 +34,5 @@ namespace GraphQL.Execution
         Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
 
         Variables Variables { get; }
-
     }
 }
