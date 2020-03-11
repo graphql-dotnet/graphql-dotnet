@@ -14,7 +14,5 @@ namespace GraphQL.Types
         };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
-
-        public override object Serialize(object value) => ParseValue(value);
     }
 }
