@@ -120,5 +120,41 @@ namespace GraphQL
                 }
             }
         }
+
+        private static readonly object lockExtensions = new object();
+        private static readonly char[] _separators = new char[] { '.' };
+
+        public static object GetExtension(this IResolveFieldContext context, string path)
+        {
+            lock (lockExtensions)
+            {
+             
+            }
+        }
+
+        public static void SetExtension(this IResolveFieldContext context, string path, object value)
+        {
+            lock (lockExtensions)
+            {
+                string[] keys = path.Split(_separators);
+                var values = context.Extensions;
+
+                for (int i = 0; i < keys.Length - 1; ++i)
+                {
+                    if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                    {
+                        values = d;
+                    }
+                    else
+                    {
+                        var temp = new Dictionary<string, object>();
+                        values[keys[i]] = temp; // override value if any
+                        values = temp;
+                    }
+                }
+
+                values[keys[keys.Length - 1]] = value;
+            }
+        }
     }
 }

@@ -41,5 +41,7 @@ namespace GraphQL.Execution
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
 
         public int? MaxParallelExecutionCount { get; set; }
+
+        public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
     }
 }

@@ -73,6 +73,12 @@ namespace GraphQL
 
         /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }
+
+        /// <summary>
+        /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
+        /// protocol however they see fit, and hence there are no additional restrictions on its contents.
+        /// </summary>
+        IDictionary<string, object> Extensions { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>
