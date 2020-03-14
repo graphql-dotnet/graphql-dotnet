@@ -27,9 +27,9 @@ namespace GraphQL.Types
         void Initialize();
 
         /// <summary>
-        /// The <see cref="IFieldNameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.FieldNameConverter"/>.
+        /// The <see cref="INameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.NameConverter"/>.
         /// </summary>
-        IFieldNameConverter FieldNameConverter { get; set; }
+        INameConverter NameConverter { get; set; }
 
         /// <summary>
         /// The 'query' base graph type; required
@@ -141,5 +141,20 @@ namespace GraphQL.Types
         /// access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the __schema introspection field available on the query graph type
+        /// </summary>
+        FieldType SchemaMetaFieldType { get; }
+
+        /// <summary>
+        /// Returns a reference to the __type introspection field available on the query graph type
+        /// </summary>
+        FieldType TypeMetaFieldType { get; }
+
+        /// <summary>
+        /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type
+        /// </summary>
+        FieldType TypeNameMetaFieldType { get; }
     }
 }

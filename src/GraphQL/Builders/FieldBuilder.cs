@@ -1,8 +1,8 @@
 using System;
-using GraphQL.Types;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
-using System.Threading.Tasks;
+using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.DataLoader;
 
@@ -11,14 +11,10 @@ namespace GraphQL.Builders
     public static class FieldBuilder
     {
         public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(Type type = null)
-        {
-            return FieldBuilder<TSourceType, TReturnType>.Create(type);
-        }
+            => FieldBuilder<TSourceType, TReturnType>.Create(type);
 
         public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(IGraphType type)
-        {
-            return FieldBuilder<TSourceType, TReturnType>.Create(type);
-        }
+            => FieldBuilder<TSourceType, TReturnType>.Create(type);
     }
 
     public class FieldBuilder<TSourceType, TReturnType>
@@ -97,19 +93,13 @@ namespace GraphQL.Builders
         }
 
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType> resolve)
-        {
-            return Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
-        }
+            => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType>> resolve)
-        {
-            return Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
-        }
+            => Resolve(new AsyncFieldResolver<TSourceType, TReturnType>(resolve));
 
         public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
-        {
-            return new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
-        }
+            => new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
 
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string description, Action<QueryArgument> configure = null)
             => Argument<TArgumentGraphType>(name, arg =>

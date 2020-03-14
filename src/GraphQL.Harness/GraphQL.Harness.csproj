@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.5.0-alpha0027" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.5.0-alpha0027" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="3.5.0-alpha0060" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.5.0-alpha0060" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.5.0-alpha0060" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.5.0-alpha0060" />
   </ItemGroup>
 
   <ItemGroup>

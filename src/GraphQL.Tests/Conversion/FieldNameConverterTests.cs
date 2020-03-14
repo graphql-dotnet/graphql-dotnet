@@ -6,13 +6,13 @@ using Xunit;
 
 namespace GraphQL.Tests.Conversion
 {
-    public class FieldNameConverterTests : BasicQueryTestBase
+    public class NameConverterTests : BasicQueryTestBase
     {
-        public ISchema build_schema(IFieldNameConverter converter = null, string argument = "Id")
+        public ISchema build_schema(INameConverter converter = null, string argument = "Id")
         {
             var schema = new Schema
             {
-                FieldNameConverter = converter ?? CamelCaseFieldNameConverter.Instance
+                NameConverter = converter ?? CamelCaseNameConverter.Instance
             };
 
             var person = new ObjectGraphType { Name = "Person" };
@@ -54,13 +54,13 @@ namespace GraphQL.Tests.Conversion
         [Fact]
         public void pascal_case_ignores_aliases()
         {
-            var converter = new PascalCaseFieldNameConverter();
+            var converter = new PascalCaseNameConverter();
 
             AssertQuerySuccess(_ =>
             {
                 _.Schema = build_schema(converter);
                 _.Query = "{ PeRsoN { naME: Name } }";
-                _.FieldNameConverter = converter;
+                _.NameConverter = converter;
             },
             @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
@@ -68,12 +68,12 @@ namespace GraphQL.Tests.Conversion
         [Fact]
         public void default_case_ignores_aliases()
         {
-            var converter = new DefaultFieldNameConverter();
+            var converter = new DefaultNameConverter();
             AssertQuerySuccess(_ =>
             {
                 _.Schema = build_schema(converter);
                 _.Query = "{ PeRsoN { naME: Name } }";
-                _.FieldNameConverter = converter;
+                _.NameConverter = converter;
             },
             @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
@@ -92,7 +92,7 @@ namespace GraphQL.Tests.Conversion
         [Fact]
         public void arguments_can_use_pascal_case()
         {
-            var schema = build_schema(new PascalCaseFieldNameConverter(), "iD");
+            var schema = build_schema(new PascalCaseNameConverter(), "iD");
             schema.Initialize();
 
             var query = schema.FindType("Query") as IObjectGraphType;

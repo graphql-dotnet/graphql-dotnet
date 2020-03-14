@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
@@ -16,14 +15,8 @@ namespace GraphQL.Resolvers
             _property = property.Compile();
         }
 
-        public TProperty Resolve(IResolveFieldContext context)
-        {
-            return _property((TSourceType)context.Source);
-        }
+        public TProperty Resolve(IResolveFieldContext context) => _property((TSourceType)context.Source);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
+        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 }

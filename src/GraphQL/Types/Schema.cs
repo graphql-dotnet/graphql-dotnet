@@ -59,7 +59,7 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         public bool Initialized => _lookup?.IsValueCreated == true;
 
@@ -97,15 +97,6 @@ namespace GraphQL.Types
         /// </returns>
         object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
-        /// <summary>
-        /// The service provider used to create objects, such as graph types, requested by the schema.
-        /// <br/><br/>
-        /// Note that most objects are created during schema initialization, which then have the same lifetime as the schema's lifetime.
-        /// <br/><br/>
-        /// Other types created by the service provider may include directives, middleware, validation rules, and name converters, among others.
-        /// </summary>
-        public IServiceProvider Services { get; set; }
-
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         public IEnumerable<DirectiveGraphType> Directives
@@ -129,6 +120,12 @@ namespace GraphQL.Types
                 .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+
+        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+
+        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+
+        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
         public void RegisterType(IGraphType type)
         {
@@ -298,7 +295,7 @@ namespace GraphQL.Types
                 types,
                 _directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                FieldNameConverter,
+                NameConverter,
                 seal: true);
         }
     }

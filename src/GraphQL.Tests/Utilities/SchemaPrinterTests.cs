@@ -1181,8 +1181,6 @@ enum __TypeKind {
                 Name = "Odd";
             }
 
-            public override object Serialize(object value) => null;
-
             public override object ParseValue(object value) => null;
 
             public override object ParseLiteral(IValue value) => null;

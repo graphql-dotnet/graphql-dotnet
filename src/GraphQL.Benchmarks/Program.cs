@@ -11,20 +11,20 @@ namespace GraphQL.Benchmarks
         private static void Main(string[] args)
         {
             if (args.Length == 0)
-                BenchmarkRunner.Run<DeserializationBenchmark>();
+                BenchmarkRunner.Run<SerializationBenchmark>();
             else
                 RunMemoryProfilerPayload();
         }
 
         private static void RunMemoryProfilerPayload()
         {
-            var bench = new DeserializationBenchmark();
+            var bench = new SerializationBenchmark();
             bench.GlobalSetup();
 
             int count = 0;
             while (true)
             {
-                bench.SystemTextJson();
+                bench.SystemTextJson().Wait();
 
                 Thread.Sleep(10);
 

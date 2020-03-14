@@ -9,13 +9,11 @@ namespace GraphQL.Subscription
 
         public SubscriptionExecutionResult()
         {
-
         }
 
         public SubscriptionExecutionResult(ExecutionResult result)
             : base(result)
         {
-
         }
     }
 }

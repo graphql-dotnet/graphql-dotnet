@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Types;
 
 namespace GraphQL.Resolvers
 {
@@ -15,15 +14,9 @@ namespace GraphQL.Resolvers
             _resolver = resolver;
         }
 
-        public TReturnType Resolve(IResolveFieldContext context)
-        {
-            return _resolver(context);
-        }
+        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context);
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
+        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 
     /// <summary>
@@ -40,14 +33,8 @@ namespace GraphQL.Resolvers
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
-        public TReturnType Resolve(IResolveFieldContext context)
-        {
-            return _resolver(context.As<TSourceType>());
-        }
+        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context.As<TSourceType>());
 
-        object IFieldResolver.Resolve(IResolveFieldContext context)
-        {
-            return Resolve(context);
-        }
+        object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }
 }

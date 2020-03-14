@@ -378,7 +378,7 @@ namespace GraphQL.Execution
             if (context.Listeners != null)
                 foreach (var listener in context.Listeners)
                 {
-                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                    await listener.BeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
                 }
         }
