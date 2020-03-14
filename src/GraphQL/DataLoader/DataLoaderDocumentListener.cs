@@ -18,9 +18,7 @@ namespace GraphQL.DataLoader
         }
 
         public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
-        {
-            return Task.CompletedTask;
-        }
+            => Task.CompletedTask;
 
         public Task BeforeExecutionAsync(IExecutionContext context)
         {
@@ -31,9 +29,7 @@ namespace GraphQL.DataLoader
         }
 
         public Task BeforeExecutionAwaitedAsync(IExecutionContext context)
-        {
-            return Task.CompletedTask;
-        }
+            => Task.CompletedTask;
 
         public Task AfterExecutionAsync(IExecutionContext context)
         {
@@ -43,8 +39,6 @@ namespace GraphQL.DataLoader
         }
 
         public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context)
-        {
-            return Task.CompletedTask;
-        }
+            => Task.CompletedTask;
     }
 }
