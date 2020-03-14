@@ -71,6 +71,8 @@ namespace GraphQL
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 
+        public IDictionary<string, object> Extensions => _baseContext.Extensions;
+
         object IResolveFieldContext.Source => Source;
     }
 }

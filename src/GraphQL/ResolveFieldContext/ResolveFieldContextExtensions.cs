@@ -120,5 +120,92 @@ namespace GraphQL
                 }
             }
         }
+
+        private static readonly char[] _separators = new char[] { '.' };
+
+        /// <summary>
+        /// Thread safe method to get value by path (key1.key2.keyN) from extensions dictionary.
+        /// </summary>
+        /// <param name="context">Context with extensions response map.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
+        public static object GetExtension(this IResolveFieldContext context, string path)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (context.Extensions == null || context.Extensions.Count == 0)
+                return null;
+
+            lock (context.Extensions)
+            {
+                var values = context.Extensions;
+
+                if (path.IndexOf('.') != -1)
+                {
+                    string[] keys = path.Split(_separators);
+
+                    for (int i = 0; i < keys.Length - 1; ++i)
+                    {
+                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                            values = d;
+                        else
+                            return null;
+                    }
+
+                    return values.TryGetValue(keys[keys.Length - 1], out object result) ? result : null;
+                }
+                else
+                {
+                    return values.TryGetValue(path, out object result) ? result : null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Thread safe method to set value by path (key1.key2.keyN) to extensions dictionary.
+        /// if the given path or its part contains values, then they will be overwritten.
+        /// </summary>
+        /// <param name="context">Context with extensions response map.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <param name="value">Value to set.</param>
+        public static void SetExtension(this IResolveFieldContext context, string path, object value)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (context.Extensions == null)
+                throw new ArgumentException("Extensions property is null", nameof(context));
+
+            lock (context.Extensions)
+            {
+                var values = context.Extensions;
+
+                if (path.IndexOf('.') != -1)
+                {
+                    string[] keys = path.Split(_separators);
+
+                    for (int i = 0; i < keys.Length - 1; ++i)
+                    {
+                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                        {
+                            values = d;
+                        }
+                        else
+                        {
+                            var temp = new Dictionary<string, object>();
+                            values[keys[i]] = temp; // overwrite value if any
+                            values = temp;
+                        }
+                    }
+
+                    values[keys[keys.Length - 1]] = value;
+                }
+                else
+                {
+                    values[path] = value;
+                }
+            }
+        }
     }
 }

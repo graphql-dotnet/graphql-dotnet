@@ -52,6 +52,8 @@ namespace GraphQL
 
         public IDictionary<string, Field> SubFields { get; set; }
 
+        public IDictionary<string, object> Extensions { get; set; }
+
         public ResolveFieldContext() { }
 
         /// <summary>
@@ -78,6 +80,7 @@ namespace GraphQL
             Errors = context.Errors;
             SubFields = context.SubFields;
             Path = context.Path;
+            Extensions = context.Extensions;
         }
     }
 
@@ -133,6 +136,7 @@ namespace GraphQL
             CancellationToken = context.CancellationToken;
             Metrics = context.Metrics;
             Errors = context.Errors;
+            Extensions = context.Extensions;
             Path = path;
         }
     }
