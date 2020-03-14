@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <Description>GraphQL for .NET</Description>
-    <VersionPrefix>3.0.0</VersionPrefix>
     <Authors>Joe McBride</Authors>
     <Copyright>Copyright 2015-2017 Joseph T. McBride et al. All rights reserved.</Copyright>
     <TargetFramework>netstandard2.0</TargetFramework>
