@@ -121,7 +121,6 @@ namespace GraphQL
             }
         }
 
-        private static readonly object _lockExtensions = new object();
         private static readonly char[] _separators = new char[] { '.' };
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace GraphQL
             if (context.Extensions == null || context.Extensions.Count == 0)
                 return null;
 
-            lock (_lockExtensions)
+            lock (context.Extensions)
             {
                 var values = context.Extensions;
 
@@ -178,7 +177,7 @@ namespace GraphQL
             if (context.Extensions == null)
                 throw new ArgumentException("Extensions property is null", nameof(context));
 
-            lock (_lockExtensions)
+            lock (context.Extensions)
             {
                 var values = context.Extensions;
 
