@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
-    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
   </ItemGroup>
 
 </Project>
