@@ -34,10 +34,6 @@ namespace GraphQL.Execution
 
         public bool ThrowOnUnhandledException { get; set; }
 
-        /// <summary>
-        /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
-        /// This can be useful for hiding error messages that reveal server implementation details.
-        /// </summary>
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
 
         public int? MaxParallelExecutionCount { get; set; }
