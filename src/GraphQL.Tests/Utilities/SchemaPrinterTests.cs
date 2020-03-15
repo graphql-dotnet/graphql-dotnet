@@ -1027,6 +1027,7 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  description: String
   # A list of all types supported by this server.
   types: [__Type!]!
   # The type that query operations will be rooted at.

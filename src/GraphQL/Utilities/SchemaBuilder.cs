@@ -159,6 +159,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (schemaDef != null)
             {
+                schema.Description = schemaDef.Comment?.Text;
+
                 foreach (var operationTypeDef in schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;

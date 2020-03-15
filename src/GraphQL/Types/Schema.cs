@@ -70,6 +70,8 @@ namespace GraphQL.Types
             FindType("____");
         }
 
+        public string Description { get; set; }
+
         public IObjectGraphType Query { get; set; }
 
         public IObjectGraphType Mutation { get; set; }

@@ -1883,6 +1883,7 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        string Description { get; set; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
         GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         bool Initialized { get; }
@@ -2040,6 +2041,7 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        public string Description { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
