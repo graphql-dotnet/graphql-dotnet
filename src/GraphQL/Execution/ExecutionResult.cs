@@ -14,7 +14,7 @@ namespace GraphQL
         public object Data { get; set; }
 
         /// <summary>
-        /// Returns a set of errors that occurred during processing. This property is typically serialized as part of the GraphQL json response.
+        /// Returns a set of errors that occurred during any stage of processing (parsing, validating, executing, etc.). This property is serialized as part of the GraphQL json response.
         /// </summary>
         public ExecutionErrors Errors { get; set; }
 
