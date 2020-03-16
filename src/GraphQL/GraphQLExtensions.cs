@@ -464,7 +464,7 @@ namespace GraphQL
                 var converter = schema.FindValueConverter(serialized, type);
                 return converter != null
                     ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert value to AST: {serialized}");
+                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
             }
         }
     }
