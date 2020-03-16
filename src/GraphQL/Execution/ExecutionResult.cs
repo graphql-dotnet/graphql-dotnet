@@ -9,7 +9,7 @@ namespace GraphQL
     public class ExecutionResult
     {
         /// <summary>
-        /// Returns the data from the graph resolvers. This property is typically serialized as part of the GraphQL json response.
+        /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public object Data { get; set; }
 
