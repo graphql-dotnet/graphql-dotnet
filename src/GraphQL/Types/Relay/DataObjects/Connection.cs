@@ -12,10 +12,7 @@ namespace GraphQL.Types.Relay.DataObjects
 
         public List<TEdge> Edges { get; set; }
 
-        public List<TNode> Items
-        {
-            get { return Edges?.Select(edge => edge.Node).ToList(); }
-        }
+        public List<TNode> Items => Edges?.Select(edge => edge.Node).ToList();
     }
 
     public class Connection<TNode> : Connection<TNode, Edge<TNode>>

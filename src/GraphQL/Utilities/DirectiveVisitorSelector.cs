@@ -8,7 +8,7 @@ namespace GraphQL.Utilities
 {
     public class DirectiveVisitorSelector : IVisitorSelector
     {
-        private IDictionary<string, Type> _directiveVisitors;
+        private readonly IDictionary<string, Type> _directiveVisitors;
         private readonly Func<Type, SchemaDirectiveVisitor> _typeResolver;
 
         public DirectiveVisitorSelector(

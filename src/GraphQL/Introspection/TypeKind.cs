@@ -22,6 +22,9 @@ namespace GraphQL.Introspection
         NON_NULL = 7
     }
 
+    /// <summary>
+    /// Shared and already boxed instances of <see cref="TypeKind"/> to avoid further boxing at runtime.
+    /// </summary>
     internal static class TypeKindBoxed
     {
         public static readonly object SCALAR = TypeKind.SCALAR;

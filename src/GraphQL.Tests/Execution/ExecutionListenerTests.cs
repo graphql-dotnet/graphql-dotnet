@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Execution
                 opts.UserContext = userContext;
                 opts.Listeners.Add(new TestExecutionListener());
                 opts.ExposeExceptions = true;
-            }, @"{ foo: ""bar"" }");
+            }, @"{ ""foo"": ""bar"" }");
 
             breaker.Dispose();
         }
@@ -43,17 +43,18 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestExecutionListener : DocumentExecutionListenerBase<TestContext>
+        public class TestExecutionListener : DocumentExecutionListenerBase
         {
-            public override Task BeforeExecutionAwaitedAsync(TestContext userContext, CancellationToken token)
+            public override Task BeforeExecutionAwaitedAsync(IExecutionContext context)
             {
-                userContext.Complete("bar");
+                var testContext = context.UserContext as TestContext;
+                testContext.Complete("bar");
 
                 return Task.CompletedTask;
             }
         }
 
-        public class TestContext: Dictionary<string, object>
+        public class TestContext : Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 

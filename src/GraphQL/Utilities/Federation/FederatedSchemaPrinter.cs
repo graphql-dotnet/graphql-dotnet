@@ -26,7 +26,7 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private CoreToVanillaConverter _converter;
+        private readonly CoreToVanillaConverter _converter;
 
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)

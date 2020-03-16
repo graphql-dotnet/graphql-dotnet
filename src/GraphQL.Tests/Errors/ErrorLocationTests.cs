@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Errors
 
                 FieldAsync<StringGraphType>(
                     "testasync",
-                    resolve: _ => { throw new Exception("wat"); });
+                    resolve: _ => throw new Exception("wat"));
 
                 Field<TestSubObject>()
                     .Name("testSub")

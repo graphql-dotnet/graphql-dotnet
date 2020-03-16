@@ -51,7 +51,7 @@ namespace GraphQL.Tests.Execution.Cancellation
         {
             using (var tokenSource = new CancellationTokenSource())
             {
-                AssertQuerySuccess("{one}", "{one: 'one'}", cancellationToken: tokenSource.Token);
+                AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
             }
         }
 

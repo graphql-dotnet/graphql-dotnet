@@ -10,28 +10,28 @@ namespace GraphQL.NewtonsoftJson
         /// <summary>
         /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
-        /// <param name="json">A JSON formatted string.</param>
+        /// <param name="json">A JSON-formatted string.</param>
         /// <returns>Inputs.</returns>
         public static Inputs ToInputs(this string json)
         {
-            var dictionary = json != null ? ToDictionary(json) : null;
-            return dictionary == null
-                ? new Inputs()
-                : new Inputs(dictionary);
+            var dictionary = json?.ToDictionary();
+            return dictionary.ToInputs();
         }
 
         /// <summary>
         /// Converts a JSON object into a dictionary.
         /// </summary>
+        /// <remarks>
+        /// Used by GraphQL.Transports.AspNetCore.NewtonsoftJson project in server repo.
+        /// </remarks>
         public static Inputs ToInputs(this JObject obj)
         {
-            var variables = obj?.GetValue() as Dictionary<string, object>
-                            ?? new Dictionary<string, object>();
-            return new Inputs(variables);
+            var variables = obj?.GetValue() as Dictionary<string, object>;
+            return variables.ToInputs();
         }
 
         /// <summary>
-        /// Converts a JSON formatted string into a the dictionary.
+        /// Converts a JSON-formatted string into a dictionary.
         /// </summary>
         /// <param name="json">The json.</param>
         /// <returns>Returns a <c>null</c> if the object cannot be converted into a dictionary.</returns>
