@@ -44,7 +44,7 @@ namespace GraphQL
         public bool ExposeExceptions { get; set; }
 
         /// <summary>
-        /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is typically serialized as part of the GraphQL json response.
+        /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public Dictionary<string, object> Extensions { get; set; }
 
