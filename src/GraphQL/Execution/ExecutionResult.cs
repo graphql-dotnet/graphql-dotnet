@@ -19,7 +19,7 @@ namespace GraphQL
         public ExecutionErrors Errors { get; set; }
 
         /// <summary>
-        /// Returns the original query.
+        /// Returns the original GraphQL query.
         /// </summary>
         public string Query { get; set; }
 
