@@ -268,7 +268,7 @@ public override object Serialize(object value)
 
 This implementation may surprise you. Why is `Serialize`, which is used for output, implemented identically to `ParseValue`, which is used for input? Why does `Serialize` return an object, rather than a string or byte array? It helps to understand a few internals of the library.
 
-- `Serialize` will be called during query execution, and should be passed an instance of `Vector3` from a field resolver
+- `Serialize` will be called during query execution, and should be passed an instance of `Vector3` from a field resolver.
 
 - `Serialize` is _also_ called when reading variables from the client so that variables can be converted to `IValue` instances. In the case of `Vector3Type`, `value` will be a string during this process.
 
