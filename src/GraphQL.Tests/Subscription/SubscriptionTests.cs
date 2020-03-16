@@ -220,7 +220,7 @@ namespace GraphQL.Tests.Subscription
                     DisplayName = "test",
                     Id = "1"
                 },
-                SentAt = DateTime.Now
+                SentAt = DateTime.Now.Date
             };
             var chat = new Chat();
             var schema = new ChatSchema(chat);
