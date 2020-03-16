@@ -31,6 +31,8 @@ namespace GraphQL.Types
         /// </summary>
         INameConverter NameConverter { get; set; }
 
+        string Description { get; set; }
+
         /// <summary>
         /// The 'query' base graph type; required
         /// </summary>
