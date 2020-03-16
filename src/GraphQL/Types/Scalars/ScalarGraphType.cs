@@ -4,6 +4,8 @@ namespace GraphQL.Types
 {
     /// <summary>
     /// Scalar types represent the leaves of the query - those fields that don't have any sub-fields.
+    /// <br/><br/>
+    /// <see href="https://github.com/graphql-dotnet/graphql-dotnet/blob/master/docs2/site/docs/getting-started/custom-scalars.md">More info</see> about scalars.
     /// </summary>
     public abstract class ScalarGraphType : GraphType
     {
