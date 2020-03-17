@@ -14,6 +14,10 @@ namespace GraphQL.Language.AST
 
         public NameNode NameNode { get; }
 
+        public string Comment => CommentNode?.Comment;
+
+        public CommentNode CommentNode { get; set; }
+
         public Directives Directives { get; set; }
 
         public override IEnumerable<INode> Children => Directives;

@@ -23,6 +23,8 @@ namespace GraphQL.Language.AST
 
         public string Name => NameNode?.Name;
         public NameNode NameNode { get; set; }
+        public string Comment => CommentNode?.Comment;
+        public CommentNode CommentNode { get; set; }
         public IType Type { get; set; }
         public IValue DefaultValue { get; set; }
 

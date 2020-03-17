@@ -16,6 +16,10 @@ namespace GraphQL.Language.AST
 
         public string Name => NamedNode?.Name;
         public NameNode NamedNode { get; }
+
+        public string Comment => CommentNode?.Comment;
+        public CommentNode CommentNode { get; set; }
+
         public IValue Value { get; set; }
 
         public override IEnumerable<INode> Children

@@ -34,6 +34,10 @@ namespace GraphQL.Language.AST
             }
         }
 
+        public string Comment => CommentNode?.Comment;
+
+        public CommentNode CommentNode { get; set; }
+
         public override string ToString()
         {
             return "InlineFragment{{typeCondition={0}, directives={1}, selections={2}}}"
