@@ -983,6 +983,8 @@ namespace GraphQL.Language.AST
         public Argument() { }
         public Argument(GraphQL.Language.AST.NameNode name) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NamedNode { get; }
         public GraphQL.Language.AST.IValue Value { get; set; }
@@ -1014,6 +1016,12 @@ namespace GraphQL.Language.AST
     {
         public ByteValue(byte value) { }
         protected override bool Equals(GraphQL.Language.AST.ValueNode<byte> other) { }
+    }
+    public class CommentNode : GraphQL.Language.AST.AbstractNode
+    {
+        public CommentNode(string comment) { }
+        public string Comment { get; }
+        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
     }
     public class DateTimeOffsetValue : GraphQL.Language.AST.ValueNode<System.DateTimeOffset>
     {
@@ -1082,6 +1090,8 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode AliasNode { get; }
         public GraphQL.Language.AST.Arguments Arguments { get; set; }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
@@ -1107,6 +1117,8 @@ namespace GraphQL.Language.AST
     {
         public FragmentDefinition(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
@@ -1120,6 +1132,8 @@ namespace GraphQL.Language.AST
     {
         public FragmentSpread(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
@@ -1165,6 +1179,8 @@ namespace GraphQL.Language.AST
     {
         public InlineFragment() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.NamedType Type { get; set; }
@@ -1255,6 +1271,8 @@ namespace GraphQL.Language.AST
     {
         public Operation(GraphQL.Language.AST.NameNode name) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
@@ -1362,6 +1380,8 @@ namespace GraphQL.Language.AST
         public VariableDefinition() { }
         public VariableDefinition(GraphQL.Language.AST.NameNode node) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
+        public string Comment { get; }
+        public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.IValue DefaultValue { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; set; }
@@ -1404,6 +1424,7 @@ namespace GraphQL.Language
     {
         public void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         public GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
+        public GraphQL.Language.AST.CommentNode Comment(GraphQLParser.AST.GraphQLComment comment) { }
         public GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
         public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
         public GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
