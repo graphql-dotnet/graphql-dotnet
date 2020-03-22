@@ -11,9 +11,17 @@ namespace GraphQL.Language.AST
 
         public string Comment { get; }
 
-        public override bool IsEqualTo(INode node)
+        protected bool Equals(CommentNode other) => string.Equals(Comment, other.Comment, StringComparison.InvariantCulture);
+
+        public override bool IsEqualTo(INode obj)
         {
-            throw new NotImplementedException();
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
+            return Equals((CommentNode)obj);
         }
     }
 }

@@ -11,11 +11,11 @@ namespace GraphQL.Language.AST
 
         public Argument(NameNode name)
         {
-            NamedNode = name;
+            NameNode = name;
         }
 
-        public string Name => NamedNode?.Name;
-        public NameNode NamedNode { get; }
+        public string Name => NameNode?.Name;
+        public NameNode NameNode { get; }
 
         public string Comment => CommentNode?.Comment;
         public CommentNode CommentNode { get; set; }

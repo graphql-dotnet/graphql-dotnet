@@ -45,35 +45,6 @@ query _ {
         }
 
         [Fact]
-        public void query_comment_should_be_null()
-        {
-            const string query = @"
-query _ {
-    person {
-        name
-    }
-}";
-
-            var document = CoreToVanillaConverter.Convert(query, _parser.Parse(new Source(query)));
-            document.Operations.First().SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
-        }
-
-        [Fact]
-        public void query_comment_should_not_be_null()
-        {
-            const string query = @"
-query _ {
-    #comment
-    person {
-        name
-    }
-}";
-
-            var document = CoreToVanillaConverter.Convert(query, _parser.Parse(new Source(query)));
-            document.Operations.First().SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment");
-        }
-
-        [Fact]
         public void field_comment_should_be_null()
         {
             const string query = @"
@@ -85,6 +56,8 @@ query _ {
 
             var document = CoreToVanillaConverter.Convert(query, _parser.Parse(new Source(query)));
             document.Operations.First()
+                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
+            document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
         }
@@ -94,16 +67,19 @@ query _ {
         {
             const string query = @"
 query _ {
+    #comment1
     person {
-        #comment
+        #comment2
         name
     }
 }";
 
             var document = CoreToVanillaConverter.Convert(query, _parser.Parse(new Source(query)));
             document.Operations.First()
+                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment1");
+            document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment");
+                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment2");
         }
 
         [Fact]
