@@ -101,7 +101,7 @@ fragment human on person {
             document.Fragments.First().Comment.ShouldBe("comment");
         }
 
-        //[Fact]
+        [Fact]
         public void fragmentspread_comment_should_not_be_null()
         {
             const string query = @"
@@ -122,7 +122,7 @@ fragment human on person {
                 .SelectionSet.Selections.OfType<FragmentSpread>().First().Comment.ShouldBe("comment");
         }
 
-        //[Fact]
+        [Fact]
         public void inlinefragment_comment_should_not_be_null()
         {
             const string query = @"
@@ -159,7 +159,7 @@ query _ {
                 .Arguments.First().Comment.ShouldBe("comment");
         }
 
-        //[Fact]
+        [Fact]
         public void variable_comment_should_not_be_null()
         {
             const string query = @"

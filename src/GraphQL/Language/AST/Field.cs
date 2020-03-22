@@ -19,9 +19,6 @@ namespace GraphQL.Language.AST
         public string Name => NameNode?.Name;
         public NameNode NameNode { get; }
 
-        public string Comment => CommentNode?.Comment;
-        public CommentNode CommentNode { get; set; }
-
         public string Alias { get; set; }
         public NameNode AliasNode { get; }
 

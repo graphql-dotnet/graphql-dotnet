@@ -14,10 +14,6 @@ namespace GraphQL.Language.AST
 
         public NameNode NameNode { get; }
 
-        public string Comment => CommentNode?.Comment;
-
-        public CommentNode CommentNode { get; set; }
-
         public NamedType Type { get; set; }
 
         public Directives Directives { get; set; }
