@@ -4,16 +4,14 @@ namespace GraphQL.Language.AST
 {
     public class CommentNode : AbstractNode
     {
-        protected string _comment;
-
-        public CommentNode(string comment)
+        public CommentNode(string value)
         {
-            _comment = comment;
+            Value = value;
         }
 
-        public new string Comment => _comment;
+        public string Value { get; }
 
-        protected bool Equals(CommentNode other) => string.Equals(Comment, other.Comment, StringComparison.InvariantCulture);
+        protected bool Equals(CommentNode other) => string.Equals(Value, other.Value, StringComparison.InvariantCulture);
 
         public override bool IsEqualTo(INode obj)
         {

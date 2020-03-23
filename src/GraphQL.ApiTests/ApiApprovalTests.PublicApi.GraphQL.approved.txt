@@ -1019,9 +1019,8 @@ namespace GraphQL.Language.AST
     }
     public class CommentNode : GraphQL.Language.AST.AbstractNode
     {
-        protected string _comment;
-        public CommentNode(string comment) { }
-        public new string Comment { get; }
+        public CommentNode(string value) { }
+        public string Value { get; }
         protected bool Equals(GraphQL.Language.AST.CommentNode other) { }
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
     }
