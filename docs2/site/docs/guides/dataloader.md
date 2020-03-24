@@ -53,18 +53,10 @@ public class MySchema : Schema
 services.AddSingleton<MySchema>();
 ```
 
-4. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+4. Add the service for DataLoader support.
 
 ``` csharp
-var listener = Services.GetRequiredService<DataLoaderDocumentListener>();
-
-var executer = new DocumentExecuter();
-var result = executer.ExecuteAsync(opts => {
-
-	...
-
-	opts.Listeners.Add(listener);
-});
+services.AddGraphQL().AddDataLoader();
 ```
 
 ## Usage
