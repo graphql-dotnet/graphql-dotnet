@@ -96,7 +96,7 @@ namespace GraphQL
     public class ExecutionResult
     {
         public ExecutionResult() { }
-        protected ExecutionResult(GraphQL.ExecutionResult result) { }
+        public ExecutionResult(GraphQL.ExecutionResult result) { }
         public object Data { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }

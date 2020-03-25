@@ -52,7 +52,7 @@ namespace GraphQL
         {
         }
 
-        protected ExecutionResult(ExecutionResult result)
+        public ExecutionResult(ExecutionResult result)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
