@@ -11,11 +11,12 @@ namespace GraphQL.Language.AST
 
         public Argument(NameNode name)
         {
-            NamedNode = name;
+            NameNode = name;
         }
 
-        public string Name => NamedNode?.Name;
-        public NameNode NamedNode { get; }
+        public string Name => NameNode?.Name;
+        public NameNode NameNode { get; }
+
         public IValue Value { get; set; }
 
         public override IEnumerable<INode> Children
