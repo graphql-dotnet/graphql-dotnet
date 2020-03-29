@@ -6,6 +6,7 @@ namespace GraphQL.Tests.Introspection
 @"{
   ""data"": {
     ""__schema"": {
+      ""description"": null,
       ""queryType"": {
         ""name"": ""TestQuery""
       },
@@ -227,6 +228,19 @@ namespace GraphQL.Tests.Introspection
           ""name"": ""__Schema"",
           ""description"": ""A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations."",
           ""fields"": [
+            {
+              ""name"": ""description"",
+              ""description"": null,
+              ""args"": [],
+              ""type"": {
+                ""kind"": ""SCALAR"",
+                ""name"": ""String"",
+                ""ofType"": null
+              },
+              ""isDeprecated"": false,
+              ""deprecationReason"": null,
+              ""directives"": []
+            },
             {
               ""name"": ""directives"",
               ""description"": ""A list of all directives supported by this server."",

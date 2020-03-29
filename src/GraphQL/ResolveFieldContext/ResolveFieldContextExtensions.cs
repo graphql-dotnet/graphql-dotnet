@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -27,7 +28,8 @@ namespace GraphQL
 
         private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
         {
-            string argumentName = context.Schema?.FieldNameConverter.NameFor(name, null) ?? name;
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
 
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
@@ -35,7 +37,7 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg is Dictionary<string, object> inputObject)
+            if (arg is IDictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
                 {
@@ -55,7 +57,22 @@ namespace GraphQL
         }
 
         /// <summary>Determines if the specified field argument has been provided in the GraphQL query request</summary>
-        public static bool HasArgument(this IResolveFieldContext context, string argumentName) => context.Arguments?.ContainsKey(argumentName) ?? false;
+        public static bool HasArgument(this IResolveFieldContext context, string name)
+        {
+            var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+            var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
+            return context.Arguments?.ContainsKey(argumentName) ?? false;
+        }
+
+        /// <summary>
+        /// Determines if this graph type is an introspection type
+        /// </summary>
+        private static bool IsIntrospectionType(this IGraphType graphType) => graphType?.Name?.StartsWith("__") ?? false;
+
+        /// <summary>
+        /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
+        /// </summary>
+        private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
@@ -100,6 +117,93 @@ namespace GraphQL
                 {
                     var result = error(context.Errors);
                     return result == null ? default : await result.ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static readonly char[] _separators = new char[] { '.' };
+
+        /// <summary>
+        /// Thread safe method to get value by path (key1.key2.keyN) from extensions dictionary.
+        /// </summary>
+        /// <param name="context">Context with extensions response map.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
+        public static object GetExtension(this IResolveFieldContext context, string path)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (context.Extensions == null || context.Extensions.Count == 0)
+                return null;
+
+            lock (context.Extensions)
+            {
+                var values = context.Extensions;
+
+                if (path.IndexOf('.') != -1)
+                {
+                    string[] keys = path.Split(_separators);
+
+                    for (int i = 0; i < keys.Length - 1; ++i)
+                    {
+                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                            values = d;
+                        else
+                            return null;
+                    }
+
+                    return values.TryGetValue(keys[keys.Length - 1], out object result) ? result : null;
+                }
+                else
+                {
+                    return values.TryGetValue(path, out object result) ? result : null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Thread safe method to set value by path (key1.key2.keyN) to extensions dictionary.
+        /// if the given path or its part contains values, then they will be overwritten.
+        /// </summary>
+        /// <param name="context">Context with extensions response map.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <param name="value">Value to set.</param>
+        public static void SetExtension(this IResolveFieldContext context, string path, object value)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (context.Extensions == null)
+                throw new ArgumentException("Extensions property is null", nameof(context));
+
+            lock (context.Extensions)
+            {
+                var values = context.Extensions;
+
+                if (path.IndexOf('.') != -1)
+                {
+                    string[] keys = path.Split(_separators);
+
+                    for (int i = 0; i < keys.Length - 1; ++i)
+                    {
+                        if (values.TryGetValue(keys[i], out object v) && v is IDictionary<string, object> d)
+                        {
+                            values = d;
+                        }
+                        else
+                        {
+                            var temp = new Dictionary<string, object>();
+                            values[keys[i]] = temp; // overwrite value if any
+                            values = temp;
+                        }
+                    }
+
+                    values[keys[keys.Length - 1]] = value;
+                }
+                else
+                {
+                    values[path] = value;
                 }
             }
         }

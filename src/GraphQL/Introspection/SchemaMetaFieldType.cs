@@ -24,6 +24,10 @@ namespace GraphQL.Introspection
                 "exposes all available types and directives on the server, as well as " +
                 "the entry points for query, mutation, and subscription operations.";
 
+            Field<StringGraphType>(
+                "description",
+                resolve: context => context.Schema.Description);
+
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
                 "types",
                 "A list of all types supported by this server.",

@@ -43,7 +43,7 @@ namespace GraphQL.Tests.Utilities.Visitors
         {
             base.VisitFieldDefinition(field);
 
-            var inner = WrapResolver(field.Resolver);
+            var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new AsyncFieldResolver<object>(async context =>
             {
                 var result = await inner.ResolveAsync(context);

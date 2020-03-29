@@ -30,6 +30,7 @@ namespace GraphQL.Tests.Utilities
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
+            schema.Description.ShouldBe("Animals - cats and dogs");
             schema.AllTypes.Count().ShouldBe(35);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");

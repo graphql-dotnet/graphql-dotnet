@@ -22,7 +22,7 @@ namespace GraphQL.Utilities
                 return defaultValue;
             }
 
-            if (arg is Dictionary<string, object> inputObject)
+            if (arg is IDictionary<string, object> inputObject)
             {
                 var type = argumentType;
                 if (type.Namespace?.StartsWith("System", StringComparison.InvariantCulture) == true)

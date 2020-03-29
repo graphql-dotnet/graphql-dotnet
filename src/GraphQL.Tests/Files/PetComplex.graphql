@@ -1,3 +1,8 @@
+#Animals - cats and dogs
+schema {
+  query: Query
+}
+
 type Query {
     animal: Pet
     allAnimalsCount: [Int!] @deprecated(reason: "do not touch!")

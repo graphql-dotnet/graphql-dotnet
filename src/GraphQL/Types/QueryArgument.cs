@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -18,6 +19,8 @@ namespace GraphQL.Types
     {
         private Type _type;
         private IGraphType _resolvedType;
+        private object _defaultValue;
+        private IValue _defaultValueAST;
 
         public QueryArgument(IGraphType type)
         {
@@ -38,7 +41,15 @@ namespace GraphQL.Types
 
         public string Description { get; set; }
 
-        public object DefaultValue { get; set; }
+        public object DefaultValue
+        {
+            get => _defaultValue;
+            set
+            {
+                _defaultValue = value;
+                _defaultValueAST = null;
+            }
+        }
 
         public IGraphType ResolvedType
         {
@@ -70,5 +81,13 @@ namespace GraphQL.Types
 
         private ArgumentOutOfRangeException Create(string paramName, Type value) => new ArgumentOutOfRangeException(paramName,
             $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+
+        internal IValue GetDefaultValueAST(ISchema schema)
+        {
+            if (_defaultValueAST == null && _defaultValue != null)
+                _defaultValueAST = _defaultValue.AstFromValue(schema, ResolvedType);
+
+            return _defaultValueAST;
+        }
     }
 }

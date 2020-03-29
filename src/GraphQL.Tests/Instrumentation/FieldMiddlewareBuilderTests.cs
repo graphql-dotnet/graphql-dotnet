@@ -146,7 +146,7 @@ namespace GraphQL.Tests.Instrumentation
             public string Name { get; set; }
         }
 
-        public class SimpleMiddleware
+        public class SimpleMiddleware : IFieldMiddleware
         {
             public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
             {
