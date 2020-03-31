@@ -116,7 +116,17 @@ namespace GraphQL
                     continue;
 
                 string propertyName = GetPropertyName(item.Key, out var field);
-                var propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo propertyInfo = null;
+
+                try
+                {
+                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                }
+
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
                     object value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);

@@ -13,24 +13,41 @@ namespace GraphQL.Tests.Bugs
             {
                 Arguments = new Dictionary<string, object>
                 {
-                    ["object"] = new Dictionary<string, object>
+                    ["root"] = new Dictionary<string, object>
                     {
-                        ["MyProperty"] = "graphql"
+                        ["MyChildProperty"] = new Dictionary<string, object>
+                        {
+                            ["MyProperty"] = "graphql"
+                        }
                     }
                 }
             };
 
-            var arg = context.GetArgument<MyDerivedType>("object");
-            arg.MyProperty.ShouldBe("graphql");
-            (arg as MyBaseType).MyProperty.ShouldBeNull();
+            var arg = context.GetArgument<MyDerivedType>("root");
+
+            arg.MyChildProperty.ShouldNotBeNull();
+            (arg as MyBaseType).MyChildProperty.ShouldBeNull();
+
+            arg.MyChildProperty.MyProperty.ShouldBe("graphql");
+            (arg.MyChildProperty as MyChildBaseType).MyProperty.ShouldBeNull();
         }
 
-        public class MyBaseType
+        private class MyBaseType
+        {
+            public MyChildBaseType MyChildProperty { get; set; }
+        }
+
+        private class MyDerivedType : MyBaseType
+        {
+            public new MyChildDerivedType MyChildProperty { get; set; }
+        }
+
+        private class MyChildBaseType
         {
             public string MyProperty { get; set; }
         }
 
-        public class MyDerivedType : MyBaseType
+        private class MyChildDerivedType : MyChildBaseType
         {
             public new string MyProperty { get; set; }
         }
