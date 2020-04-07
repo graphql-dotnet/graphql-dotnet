@@ -214,7 +214,13 @@ namespace GraphQL.Language
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
-                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    // If the value doesn't fit in an long, revert to using decimal...
+                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    {
+                        return new DecimalValue(decimalResult).WithLocation(str, _body);
+                    }
+
+                    // If the value doesn't fit in an decimal, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
