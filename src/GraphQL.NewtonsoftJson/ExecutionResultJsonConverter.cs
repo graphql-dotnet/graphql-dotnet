@@ -12,8 +12,8 @@ namespace GraphQL.NewtonsoftJson
             {
                 writer.WriteStartObject();
 
-                WriteData(result, writer, serializer);
                 WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+                WriteData(result, writer, serializer);
                 WriteExtensions(result, writer, serializer);
 
                 writer.WriteEndObject();
