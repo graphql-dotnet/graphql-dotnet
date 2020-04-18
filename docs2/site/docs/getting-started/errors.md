@@ -45,4 +45,32 @@ modify or just log the unhandled exception from your resolver before wrap it int
 `ExecutionError`. This can be useful for hiding error messages that reveal server
 implementation details.
 
+```csharp
+var executor = new DocumentExecutor();
+ExecutionResult result = await executor.ExecuteAsync(_ =>
+{
+  _.Query = "...";
+  _.UnhandledExceptionDelegate = context => context.ErrorMessage = "Error Message";
+});
+```
+
+Set `ExecutionOptions.ThrowOnUnhandledException` to `true` in cases where the thrown exception needs to propagate to an enclosing or global handler.
+
+**Note:** `UnhandledExceptionDelegate` will not be invoked in the case `ThrowOnUnhandledException` is `true`.
+
+```csharp
+try
+{
+  result = await executor.ExecuteAsync(_ =>
+  {
+    _.Query = "...";
+    _.ThrowOnUnhandledException = true;
+  });
+}
+catch (Exception ex)
+{
+  logger.Error(ex, "Error Message");
+}
+```
+
 You can provide additional error handling or logging for fields by adding Field Middleware.
