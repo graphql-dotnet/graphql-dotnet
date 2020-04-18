@@ -56,16 +56,18 @@ ExecutionResult result = await executor.ExecuteAsync(_ =>
 
 Set `ExecutionOptions.ThrowOnUnhandledException` to `true` in cases where the thrown exception needs to propagate to an enclosing or global handler.
 
-**Note:** `UnhandledExceptionDelegate` will not be invoked in the case `ThrowOnUnhandledException` is `true`.
+Note that `UnhandledExceptionDelegate` will not be invoked in the case `ThrowOnUnhandledException` is `true`.
 
 ```csharp
 try
 {
-  result = await executor.ExecuteAsync(_ =>
+  var result = await executor.ExecuteAsync(_ =>
   {
     _.Query = "...";
     _.ThrowOnUnhandledException = true;
   });
+  
+  //Process result...
 }
 catch (Exception ex)
 {
