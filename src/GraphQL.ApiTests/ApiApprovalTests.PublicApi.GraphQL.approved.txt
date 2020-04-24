@@ -30,6 +30,7 @@ namespace GraphQL
     }
     public static class EnumerableExtensions
     {
+        public static void Apply(this System.Collections.IDictionary items, System.Action<object, object> action) { }
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
         public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
     }
@@ -50,8 +51,6 @@ namespace GraphQL
         public ExecutionError(string message, System.Exception exception) { }
         public string Code { get; set; }
         public System.Collections.Generic.IEnumerable<string> Codes { get; }
-        public override System.Collections.IDictionary Data { get; }
-        public System.Collections.Generic.Dictionary<string, object> DataAsDictionary { get; }
         public bool HasCodes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<string> Path { get; set; }
