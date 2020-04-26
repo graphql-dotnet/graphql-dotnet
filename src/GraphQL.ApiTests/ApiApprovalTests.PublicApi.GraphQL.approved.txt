@@ -2651,7 +2651,7 @@ namespace GraphQL.Validation.Complexity
 {
     public class ComplexityAnalyzer : GraphQL.Validation.Complexity.IComplexityAnalyzer
     {
-        public ComplexityAnalyzer(int maxRecursionCount = 250) { }
+        public ComplexityAnalyzer() { }
         protected virtual void Analyzed(GraphQL.Language.AST.Document document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
         public void Validate(GraphQL.Language.AST.Document document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters) { }
     }
@@ -2661,6 +2661,7 @@ namespace GraphQL.Validation.Complexity
         public double? FieldImpact { get; set; }
         public int? MaxComplexity { get; set; }
         public int? MaxDepth { get; set; }
+        public int MaxRecursionCount { get; set; }
     }
     public class ComplexityResult
     {
