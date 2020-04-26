@@ -59,10 +59,6 @@ namespace GraphQL
 
         public IEnumerable<string> Path { get; set; }
 
-        public Dictionary<string, object> DataAsDictionary { get; } = new Dictionary<string, object>();
-
-        public override IDictionary Data => DataAsDictionary;
-
         public void AddLocation(int line, int column)
         {
             if (_errorLocations == null)
@@ -91,9 +87,7 @@ namespace GraphQL
             {
                 foreach (DictionaryEntry keyValuePair in dict)
                 {
-                    var key = keyValuePair.Key.ToString();
-                    var value = keyValuePair.Value;
-                    Data[key] = value;
+                    Data[keyValuePair.Key] = keyValuePair.Value;
                 }
             }
         }

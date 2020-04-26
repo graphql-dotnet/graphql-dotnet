@@ -202,10 +202,10 @@ namespace GraphQL.SystemTextJson
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
-                error.DataAsDictionary.Apply(entry =>
+                error.Data.Apply((key, value) =>
                 {
-                    writer.WritePropertyName(entry.Key);
-                    JsonSerializer.Serialize(writer, entry.Value, options);
+                    writer.WritePropertyName(key.ToString());
+                    JsonSerializer.Serialize(writer, value, options);
                 });
                 writer.WriteEndObject();
             }
