@@ -63,7 +63,6 @@ namespace Example
                 options.Inputs = request.Variables.ToInputs();
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
-                //options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
                     options.FieldMiddleware
