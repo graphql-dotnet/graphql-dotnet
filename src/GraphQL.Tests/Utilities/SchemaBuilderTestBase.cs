@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
@@ -16,7 +17,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
+        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true, errorParser: new ErrorParser(opts => opts.ExposeExceptions = true));
         protected SchemaBuilder Builder { get; set; }
 
         public ExecutionResult AssertQuery(Action<ExecuteConfig> configure)

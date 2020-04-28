@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader.Tests
     public abstract class QueryTestBase : DataLoaderTestBase
     {
         private readonly IDocumentExecuter executer = new DocumentExecuter();
-        private readonly IDocumentWriter writer = new DocumentWriter(indent: true);
+        private readonly IDocumentWriter writer = new DocumentWriter(indent: true, errorParser: new ErrorParser(opts => opts.ExposeExceptions = true));
 
         protected IServiceProvider Services { get; }
 
@@ -84,7 +84,6 @@ namespace GraphQL.DataLoader.Tests
             {
                 options(opts);
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
             }));
 
             var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
@@ -113,7 +112,6 @@ namespace GraphQL.DataLoader.Tests
             return executer.ExecuteAsync(opts =>
             {
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
                 opts.Query = query;
                 foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
                 {

@@ -1,18 +1,26 @@
 using System;
 using System.Linq;
+using GraphQL.Execution;
 using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
+        private readonly IErrorParser _errorParser;
+
+        public ExecutionResultJsonConverter(IErrorParser errorParser)
+        {
+            _errorParser = errorParser;
+        }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value is ExecutionResult result)
             {
                 writer.WriteStartObject();
 
-                WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+                WriteErrors(result.Errors, writer, serializer);
                 WriteData(result, writer, serializer);
                 WriteExtensions(result, writer, serializer);
 
@@ -33,7 +41,7 @@ namespace GraphQL.NewtonsoftJson
             serializer.Serialize(writer, data);
         }
 
-        private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer, bool exposeExceptions)
+        private void WriteErrors(ExecutionErrors errors, JsonWriter writer, JsonSerializer serializer)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -44,14 +52,13 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WriteStartArray();
 
-            errors.Apply(error =>
+            errors.Select(error => _errorParser.Parse(error)).Apply(error =>
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
 
-                // check if return StackTrace, including all inner exceptions
-                serializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
+                serializer.Serialize(writer, error.Message);
 
                 if (error.Locations != null)
                 {
@@ -75,51 +82,16 @@ namespace GraphQL.NewtonsoftJson
                     serializer.Serialize(writer, error.Path);
                 }
 
-                WriteErrorExtensions(error, writer, serializer);
+                if (error.Extensions?.Count > 0)
+                {
+                    writer.WritePropertyName("extensions");
+                    serializer.Serialize(writer, error.Extensions);
+                } 
 
                 writer.WriteEndObject();
             });
 
             writer.WriteEndArray();
-        }
-
-        private void WriteErrorExtensions(ExecutionError error, JsonWriter writer, JsonSerializer serializer)
-        {
-            if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
-            {
-                return;
-            }
-
-            writer.WritePropertyName("extensions");
-            writer.WriteStartObject();
-
-            if (!string.IsNullOrWhiteSpace(error.Code))
-            {
-                writer.WritePropertyName("code");
-                serializer.Serialize(writer, error.Code);
-            }
-
-            if (error.HasCodes)
-            {
-                writer.WritePropertyName("codes");
-                writer.WriteStartArray();
-                error.Codes.Apply(code => serializer.Serialize(writer, code));
-                writer.WriteEndArray();
-            }
-
-            if (error.Data?.Count > 0)
-            {
-                writer.WritePropertyName("data");
-                writer.WriteStartObject();
-                error.Data.Apply((key, value) =>
-                {
-                    writer.WritePropertyName(key.ToString());
-                    serializer.Serialize(writer, value);
-                });
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndObject();
         }
 
         private void WriteExtensions(ExecutionResult result, JsonWriter writer, JsonSerializer serializer)

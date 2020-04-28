@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Execution;
 using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
@@ -20,13 +21,23 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(bool indent)
-            : this(GetDefaultSerializerSettings(indent))
+            : this(GetDefaultSerializerSettings(indent, null))
+        {
+        }
+
+        public DocumentWriter(bool indent, IErrorParser errorParser)
+            : this(GetDefaultSerializerSettings(indent, errorParser ?? throw new ArgumentNullException(nameof(errorParser))))
+        {
+        }
+
+        public DocumentWriter(IErrorParser errorParser)
+            : this(false, errorParser)
         {
         }
 
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
         {
-            var serializerSettings = GetDefaultSerializerSettings(indent: false);
+            var serializerSettings = GetDefaultSerializerSettings(indent: false, errorParser: null);
             configureSerializerSettings?.Invoke(serializerSettings);
 
             _serializer = BuildSerializer(serializerSettings);
@@ -35,24 +46,25 @@ namespace GraphQL.NewtonsoftJson
         public DocumentWriter(JsonSerializerSettings serializerSettings)
         {
             if (serializerSettings == null)
-            {
                 throw new ArgumentNullException(nameof(serializerSettings));
-            }
 
             _serializer = BuildSerializer(serializerSettings);
         }
 
-        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent)
-            => new JsonSerializerSettings { Formatting = indent ? Formatting.Indented : Formatting.None };
+        private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorParser errorParser)
+        {
+            return new JsonSerializerSettings {
+                Formatting = indent ? Formatting.Indented : Formatting.None,
+                ContractResolver = new ExecutionResultContractResolver(errorParser ?? new ErrorParser()),
+            };
+        }
 
         private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings)
         {
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
             if (serializerSettings.ContractResolver == null)
-            {
-                serializer.ContractResolver = new ExecutionResultContractResolver();
-            }
+                serializer.ContractResolver = new ExecutionResultContractResolver(new ErrorParser());
 
             return serializer;
         }

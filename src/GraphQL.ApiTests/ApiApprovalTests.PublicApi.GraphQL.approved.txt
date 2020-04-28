@@ -76,7 +76,6 @@ namespace GraphQL
         public GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public bool EnableMetrics { get; set; }
-        public bool ExposeExceptions { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -99,7 +98,6 @@ namespace GraphQL
         public object Data { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
-        public bool ExposeExceptions { get; set; }
         public System.Collections.Generic.Dictionary<string, object> Extensions { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
@@ -579,6 +577,18 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
+    public class ErrorParser : GraphQL.Execution.IErrorParser
+    {
+        public ErrorParser() { }
+        public ErrorParser(GraphQL.Execution.ErrorParserOptions options) { }
+        public ErrorParser(System.Action<GraphQL.Execution.ErrorParserOptions> optionsBuilder) { }
+        public GraphQL.Execution.ParsedError Parse(GraphQL.ExecutionError executionError) { }
+    }
+    public class ErrorParserOptions
+    {
+        public ErrorParserOptions() { }
+        public bool ExposeExceptions { get; set; }
+    }
     public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
     {
         public ExecutionContext() { }
@@ -659,6 +669,10 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
+    public interface IErrorParser
+    {
+        GraphQL.Execution.ParsedError Parse(GraphQL.ExecutionError executionError);
+    }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {
         System.Threading.CancellationToken CancellationToken { get; }
@@ -704,6 +718,14 @@ namespace GraphQL.Execution
         public ParallelExecutionStrategy() { }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
+    }
+    public class ParsedError
+    {
+        public ParsedError() { }
+        public System.Collections.Generic.IDictionary<string, object> Extensions { get; set; }
+        public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; set; }
+        public string Message { get; set; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; set; }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {

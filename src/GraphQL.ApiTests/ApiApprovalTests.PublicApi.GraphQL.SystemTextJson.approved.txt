@@ -3,14 +3,16 @@ namespace GraphQL.SystemTextJson
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
+        public DocumentWriter(GraphQL.Execution.IErrorParser errorParser) { }
         public DocumentWriter(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
         public DocumentWriter(bool indent) { }
         public DocumentWriter(System.Text.Json.JsonSerializerOptions serializerOptions) { }
+        public DocumentWriter(bool indent, GraphQL.Execution.IErrorParser errorParser) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class ExecutionResultJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionResult>
     {
-        public ExecutionResultJsonConverter() { }
+        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorParser errorParser) { }
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }

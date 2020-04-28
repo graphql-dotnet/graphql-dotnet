@@ -1,4 +1,5 @@
 using Example;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GraphQL.Harness
 {
@@ -28,6 +30,11 @@ namespace GraphQL.Harness
             // add execution components
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            services.AddSingleton<IErrorParser>(services =>
+            {
+                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                return new ErrorParser(options => options.ExposeExceptions = settings.Value.ExposeExceptions);
+            });
 
             // add something like repository
             services.AddSingleton<StarWarsData>();

@@ -3,18 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GraphQL.Execution;
 
 namespace GraphQL.SystemTextJson
 {
     public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
     {
+        private readonly IErrorParser _errorParser;
+
+        public ExecutionResultJsonConverter(IErrorParser errorParser)
+        {
+            _errorParser = errorParser;
+        }
+
         public override void Write(Utf8JsonWriter writer, ExecutionResult value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
 
             // Important: Be careful with passing the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
-            WriteErrors(writer, value.Errors, value.ExposeExceptions, options);
+            WriteErrors(writer, value.Errors, _errorParser, options);
             WriteData(writer, value, options);
             WriteExtensions(writer, value, options);
 
@@ -124,7 +132,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, IErrorParser errorParser, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -135,14 +143,13 @@ namespace GraphQL.SystemTextJson
 
             writer.WriteStartArray();
 
-            errors.Apply(error =>
+            errors.Select(error => errorParser.Parse(error)).Apply(error =>
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
 
-                // Check if return StackTrace, including all inner exceptions
-                JsonSerializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message, options);
+                JsonSerializer.Serialize(writer, error.Message, options);
 
                 if (error.Locations != null)
                 {
@@ -166,51 +173,16 @@ namespace GraphQL.SystemTextJson
                     JsonSerializer.Serialize(writer, error.Path, options);
                 }
 
-                WriteErrorExtensions(writer, error, options);
+                if (error.Extensions?.Count > 0)
+                {
+                    writer.WritePropertyName("extensions");
+                    JsonSerializer.Serialize(writer, error.Extensions);
+                }
 
                 writer.WriteEndObject();
             });
 
             writer.WriteEndArray();
-        }
-
-        private static void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
-        {
-            if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
-            {
-                return;
-            }
-
-            writer.WritePropertyName("extensions");
-            writer.WriteStartObject();
-
-            if (!string.IsNullOrWhiteSpace(error.Code))
-            {
-                writer.WritePropertyName("code");
-                JsonSerializer.Serialize(writer, error.Code, options);
-            }
-
-            if (error.HasCodes)
-            {
-                writer.WritePropertyName("codes");
-                writer.WriteStartArray();
-                error.Codes.Apply(code => JsonSerializer.Serialize(writer, code, options));
-                writer.WriteEndArray();
-            }
-
-            if (error.Data?.Count > 0)
-            {
-                writer.WritePropertyName("data");
-                writer.WriteStartObject();
-                error.Data.Apply((key, value) =>
-                {
-                    writer.WritePropertyName(key.ToString());
-                    JsonSerializer.Serialize(writer, value, options);
-                });
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndObject();
         }
 
         private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
