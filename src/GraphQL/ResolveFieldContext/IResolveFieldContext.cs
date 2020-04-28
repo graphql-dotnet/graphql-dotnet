@@ -69,7 +69,7 @@ namespace GraphQL
         ExecutionErrors Errors { get; }
 
         /// <summary>The path to the current executing field from the request root</summary>
-        IEnumerable<string> Path { get; }
+        IEnumerable<object> Path { get; }
 
         /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }

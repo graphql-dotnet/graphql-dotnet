@@ -53,7 +53,7 @@ namespace GraphQL
         public System.Collections.Generic.IEnumerable<string> Codes { get; }
         public bool HasCodes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
-        public System.Collections.Generic.IEnumerable<string> Path { get; set; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public void AddLocation(int line, int column) { }
     }
     public static class ExecutionErrorExtensions
@@ -177,7 +177,7 @@ namespace GraphQL
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
-        System.Collections.Generic.IEnumerable<string> Path { get; }
+        System.Collections.Generic.IEnumerable<object> Path { get; }
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
@@ -256,7 +256,7 @@ namespace GraphQL
         public GraphQL.Instrumentation.Metrics Metrics { get; }
         public GraphQL.Language.AST.Operation Operation { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
-        public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; }
         public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
@@ -281,7 +281,7 @@ namespace GraphQL
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
-        public System.Collections.Generic.IEnumerable<string> Path { get; set; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -622,7 +622,7 @@ namespace GraphQL.Execution
         public bool IsResultSet { get; }
         public string Name { get; }
         public GraphQL.Execution.ExecutionNode Parent { get; }
-        public System.Collections.Generic.IEnumerable<string> Path { get; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; }
         public object Result { get; set; }
         public object Source { get; set; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }

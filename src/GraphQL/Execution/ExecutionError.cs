@@ -57,7 +57,7 @@ namespace GraphQL
             }
         }
 
-        public IEnumerable<string> Path { get; set; }
+        public IEnumerable<object> Path { get; set; }
 
         public void AddLocation(int line, int column)
         {

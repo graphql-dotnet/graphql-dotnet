@@ -60,7 +60,7 @@ namespace GraphQL.Execution
             return null;
         }
 
-        public IEnumerable<string> Path
+        public IEnumerable<object> Path
         {
             get
             {
@@ -72,13 +72,13 @@ namespace GraphQL.Execution
                     ++count;
                 }
 
-                var pathList = new string[count];
+                var pathList = new object[count];
                 var index = count;
                 node = this;
                 while (!(node is RootExecutionNode))
                 {
                     if (node.IndexInParentNode.HasValue)
-                        pathList[--index] = GetStringIndex(node.IndexInParentNode.Value);
+                        pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
                     else
                         pathList[--index] = node.Field.Name;
                     node = node.Parent;
@@ -88,25 +88,25 @@ namespace GraphQL.Execution
             }
         }
 
-        private static string GetStringIndex(int index) => index switch
+        private static object GetObjectIndex(int index) => index switch
         {
-            0 => "0",
-            1 => "1",
-            2 => "2",
-            3 => "3",
-            4 => "4",
-            5 => "5",
-            6 => "6",
-            7 => "7",
-            8 => "8",
-            9 => "9",
-            10 => "10",
-            11 => "11",
-            12 => "12",
-            13 => "13",
-            14 => "14",
-            15 => "15",
-            _ => index.ToString()
+            0 => 0,
+            1 => 1,
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => 5,
+            6 => 6,
+            7 => 7,
+            8 => 8,
+            9 => 9,
+            10 => 10,
+            11 => 11,
+            12 => 12,
+            13 => 13,
+            14 => 14,
+            15 => 15,
+            _ => index
         };
     }
 
