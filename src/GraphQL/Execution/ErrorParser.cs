@@ -9,7 +9,15 @@ namespace GraphQL.Execution
     {
         private readonly ErrorParserOptions _options;
 
-        public ErrorParser() : this(new ErrorParserOptions()) { }
+        public ErrorParser()
+            : this(false)
+        {
+        }
+
+        public ErrorParser(bool exposeExceptions)
+            : this(new ErrorParserOptions() { ExposeExceptions = exposeExceptions })
+        {
+        }
 
         public ErrorParser(ErrorParserOptions options)
         {

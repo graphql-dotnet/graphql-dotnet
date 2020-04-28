@@ -582,6 +582,7 @@ namespace GraphQL.Execution
         public ErrorParser() { }
         public ErrorParser(GraphQL.Execution.ErrorParserOptions options) { }
         public ErrorParser(System.Action<GraphQL.Execution.ErrorParserOptions> optionsBuilder) { }
+        public ErrorParser(bool exposeExceptions) { }
         public GraphQL.Execution.ParsedError Parse(GraphQL.ExecutionError executionError) { }
     }
     public class ErrorParserOptions
