@@ -95,8 +95,7 @@ namespace GraphQL.Execution
 
             if (!(parent.Result is IEnumerable data))
             {
-                var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                throw error;
+                throw new InvalidOperationException("User error: expected an IEnumerable list though did not find one.");
             }
 
             var index = 0;
@@ -126,14 +125,9 @@ namespace GraphQL.Execution
                 {
                     if (listType.ResolvedType is NonNullGraphType)
                     {
-                        var error = new ExecutionError(
+                        throw new InvalidOperationException(
                             "Cannot return null for non-null type."
-                            + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
-
-                        error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.Path.Append(index.ToString());
-                        context.Errors.Add(error);
-                        return;
+                            + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}, Path: '{parent.Path.Append(index.ToString())}'.");
                     }
 
                     var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
@@ -248,7 +242,7 @@ namespace GraphQL.Execution
             {
                 if (result == null)
                 {
-                    throw new ExecutionError("Cannot return null for non-null type."
+                    throw new InvalidOperationException("Cannot return null for non-null type."
                         + $" Field: {node.Name}, Type: {nonNullType}.");
                 }
 
@@ -266,7 +260,7 @@ namespace GraphQL.Execution
 
                 if (objectType == null)
                 {
-                    throw new ExecutionError(
+                    throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
                         $"runtime for field {node.Parent.GraphType.Name}.{node.Name} " +
                         $"with value '{result}', received 'null'.");
@@ -274,13 +268,13 @@ namespace GraphQL.Execution
 
                 if (!abstractType.IsPossibleType(objectType))
                 {
-                    throw new ExecutionError($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\".");
+                    throw new InvalidOperationException($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\".");
                 }
             }
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                throw new ExecutionError($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
+                throw new InvalidOperationException($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
             }
         }
 

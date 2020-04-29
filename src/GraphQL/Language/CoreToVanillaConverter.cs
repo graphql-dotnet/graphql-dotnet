@@ -110,7 +110,7 @@ namespace GraphQL.Language
             }
             else if (source.DefaultValue != null && !(source.DefaultValue is GraphQLValue))
             {
-                throw new ExecutionError($"Unknown default value: {source.DefaultValue}");
+                throw new InvalidOperationException($"Unknown default value: {source.DefaultValue}");
             }
             return def;
         }
@@ -267,7 +267,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped value type {source.Kind}");
+            throw new InvalidOperationException($"Unmapped value type {source.Kind}");
         }
 
         public ObjectField ObjectField(GraphQLObjectField source)
@@ -303,7 +303,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped type {type.Kind}");
+            throw new InvalidOperationException($"Unmapped type {type.Kind}");
         }
 
         public NameNode Name(GraphQLName name)
@@ -324,7 +324,7 @@ namespace GraphQL.Language
             OperationTypeParser.Query => OperationType.Query,
             OperationTypeParser.Mutation => OperationType.Mutation,
             OperationTypeParser.Subscription => OperationType.Subscription,
-            _ => throw new ExecutionError($"Unmapped operation type {type}")
+            _ => throw new InvalidOperationException($"Unmapped operation type {type}")
         };
     }
 

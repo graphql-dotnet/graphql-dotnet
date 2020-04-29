@@ -41,12 +41,12 @@ namespace GraphQL
         {
             if (options.Schema == null)
             {
-                throw new ExecutionError("A schema is required.");
+                throw new InvalidOperationException("A schema is required.");
             }
 
             if (string.IsNullOrWhiteSpace(options.Query))
             {
-                throw new ExecutionError("A query is required.");
+                throw new InvalidOperationException("A query is required.");
             }
         }
 
@@ -92,7 +92,7 @@ namespace GraphQL
 
                 if (operation == null)
                 {
-                    throw new ExecutionError("Unable to determine operation from query.");
+                    throw new InvalidOperationException("Unable to determine operation from query.");
                 }
 
                 IValidationResult validationResult;

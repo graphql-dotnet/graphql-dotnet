@@ -232,7 +232,7 @@ namespace GraphQL.Types
 
             if (type is NonNullGraphType || type is ListGraphType)
             {
-                throw new ExecutionError("Only add root types.");
+                throw new InvalidOperationException("Only add root types.");
             }
 
             var name = type.CollectTypes(context).TrimGraphQLTypes();
@@ -262,7 +262,7 @@ namespace GraphQL.Types
 
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
-                            throw new ExecutionError((
+                            throw new InvalidOperationException((
                                 "Interface type {0} does not provide a \"resolveType\" function " +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                 "There is no way to resolve this possible type during execution.")
@@ -276,7 +276,7 @@ namespace GraphQL.Types
             {
                 if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
-                    throw new ExecutionError("Must provide types for Union {0}.".ToFormat(union));
+                    throw new InvalidOperationException("Must provide types for Union {0}.".ToFormat(union));
                 }
 
                 foreach (var unionedType in union.PossibleTypes)
@@ -288,7 +288,7 @@ namespace GraphQL.Types
 
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)
                     {
-                        throw new ExecutionError((
+                        throw new InvalidOperationException((
                             "Union type {0} does not provide a \"resolveType\" function " +
                             "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                             "There is no way to resolve this possible type during execution.")
@@ -304,7 +304,7 @@ namespace GraphQL.Types
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
-                        throw new ExecutionError((
+                        throw new InvalidOperationException((
                             "Union type {0} does not provide a \"resolveType\" function " +
                             "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                             "There is no way to resolve this possible type during execution.")
@@ -458,7 +458,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
                         if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                         {
-                            throw new ExecutionError((
+                            throw new InvalidOperationException((
                                     "Interface type {0} does not provide a \"resolveType\" function " +
                                     "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
                                     "There is no way to resolve this possible type during execution.")
@@ -482,7 +482,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
                         if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                         {
-                            throw new ExecutionError((
+                            throw new InvalidOperationException((
                                 "Union type {0} does not provide a \"resolveType\" function " +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                 "There is no way to resolve this possible type during execution.")
@@ -514,7 +514,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
             if (reference != null && result == null)
             {
-                throw new ExecutionError($"Unable to resolve reference to type '{reference.TypeName}' on '{parentType.Name}'");
+                throw new InvalidOperationException($"Unable to resolve reference to type '{reference.TypeName}' on '{parentType.Name}'");
             }
 
             return result;
