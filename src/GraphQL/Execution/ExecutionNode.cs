@@ -88,24 +88,40 @@ namespace GraphQL.Execution
             }
         }
 
+        private static readonly object _num0 = 0;
+        private static readonly object _num1 = 1;
+        private static readonly object _num2 = 2;
+        private static readonly object _num3 = 3;
+        private static readonly object _num4 = 4;
+        private static readonly object _num5 = 5;
+        private static readonly object _num6 = 6;
+        private static readonly object _num7 = 7;
+        private static readonly object _num8 = 8;
+        private static readonly object _num9 = 9;
+        private static readonly object _num10 = 10;
+        private static readonly object _num11 = 11;
+        private static readonly object _num12 = 12;
+        private static readonly object _num13 = 13;
+        private static readonly object _num14 = 14;
+        private static readonly object _num15 = 15;
         private static object GetObjectIndex(int index) => index switch
         {
-            0 => 0,
-            1 => 1,
-            2 => 2,
-            3 => 3,
-            4 => 4,
-            5 => 5,
-            6 => 6,
-            7 => 7,
-            8 => 8,
-            9 => 9,
-            10 => 10,
-            11 => 11,
-            12 => 12,
-            13 => 13,
-            14 => 14,
-            15 => 15,
+            0 => _num0,
+            1 => _num1,
+            2 => _num2,
+            3 => _num3,
+            4 => _num4,
+            5 => _num5,
+            6 => _num6,
+            7 => _num7,
+            8 => _num8,
+            9 => _num9,
+            10 => _num10,
+            11 => _num11,
+            12 => _num12,
+            13 => _num13,
+            14 => _num14,
+            15 => _num15,
             _ => index
         };
     }
