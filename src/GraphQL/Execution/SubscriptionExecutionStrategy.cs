@@ -171,15 +171,4 @@ namespace GraphQL.Execution
             return error;
         }
     }
-
-    internal static class ExecutionContextExtensions
-    {
-        public static ExecutionResult With(this ExecutionResult result, ExecutionContext context)
-        {
-            result.Query = context.Document.OriginalQuery;
-            result.Document = context.Document;
-            result.Operation = context.Operation;
-            return result;
-        }
-    }
 }

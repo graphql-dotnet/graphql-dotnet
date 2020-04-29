@@ -75,5 +75,11 @@ namespace GraphQL.Execution
         /// Input variables to the GraphQL request
         /// </summary>
         Variables Variables { get; }
+
+        /// <summary>
+        /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
+        /// protocol however they see fit, and hence there are no additional restrictions on its contents.
+        /// </summary>
+        Dictionary<string, object> Extensions { get; }
     }
 }

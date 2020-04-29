@@ -159,6 +159,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (schemaDef != null)
             {
+                schema.Description = schemaDef.Comment?.Text;
+
                 foreach (var operationTypeDef in schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;
@@ -564,7 +566,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         return longResult;
                     }
 
-                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    // If the value doesn't fit in an long, revert to using decimal...
+                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    {
+                        return decimalResult;
+                    }
+
+                    // If the value doesn't fit in an decimal, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
                         return bigIntegerResult;

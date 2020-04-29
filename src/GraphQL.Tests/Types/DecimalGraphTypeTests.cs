@@ -49,7 +49,8 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void converts_DecimalValue_to_decimal()
         {
-            _type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe((decimal)12345.6579);
+            _type.ParseLiteral(new DecimalValue(12345.6579m)).ShouldBe(12345.6579m);
+            _type.ParseLiteral(new DecimalValue(39614081257132168796771975168m)).ShouldBe(39614081257132168796771975168m);
         }
     }
 }

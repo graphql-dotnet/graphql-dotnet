@@ -29,11 +29,6 @@ namespace GraphQL.Tests
             };
 
             var expected = @"{
-              ""data"": {
-                ""someType"": {
-                    ""someProperty"": ""someValue""
-                }
-              },
               ""errors"": [
                 {
                   ""message"": ""some error 1""
@@ -42,6 +37,11 @@ namespace GraphQL.Tests
                   ""message"": ""some error 2""
                 }
               ],
+              ""data"": {
+                ""someType"": {
+                    ""someProperty"": ""someValue""
+                }
+              },
               ""extensions"": {
                 ""someExtension"": {
                   ""someProperty"": ""someValue"",
