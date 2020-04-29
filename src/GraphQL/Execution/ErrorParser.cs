@@ -32,7 +32,7 @@ namespace GraphQL.Execution
             optionsBuilder(_options);
         }
 
-        public ParsedError Parse(ExecutionError executionError)
+        public virtual ParsedError Parse(ExecutionError executionError)
         {
             IDictionary<string, object> extensions = null;
             if (!string.IsNullOrWhiteSpace(executionError.Code) ||
