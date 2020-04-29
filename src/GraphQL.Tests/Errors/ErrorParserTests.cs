@@ -47,12 +47,14 @@ namespace GraphQL.Tests.Errors
             {
                 { "test1", "object1" },
                 { "test2", 15 },
+                { "test3", new Dictionary<string, object>() { { "test4", "object4" } } },
             };
             var error = new ExecutionError(null, data);
             error.Data.ShouldNotBeNull();
-            error.Data.Count.ShouldBe(2);
+            error.Data.Count.ShouldBe(3);
             error.Data["test1"].ShouldBe("object1");
             error.Data["test2"].ShouldBe(15);
+            error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
 
             var parsed = new ErrorParser().Parse(error);
             parsed.Message.ShouldBe(error.Message);
@@ -183,6 +185,7 @@ namespace GraphQL.Tests.Errors
             };
             error.Data.Add("test1", "object1");
             error.Data.Add("test2", 15);
+            error.Data.Add("test3", new Dictionary<string, object>() { { "test4", "object4" } });
             error.AddLocation(5, 6);
             error.AddLocation(7, 8);
 
