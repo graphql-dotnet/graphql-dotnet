@@ -281,6 +281,9 @@ namespace GraphQL.Tests.Errors
 
             parsed = new ErrorParser().Parse(error);
             parsed.Extensions.ShouldNotBeNull();
+            parsed.Extensions.ShouldContainKey("data");
+            parsed.Extensions.ShouldContainKey("codes");
+            parsed.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().Count().ShouldBe(2);
         }
     }
 
