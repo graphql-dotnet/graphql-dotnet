@@ -34,6 +34,9 @@ namespace GraphQL.Execution
 
         public virtual ParsedError Parse(ExecutionError executionError)
         {
+            if (executionError == null)
+                throw new ArgumentNullException(nameof(executionError));
+
             IDictionary<string, object> extensions = null;
             if (!string.IsNullOrWhiteSpace(executionError.Code) ||
                 // skip next check to match existing functionality
@@ -45,7 +48,7 @@ namespace GraphQL.Execution
                     extensions.Add("code", executionError.Code);
                 if (executionError.HasCodes)
                     extensions.Add("codes", executionError.Codes);
-                if (executionError.Data != null)
+                if (executionError.Data?.Count > 0)
                     extensions.Add("data", executionError.Data);
             }
 
