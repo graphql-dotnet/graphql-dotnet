@@ -238,6 +238,50 @@ namespace GraphQL.Tests.Errors
             var parsed = new ErrorParser(true).Parse(error);
             parsed.Message.ShouldBe(error.ToString());
         }
+
+        [Fact]
+        public void blank_codes_do_not_serialize()
+        {
+            var error = new ExecutionError(null)
+            {
+                Code = "",
+            };
+            error.Code.ShouldBe("");
+            error.HasCodes.ShouldBeFalse();
+
+            var parsed = new ErrorParser(true).Parse(error);
+            parsed.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void inner_exception_of_type_exception_does_not_serialize_extensions()
+        {
+            var error = new ExecutionError("Test execution error", new Exception("Test exception"));
+            error.Code.ShouldBe("");
+            error.HasCodes.ShouldBeTrue();
+            error.Codes.ShouldBe(new[] { "" });
+
+            var parsed = new ErrorParser().Parse(error);
+            parsed.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void codes_with_blank_code_has_undefined_behavior()
+        {
+            var error = new ExecutionError(null, new Exception(null, new ArgumentNullException("param")));
+            error.Code.ShouldBe("");
+            error.HasCodes.ShouldBeTrue();
+            //error.Codes.ShouldBe(new[] { "", "ARGUMENT_NULL" });
+            error.Codes.Count().ShouldBe(2);
+
+            var parsed = new ErrorParser().Parse(error);
+            parsed.Extensions.ShouldBeNull();
+
+            error.Data.Add("test1", "object1");
+
+            parsed = new ErrorParser().Parse(error);
+            parsed.Extensions.ShouldNotBeNull();
+        }
     }
 
 }
