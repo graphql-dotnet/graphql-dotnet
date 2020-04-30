@@ -143,8 +143,7 @@ namespace GraphQL.Tests.Errors
             var parsed = new ErrorParser().Parse(error);
             parsed.Message.ShouldBe(error.Message);
             parsed.Locations.ShouldBeNull();
-            //parsed.Path.ShouldBe(new object[] { "root", 23, "child" });
-            parsed.Path.ShouldBe(new string[] { "root", "23", "child" });
+            parsed.Path.ShouldBe(new object[] { "root", 23, "child" });
             parsed.Extensions.ShouldBeNull();
         }
 
