@@ -180,7 +180,7 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError("Test error message", new ArgumentNullException(null, new ArgumentOutOfRangeException()))
             {
-                Path = new string[] { "path1", "path2" },
+                Path = new object[] { "path1", 22, "path2" },
             };
             error.Data.Add("test1", "object1");
             error.Data.Add("test2", 15);
