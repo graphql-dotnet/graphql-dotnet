@@ -162,7 +162,7 @@ namespace GraphQL.Execution
             ExecutionContext context,
             string message,
             Field field,
-            IEnumerable<string> path,
+            IEnumerable<object> path,
             Exception ex = null)
         {
             var error = new ExecutionError(message, ex);
