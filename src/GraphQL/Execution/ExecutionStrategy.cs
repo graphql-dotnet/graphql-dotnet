@@ -131,7 +131,7 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.Path.Append(index.ToString());
+                        error.Path = parent.Path.Append(index);
                         context.Errors.Add(error);
                         return;
                     }
