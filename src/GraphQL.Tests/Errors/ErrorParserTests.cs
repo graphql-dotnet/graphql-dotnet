@@ -137,8 +137,7 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError(null)
             {
-                //Path = new object[] { "root", 23, "child" },
-                Path = new string[] { "root", "23", "child" },
+                Path = new object[] { "root", 23, "child" },
             };
 
             var parsed = new ErrorParser().Parse(error);
