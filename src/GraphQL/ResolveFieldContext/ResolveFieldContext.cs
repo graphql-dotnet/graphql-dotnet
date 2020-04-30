@@ -48,7 +48,7 @@ namespace GraphQL
 
         public ExecutionErrors Errors { get; set; }
 
-        public IEnumerable<string> Path { get; set; }
+        public IEnumerable<object> Path { get; set; }
 
         public IDictionary<string, Field> SubFields { get; set; }
 
