@@ -58,6 +58,70 @@ namespace GraphQL.DataLoader.Tests
         }
 
         [Fact]
+        public void Batched_Honors_MaxBatchSize()
+        {
+            var mock = new Mock<IUsersStore>();
+            var users = Fake.Users.Generate(4);
+
+            mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
+                .ReturnsAsync(() => users.ToDictionary(x => x.UserId));
+
+            var usersStore = mock.Object;
+
+            User user1 = null;
+            User user2 = null;
+            User user3 = null;
+            User user4 = null;
+            User user5 = null;
+
+            // Run within an async context to make sure we won't deadlock
+            AsyncContext.Run(async () =>
+            {
+                var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, null, null, 2);
+
+                // Start async tasks to load by ID
+                var result1 = loader.LoadAsync(1);
+                var result2 = loader.LoadAsync(2);
+                var result3 = loader.LoadAsync(3);
+                var result4 = loader.LoadAsync(4);
+                var result5 = loader.LoadAsync(5);
+
+                // Dispatch loading
+                await loader.DispatchAsync();
+
+                var task1 = result1.GetResultAsync();
+                var task2 = result2.GetResultAsync();
+                var task3 = result3.GetResultAsync();
+                var task4 = result4.GetResultAsync();
+                var task5 = result5.GetResultAsync();
+
+                // Now await tasks
+                user1 = await task1;
+                user2 = await task2;
+                user3 = await task3;
+                user4 = await task4;
+                user5 = await task5;
+            });
+
+            user1.ShouldNotBeNull();
+            user2.ShouldNotBeNull();
+            user3.ShouldNotBeNull();
+            user4.ShouldNotBeNull();
+            user5.ShouldBeNull();
+
+            user1.UserId.ShouldBe(1);
+            user2.UserId.ShouldBe(2);
+            user3.UserId.ShouldBe(3);
+            user4.UserId.ShouldBe(4);
+
+            // This should have been called three times to load in three batch (maximum of 2 per batch)
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default), Times.Once);
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 3, 4 }, default), Times.Once);
+            mock.Verify(x => x.GetUsersByIdAsync(new[] { 5 }, default), Times.Once);
+            mock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public void Results_Are_Cached()
         {
             var mock = new Mock<IUsersStore>();

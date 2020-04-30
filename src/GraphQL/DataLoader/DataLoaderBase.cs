@@ -19,28 +19,51 @@ namespace GraphQL.DataLoader
         private DataLoaderList _list;
         private readonly Dictionary<TKey, DataLoaderPair<TKey, T>> _cachedList;
         private readonly object _sync = new object();
+        protected internal readonly int MaxBatchSize;
         protected internal readonly IEqualityComparer<TKey> EqualityComparer;
 
         /// <summary>
-        /// Initialize a DataLoaderBase with caching and the default equality comparer
+        /// Initialize a DataLoaderBase with caching enabled and the default equality comparer
         /// </summary>
-        public DataLoaderBase() : this(true, null) { }
+        public DataLoaderBase() : this(true, null, int.MaxValue) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase the default equality comparer and caching if specified
+        /// Initialize a DataLoaderBase with the specified options
         /// </summary>
-        public DataLoaderBase(bool caching) : this(caching, null) { }
+        /// <param name="caching">Indicates if responses should be cached</param>
+        public DataLoaderBase(bool caching) : this(caching, null, int.MaxValue) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with caching and the specified equality comparer
+        /// Initialize a DataLoaderBase with the specified options
         /// </summary>
-        public DataLoaderBase(IEqualityComparer<TKey> equalityComparer) : this(true, equalityComparer) { }
+        /// <param name="caching">Indicates if responses should be cached</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
+        public DataLoaderBase(bool caching, int maxBatchSize) : this(caching, null, maxBatchSize) { }
 
         /// <summary>
-        /// Initialize a DataLoaderBase with the specified equality comparer and caching if specified
+        /// Initialize a DataLoaderBase with caching enabled and the specified equality comparer
         /// </summary>
-        public DataLoaderBase(bool caching, IEqualityComparer<TKey> equalityComparer)
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        public DataLoaderBase(IEqualityComparer<TKey> equalityComparer) : this(true, equalityComparer, int.MaxValue) { }
+
+        /// <summary>
+        /// Initialize a DataLoaderBase with caching enabled and the specified options
+        /// </summary>
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
+        public DataLoaderBase(IEqualityComparer<TKey> equalityComparer, int maxBatchSize) : this(true, equalityComparer, maxBatchSize) { }
+
+        /// <summary>
+        /// Initialize a DataLoaderBase with the specified options
+        /// </summary>
+        /// <param name="caching">Indicates if responses should be cached</param>
+        /// <param name="equalityComparer">Specifies the equality comparer to be used, or null for the default equality comparer</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch function at a time</param>
+        public DataLoaderBase(bool caching, IEqualityComparer<TKey> equalityComparer, int maxBatchSize)
         {
+            if (maxBatchSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(maxBatchSize));
+            MaxBatchSize = maxBatchSize;
             EqualityComparer = equalityComparer ?? EqualityComparer<TKey>.Default;
             if (caching)
                 _cachedList = new Dictionary<TKey, DataLoaderPair<TKey, T>>(equalityComparer);
@@ -67,6 +90,9 @@ namespace GraphQL.DataLoader
                 {
                     if (_list.TryGetValue(key, out var ret2))
                         return ret2;
+
+                    if (_list.Count >= MaxBatchSize)
+                        _list = new DataLoaderList(this);
                 }
                 else
                 {

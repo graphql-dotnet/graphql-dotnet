@@ -14,33 +14,31 @@ namespace GraphQL.DataLoader
     public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerable<T>>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
-        private readonly T _defaultValue;
 
         /// <summary>
-        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate
+        /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate
         /// </summary>
         /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns an ILookup of keys and values</param>
         /// <param name="keyComparer">An optional equality comparer for the keys</param>
-        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
                IEqualityComparer<TKey> keyComparer = null,
-               T defaultValue = default) : base(keyComparer)
+               int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
-            _defaultValue = defaultValue;
         }
 
         /// <summary>
-        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate and key selector
+        /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate and key selector
         /// </summary>
         /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
         /// <param name="keySelector">A selector for the key from the returned object</param>
         /// <param name="keyComparer">An optional equality comparer for the keys</param>
-        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default) : base(keyComparer)
+            int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
             if (fetchDelegate == null)
                 throw new ArgumentNullException(nameof(fetchDelegate));
@@ -52,7 +50,6 @@ namespace GraphQL.DataLoader
                 var ret = await fetchDelegate(keys, cancellationToken);
                 return ret.ToLookup(keySelector, keyComparer);
             };
-            _defaultValue = defaultValue;
         }
 
         protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, IEnumerable<T>>> list, CancellationToken cancellationToken)
