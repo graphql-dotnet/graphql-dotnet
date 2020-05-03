@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -71,13 +72,13 @@ namespace GraphQL.Utilities.Federation
                 "_entities",
                 new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
                 arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations"}),
-                resolve: async context =>
+                resolve: context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);
 
                     var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
 
-                    var results = new List<object>();
+                    var results = new List<Task<object>>();
 
                     foreach (var rep in reps)
                     {
@@ -94,22 +95,24 @@ namespace GraphQL.Utilities.Federation
                                     Arguments = rep,
                                     ParentFieldContext = context
                                 };
-                                var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
+                                var result = resolver.Resolve(resolveContext);
                                 results.Add(result);
                             }
                             else
                             {
-                                results.Add(rep);
+                                results.Add(Task.FromResult((object)rep));
                             }
                         }
                         else
                         {
                             // otherwise return the representation
-                            results.Add(rep);
+                            results.Add(Task.FromResult((object)rep));
                         }
                     }
 
-                    return results;
+                    var tasks = Task.WhenAll(results).ContinueWith(results => (object)results.Result);
+                    tasks.ConfigureAwait(false);
+                    return tasks;
                 });
         }
 
