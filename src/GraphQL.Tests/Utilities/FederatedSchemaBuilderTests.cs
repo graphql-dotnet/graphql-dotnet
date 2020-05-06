@@ -207,14 +207,13 @@ type User @key(fields: ""id"") {
 
             var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""1"", ""username"": ""One"" }, { ""__typename"": ""User"", ""id"" : ""2"", ""username"": ""Two"" }] }";
 
-            var executionResult = Executer.ExecuteAsync(_ =>
+            AssertQuery(_ =>
             {
-                _.Schema = Builder.Build(definitions);
+                _.Definitions = definitions;
                 _.Query = query;
+                _.ExpectedResult = expected;
                 _.Listeners.Add(listener);
-            }).GetAwaiter().GetResult();
-
-            Assert.Equal(CreateQueryResult(expected).Data, executionResult.Data);
+            });
         }
     }
 }
