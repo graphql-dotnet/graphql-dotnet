@@ -2,7 +2,7 @@ using System;
 
 namespace GraphQL.Types
 {
-    public class ListGraphType<T> : ListGraphType
+    public class ListGraphType<T> : ListGraphType, IProvideResolvedType
         where T : IGraphType
     {
         public ListGraphType()
