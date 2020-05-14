@@ -1049,17 +1049,22 @@ namespace GraphQL.Language.AST
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
-    public class Directives : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Directive>, System.Collections.IEnumerable
+    public class Directives : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.ICollection<GraphQL.Language.AST.Directive>, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Directive>, System.Collections.IEnumerable
     {
         public Directives() { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public int Count { get; }
         public bool HasDuplicates { get; }
+        public bool IsReadOnly { get; }
         public void Add(GraphQL.Language.AST.Directive directive) { }
+        public void Clear() { }
+        public bool Contains(GraphQL.Language.AST.Directive item) { }
+        public void CopyTo(GraphQL.Language.AST.Directive[] array, int arrayIndex) { }
         protected bool Equals(GraphQL.Language.AST.Directives directives) { }
         public GraphQL.Language.AST.Directive Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Directive> GetEnumerator() { }
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
+        public bool Remove(GraphQL.Language.AST.Directive item) { }
     }
     public class Document : GraphQL.Language.AST.AbstractNode
     {
