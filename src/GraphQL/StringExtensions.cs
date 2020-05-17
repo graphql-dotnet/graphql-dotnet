@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL
 {
     public static class StringExtensions
@@ -11,9 +8,7 @@ namespace GraphQL
         /// <param name="format">The format string in String.Format style.</param>
         /// <param name="args">The arguments.</param>
         public static string ToFormat(this string format, params object[] args)
-        {
-            return string.Format(format, args);
-        }
+            => string.Format(format, args);
 
         /// <summary>
         /// Returns a camel case version of the string.

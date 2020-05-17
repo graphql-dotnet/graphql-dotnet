@@ -7,6 +7,8 @@ namespace GraphQL.Language.AST
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
         private List<Argument> _arguments;
+        // for internal use only, do not modify this instance
+        internal static readonly Arguments Empty = new Arguments();
 
         public override IEnumerable<INode> Children => _arguments;
 

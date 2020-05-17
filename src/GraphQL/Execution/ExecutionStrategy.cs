@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
@@ -105,11 +106,9 @@ namespace GraphQL.Execution
 
             foreach (var d in data)
             {
-                var path = AppendPath(parent.Path, GetStringIndex(index++));
-
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
@@ -132,12 +131,12 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = path;
+                        error.Path = parent.Path.Append(index);
                         context.Errors.Add(error);
                         return;
                     }
 
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
+                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
                     {
                         Result = null
                     };
@@ -148,34 +147,17 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
-        private static string GetStringIndex(int index) => index switch
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
-            0 => "0",
-            1 => "1",
-            2 => "2",
-            3 => "3",
-            4 => "4",
-            5 => "5",
-            6 => "6",
-            7 => "7",
-            8 => "8",
-            9 => "9",
-            _ => index.ToString()
-        };
-
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
-        {
-            path ??= AppendPath(parent.Path, field.Name);
-
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
             return graphType switch
             {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path),
-                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, path),
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -186,12 +168,12 @@ namespace GraphQL.Execution
         /// <remarks>
         /// Builds child nodes, but does not execute them
         /// </remarks>
-        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             if (node.IsResultSet)
-                return node;
+                return;
 
             IResolveFieldContext resolveContext = null;
 
@@ -253,8 +235,6 @@ namespace GraphQL.Execution
 
                 node.Result = null;
             }
-
-            return node;
         }
 
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
@@ -309,7 +289,7 @@ namespace GraphQL.Execution
             if (context.Listeners != null)
                 foreach (var listener in context.Listeners)
                 {
-                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                    await listener.BeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
                 }
         }

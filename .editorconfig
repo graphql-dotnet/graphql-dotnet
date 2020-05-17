@@ -120,7 +120,7 @@ csharp_style_conditional_delegate_call = true:warning
 
 # C# code style settings - Code block preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#code-block-preferences
-csharp_prefer_braces = false:suggestion
+csharp_prefer_braces = when_multiline:suggestion
 
 # C# code style - Unused value preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#unused-value-preferences
@@ -193,6 +193,25 @@ csharp_space_between_square_brackets = false
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions?view=vs-2019#wrap-options
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = false
+
+########## name all private fields using camelCase with underscore prefix ##########
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2019
+# dotnet_naming_rule.<namingRuleTitle>.symbols = <symbolTitle>
+dotnet_naming_rule.private_fields_with_underscore.symbols = private_fields
+ 
+# dotnet_naming_symbols.<symbolTitle>.<property> = <value>
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+ 
+# dotnet_naming_rule.<namingRuleTitle>.style = <styleTitle>
+dotnet_naming_rule.private_fields_with_underscore.style = prefix_underscore
+ 
+# dotnet_naming_style.<styleTitle>.<property> = <value>
+dotnet_naming_style.prefix_underscore.capitalization = camel_case
+dotnet_naming_style.prefix_underscore.required_prefix = _
+ 
+# dotnet_naming_rule.<namingRuleTitle>.severity = <value>
+dotnet_naming_rule.private_fields_with_underscore.severity = warning
 
 ########## name all constant fields using UPPER_CASE ##########
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2019

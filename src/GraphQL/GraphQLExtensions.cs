@@ -14,11 +14,11 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        private static readonly Regex TrimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
+        private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
         public static string TrimGraphQLTypes(this string name)
         {
-            return TrimPattern.Replace(name, string.Empty).Trim();
+            return _trimPattern.Replace(name, string.Empty).Trim();
         }
 
         public static bool IsCompositeType(this IGraphType type)
@@ -229,7 +229,7 @@ namespace GraphQL
                 foreach (var field in fields)
                 {
                     var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value, schema);
+                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value ?? field.GetDefaultValueAST(schema), schema);
 
                     errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
                 }
@@ -464,7 +464,7 @@ namespace GraphQL
                 var converter = schema.FindValueConverter(serialized, type);
                 return converter != null
                     ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert value to AST: {serialized}");
+                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
             }
         }
     }

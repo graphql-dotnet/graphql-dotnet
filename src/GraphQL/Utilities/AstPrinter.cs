@@ -15,11 +15,11 @@ namespace GraphQL.Utilities
         // was killing the performance of introspection queries (20-30% of the call time)
         // because of continually re-running its constructor lambdas
         // so we cache one copy of it here - it's not changed ever anyway
-        private static readonly AstPrintVisitor Visitor = new AstPrintVisitor();
+        private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
         public static string Print(INode node)
         {
-            var result = Visitor.Visit(node);
+            var result = _visitor.Visit(node);
             return result?.ToString() ?? string.Empty;
         }
     }

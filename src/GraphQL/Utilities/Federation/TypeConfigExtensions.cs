@@ -12,7 +12,7 @@ namespace GraphQL.Utilities.Federation
 
         public static void ResolveReferenceAsync(this TypeConfig config, IFederatedResolver resolver)
         {
-            config.Metadata[FederatedSchemaBuilder.ResolverMetadataField] = resolver;
+            config.Metadata[FederatedSchemaBuilder.RESOLVER_METADATA_FIELD] = resolver;
         }
     }
 }

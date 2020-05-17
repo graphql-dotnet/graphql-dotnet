@@ -11,6 +11,7 @@ namespace GraphQL.Language.AST
         }
 
         public string Name => NameNode.Name;
+
         public NameNode NameNode { get; set; }
 
         public Arguments Arguments { get; set; }

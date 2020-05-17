@@ -68,7 +68,7 @@ namespace GraphQL.Tests.Errors
                 );
                 FieldAsync<StringGraphType>(
                     "firstAsync",
-                    resolve: _ => { throw new FirstException("Exception from asynchronous resolver"); }
+                    resolve: _ => throw new FirstException("Exception from asynchronous resolver")
                 );
                 Field<StringGraphType>(
                     "secondSync",
@@ -76,7 +76,7 @@ namespace GraphQL.Tests.Errors
                 );
                 FieldAsync<StringGraphType>(
                     "secondAsync",
-                    resolve: _ => { throw new SecondTestException("Exception from asynchronous resolver"); }
+                    resolve: _ => throw new SecondTestException("Exception from asynchronous resolver")
                 );
                 Field<StringGraphType>(
                     "uncodedSync",
@@ -84,7 +84,7 @@ namespace GraphQL.Tests.Errors
                 );
                 FieldAsync<StringGraphType>(
                     "uncodedAsync",
-                    resolve: _ => { throw new Exception("Exception from asynchronous resolver"); }
+                    resolve: _ => throw new Exception("Exception from asynchronous resolver")
                 );
             }
         }

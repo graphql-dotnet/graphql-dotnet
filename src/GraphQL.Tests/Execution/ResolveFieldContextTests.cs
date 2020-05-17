@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using GraphQL.NewtonsoftJson;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +18,8 @@ namespace GraphQL.Tests.Execution
             _context = new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
-                Errors = new ExecutionErrors()
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
             };
         }
 
@@ -104,7 +105,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_list_from_array()
         {
-            _context.Arguments = "{a: ['one', 'two']}".ToInputs();
+            _context.Arguments = @"{ ""a"": [""one"", ""two""]}".ToInputs();
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
             result.Count.ShouldBe(2);
@@ -245,7 +246,38 @@ namespace GraphQL.Tests.Execution
             });
         }
 
-        enum SomeEnum
+        [Fact]
+        public void GetSetExtension_Should_Throw_On_Null()
+        {
+            IResolveFieldContext context = null;
+            Should.Throw<ArgumentNullException>(() => context.GetExtension("e"));
+            Should.Throw<ArgumentNullException>(() => context.SetExtension("e", 1));
+
+            context = new ResolveFieldContext();
+            context.GetExtension("a").ShouldBe(null);
+            context.GetExtension("a.b.c.d").ShouldBe(null);
+            Should.Throw<ArgumentException>(() => context.SetExtension("e", 1));
+        }
+
+        [Fact]
+        public void GetSetExtension_Should_Get_And_Set_Values()
+        {
+            _context.GetExtension("a").ShouldBe(null);
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
+
+            _context.SetExtension("a", 5);
+            _context.GetExtension("a").ShouldBe(5);
+
+            _context.SetExtension("a.b.c.d", "value");
+            _context.GetExtension("a.b.c.d").ShouldBe("value");
+            var d = _context.GetExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
+            d.Count.ShouldBe(1);
+
+            _context.SetExtension("a.b.c", "override");
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
+        }
+
+        private enum SomeEnum
         {
             One,
             Two

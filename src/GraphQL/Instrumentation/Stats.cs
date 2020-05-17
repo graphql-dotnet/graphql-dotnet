@@ -32,7 +32,7 @@ namespace GraphQL.Instrumentation
 
         public FieldStat[] Fields
         {
-            get { return _fields.GetAll(); }
+            get => _fields.GetAll();
             set
             {
                 _fields.Clear();

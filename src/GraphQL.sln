@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
+		..\.gitignore = ..\.gitignore
 		..\appveyor.yml = ..\appveyor.yml
-		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 		Directory.Build.props = Directory.Build.props
 		NuGet.config = NuGet.config
 		..\README.md = ..\README.md
@@ -79,6 +79,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.SystemTextJson", "GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj", "{FCE8E24C-29AA-4AED-93BA-08551D38823A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serialization", "Serialization", "{7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +129,10 @@ Global
 		{55968205-5F9A-4646-AFE4-F29913570DBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55968205-5F9A-4646-AFE4-F29913570DBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE8E24C-29AA-4AED-93BA-08551D38823A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +145,8 @@ Global
 		{1CEB8BF8-2292-4B93-9C58-860887FEC9D4} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{587B3CCD-8B68-491B-9AC5-0E04DF3E9507} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 		{F279F263-BCEB-4738-9111-C85139BC63A7} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
+		{55968205-5F9A-4646-AFE4-F29913570DBA} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
+		{FCE8E24C-29AA-4AED-93BA-08551D38823A} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

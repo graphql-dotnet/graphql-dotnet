@@ -1,5 +1,3 @@
-using GraphQL.Types;
-
 namespace GraphQL.Subscription
 {
     public class ResolveEventStreamContext<T> : ResolveFieldContext<T>, IResolveEventStreamContext<T>
@@ -11,6 +9,5 @@ namespace GraphQL.Subscription
 
     public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext
     {
-
     }
 }

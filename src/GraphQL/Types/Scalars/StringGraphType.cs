@@ -1,0 +1,11 @@
+using GraphQL.Language.AST;
+
+namespace GraphQL.Types
+{
+    public class StringGraphType : ScalarGraphType
+    {
+        public override object ParseValue(object value) => value?.ToString();
+
+        public override object ParseLiteral(IValue value) => (value as StringValue)?.Value;
+    }
+}

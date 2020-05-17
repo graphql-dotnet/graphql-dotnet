@@ -7,8 +7,8 @@ namespace GraphQL.Utilities
 {
     internal static class SchemaBuilderExtensions
     {
-        private const string __AST_MetaField__ = "__AST_MetaField__";
-        private const string __EXTENSION_AST_MetaField__ = "__EXTENSION_AST_MetaField__";
+        private const string AST_METAFIELD = "__AST_MetaField__";
+        private const string EXTENSION_AST_METAFIELD = "__EXTENSION_AST_MetaField__";
 
         public static bool IsExtensionType(this IProvideMetadata type)
         {
@@ -28,12 +28,12 @@ namespace GraphQL.Utilities
 
         public static T GetAstType<T>(this IProvideMetadata type) where T : class
         {
-            return type.GetMetadata<T>(__AST_MetaField__);
+            return type.GetMetadata<T>(AST_METAFIELD);
         }
 
         public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node)
             where TMetadataProvider : IProvideMetadata
-            => provider.WithMetadata(__AST_MetaField__, node);
+            => provider.WithMetadata(AST_METAFIELD, node);
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
@@ -44,17 +44,17 @@ namespace GraphQL.Utilities
         {
             var types = GetExtensionAstTypes(type);
             types.Add(astType);
-            type.Metadata[__EXTENSION_AST_MetaField__] = types;
+            type.Metadata[EXTENSION_AST_METAFIELD] = types;
         }
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(__EXTENSION_AST_MetaField__, () => new List<ASTNode>());
+            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>());
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
         {
-            var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>();
+            var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
             return types.SelectMany(x => x.Directives);
         }
     }

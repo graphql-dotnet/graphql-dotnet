@@ -26,7 +26,7 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private CoreToVanillaConverter _converter;
+        private readonly CoreToVanillaConverter _converter;
 
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)
@@ -42,12 +42,12 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
-            var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return "";
+            var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
+            if (astDirectives == null) return "";
 
             var dirs = string.Join(
                 " ",
-                ast.Directives
+                astDirectives
                     .Where(x => IsFederatedDirective(x.Name.Value))
                     .Select(PrintAstDirective)
             );
