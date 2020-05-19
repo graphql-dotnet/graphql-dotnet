@@ -33,7 +33,7 @@ namespace GraphQL.Language.AST
 
         public bool HasDuplicates => _directives?.Count != _unique.Count;
 
-        public bool IsReadOnly => ((ICollection<Directive>)_directives).IsReadOnly;
+        public bool IsReadOnly => false;
 
         public IEnumerator<Directive> GetEnumerator()
         {
