@@ -33,7 +33,6 @@ These are additional scalars provided by this project.
 | `UInt` | `UIntGraphType` | `uint` |
 | `Long` | `LongGraphType` | `long` |
 | `ULong` | `ULongGraphType` | `ulong` |
-| `Byte` | `ByteGraphType` | `byte` |
 | `SByte` | `SByteGraphType` | `sbyte`
 | `BigInt` | `BigIntGraphType` | `BigInteger`
 
