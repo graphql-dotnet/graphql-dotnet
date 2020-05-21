@@ -67,7 +67,7 @@ changes. Publication of each preview version to NuGet would create only unnecess
 http://graphql-dotnet.github.io
 
 > *Note: The current state of documentation corresponds to the state of the code in the master branch
-> with which the **preview** packages are published now.*
+> which is used now to publish the **preview** package versions.*
 
 ## Examples
 
