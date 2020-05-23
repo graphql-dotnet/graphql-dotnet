@@ -178,6 +178,7 @@ namespace GraphQL
         GraphQL.Language.AST.Operation Operation { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
         System.Collections.Generic.IEnumerable<object> Path { get; }
+        System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
@@ -257,6 +258,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Operation Operation { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
+        public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
@@ -282,6 +284,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
+        public System.Collections.Generic.IEnumerable<object> ResponsePath { get; set; }
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -617,6 +620,7 @@ namespace GraphQL.Execution
         public string Name { get; }
         public GraphQL.Execution.ExecutionNode Parent { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
+        public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
         public object Result { get; set; }
         public object Source { get; set; }
         public GraphQL.Types.IObjectGraphType GetParentType(GraphQL.Types.ISchema schema) { }

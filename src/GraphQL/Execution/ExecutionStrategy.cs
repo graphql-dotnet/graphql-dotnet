@@ -131,7 +131,7 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.Path.Append(index);
+                        error.Path = parent.ResponsePath.Append(index);
                         context.Errors.Add(error);
                         return;
                     }
@@ -210,7 +210,7 @@ namespace GraphQL.Execution
             catch (ExecutionError error)
             {
                 error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
+                error.Path = node.ResponsePath;
                 context.Errors.Add(error);
 
                 node.Result = null;
@@ -230,7 +230,7 @@ namespace GraphQL.Execution
 
                 var error = new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
+                error.Path = node.ResponsePath;
                 context.Errors.Add(error);
 
                 node.Result = null;

@@ -60,33 +60,15 @@ namespace GraphQL.Execution
             return null;
         }
 
-        public IEnumerable<object> Path
-        {
-            get
-            {
-                var node = this;
-                var count = 0;
-                while (!(node is RootExecutionNode))
-                {
-                    node = node.Parent;
-                    ++count;
-                }
+        /// <summary>
+        /// The path for the current node within the query.
+        /// </summary>
+        public IEnumerable<object> Path => GeneratePath(isForResponse: false);
 
-                var pathList = new object[count];
-                var index = count;
-                node = this;
-                while (!(node is RootExecutionNode))
-                {
-                    if (node.IndexInParentNode.HasValue)
-                        pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
-                    else
-                        pathList[--index] = node.Field.Name;
-                    node = node.Parent;
-                }
-
-                return pathList;
-            }
-        }
+        /// <summary>
+        /// The path for the current node within the response.
+        /// </summary>
+        public IEnumerable<object> ResponsePath => GeneratePath(isForResponse: true);
 
         private static readonly object _num0 = 0;
         private static readonly object _num1 = 1;
@@ -124,6 +106,31 @@ namespace GraphQL.Execution
             15 => _num15,
             _ => index
         };
+
+        private IEnumerable<object> GeneratePath(bool isForResponse)
+        {
+            var node = this;
+            var count = 0;
+            while (!(node is RootExecutionNode))
+            {
+                node = node.Parent;
+                ++count;
+            }
+
+            var pathList = new object[count];
+            var index = count;
+            node = this;
+            while (!(node is RootExecutionNode))
+            {
+                if (node.IndexInParentNode.HasValue)
+                    pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
+                else
+                    pathList[--index] = isForResponse ? node.Name : node.Field.Name;
+                node = node.Parent;
+            }
+
+            return pathList;
+        }
     }
 
     public interface IParentExecutionNode
