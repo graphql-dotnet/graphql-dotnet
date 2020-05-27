@@ -151,7 +151,7 @@ public class StarWarsQuery : ObjectGraphType
     Field<DroidType>(
       "hero",
 
-      // #2 Resolve dependeiceis using current scope provider
+      // #2 Resolve dependencies using current scope provider
       resolve: context => repoFactory.Value.GetDroid("R2-D2")
 
     );
