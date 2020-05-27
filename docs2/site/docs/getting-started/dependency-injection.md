@@ -145,7 +145,7 @@ Then in your query graph types you can request services using `Defer<T>` to be i
 ```csharp
 public class StarWarsQuery : ObjectGraphType
 {
-  // #1 - Add dependecies using Defer<T>
+  // #1 - Add dependencies using Defer<T>
   public StarWarsQuery(Defer<IDroidRepo> repoFactory)
   {
     Field<DroidType>(
