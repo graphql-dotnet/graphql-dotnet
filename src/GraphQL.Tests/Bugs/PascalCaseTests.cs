@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = "{ Query(ArgumentValue: 42) }";
             var expectedResult = @"{ ""Query"": 42 }";
-            AssertQuery(query, CreateQueryResult(expectedResult), null, null, fieldNameConverter: PascalCaseFieldNameConverter.Instance);
+            AssertQuery(query, CreateQueryResult(expectedResult), null, null, nameConverter: PascalCaseNameConverter.Instance);
         }
     }
 

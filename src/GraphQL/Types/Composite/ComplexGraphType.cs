@@ -24,6 +24,7 @@ namespace GraphQL.Types
 
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
+        internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
         private readonly List<FieldType> _fields = new List<FieldType>();
 
         protected ComplexGraphType()
@@ -64,13 +65,13 @@ namespace GraphQL.Types
                 {
                     if (fieldType.ResolvedType?.IsInputType() == false || fieldType.Type?.IsInputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
-                            $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+                            $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field '{fieldType.Name}' has an output type.");
                 }
                 else
                 {
                     if (fieldType.ResolvedType?.IsOutputType() == false || fieldType.Type?.IsOutputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
-                            $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
+                            $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType. Field '{fieldType.Name}' has an input type.");
                 }
             }
 
@@ -312,6 +313,11 @@ namespace GraphQL.Types
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
+
+            if (expression.Body is MemberExpression expr)
+            {
+                builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+            }
 
             AddField(builder.FieldType);
             return builder;

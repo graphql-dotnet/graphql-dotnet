@@ -433,8 +433,6 @@ namespace GraphQL.Tests.Utilities
                 Name = "CustomScalar";
             }
 
-            public override object Serialize(object value) => throw new System.NotImplementedException();
-
             public override object ParseValue(object value) => throw new System.NotImplementedException();
 
             public override object ParseLiteral(IValue value) => throw new System.NotImplementedException();

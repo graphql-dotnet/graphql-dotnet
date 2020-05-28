@@ -18,7 +18,8 @@ namespace GraphQL.Tests.Execution
             _context = new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
-                Errors = new ExecutionErrors()
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
             };
         }
 
@@ -243,6 +244,37 @@ namespace GraphQL.Tests.Execution
             {
                 var adapter = new ResolveFieldContextAdapter<int>(context);
             });
+        }
+
+        [Fact]
+        public void GetSetExtension_Should_Throw_On_Null()
+        {
+            IResolveFieldContext context = null;
+            Should.Throw<ArgumentNullException>(() => context.GetExtension("e"));
+            Should.Throw<ArgumentNullException>(() => context.SetExtension("e", 1));
+
+            context = new ResolveFieldContext();
+            context.GetExtension("a").ShouldBe(null);
+            context.GetExtension("a.b.c.d").ShouldBe(null);
+            Should.Throw<ArgumentException>(() => context.SetExtension("e", 1));
+        }
+
+        [Fact]
+        public void GetSetExtension_Should_Get_And_Set_Values()
+        {
+            _context.GetExtension("a").ShouldBe(null);
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
+
+            _context.SetExtension("a", 5);
+            _context.GetExtension("a").ShouldBe(5);
+
+            _context.SetExtension("a.b.c.d", "value");
+            _context.GetExtension("a.b.c.d").ShouldBe("value");
+            var d = _context.GetExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
+            d.Count.ShouldBe(1);
+
+            _context.SetExtension("a.b.c", "override");
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
         }
 
         private enum SomeEnum

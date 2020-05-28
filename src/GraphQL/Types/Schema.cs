@@ -58,7 +58,7 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         public bool Initialized => _lookup?.IsValueCreated == true;
 
@@ -68,6 +68,8 @@ namespace GraphQL.Types
 
             FindType("____");
         }
+
+        public string Description { get; set; }
 
         public IObjectGraphType Query { get; set; }
 
@@ -100,6 +102,12 @@ namespace GraphQL.Types
                 .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
+
+        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+
+        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+
+        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
         public void RegisterType(IGraphType type)
         {
@@ -269,7 +277,7 @@ namespace GraphQL.Types
                 types,
                 _directives,
                 type => (IGraphType)Services.GetRequiredService(type),
-                FieldNameConverter,
+                NameConverter,
                 seal: true);
         }
     }

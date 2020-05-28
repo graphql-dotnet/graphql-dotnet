@@ -6,6 +6,7 @@ using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
 using System.Numerics;
+using System;
 
 namespace GraphQL.Language
 {
@@ -46,6 +47,7 @@ namespace GraphQL.Language
         {
             var name = source.Name != null ? Name(source.Name) : null;
             var op = new Operation(name).WithLocation(source, _body);
+            op.CommentNode = Comment(source.Comment);
             op.OperationType = ToOperationType(source.Operation);
             op.SelectionSet = SelectionSet(source.SelectionSet);
             op.Variables = VariableDefinitions(source.VariableDefinitions);
@@ -56,6 +58,7 @@ namespace GraphQL.Language
         public FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
             var frag = new FragmentDefinition(Name(source.Name)).WithLocation(source, _body);
+            frag.CommentNode = Comment(source.Comment);
             frag.Type = NamedType(source.TypeCondition);
             frag.SelectionSet = SelectionSet(source.SelectionSet);
             frag.Directives = Directives(source.Directives);
@@ -66,6 +69,7 @@ namespace GraphQL.Language
         {
             var name = source.Name != null ? Name(source.Name) : null;
             var spread = new FragmentSpread(name).WithLocation(source, _body);
+            spread.CommentNode = Comment(source.Comment);
             spread.Directives = Directives(source.Directives);
             return spread;
         }
@@ -73,6 +77,7 @@ namespace GraphQL.Language
         public InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
             var frag = new InlineFragment().WithLocation(source, _body);
+            frag.CommentNode = Comment(source.Comment);
             frag.Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null;
             frag.Directives = Directives(source.Directives);
             frag.SelectionSet = SelectionSet(source.SelectionSet);
@@ -97,6 +102,7 @@ namespace GraphQL.Language
         public VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
             var def = new VariableDefinition(Name(source.Variable.Name)).WithLocation(source, _body);
+            def.CommentNode = Comment(source.Comment);
             def.Type = Type(source.Type);
             if (source.DefaultValue is GraphQLValue val)
             {
@@ -137,6 +143,7 @@ namespace GraphQL.Language
         {
             var alias = source.Alias != null ? Name(source.Alias) : null;
             var field = new Field(alias, Name(source.Name)).WithLocation(source, _body);
+            field.CommentNode = Comment(source.Comment);
             field.Arguments = Arguments(source.Arguments);
             field.Directives = Directives(source.Directives);
             field.SelectionSet = SelectionSet(source.SelectionSet);
@@ -174,6 +181,7 @@ namespace GraphQL.Language
                 foreach (var a in source)
                 {
                     var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
+                    arg.CommentNode = Comment(a.Comment);
                     arg.Value = Value(a.Value);
                     (target ?? (target = new Arguments())).Add(arg);
                 }
@@ -206,7 +214,13 @@ namespace GraphQL.Language
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
-                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    // If the value doesn't fit in an long, revert to using decimal...
+                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    {
+                        return new DecimalValue(decimalResult).WithLocation(str, _body);
+                    }
+
+                    // If the value doesn't fit in an decimal, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
@@ -295,6 +309,14 @@ namespace GraphQL.Language
         public NameNode Name(GraphQLName name)
         {
             return new NameNode(name.Value).WithLocation(name, _body);
+        }
+
+        private CommentNode Comment(GraphQLComment comment)
+        {
+            if (comment == null)
+                return null;
+
+            return new CommentNode(comment.Text).WithLocation(comment, _body);
         }
 
         public static OperationType ToOperationType(OperationTypeParser type) => type switch

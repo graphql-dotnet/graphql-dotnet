@@ -52,17 +52,17 @@ namespace GraphQL.Execution
 
         public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
         {
-            if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.SchemaMeta;
+                return schema.SchemaMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.TypeMeta;
+                return schema.TypeMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
+            if (field.Name == schema.TypeNameMetaFieldType.Name)
             {
-                return SchemaIntrospection.TypeNameMeta;
+                return schema.TypeNameMetaFieldType;
             }
 
             if (parentType == null)

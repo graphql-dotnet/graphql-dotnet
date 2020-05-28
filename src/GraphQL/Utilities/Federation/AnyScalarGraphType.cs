@@ -13,7 +13,5 @@ namespace GraphQL.Utilities.Federation
         public override object ParseLiteral(IValue value) => value.Value;
 
         public override object ParseValue(object value) => value;
-
-        public override object Serialize(object value) => value;
     }
 }

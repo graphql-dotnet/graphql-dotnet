@@ -74,10 +74,10 @@ namespace GraphQL.Tests.Utilities
         {
             public override void VisitFieldDefinition(FieldType field)
             {
-                var inner = WrapResolver(field.Resolver);
+                var inner = field.Resolver;
                 field.Resolver = new AsyncFieldResolver<object>(async context =>
                 {
-                    var result = await inner.ResolveAsync(context);
+                    object result = await (inner ?? NameFieldResolver.Instance).ResolveAsync(context);
 
                     if (result is string str)
                     {

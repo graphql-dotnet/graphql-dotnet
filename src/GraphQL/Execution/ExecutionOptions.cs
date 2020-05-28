@@ -58,8 +58,8 @@ namespace GraphQL
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
-        /// <summary>Field and argument names are sanitized by the provided <see cref="IFieldNameConverter"/>; defaults to <see cref="CamelCaseFieldNameConverter"/></summary>
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        /// <summary>Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/></summary>
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
         public bool ExposeExceptions { get; set; }

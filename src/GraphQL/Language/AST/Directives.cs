@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
-    public class Directives : AbstractNode, IEnumerable<Directive>
+    public class Directives : AbstractNode, ICollection<Directive>
     {
         private List<Directive> _directives;
         private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
@@ -33,6 +33,8 @@ namespace GraphQL.Language.AST
 
         public bool HasDuplicates => _directives?.Count != _unique.Count;
 
+        public bool IsReadOnly => false;
+
         public IEnumerator<Directive> GetEnumerator()
         {
             if (_directives == null)
@@ -52,5 +54,17 @@ namespace GraphQL.Language.AST
             if (obj.GetType() != GetType()) return false;
             return Equals((Directives)obj);
         }
+
+        public void Clear()
+        {
+            _directives.Clear();
+            _unique.Clear();
+        }
+
+        public bool Contains(Directive item) => _directives.Contains(item);
+
+        public void CopyTo(Directive[] array, int arrayIndex) => _directives.CopyTo(array, arrayIndex);
+
+        public bool Remove(Directive item) => _directives.Remove(item) && _unique.Remove(item.Name);
     }
 }

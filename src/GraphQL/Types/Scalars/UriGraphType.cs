@@ -5,8 +5,6 @@ namespace GraphQL.Types
 {
     public class UriGraphType : ScalarGraphType
     {
-        public override object Serialize(object value) => ParseValue(value);
-
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
 
         public override object ParseLiteral(IValue value) => value switch

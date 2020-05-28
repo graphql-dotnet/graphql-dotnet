@@ -21,11 +21,25 @@ namespace GraphQL
         /// </summary>
         /// <param name="options">The options of the execution</param>
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
+    }
 
+    /// <summary>
+    /// Extension methods for <see cref="IDocumentExecuter"/>.
+    /// </summary>
+    public static class DocumentExecuterExtensions
+    {
         /// <summary>
         /// Executes a GraphQL request and returns the result
         /// </summary>
         /// <param name="configure">A delegate which configures the execution options</param>
-        Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure);
+        public static Task<ExecutionResult> ExecuteAsync(this IDocumentExecuter executer, Action<ExecutionOptions> configure)
+        {
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+
+            var options = new ExecutionOptions();
+            configure(options);
+            return executer.ExecuteAsync(options);
+        }
     }
 }

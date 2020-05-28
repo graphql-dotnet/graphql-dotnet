@@ -12,8 +12,8 @@ namespace GraphQL.NewtonsoftJson
             {
                 writer.WriteStartObject();
 
-                WriteData(result, writer, serializer);
                 WriteErrors(result.Errors, writer, serializer, result.ExposeExceptions);
+                WriteData(result, writer, serializer);
                 WriteExtensions(result, writer, serializer);
 
                 writer.WriteEndObject();
@@ -111,10 +111,10 @@ namespace GraphQL.NewtonsoftJson
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
-                error.DataAsDictionary.Apply(entry =>
+                error.Data.Apply((key, value) =>
                 {
-                    writer.WritePropertyName(entry.Key);
-                    serializer.Serialize(writer, entry.Value);
+                    writer.WritePropertyName(key.ToString());
+                    serializer.Serialize(writer, value);
                 });
                 writer.WriteEndObject();
             }

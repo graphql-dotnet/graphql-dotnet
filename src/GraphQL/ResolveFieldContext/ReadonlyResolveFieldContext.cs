@@ -62,13 +62,15 @@ namespace GraphQL
 
         public ExecutionErrors Errors => _executionContext.Errors;
 
-        public IEnumerable<string> Path => _executionNode.Path;
+        public IEnumerable<object> Path => _executionNode.Path;
 
         public IDictionary<string, Language.AST.Field> SubFields => _subFields ?? (_subFields = GetSubFields());
 
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
 
         object IResolveFieldContext.Source => _executionNode.Source;
+
+        public IDictionary<string, object> Extensions => _executionContext.Extensions;
 
         public IServiceProvider RequestServices => _executionContext.RequestServices;
     }

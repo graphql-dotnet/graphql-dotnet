@@ -62,13 +62,15 @@ namespace GraphQL.Extensions.DI.Microsoft
 
         public ExecutionErrors Errors => _baseContext.Errors;
 
-        public IEnumerable<string> Path => _baseContext.Path;
+        public IEnumerable<object> Path => _baseContext.Path;
 
         public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
+
+        public IDictionary<string, object> Extensions => _baseContext.Extensions;
 
         object IResolveFieldContext.Source => _baseContext.Source;
     }

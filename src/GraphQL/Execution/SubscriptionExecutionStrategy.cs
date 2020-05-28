@@ -113,7 +113,7 @@ namespace GraphQL.Execution
                         if (context.Listeners != null)
                             foreach (var listener in context.Listeners)
                             {
-                                await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
+                                await listener.BeforeExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
 
@@ -123,7 +123,7 @@ namespace GraphQL.Execution
                         if (context.Listeners != null)
                             foreach (var listener in context.Listeners)
                             {
-                                await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
+                                await listener.AfterExecutionAsync(context)
                                     .ConfigureAwait(false);
                             }
 
@@ -163,24 +163,13 @@ namespace GraphQL.Execution
             ExecutionContext context,
             string message,
             Field field,
-            IEnumerable<string> path,
+            IEnumerable<object> path,
             Exception ex = null)
         {
             var error = new ExecutionError(message, ex);
             error.AddLocation(field, context.Document);
             error.Path = path;
             return error;
-        }
-    }
-
-    internal static class ExecutionContextExtensions
-    {
-        public static ExecutionResult With(this ExecutionResult result, ExecutionContext context)
-        {
-            result.Query = context.Document.OriginalQuery;
-            result.Document = context.Document;
-            result.Operation = context.Operation;
-            return result;
         }
     }
 }

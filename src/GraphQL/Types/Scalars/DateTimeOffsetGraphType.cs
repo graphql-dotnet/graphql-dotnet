@@ -12,8 +12,6 @@ namespace GraphQL.Types
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
-        public override object Serialize(object value) => ParseValue(value);
-
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
 
         public override object ParseLiteral(IValue value) => value switch

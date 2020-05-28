@@ -44,8 +44,8 @@ Set the `Mutation` property on your `Schema`.
 ```csharp
 public class StarWarsSchema : Schema
 {
-  public StarWarsSchema(IDependencyResolver resolver)
-    : base(resolver)
+  public StarWarsSchema(IServiceProvider provider)
+    : base(provider)
   {
     Query = resolver.Resolve<StarWarsQuery>();
     Mutation = resolver.Resolve<StarWarsMutation>();

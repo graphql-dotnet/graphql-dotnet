@@ -5,6 +5,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
 [![Nuget](https://img.shields.io/nuget/vpre/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json)
 [![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
 
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
@@ -26,7 +27,7 @@ by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.
 > WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
 > If errors occur, it is recommended that you first check the behavior on the latest available preview version before
 > reporting a issue. Latest 3.0.0-preview-XXXX versions are **backwards incompatible** with latest stable 2.4.0 version.
-> You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1352/lib/netstandard2.0/diff/2.4.0/).
+> You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1490/lib/netstandard2.0/diff/2.4.0/).
 
 You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 ```
@@ -34,9 +35,13 @@ You can install the latest stable version via [NuGet](https://www.nuget.org/pack
 ```
 
 For serialized results, you'll need an `IDocumentWriter` implementation.
-We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.SystemTextJson/) for .NET Core 3+,
-[GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson/)
-(formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/)), or you can bring your own.
+We support several serializers (or you can bring your own):
+
+| Package | Downloads | Nuget Latest | MyGet Latest |
+|---------|-----------|--------------|--------------|
+| GraphQL.SystemTextJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson/) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) | [![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL.SystemTextJson?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) |
+| GraphQL.NewtonsoftJson, formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/) | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL.NewtonsoftJson?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) |
+
 ```
 > dotnet add package GraphQL.SystemTextJson
 > dotnet add package GraphQL.NewtonsoftJson
@@ -46,22 +51,35 @@ We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.Syste
 > `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
 > which isn't recommended.*
 
-You can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json),
+You can get the latest pre-release packages from the [MyGet feed](src/NuGet.config),
 where you may want to explicitly pull a certain version using `-v`.
 ```
-> dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1448
+> dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1593
 ```
+
+[MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) is the primary source of packages
+where you can find all preview versions built from the `master` branch. Periodically (usually once every
+few months) the latest preview version is published to NuGet manually. This is due to fairly frequent
+changes. Publication of each preview version to NuGet would create only unnecessary noise.
 
 ## Documentation
 
 http://graphql-dotnet.github.io
+
+> *Note: The current state of documentation corresponds to the state of the code in the master branch
+> which is used now to publish the **preview** package versions.*
 
 ## Examples
 
 https://github.com/graphql-dotnet/examples
 
 You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
-It supports the popular IDEs for managing GraphQL requests - GraphQL Playground, GraphiQL and Altair.
+It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
+- [Altair](https://github.com/imolorhe/altair)
+- [Firecamp](https://firecamp.io/graphql/)
+- [GraphiQL](https://github.com/graphql/graphiql)
+- [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+- [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
 ## Training
 
@@ -70,6 +88,7 @@ It supports the popular IDEs for managing GraphQL requests - GraphQL Playground,
 
 ## Upgrade Guides
 
+* 2.4.0 to 3.0 - under development
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](/upgrade-guides/v0.11.0.md)
 * [0.8.0](/upgrade-guides/v0.8.0.md)

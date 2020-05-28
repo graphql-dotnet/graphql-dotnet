@@ -12,7 +12,5 @@ namespace GraphQL.Types
         };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(short));
-
-        public override object Serialize(object value) => ParseValue(value);
     }
 }
