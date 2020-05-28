@@ -1954,7 +1954,7 @@ namespace GraphQL.Types
         public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
     }
-    public class ListGraphType : GraphQL.Types.GraphType
+    public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         protected ListGraphType(System.Type type) { }
@@ -1963,7 +1963,7 @@ namespace GraphQL.Types
         public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
-    public class ListGraphType<T> : GraphQL.Types.ListGraphType, GraphQL.Types.IProvideResolvedType
+    public class ListGraphType<T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
         public ListGraphType() { }
@@ -1974,7 +1974,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
-    public class NonNullGraphType : GraphQL.Types.GraphType
+    public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         protected NonNullGraphType(System.Type type) { }
@@ -1983,7 +1983,7 @@ namespace GraphQL.Types
         public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
-    public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType, GraphQL.Types.IProvideResolvedType
+    public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.GraphType
     {
         public NonNullGraphType() { }
