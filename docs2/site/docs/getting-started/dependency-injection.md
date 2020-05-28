@@ -206,7 +206,7 @@ E.g. In ASP.NET Core [GraphQl.Harness](https://github.com/graphql-dotnet/graphql
             Field<CharacterInterface>("hero",
                 resolve: context =>
                     ((GraphQLUserContext)context.UserContext)
-                    .GetRequiredService<IDroidRepo>()
+                    .ServiceProvider.GetRequiredService<IDroidRepo>()
                     .GetDroidByIdAsync("3")
             );
 
