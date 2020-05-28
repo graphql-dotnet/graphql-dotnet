@@ -2,7 +2,7 @@ using System;
 
 namespace GraphQL.Types
 {
-    public class NonNullGraphType<T> : NonNullGraphType, IProvideResolvedType
+    public class NonNullGraphType<T> : NonNullGraphType
         where T : GraphType
     {
         public NonNullGraphType()
@@ -11,7 +11,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class NonNullGraphType : GraphType
+    public class NonNullGraphType : GraphType, IProvideResolvedType
     {
         public NonNullGraphType(IGraphType type)
         {
