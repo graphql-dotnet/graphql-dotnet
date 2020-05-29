@@ -130,9 +130,9 @@ public static class ContextExtensions
 {
     public static T GetRequiredScopedService<T>(this IResolveFieldContext context)
     {
-        var schema = (IServiceProvider) context.Schema;
+        var rootServiceProvider = (IServiceProvider)context.Schema;
 
-        var contextAccessor = schema.GetRequiredService<IHttpContextAccessor>();
+        var contextAccessor = rootServiceProvider.GetRequiredService<IHttpContextAccessor>();
 
         var scopedServiceProvider = contextAccessor.HttpContext.RequestServices;
 
