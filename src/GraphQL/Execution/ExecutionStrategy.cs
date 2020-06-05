@@ -119,6 +119,11 @@ namespace GraphQL.Execution
                     {
                         SetArrayItemNodes(context, arrayNode);
                     }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = ((ScalarGraphType)itemType).Serialize(d)
+                            ?? throw new ExecutionError($"Unable to serialize '{d}'");
+                    }
 
                     arrayItems.Add(node);
                 }
@@ -204,6 +209,11 @@ namespace GraphQL.Execution
                     else if (node is ArrayExecutionNode arrayNode)
                     {
                         SetArrayItemNodes(context, arrayNode);
+                    }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = ((ScalarGraphType)valueNode.GraphType).Serialize(node.Result)
+                            ?? throw new ExecutionError($"Unable to serialize '{node.Result}'");
                     }
                 }
             }

@@ -643,13 +643,15 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var expected = @"
+            var error = new ExecutionError("Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.");
+            error.AddLocation(3, 45);
+            error.Code = "5.3.3.1";
+            var expected = new ExecutionResult
             {
-              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
-            }
-            ";
+                Errors = new ExecutionErrors { error },
+            };
 
-            AssertQuerySuccess(query, expected, rules:Enumerable.Empty<IValidationRule>());
+            AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
     }
 }

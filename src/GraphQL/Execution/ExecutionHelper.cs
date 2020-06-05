@@ -1,6 +1,7 @@
 using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,10 +208,10 @@ namespace GraphQL.Execution
         {
             if (input is IValue value)
             {
-                return scalar.ParseLiteral(value);
+                return scalar.ParseLiteral(value) ?? throw new ArgumentException($"Unable to convert '{value.Value}'");
             }
 
-            return scalar.ParseValue(input);
+            return scalar.ParseValue(input) ?? throw new ArgumentException($"Unable to convert '{input}'");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
@@ -299,7 +300,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return scalarType.ParseLiteral(input);
+                return scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}'");
             }
 
             return null;

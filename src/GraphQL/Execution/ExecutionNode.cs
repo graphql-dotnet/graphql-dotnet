@@ -241,11 +241,8 @@ namespace GraphQL.Execution
 
         public override object ToValue()
         {
-            if (Result == null)
-                return null;
-
-            var scalarType = GraphType as ScalarGraphType;
-            return scalarType?.Serialize(Result);
+            // result has already been serialized within ExecuteNodeAsync / SetArrayItemNodes
+            return Result;
         }
     }
 }
