@@ -131,7 +131,7 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.Path.Append(index.ToString());
+                        error.Path = parent.Path.Append(index);
                         context.Errors.Add(error);
                         return;
                     }
@@ -289,7 +289,7 @@ namespace GraphQL.Execution
             if (context.Listeners != null)
                 foreach (var listener in context.Listeners)
                 {
-                    await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
+                    await listener.BeforeExecutionStepAwaitedAsync(context)
                         .ConfigureAwait(false);
                 }
         }

@@ -50,12 +50,11 @@ namespace GraphQL.Instrumentation
             var fieldStats = perf.Where(x => x.Category == "field");
             foreach (var fieldStat in fieldStats)
             {
-                var stringPath = fieldStat.MetaField<IEnumerable<string>>("path");
                 trace.Execution.Resolvers.Add(
                     new ApolloTrace.ResolverTrace
                     {
                         FieldName = fieldStat.MetaField<string>("fieldName"),
-                        Path = ConvertPath(stringPath).ToList(),
+                        Path = fieldStat.MetaField<IEnumerable<object>>("path").ToList(),
                         ParentType = fieldStat.MetaField<string>("typeName"),
                         ReturnType = fieldStat.MetaField<string>("returnTypeName"),
                         StartOffset = ApolloTrace.ConvertTime(fieldStat.Start),
@@ -64,21 +63,6 @@ namespace GraphQL.Instrumentation
             }
 
             return trace;
-        }
-
-        private static IEnumerable<object> ConvertPath(IEnumerable<string> stringPath)
-        {
-            foreach (var step in stringPath)
-            {
-                if (int.TryParse(step, out var arrayIndex))
-                {
-                    yield return arrayIndex;
-                }
-                else
-                {
-                    yield return step;
-                }
-            }
         }
     }
 }

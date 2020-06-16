@@ -1,77 +1,41 @@
-using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Resolvers;
 using GraphQL.Validation;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Provides the ability to log query validation failures and monitor progress of a GraphQL request's execution.
+    /// </summary>
     public interface IDocumentExecutionListener
     {
-        Task AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token);
-        Task BeforeExecutionAsync(object userContext, CancellationToken token);
-        Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token);
-        Task AfterExecutionAsync(object userContext, CancellationToken token);
-        Task BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token);
+        /// <summary>Executes after document validation is complete. Can be used to log validation failures.</summary>
+        Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult);
+
+        /// <summary>Executes after document validation passes, before calling <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/>.</summary>
+        Task BeforeExecutionAsync(IExecutionContext context);
+
+        /// <summary>Executes before the <see cref="IDocumentExecuter"/> awaits the <see cref="Task"/> returned by <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/></summary>
+        Task BeforeExecutionAwaitedAsync(IExecutionContext context);
+
+        /// <summary>Executes after the <see cref="IExecutionStrategy"/> has completed executing the request</summary>
+        Task AfterExecutionAsync(IExecutionContext context);
+
+        /// <summary>Executes before each time the <see cref="IExecutionStrategy"/> awaits the <see cref="Task{TResult}"/> returned by <see cref="IFieldResolver.Resolve"/>. For parallel resolvers, this may execute a single time prior to awaiting multiple tasks.</summary>
+        Task BeforeExecutionStepAwaitedAsync(IExecutionContext context);
     }
 
-    public interface IDocumentExecutionListener<in T>
+    /// <inheritdoc cref="IDocumentExecutionListener"/>
+    public abstract class DocumentExecutionListenerBase : IDocumentExecutionListener
     {
-        Task AfterValidationAsync(T userContext, IValidationResult validationResult, CancellationToken token);
-        Task BeforeExecutionAsync(T userContext, CancellationToken token);
-        Task BeforeExecutionAwaitedAsync(T userContext, CancellationToken token);
-        Task AfterExecutionAsync(T userContext, CancellationToken token);
-        Task BeforeExecutionStepAwaitedAsync(T userContext, CancellationToken token);
-    }
+        public virtual Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult) => Task.CompletedTask;
 
-    public abstract class DocumentExecutionListenerBase<T> : IDocumentExecutionListener<T>, IDocumentExecutionListener
-    {
-        public virtual Task AfterValidationAsync(T userContext, IValidationResult validationResult, CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
+        public virtual Task BeforeExecutionAsync(IExecutionContext context) => Task.CompletedTask;
 
-        public virtual Task BeforeExecutionAsync(T userContext, CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
+        public virtual Task BeforeExecutionAwaitedAsync(IExecutionContext context) => Task.CompletedTask;
 
-        public virtual Task BeforeExecutionAwaitedAsync(T userContext, CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
+        public virtual Task AfterExecutionAsync(IExecutionContext context) => Task.CompletedTask;
 
-        public virtual Task AfterExecutionAsync(T userContext, CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
-
-        public virtual Task BeforeExecutionStepAwaitedAsync(T userContext, CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
-
-        Task IDocumentExecutionListener.AfterValidationAsync(object userContext, IValidationResult validationResult, CancellationToken token)
-        {
-            return AfterValidationAsync((T)userContext, validationResult, token);
-        }
-
-        Task IDocumentExecutionListener.BeforeExecutionAsync(object userContext, CancellationToken token)
-        {
-            return BeforeExecutionAsync((T)userContext, token);
-        }
-
-        Task IDocumentExecutionListener.BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
-        {
-            return BeforeExecutionAwaitedAsync((T)userContext, token);
-        }
-
-        Task IDocumentExecutionListener.AfterExecutionAsync(object userContext, CancellationToken token)
-        {
-            return AfterExecutionAsync((T)userContext, token);
-        }
-
-        Task IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(object userContext, CancellationToken token)
-        {
-            return BeforeExecutionStepAwaitedAsync((T)userContext, token);
-        }
+        public virtual Task BeforeExecutionStepAwaitedAsync(IExecutionContext context) => Task.CompletedTask;
     }
 }

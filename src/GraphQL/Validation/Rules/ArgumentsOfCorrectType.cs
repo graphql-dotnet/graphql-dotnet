@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
                     if (argDef == null) return;
 
                     var type = argDef.ResolvedType;
-                    var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
+                    var errors = type.IsValidLiteralValue(argAst.Value ?? argDef.GetDefaultValueAST(context.Schema), context.Schema).ToList();
                     if (errors.Count > 0)
                     {
                         var error = new ValidationError(

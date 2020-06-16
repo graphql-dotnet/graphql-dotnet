@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -67,7 +66,9 @@ namespace Example
                 options.ExposeExceptions = _settings.ExposeExceptions;
                 if (_settings.EnableMetrics)
                 {
-                    options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                    options.FieldMiddleware
+                        .Use<CountFieldMiddleware>()
+                        .Use<InstrumentFieldsMiddleware>();
                 }
             });
 

@@ -13,6 +13,8 @@ namespace GraphQL.StarWars
             //Query = serviceProvider.GetRequiredService<StarWarsQuery>();
             Query = serviceProvider.GetRequiredService<DIObjectGraphType<StarWarsQueryDI>>();
             Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
+
+            Description = "Example StarWars universe schema";
         }
     }
 }

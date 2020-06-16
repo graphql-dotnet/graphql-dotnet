@@ -29,11 +29,6 @@ namespace GraphQL.Tests
             };
 
             var expected = @"{
-              ""data"": {
-                ""someType"": {
-                    ""someProperty"": ""someValue""
-                }
-              },
               ""errors"": [
                 {
                   ""message"": ""some error 1""
@@ -42,6 +37,11 @@ namespace GraphQL.Tests
                   ""message"": ""some error 2""
                 }
               ],
+              ""data"": {
+                ""someType"": {
+                    ""someProperty"": ""someValue""
+                }
+              },
               ""extensions"": {
                 ""someExtension"": {
                   ""someProperty"": ""someValue"",
@@ -107,6 +107,29 @@ namespace GraphQL.Tests
             };
 
             var expected = @"{ ""data"": {} }";
+
+            var actual = await writer.WriteToStringAsync(executionResult);
+
+            actual.ShouldBeCrossPlatJson(expected);
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async void Writes_Path_Property_Correctly(IDocumentWriter writer)
+        {
+            var executionResult = new ExecutionResult
+            {
+                Data = null,
+                Errors = new ExecutionErrors(),
+                Extensions = null,
+            };
+            var executionError = new ExecutionError("Error testing index")
+            {
+                Path = new object[] { "parent", 23, "child" }
+            };
+            executionResult.Errors.Add(executionError);
+
+            var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
 
             var actual = await writer.WriteToStringAsync(executionResult);
 

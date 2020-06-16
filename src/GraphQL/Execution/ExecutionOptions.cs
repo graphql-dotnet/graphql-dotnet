@@ -15,7 +15,11 @@ namespace GraphQL
     /// <summary>Configuration options to be passed to <see cref="IDocumentExecuter"/> to execute a query</summary>
     public class ExecutionOptions : IProvideUserContext
     {
-        /// <summary>Schema of graph to use; required<br/><br/>Schema will be initialized if has not yet been initialized.</summary>
+        /// <summary>
+        /// Schema of graph to use; required
+        /// <br/><br/>
+        /// Schema will be initialized if it has not yet been initialized.
+        /// </summary>
         public ISchema Schema { get; set; }
 
         /// <summary>Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers</summary>
@@ -44,7 +48,7 @@ namespace GraphQL
         /// <summary>
         /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
         /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
-        /// at the beginning of the first call to DocumentExecuter.ExecuteAsync.
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(Action{ExecutionOptions})">ExecuteAsync</see>.
         /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
 
@@ -54,8 +58,8 @@ namespace GraphQL
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
-        /// <summary>Field and argument names are sanitized by the provided <see cref="IFieldNameConverter"/>; defaults to <see cref="CamelCaseFieldNameConverter"/></summary>
-        public IFieldNameConverter FieldNameConverter { get; set; } = CamelCaseFieldNameConverter.Instance;
+        /// <summary>Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/></summary>
+        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
         /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
         public bool ExposeExceptions { get; set; }

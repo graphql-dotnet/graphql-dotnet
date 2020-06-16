@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.0</Version>
     <IsPackable>false</IsPackable>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>

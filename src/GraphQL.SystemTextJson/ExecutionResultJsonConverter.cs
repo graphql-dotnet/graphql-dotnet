@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,16 +12,16 @@ namespace GraphQL.SystemTextJson
         {
             writer.WriteStartObject();
 
-            // Important: Don't pass the same options down when recursively calling Serialize.
+            // Important: Be careful with passing the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
-            WriteData(writer, value);
-            WriteErrors(writer, value.Errors, value.ExposeExceptions);
-            WriteExtensions(writer, value);
+            WriteErrors(writer, value.Errors, value.ExposeExceptions, options);
+            WriteData(writer, value, options);
+            WriteExtensions(writer, value, options);
 
             writer.WriteEndObject();
         }
 
-        private void WriteData(Utf8JsonWriter writer, ExecutionResult result)
+        private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             var data = result.Data;
 
@@ -29,11 +30,101 @@ namespace GraphQL.SystemTextJson
                 return;
             }
 
-            writer.WritePropertyName("data");
-            JsonSerializer.Serialize(writer, data);
+            WriteProperty(writer, "data", data, options);
         }
 
-        private void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions)
+        private static void WriteProperty(Utf8JsonWriter writer, string propertyName, object propertyValue, JsonSerializerOptions options)
+        {
+            writer.WritePropertyName(propertyName);
+            WriteValue(writer, propertyValue, options);
+        }
+
+        private static void WriteValue(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            switch (value)
+            {
+                case null:
+                {
+                    writer.WriteNullValue();
+                    break;
+                }
+                case string s:
+                {
+                    writer.WriteStringValue(s);
+                    break;
+                }
+                case bool b:
+                {
+                    writer.WriteBooleanValue(b);
+                    break;
+                }
+                case int i:
+                {
+                    writer.WriteNumberValue(i);
+                    break;
+                }
+                case long l:
+                {
+                    writer.WriteNumberValue(l);
+                    break;
+                }
+                case float f:
+                {
+                    writer.WriteNumberValue(f);
+                    break;
+                }
+                case double d:
+                {
+                    writer.WriteNumberValue(d);
+                    break;
+                }
+                case decimal dm:
+                {
+                    writer.WriteNumberValue(dm);
+                    break;
+                }
+                case uint ui:
+                {
+                    writer.WriteNumberValue(ui);
+                    break;
+                }
+                case ulong ul:
+                {
+                    writer.WriteNumberValue(ul);
+                    break;
+                }
+                case Dictionary<string, object> dictionary:
+                {
+                    writer.WriteStartObject();
+
+                    foreach (var kvp in dictionary)
+                        WriteProperty(writer, kvp.Key, kvp.Value, options);
+
+                    writer.WriteEndObject();
+
+                    break;
+                }
+                case List<object> list:
+                {
+                    writer.WriteStartArray();
+
+                    foreach (object item in list)
+                        WriteValue(writer, item, options);
+
+                    writer.WriteEndArray();
+
+                    break;
+                }
+                default:
+                {
+                    // Need to avoid this call by all means! The question remains open - why this API so expensive?
+                    JsonSerializer.Serialize(writer, value, options);
+                    break;
+                }
+            }
+        }
+
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, bool exposeExceptions, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -51,7 +142,7 @@ namespace GraphQL.SystemTextJson
                 writer.WritePropertyName("message");
 
                 // Check if return StackTrace, including all inner exceptions
-                JsonSerializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message);
+                JsonSerializer.Serialize(writer, exposeExceptions ? error.ToString() : error.Message, options);
 
                 if (error.Locations != null)
                 {
@@ -61,9 +152,9 @@ namespace GraphQL.SystemTextJson
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
-                        JsonSerializer.Serialize(writer, location.Line);
+                        JsonSerializer.Serialize(writer, location.Line, options);
                         writer.WritePropertyName("column");
-                        JsonSerializer.Serialize(writer, location.Column);
+                        JsonSerializer.Serialize(writer, location.Column, options);
                         writer.WriteEndObject();
                     });
                     writer.WriteEndArray();
@@ -72,10 +163,10 @@ namespace GraphQL.SystemTextJson
                 if (error.Path != null && error.Path.Any())
                 {
                     writer.WritePropertyName("path");
-                    JsonSerializer.Serialize(writer, error.Path);
+                    JsonSerializer.Serialize(writer, error.Path, options);
                 }
 
-                WriteErrorExtensions(writer, error);
+                WriteErrorExtensions(writer, error, options);
 
                 writer.WriteEndObject();
             });
@@ -83,7 +174,7 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndArray();
         }
 
-        private void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error)
+        private static void WriteErrorExtensions(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
         {
             if (string.IsNullOrWhiteSpace(error.Code) && (error.Data == null || error.Data.Count == 0))
             {
@@ -96,14 +187,14 @@ namespace GraphQL.SystemTextJson
             if (!string.IsNullOrWhiteSpace(error.Code))
             {
                 writer.WritePropertyName("code");
-                JsonSerializer.Serialize(writer, error.Code);
+                JsonSerializer.Serialize(writer, error.Code, options);
             }
 
             if (error.HasCodes)
             {
                 writer.WritePropertyName("codes");
                 writer.WriteStartArray();
-                error.Codes.Apply(code => JsonSerializer.Serialize(writer, code));
+                error.Codes.Apply(code => JsonSerializer.Serialize(writer, code, options));
                 writer.WriteEndArray();
             }
 
@@ -111,10 +202,10 @@ namespace GraphQL.SystemTextJson
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
-                error.DataAsDictionary.Apply(entry =>
+                error.Data.Apply((key, value) =>
                 {
-                    writer.WritePropertyName(entry.Key);
-                    JsonSerializer.Serialize(writer, entry.Value);
+                    writer.WritePropertyName(key.ToString());
+                    JsonSerializer.Serialize(writer, value, options);
                 });
                 writer.WriteEndObject();
             }
@@ -122,12 +213,12 @@ namespace GraphQL.SystemTextJson
             writer.WriteEndObject();
         }
 
-        private void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result)
+        private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
         {
             if (result.Extensions?.Count > 0)
             {
                 writer.WritePropertyName("extensions");
-                JsonSerializer.Serialize(writer, result.Extensions);
+                JsonSerializer.Serialize(writer, result.Extensions, options);
             }
         }
 

@@ -1,4 +1,5 @@
 using Example;
+using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.SystemTextJson;
@@ -24,11 +25,15 @@ namespace GraphQL.Harness
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            // add execution components
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddScoped<IDocumentExecuter, DI.DIDocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
+            // add something like repository
             services.AddSingleton<StarWarsData>(); //should be scoped, but since all of the singleton types still depend on this, it's a singleton
+
+            // add graph types
             //services.AddSingleton<StarWarsQuery>();
             services.AddScoped<StarWarsQueryDI>();
             services.AddSingleton<DI.DIObjectGraphType<StarWarsQueryDI>>();
@@ -40,13 +45,21 @@ namespace GraphQL.Harness
             services.AddSingleton<DroidTypeDIGraph>();
             services.AddSingleton<CharacterInterface>();
             services.AddSingleton<EpisodeEnum>();
+
+            // add schema
             services.AddSingleton<ISchema, StarWarsSchema>();
 
+            // add infrastructure stuff
             services.AddHttpContextAccessor();
             services.AddLogging(builder => builder.AddConsole());
 
+            // add options configuration
             services.Configure<GraphQLSettings>(Configuration);
             services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
+
+            // add Field Middlewares
+            services.AddSingleton<CountFieldMiddleware>();
+            services.AddSingleton<InstrumentFieldsMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +71,8 @@ namespace GraphQL.Harness
             app.UseMiddleware<GraphQLMiddleware>();
             app.UseGraphQLPlayground();
             app.UseGraphiQLServer();
+            app.UseGraphQLAltair();
+            app.UseGraphQLVoyager();
         }
     }
 }

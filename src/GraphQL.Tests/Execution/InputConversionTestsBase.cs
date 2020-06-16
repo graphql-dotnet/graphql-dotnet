@@ -10,6 +10,13 @@ namespace GraphQL.Tests.Execution
     {
         #region Input Types
 
+        private class Person
+        {
+            public string Name { get; set; }
+
+            public int Age { get; set; }
+        }
+
         public class MyInput
         {
             public int A { get; set; }
@@ -326,6 +333,33 @@ namespace GraphQL.Tests.Execution
 
             myInput.ShouldNotBeNull();
             myInput.H.ShouldBe(expected);
+        }
+
+        [Fact]
+        public void can_convert_json_to_input_object_with_custom_converter()
+        {
+            var json = @"{ ""name1"": ""tom"", ""age1"": 10 }";
+
+            var inputs = VariablesToInputs(json);
+
+            // before custom converter
+            var person1 = inputs.ToObject<Person>();
+            person1.Name.ShouldBeNull();
+            person1.Age.ShouldBe(0);
+
+            ValueConverter.Register(v => new Person { Name = (string)v["name1"], Age = (int)v["age1"] });
+
+            // after registering custom converter
+            var person2 = inputs.ToObject<Person>();
+            person2.Name.ShouldBe("tom");
+            person2.Age.ShouldBe(10);
+
+            // after unregistering custom converter
+            ValueConverter.Register<Person>(null);
+
+            var person3 = inputs.ToObject<Person>();
+            person3.Name.ShouldBeNull();
+            person3.Age.ShouldBe(0);
         }
 
         protected abstract Inputs VariablesToInputs(string variables);

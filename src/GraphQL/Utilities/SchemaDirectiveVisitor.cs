@@ -6,6 +6,7 @@ namespace GraphQL.Utilities
     public abstract class SchemaDirectiveVisitor : BaseSchemaNodeVisitor
     {
         public string Name { get; set; }
+
         public Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
 
         public TType GetArgument<TType>(string name, TType defaultValue = default)
@@ -20,7 +21,7 @@ namespace GraphQL.Utilities
                 return defaultValue;
             }
 
-            if (arg is Dictionary<string, object> inputObject)
+            if (arg is IDictionary<string, object> inputObject)
             {
                 var type = argumentType;
                 if (type.Namespace?.StartsWith("System", StringComparison.InvariantCulture) == true)
