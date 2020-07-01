@@ -1579,11 +1579,13 @@ namespace GraphQL.Types
     }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
+        public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
+        public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludedProperties) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }
