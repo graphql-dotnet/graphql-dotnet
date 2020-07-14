@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Shouldly;
 using System;
 using Xunit;
 
@@ -11,7 +12,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = @"
 mutation {
-  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decArray: [1,39614081257132168796771975168,3] })
+  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
   {
     id1
     id2
@@ -35,6 +36,7 @@ mutation {
     sbyteArray
 
     dec
+    decZero
     decArray
   }
   create_with_defaults(input: { })
@@ -61,6 +63,7 @@ mutation {
     sbyteArray
 
     dec
+    decZero
     decArray
   }
 }
@@ -99,6 +102,7 @@ mutation {
         -3
       ],
       ""dec"": 39614081257132168796771975168,
+      ""decZero"": 12.10,
       ""decArray"": [
         1,
         39614081257132168796771975168,
@@ -137,6 +141,7 @@ mutation {
         -3
       ],
       ""dec"": 39614081257132168796771975168,
+      ""decZero"": 12.10,
       ""decArray"": [
         1,
         39614081257132168796771975168,
@@ -182,6 +187,7 @@ mutation {
         public sbyte[] sbyteArray { get; set; }
 
         public decimal dec { get; set; }
+        public decimal decZero { get; set; }
         public decimal[] decArray { get; set; }
     }
 
@@ -200,6 +206,7 @@ mutation {
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
             Field("dec", o => o.dec, type: typeof(DecimalGraphType));
+            Field("decZero", o => o.decZero, type: typeof(DecimalGraphType));
 
             Field(o => o.byteArray);
             Field(o => o.sbyteArray);
@@ -226,6 +233,7 @@ mutation {
             Field("byte", o => o.bYte, type: typeof(NonNullGraphType<ByteGraphType>)).DefaultValue((byte)50);
             Field("sbyte", o => o.sByte, type: typeof(NonNullGraphType<SByteGraphType>)).DefaultValue((sbyte)-60);
             Field("dec", o => o.dec, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(39614081257132168796771975168m);
+            Field("decZero", o => o.decZero, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(12.10m);
 
             Field(o => o.byteArray, nullable: false).DefaultValue(new byte[] { 1, 2, 3 });
             Field(o => o.sbyteArray, nullable: false).DefaultValue(new sbyte[] { -1, 2, -3 });
@@ -252,6 +260,7 @@ mutation {
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
             Field("dec", o => o.dec, type: typeof(DecimalGraphType));
+            Field("decZero", o => o.decZero, type: typeof(DecimalGraphType));
 
             Field(o => o.byteArray);
             Field(o => o.sbyteArray);
@@ -275,6 +284,7 @@ mutation {
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<ScalarsModel>("input");
+                    arg.decZero.ShouldBe(12.10m);
                     return arg;
                 });
 
@@ -284,6 +294,7 @@ mutation {
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<ScalarsModel>("input");
+                    arg.decZero.ShouldBe(12.10m);
                     return arg;
                 });
         }

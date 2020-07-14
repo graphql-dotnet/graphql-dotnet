@@ -311,6 +311,16 @@ namespace GraphQL.Utilities
                 });
             });
 
+            Config<DecimalValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f =>
+                {
+                    var val = (decimal)f.Arg(x => x.Value);
+                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                });
+            });
+
             Config<StringValue>(c =>
             {
                 c.Field(x => x.Value);
