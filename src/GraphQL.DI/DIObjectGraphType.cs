@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GraphQL.DI
@@ -44,6 +45,7 @@ namespace GraphQL.DI
         private static readonly MethodInfo getArgumentMethod = typeof(GraphQL.ResolveFieldContextExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static).Single(x => x.Name == nameof(GraphQL.ResolveFieldContextExtensions.GetArgument) && x.IsGenericMethod);
         private static readonly PropertyInfo sourceProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
         private static readonly PropertyInfo currentServiceProviderProperty = typeof(AsyncServiceProvider).GetProperty(nameof(AsyncServiceProvider.Current), BindingFlags.Public | BindingFlags.Static);
+        private static readonly PropertyInfo cancellationTokenProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.CancellationToken), BindingFlags.Public | BindingFlags.Instance);
 
         protected virtual List<DIFieldType> CreateFieldTypeList()
         {
@@ -265,6 +267,13 @@ namespace GraphQL.DI
                 //if they are requesting the IResolveFieldContext, just pass it in
                 //e.g. Func<IResolveFieldContext, IResolveFieldContext> = (context) => context;
                 expr = resolveFieldContextParameter;
+                //and do not add it as a QueryArgument
+                return null;
+            }
+            if (param.ParameterType == typeof(CancellationToken))
+            {
+                //return the cancellation token from the IResolveFieldContext parameter
+                expr = Expression.MakeMemberAccess(resolveFieldContextParameter, cancellationTokenProperty);
                 //and do not add it as a QueryArgument
                 return null;
             }
