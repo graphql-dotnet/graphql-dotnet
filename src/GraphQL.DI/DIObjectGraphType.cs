@@ -70,7 +70,17 @@ namespace GraphQL.DI
             //get the method name
             string methodName = method.Name;
             var methodNameAttribute = method.GetCustomAttribute<NameAttribute>();
-            if (methodNameAttribute != null) methodName = (string)methodNameAttribute.Name;
+            if (methodNameAttribute != null)
+            {
+                methodName = methodNameAttribute.Name;
+            }
+            else
+            {
+                if (methodName.EndsWith("Async") && method.ReturnType.IsGenericType && method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    methodName = methodName.Substring(0, methodName.Length - "Async".Length);
+                }
+            }
             if (methodName == null) return null; //ignore method if set to null
 
             //ignore method if it does not return a value
