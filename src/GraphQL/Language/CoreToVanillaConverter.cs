@@ -240,7 +240,7 @@ namespace GraphQL.Language
                     int[] decBits = decimal.GetBits(dec);
                     int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
                     if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
-                        return new DecimalValue(dec);
+                        return new DecimalValue(dec).WithLocation(str, _body);
 
                     return new FloatValue(dbl).WithLocation(str, _body);
                 }
