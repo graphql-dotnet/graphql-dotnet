@@ -318,24 +318,5 @@ namespace GraphQL
 
             return false;
         }
-
-        /// <summary>
-        /// Converts an object into a dictionary.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="flags">The binding flags used to control which properties are read.</param>
-        public static IDictionary<string, object> AsDictionary(
-            this object source,
-            BindingFlags flags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-        {
-            return source
-                .GetType()
-                .GetProperties(flags)
-                .ToDictionary
-                (
-                    propInfo => propInfo.Name,
-                    propInfo => propInfo.GetValue(source, null)
-                );
-        }
     }
 }

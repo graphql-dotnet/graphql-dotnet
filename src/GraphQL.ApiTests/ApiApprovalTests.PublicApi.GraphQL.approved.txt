@@ -231,7 +231,6 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static System.Collections.Generic.IDictionary<string, object> AsDictionary(this object source, System.Reflection.BindingFlags flags = 22) { }
         public static System.Type GetInterface(this System.Type type, string name) { }
         public static object GetPropertyValue(this object obj, string propertyName) { }
         public static object GetPropertyValue(this object propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType = null) { }
