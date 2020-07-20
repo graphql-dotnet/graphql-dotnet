@@ -38,5 +38,12 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+
+        private IServiceProvider _requestServices;
+        public IServiceProvider RequestServices
+        {
+            get => _requestServices ?? throw new InvalidOperationException("No service provider specified.  Please set the value of the ExecutionOptions.RequestServices to a valid service provider.  Typically, this would be a scoped service provider from your dependency injection framework.");
+            set => _requestServices = value;
+        }
     }
 }

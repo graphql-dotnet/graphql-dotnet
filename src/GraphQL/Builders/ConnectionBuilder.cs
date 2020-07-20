@@ -176,7 +176,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
-                var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
+                var args = new ResolveConnectionContextAdapter<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
                 return resolver(args);
             });
@@ -186,7 +186,7 @@ namespace GraphQL.Builders
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
-                var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
+                var args = new ResolveConnectionContextAdapter<TSourceType>(context, _isUnidirectional, _pageSize);
                 CheckForErrors(args);
                 return resolver(args);
             });

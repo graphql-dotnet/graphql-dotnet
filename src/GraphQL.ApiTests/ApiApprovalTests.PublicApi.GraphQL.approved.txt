@@ -84,6 +84,7 @@ namespace GraphQL
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
@@ -178,6 +179,7 @@ namespace GraphQL
         GraphQL.Language.AST.Operation Operation { get; }
         GraphQL.Types.IObjectGraphType ParentType { get; }
         System.Collections.Generic.IEnumerable<object> Path { get; }
+        System.IServiceProvider RequestServices { get; }
         GraphQL.Types.IGraphType ReturnType { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
@@ -256,6 +258,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Operation Operation { get; }
         public GraphQL.Types.IObjectGraphType ParentType { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; }
+        public System.IServiceProvider RequestServices { get; }
         public GraphQL.Types.IGraphType ReturnType { get; }
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
@@ -281,6 +284,7 @@ namespace GraphQL
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Types.IObjectGraphType ParentType { get; set; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public GraphQL.Types.IGraphType ReturnType { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
@@ -305,7 +309,7 @@ namespace GraphQL
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path) { }
+        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path, System.IServiceProvider requestServices) { }
         public new TSource Source { get; set; }
     }
     public enum ResolverType
@@ -584,6 +588,7 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
         public GraphQL.Instrumentation.Metrics Metrics { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
+        public System.IServiceProvider RequestServices { get; set; }
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
@@ -663,6 +668,7 @@ namespace GraphQL.Execution
         int? MaxParallelExecutionCount { get; }
         GraphQL.Instrumentation.Metrics Metrics { get; }
         GraphQL.Language.AST.Operation Operation { get; }
+        System.IServiceProvider RequestServices { get; }
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         bool ThrowOnUnhandledException { get; }
@@ -1551,6 +1557,10 @@ namespace GraphQL.Subscription
     public interface ISubscriptionExecuter
     {
         System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
+    }
+    public class ReadonlyResolveEventStreamContext : GraphQL.ReadonlyResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Subscription.IResolveEventStreamContext<object>
+    {
+        public ReadonlyResolveEventStreamContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
     }
     public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {

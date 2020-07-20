@@ -91,7 +91,7 @@ namespace GraphQL
             if (context is IResolveEventStreamContext<T> typedContext)
                 return typedContext;
 
-            return new ResolveEventStreamContext<T>(context);
+            return new ResolveEventStreamContextAdapter<T>(context);
         }
 
         public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)

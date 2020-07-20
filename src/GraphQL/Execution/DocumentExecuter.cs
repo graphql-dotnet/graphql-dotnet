@@ -125,7 +125,8 @@ namespace GraphQL
                     options.Listeners,
                     options.ThrowOnUnhandledException,
                     options.UnhandledExceptionDelegate,
-                    options.MaxParallelExecutionCount);
+                    options.MaxParallelExecutionCount,
+                    options.RequestServices);
 
                 foreach (var listener in options.Listeners)
                 {
@@ -234,7 +235,8 @@ namespace GraphQL
             List<IDocumentExecutionListener> listeners,
             bool throwOnUnhandledException,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate,
-            int? maxParallelExecutionCount)
+            int? maxParallelExecutionCount,
+            IServiceProvider services)
         {
             var context = new ExecutionContext
             {
@@ -252,7 +254,8 @@ namespace GraphQL
                 Listeners = listeners,
                 ThrowOnUnhandledException = throwOnUnhandledException,
                 UnhandledExceptionDelegate = unhandledExceptionDelegate,
-                MaxParallelExecutionCount = maxParallelExecutionCount
+                MaxParallelExecutionCount = maxParallelExecutionCount,
+                RequestServices = services
             };
 
             return context;

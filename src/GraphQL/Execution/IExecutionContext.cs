@@ -81,5 +81,11 @@ namespace GraphQL.Execution
         /// protocol however they see fit, and hence there are no additional restrictions on its contents.
         /// </summary>
         Dictionary<string, object> Extensions { get; }
+
+        /// <summary>
+        /// The service provider for the executing request.  Typically this is a scoped service provider
+        /// from your dependency injection framework.
+        /// </summary>
+        IServiceProvider RequestServices { get; }
     }
 }
