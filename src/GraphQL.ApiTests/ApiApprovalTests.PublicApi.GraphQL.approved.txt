@@ -2388,12 +2388,11 @@ namespace GraphQL.Utilities
         public object GetArgument(System.Type argumentType, string name, object defaultValue = null) { }
         public TType GetArgument<TType>(string name, TType defaultValue = default) { }
     }
-    public class SchemaPrinter : System.IDisposable
+    public class SchemaPrinter
     {
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions options = null) { }
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
         public string[] BreakLine(string line, int len) { }
-        public void Dispose() { }
         public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
         public bool IsBuiltInScalar(string typeName) { }
         public virtual bool IsDefinedType(string typeName) { }

@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
-    public class SchemaPrinter : IDisposable
+    public class SchemaPrinter
     {
         protected SchemaPrinterOptions Options { get; }
 
@@ -430,11 +430,6 @@ namespace GraphQL.Utilities
                 sublines.Add(parts[i].Substring(1) + parts[i + 1]);
             }
             return sublines.ToArray();
-        }
-
-        public void Dispose()
-        {
-            Schema = null;
         }
     }
 }
