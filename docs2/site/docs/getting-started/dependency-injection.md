@@ -259,7 +259,7 @@ E.g. In ASP.NET Core [GraphQL.Harness](https://github.com/graphql-dotnet/graphql
  ```csharp
 public static class GraphQLExtensions
 {
-    public static T GetRequiredService<T>(this IResolveFieldContext<object> context) =>
+    public static T GetRequiredService<T>(this IResolveFieldContext context) =>
         ((GraphQLUserContext)context.UserContext).ServiceProvider.GetRequiredService<T>();
 }
  ```
