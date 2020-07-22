@@ -1755,7 +1755,7 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
+    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments Arguments { get; set; }
@@ -1845,7 +1845,7 @@ namespace GraphQL.Types
         GraphQL.Types.FieldType GetField(string name);
         bool HasField(string name);
     }
-    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata
+    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments Arguments { get; set; }
         string DeprecationReason { get; set; }
@@ -1858,10 +1858,9 @@ namespace GraphQL.Types
         string Description { get; set; }
         string CollectTypes(GraphQL.Types.TypeCollectionContext context);
     }
-    public interface IHaveDefaultValue
+    public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
         object DefaultValue { get; }
-        GraphQL.Types.IGraphType ResolvedType { get; }
         System.Type Type { get; }
     }
     public interface IImplementInterfaces
@@ -1886,6 +1885,10 @@ namespace GraphQL.Types
         TType GetMetadata<TType>(string key, System.Func<TType> defaultValueFactory);
         TType GetMetadata<TType>(string key, TType defaultValue = default);
         bool HasMetadata(string key);
+    }
+    public interface IProvideResolvedType
+    {
+        GraphQL.Types.IGraphType ResolvedType { get; }
     }
     public interface ISchema
     {
@@ -1951,7 +1954,7 @@ namespace GraphQL.Types
         public System.Func<object, GraphQL.Types.IObjectGraphType> ResolveType { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
     }
-    public class ListGraphType : GraphQL.Types.GraphType
+    public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         protected ListGraphType(System.Type type) { }
@@ -1971,7 +1974,7 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
     }
-    public class NonNullGraphType : GraphQL.Types.GraphType
+    public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         protected NonNullGraphType(System.Type type) { }
@@ -2005,7 +2008,7 @@ namespace GraphQL.Types
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
     }
-    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue
+    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideResolvedType
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
