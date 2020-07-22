@@ -300,7 +300,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}'");
+                return scalarType.ParseLiteral(input) ?? throw new InvalidValueException($"Unable to convert '{input}' to {type.Name}");
             }
 
             return null;
