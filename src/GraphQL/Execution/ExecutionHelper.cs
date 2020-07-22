@@ -144,7 +144,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalar)
             {
-                // validate value can be parsed correctly
+                // verify value can be converted successfully
 
                 if (input is IValue value)
                 {
