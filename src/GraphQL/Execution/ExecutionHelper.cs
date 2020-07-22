@@ -111,7 +111,7 @@ namespace GraphQL.Execution
             catch (InvalidValueException error)
             {
                 error.AddLocation(variable, document);
-                throw;
+                throw error;
             }
 
             if (input == null && variable.DefaultValue != null)
@@ -144,8 +144,18 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalar)
             {
-                if (ValueFromScalar(scalar, input) == null)
-                    throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
+                // validate value can be parsed correctly
+
+                if (input is IValue value)
+                {
+                    if (scalar.ParseLiteral(value) == null)
+                        throw new InvalidValueException(fieldName, $"Unable to convert '{value.Value}' to {type.Name}");
+                }
+                else
+                {
+                    if (scalar.ParseValue(input) == null)
+                        throw new InvalidValueException(fieldName, $"Unable to convert '{input}' to {type.Name}");
+                }
 
                 return;
             }
@@ -202,16 +212,6 @@ namespace GraphQL.Execution
             }
 
             throw new InvalidValueException(fieldName ?? "input", "Invalid input");
-        }
-
-        private static object ValueFromScalar(ScalarGraphType scalar, object input)
-        {
-            if (input is IValue value)
-            {
-                return scalar.ParseLiteral(value) ?? throw new ArgumentException($"Unable to convert '{value.Value}'");
-            }
-
-            return scalar.ParseValue(input) ?? throw new ArgumentException($"Unable to convert '{input}'");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

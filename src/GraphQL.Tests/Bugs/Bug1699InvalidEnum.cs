@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Bugs
         private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            error.AddLocation(line, column);
+            if (line != 0) error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;
@@ -51,10 +51,19 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_Valid2() => AssertQuerySuccess("{ input(arg: SLEEPY) }", @"{ ""input"": ""Sleepy"" }");
 
         [Fact]
+        public void Input_Enum_InvalidEnum() => AssertQueryWithError("{ input(arg: DOPEY) }", null, "Argument \u0022arg\u0022 has invalid value DOPEY.\nExpected type \u0022Bug1699Enum\u0022, found DOPEY.", 1, 9, (object[])null, code: "5.3.3.1");
+
+        [Fact]
         public void Input_Enum_InvalidString() => AssertQueryWithError(@"{ input(arg: ""SLEEPY"") }", null, "Argument \u0022arg\u0022 has invalid value \u0022SLEEPY\u0022.\nExpected type \u0022Bug1699Enum\u0022, found \u0022SLEEPY\u0022.", 1, 9, (object[])null, code: "5.3.3.1");
 
         [Fact]
         public void Input_Enum_InvalidInt() => AssertQueryWithError(@"{ input(arg: 2) }", null, "Argument \u0022arg\u0022 has invalid value 2.\nExpected type \u0022Bug1699Enum\u0022, found 2.", 1, 9, (object[])null, code: "5.3.3.1");
+
+        [Fact]
+        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to Bug1699Enum", 0, 0, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}");
+
+        [Fact]
+        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to Bug1699Enum", 0, 0, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}");
 
         [Fact]
         public void Input_Enum_UndefinedDefault() => AssertQuerySuccess("{ input }", @"{ ""input"": ""Grumpy"" }");
