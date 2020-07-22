@@ -290,7 +290,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null variable.");
         }
 
         [Fact]
@@ -322,7 +322,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError?.InnerException.ShouldNotBeNull();
-            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null field.");
+            caughtError?.InnerException.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null variable.");
         }
 
         [Fact]
@@ -510,7 +510,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null variable.");
         }
 
         [Fact]
@@ -531,7 +531,7 @@ namespace GraphQL.Tests.Execution
             var caughtError = result.Errors.Single();
             caughtError.ShouldNotBeNull();
             caughtError.InnerException.ShouldNotBeNull();
-            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null field.");
+            caughtError.InnerException.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null variable.");
         }
 
         [Fact]
