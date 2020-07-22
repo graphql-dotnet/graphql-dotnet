@@ -192,6 +192,15 @@ namespace GraphQL
                     result.Errors = context.Errors;
                 }
             }
+            catch (ExecutionError ex)
+            {
+                result = new ExecutionResult {
+                    Errors = new ExecutionErrors
+                    {
+                        ex
+                    }
+                };
+            }
             catch (Exception ex)
             {
                 if (options.ThrowOnUnhandledException)
