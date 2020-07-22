@@ -124,6 +124,7 @@ namespace GraphQL.Execution
 
         public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName)
         {
+            // see also GraphQLExtensions.IsValidLiteralValue
             if (type is NonNullGraphType graphType)
             {
                 var nonNullType = graphType.ResolvedType;
