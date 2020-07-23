@@ -112,7 +112,14 @@ namespace GraphQL.SystemTextJson
                 return dm;
             }
 
-            throw new NotImplementedException($"Unexpected Number value. Raw text was: {Encoding.UTF8.GetString(reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan)}");
+            var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
+#if NETSTANDARD2_0
+            var data = span.ToArray();
+#else
+            var data = span;
+#endif
+
+            throw new NotImplementedException($"Unexpected Number value. Raw text was: {Encoding.UTF8.GetString(data)}");
         }
     }
 }

@@ -8,11 +8,12 @@ namespace GraphQL.Types
 
         public override object ParseLiteral(IValue value) => value switch
         {
+            DecimalValue decimalValue => decimalValue.Value,
             StringValue stringValue => ParseValue(stringValue.Value),
             IntValue intValue => ParseValue(intValue.Value),
             LongValue longValue => ParseValue(longValue.Value),
             FloatValue floatValue => ParseValue(floatValue.Value),
-            DecimalValue decimalValue => decimalValue.Value,
+            BigIntValue bigIntValue => ParseValue(bigIntValue.Value),
             _ => null
         };
     }

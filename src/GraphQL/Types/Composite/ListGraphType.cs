@@ -11,7 +11,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class ListGraphType : GraphType
+    public class ListGraphType : GraphType, IProvideResolvedType
     {
         public ListGraphType(IGraphType type)
         {

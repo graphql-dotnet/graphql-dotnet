@@ -12,7 +12,7 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
+    public class ResolveFieldContext : IResolveFieldContext
     {
         public string FieldName { get; set; }
 
@@ -48,7 +48,7 @@ namespace GraphQL
 
         public ExecutionErrors Errors { get; set; }
 
-        public IEnumerable<string> Path { get; set; }
+        public IEnumerable<object> Path { get; set; }
 
         public IDictionary<string, Field> SubFields { get; set; }
 

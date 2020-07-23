@@ -920,6 +920,44 @@ scalar Uri
         }
 
         [Fact]
+        public void prints_enum_default_args()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            
+            var f = new FieldType
+            {
+                Name = "bestColor",
+                Arguments = new QueryArguments(new QueryArgument<RgbEnum>
+                {
+                    Name = "color",
+                    DefaultValue = "RED"
+                }),
+                Type = typeof(RgbEnum)
+            };
+            root.AddField(f);
+            var schema = new Schema { Query = root };
+            schema.RegisterType<RgbEnum>();
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"type Query {
+  bestColor(color: RGB = RED): RGB
+}"
+                },
+                {
+                    "RGB",
+@"enum RGB {
+  RED
+  GREEN
+  BLUE
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_introspection_schema()
         {
             var schema = new Schema

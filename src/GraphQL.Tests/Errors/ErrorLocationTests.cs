@@ -74,7 +74,7 @@ namespace GraphQL.Tests.Errors
 
             result.Errors.Count.ShouldBe(1);
             var error = result.Errors.First();
-            error.Path.ShouldBe(new[] { "testSubList", "0", "two" });
+            error.Path.ShouldBe(new object[] { "testSubList", 0, "two" });
         }
 
         [Fact]

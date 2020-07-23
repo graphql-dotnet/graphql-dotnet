@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
-    public class SchemaPrinter : IDisposable
+    public class SchemaPrinter
     {
         protected SchemaPrinterOptions Options { get; }
 
@@ -322,6 +322,11 @@ namespace GraphQL.Utilities
 
         public string FormatDefaultValue(object value, IGraphType graphType)
         {
+            if (IsEnumType(graphType))
+            {
+                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
+            }
+
             if (value is string)
             {
                 return "\"{0}\"".ToFormat(value);
@@ -330,11 +335,6 @@ namespace GraphQL.Utilities
             if (value is bool)
             {
                 return value.ToString().ToLower(CultureInfo.InvariantCulture);
-            }
-
-            if (IsEnumType(graphType))
-            {
-                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
             }
 
             return "{0}".ToFormat(value);
@@ -430,11 +430,6 @@ namespace GraphQL.Utilities
                 sublines.Add(parts[i].Substring(1) + parts[i + 1]);
             }
             return sublines.ToArray();
-        }
-
-        public void Dispose()
-        {
-            Schema = null;
         }
     }
 }

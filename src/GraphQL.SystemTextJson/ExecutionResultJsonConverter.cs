@@ -14,8 +14,8 @@ namespace GraphQL.SystemTextJson
 
             // Important: Be careful with passing the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
-            WriteData(writer, value, options);
             WriteErrors(writer, value.Errors, value.ExposeExceptions, options);
+            WriteData(writer, value, options);
             WriteExtensions(writer, value, options);
 
             writer.WriteEndObject();
@@ -202,10 +202,10 @@ namespace GraphQL.SystemTextJson
             {
                 writer.WritePropertyName("data");
                 writer.WriteStartObject();
-                error.DataAsDictionary.Apply(entry =>
+                error.Data.Apply((key, value) =>
                 {
-                    writer.WritePropertyName(entry.Key);
-                    JsonSerializer.Serialize(writer, entry.Value, options);
+                    writer.WritePropertyName(key.ToString());
+                    JsonSerializer.Serialize(writer, value, options);
                 });
                 writer.WriteEndObject();
             }

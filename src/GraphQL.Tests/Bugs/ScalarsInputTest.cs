@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Shouldly;
 using System;
 using Xunit;
 
@@ -11,7 +12,7 @@ namespace GraphQL.Tests.Bugs
         {
             var query = @"
 mutation {
-  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3] })
+  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
   {
     id1
     id2
@@ -33,6 +34,10 @@ mutation {
 
     sbyte
     sbyteArray
+
+    dec
+    decZero
+    decArray
   }
   create_with_defaults(input: { })
   {
@@ -56,44 +61,96 @@ mutation {
 
     sbyte
     sbyteArray
+
+    dec
+    decZero
+    decArray
   }
 }
 ";
             var expected = @"{
-  ""create"": {
-    ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
-    ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
-    ""uint"": 3147483647,
-    ""uintArray"": [3147483640],
-    ""short"": -21000,
-    ""shortArray"": [20000],
-    ""ushort"": 61000,
-    ""ushortArray"": [65000],
-    ""ulong"": 4000000000000,
-    ""ulongArray"": [1234567890123456789],
-    ""byte"": 50,
-    ""byteArray"": [1,2,3],
-    ""sbyte"": -60,
-    ""sbyteArray"": [-1,2,-3]
-  },
-  ""create_with_defaults"": {
-    ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
-    ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
-    ""uint"": 3147483647,
-    ""uintArray"": [3147483640],
-    ""short"": -21000,
-    ""shortArray"": [20000],
-    ""ushort"": 61000,
-    ""ushortArray"": [65000],
-    ""ulong"": 4000000000000,
-    ""ulongArray"": [1234567890123456789],
-    ""byte"": 50,
-    ""byteArray"": [1,2,3],
-    ""sbyte"": -60,
-    ""sbyteArray"": [-1,2,-3]
+  ""data"": {
+    ""create"": {
+      ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
+      ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
+      ""uint"": 3147483647,
+      ""uintArray"": [
+        3147483640
+      ],
+      ""short"": -21000,
+      ""shortArray"": [
+        20000
+      ],
+      ""ushort"": 61000,
+      ""ushortArray"": [
+        65000
+      ],
+      ""ulong"": 4000000000000,
+      ""ulongArray"": [
+        1234567890123456789
+      ],
+      ""byte"": 50,
+      ""byteArray"": [
+        1,
+        2,
+        3
+      ],
+      ""sbyte"": -60,
+      ""sbyteArray"": [
+        -1,
+        2,
+        -3
+      ],
+      ""dec"": 39614081257132168796771975168,
+      ""decZero"": 12.10,
+      ""decArray"": [
+        1,
+        39614081257132168796771975168,
+        3
+      ]
+    },
+    ""create_with_defaults"": {
+      ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
+      ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
+      ""uint"": 3147483647,
+      ""uintArray"": [
+        3147483640
+      ],
+      ""short"": -21000,
+      ""shortArray"": [
+        20000
+      ],
+      ""ushort"": 61000,
+      ""ushortArray"": [
+        65000
+      ],
+      ""ulong"": 4000000000000,
+      ""ulongArray"": [
+        1234567890123456789
+      ],
+      ""byte"": 50,
+      ""byteArray"": [
+        1,
+        2,
+        3
+      ],
+      ""sbyte"": -60,
+      ""sbyteArray"": [
+        -1,
+        2,
+        -3
+      ],
+      ""dec"": 39614081257132168796771975168,
+      ""decZero"": 12.10,
+      ""decArray"": [
+        1,
+        39614081257132168796771975168,
+        3
+      ]
+    }
   }
 }";
-            AssertQuerySuccess(query, expected, null);
+            AssertQuery(query, expected, null, null);
         }
     }
 
@@ -128,6 +185,10 @@ mutation {
 
         public sbyte sByte { get; set; }
         public sbyte[] sbyteArray { get; set; }
+
+        public decimal dec { get; set; }
+        public decimal decZero { get; set; }
+        public decimal[] decArray { get; set; }
     }
 
     public class ScalarsInput : InputObjectGraphType<ScalarsModel>
@@ -144,6 +205,8 @@ mutation {
             Field("ulong", o => o.uLong, type: typeof(ULongGraphType));
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
+            Field("dec", o => o.dec, type: typeof(DecimalGraphType));
+            Field("decZero", o => o.decZero, type: typeof(DecimalGraphType));
 
             Field(o => o.byteArray);
             Field(o => o.sbyteArray);
@@ -151,6 +214,7 @@ mutation {
             Field(o => o.uintArray);
             Field(o => o.shortArray);
             Field(o => o.ushortArray);
+            Field(o => o.decArray);
         }
     }
 
@@ -168,13 +232,16 @@ mutation {
             Field("ulong", o => o.uLong, type: typeof(NonNullGraphType<ULongGraphType>)).DefaultValue((ulong)4000000000000);
             Field("byte", o => o.bYte, type: typeof(NonNullGraphType<ByteGraphType>)).DefaultValue((byte)50);
             Field("sbyte", o => o.sByte, type: typeof(NonNullGraphType<SByteGraphType>)).DefaultValue((sbyte)-60);
+            Field("dec", o => o.dec, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(39614081257132168796771975168m);
+            Field("decZero", o => o.decZero, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(12.10m);
 
-            Field(o => o.byteArray, nullable: false).DefaultValue(new byte[] { 1,2,3 });
-            Field(o => o.sbyteArray, nullable: false).DefaultValue(new sbyte[] { -1,2,-3 });
+            Field(o => o.byteArray, nullable: false).DefaultValue(new byte[] { 1, 2, 3 });
+            Field(o => o.sbyteArray, nullable: false).DefaultValue(new sbyte[] { -1, 2, -3 });
             Field(o => o.ulongArray, nullable: false).DefaultValue(new ulong[] { 1234567890123456789 });
             Field(o => o.uintArray, nullable: false).DefaultValue(new uint[] { 3147483640 });
             Field(o => o.shortArray, nullable: false).DefaultValue(new short[] { 20000 });
             Field(o => o.ushortArray, nullable: false).DefaultValue(new ushort[] { 65000 });
+            Field(o => o.decArray, nullable: false).DefaultValue(new decimal[] { 1, 39614081257132168796771975168m, 3 });
         }
     }
 
@@ -192,6 +259,8 @@ mutation {
             Field("ulong", o => o.uLong, type: typeof(ULongGraphType));
             Field("byte", o => o.bYte, type: typeof(ByteGraphType));
             Field("sbyte", o => o.sByte, type: typeof(SByteGraphType));
+            Field("dec", o => o.dec, type: typeof(DecimalGraphType));
+            Field("decZero", o => o.decZero, type: typeof(DecimalGraphType));
 
             Field(o => o.byteArray);
             Field(o => o.sbyteArray);
@@ -199,6 +268,7 @@ mutation {
             Field(o => o.uintArray);
             Field(o => o.shortArray);
             Field(o => o.ushortArray);
+            Field(o => o.decArray);
         }
     }
 
@@ -214,6 +284,7 @@ mutation {
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<ScalarsModel>("input");
+                    arg.decZero.ShouldBe(12.10m);
                     return arg;
                 });
 
@@ -223,6 +294,7 @@ mutation {
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<ScalarsModel>("input");
+                    arg.decZero.ShouldBe(12.10m);
                     return arg;
                 });
         }
