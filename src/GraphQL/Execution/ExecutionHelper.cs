@@ -1,4 +1,3 @@
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using System.Collections;

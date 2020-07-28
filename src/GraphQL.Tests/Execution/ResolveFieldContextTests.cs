@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.SystemTextJson;
-using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
@@ -213,7 +212,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void resolveFieldContextAdapter_throws_error_if_invalid_type()
         {
-            var context = new ResolveFieldContext() { Source = "test" };
+            var context = new ResolveFieldContext { Source = "test" };
             Should.Throw<ArgumentException>(() =>
             {
                 var adapter = new ResolveFieldContextAdapter<int>(context);

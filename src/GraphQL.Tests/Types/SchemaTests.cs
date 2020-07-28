@@ -370,16 +370,10 @@ namespace GraphQL.Tests.Types
 
     public class WithoutIsTypeOf1Type : ObjectGraphType
     {
-        public WithoutIsTypeOf1Type()
-        {
-        }
     }
 
     public class WithoutIsTypeOf2Type : ObjectGraphType
     {
-        public WithoutIsTypeOf2Type()
-        {
-        }
     }
 
     public class SimpleCycleSchema : Schema

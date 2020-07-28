@@ -1,4 +1,3 @@
-using System.Linq;
 using Alba;
 using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Http;
