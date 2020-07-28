@@ -241,8 +241,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 constructFieldType = ToFieldType;
             }
 
-            var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
-            fields.Apply(f => type.AddField(f));
+            if (astType.Fields != null)
+            {
+                var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
+                fields.Apply(f => type.AddField(f));
+            }
 
             if (astType.Interfaces != null)
             {
@@ -350,8 +353,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(type, typeConfig);
 
-            var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
-            fields.Apply(f => type.AddField(f));
+            if (interfaceDef.Fields != null)
+            {
+                var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
+                fields.Apply(f => type.AddField(f));
+            }
 
             return type;
         }
@@ -390,8 +396,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(type, typeConfig);
 
-            var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
-            fields.Apply(f => type.AddField(f));
+            if (inputDef.Fields != null)
+            {
+                var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
+                fields.Apply(f => type.AddField(f));
+            }
 
             return type;
         }
@@ -604,7 +613,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     var values = new Dictionary<string, object>();
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
-                    obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
+                    if (obj.Fields != null)
+                        obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
                     return values;
                 }
                 case ASTNodeKind.ListValue:
