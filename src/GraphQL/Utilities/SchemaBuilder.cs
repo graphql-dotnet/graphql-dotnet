@@ -68,7 +68,7 @@ namespace GraphQL.Utilities
                 throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
 
-            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
+            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
         }
 
         private static GraphQLDocument Parse(string document)
@@ -425,14 +425,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
             var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
-            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations)
+            return new DirectiveGraphType(directiveDef.Name.Value, locations)
             {
-                Description = directiveDef.Comment?.Text
+                Description = directiveDef.Comment?.Text,
+                Arguments = ToQueryArguments(directiveDef.Arguments)
             };
-
-            directive.Arguments = ToQueryArguments(directiveDef.Arguments);
-
-            return directive;
         }
 
         private DirectiveLocation ToDirectiveLocation(string name)

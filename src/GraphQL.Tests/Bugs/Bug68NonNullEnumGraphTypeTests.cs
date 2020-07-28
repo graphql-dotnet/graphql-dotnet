@@ -1,4 +1,3 @@
-using GraphQL.Introspection;
 using GraphQL.Tests.Introspection;
 using GraphQL.Types;
 using Shouldly;

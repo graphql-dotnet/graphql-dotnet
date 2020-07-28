@@ -36,10 +36,6 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public FederatedSchemaBuilder()
-        {
-        }
-
         public override ISchema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
