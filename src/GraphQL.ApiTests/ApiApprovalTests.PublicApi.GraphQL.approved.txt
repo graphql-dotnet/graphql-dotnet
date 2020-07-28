@@ -2397,6 +2397,7 @@ namespace GraphQL.Utilities
         protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
         public string[] BreakLine(string line, int len) { }
         public string FormatDefaultValue(object value, GraphQL.Types.IGraphType graphType) { }
+        protected string FormatDescription(string description, string indentation = "") { }
         public bool IsBuiltInScalar(string typeName) { }
         public virtual bool IsDefinedType(string typeName) { }
         public bool IsIntrospectionType(string typeName) { }
@@ -2411,7 +2412,7 @@ namespace GraphQL.Utilities
         public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
         public string PrintFilteredSchema(System.Func<string, bool> directiveFilter, System.Func<string, bool> typeFilter) { }
         public string PrintInputObject(GraphQL.Types.IInputObjectGraphType type) { }
-        public string PrintInputValue(GraphQL.Types.FieldType argument) { }
+        public string PrintInputValue(GraphQL.Types.FieldType field) { }
         public string PrintInputValue(GraphQL.Types.QueryArgument argument) { }
         public virtual string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
         public string PrintIntrospectionSchema() { }
