@@ -1,6 +1,5 @@
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
-using GraphQL.Types;
 using Shouldly;
 using System;
 using Xunit;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -12,7 +11,7 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
+    public class ResolveFieldContext : IResolveFieldContext
     {
         public string FieldName { get; set; }
 

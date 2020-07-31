@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using GraphQL.Introspection;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Tests.Introspection;
@@ -21,7 +20,7 @@ namespace GraphQL.Benchmarks
         public void GlobalSetup()
         {
             var services = new ServiceCollection();
-            
+
             services.AddSingleton<StarWarsData>();
             services.AddSingleton<StarWarsQuery>();
             services.AddSingleton<StarWarsMutation>();

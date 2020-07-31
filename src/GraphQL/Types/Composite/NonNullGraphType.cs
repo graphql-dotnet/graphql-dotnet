@@ -11,7 +11,7 @@ namespace GraphQL.Types
         }
     }
 
-    public class NonNullGraphType : GraphType
+    public class NonNullGraphType : GraphType, IProvideResolvedType
     {
         public NonNullGraphType(IGraphType type)
         {

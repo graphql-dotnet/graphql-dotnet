@@ -6,7 +6,6 @@ using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
 using System.Numerics;
-using System;
 
 namespace GraphQL.Language
 {
@@ -231,7 +230,18 @@ namespace GraphQL.Language
                 case ASTNodeKind.FloatValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new FloatValue(ValueConverter.ConvertTo<double>(str.Value)).WithLocation(str, _body);
+
+                    // the idea is to see if there is a loss of accuracy of value
+                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
+                    double dbl = ValueConverter.ConvertTo<double>(str.Value);
+                    decimal dec = ValueConverter.ConvertTo<decimal>(str.Value);
+                    // TODO: make more efficient, current solution allocates memory
+                    int[] decBits = decimal.GetBits(dec);
+                    int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
+                    if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
+                        return new DecimalValue(dec).WithLocation(str, _body);
+
+                    return new FloatValue(dbl).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
@@ -251,7 +261,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = (GraphQLObjectValue)source;
-                    var fields = obj.Fields.Select(ObjectField);
+                    var fields = obj.Fields?.Select(ObjectField);
                     return new ObjectValue(fields).WithLocation(obj, _body);
                 }
                 case ASTNodeKind.ListValue:
