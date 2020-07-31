@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 using AST = GraphQL.Language.AST;
@@ -23,8 +23,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            string pathSegment = Assert.Single(path) as string;
-            Assert.Equal("name", pathSegment);
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
 
         [Fact]
@@ -40,8 +39,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
-            string pathSegment = Assert.Single(path) as string;
-            Assert.Equal("name", pathSegment);
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
 
         [Fact]
@@ -57,8 +55,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            string pathSegment = Assert.Single(path) as string;
-            Assert.Equal("alias", pathSegment);
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("alias");
         }
 
         [Fact]
@@ -74,8 +71,7 @@ namespace GraphQL.Tests.Execution
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
-            string pathSegment = Assert.Single(path) as string;
-            Assert.Equal("name", pathSegment);
+            path.ShouldHaveSingleItem().ShouldBeOfType<string>().ShouldBe("name");
         }
     }
 

@@ -68,8 +68,6 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _subFields ?? (_subFields = GetSubFields());
-
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
 
         object IResolveFieldContext.Source => _executionNode.Source;

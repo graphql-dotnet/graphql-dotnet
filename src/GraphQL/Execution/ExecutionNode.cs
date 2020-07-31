@@ -62,12 +62,12 @@ namespace GraphQL.Execution
         /// <summary>
         /// The path for the current node within the query.
         /// </summary>
-        public IEnumerable<object> Path => GeneratePath(isForResponse: false);
+        public IEnumerable<object> Path => GeneratePath(preferAlias: false);
 
         /// <summary>
         /// The path for the current node within the response.
         /// </summary>
-        public IEnumerable<object> ResponsePath => GeneratePath(isForResponse: true);
+        public IEnumerable<object> ResponsePath => GeneratePath(preferAlias: true);
 
         private static readonly object _num0 = 0;
         private static readonly object _num1 = 1;
@@ -106,7 +106,7 @@ namespace GraphQL.Execution
             _ => index
         };
 
-        private IEnumerable<object> GeneratePath(bool isForResponse)
+        private IEnumerable<object> GeneratePath(bool preferAlias)
         {
             var node = this;
             var count = 0;
@@ -124,7 +124,7 @@ namespace GraphQL.Execution
                 if (node.IndexInParentNode.HasValue)
                     pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
                 else
-                    pathList[--index] = isForResponse ? node.Name : node.Field.Name;
+                    pathList[--index] = preferAlias ? node.Name : node.Field.Name;
                 node = node.Parent;
             }
 
