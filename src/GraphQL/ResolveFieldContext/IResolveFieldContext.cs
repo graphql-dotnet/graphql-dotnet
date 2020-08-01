@@ -68,8 +68,11 @@ namespace GraphQL
         /// <summary>Can be used to return specific errors back to the GraphQL request caller</summary>
         ExecutionErrors Errors { get; }
 
-        /// <summary>The path to the current executing field from the request root</summary>
+        /// <summary>The path to the current executing field from the request root as it would appear in the query</summary>
         IEnumerable<object> Path { get; }
+
+        /// <summary>The path to the current executing field from the request root as it would appear in the response</summary>
+        IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }
