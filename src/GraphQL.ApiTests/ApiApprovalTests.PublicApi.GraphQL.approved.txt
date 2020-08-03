@@ -2603,6 +2603,12 @@ namespace GraphQL.Validation
     {
         public MatchingNodeVisitor(System.Action<TNode> enter = null, System.Action<TNode> leave = null) { }
     }
+    public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
+    {
+        public static readonly GraphQL.Validation.SuccessfullyValidatedResult Instance;
+        public GraphQL.ExecutionErrors Errors { get; }
+        public bool IsValid { get; }
+    }
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }

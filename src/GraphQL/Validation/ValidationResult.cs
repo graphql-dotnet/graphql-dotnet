@@ -17,7 +17,7 @@ namespace GraphQL.Validation
     /// <summary>
     /// Optimization for validation "green path" - does not allocate memory in managed heap.
     /// </summary>
-    internal sealed class SuccessfullyValidatedResult : IValidationResult
+    public sealed class SuccessfullyValidatedResult : IValidationResult
     {
         private SuccessfullyValidatedResult() { }
 
