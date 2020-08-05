@@ -14,12 +14,12 @@ namespace GraphQL.Validation.Rules
     {
         public string MissingFieldArgMessage(string fieldName, string argName, string type)
         {
-            return $"Field \"{fieldName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
+            return $"Argument \"{argName}\" of type \"{type}\" is required for field \"{fieldName}\" but not provided.";
         }
 
         public string MissingDirectiveArgMessage(string directiveName, string argName, string type)
         {
-            return $"Directive \"{directiveName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
+            return $"Argument \"{argName}\" of type \"{type}\" is required for directive \"{directiveName}\" but not provided.";
         }
 
         public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
