@@ -121,7 +121,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ValueExecutionNode valueNode)
                     {
-                        node.Result = ((ScalarGraphType)itemType).Serialize(d)
+                        node.Result = valueNode.GraphType.Serialize(d)
                             ?? throw new ExecutionError($"Unable to serialize '{d}' to {valueNode.GraphType.Name}");
                     }
 
@@ -141,11 +141,8 @@ namespace GraphQL.Execution
                         return;
                     }
 
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
-                    {
-                        Result = null
-                    };
-                    arrayItems.Add(valueExecutionNode);
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    arrayItems.Add(nullExecutionNode);
                 }
             }
 
@@ -162,7 +159,7 @@ namespace GraphQL.Execution
                 ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -212,7 +209,7 @@ namespace GraphQL.Execution
                     }
                     else if (node is ValueExecutionNode valueNode)
                     {
-                        node.Result = ((ScalarGraphType)valueNode.GraphType).Serialize(node.Result)
+                        node.Result = valueNode.GraphType.Serialize(node.Result)
                             ?? throw new ExecutionError($"Unable to serialize '{node.Result}'");
                     }
                 }
