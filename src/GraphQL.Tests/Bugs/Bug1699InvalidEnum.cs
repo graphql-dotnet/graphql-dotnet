@@ -81,7 +81,7 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_MissingRequired() => AssertQueryWithError(@"{ inputRequired }", null, "Argument \u0022arg\u0022 of type \u0022Bug1699Enum!\u0022 is required for field \u0022inputRequired\u0022 but not provided.", 1, 3, (object[])null, code: "5.3.3.2");
 
         [Fact]
-        public void Input_Enum_RequiredWithDefault() => AssertQueryWithError(@"{ inputRequiredWithDefault }", null, "Argument \u0022arg\u0022 of type \u0022Bug1699Enum!\u0022 is required for field \u0022inputRequiredWithDefault\u0022 but not provided.", 1, 3, (object[])null, code: "5.3.3.2");
+        public void Input_Enum_RequiredWithDefault() => AssertQuerySuccess("{ inputRequiredWithDefault }", @"{ ""inputRequiredWithDefault"": ""Happy"" }");
     }
 
     public class Bug1699InvalidEnumSchema : Schema

@@ -39,16 +39,15 @@ namespace GraphQL.Validation.Rules
 
                     foreach (var arg in fieldDef.Arguments)
                     {
-                        var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = arg.ResolvedType;
-
-                        if (argAst == null && type is NonNullGraphType)
+                        if (arg.DefaultValue == null &&
+                            arg.ResolvedType is NonNullGraphType &&
+                            node.Arguments?.ValueFor(arg.Name) == null)
                         {
                             context.ReportError(
                                 new ValidationError(
                                     context.OriginalQuery,
                                     "5.3.3.2",
-                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(type)),
+                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)),
                                     node));
                         }
                     }
