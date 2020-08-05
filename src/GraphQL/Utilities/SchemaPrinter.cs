@@ -289,52 +289,28 @@ namespace GraphQL.Utilities
 
         public string FormatDefaultValue(object value, IGraphType graphType)
         {
-            if (IsEnumType(graphType))
+            return graphType switch
             {
-                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
-            }
-
-            if (value is string)
-            {
-                return "\"{0}\"".ToFormat(value);
-            }
-
-            if (value is bool)
-            {
-                return value.ToString().ToLower(CultureInfo.InvariantCulture);
-            }
-
-            return "{0}".ToFormat(value);
-        }
-
-        private static bool IsEnumType(IGraphType type)
-        {
-            return type.GetNamedType() is EnumerationGraphType;
-        }
-
-        private static object SerializeEnumValue(IGraphType type, object value)
-        {
-            if (type is NonNullGraphType nullable)
-            {
-                type = nullable.ResolvedType;
-            }
-
-            return ((EnumerationGraphType)type).Serialize(value);
+                NonNullGraphType nullable => FormatDefaultValue(value, nullable.ResolvedType),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
+                EnumerationGraphType enumeration => enumeration.Serialize(value).ToString(),
+                _ => value switch
+                {
+                    string s => $"\"{s}\"",
+                    bool b => b ? "true" : "false",
+                    _ => value.ToString()
+                }
+            };
         }
 
         public static string ResolveName(IGraphType type)
         {
-            if (type is NonNullGraphType nullable)
+            return type switch
             {
-                return "{0}!".ToFormat(ResolveName(nullable.ResolvedType));
-            }
-
-            if (type is ListGraphType list)
-            {
-                return "[{0}]".ToFormat(ResolveName(list.ResolvedType));
-            }
-
-            return type?.Name;
+                NonNullGraphType nullable => "{0}!".ToFormat(ResolveName(nullable.ResolvedType)),
+                ListGraphType list => "[{0}]".ToFormat(ResolveName(list.ResolvedType)),
+                _ => type?.Name
+            };
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
