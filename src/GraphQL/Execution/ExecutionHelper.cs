@@ -111,7 +111,7 @@ namespace GraphQL.Execution
             catch (InvalidValueException error)
             {
                 error.AddLocation(variable, document);
-                throw error;
+                throw;
             }
 
             if (input == null && variable.DefaultValue != null)
