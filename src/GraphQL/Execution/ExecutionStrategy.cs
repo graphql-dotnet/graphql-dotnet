@@ -210,7 +210,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(node.Result)
-                            ?? throw new ExecutionError($"Unable to serialize '{node.Result}'");
+                            ?? throw new ExecutionError($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'");
                     }
                 }
             }
