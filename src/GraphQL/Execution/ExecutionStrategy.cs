@@ -122,7 +122,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(d)
-                            ?? throw new ExecutionError($"Unable to serialize '{d}' to {valueNode.GraphType.Name}");
+                            ?? throw new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'");
                     }
 
                     arrayItems.Add(node);
