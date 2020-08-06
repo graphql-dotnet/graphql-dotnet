@@ -239,7 +239,7 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
@@ -247,11 +247,21 @@ namespace GraphQL.Execution
 
         public override object ToValue()
         {
-            if (Result == null)
-                return null;
-
-            var scalarType = GraphType as ScalarGraphType;
-            return scalarType?.Serialize(Result);
+            // result has already been serialized within ExecuteNodeAsync / SetArrayItemNodes
+            return Result;
         }
+
+        public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType;
+    }
+
+    public class NullExecutionNode : ExecutionNode
+    {
+        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        {
+            Result = null;
+        }
+
+        public override object ToValue() => null;
     }
 }
