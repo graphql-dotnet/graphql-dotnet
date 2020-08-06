@@ -35,7 +35,7 @@ namespace GraphQL.Tests.Bugs
         public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Unable to serialize '1' to \u0027Bug1699Enum\u0027", 1, 3, "happy");
 
         [Fact]
-        public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Unable to serialize '50'", 1, 3, "invalidEnum");
+        public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Unable to serialize '50' to \u0027Bug1699Enum\u0027", 1, 3, "invalidEnum");
 
         // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
         [Fact]
