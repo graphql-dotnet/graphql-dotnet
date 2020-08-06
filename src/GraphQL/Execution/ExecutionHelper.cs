@@ -155,7 +155,7 @@ namespace GraphQL.Execution
                 else
                 {
                     if (scalar.ParseValue(input) == null)
-                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to {type.Name}");
+                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
                 }
 
                 return;
