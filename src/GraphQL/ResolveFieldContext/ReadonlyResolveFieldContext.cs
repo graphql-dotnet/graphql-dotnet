@@ -34,7 +34,7 @@ namespace GraphQL
 
         public string FieldName => _executionNode.Field.Name;
 
-        public Language.AST.Field FieldAst => _executionNode.Field;
+        public Field FieldAst => _executionNode.Field;
 
         public FieldType FieldDefinition => _executionNode.FieldDefinition;
 
@@ -63,6 +63,8 @@ namespace GraphQL
         public ExecutionErrors Errors => _executionContext.Errors;
 
         public IEnumerable<object> Path => _executionNode.Path;
+
+        public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         public IDictionary<string, Language.AST.Field> SubFields => _subFields ??= GetSubFields();
 

@@ -124,7 +124,7 @@ namespace GraphQL.Execution
                                         context,
                                         $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'",
                                         node.Field,
-                                        node.Path,
+                                        node.ResponsePath,
                                         exception)
                                 }
                             }.With(context)));
@@ -132,7 +132,7 @@ namespace GraphQL.Execution
             catch (Exception ex)
             {
                 var message = $"Error trying to resolve {node.Field.Name}.";
-                var error = GenerateError(context, message, node.Field, node.Path, ex);
+                var error = GenerateError(context, message, node.Field, node.ResponsePath, ex);
                 context.Errors.Add(error);
                 return null;
             }

@@ -6,7 +6,6 @@ using GraphQLParser.AST;
 using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
 using System.Numerics;
-using System;
 
 namespace GraphQL.Language
 {
@@ -262,7 +261,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = (GraphQLObjectValue)source;
-                    var fields = obj.Fields.Select(ObjectField);
+                    var fields = obj.Fields?.Select(ObjectField);
                     return new ObjectValue(fields).WithLocation(obj, _body);
                 }
                 case ASTNodeKind.ListValue:
