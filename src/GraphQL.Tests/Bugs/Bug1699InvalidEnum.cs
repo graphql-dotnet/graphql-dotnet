@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Bugs
 
         // within C#, (int)Bug1699Enum.Happy does not equal Bug1699.Happy
         [Fact]
-        public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Unable to serialize '1'", 1, 3, "happy");
+        public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Unable to serialize '1' to \u0027Bug1699Enum\u0027", 1, 3, "happy");
 
         [Fact]
         public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Unable to serialize '50'", 1, 3, "invalidEnum");
