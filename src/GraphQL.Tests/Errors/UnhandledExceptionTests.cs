@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Errors
         }
 
         [Fact]
-        public void unhandled_error_delegate_can_rethrow_custom_exception()
+        public void unhandled_exception_delegate_can_rethrow_custom_exception()
         {
             var def = @"
                 type Query {
