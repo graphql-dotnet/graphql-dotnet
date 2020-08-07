@@ -8,7 +8,7 @@ namespace GraphQL.Execution
         public InvalidValueException(string variableName, string message) :
             base($"Variable '${variableName}' is invalid. {message}")
         {
-
+            Code = "INVALID_VALUE";
         }
     }
 }
