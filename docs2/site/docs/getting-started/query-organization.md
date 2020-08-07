@@ -88,7 +88,7 @@ Will now require
 
 ```graphql
 {
-  Retail {
+  retail {
     products {
       name
     }
