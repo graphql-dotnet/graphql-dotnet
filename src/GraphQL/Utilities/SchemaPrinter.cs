@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
-    public class SchemaPrinter : IDisposable
+    public class SchemaPrinter
     {
         protected SchemaPrinterOptions Options { get; }
 
@@ -158,88 +158,53 @@ namespace GraphQL.Utilities
 
         public string PrintType(IGraphType type)
         {
-            if (type is EnumerationGraphType graphType)
+            return type switch
             {
-                return PrintEnum(graphType);
-            }
-
-            if (type is ScalarGraphType scalarGraphType)
-            {
-                return PrintScalar(scalarGraphType);
-            }
-
-            if (type is IObjectGraphType objectGraphType)
-            {
-                return PrintObject(objectGraphType);
-            }
-
-            if (type is IInterfaceGraphType interfaceGraphType)
-            {
-                return PrintInterface(interfaceGraphType);
-            }
-
-            if (type is UnionGraphType unionGraphType)
-            {
-                return PrintUnion(unionGraphType);
-            }
-
-            if (type is DirectiveGraphType directiveGraphType)
-            {
-                return PrintDirective(directiveGraphType);
-            }
-
-            if (!(type is IInputObjectGraphType))
-            {
-                throw new InvalidOperationException("Unknown GraphType {0}".ToFormat(type.GetType().Name));
-            }
-
-            return PrintInputObject((IInputObjectGraphType)type);
+                EnumerationGraphType graphType => PrintEnum(graphType),
+                ScalarGraphType scalarGraphType => PrintScalar(scalarGraphType),
+                IObjectGraphType objectGraphType => PrintObject(objectGraphType),
+                IInterfaceGraphType interfaceGraphType => PrintInterface(interfaceGraphType),
+                UnionGraphType unionGraphType => PrintUnion(unionGraphType),
+                DirectiveGraphType directiveGraphType => PrintDirective(directiveGraphType),
+                IInputObjectGraphType input => PrintInputObject(input),
+                _ => throw new InvalidOperationException($"Unknown GraphType '{type.GetType().Name}' with name '{type.Name}'")
+            };
         }
 
-        public string PrintScalar(ScalarGraphType type)
-        {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
-            return description + "scalar {0}".ToFormat(type.Name);
-        }
+        public string PrintScalar(ScalarGraphType type) => $"{FormatDescription(type.Description)}scalar {type.Name}";
 
         public virtual string PrintObject(IObjectGraphType type)
         {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
-
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
             var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
 
-            return description + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
+            return FormatDescription(type.Description) + "type {1}{2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, type.Name, implementedInterfaces, PrintFields(type));
         }
 
         public virtual string PrintInterface(IInterfaceGraphType type)
         {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
-            return description + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
+            return FormatDescription(type.Description) + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
 
         public string PrintUnion(UnionGraphType type)
         {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var possibleTypes = string.Join(" | ", type.PossibleTypes.Select(x => x.Name));
-            return description + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
+            return FormatDescription(type.Description) + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
         public string PrintEnum(EnumerationGraphType type)
         {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var values = string.Join(Environment.NewLine, type.Values.Select(x => "  " + x.Name));
-            return description + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
+            return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
         public string PrintInputObject(IInputObjectGraphType type)
         {
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
-            var fields = type.Fields.Select(x => "  " + PrintInputValue(x));
-            return description + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
+            var fields = type.Fields.Select(x => PrintInputValue(x));
+            return FormatDescription(type.Description) + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
         public virtual string PrintFields(IComplexGraphType type)
@@ -251,8 +216,8 @@ namespace GraphQL.Utilities
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = Options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
-                    Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
+                    Description = FormatDescription(x.Description, "  "),
+                    Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "",
                 }).ToList();
 
             return string.Join(Environment.NewLine, fields?.Select(
@@ -269,17 +234,17 @@ namespace GraphQL.Utilities
             return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue)));
         }
 
-        public string PrintInputValue(FieldType argument)
+        public string PrintInputValue(FieldType field)
         {
-            var argumentType = argument.ResolvedType;
-            var desc = "{0}: {1}".ToFormat(argument.Name, ResolveName(argumentType));
+            var argumentType = field.ResolvedType;
+            var description = $"{FormatDescription(field.Description, "  ")}  {field.Name}: {ResolveName(argumentType)}";
 
-            if (argument.DefaultValue != null)
+            if (field.DefaultValue != null)
             {
-                desc += " = {0}".ToFormat(FormatDefaultValue(argument.DefaultValue, argumentType));
+                description += " = {0}".ToFormat(FormatDefaultValue(field.DefaultValue, argumentType));
             }
 
-            return desc;
+            return description;
         }
 
         public string PrintInputValue(QueryArgument argument)
@@ -320,54 +285,32 @@ namespace GraphQL.Utilities
             return string.Join(" | ", locations.Select(x => enums.Serialize(x)));
         }
 
+        protected string FormatDescription(string description, string indentation = "") => Options.IncludeDescriptions ? PrintDescription(description, indentation) : "";
+
         public string FormatDefaultValue(object value, IGraphType graphType)
         {
-            if (IsEnumType(graphType))
+            return graphType switch
             {
-                return "{0}".ToFormat(SerializeEnumValue(graphType, value));
-            }
-
-            if (value is string)
-            {
-                return "\"{0}\"".ToFormat(value);
-            }
-
-            if (value is bool)
-            {
-                return value.ToString().ToLower(CultureInfo.InvariantCulture);
-            }
-
-            return "{0}".ToFormat(value);
-        }
-
-        private static bool IsEnumType(IGraphType type)
-        {
-            return type.GetNamedType() is EnumerationGraphType;
-        }
-
-        private static object SerializeEnumValue(IGraphType type, object value)
-        {
-            if (type is NonNullGraphType nullable)
-            {
-                type = nullable.ResolvedType;
-            }
-
-            return ((EnumerationGraphType)type).Serialize(value);
+                NonNullGraphType nullable => FormatDefaultValue(value, nullable.ResolvedType),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
+                EnumerationGraphType enumeration => enumeration.Serialize(value).ToString(),
+                _ => value switch
+                {
+                    string s => $"\"{s}\"",
+                    bool b => b ? "true" : "false",
+                    _ => value.ToString()
+                }
+            };
         }
 
         public static string ResolveName(IGraphType type)
         {
-            if (type is NonNullGraphType nullable)
+            return type switch
             {
-                return "{0}!".ToFormat(ResolveName(nullable.ResolvedType));
-            }
-
-            if (type is ListGraphType list)
-            {
-                return "[{0}]".ToFormat(ResolveName(list.ResolvedType));
-            }
-
-            return type?.Name;
+                NonNullGraphType nullable => "{0}!".ToFormat(ResolveName(nullable.ResolvedType)),
+                ListGraphType list => "[{0}]".ToFormat(ResolveName(list.ResolvedType)),
+                _ => type?.Name
+            };
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
@@ -430,11 +373,6 @@ namespace GraphQL.Utilities
                 sublines.Add(parts[i].Substring(1) + parts[i + 1]);
             }
             return sublines.ToArray();
-        }
-
-        public void Dispose()
-        {
-            Schema = null;
         }
     }
 }

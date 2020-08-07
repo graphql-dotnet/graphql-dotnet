@@ -18,7 +18,7 @@ namespace GraphQL
         }
 
         /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
-        public static object GetArgument(this IResolveFieldContext context, System.Type argumentType, string name, object defaultValue = null)
+        public static object GetArgument(this IResolveFieldContext context, Type argumentType, string name, object defaultValue = null)
         {
             bool exists = context.TryGetArgument(argumentType, name, out object result);
             return exists
@@ -26,7 +26,7 @@ namespace GraphQL
                 : defaultValue;
         }
 
-        private static bool TryGetArgument(this IResolveFieldContext context, System.Type argumentType, string name, out object result)
+        private static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object result)
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
@@ -121,7 +121,7 @@ namespace GraphQL
             }
         }
 
-        private static readonly char[] _separators = new char[] { '.' };
+        private static readonly char[] _separators = { '.' };
 
         /// <summary>
         /// Thread safe method to get value by path (key1.key2.keyN) from extensions dictionary.

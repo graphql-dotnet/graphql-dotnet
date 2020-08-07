@@ -119,6 +119,11 @@ namespace GraphQL.Execution
                     {
                         SetArrayItemNodes(context, arrayNode);
                     }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = valueNode.GraphType.Serialize(d)
+                            ?? throw new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'");
+                    }
 
                     arrayItems.Add(node);
                 }
@@ -131,16 +136,13 @@ namespace GraphQL.Execution
                             + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
 
                         error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.Path.Append(index);
+                        error.Path = parent.ResponsePath.Append(index);
                         context.Errors.Add(error);
                         return;
                     }
 
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++)
-                    {
-                        Result = null
-                    };
-                    arrayItems.Add(valueExecutionNode);
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    arrayItems.Add(nullExecutionNode);
                 }
             }
 
@@ -157,7 +159,7 @@ namespace GraphQL.Execution
                 ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType _ => new ValueExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -205,12 +207,17 @@ namespace GraphQL.Execution
                     {
                         SetArrayItemNodes(context, arrayNode);
                     }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = valueNode.GraphType.Serialize(node.Result)
+                            ?? throw new ExecutionError($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'");
+                    }
                 }
             }
             catch (ExecutionError error)
             {
                 error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
+                error.Path = node.ResponsePath;
                 context.Errors.Add(error);
 
                 node.Result = null;
@@ -230,7 +237,7 @@ namespace GraphQL.Execution
 
                 var error = ex is ExecutionError executionError ? executionError : new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
+                error.Path = node.ResponsePath;
                 context.Errors.Add(error);
 
                 node.Result = null;
