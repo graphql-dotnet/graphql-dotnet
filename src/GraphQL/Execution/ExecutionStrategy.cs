@@ -235,7 +235,7 @@ namespace GraphQL.Execution
                     ex = exceptionContext.Exception;
                 }
 
-                var error = new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
+                var error = ex is ExecutionError executionError ? executionError : new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
                 error.AddLocation(node.Field, context.Document);
                 error.Path = node.ResponsePath;
                 context.Errors.Add(error);
