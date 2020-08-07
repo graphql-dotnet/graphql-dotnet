@@ -208,7 +208,7 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        new ExecutionError(ex.Message, ex)
+                        ex is ExecutionError executionError ? executionError : new ExecutionError(ex.Message, ex)
                     }
                 };
             }
