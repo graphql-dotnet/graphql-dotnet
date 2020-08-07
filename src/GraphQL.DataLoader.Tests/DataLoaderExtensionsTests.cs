@@ -16,7 +16,7 @@ namespace GraphQL.DataLoader.Tests
         {
             var mock = new Mock<IDataLoader<int, User>>();
             mock.Setup(dl => dl.LoadAsync(It.IsAny<int>()))
-                .ReturnsAsync((int key) => new User() { UserId = key });
+                .ReturnsAsync((int key) => new User { UserId = key });
             return mock;
         }
 

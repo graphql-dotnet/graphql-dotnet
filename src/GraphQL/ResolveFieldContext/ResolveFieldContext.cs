@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -50,6 +49,8 @@ namespace GraphQL
 
         public IEnumerable<object> Path { get; set; }
 
+        public IEnumerable<object> ResponsePath { get; set; }
+
         public IDictionary<string, Field> SubFields { get; set; }
 
         public IDictionary<string, object> Extensions { get; set; }
@@ -80,6 +81,7 @@ namespace GraphQL
             Errors = context.Errors;
             SubFields = context.SubFields;
             Path = context.Path;
+            ResponsePath = context.ResponsePath;
             Extensions = context.Extensions;
         }
     }
