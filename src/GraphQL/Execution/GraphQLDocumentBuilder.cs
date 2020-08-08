@@ -25,33 +25,9 @@ namespace GraphQL.Execution
             }
             catch (GraphQLParser.Exceptions.GraphQLSyntaxErrorException ex)
             {
-                ExecutionError rethrowException = null;
-                try
-                {
-                    //e.g. message = "Syntax Error GraphQL (1:1) Unexpected Name \"unknownoperation\"\n1: unknownoperation { firstAsync }\n   ^\n"
-                    var message = ex.Message.Substring(0, ex.Message.IndexOf('\n'));
-                    var paren = ex.Message.IndexOf('(');
-                    var colon = ex.Message.IndexOf(':', paren);
-                    var paren2 = ex.Message.IndexOf(')', colon);
-                    var line = ex.Message.Substring(paren + 1, colon - paren - 1);
-                    var column = ex.Message.Substring(colon + 1, paren2 - colon - 1);
-                    var messageDescription = message.Substring(paren2 + 1).Trim();
-
-                    //e.g. newMessageDescription = "Error parsing query: Unexpected Name \"unknownoperation\""
-                    var newMessageDescription = "Error parsing query: " + messageDescription;
-
-                    rethrowException = new ExecutionError(newMessageDescription, ex);
-                    rethrowException.AddLocation(int.Parse(line), int.Parse(column));
-                    //rethrowException.Code will default to "SYNTAX_ERROR"
-                }
-                catch
-                {
-                }
-
-                if (rethrowException != null)
-                    throw rethrowException;
-
-                throw;
+                var e = new ExecutionError(ex.Description, ex);
+                e.AddLocation(ex.Line, ex.Column);
+                throw e;
             }
 
             var document = CoreToVanillaConverter.Convert(body, result);
