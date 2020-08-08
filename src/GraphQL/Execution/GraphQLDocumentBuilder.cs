@@ -1,7 +1,8 @@
-using System;
 using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQLParser;
+using GraphQLParser.AST;
+using GraphQLParser.Exceptions;
 
 namespace GraphQL.Execution
 {
@@ -18,12 +19,12 @@ namespace GraphQL.Execution
         public Document Build(string body)
         {
             var source = new Source(body);
-            GraphQLParser.AST.GraphQLDocument result;
+            GraphQLDocument result;
             try
             {
                 result = _parser.Parse(source);
             }
-            catch (GraphQLParser.Exceptions.GraphQLSyntaxErrorException ex)
+            catch (GraphQLSyntaxErrorException ex)
             {
                 var e = new ExecutionError(ex.Description, ex);
                 e.AddLocation(ex.Line, ex.Column);
