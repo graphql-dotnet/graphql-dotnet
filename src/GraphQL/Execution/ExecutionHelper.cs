@@ -148,12 +148,28 @@ namespace GraphQL.Execution
 
                 if (input is IValue value)
                 {
-                    if (scalar.ParseLiteral(value) == null)
+                    object convertedValue = null;
+                    try
+                    {
+                        convertedValue = scalar.ParseLiteral(value);
+                    }
+                    catch
+                    {
+                    }
+                    if (convertedValue == null)
                         throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
                 }
                 else
                 {
-                    if (scalar.ParseValue(input) == null)
+                    object convertedValue = null;
+                    try
+                    {
+                        convertedValue = scalar.ParseValue(input);
+                    }
+                    catch
+                    {
+                    }
+                    if (convertedValue == null)
                         throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
                 }
 
