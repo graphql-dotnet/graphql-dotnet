@@ -8,7 +8,7 @@ using Xunit;
 namespace GraphQL.Tests.Bugs
 {
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1766
-    public class Bug1766InvalidByte : QueryTestBase<Bug1766Schema>
+    public class Bug1767InvalidByte : QueryTestBase<Bug1767Schema>
     {
         private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
         {
@@ -34,17 +34,17 @@ namespace GraphQL.Tests.Bugs
         public void Input_Byte_Invalid_Argument() => AssertQueryWithError("query { input(arg: 300) }", null, "Argument \"arg\" has invalid value 300.\nExpected type \"Byte\", found 300.", 1, 15, null, code: "5.3.3.1");
     }
 
-    public class Bug1766Schema : Schema
+    public class Bug1767Schema : Schema
     {
-        public Bug1766Schema()
+        public Bug1767Schema()
         {
-            Query = new Bug1766Query();
+            Query = new Bug1767Query();
         }
     }
 
-    public class Bug1766Query : ObjectGraphType
+    public class Bug1767Query : ObjectGraphType
     {
-        public Bug1766Query()
+        public Bug1767Query()
         {
             Field<StringGraphType>(
                 "input",
