@@ -78,7 +78,7 @@ namespace GraphQL
 
                 if (document.Operations.Count == 0)
                 {
-                    throw new ExecutionError("A query is required.")
+                    throw new ExecutionError("Cannot execute query if no operation is specified.")
                     {
                         Code = "SYNTAX_ERROR"
                     };
