@@ -50,6 +50,7 @@ namespace GraphQL
         public ExecutionError(string message) { }
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception exception) { }
+        public ExecutionError(string message, System.Exception exception, bool copyData) { }
         public string Code { get; set; }
         public System.Collections.Generic.IEnumerable<string> Codes { get; }
         public bool HasCodes { get; }
@@ -690,6 +691,7 @@ namespace GraphQL.Execution
     public class InvalidValueException : GraphQL.ExecutionError
     {
         public InvalidValueException(string variableName, string message) { }
+        public InvalidValueException(string variableName, string message, System.Exception innerException) { }
     }
     public class NullExecutionNode : GraphQL.Execution.ExecutionNode
     {

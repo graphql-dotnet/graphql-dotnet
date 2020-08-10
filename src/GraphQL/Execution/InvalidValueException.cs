@@ -10,5 +10,12 @@ namespace GraphQL.Execution
         {
             Code = "INVALID_VALUE";
         }
+
+        public InvalidValueException(string variableName, string message, Exception innerException) :
+            base($"Variable '${variableName}' is invalid. {message}", innerException, false)
+        {
+            Code = "INVALID_VALUE";
+            // note: Codes will also return codes of inner exceptions
+        }
     }
 }
