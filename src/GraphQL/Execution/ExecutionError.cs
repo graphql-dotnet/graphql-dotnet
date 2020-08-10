@@ -27,16 +27,10 @@ namespace GraphQL
         }
 
         public ExecutionError(string message, Exception exception)
-            : this(message, exception, true)
-        {
-        }
-
-        public ExecutionError(string message, Exception exception, bool copyData)
             : base(message, exception)
         {
             SetCode(exception);
-            if (copyData)
-                SetData(exception);
+            SetData(exception);
         }
 
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
