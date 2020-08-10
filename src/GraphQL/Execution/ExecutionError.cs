@@ -14,7 +14,6 @@ namespace GraphQL
         private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
 
         private List<ErrorLocation> _errorLocations;
-        private bool _autogenerateCodes;
 
         public ExecutionError(string message)
             : base(message)
