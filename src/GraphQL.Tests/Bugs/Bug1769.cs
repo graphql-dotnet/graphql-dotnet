@@ -29,7 +29,7 @@ namespace GraphQL.Tests.Bugs
         public async Task DocumentExecuter_has_valid_options()
         {
             var de = new DocumentExecuter();
-            var valid = await de.ExecuteAsync(new ExecutionOptions()
+            var valid = await de.ExecuteAsync(new ExecutionOptions
             {
                 Query = "{test}",
                 Schema = Schema,
