@@ -80,7 +80,7 @@ namespace GraphQL
                 {
                     throw new ExecutionError("Cannot execute query if no operation is specified.")
                     {
-                        Code = "SYNTAX_ERROR"
+                        Code = "NO_OPERATION"
                     };
                 }
 
