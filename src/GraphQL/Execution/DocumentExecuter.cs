@@ -76,6 +76,14 @@ namespace GraphQL
                     }
                 }
 
+                if (document.Operations.Count == 0)
+                {
+                    throw new ExecutionError("A query is required.")
+                    {
+                        Code = "SYNTAX_ERROR"
+                    };
+                }
+
                 var operation = GetOperation(options.OperationName, document);
                 metrics.SetOperationName(operation?.Name);
 
