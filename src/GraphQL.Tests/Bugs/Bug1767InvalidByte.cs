@@ -7,7 +7,7 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1766
+    // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1767
     public class Bug1767InvalidByte : QueryTestBase<Bug1767Schema>
     {
         private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
