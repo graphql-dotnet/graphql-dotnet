@@ -26,7 +26,7 @@ namespace GraphQL.Execution
             }
             catch (GraphQLSyntaxErrorException ex)
             {
-                var e = new ExecutionError(ex.Description, ex);
+                var e = new ExecutionError("Error parsing query: " + ex.Description, ex);
                 e.AddLocation(ex.Line, ex.Column);
                 throw e;
             }
