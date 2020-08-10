@@ -62,10 +62,10 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void query_is_empty() => AssertQueryWithError("", null, "A query is required.", 0, 0, (object[])null);
+        public void query_is_empty1() => AssertQueryWithError("", null, "A query is required.", 0, 0, (object[])null, code: "SYNTAX_ERROR");
 
         [Fact]
-        public void query_is_whitespace() => AssertQueryWithError("\t \t \r\n", null, "A query is required.", 0, 0, (object[])null);
+        public void query_is_whitespace2() => AssertQueryWithError("\t \t \r\n", null, "A query is required.", 0, 0, (object[])null, code: "SYNTAX_ERROR");
 
         [Fact]
         public void DocumentExecuter_cannot_have_null_constructor_parameters()
