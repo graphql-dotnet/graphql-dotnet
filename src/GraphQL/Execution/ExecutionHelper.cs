@@ -1,6 +1,6 @@
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,7 +105,7 @@ namespace GraphQL.Execution
 
             try
             {
-                AssertValidValue(schema, type, input, variable.Name);
+                AssertValidVariableValue(schema, type, input, variable.Name);
             }
             catch (InvalidValueException error)
             {
@@ -121,18 +121,19 @@ namespace GraphQL.Execution
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
-        public static void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
+        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName)
         {
+            // see also GraphQLExtensions.IsValidLiteralValue
             if (type is NonNullGraphType graphType)
             {
                 var nonNullType = graphType.ResolvedType;
 
                 if (input == null)
                 {
-                    throw new InvalidValueException(fieldName, "Received a null input for a non-null field.");
+                    throw new InvalidValueException(variableName, "Received a null input for a non-null variable.");
                 }
 
-                AssertValidValue(schema, nonNullType, input, fieldName);
+                AssertValidVariableValue(schema, nonNullType, input, variableName);
                 return;
             }
 
@@ -143,8 +144,18 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalar)
             {
-                if (ValueFromScalar(scalar, input) == null)
-                    throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
+                // verify value can be converted successfully
+
+                if (input is IValue value)
+                {
+                    if (scalar.ParseLiteral(value) == null)
+                        throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
+                }
+                else
+                {
+                    if (scalar.ParseValue(input) == null)
+                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
+                }
 
                 return;
             }
@@ -157,11 +168,11 @@ namespace GraphQL.Execution
                 {
                     var index = -1;
                     foreach (var item in list)
-                        AssertValidValue(schema, listItemType, item, $"{fieldName}[{++index}]");
+                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]");
                 }
                 else
                 {
-                    AssertValidValue(schema, listItemType, input, fieldName);
+                    AssertValidVariableValue(schema, listItemType, input, variableName);
                 }
                 return;
             }
@@ -172,7 +183,7 @@ namespace GraphQL.Execution
 
                 if (!(input is Dictionary<string, object> dict))
                 {
-                    throw new InvalidValueException(fieldName,
+                    throw new InvalidValueException(variableName,
                         $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
@@ -188,29 +199,19 @@ namespace GraphQL.Execution
 
                 if (unknownFields?.Count > 0)
                 {
-                    throw new InvalidValueException(fieldName,
+                    throw new InvalidValueException(variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
                 }
 
                 foreach (var field in complexType.Fields)
                 {
                     dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidValue(schema, field.ResolvedType, fieldValue, $"{fieldName}.{field.Name}");
+                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}");
                 }
                 return;
             }
 
-            throw new InvalidValueException(fieldName ?? "input", "Invalid input");
-        }
-
-        private static object ValueFromScalar(ScalarGraphType scalar, object input)
-        {
-            if (input is IValue value)
-            {
-                return scalar.ParseLiteral(value);
-            }
-
-            return scalar.ParseValue(input);
+            throw new InvalidValueException(variableName ?? "input", "Invalid input");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
@@ -299,7 +300,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return scalarType.ParseLiteral(input);
+                return scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'");
             }
 
             return null;

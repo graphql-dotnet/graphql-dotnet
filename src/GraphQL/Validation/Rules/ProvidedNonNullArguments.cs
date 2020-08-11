@@ -14,12 +14,12 @@ namespace GraphQL.Validation.Rules
     {
         public string MissingFieldArgMessage(string fieldName, string argName, string type)
         {
-            return $"Field \"{fieldName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
+            return $"Argument \"{argName}\" of type \"{type}\" is required for field \"{fieldName}\" but not provided.";
         }
 
         public string MissingDirectiveArgMessage(string directiveName, string argName, string type)
         {
-            return $"Directive \"{directiveName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
+            return $"Argument \"{argName}\" of type \"{type}\" is required for directive \"{directiveName}\" but not provided.";
         }
 
         public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
@@ -39,16 +39,15 @@ namespace GraphQL.Validation.Rules
 
                     foreach (var arg in fieldDef.Arguments)
                     {
-                        var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = arg.ResolvedType;
-
-                        if (argAst == null && type is NonNullGraphType)
+                        if (arg.DefaultValue == null &&
+                            arg.ResolvedType is NonNullGraphType &&
+                            node.Arguments?.ValueFor(arg.Name) == null)
                         {
                             context.ReportError(
                                 new ValidationError(
                                     context.OriginalQuery,
                                     "5.3.3.2",
-                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(type)),
+                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)),
                                     node));
                         }
                     }

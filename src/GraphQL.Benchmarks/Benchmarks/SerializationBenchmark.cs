@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using GraphQL.Introspection;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Tests.Introspection;
