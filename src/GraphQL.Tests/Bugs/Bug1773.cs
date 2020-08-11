@@ -51,7 +51,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void nonnull_list_throws_when_null()
         {
-            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve testListNullInvalid.", 1, 2, new[] { "testListNullInvalid" }, new InvalidOperationException("Cannot return a null member within a non-null list."));
+            AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve testListNullInvalid.", 1, 2, new[] { "testListNullInvalid" }, new InvalidOperationException("Cannot return a null member within a non-null list for list index 0."));
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace GraphQL.Tests.Bugs
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
             // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
-            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve testListInvalidType2.", 1, 2, new[] { "testListInvalidType2" }, new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'"));
+            AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve testListInvalidType2.", 1, 2, new[] { "testListInvalidType2" }, new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum' for list index 0."));
         }
 
         [Fact]
