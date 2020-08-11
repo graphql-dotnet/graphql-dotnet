@@ -313,7 +313,6 @@ namespace GraphQL
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType type, TSource source, GraphQL.Types.IObjectGraphType parentType, System.Collections.Generic.Dictionary<string, object> arguments, System.Collections.Generic.IEnumerable<string> path, System.IServiceProvider requestServices) { }
         public new TSource Source { get; set; }
     }
     public enum ResolverType
