@@ -1,8 +1,6 @@
+using System;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using System;
-using System.Linq;
-using System.Numerics;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs

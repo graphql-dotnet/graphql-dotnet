@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using GraphQL.Types;
 using Shouldly;
-using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Utilities

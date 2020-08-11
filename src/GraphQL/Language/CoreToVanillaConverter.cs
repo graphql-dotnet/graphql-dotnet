@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
-using System.Numerics;
+using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
 {

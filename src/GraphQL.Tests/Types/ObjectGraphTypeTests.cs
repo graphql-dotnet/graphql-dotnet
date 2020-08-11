@@ -1,7 +1,7 @@
-using GraphQL.Types;
-using Shouldly;
 using System;
 using System.Linq;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types

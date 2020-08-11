@@ -1,12 +1,10 @@
+using System;
+using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
-using System;
-using System.Linq;
-using System.Numerics;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
