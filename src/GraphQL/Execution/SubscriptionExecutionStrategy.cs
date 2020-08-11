@@ -80,7 +80,7 @@ namespace GraphQL.Execution
                     Metrics = context.Metrics,
                     Errors = context.Errors,
                     Path = node.Path,
-                    ResponsePath = node.ResponsePath,
+                    RequestServices = context.RequestServices,
                 };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
