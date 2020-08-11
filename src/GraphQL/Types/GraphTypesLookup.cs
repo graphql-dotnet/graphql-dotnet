@@ -232,7 +232,7 @@ namespace GraphQL.Types
 
             if (type is NonNullGraphType || type is ListGraphType)
             {
-                throw new ExecutionError("Only add root types.");
+                throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
             }
 
             var name = type.CollectTypes(context).TrimGraphQLTypes();
@@ -262,7 +262,7 @@ namespace GraphQL.Types
 
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
-                            throw new ExecutionError((
+                            throw new InvalidOperationException((
                                 "Interface type {0} does not provide a \"resolveType\" function " +
                                 "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
                                 "There is no way to resolve this possible type during execution.")
