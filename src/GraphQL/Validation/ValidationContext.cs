@@ -37,7 +37,7 @@ namespace GraphQL.Validation
 
         public void ReportError(ValidationError error)
         {
-            _errors.Add(error ?? throw new ArgumentNullException("Must provide a validation error."));
+            _errors.Add(error ?? throw new ArgumentNullException(nameof(error), "Must provide a validation error."));
         }
 
         public List<VariableUsage> GetVariables(IHaveSelectionSet node)
