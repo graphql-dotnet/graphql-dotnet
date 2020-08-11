@@ -82,5 +82,11 @@ namespace GraphQL
 
         /// <summary>Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.</summary>
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
+
+        /// <summary>
+        /// The service provider for the executing request. Typically this is set to a scoped service provider
+        /// from your dependency injection framework.
+        /// </summary>
+        public IServiceProvider RequestServices { get; set; }
     }
 }

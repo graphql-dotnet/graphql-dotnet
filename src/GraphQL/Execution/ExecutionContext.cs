@@ -38,5 +38,7 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+
+        public IServiceProvider RequestServices { get; set; }
     }
 }
