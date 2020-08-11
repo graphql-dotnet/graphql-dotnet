@@ -1,13 +1,7 @@
-using GraphQL.Execution;
-using GraphQL.SystemTextJson;
-using GraphQL.Types;
-using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
-using Shouldly;
 using System;
-using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
