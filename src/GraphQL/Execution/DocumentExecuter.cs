@@ -255,7 +255,7 @@ namespace GraphQL
                 ThrowOnUnhandledException = throwOnUnhandledException,
                 UnhandledExceptionDelegate = unhandledExceptionDelegate,
                 MaxParallelExecutionCount = maxParallelExecutionCount,
-                RequestServices = services
+                RequestServices = requestServices
             };
 
             return context;
