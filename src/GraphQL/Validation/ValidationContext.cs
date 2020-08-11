@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
@@ -36,8 +37,7 @@ namespace GraphQL.Validation
 
         public void ReportError(ValidationError error)
         {
-            Invariant.Check(error != null, "Must provide a validation error.");
-            _errors.Add(error);
+            _errors.Add(error ?? throw new ArgumentNullException("Must provide a validation error."));
         }
 
         public List<VariableUsage> GetVariables(IHaveSelectionSet node)

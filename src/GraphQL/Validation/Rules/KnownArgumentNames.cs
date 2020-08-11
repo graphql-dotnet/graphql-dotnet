@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -51,8 +52,7 @@ namespace GraphQL.Validation.Rules
                             var fieldArgDef = fieldDef.Arguments?.Find(node.Name);
                             if (fieldArgDef == null)
                             {
-                                var parentType = context.TypeInfo.GetParentType();
-                                Invariant.Check(parentType != null, "Parent type must not be null.");
+                                var parentType = context.TypeInfo.GetParentType() ?? throw new InvalidOperationException("Parent type must not be null.");
                                 context.ReportError(new ValidationError(
                                     context.OriginalQuery,
                                     "5.3.1",
