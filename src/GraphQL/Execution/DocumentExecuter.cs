@@ -32,22 +32,9 @@ namespace GraphQL
 
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
-            _documentBuilder = documentBuilder;
-            _documentValidator = documentValidator;
-            _complexityAnalyzer = complexityAnalyzer;
-        }
-
-        private void ValidateOptions(ExecutionOptions options)
-        {
-            if (options.Schema == null)
-            {
-                throw new ExecutionError("A schema is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(options.Query))
-            {
-                throw new ExecutionError("A query is required.");
-            }
+            _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
+            _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
+            _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
         }
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
@@ -56,6 +43,10 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(options));
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
+            if (options.Query == null)
+                throw new InvalidOperationException("Cannot execute request if no query is specified");
+            if (options.FieldMiddleware == null)
+                throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
             var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
@@ -67,8 +58,6 @@ namespace GraphQL
 
             try
             {
-                ValidateOptions(options);
-
                 if (!options.Schema.Initialized)
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
@@ -85,6 +74,14 @@ namespace GraphQL
                     {
                         document = _documentBuilder.Build(options.Query);
                     }
+                }
+
+                if (document.Operations.Count == 0)
+                {
+                    throw new ExecutionError("Cannot execute query if no operation is specified.")
+                    {
+                        Code = "NO_OPERATION"
+                    };
                 }
 
                 var operation = GetOperation(options.OperationName, document);
