@@ -36,7 +36,7 @@ namespace GraphQL.Language.AST
             }
             else
             {
-                throw new ExecutionError("Unhandled document definition");
+                throw new ArgumentOutOfRangeException("Unhandled document definition");
             }
         }
 
