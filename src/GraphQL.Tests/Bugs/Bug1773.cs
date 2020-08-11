@@ -57,14 +57,14 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void list_throws_for_invalid_type()
         {
-            // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
+            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": null}", "Error trying to resolve testListInvalidType.", 1, 2, new[] { "testListInvalidType" }, new FormatException("Input string was not in a correct format."));
         }
 
         [Fact]
         public void list_throws_for_invalid_type_when_conversion_returns_null()
         {
-            // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
+            // TODO: does not yet fully meet spec (does not return members of lists that are able to be serialized, with nulls and individual errors for unserializable values)
             AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": null}", "Error trying to resolve testListInvalidType2.", 1, 2, new[] { "testListInvalidType2" }, new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'"));
         }
 
