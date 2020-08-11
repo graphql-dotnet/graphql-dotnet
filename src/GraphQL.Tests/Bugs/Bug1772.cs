@@ -12,8 +12,8 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1770
-    public class Bug1770 : QueryTestBase<Bug1770Schema>
+    // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1772
+    public class Bug1772 : QueryTestBase<Bug1772Schema>
     {
         [Theory]
         [InlineData("")]
@@ -57,17 +57,17 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug1770Schema : Schema
+    public class Bug1772Schema : Schema
     {
-        public Bug1770Schema()
+        public Bug1772Schema()
         {
-            Query = new Bug1770Query();
+            Query = new Bug1772Query();
         }
     }
 
-    public class Bug1770Query : ObjectGraphType
+    public class Bug1772Query : ObjectGraphType
     {
-        public Bug1770Query()
+        public Bug1772Query()
         {
             Field<StringGraphType>("Test", resolve: context => "ok");
         }
