@@ -236,7 +236,7 @@ namespace GraphQL
             bool throwOnUnhandledException,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate,
             int? maxParallelExecutionCount,
-            IServiceProvider services)
+            IServiceProvider requestServices)
         {
             var context = new ExecutionContext
             {
