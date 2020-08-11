@@ -60,7 +60,28 @@ namespace GraphQL.Execution
 
             try
             {
-                var resolveContext = new ReadonlyResolveEventStreamContext(node, context);
+                var resolveContext = new ResolveEventStreamContext
+                {
+                    FieldName = node.Field.Name,
+                    FieldAst = node.Field,
+                    FieldDefinition = node.FieldDefinition,
+                    ReturnType = node.FieldDefinition.ResolvedType,
+                    ParentType = node.GetParentType(context.Schema),
+                    Arguments = arguments,
+                    Source = source,
+                    Schema = context.Schema,
+                    Document = context.Document,
+                    Fragments = context.Fragments,
+                    RootValue = context.RootValue,
+                    UserContext = context.UserContext,
+                    Operation = context.Operation,
+                    Variables = context.Variables,
+                    CancellationToken = context.CancellationToken,
+                    Metrics = context.Metrics,
+                    Errors = context.Errors,
+                    Path = node.Path,
+                    RequestServices = context.RequestServices,
+                };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
 
