@@ -89,7 +89,7 @@ namespace GraphQL
 
                 if (operation == null)
                 {
-                    throw new ExecutionError("Unable to determine operation from query.");
+                    throw new InvalidOperationException($"Query does not contain operation '{options.OperationName}'.");
                 }
 
                 IValidationResult validationResult;
