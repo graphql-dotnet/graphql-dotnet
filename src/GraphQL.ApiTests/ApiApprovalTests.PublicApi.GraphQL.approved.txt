@@ -1569,10 +1569,6 @@ namespace GraphQL.Subscription
     {
         System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
     }
-    public class ReadonlyResolveEventStreamContext : GraphQL.ReadonlyResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>, GraphQL.Subscription.IResolveEventStreamContext, GraphQL.Subscription.IResolveEventStreamContext<object>
-    {
-        public ReadonlyResolveEventStreamContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
-    }
     public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }
