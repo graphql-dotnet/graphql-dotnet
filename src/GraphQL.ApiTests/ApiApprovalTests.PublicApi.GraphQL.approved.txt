@@ -695,6 +695,7 @@ namespace GraphQL.Execution
     public class InvalidValueException : GraphQL.ExecutionError
     {
         public InvalidValueException(string variableName, string message) { }
+        public InvalidValueException(string variableName, string message, System.Exception innerException) { }
     }
     public class NullExecutionNode : GraphQL.Execution.ExecutionNode
     {
