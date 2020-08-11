@@ -107,7 +107,7 @@ namespace GraphQL.Execution
             {
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
@@ -121,7 +121,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(d)
-                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'");
+                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}");
                     }
 
                     arrayItems.Add(node);
@@ -130,12 +130,14 @@ namespace GraphQL.Execution
                 {
                     if (listType.ResolvedType is NonNullGraphType)
                     {
-                        throw new InvalidOperationException("Cannot return a null member within a non-null list.");
+                        throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
                     }
 
-                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     arrayItems.Add(nullExecutionNode);
                 }
+
+                index++;
             }
 
             parent.Items = arrayItems;
