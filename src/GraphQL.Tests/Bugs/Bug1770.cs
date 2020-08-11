@@ -18,12 +18,14 @@ namespace GraphQL.Tests.Bugs
         [Theory]
         [InlineData("")]
         [InlineData((string)null)]
+        [InlineData("firstQuery")]
+        [InlineData("secondQuery")]
         public async Task DocumentExecuter_works_for_valid_operation(string operationName)
         {
             var de = new DocumentExecuter();
             var valid = await de.ExecuteAsync(new ExecutionOptions
             {
-                Query = "{test}",
+                Query = "query firstQuery {test} query secondQuery {test}",
                 Schema = Schema,
                 OperationName = operationName,
             });
@@ -33,15 +35,15 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Theory]
-        [InlineData("mutation")]
-        [InlineData("subscription")]
+        [InlineData("thirdQuery")]
+        [InlineData("query")]
         [InlineData("test")]
         public async Task DocumentExecuter_throws_for_invalid_operation(string operationName)
         {
             var de = new DocumentExecuter();
             var result = await de.ExecuteAsync(new ExecutionOptions()
                 {
-                    Query = "{test}",
+                    Query = "query firstQuery {test} query secondQuery {test}",
                     Schema = Schema,
                     OperationName = operationName
                 });
