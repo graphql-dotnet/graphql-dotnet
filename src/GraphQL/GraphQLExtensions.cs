@@ -1,6 +1,3 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {

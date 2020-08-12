@@ -1,13 +1,13 @@
-using GraphQL.Builders;
-using GraphQL.Resolvers;
-using GraphQL.Subscription;
-using GraphQL.Types.Relay;
-using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GraphQL.Builders;
+using GraphQL.Resolvers;
+using GraphQL.Subscription;
+using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {

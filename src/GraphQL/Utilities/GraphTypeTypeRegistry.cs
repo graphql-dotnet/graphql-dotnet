@@ -1,7 +1,7 @@
-using GraphQL.Types;
 using System;
 using System.Collections.Concurrent;
 using System.Numerics;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {

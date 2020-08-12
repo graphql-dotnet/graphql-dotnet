@@ -1,10 +1,10 @@
-using GraphQL.Conversion;
-using GraphQL.Introspection;
-using GraphQL.Types.Relay;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GraphQL.Conversion;
+using GraphQL.Introspection;
+using GraphQL.Types.Relay;
 
 namespace GraphQL.Types
 {

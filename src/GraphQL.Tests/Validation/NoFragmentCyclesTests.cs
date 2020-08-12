@@ -1,5 +1,5 @@
-using GraphQL.Validation.Rules;
 using System;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation

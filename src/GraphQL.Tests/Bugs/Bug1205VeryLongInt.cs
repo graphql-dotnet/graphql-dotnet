@@ -1,6 +1,6 @@
-using GraphQL.Types;
 using System;
 using System.Numerics;
+using GraphQL.Types;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
