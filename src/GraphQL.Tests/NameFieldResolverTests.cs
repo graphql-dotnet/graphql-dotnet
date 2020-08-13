@@ -1,7 +1,7 @@
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.Tests

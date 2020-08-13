@@ -1,9 +1,9 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Language.AST;
+using GraphQL.Types;
 
 namespace GraphQL.Execution
 {

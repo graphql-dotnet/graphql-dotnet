@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using GraphQL.StarWars;
+using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
-using GraphQL.StarWars.Types;
-using GraphQL.StarWars;
 
 namespace GraphQL.Tests.StarWars
 {
