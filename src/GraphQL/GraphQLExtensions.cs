@@ -426,9 +426,8 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            Invariant.Check(
-                type.IsInputType(),
-                $"Must provide Input Type, cannot use: {type}");
+            if (!type.IsInputType())
+                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
             var inputType = type as ScalarGraphType;
 
