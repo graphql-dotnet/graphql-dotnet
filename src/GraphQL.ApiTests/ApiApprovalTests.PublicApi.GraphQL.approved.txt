@@ -202,10 +202,6 @@ namespace GraphQL
     {
         public static GraphQL.Inputs ToInputs(this System.Collections.Generic.Dictionary<string, object> dictionary) { }
     }
-    public static class Invariant
-    {
-        public static void Check(bool valid, string message) { }
-    }
     public class LightweightCache<TKey, TValue> : System.Collections.Generic.IEnumerable<TValue>, System.Collections.IEnumerable
     {
         public LightweightCache() { }
