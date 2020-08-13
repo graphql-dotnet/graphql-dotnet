@@ -83,7 +83,7 @@ namespace GraphQL.Tests.Types
         public void throw_error_on_missing_istypeof()
         {
             var schema = new InvalidUnionSchema();
-            //note: The exception occurs during CreateTypesLookup, not during FindType
+            //note: The exception occurs during Schema.CreateTypesLookup(), not during Schema.FindType()
             Should.Throw<InvalidOperationException>(() => schema.FindType("a"));
         }
 
