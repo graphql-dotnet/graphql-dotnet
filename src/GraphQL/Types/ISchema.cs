@@ -145,11 +145,6 @@ namespace GraphQL.Types
         ISchemaFilter Filter { get; set; }
 
         /// <summary>
-        /// The service provider for the schema
-        /// </summary>
-        IServiceProvider Services { get; }
-
-        /// <summary>
         /// Returns a reference to the __schema introspection field available on the query graph type
         /// </summary>
         FieldType SchemaMetaFieldType { get; }

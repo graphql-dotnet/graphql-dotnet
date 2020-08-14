@@ -56,7 +56,11 @@ namespace GraphQL.Instrumentation
                 if (schema == null)
                     throw new InvalidOperationException("Schema is null. Schema required for resolving middlewares from DI container.");
 
-                var instance = (IFieldMiddleware)schema.Services.GetService(middleware);
+                // Not an ideal solution, but at least it allows to work with custom schemas which are not inherited from Schema type
+                if (!(schema is IServiceProvider provider))
+                    throw new NotSupportedException($"'{schema.GetType().FullName}' should implement 'IServiceProvider' interface for resolving middlewares.");
+
+                var instance = (IFieldMiddleware)provider.GetService(middleware);
                 if (instance == null)
                     throw new InvalidOperationException($"Field middleware of type '{middleware.FullName}' must be registered in the DI container.");
 

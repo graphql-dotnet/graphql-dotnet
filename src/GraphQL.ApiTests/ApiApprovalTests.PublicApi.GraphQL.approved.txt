@@ -1916,7 +1916,6 @@ namespace GraphQL.Types
         GraphQL.Conversion.INameConverter NameConverter { get; set; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        System.IServiceProvider Services { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
         GraphQL.Types.FieldType TypeMetaFieldType { get; }
         GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
@@ -2061,7 +2060,7 @@ namespace GraphQL.Types
         public abstract object ParseValue(object value);
         public virtual object Serialize(object value) { }
     }
-    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
@@ -2075,7 +2074,6 @@ namespace GraphQL.Types
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        public System.IServiceProvider Services { get; }
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
