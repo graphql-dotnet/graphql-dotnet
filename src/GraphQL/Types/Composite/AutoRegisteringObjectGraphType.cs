@@ -1,4 +1,3 @@
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {

@@ -1,8 +1,8 @@
-using GraphQL.Resolvers;
 using System;
 using System.Diagnostics;
-using GraphQL.Utilities;
 using GraphQL.Language.AST;
+using GraphQL.Resolvers;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {

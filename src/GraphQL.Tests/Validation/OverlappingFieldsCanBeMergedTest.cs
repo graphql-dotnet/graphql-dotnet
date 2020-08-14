@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using GraphQL.Types;
 using GraphQL.Validation.Rules;
-using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Validation

@@ -1,10 +1,10 @@
-using GraphQL.Tests.Introspection;
-using GraphQL.Types;
-using Shouldly;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using GraphQL.Tests.Introspection;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs

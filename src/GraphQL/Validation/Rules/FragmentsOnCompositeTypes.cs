@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using System.Threading.Tasks;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Rules
 {
