@@ -192,7 +192,8 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                result = new ExecutionResult {
+                result = new ExecutionResult
+                {
                     Errors = new ExecutionErrors
                     {
                         ex
