@@ -226,7 +226,7 @@ namespace GraphQL.Language
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
-                    // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger
+                    // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger via an invalid query
                     throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
