@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -11,10 +10,10 @@ namespace GraphQL.Tests.Bugs
     public class Bug1735 : QueryTestBase<Bug1735Schema>
     {
         [Theory]
-        [InlineData("")]            //NO_OPERATION
-        [InlineData("{ unknown }")] //5.2.1 (validation error)
-        [InlineData("{ abcd")]      //SYNTAX_ERROR
-        [InlineData("{ test(arg: 500) }")] //5.3.3.1 (invalid type)
+        [InlineData("")]                   // NO_OPERATION
+        [InlineData("{ unknown }")]        // 5.2.1 (validation error)
+        [InlineData("{ abcd")]             // SYNTAX_ERROR
+        [InlineData("{ test(arg: 500) }")] // 5.3.3.1 (invalid type)
         public async Task DocumentExecuter_does_not_throw_for_invalid_queries(string query)
         {
             var de = new DocumentExecuter();
