@@ -64,6 +64,8 @@ namespace GraphQL.Extensions.DI.Microsoft
 
         public IEnumerable<object> Path => _baseContext.Path;
 
+        public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
+
         public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
 
         public IServiceProvider RequestServices { get; }
