@@ -15,12 +15,12 @@ using Shouldly;
 namespace GraphQL.Tests
 {
     public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder>
-        where TSchema : ISchema
+        where TSchema : Schema
     {
     }
 
     public class QueryTestBase<TSchema, TDocumentBuilder>
-        where TSchema : ISchema
+        where TSchema : Schema
         where TDocumentBuilder : IDocumentBuilder, new()
     {
         public QueryTestBase()

@@ -29,7 +29,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
         /// </summary>
-        INameConverter NameConverter { get; set; }
+        INameConverter NameConverter { get; }
 
         string Description { get; set; }
 
@@ -141,7 +141,7 @@ namespace GraphQL.Types
         /// Note that this filter in fact does not prohibit the execution of queries that contain hidden types. To limit
         /// access to the particular fields, you should use some authorization logic.
         /// </summary>
-        ISchemaFilter Filter { get; set; }
+        ISchemaFilter Filter { get; }
 
         /// <summary>
         /// Returns a reference to the __schema introspection field available on the query graph type
