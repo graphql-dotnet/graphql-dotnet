@@ -226,8 +226,8 @@ namespace GraphQL.Language
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
-                    // TODO: add code and test
-                    throw new ExecutionError($"Invalid number {str.Value}");
+                    // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger
+                    throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
@@ -235,20 +235,24 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    double dbl = ValueConverter.ConvertTo<double>(str.Value);
-                    decimal dec = ValueConverter.ConvertTo<decimal>(str.Value);
-                    // TODO: make more efficient, current solution allocates memory
-                    int[] decBits = decimal.GetBits(dec);
-                    int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
-                    if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
-                        return new DecimalValue(dec).WithLocation(str, _body);
+                    double dbl = double.Parse(str.Value);
+
+                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                    if (decimal.TryParse(str.Value, out var dec))
+                    {
+                        // TODO: make more efficient, current solution allocates memory
+                        int[] decBits = decimal.GetBits(dec);
+                        int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
+                        if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
+                            return new DecimalValue(dec).WithLocation(str, _body);
+                    }
 
                     return new FloatValue(dbl).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new BooleanValue(ValueConverter.ConvertTo<bool>(str.Value)).WithLocation(str, _body);
+                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {
