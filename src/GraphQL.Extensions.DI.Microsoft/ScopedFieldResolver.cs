@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Resolvers;
-using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Extensions.DI.Microsoft

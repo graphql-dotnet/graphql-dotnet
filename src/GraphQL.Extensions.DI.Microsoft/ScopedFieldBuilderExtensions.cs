@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using GraphQL.Builders;
-using GraphQL.Types;
 
 namespace GraphQL.Extensions.DI.Microsoft
 {
