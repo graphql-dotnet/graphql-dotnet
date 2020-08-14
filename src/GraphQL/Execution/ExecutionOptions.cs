@@ -84,7 +84,8 @@ namespace GraphQL
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
 
         /// <summary>
-        /// The service provider for the executing request
+        /// The service provider for the executing request. Typically this is set to a scoped service provider
+        /// from your dependency injection framework.
         /// </summary>
         public IServiceProvider RequestServices { get; set; }
     }

@@ -1,13 +1,13 @@
-using GraphQL.Resolvers;
 using System;
 using System.Diagnostics;
-using GraphQL.Utilities;
 using GraphQL.Language.AST;
+using GraphQL.Resolvers;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class FieldType : MetadataProvider, IFieldType
+    public class FieldType : MetadataProvider, IFieldType, IProvideResolvedType
     {
         private object _defaultValue;
         private IValue _defaultValueAST;

@@ -32,22 +32,9 @@ namespace GraphQL
 
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
-            _documentBuilder = documentBuilder;
-            _documentValidator = documentValidator;
-            _complexityAnalyzer = complexityAnalyzer;
-        }
-
-        private void ValidateOptions(ExecutionOptions options)
-        {
-            if (options.Schema == null)
-            {
-                throw new ExecutionError("A schema is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(options.Query))
-            {
-                throw new ExecutionError("A query is required.");
-            }
+            _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
+            _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
+            _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
         }
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
@@ -56,6 +43,10 @@ namespace GraphQL
                 throw new ArgumentNullException(nameof(options));
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
+            if (options.Query == null)
+                throw new InvalidOperationException("Cannot execute request if no query is specified");
+            if (options.FieldMiddleware == null)
+                throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
             var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
@@ -67,8 +58,6 @@ namespace GraphQL
 
             try
             {
-                ValidateOptions(options);
-
                 if (!options.Schema.Initialized)
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
@@ -87,12 +76,20 @@ namespace GraphQL
                     }
                 }
 
+                if (document.Operations.Count == 0)
+                {
+                    throw new ExecutionError("Cannot execute query if no operation is specified.")
+                    {
+                        Code = "NO_OPERATION"
+                    };
+                }
+
                 var operation = GetOperation(options.OperationName, document);
                 metrics.SetOperationName(operation?.Name);
 
                 if (operation == null)
                 {
-                    throw new ExecutionError("Unable to determine operation from query.");
+                    throw new InvalidOperationException($"Query does not contain operation '{options.OperationName}'.");
                 }
 
                 IValidationResult validationResult;
@@ -209,7 +206,7 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        new ExecutionError(ex.Message, ex)
+                        ex is ExecutionError executionError ? executionError : new ExecutionError(ex.Message, ex)
                     }
                 };
             }
@@ -236,7 +233,7 @@ namespace GraphQL
             bool throwOnUnhandledException,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate,
             int? maxParallelExecutionCount,
-            IServiceProvider services)
+            IServiceProvider requestServices)
         {
             var context = new ExecutionContext
             {
@@ -255,7 +252,7 @@ namespace GraphQL
                 ThrowOnUnhandledException = throwOnUnhandledException,
                 UnhandledExceptionDelegate = unhandledExceptionDelegate,
                 MaxParallelExecutionCount = maxParallelExecutionCount,
-                RequestServices = services
+                RequestServices = requestServices
             };
 
             return context;

@@ -1,7 +1,7 @@
-using GraphQL.Conversion;
-using GraphQL.Introspection;
 using System;
 using System.Collections.Generic;
+using GraphQL.Conversion;
+using GraphQL.Introspection;
 
 namespace GraphQL.Types
 {

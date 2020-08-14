@@ -34,7 +34,7 @@ namespace GraphQL
 
         public string FieldName => _executionNode.Field.Name;
 
-        public Language.AST.Field FieldAst => _executionNode.Field;
+        public Field FieldAst => _executionNode.Field;
 
         public FieldType FieldDefinition => _executionNode.FieldDefinition;
 
@@ -42,7 +42,7 @@ namespace GraphQL
 
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
-        public IDictionary<string, object> Arguments => _arguments ?? (_arguments = GetArguments());
+        public IDictionary<string, object> Arguments => _arguments ??= GetArguments();
 
         public object RootValue => _executionContext.RootValue;
 
@@ -64,7 +64,9 @@ namespace GraphQL
 
         public IEnumerable<object> Path => _executionNode.Path;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _subFields ?? (_subFields = GetSubFields());
+        public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
+
+        public IDictionary<string, Field> SubFields => _subFields ??= GetSubFields();
 
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
 

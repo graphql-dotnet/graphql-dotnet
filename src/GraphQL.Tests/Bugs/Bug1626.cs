@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void GetArgument_Should_Not_Throw_AmbiguousMatchException()
         {
-            var context = new ResolveFieldContext()
+            var context = new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>
                 {

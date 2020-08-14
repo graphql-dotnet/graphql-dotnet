@@ -23,7 +23,14 @@ namespace GraphQL.Reflection
 
         public object GetValue(object target, object[] arguments)
         {
-            return MethodInfo.Invoke(target, arguments);
+            try
+            {
+                return MethodInfo.Invoke(target, arguments);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw ex.InnerException;
+            }
         }
     }
 }

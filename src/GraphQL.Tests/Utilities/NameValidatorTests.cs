@@ -1,5 +1,5 @@
-using Shouldly;
 using System;
+using Shouldly;
 using Xunit;
 using static GraphQL.Utilities.NameValidator;
 
