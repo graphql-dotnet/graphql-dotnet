@@ -35,7 +35,7 @@ namespace GraphQL.Utilities
         {
             if (FieldsList.Exists(x => x.Name == field.Name))
             {
-                throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
+                throw new ArgumentException($"A field with name \"{field.Name}\" already exists!", nameof(field));
             }
 
             FieldsList.Add(field);
