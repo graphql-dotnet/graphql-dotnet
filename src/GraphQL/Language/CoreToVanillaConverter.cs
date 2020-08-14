@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using GraphQL.Language.AST;
@@ -203,25 +204,25 @@ namespace GraphQL.Language
                 {
                     var str = (GraphQLScalarValue)source;
 
-                    if (int.TryParse(str.Value, out var intResult))
+                    if (int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
                     {
                         return new IntValue(intResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    if (long.TryParse(str.Value, out var longResult))
+                    if (long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
                     {
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
-                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    if (decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
                     {
                         return new DecimalValue(decimalResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    if (BigInteger.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
@@ -235,10 +236,17 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    double dbl = double.Parse(str.Value);
+                    double dbl = double.Parse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture);
 
                     //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
-                    if (decimal.TryParse(str.Value, out var dec))
+                    if (decimal.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out var dec))
                     {
                         // TODO: make more efficient, current solution allocates memory
                         int[] decBits = decimal.GetBits(dec);
