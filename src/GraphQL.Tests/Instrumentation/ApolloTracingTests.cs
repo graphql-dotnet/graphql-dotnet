@@ -1,10 +1,10 @@
-using GraphQL.Instrumentation;
-using GraphQL.Tests.StarWars;
-using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Instrumentation;
+using GraphQL.Tests.StarWars;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Instrumentation

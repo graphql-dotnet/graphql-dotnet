@@ -920,6 +920,44 @@ scalar Uri
         }
 
         [Fact]
+        public void prints_enum_default_args()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            
+            var f = new FieldType
+            {
+                Name = "bestColor",
+                Arguments = new QueryArguments(new QueryArgument<RgbEnum>
+                {
+                    Name = "color",
+                    DefaultValue = "RED"
+                }),
+                Type = typeof(RgbEnum)
+            };
+            root.AddField(f);
+            var schema = new Schema { Query = root };
+            schema.RegisterType<RgbEnum>();
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"type Query {
+  bestColor(color: RGB = RED): RGB
+}"
+                },
+                {
+                    "RGB",
+@"enum RGB {
+  RED
+  GREEN
+  BLUE
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_introspection_schema()
         {
             var schema = new Schema
@@ -1027,6 +1065,7 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  description: String
   # A list of all types supported by this server.
   types: [__Type!]!
   # The type that query operations will be rooted at.
@@ -1180,8 +1219,6 @@ enum __TypeKind {
             {
                 Name = "Odd";
             }
-
-            public override object Serialize(object value) => null;
 
             public override object ParseValue(object value) => null;
 

@@ -1,7 +1,7 @@
-using GraphQL.Types;
 using System;
 using System.Collections.Concurrent;
 using System.Numerics;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
@@ -17,7 +17,7 @@ namespace GraphQL.Utilities
             [typeof(decimal)] = typeof(DecimalGraphType),
             [typeof(string)] = typeof(StringGraphType),
             [typeof(bool)] = typeof(BooleanGraphType),
-            [typeof(DateTime)] = typeof(DateGraphType),
+            [typeof(DateTime)] = typeof(DateTimeGraphType),
             [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
             [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
             [typeof(Guid)] = typeof(IdGraphType),

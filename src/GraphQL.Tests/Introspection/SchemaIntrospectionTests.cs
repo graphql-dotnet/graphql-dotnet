@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using GraphQL.Conversion;
-using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;

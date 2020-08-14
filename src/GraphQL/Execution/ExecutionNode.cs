@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
@@ -60,54 +59,77 @@ namespace GraphQL.Execution
             return null;
         }
 
-        public IEnumerable<string> Path
+        /// <summary>
+        /// The path for the current node within the query.
+        /// </summary>
+        public IEnumerable<object> Path => GeneratePath(preferAlias: false);
+
+        /// <summary>
+        /// The path for the current node within the response.
+        /// </summary>
+        public IEnumerable<object> ResponsePath => GeneratePath(preferAlias: true);
+
+        private static readonly object _num0 = 0;
+        private static readonly object _num1 = 1;
+        private static readonly object _num2 = 2;
+        private static readonly object _num3 = 3;
+        private static readonly object _num4 = 4;
+        private static readonly object _num5 = 5;
+        private static readonly object _num6 = 6;
+        private static readonly object _num7 = 7;
+        private static readonly object _num8 = 8;
+        private static readonly object _num9 = 9;
+        private static readonly object _num10 = 10;
+        private static readonly object _num11 = 11;
+        private static readonly object _num12 = 12;
+        private static readonly object _num13 = 13;
+        private static readonly object _num14 = 14;
+        private static readonly object _num15 = 15;
+        private static object GetObjectIndex(int index) => index switch
         {
-            get
-            {
-                var node = this;
-                var count = 0;
-                while (!(node is RootExecutionNode))
-                {
-                    node = node.Parent;
-                    ++count;
-                }
-
-                var pathList = new string[count];
-                var index = count;
-                node = this;
-                while (!(node is RootExecutionNode))
-                {
-                    if (node.IndexInParentNode.HasValue)
-                        pathList[--index] = GetStringIndex(node.IndexInParentNode.Value);
-                    else
-                        pathList[--index] = node.Field.Name;
-                    node = node.Parent;
-                }
-
-                return pathList;
-            }
-        }
-
-        private static string GetStringIndex(int index) => index switch
-        {
-            0 => "0",
-            1 => "1",
-            2 => "2",
-            3 => "3",
-            4 => "4",
-            5 => "5",
-            6 => "6",
-            7 => "7",
-            8 => "8",
-            9 => "9",
-            10 => "10",
-            11 => "11",
-            12 => "12",
-            13 => "13",
-            14 => "14",
-            15 => "15",
-            _ => index.ToString()
+            0 => _num0,
+            1 => _num1,
+            2 => _num2,
+            3 => _num3,
+            4 => _num4,
+            5 => _num5,
+            6 => _num6,
+            7 => _num7,
+            8 => _num8,
+            9 => _num9,
+            10 => _num10,
+            11 => _num11,
+            12 => _num12,
+            13 => _num13,
+            14 => _num14,
+            15 => _num15,
+            _ => index
         };
+
+        private IEnumerable<object> GeneratePath(bool preferAlias)
+        {
+            var node = this;
+            var count = 0;
+            while (!(node is RootExecutionNode))
+            {
+                node = node.Parent;
+                ++count;
+            }
+
+            var pathList = new object[count];
+            var index = count;
+            node = this;
+            while (!(node is RootExecutionNode))
+            {
+                if (node.IndexInParentNode.HasValue)
+                    pathList[--index] = GetObjectIndex(node.IndexInParentNode.Value);
+                else
+                    pathList[--index] = preferAlias ? node.Name : node.Field.Name;
+                node = node.Parent;
+            }
+
+            return pathList;
+        }
     }
 
     public interface IParentExecutionNode
@@ -217,7 +239,7 @@ namespace GraphQL.Execution
 
     public class ValueExecutionNode : ExecutionNode
     {
-        public ValueExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
@@ -225,11 +247,21 @@ namespace GraphQL.Execution
 
         public override object ToValue()
         {
-            if (Result == null)
-                return null;
-
-            var scalarType = GraphType as ScalarGraphType;
-            return scalarType?.Serialize(Result);
+            // result has already been serialized within ExecuteNodeAsync / SetArrayItemNodes
+            return Result;
         }
+
+        public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType;
+    }
+
+    public class NullExecutionNode : ExecutionNode
+    {
+        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        {
+            Result = null;
+        }
+
+        public override object ToValue() => null;
     }
 }

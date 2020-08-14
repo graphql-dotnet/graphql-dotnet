@@ -202,10 +202,6 @@ namespace GraphQL.Builders
             {
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
-            if (args.IsPartial && args.NumberOfSkippedEntries.HasValue)
-            {
-                throw new ArgumentException("Cannot specify `numberOfSkippedEntries` with partial connection resolvers.");
-            }
         }
     }
 }

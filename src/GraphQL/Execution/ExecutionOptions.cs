@@ -76,5 +76,11 @@ namespace GraphQL
 
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }
+
+        /// <summary>
+        /// The service provider for the executing request. Typically this is set to a scoped service provider
+        /// from your dependency injection framework.
+        /// </summary>
+        public IServiceProvider RequestServices { get; set; }
     }
 }

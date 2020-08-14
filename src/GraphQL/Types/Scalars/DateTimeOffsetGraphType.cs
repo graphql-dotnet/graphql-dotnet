@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using System;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -11,8 +11,6 @@ namespace GraphQL.Types
                 "The `DateTimeOffset` scalar type represents a date, time and offset from UTC. `DateTimeOffset` expects timestamps " +
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
-
-        public override object Serialize(object value) => ParseValue(value);
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
 

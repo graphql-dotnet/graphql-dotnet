@@ -114,7 +114,7 @@ namespace GraphQL.Tests
 
         public ExecutionResult AssertQuery(
             string query,
-            ExecutionResult expectedExecutionResult,
+            object expectedExecutionResultOrJson,
             Inputs inputs,
             object root,
             IDictionary<string, object> userContext = null,
@@ -141,7 +141,7 @@ namespace GraphQL.Tests
             writer ??= Writer;
 
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
 
             string additionalInfo = null;
 

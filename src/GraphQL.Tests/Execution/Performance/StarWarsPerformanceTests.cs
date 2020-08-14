@@ -1,7 +1,7 @@
+using System.Diagnostics;
 using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
 using Shouldly;
-using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
 

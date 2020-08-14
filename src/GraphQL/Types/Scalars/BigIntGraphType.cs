@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using System.Numerics;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -14,7 +14,5 @@ namespace GraphQL.Types
         };
 
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(BigInteger));
-
-        public override object Serialize(object value) => ParseValue(value);
     }
 }

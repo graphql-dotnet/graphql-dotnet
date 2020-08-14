@@ -5,6 +5,7 @@ namespace GraphQL.Tests.Introspection
         public static readonly string IntrospectionQuery = @"
   query IntrospectionQuery {
     __schema {
+      description
       queryType { name }
       mutationType { name }
       subscriptionType { name }

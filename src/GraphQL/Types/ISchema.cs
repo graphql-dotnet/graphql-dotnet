@@ -1,7 +1,7 @@
-using GraphQL.Conversion;
-using GraphQL.Introspection;
 using System;
 using System.Collections.Generic;
+using GraphQL.Conversion;
+using GraphQL.Introspection;
 
 namespace GraphQL.Types
 {
@@ -30,6 +30,8 @@ namespace GraphQL.Types
         /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
         /// </summary>
         INameConverter NameConverter { get; set; }
+
+        string Description { get; set; }
 
         /// <summary>
         /// The 'query' base graph type; required

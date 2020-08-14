@@ -89,16 +89,21 @@ using GraphQL.Language.AST;
 
 public class Vector3Type : ScalarGraphType
 {
-    public Vector3Type() => Name = "Vector3";
+    public Vector3Type()
+    {
+        Name = "Vector3";
+    }
 
     public override object ParseLiteral(IValue value)
     {
         throw new NotImplementedException();
     }
+
     public override object ParseValue(object value)
     {
         throw new NotImplementedException();
     }
+
     public override object Serialize(object value)
     {
         throw new NotImplementedException();
@@ -109,13 +114,13 @@ public class Vector3Type : ScalarGraphType
 3. Register the graph type with the DI container.
 
 ```csharp
-//In Startup.cs
+// In Startup.cs
 
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<Vector3Type>();
 
-    //Other schema registrations...
+    // Other schema registrations...
 }
 ```
 
@@ -137,7 +142,7 @@ Once the raw string is extracted from the value node, normal parsing can proceed
 5. Prepare to accept `Vector3` inputs from query variables. Implement `ScalarGraphType.ParseValue`.
 
 ```csharp
-//In Vector3Type
+// In Vector3Type
 public override object ParseValue(object value)
 {
     return ValueConverter.ConvertTo(value, typeof(Vector3));
@@ -155,19 +160,18 @@ using System;
 
 public class ExampleSchema : Schema
 {
-    public ExampleSchema(IDependencyResolver resolver)
-        : base(resolver)
+    public ExampleSchema(IServiceProvider provider)
+        : base(provider)
     {        
-        ValueConverter.Register(typeof(string), typeof(Vector3) ParseVector3);
+        ValueConverter.Register<string, Vector3>(ParseVector3);
 
-        //Other schema assignments...
+        // Other schema assignments...
     }
 
-    private object ParseVector3(object vector3Input)
+    private Vector3 ParseVector3(string vector3InputString)
     {
         try
         {
-            var vector3InputString = (string)vector3Input;
             var vector3Parts = vector3InputString.Split(',');
             var x = float.Parse(vector3Parts[0]);
             var y = float.Parse(vector3Parts[1]);
@@ -176,7 +180,7 @@ public class ExampleSchema : Schema
         }
         catch
         {
-            throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3Input}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
+            throw new FormatException($"Failed to parse {nameof(Vector3)} from input '{vector3InputString}'. Input should be a string of three comma-separated floats in X Y Z order, ex. 1.0,2.0,3.0");
         }
     }
 }
@@ -221,24 +225,24 @@ public class Vector3AstValueConverter : IAstFromValueConverter
 Register `Vector3AstValueConverter` with the schema. Don't conflate `ValueConverter.Register` used in step 4 with `Schema.RegisterValueConverter` - the latter is used for conversions to AST value nodes.
 
 ```csharp
-//In ExampleSchema
-public ExampleSchema(IDependencyResolver resolver)
-    : base(resolver)
+// In ExampleSchema
+public ExampleSchema(IServiceProvider provider)
+    : base(provider)
 {        
-    ValueConverter.Register(typeof(string), typeof(Vector3) ParseVector3);
-    this.RegisterValueConverter(new Vector3AstValueConverter());
+    ValueConverter.Register<string, Vector3>(ParseVector3);
+    RegisterValueConverter(new Vector3AstValueConverter());
 
-    //Other schema assignments...
+    // Other schema assignments...
 }
 ``` 
 
 Update the implementation of `Vector3Type.ParseLiteral`:
 
 ```csharp
-//In Vector3Type
+// In Vector3Type
 public override object ParseLiteral(IValue value)
 {
-    //new test
+    // new test
     if (value is Vector3Value vector3Value)
         return ParseValue(vector3Value.Value);
 
@@ -254,7 +258,7 @@ This is necessary since the query executor converts all arguments and variables 
 7. Implement `ScalarGraphType.Serialize` so `Vector3` instances can be sent to the client.
 
 ```csharp
-//in Vector3Type
+// In Vector3Type
 
 public override object Serialize(object value)
 {
@@ -264,7 +268,7 @@ public override object Serialize(object value)
 
 This implementation may surprise you. Why is `Serialize`, which is used for output, implemented identically to `ParseValue`, which is used for input? Why does `Serialize` return an object, rather than a string or byte array? It helps to understand a few internals of the library.
 
-- `Serialize` will be called during query execution, and should be passed an instance of `Vector3` from a field resolver
+- `Serialize` will be called during query execution, and should be passed an instance of `Vector3` from a field resolver.
 
 - `Serialize` is _also_ called when reading variables from the client so that variables can be converted to `IValue` instances. In the case of `Vector3Type`, `value` will be a string during this process.
 

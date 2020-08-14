@@ -1,6 +1,3 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -153,6 +153,7 @@ namespace GraphQL
 
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
+            // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType;
@@ -229,7 +230,7 @@ namespace GraphQL
                 foreach (var field in fields)
                 {
                     var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
-                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value, schema);
+                    var result = IsValidLiteralValue(field.ResolvedType, fieldAst?.Value ?? field.GetDefaultValueAST(schema), schema);
 
                     errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
                 }
@@ -425,9 +426,8 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            Invariant.Check(
-                type.IsInputType(),
-                $"Must provide Input Type, cannot use: {type}");
+            if (!type.IsInputType())
+                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
             var inputType = type as ScalarGraphType;
 
@@ -464,7 +464,7 @@ namespace GraphQL
                 var converter = schema.FindValueConverter(serialized, type);
                 return converter != null
                     ? converter.Convert(serialized, type)
-                    : throw new ExecutionError($"Cannot convert value to AST: {serialized}");
+                    : throw new ExecutionError($"Cannot convert '{serialized}' value to AST for type '{type.Name}'.");
             }
         }
     }

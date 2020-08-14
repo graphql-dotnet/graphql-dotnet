@@ -17,7 +17,7 @@ namespace GraphQL.Types
             TimeSpan timeSpan => (long)timeSpan.TotalMilliseconds,
             int i => i,
             long l => l,
-            _ => (object)null
+            _ => null
         };
 
         public override object ParseValue(object value) => value switch
@@ -25,7 +25,7 @@ namespace GraphQL.Types
             int i => TimeSpan.FromMilliseconds(i),
             long l => TimeSpan.FromMilliseconds(l),
             TimeSpan t => t,
-            _ => (object)null
+            _ => null
         };
 
         public override object ParseLiteral(IValue value) => value switch

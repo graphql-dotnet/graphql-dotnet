@@ -1,11 +1,11 @@
-using GraphQL.Conversion;
-using GraphQL.Types;
-using GraphQL.Utilities;
-using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using GraphQL.Conversion;
+using GraphQL.Types;
+using GraphQL.Utilities;
+using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 

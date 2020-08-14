@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
-using System.Numerics;
+using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
 {
@@ -46,6 +47,7 @@ namespace GraphQL.Language
         {
             var name = source.Name != null ? Name(source.Name) : null;
             var op = new Operation(name).WithLocation(source, _body);
+            op.CommentNode = Comment(source.Comment);
             op.OperationType = ToOperationType(source.Operation);
             op.SelectionSet = SelectionSet(source.SelectionSet);
             op.Variables = VariableDefinitions(source.VariableDefinitions);
@@ -56,6 +58,7 @@ namespace GraphQL.Language
         public FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
             var frag = new FragmentDefinition(Name(source.Name)).WithLocation(source, _body);
+            frag.CommentNode = Comment(source.Comment);
             frag.Type = NamedType(source.TypeCondition);
             frag.SelectionSet = SelectionSet(source.SelectionSet);
             frag.Directives = Directives(source.Directives);
@@ -66,6 +69,7 @@ namespace GraphQL.Language
         {
             var name = source.Name != null ? Name(source.Name) : null;
             var spread = new FragmentSpread(name).WithLocation(source, _body);
+            spread.CommentNode = Comment(source.Comment);
             spread.Directives = Directives(source.Directives);
             return spread;
         }
@@ -73,6 +77,7 @@ namespace GraphQL.Language
         public InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
             var frag = new InlineFragment().WithLocation(source, _body);
+            frag.CommentNode = Comment(source.Comment);
             frag.Type = source.TypeCondition != null ? NamedType(source.TypeCondition) : null;
             frag.Directives = Directives(source.Directives);
             frag.SelectionSet = SelectionSet(source.SelectionSet);
@@ -87,7 +92,7 @@ namespace GraphQL.Language
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    (defs ?? (defs = new VariableDefinitions())).Add(def);
+                    (defs ??= new VariableDefinitions()).Add(def);
                 }
             }
 
@@ -97,6 +102,7 @@ namespace GraphQL.Language
         public VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
             var def = new VariableDefinition(Name(source.Variable.Name)).WithLocation(source, _body);
+            def.CommentNode = Comment(source.Comment);
             def.Type = Type(source.Type);
             if (source.DefaultValue is GraphQLValue val)
             {
@@ -104,7 +110,7 @@ namespace GraphQL.Language
             }
             else if (source.DefaultValue != null && !(source.DefaultValue is GraphQLValue))
             {
-                throw new ExecutionError($"Unknown default value: {source.DefaultValue}");
+                throw new InvalidOperationException($"Unknown default value: {source.DefaultValue}");
             }
             return def;
         }
@@ -130,13 +136,14 @@ namespace GraphQL.Language
             ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
             ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
             ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
-            _ => throw new ExecutionError($"Unmapped selection {source.Kind}")
+            _ => throw new InvalidOperationException($"Unmapped selection {source.Kind}")
         };
 
         public Field Field(GraphQLFieldSelection source)
         {
             var alias = source.Alias != null ? Name(source.Alias) : null;
             var field = new Field(alias, Name(source.Name)).WithLocation(source, _body);
+            field.CommentNode = Comment(source.Comment);
             field.Arguments = Arguments(source.Arguments);
             field.Directives = Directives(source.Directives);
             field.SelectionSet = SelectionSet(source.SelectionSet);
@@ -151,7 +158,7 @@ namespace GraphQL.Language
             {
                 foreach (var d in source)
                 {
-                    (target ?? (target = new Directives())).Add(Directive(d));
+                    (target ??= new Directives()).Add(Directive(d));
                 }
             }
 
@@ -174,8 +181,9 @@ namespace GraphQL.Language
                 foreach (var a in source)
                 {
                     var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
+                    arg.CommentNode = Comment(a.Comment);
                     arg.Value = Value(a.Value);
-                    (target ?? (target = new Arguments())).Add(arg);
+                    (target ??= new Arguments()).Add(arg);
                 }
             }
 
@@ -206,18 +214,36 @@ namespace GraphQL.Language
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
-                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    // If the value doesn't fit in an long, revert to using decimal...
+                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    {
+                        return new DecimalValue(decimalResult).WithLocation(str, _body);
+                    }
+
+                    // If the value doesn't fit in an decimal, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
+                    // TODO: add code and test
                     throw new ExecutionError($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new FloatValue(ValueConverter.ConvertTo<double>(str.Value)).WithLocation(str, _body);
+
+                    // the idea is to see if there is a loss of accuracy of value
+                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
+                    double dbl = ValueConverter.ConvertTo<double>(str.Value);
+                    decimal dec = ValueConverter.ConvertTo<decimal>(str.Value);
+                    // TODO: make more efficient, current solution allocates memory
+                    int[] decBits = decimal.GetBits(dec);
+                    int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
+                    if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
+                        return new DecimalValue(dec).WithLocation(str, _body);
+
+                    return new FloatValue(dbl).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
@@ -237,7 +263,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = (GraphQLObjectValue)source;
-                    var fields = obj.Fields.Select(ObjectField);
+                    var fields = obj.Fields?.Select(ObjectField);
                     return new ObjectValue(fields).WithLocation(obj, _body);
                 }
                 case ASTNodeKind.ListValue:
@@ -253,7 +279,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped value type {source.Kind}");
+            throw new InvalidOperationException($"Unmapped value type {source.Kind}");
         }
 
         public ObjectField ObjectField(GraphQLObjectField source)
@@ -289,7 +315,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped type {type.Kind}");
+            throw new InvalidOperationException($"Unmapped type {type.Kind}");
         }
 
         public NameNode Name(GraphQLName name)
@@ -297,12 +323,20 @@ namespace GraphQL.Language
             return new NameNode(name.Value).WithLocation(name, _body);
         }
 
+        private CommentNode Comment(GraphQLComment comment)
+        {
+            if (comment == null)
+                return null;
+
+            return new CommentNode(comment.Text).WithLocation(comment, _body);
+        }
+
         public static OperationType ToOperationType(OperationTypeParser type) => type switch
         {
             OperationTypeParser.Query => OperationType.Query,
             OperationTypeParser.Mutation => OperationType.Mutation,
             OperationTypeParser.Subscription => OperationType.Subscription,
-            _ => throw new ExecutionError($"Unmapped operation type {type}")
+            _ => throw new InvalidOperationException($"Unmapped operation type {type}")
         };
     }
 

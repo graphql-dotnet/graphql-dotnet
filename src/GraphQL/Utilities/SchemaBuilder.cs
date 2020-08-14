@@ -68,7 +68,7 @@ namespace GraphQL.Utilities
                 throw new ArgumentException(@$"All types within a GraphQL schema must have unique names. No two provided types may have the same name.
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
 
-            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653 
+            // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
         }
 
         private static GraphQLDocument Parse(string document)
@@ -159,6 +159,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (schemaDef != null)
             {
+                schema.Description = schemaDef.Comment?.Text;
+
                 foreach (var operationTypeDef in schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;
@@ -239,8 +241,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 constructFieldType = ToFieldType;
             }
 
-            var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
-            fields.Apply(f => type.AddField(f));
+            if (astType.Fields != null)
+            {
+                var fields = astType.Fields.Select(f => constructFieldType(type.Name, f));
+                fields.Apply(f => type.AddField(f));
+            }
 
             if (astType.Interfaces != null)
             {
@@ -348,8 +353,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(type, typeConfig);
 
-            var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
-            fields.Apply(f => type.AddField(f));
+            if (interfaceDef.Fields != null)
+            {
+                var fields = interfaceDef.Fields.Select(f => ToFieldType(type.Name, f));
+                fields.Apply(f => type.AddField(f));
+            }
 
             return type;
         }
@@ -388,8 +396,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(type, typeConfig);
 
-            var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
-            fields.Apply(f => type.AddField(f));
+            if (inputDef.Fields != null)
+            {
+                var fields = inputDef.Fields.Select(x => ToFieldType(type.Name, x));
+                fields.Apply(f => type.AddField(f));
+            }
 
             return type;
         }
@@ -414,14 +425,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
             var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
-            var directive = new DirectiveGraphType(directiveDef.Name.Value, locations)
+            return new DirectiveGraphType(directiveDef.Name.Value, locations)
             {
-                Description = directiveDef.Comment?.Text
+                Description = directiveDef.Comment?.Text,
+                Arguments = ToQueryArguments(directiveDef.Arguments)
             };
-
-            directive.Arguments = ToQueryArguments(directiveDef.Arguments);
-
-            return directive;
         }
 
         private DirectiveLocation ToDirectiveLocation(string name)
@@ -564,7 +572,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         return longResult;
                     }
 
-                    // If the value doesn't fit in an long, revert to using BigInteger...
+                    // If the value doesn't fit in an long, revert to using decimal...
+                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    {
+                        return decimalResult;
+                    }
+
+                    // If the value doesn't fit in an decimal, revert to using BigInteger...
                     if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
                     {
                         return bigIntegerResult;
@@ -596,7 +610,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     var values = new Dictionary<string, object>();
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
-                    obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
+                    if (obj.Fields != null)
+                        obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
                     return values;
                 }
                 case ASTNodeKind.ListValue:

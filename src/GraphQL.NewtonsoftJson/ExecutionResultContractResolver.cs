@@ -10,7 +10,7 @@ namespace GraphQL.NewtonsoftJson
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
 
         protected override JsonConverter ResolveContractConverter(Type objectType) =>
-            objectType == typeof(ExecutionResult)
+            typeof(ExecutionResult).IsAssignableFrom(objectType)
                 ? new ExecutionResultJsonConverter()
                 : base.ResolveContractConverter(objectType);
 

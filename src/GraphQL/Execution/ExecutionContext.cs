@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -8,7 +7,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
-    public class ExecutionContext : IProvideUserContext
+    public class ExecutionContext : IExecutionContext
     {
         public Document Document { get; set; }
 
@@ -34,12 +33,12 @@ namespace GraphQL.Execution
 
         public bool ThrowOnUnhandledException { get; set; }
 
-        /// <summary>
-        /// Allows to override, hide, modify or just log the unhandled exception before wrap it into ExecutionError.
-        /// This can be useful for hiding error messages that reveal server implementation details.
-        /// </summary>
         public Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
 
         public int? MaxParallelExecutionCount { get; set; }
+
+        public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+
+        public IServiceProvider RequestServices { get; set; }
     }
 }

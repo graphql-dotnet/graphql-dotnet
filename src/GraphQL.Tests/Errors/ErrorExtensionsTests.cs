@@ -1,7 +1,7 @@
-using GraphQL.Types;
-using GraphQL.Validation;
 using System;
 using System.Threading.Tasks;
+using GraphQL.Types;
+using GraphQL.Validation;
 using Xunit;
 
 namespace GraphQL.Tests.Errors

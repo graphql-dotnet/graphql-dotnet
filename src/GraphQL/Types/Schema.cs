@@ -1,9 +1,9 @@
-using GraphQL.Conversion;
-using GraphQL.Introspection;
-using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Conversion;
+using GraphQL.Introspection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -69,6 +69,8 @@ namespace GraphQL.Types
 
             FindType("____");
         }
+
+        public string Description { get; set; }
 
         public IObjectGraphType Query { get; set; }
 

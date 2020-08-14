@@ -6,6 +6,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using System;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
@@ -68,11 +69,26 @@ namespace GraphQL
         /// <summary>Can be used to return specific errors back to the GraphQL request caller</summary>
         ExecutionErrors Errors { get; }
 
-        /// <summary>The path to the current executing field from the request root</summary>
-        IEnumerable<string> Path { get; }
+        /// <summary>The path to the current executing field from the request root as it would appear in the query</summary>
+        IEnumerable<object> Path { get; }
+
+        /// <summary>The path to the current executing field from the request root as it would appear in the response</summary>
+        IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field</summary>
         IDictionary<string, Field> SubFields { get; }
+
+        /// <summary>
+        /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
+        /// protocol however they see fit, and hence there are no additional restrictions on its contents. This dictionary is shared
+        /// by all running resolvers and is not thread safe. Also you may use <see cref="ResolveFieldContextExtensions.GetExtension(IResolveFieldContext, string)">GetExtension</see>
+        /// and <see cref="ResolveFieldContextExtensions.SetExtension(IResolveFieldContext, string, object)">SetExtension</see>
+        /// methods.
+        /// </summary>
+        IDictionary<string, object> Extensions { get; }
+
+        /// <summary>The service provider for the executing request</summary>
+        IServiceProvider RequestServices { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>
