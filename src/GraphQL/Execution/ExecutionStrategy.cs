@@ -166,11 +166,8 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Execute a single node
+        /// Execute a single node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
         /// </summary>
-        /// <remarks>
-        /// Builds child nodes, but does not execute them
-        /// </remarks>
         protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -178,11 +175,9 @@ namespace GraphQL.Execution
             if (node.IsResultSet)
                 return;
 
-            IResolveFieldContext resolveContext = null;
-
             try
             {
-                resolveContext = new ReadonlyResolveFieldContext(node, context);
+                var resolveContext = new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -202,34 +197,20 @@ namespace GraphQL.Execution
             }
             catch (ExecutionError error)
             {
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
+                SetNodeError(context, node, error);
             }
             catch (Exception ex)
             {
                 if (context.ThrowOnUnhandledException)
                     throw;
 
-                UnhandledExceptionContext exceptionContext = null;
-                if (context.UnhandledExceptionDelegate != null)
-                {
-                    exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
-                    context.UnhandledExceptionDelegate(exceptionContext);
-                    ex = exceptionContext.Exception;
-                }
-
-                var error = new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
+                ProcessNodeUnhandledException(context, node, ex);
             }
         }
 
+        /// <summary>
+        /// Completes a pending data loader node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
+        /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             if (!node.IsResultSet)
@@ -248,34 +229,18 @@ namespace GraphQL.Execution
             }
             catch (ExecutionError error)
             {
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
+                SetNodeError(context, node, error);
             }
             catch (Exception ex)
             {
-                if (context.ThrowOnUnhandledException)
+                if (ProcessNodeUnhandledException(context, node, ex))
                     throw;
-
-                if (context.UnhandledExceptionDelegate != null)
-                {
-                    var resolveContext = new ReadonlyResolveFieldContext(node, context);
-                    var exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
-                    context.UnhandledExceptionDelegate(exceptionContext);
-                    ex = exceptionContext.Exception;
-                }
-
-                var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
             }
         }
 
+        /// <summary>
+        /// Builds child nodes, but does not execute them.
+        /// </summary>
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
         {
             if (!node.IsResultSet)
@@ -305,32 +270,50 @@ namespace GraphQL.Execution
             }
             catch (ExecutionError error)
             {
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.ResponsePath;
-                context.Errors.Add(error);
-
-                node.Result = null;
+                SetNodeError(context, node, error);
             }
             catch (Exception ex)
             {
-                if (context.ThrowOnUnhandledException)
+                if (ProcessNodeUnhandledException(context, node, ex))
                     throw;
-
-                if (context.UnhandledExceptionDelegate != null)
-                {
-                    var resolveContext = new ReadonlyResolveFieldContext(node, context);
-                    var exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
-                    context.UnhandledExceptionDelegate(exceptionContext);
-                    ex = exceptionContext.Exception;
-                }
-
-                var error = ex is ExecutionError executionError ? executionError : new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.ResponsePath;
-                context.Errors.Add(error);
-
-                node.Result = null;
             }
+        }
+
+        /// <summary>
+        /// Sets the location and path information to the error and adds it to the document. Sets the node result to null.
+        /// </summary>
+        protected void SetNodeError(ExecutionContext context, ExecutionNode node, ExecutionError error)
+        {
+            error.AddLocation(node.Field, context.Document);
+            error.Path = node.ResponsePath;
+            context.Errors.Add(error);
+
+            node.Result = null;
+        }
+
+        /// <summary>
+        /// Processes unhandled field resolver exceptions
+        /// </summary>
+        /// <returns>A value that indicates when the exception should be rethrown</returns>
+        protected bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
+        {
+            if (context.ThrowOnUnhandledException)
+                return true;
+
+            UnhandledExceptionContext exceptionContext = null;
+            if (context.UnhandledExceptionDelegate != null)
+            {
+                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                context.UnhandledExceptionDelegate(exceptionContext);
+                ex = exceptionContext.Exception;
+            }
+
+            var error = ex is ExecutionError executionError ? executionError : new ExecutionError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve {node.Name}.", ex);
+
+            SetNodeError(context, node, error);
+
+            return false;
         }
 
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
