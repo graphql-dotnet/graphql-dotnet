@@ -110,3 +110,167 @@ public void Install(IWindsorContainer container, IConfigurationStore store)
     );
 }
 ```
+
+# Scoped Services
+
+To use scoped services (e.g. HttpContext Scoped services in ASP.NET Core) you will either need to:
+
+* [Use Schema to get IHttpContextAccessor](#using-schema-to-get-ihttpcontextaccessor)
+* [Use SteroidsDI](#using-steroidsdi)
+* [Use UserContext Scoped IServiceProvider](#using-usercontext-scoped-iserviceprovider)
+
+## Using Schema to get IHttpContextAccessor
+
+You can access scoped services by indirectly using the `IHttpContextAccessor` in order to retrieve the currently scoped `HttpContext` which in turn you can use to retrieve the required scoped services.
+
+E.g. You can have the following extension method:
+
+```csharp
+public static class ContextExtensions
+{
+    public static T GetRequiredScopedService<T>(this IResolveFieldContext context)
+    {
+        var rootServiceProvider = (IServiceProvider)context.Schema;
+
+        var contextAccessor = rootServiceProvider.GetRequiredService<IHttpContextAccessor>();
+
+        var scopedServiceProvider = contextAccessor.HttpContext.RequestServices;
+
+        return scopedServiceProvider.GetRequiredService<T>();
+    }
+}
+```
+
+Then you can use it as follows:
+
+ ```csharp
+ public class StarWarsQuery : ObjectGraphType
+ {
+   public StarWarsQuery()
+   {
+     Field<DroidType>(
+       "hero",
+       resolve: context => context.GetRequiredScopedService<IDroidRepo>().GetDroid("R2-D2")
+     );
+   }
+ }
+ ```
+
+## Using SteroidsDI
+
+To use [SteroidsDI](https://github.com/sungam3r/SteroidsDI) with ASP.NET Core, add `Defer<>` and `IScopeProvider` in your `Startup.ConfigureServices`:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    ...
+
+    // Add SteroidsDI Open Generic Defer<> Factory Class
+    services.AddDefer();
+
+    // Add SteroidsDI IScopeProvider to use the AspNetCoreHttpScopeProvider
+    // which internally uses the IHttpContextAccessor.HttpContext.RequestServices;
+    services.AddHttpScope();
+
+    ...
+}
+```
+
+Then in your query graph types you can request services using `Defer<T>` to be injected via DI,
+ which will be evaluated at runtime to their relevant Scoped services, `T` has been registered with a `Scoped` DI lifetime:
+
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+  // #1 - Add dependencies using Defer<T>
+  public StarWarsQuery(Defer<IDroidRepo> repoFactory)
+  {
+    Field<DroidType>(
+      "hero",
+
+      // #2 Resolve dependencies using current scope provider
+      resolve: context => repoFactory.Value.GetDroid("R2-D2")
+
+    );
+  }
+}
+```
+
+1. Add `Defer<T>` to be injected by the dependency injection container. This is a factory which upon calling `Defer.Value` will resolve the requested service using any currently registered scope provider (e.g. `AspNetCoreHttpScopeProvider`)
+2. Use the `Defer<T>` factory class to resolve the requested dependency using any currently registered scope provider. In our case it will attempt to use the `IHttpContextAccessor.HttpContext.RequestServices` which is the ASP.NET Core Scoped `IServiceProvider` in order to resolve the dependency.
+
+## Using UserContext Scoped IServiceProvider
+
+**Be Aware**: Exposing the service locator is considered an Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)
+
+You can add the relevant scoped `IServiceProvider` when creating the `UserContext` in order to run `IDocumentExecuter`.
+
+E.g. In ASP.NET Core [GraphQL.Harness](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Harness) example, you could add `IServiceProvider` to the [GraphQLUserContext](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Harness/GraphQLUserContext.cs) class, and then set it to the `HttpContext.RequestServices` when configuring the `GraphQLSettings.BuildUserContext`
+
+
+1. Add ServiceProvider to the UserContext
+
+    ```csharp
+    public class GraphQLUserContext: Dictionary<string, object>
+    {
+        ...
+        IServiceProvider ServiceProvider { get; set; }
+        ...
+    }
+    ```
+
+2. Set it to the `HttpContext.RequestServices` when building the `UserContext`.
+
+    > N.B The below uses [GraphQLSettings](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Harness/GraphQLSettings.cs) from the [GraphQL.Harness](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Harness) example.
+
+    ```csharp
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext
+        {
+            User = ctx.User,
+            ServiceProvider = ctx.RequestServices
+        });
+    }
+    ```
+
+3. Use it in resolvers
+
+    ```csharp
+    public class StarWarsQuery : ObjectGraphType<object>
+    {
+        public StarWarsQuery()
+        {
+            ...
+            Field<CharacterInterface>("hero",
+                resolve: context =>
+                    ((GraphQLUserContext)context.UserContext)
+                    .GetRequiredService<IDroidRepo>()
+                    .GetDroidByIdAsync("3")
+            );
+
+            Field<CharacterInterface>("hero", resolve: context => context);
+        }
+    }
+    ```
+
+ You could always create an extension method:
+
+ ```csharp
+public static class GraphQLExtensions
+{
+    public static T GetRequiredService<T>(this IResolveFieldContext context) =>
+        ((GraphQLUserContext)context.UserContext).ServiceProvider.GetRequiredService<T>();
+}
+ ```
+
+and use it as such:
+
+```csharp
+Field<CharacterInterface>("hero",
+            resolve: context =>
+                context
+                .GetRequiredService<IDroidRepo>()
+                .GetDroidByIdAsync("3")
+        );
+```

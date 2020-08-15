@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,10 @@ namespace GraphQL.Language.AST
     {
         public ObjectValue(IEnumerable<ObjectField> fields)
         {
-            ObjectFields = fields;
+            if (fields == null)
+                ObjectFields = Array.Empty<ObjectField>();
+            else
+                ObjectFields = fields;
         }
 
         public object Value

@@ -1,18 +1,18 @@
-using GraphQL.StarWars.Types;
-using GraphQL.Types;
-using GraphQL.Utilities;
-using Shouldly;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using GraphQL.StarWars.Types;
+using GraphQL.Types;
+using GraphQL.Utilities;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Types
 {
-    #pragma warning disable 618
+#pragma warning disable 618
 
     public class ComplexGraphTypeTests
     {

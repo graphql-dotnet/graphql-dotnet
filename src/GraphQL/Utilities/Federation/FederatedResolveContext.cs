@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GraphQL.Types;
 
 namespace GraphQL.Utilities.Federation
 {

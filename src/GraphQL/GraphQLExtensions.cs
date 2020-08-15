@@ -1,6 +1,3 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {
@@ -153,6 +153,7 @@ namespace GraphQL
 
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
+            // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
             {
                 var ofType = nonNull.ResolvedType;
@@ -425,9 +426,8 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            Invariant.Check(
-                type.IsInputType(),
-                $"Must provide Input Type, cannot use: {type}");
+            if (!type.IsInputType())
+                throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
 
             var inputType = type as ScalarGraphType;
 

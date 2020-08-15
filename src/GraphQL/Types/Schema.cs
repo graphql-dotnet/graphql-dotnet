@@ -1,9 +1,9 @@
-using GraphQL.Conversion;
-using GraphQL.Introspection;
-using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Conversion;
+using GraphQL.Introspection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
