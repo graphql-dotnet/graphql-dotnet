@@ -671,6 +671,8 @@ namespace GraphQL.Execution
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
+        protected bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
+        protected void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
         public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
