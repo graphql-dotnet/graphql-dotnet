@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Threading.Tasks;
 using GraphQL.Language;
 using GraphQL.Types;
@@ -9,7 +8,7 @@ using Xunit;
 namespace GraphQL.Tests.Bugs
 {
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1781
-    public class Bug1781 : QueryTestBase<Bug1781Schema>
+    public class CoreToVanillaConverterTests : QueryTestBase<PR1781Schema>
     {
         [Fact]
         public async Task DocumentExecuter_really_big_double_valid()
@@ -17,7 +16,7 @@ namespace GraphQL.Tests.Bugs
             var de = new DocumentExecuter();
             var valid = await de.ExecuteAsync(new ExecutionOptions
             {
-                Query = $"{{ test(arg:{double.MaxValue.ToString("0")}0.0) }}",
+                Query = $"{{ test(arg:{double.MaxValue:0}0.0) }}",
                 Schema = Schema,
             });
             valid.ShouldNotBeNull();
@@ -31,7 +30,7 @@ namespace GraphQL.Tests.Bugs
             var de = new DocumentExecuter();
             var valid = await de.ExecuteAsync(new ExecutionOptions
             {
-                Query = $"{{ test(arg:{double.MinValue.ToString("0")}0.0) }}",
+                Query = $"{{ test(arg:{double.MinValue:0}0.0) }}",
                 Schema = Schema,
             });
             valid.ShouldNotBeNull();
@@ -73,17 +72,17 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug1781Schema : Schema
+    public class PR1781Schema : Schema
     {
-        public Bug1781Schema()
+        public PR1781Schema()
         {
-            Query = new Bug1781Query();
+            Query = new PR1781Query();
         }
     }
 
-    public class Bug1781Query : ObjectGraphType
+    public class PR1781Query : ObjectGraphType
     {
-        public Bug1781Query()
+        public PR1781Query()
         {
             Field<StringGraphType>("Test",
                 resolve: context => "ok",
