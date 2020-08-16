@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using GraphQL.Language.AST;
@@ -203,31 +204,31 @@ namespace GraphQL.Language
                 {
                     var str = (GraphQLScalarValue)source;
 
-                    if (int.TryParse(str.Value, out var intResult))
+                    if (int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
                     {
                         return new IntValue(intResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    if (long.TryParse(str.Value, out var longResult))
+                    if (long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
                     {
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
-                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    if (decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
                     {
                         return new DecimalValue(decimalResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    if (BigInteger.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
-                    // TODO: add code and test
-                    throw new ExecutionError($"Invalid number {str.Value}");
+                    // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger via an invalid query
+                    throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
@@ -235,20 +236,31 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    double dbl = ValueConverter.ConvertTo<double>(str.Value);
-                    decimal dec = ValueConverter.ConvertTo<decimal>(str.Value);
-                    // TODO: make more efficient, current solution allocates memory
-                    int[] decBits = decimal.GetBits(dec);
-                    int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
-                    if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
-                        return new DecimalValue(dec).WithLocation(str, _body);
+                    double dbl = double.Parse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture);
+
+                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                    if (decimal.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out var dec))
+                    {
+                        // TODO: make more efficient, current solution allocates memory
+                        int[] decBits = decimal.GetBits(dec);
+                        int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
+                        if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
+                            return new DecimalValue(dec).WithLocation(str, _body);
+                    }
 
                     return new FloatValue(dbl).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new BooleanValue(ValueConverter.ConvertTo<bool>(str.Value)).WithLocation(str, _body);
+                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {
