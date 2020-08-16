@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Bugs
                 // create a floating-point value that is larger than double.MaxValue
                 // in the expression "{double.MaxValue:0}0.0" below, the 0.0 effectively
                 // multiplies double.MaxValue by 10 and the .0 forces the parser to
-                //   assume it is a floating point value rather than a large integer
+                // assume it is a floating point value rather than a large integer
                 Query = $"{{ test(arg:{double.MaxValue:0}0.0) }}",
                 Schema = Schema,
             });
