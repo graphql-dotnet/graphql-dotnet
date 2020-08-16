@@ -95,7 +95,7 @@ namespace GraphQL.Execution
 
             if (!(parent.Result is IEnumerable data))
             {
-                throw new InvalidOperationException("Expected an IEnumerable list though did not find one.");
+                throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
             var index = 0;
