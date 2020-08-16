@@ -4,10 +4,10 @@ using GraphQL.Types;
 using Shouldly;
 using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Execution
 {
     // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1735
-    public class Bug1735 : QueryTestBase<Bug1735Schema>
+    public class DocumentExecuterExceptions : QueryTestBase<PR1735Schema>
     {
         [Theory]
         [InlineData("")]                   // NO_OPERATION
@@ -47,17 +47,17 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class Bug1735Schema : Schema
+    public class PR1735Schema : Schema
     {
-        public Bug1735Schema()
+        public PR1735Schema()
         {
-            Query = new Bug1735Query();
+            Query = new PR1735Query();
         }
     }
 
-    public class Bug1735Query : ObjectGraphType
+    public class PR1735Query : ObjectGraphType
     {
-        public Bug1735Query()
+        public PR1735Query()
         {
             Field<StringGraphType>("Test",
                 resolve: context => "ok",
