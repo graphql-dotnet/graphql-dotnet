@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Bugs
         public void list_throws_when_not_ienumerable()
         {
             AssertQueryWithError("{testListInvalid}", "{\"testListInvalid\": null}", "Error trying to resolve testListInvalid.", 1, 2, new[] { "testListInvalid" },
-                new InvalidOperationException("Expected an IEnumerable list though did not find one."));
+                new InvalidOperationException("Expected an IEnumerable list though did not find one. Found: Int32"));
         }
 
         [Fact]
