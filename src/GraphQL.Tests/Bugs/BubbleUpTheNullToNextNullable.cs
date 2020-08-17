@@ -106,9 +106,9 @@ namespace GraphQL.Tests.Bugs
             var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: listOfNonNullable, Type: [String!].")
+                new ExecutionError("Error trying to resolve listOfNonNullable.")
                 {
-                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 1}
+                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable"}
                 }
             };
 
@@ -158,9 +158,9 @@ namespace GraphQL.Tests.Bugs
             var errors = new[]
             {
                 new ExecutionError(
-                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
+                    "Error trying to resolve nonNullableListOfNonNullable.")
                 {
-                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 1}
+                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
                 }
             };
 

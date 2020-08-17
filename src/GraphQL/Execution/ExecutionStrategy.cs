@@ -95,8 +95,7 @@ namespace GraphQL.Execution
 
             if (!(parent.Result is IEnumerable data))
             {
-                var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                throw error;
+                throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
             var index = 0;
@@ -108,7 +107,7 @@ namespace GraphQL.Execution
             {
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
@@ -122,7 +121,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(d)
-                            ?? throw new ExecutionError($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}'");
+                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
                     }
 
                     arrayItems.Add(node);
@@ -131,19 +130,14 @@ namespace GraphQL.Execution
                 {
                     if (listType.ResolvedType is NonNullGraphType)
                     {
-                        var error = new ExecutionError(
-                            "Cannot return null for non-null type."
-                            + $" Field: {parent.Name}, Type: {parent.FieldDefinition.ResolvedType}.");
-
-                        error.AddLocation(parent.Field, context.Document);
-                        error.Path = parent.ResponsePath.Append(index);
-                        context.Errors.Add(error);
-                        return;
+                        throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
                     }
 
-                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index++);
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     arrayItems.Add(nullExecutionNode);
                 }
+
+                index++;
             }
 
             parent.Items = arrayItems;
@@ -210,7 +204,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(node.Result)
-                            ?? throw new ExecutionError($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'");
+                            ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'");
                     }
                 }
             }
