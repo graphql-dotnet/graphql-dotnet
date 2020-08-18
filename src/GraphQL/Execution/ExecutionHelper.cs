@@ -25,7 +25,7 @@ namespace GraphQL.Execution
                     type = schema.Mutation;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for mutations");
+                        error = new InvalidOperationError("Schema is not configured for mutations");
                         error.AddLocation(operation, document);
                         throw error;
                     }
@@ -35,16 +35,14 @@ namespace GraphQL.Execution
                     type = schema.Subscription;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error = new InvalidOperationError("Schema is not configured for subscriptions");
                         error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
 
                 default:
-                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation, document);
-                    throw error;
+                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
             }
 
             return type;
