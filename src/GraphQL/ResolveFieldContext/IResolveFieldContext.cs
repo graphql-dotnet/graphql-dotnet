@@ -6,6 +6,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using System;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
@@ -85,6 +86,9 @@ namespace GraphQL
         /// methods.
         /// </summary>
         IDictionary<string, object> Extensions { get; }
+
+        /// <summary>The service provider for the executing request</summary>
+        IServiceProvider RequestServices { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

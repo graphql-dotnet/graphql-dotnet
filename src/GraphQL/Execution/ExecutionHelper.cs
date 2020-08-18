@@ -1,9 +1,9 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Language.AST;
+using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
@@ -148,12 +148,34 @@ namespace GraphQL.Execution
 
                 if (input is IValue value)
                 {
-                    if (scalar.ParseLiteral(value) == null)
+                    bool conversionFailed;
+
+                    try
+                    {
+                        conversionFailed = scalar.ParseLiteral(value) == null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
+                    }
+
+                    if (conversionFailed)
                         throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
                 }
                 else
                 {
-                    if (scalar.ParseValue(input) == null)
+                    bool conversionFailed;
+
+                    try
+                    {
+                        conversionFailed = scalar.ParseValue(input) == null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
+                    }
+
+                    if (conversionFailed)
                         throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
                 }
 

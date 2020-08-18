@@ -1,11 +1,10 @@
-using GraphQL.Introspection;
-using GraphQL.Types;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using GraphQL.Introspection;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {

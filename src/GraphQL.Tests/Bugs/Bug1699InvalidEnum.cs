@@ -1,8 +1,6 @@
+using System;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using System;
-using System.Linq;
-using System.Numerics;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -32,17 +30,17 @@ namespace GraphQL.Tests.Bugs
 
         // within C#, (int)Bug1699Enum.Happy does not equal Bug1699.Happy
         [Fact]
-        public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Unable to serialize '1' to \u0027Bug1699Enum\u0027", 1, 3, "happy");
+        public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Error trying to resolve happy.", 1, 3, "happy", exception: new InvalidOperationException());
 
         [Fact]
-        public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Unable to serialize '50' to \u0027Bug1699Enum\u0027", 1, 3, "invalidEnum");
+        public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Error trying to resolve invalidEnum.", 1, 3, "invalidEnum", exception: new InvalidOperationException());
 
         // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
         [Fact]
-        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": null }", "Unable to serialize '50' to \u0027Bug1699Enum\u0027", 1, 3, "invalidEnumWithinList");
+        public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", @"{ ""invalidEnumWithinList"": null }", "Error trying to resolve invalidEnumWithinList.", 1, 3, "invalidEnumWithinList", exception: new InvalidOperationException());
 
         [Fact]
-        public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", @"{ ""invalidEnumWithinNonNullList"": null }", "Unable to serialize '50' to \u0027Bug1699Enum\u0027", 1, 3, "invalidEnumWithinNonNullList");
+        public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", @"{ ""invalidEnumWithinNonNullList"": null }", "Error trying to resolve invalidEnumWithinNonNullList.", 1, 3, "invalidEnumWithinNonNullList", exception: new InvalidOperationException());
 
         [Fact]
         public void Input_Enum_Valid() => AssertQuerySuccess("{ inputEnum(arg: SLEEPY) }", @"{ ""inputEnum"": ""SLEEPY"" }");
@@ -63,10 +61,10 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_Valid_Variable() => AssertQuerySuccess("query($arg: Bug1699Enum!) { input(arg: $arg) }", @"{ ""input"": ""Grumpy"" }", "{\"arg\":\"GRUMPY\"}".ToInputs());
 
         [Fact]
-        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 0, 0, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}");
+        public void Input_Enum_InvalidEnum_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u0027DOPEY\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":\"DOPEY\"}");
 
         [Fact]
-        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 0, 0, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}");
+        public void Input_Enum_InvalidInt_Variable() => AssertQueryWithError(@"query($arg: Bug1699Enum!) { input(arg: $arg) }", null, "Variable \u0027$arg\u0027 is invalid. Unable to convert \u00272\u0027 to \u0027Bug1699Enum\u0027", 1, 7, (object[])null, code: "INVALID_VALUE", inputs: "{\"arg\":2}");
 
         [Fact]
         public void Input_Enum_UndefinedDefault() => AssertQuerySuccess("{ input }", @"{ ""input"": ""Grumpy"" }");

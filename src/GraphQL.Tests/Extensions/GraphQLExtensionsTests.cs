@@ -1,12 +1,12 @@
-using GraphQL.Dummy;
-using GraphQL.StarWars.Types;
-using GraphQL.Types;
-using Shouldly;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Dummy;
+using GraphQL.StarWars.Types;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Extensions

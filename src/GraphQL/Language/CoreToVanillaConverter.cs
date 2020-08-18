@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using GraphQL.Language.AST;
 using GraphQLParser;
 using GraphQLParser.AST;
-using OperationTypeParser = GraphQLParser.AST.OperationType;
 using OperationType = GraphQL.Language.AST.OperationType;
-using System.Numerics;
+using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
 {
@@ -91,7 +93,7 @@ namespace GraphQL.Language
             {
                 foreach (var def in source.Select(VariableDefinition))
                 {
-                    (defs ?? (defs = new VariableDefinitions())).Add(def);
+                    (defs ??= new VariableDefinitions()).Add(def);
                 }
             }
 
@@ -109,7 +111,7 @@ namespace GraphQL.Language
             }
             else if (source.DefaultValue != null && !(source.DefaultValue is GraphQLValue))
             {
-                throw new ExecutionError($"Unknown default value: {source.DefaultValue}");
+                throw new InvalidOperationException($"Unknown default value: {source.DefaultValue}");
             }
             return def;
         }
@@ -135,7 +137,7 @@ namespace GraphQL.Language
             ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
             ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
             ASTNodeKind.InlineFragment => InlineFragment((GraphQLInlineFragment)source),
-            _ => throw new ExecutionError($"Unmapped selection {source.Kind}")
+            _ => throw new InvalidOperationException($"Unmapped selection {source.Kind}")
         };
 
         public Field Field(GraphQLFieldSelection source)
@@ -157,7 +159,7 @@ namespace GraphQL.Language
             {
                 foreach (var d in source)
                 {
-                    (target ?? (target = new Directives())).Add(Directive(d));
+                    (target ??= new Directives()).Add(Directive(d));
                 }
             }
 
@@ -182,7 +184,7 @@ namespace GraphQL.Language
                     var arg = new Argument(Name(a.Name)).WithLocation(a.Name, _body);
                     arg.CommentNode = Comment(a.Comment);
                     arg.Value = Value(a.Value);
-                    (target ?? (target = new Arguments())).Add(arg);
+                    (target ??= new Arguments()).Add(arg);
                 }
             }
 
@@ -202,30 +204,31 @@ namespace GraphQL.Language
                 {
                     var str = (GraphQLScalarValue)source;
 
-                    if (int.TryParse(str.Value, out var intResult))
+                    if (int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
                     {
                         return new IntValue(intResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    if (long.TryParse(str.Value, out var longResult))
+                    if (long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
                     {
                         return new LongValue(longResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
-                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    if (decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
                     {
                         return new DecimalValue(decimalResult).WithLocation(str, _body);
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    if (BigInteger.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
                     {
                         return new BigIntValue(bigIntegerResult).WithLocation(str, _body);
                     }
 
-                    throw new ExecutionError($"Invalid number {str.Value}");
+                    // Since BigInteger can contain any valid integer (arbitrarily large), this is impossible to trigger via an invalid query
+                    throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
@@ -233,20 +236,31 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    double dbl = ValueConverter.ConvertTo<double>(str.Value);
-                    decimal dec = ValueConverter.ConvertTo<decimal>(str.Value);
-                    // TODO: make more efficient, current solution allocates memory
-                    int[] decBits = decimal.GetBits(dec);
-                    int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
-                    if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
-                        return new DecimalValue(dec).WithLocation(str, _body);
+                    double dbl = double.Parse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture);
+
+                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                    if (decimal.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out var dec))
+                    {
+                        // TODO: make more efficient, current solution allocates memory
+                        int[] decBits = decimal.GetBits(dec);
+                        int[] dblAsDecBits = decimal.GetBits(new decimal(dbl));
+                        if (decBits[0] != dblAsDecBits[0] || decBits[1] != dblAsDecBits[1] || decBits[2] != dblAsDecBits[2] || decBits[3] != dblAsDecBits[3])
+                            return new DecimalValue(dec).WithLocation(str, _body);
+                    }
 
                     return new FloatValue(dbl).WithLocation(str, _body);
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new BooleanValue(ValueConverter.ConvertTo<bool>(str.Value)).WithLocation(str, _body);
+                    return new BooleanValue(bool.Parse(str.Value)).WithLocation(str, _body);
                 }
                 case ASTNodeKind.EnumValue:
                 {
@@ -277,7 +291,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped value type {source.Kind}");
+            throw new InvalidOperationException($"Unmapped value type {source.Kind}");
         }
 
         public ObjectField ObjectField(GraphQLObjectField source)
@@ -313,7 +327,7 @@ namespace GraphQL.Language
                 }
             }
 
-            throw new ExecutionError($"Unmapped type {type.Kind}");
+            throw new InvalidOperationException($"Unmapped type {type.Kind}");
         }
 
         public NameNode Name(GraphQLName name)
@@ -334,7 +348,7 @@ namespace GraphQL.Language
             OperationTypeParser.Query => OperationType.Query,
             OperationTypeParser.Mutation => OperationType.Mutation,
             OperationTypeParser.Subscription => OperationType.Subscription,
-            _ => throw new ExecutionError($"Unmapped operation type {type}")
+            _ => throw new InvalidOperationException($"Unmapped operation type {type}")
         };
     }
 
