@@ -13,7 +13,7 @@ namespace GraphQL.Tests.Bugs
         public void Very_Long_Number_Should_Return_Error_For_Int()
         {
             var query = "{ int }";
-            var error = new ExecutionError("Error trying to resolve int.", new OverflowException());
+            var error = new ExecutionError("Error trying to resolve field 'int'.", new OverflowException());
             error.AddLocation(1, 3);
             error.Path = new object[] { "int" };
             var expected = new ExecutionResult {
@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Bugs
         public void Very_Very_Long_Number_Should_Return_Error_For_Long()
         {
             var query = "{ long_return_bigint }";
-            var error = new ExecutionError("Error trying to resolve long_return_bigint.", new OverflowException());
+            var error = new ExecutionError("Error trying to resolve field 'long_return_bigint'.", new OverflowException());
             error.AddLocation(1, 3);
             error.Path = new object[] { "long_return_bigint" };
             var expected = new ExecutionResult
