@@ -63,6 +63,14 @@ namespace GraphQL.Types
 
         public bool Initialized => _lookup?.IsValueCreated == true;
 
+        // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
+        private void CheckInitialized()
+        {
+            if (Initialized)
+                throw new InvalidOperationException(@"Schema is already initialized and sealed for modifications.
+There was an attempt to modify schema after it was initialized. You should call RegisterXXX methods only when Schema.Initialized = false.");
+        }
+
         public void Initialize()
         {
             CheckDisposed();
@@ -107,6 +115,7 @@ namespace GraphQL.Types
             set
             {
                 CheckDisposed();
+                CheckInitialized();
 
                 _directives.Clear();
 
@@ -132,6 +141,7 @@ namespace GraphQL.Types
         public void RegisterType(IGraphType type)
         {
             CheckDisposed();
+            CheckInitialized();
 
             _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
@@ -139,6 +149,7 @@ namespace GraphQL.Types
         public void RegisterTypes(params IGraphType[] types)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var type in types)
                 RegisterType(type);
@@ -147,6 +158,7 @@ namespace GraphQL.Types
         public void RegisterTypes(params Type[] types)
         {
             CheckDisposed();
+            CheckInitialized();
 
             if (types == null)
             {
@@ -162,6 +174,7 @@ namespace GraphQL.Types
         public void RegisterType<T>() where T : IGraphType
         {
             CheckDisposed();
+            CheckInitialized();
 
             RegisterType(typeof(T));
         }
@@ -169,6 +182,7 @@ namespace GraphQL.Types
         public void RegisterDirective(DirectiveGraphType directive)
         {
             CheckDisposed();
+            CheckInitialized();
 
             _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
@@ -176,6 +190,7 @@ namespace GraphQL.Types
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var directive in directives)
                 RegisterDirective(directive);
@@ -184,6 +199,7 @@ namespace GraphQL.Types
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var directive in directives)
                 RegisterDirective(directive);
