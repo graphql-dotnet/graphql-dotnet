@@ -750,7 +750,6 @@ namespace GraphQL.Execution
     [System.Serializable]
     public class UnhandledError : GraphQL.ExecutionError
     {
-        public UnhandledError(string message) { }
         public UnhandledError(string message, System.Exception innerException) { }
     }
     public class UnhandledExceptionContext

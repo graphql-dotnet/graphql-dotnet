@@ -13,6 +13,7 @@ namespace GraphQL.Execution
             AddLocation(ex.Line, ex.Column);
         }
 
+        // available for use with third-party parsing engines
         public SyntaxError(string message, Exception innerException)
             : base("Error parsing query: " + message, innerException)
         {
