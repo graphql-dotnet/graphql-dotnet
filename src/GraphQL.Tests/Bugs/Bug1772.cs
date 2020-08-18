@@ -45,9 +45,10 @@ namespace GraphQL.Tests.Bugs
             result.Data.ShouldBeNull();
             result.Errors.ShouldNotBeNull();
             result.Errors.Count.ShouldBe(1);
-            result.Errors[0].Message.ShouldBe($"Query does not contain operation '{operationName}'.");
+            result.Errors[0].Message.ShouldBe("Error executing document.");
             result.Errors[0].InnerException.ShouldNotBeNull();
             result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>();
+            result.Errors[0].InnerException.Message.ShouldBe($"Query does not contain operation '{operationName}'.");
         }
     }
 

@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Bugs
 
         [Theory]
         [InlineData(typeof(Issue1189_DroidType_ExecutionError), "Error Message")]
-        [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve friend.")]
+        [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve field 'friend'.")]
         public void Issue1189_Should_Work(Type resolverType, string errorMessage)
         {
             Builder.Types.Include<Issue1189_Query>();

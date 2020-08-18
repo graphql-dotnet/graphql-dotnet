@@ -213,7 +213,7 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new UnhandledError(ex.Message, ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError("Error executing document.", ex)
                     }
                 };
             }
