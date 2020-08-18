@@ -3,15 +3,15 @@ using System;
 namespace GraphQL.Execution
 {
     [Serializable]
-    public class InvalidValueError : DocumentError
+    public class InvalidVariableError : DocumentError
     {
-        public InvalidValueError(string variableName, string message) :
+        public InvalidVariableError(string variableName, string message) :
             base($"Variable '${variableName}' is invalid. {message}")
         {
             Code = "INVALID_VALUE";
         }
 
-        public InvalidValueError(string variableName, string message, Exception innerException) :
+        public InvalidVariableError(string variableName, string message, Exception innerException) :
             base($"Variable '${variableName}' is invalid. {message}", innerException)
         {
             Code = "INVALID_VALUE";

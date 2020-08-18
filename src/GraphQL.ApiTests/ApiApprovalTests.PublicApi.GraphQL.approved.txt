@@ -698,10 +698,10 @@ namespace GraphQL.Execution
         public InvalidOperationError(string message) { }
     }
     [System.Serializable]
-    public class InvalidValueError : GraphQL.Execution.DocumentError
+    public class InvalidVariableError : GraphQL.Execution.DocumentError
     {
-        public InvalidValueError(string variableName, string message) { }
-        public InvalidValueError(string variableName, string message, System.Exception innerException) { }
+        public InvalidVariableError(string variableName, string message) { }
+        public InvalidVariableError(string variableName, string message, System.Exception innerException) { }
     }
     [System.Serializable]
     public class NoOperationError : GraphQL.Execution.DocumentError
