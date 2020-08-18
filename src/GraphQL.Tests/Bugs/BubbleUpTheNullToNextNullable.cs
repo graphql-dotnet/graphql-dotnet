@@ -243,6 +243,7 @@ namespace GraphQL.Tests.Bugs
                     else
                     {
                         actualError.InnerException.ShouldNotBeNull();
+                        actualError.InnerException.ShouldBeOfType(expectedError.InnerException.GetType());
                         actualError.InnerException.Message.ShouldBe(expectedError.InnerException.Message);
                     }
                 }
