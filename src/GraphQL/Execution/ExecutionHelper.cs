@@ -25,7 +25,7 @@ namespace GraphQL.Execution
                     type = schema.Mutation;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for mutations");
+                        error = new InvalidOperationError("Schema is not configured for mutations");
                         error.AddLocation(operation, document);
                         throw error;
                     }
@@ -35,16 +35,14 @@ namespace GraphQL.Execution
                     type = schema.Subscription;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error = new InvalidOperationError("Schema is not configured for subscriptions");
                         error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
 
                 default:
-                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation, document);
-                    throw error;
+                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
             }
 
             return type;
@@ -107,7 +105,7 @@ namespace GraphQL.Execution
             {
                 AssertValidVariableValue(schema, type, input, variable.Name);
             }
-            catch (InvalidValueException error)
+            catch (InvalidVariableError error)
             {
                 error.AddLocation(variable, document);
                 throw;
@@ -130,7 +128,7 @@ namespace GraphQL.Execution
 
                 if (input == null)
                 {
-                    throw new InvalidValueException(variableName, "Received a null input for a non-null variable.");
+                    throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
                 }
 
                 AssertValidVariableValue(schema, nonNullType, input, variableName);
@@ -156,11 +154,11 @@ namespace GraphQL.Execution
                     }
                     catch (Exception ex)
                     {
-                        throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
                     }
 
                     if (conversionFailed)
-                        throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
                 }
                 else
                 {
@@ -172,11 +170,11 @@ namespace GraphQL.Execution
                     }
                     catch (Exception ex)
                     {
-                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
                     }
 
                     if (conversionFailed)
-                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'");
                 }
 
                 return;
@@ -205,7 +203,7 @@ namespace GraphQL.Execution
 
                 if (!(input is Dictionary<string, object> dict))
                 {
-                    throw new InvalidValueException(variableName,
+                    throw new InvalidVariableError(variableName,
                         $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
@@ -221,7 +219,7 @@ namespace GraphQL.Execution
 
                 if (unknownFields?.Count > 0)
                 {
-                    throw new InvalidValueException(variableName,
+                    throw new InvalidVariableError(variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
                 }
 
@@ -233,7 +231,7 @@ namespace GraphQL.Execution
                 return;
             }
 
-            throw new InvalidValueException(variableName ?? "input", "Invalid input");
+            throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

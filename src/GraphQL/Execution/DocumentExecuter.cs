@@ -78,10 +78,7 @@ namespace GraphQL
 
                 if (document.Operations.Count == 0)
                 {
-                    throw new ExecutionError("Cannot execute query if no operation is specified.")
-                    {
-                        Code = "NO_OPERATION"
-                    };
+                    throw new NoOperationError();
                 }
 
                 var operation = GetOperation(options.OperationName, document);
@@ -216,7 +213,7 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new ExecutionError("Error executing document.", ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError("Error executing document.", ex)
                     }
                 };
             }
