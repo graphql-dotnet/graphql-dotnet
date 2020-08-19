@@ -67,8 +67,7 @@ namespace GraphQL.Types
         private void CheckInitialized()
         {
             if (Initialized)
-                throw new InvalidOperationException(@"Schema is already initialized and sealed for modifications.
-There was an attempt to modify schema after it was initialized. You should call RegisterXXX methods only when Schema.Initialized = false.");
+                throw new InvalidOperationException("Schema is already initialized and sealed for modifications. You should call RegisterXXX methods only when Schema.Initialized = false.");
         }
 
         public void Initialize()
