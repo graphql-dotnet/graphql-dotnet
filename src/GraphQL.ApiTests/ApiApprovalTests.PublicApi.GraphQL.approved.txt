@@ -777,7 +777,7 @@ namespace GraphQL.Instrumentation
     }
     public static class ApolloTracingExtensions
     {
-        public static GraphQL.Instrumentation.ApolloTrace CreateTrace(GraphQL.Language.AST.Operation operation, GraphQL.Instrumentation.PerfRecord[] perf, System.DateTime start) { }
+        public static GraphQL.Instrumentation.ApolloTrace CreateTrace(GraphQL.Instrumentation.PerfRecord[] perf, System.DateTime start) { }
         public static void EnrichWithApolloTracing(this GraphQL.ExecutionResult result, System.DateTime start) { }
     }
     public class Field
