@@ -745,7 +745,6 @@ namespace GraphQL.Execution
     public class SyntaxError : GraphQL.Execution.DocumentError
     {
         public SyntaxError(GraphQLParser.Exceptions.GraphQLSyntaxErrorException ex) { }
-        public SyntaxError(string message, System.Exception innerException) { }
     }
     [System.Serializable]
     public class UnhandledError : GraphQL.ExecutionError

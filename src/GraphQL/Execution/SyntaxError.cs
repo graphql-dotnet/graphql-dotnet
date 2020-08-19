@@ -12,6 +12,5 @@ namespace GraphQL.Execution
             // Code will contain SYNTAX_ERROR due to inner exception
             AddLocation(ex.Line, ex.Column);
         }
-
     }
 }
