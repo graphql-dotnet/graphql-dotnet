@@ -419,6 +419,85 @@ usual, only queuing the data loader once the `IDataLoaderResult` has been return
 be queued to execute at the proper time. Please refer to the reference implementation of `ParallelExecutionStrategy`
 for an example.
 
+### Exception handling changes
+
+Exceptions have been split into two categories: input errors, and processing errors.  For instance, if an invalid
+query was passed to the `DocumentExecuter`, it would be considered an input error, and a `SyntaxError` would be
+thrown.  Or if an invalid enum string was passed as a variable to a query, an `InvalidValueError` would be thrown.
+All validation rules that fail their respective tests are treated as input errors.
+
+All input errors will inherit from `DocumentError`.  Below is a list of error messages and their respective error
+classes and codes:
+
+Description | Error class | Code
+-|-|-
+Empty query document | NoOperationError | NO_OPERATION
+Query parsing error | SyntaxError | SYNTAX_ERROR
+Attempting a mutation or subscription when none are defined | InvalidOperationError | INVAILD_OPERATION
+Invalid variable values | InvalidVariableError | INVALID_VALUE
+
+Processing errors should only occur if an exception is thrown from within a field resolver.  For instance, if
+an error in your code causes an NullReferenceException to be thrown.  Or if you execute `.Single()` on an empty
+array, causing an `InvalidOperationException` to be thrown.  Processing errors also include calling
+`context.GetArgument<>` with a type that does not match the argument type, and the system cannot perform
+the conversion.  For instance, calling `context.GetArgument<Guid>("arg")` on an argument of type `IntGraphType`.
+
+Field resolvers can manually trigger an input error by throwing an exception of the `ExecutionError` type, or
+a type that inherits from it.  Any other thrown error is treated as a processing error.  Below is an example of
+typical validation within a query or mutation that returns an input error:
+
+```csharp
+Field<NonNullGraphType<OrderGraph>>("order",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }),
+    resolve: ctx =>
+    {
+        var orderService = ctx.RequestServices.GetRequiredService<OrderService>();
+        var order = orderService.GetById(ctx.GetArgument<int>("id"));
+        if (order == null)
+            throw new ExecutionError("Invalid order id");
+    });
+```
+
+Input errors are returned back from the `DocumentExecuter` pursuant to GraphQL specifications.  You can test for
+input errors by checking the `Errors` property of the `ExecutionResult` object returned from `DocumentExecuter.ExecuteAsync`.
+
+Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the
+`ExecutionOptions.ThrowOnUnhandledExceptions` property to `true`.  When this property is set to `false`, the
+default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic error
+message to the `ExecutionResult.Errors` property.  Error codes are dynamically generated from the inner exceptions
+of the wrapped exception and also returned.
+
+You can also handle these processing exceptions by setting a delegate within the `ExecutionOptions.UnhandledExceptionDelegate`
+property.  Within the delegate you can log the error message and stack trace for debugging needs.  You can also
+override the generic error message with a more specific message, wrap the exception in your own ExecutionError
+class, and/or set the codes as necessary.
+
+Here is a sample of a typical unhandled exception delegate:
+
+```csharp
+var executer = new DocumentExecuter();
+var result = executer.ExecuteAsync(options => {
+
+	...
+
+  options.UnhandledExecutionDelegate = ctx =>
+  {
+      try
+      {
+          using var db = new MyDatabase();
+          db.ErrorLogs.Add(new ErrorLog {
+              DateStamp = DateTime.UtcNow,
+              Message = ctx.Exception.Message,
+              Details = ctx.Exception.ToString()
+          });
+          db.SaveChanges();
+      }
+      catch { }
+  };
+});
+```
+
 ### SubscriptionExecuter removal
 
 The `SubscriptionExecuter` class, previously marked as obsolete, has been removed. Use the `DocumentExecuter`
