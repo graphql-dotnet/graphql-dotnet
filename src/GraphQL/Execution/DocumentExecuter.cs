@@ -199,21 +199,23 @@ namespace GraphQL
             }
             catch (Exception ex)
             {
-                if (options.ThrowOnUnhandledException)
-                    throw;
+                UnhandledExceptionContext exceptionContext = null;
 
                 if (options.UnhandledExceptionDelegate != null)
                 {
-                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, null, ex);
                     options.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
+
+                if (options.ThrowOnUnhandledException && !(ex is ExecutionError))
+                    throw;
 
                 result = new ExecutionResult
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new UnhandledError("Error executing document.", ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex)
                     }
                 };
             }
