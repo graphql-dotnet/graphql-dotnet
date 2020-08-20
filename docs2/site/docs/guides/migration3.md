@@ -479,22 +479,22 @@ Here is a sample of a typical unhandled exception delegate:
 var executer = new DocumentExecuter();
 var result = executer.ExecuteAsync(options => {
 
-	...
+    ...
 
-  options.UnhandledExecutionDelegate = ctx =>
-  {
-      try
-      {
-          using var db = new MyDatabase();
-          db.ErrorLogs.Add(new ErrorLog {
-              DateStamp = DateTime.UtcNow,
-              Message = ctx.Exception.Message,
-              Details = ctx.Exception.ToString()
-          });
-          db.SaveChanges();
-      }
-      catch { }
-  };
+    options.UnhandledExecutionDelegate = ctx =>
+    {
+        try
+        {
+            using var db = new MyDatabase();
+            db.ErrorLogs.Add(new ErrorLog {
+                DateStamp = DateTime.UtcNow,
+                Message = ctx.Exception.Message,
+                Details = ctx.Exception.ToString()
+            });
+            db.SaveChanges();
+        }
+        catch { }
+    };
 });
 ```
 
