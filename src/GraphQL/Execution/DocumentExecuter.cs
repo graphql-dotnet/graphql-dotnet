@@ -203,7 +203,6 @@ namespace GraphQL
                     throw;
 
                 UnhandledExceptionContext exceptionContext = null;
-
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
