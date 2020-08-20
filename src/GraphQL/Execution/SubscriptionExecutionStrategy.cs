@@ -166,7 +166,7 @@ namespace GraphQL.Execution
             IEnumerable<object> path,
             Exception ex = null)
         {
-            var error = new ExecutionError(message, ex);
+            var error = new UnhandledError(message, ex);
             error.AddLocation(field, context.Document);
             error.Path = path;
             return error;
