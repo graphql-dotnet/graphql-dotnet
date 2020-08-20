@@ -22,14 +22,14 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 ### Other new features
 
 * Based on .Net Standard 2.0, supporting .Net Core applications
+* Supports scoped services (see below under _Dependency Injection_)
 * Supports the `System.Text.Json` library for JSON serialization, in addition to the Newtonsoft.Json library
 * Data loaders work with serial execution strategies and can be chained together
 * Name converters can be configured to use a different function for field names versus argument names
 * Field builders can take an optional configuration action parameter
 * Support for auto-registering input object graph types via `AutoRegisteringInputObjectGraphType`
 * Added codes to `ExecutionError`s
-* Enhanced exception handling and processing
-* Document processing exceptions can be logged or modified - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1164)
+* Document processing exceptions can be logged or modified (see below under _Exception handling changes_)
 * Enhanced validation of graphs built-in
 * Supports filtering of schema introspection requests - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1179)
 * Supports federated schemas - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1233)
