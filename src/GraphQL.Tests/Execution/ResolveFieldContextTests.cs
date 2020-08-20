@@ -281,5 +281,36 @@ namespace GraphQL.Tests.Execution
             One,
             Two
         }
+
+    }
+
+    public static class ResolveFieldContextExtensions
+    {
+        public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
+            => TryAsyncResolve<object>(context, resolve, error);
+
+        public static async Task<TResult> TryAsyncResolve<TResult>(this IResolveFieldContext context, Func<IResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
+        {
+            try
+            {
+                return await resolve(context).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (error == null)
+                {
+                    var er = new ExecutionError(ex.Message, ex);
+                    er.AddLocation(context.FieldAst, context.Document);
+                    er.Path = context.Path;
+                    context.Errors.Add(er);
+                    return default;
+                }
+                else
+                {
+                    var result = error(context.Errors);
+                    return result == null ? default : await result.ConfigureAwait(false);
+                }
+            }
+        }
     }
 }
