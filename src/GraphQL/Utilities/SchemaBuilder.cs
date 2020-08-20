@@ -441,7 +441,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 return (DirectiveLocation)result;
             }
 
-            throw new ExecutionError($"{name} is an unknown directive location");
+            throw new ArgumentOutOfRangeException(nameof(name), $"{name} is an unknown directive location");
         }
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
@@ -584,7 +584,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         return bigIntegerResult;
                     }
 
-                    throw new ExecutionError($"Invalid number {str.Value}");
+                    throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
@@ -626,7 +626,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     return values;
                 }
                 default:
-                    throw new ExecutionError($"Unsupported value type {source.Kind}");
+                    throw new InvalidOperationException($"Unsupported value type {source.Kind}");
             }
         }
     }

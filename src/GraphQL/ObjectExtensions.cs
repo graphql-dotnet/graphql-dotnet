@@ -247,7 +247,7 @@ namespace GraphQL
 
                 if (!IsDefinedEnumValue(fieldType, value))
                 {
-                    throw new ExecutionError($"Unknown value '{value}' for enum '{fieldType.Name}'.");
+                    throw new InvalidOperationException($"Unknown value '{value}' for enum '{fieldType.Name}'.");
                 }
 
                 string str = value.ToString();
@@ -296,24 +296,30 @@ namespace GraphQL
         /// <param name="value">The value being tested.</param>
         public static bool IsDefinedEnumValue(Type type, object value)
         {
-            var names = Enum.GetNames(type);
-            if (names.Contains(value?.ToString() ?? "", StringComparer.OrdinalIgnoreCase))
+            try
             {
-                return true;
-            }
-
-            var underlyingType = Enum.GetUnderlyingType(type);
-            var converted = Convert.ChangeType(value, underlyingType);
-
-            var values = Enum.GetValues(type);
-
-            foreach (var val in values)
-            {
-                var convertedVal = Convert.ChangeType(val, underlyingType);
-                if (convertedVal.Equals(converted))
+                var names = Enum.GetNames(type);
+                if (names.Contains(value?.ToString() ?? "", StringComparer.OrdinalIgnoreCase))
                 {
                     return true;
                 }
+
+                var underlyingType = Enum.GetUnderlyingType(type);
+                var converted = Convert.ChangeType(value, underlyingType);
+
+                var values = Enum.GetValues(type);
+
+                foreach (var val in values)
+                {
+                    var convertedVal = Convert.ChangeType(val, underlyingType);
+                    if (convertedVal.Equals(converted))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
             }
 
             return false;
