@@ -73,17 +73,17 @@ Core projects, you can add set this to equal `HttpContext.RequestServices`.  Her
 ```csharp
 private static async Task ExecuteAsync(HttpContext context, ISchema schema)
 {
-    // load request and variables from context
+    ...
 
+    var executer = new DocumentExecuter();
     var result = await executer.ExecuteAsync(options =>
     {
-        // set schema, request, and variables
+        ...
 
-        // set RequestServices property
         options.RequestServices = context.RequestServices;
     });
 
-    // format result as json and return it
+    ...
 }
 
 public class MyGraphType : ObjectGraphType<Category>
