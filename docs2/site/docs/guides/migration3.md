@@ -65,18 +65,24 @@ obtain other singleton or transient services.  For scoped schemas with scoped gr
 for the current executing scope.  Casting `Schema` to `IServiceProvider` is also possible, but not recommended, and will
 yield similar results.
 
-If you wish to access a scoped service from within a resolver and want to use a singleton schema, you will need to write or
-utilize an accessor based on your own needs. For Asp.Net Core projects, you can add an extension function to `IResolveFieldContext`
-to retrieve a scoped service within a field resolver that utilizes the `IHttpContextAccessor` interface to obtain the DI scope.
-Here is a sample of such a method:
+If you wish to access a scoped service from within a resolver and want to use a singleton schema, you will need to pass a
+scoped service provider to `ExecutionOptions.RequestServices`, which can then be used to resolve scoped services.  For Asp.Net
+Core projects, you can add set this to equal `HttpContext.RequestServices`.  Here is a sample of such a method:
 
 ```csharp
-public static class ContextExtensions
+private static async Task ExecuteAsync(HttpContext context, ISchema schema)
 {
-    public static T GetService<T>(this IResolveFieldContext context) {
-        return ((IServiceProvider)context.Schema).GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>()
-            .HttpContext.RequestServices.GetRequiredService<T>();
-    }
+    // load request and variables from context
+
+    var result = await executer.ExecuteAsync(options =>
+    {
+        // set schema, request, and variables
+
+        // set RequestServices property
+        options.RequestServices = context.RequestServices;
+    });
+
+    // format result as json and return it
 }
 
 public class MyGraphType : ObjectGraphType<Category>
@@ -85,7 +91,7 @@ public class MyGraphType : ObjectGraphType<Category>
     {
         Field("Name", context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products", resolve: (context) => {
-            var db = context.GetService<MyDbContext>();
+            var db = context.RequestServices.GetRequiredService<MyDbContext>();
             return db.Products.Where(x => x.CategoryId == context.Source.Id);
         });
     }
@@ -100,20 +106,26 @@ your field resolver's execution.  You can write extension functions to assist wi
 ```csharp
 public static class ContextExtensions
 {
-    public static async Task<TReturn> RunScopedAsync<TSource, TReturn>(this IResolveFieldContext<TSource> context, Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    public static async Task<TReturn> RunScopedAsync<TSource, TReturn>(
+        this IResolveFieldContext<TSource> context,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
     {
-        using (var scope = ((IServiceProvider)context.Schema).CreateScope()) {
+        using (var scope = context.RequestServices.CreateScope()) {
             return await func(context, scope.ServiceProvider);
         }
     }
 }
+
 public static class FieldBuilderExtensions
 {
-    public static FieldBuilder<TSource, TReturn> ResolveScopedAsync<TSource, TReturn>(this FieldBuilder<TSource, TReturn> builder, Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    public static FieldBuilder<TSource, TReturn> ResolveScopedAsync<TSource, TReturn>(
+        this FieldBuilder<TSource, TReturn> builder,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
     {
         return builder.ResolveAsync(context => context.RunScopedAsync(func));
     }
 }
+
 public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
@@ -121,7 +133,7 @@ public class MyGraphType : ObjectGraphType<Category>
         Field("Name", context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products")
             .ResolveScopedAsync((context, serviceProvider) => {
-                var db = serviceProvider.GetService<MyDbContext>();
+                var db = serviceProvider.GetRequiredService<MyDbContext>();
                 return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
             });
     }
