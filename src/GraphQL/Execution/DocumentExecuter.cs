@@ -199,6 +199,9 @@ namespace GraphQL
             }
             catch (Exception ex)
             {
+                if (options.ThrowOnUnhandledException)
+                    throw;
+
                 UnhandledExceptionContext exceptionContext = null;
 
                 if (options.UnhandledExceptionDelegate != null)
@@ -207,9 +210,6 @@ namespace GraphQL
                     options.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
-
-                if (options.ThrowOnUnhandledException && !(ex is ExecutionError))
-                    throw;
 
                 result = new ExecutionResult
                 {

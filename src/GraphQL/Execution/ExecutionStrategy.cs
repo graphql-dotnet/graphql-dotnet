@@ -218,6 +218,9 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
+                if (context.ThrowOnUnhandledException)
+                    throw;
+
                 UnhandledExceptionContext exceptionContext = null;
                 if (context.UnhandledExceptionDelegate != null)
                 {
@@ -225,9 +228,6 @@ namespace GraphQL.Execution
                     context.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
-
-                if (context.ThrowOnUnhandledException && !(ex is ExecutionError))
-                    throw;
 
                 var error = ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve field '{node.Name}'.", ex);
                 error.AddLocation(node.Field, context.Document);
