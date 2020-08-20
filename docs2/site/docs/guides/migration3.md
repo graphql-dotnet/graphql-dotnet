@@ -29,7 +29,7 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 * Field builders can take an optional configuration action parameter
 * Support for auto-registering input object graph types via `AutoRegisteringInputObjectGraphType`
 * Added codes to `ExecutionError`s
-* Document processing exceptions can be logged or modified (see below under _Exception handling changes_)
+* Document processing exceptions can be logged or modified (see below under _Exception Handling_)
 * Enhanced validation of graphs built-in
 * Supports filtering of schema introspection requests - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1179)
 * Supports federated schemas - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1233)
@@ -272,7 +272,7 @@ class MyContext : Dictionary<string, object>
 }
 ```
 
-### Document listeners
+### Document Listeners
 
 The `DocumentExecutionListenerBase<T>` class and `IDocumentExecutionListener<T>` interface have been removed;
 please implement the `IDocumentExecutionListener` interface when creating a custom document listener. You
@@ -419,7 +419,7 @@ usual, only queuing the data loader once the `IDataLoaderResult` has been return
 be queued to execute at the proper time. Please refer to the reference implementation of `ParallelExecutionStrategy`
 for an example.
 
-### Exception handling changes
+### Exception Handling
 
 Exceptions have been split into two categories: input errors, and processing errors.  For instance, if an invalid
 query was passed to the `DocumentExecuter`, it would be considered an input error, and a `SyntaxError` would be
