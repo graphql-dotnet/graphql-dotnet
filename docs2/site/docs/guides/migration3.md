@@ -26,9 +26,10 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 * Data loaders work with serial execution strategies and can be chained together
 * Name converters can be configured to use a different function for field names versus argument names
 * Field builders can take an optional configuration action parameter
-* Document processing exceptions can be logged or modified - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1164)
 * Support for auto-registering input object graph types via `AutoRegisteringInputObjectGraphType`
 * Added codes to `ExecutionError`s
+* Enhanced exception handling and processing
+* Document processing exceptions can be logged or modified - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1164)
 * Enhanced validation of graphs built-in
 * Supports filtering of schema introspection requests - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1179)
 * Supports federated schemas - see details [here](https://github.com/graphql-dotnet/graphql-dotnet/pull/1233)
@@ -401,6 +402,7 @@ public class OrderType : ObjectGraphType<Order>
         return loader.LoadAsync(context.Source.UserId);
     }
 }
+```
 
 If you need to process the data loader result before it is returned, additional refactoring will need to be done.
 The data loader also now supports chained data loaders, and asynchronous code prior to queuing the data loader. See
@@ -464,7 +466,7 @@ public class MyConverter : INameConverter
 }
 ```
 
-## Global references to the three introspection fields are now properties on `ISchema`
+### Global references to the three introspection fields are now properties on `ISchema`
 
 The three introspection field definitions for `__schema`, `__type`, and `__typename` have moved from static properties on the `SchemaIntrospection` class
 to properties of the `ISchema` interface, typically provided by the `Schema` class. Custom implementations of `ISchema` must implement three new properties:
