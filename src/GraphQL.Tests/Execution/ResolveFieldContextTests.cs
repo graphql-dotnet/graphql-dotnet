@@ -113,94 +113,6 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
-        public async Task try_resolve_async_handles_null()
-        {
-            var result = await _context.TryAsyncResolve(c => null);
-            result.ShouldBe(null);
-        }
-
-        [Fact]
-        public async Task try_resolve_async_handles_exception()
-        {
-            var result = await _context.TryAsyncResolve(c => throw new InvalidOperationException("Test Error"));
-            result.ShouldBeNull();
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_sets_inner_exception()
-        {
-            var exception = new Exception("Test");
-            var result = await _context.TryAsyncResolve(
-                c => throw exception);
-            result.ShouldBeNull();
-            _context.Errors.First().InnerException.ShouldBe(exception);
-        }
-
-        [Fact]
-        public async Task try_resolve_async_invokes_error_handler()
-        {
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return null;
-                }
-            );
-            result.ShouldBeNull();
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_async_not_null_invokes_error_handler()
-        {
-            var obj = new object();
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return Task.FromResult(obj);
-                }
-            );
-            result.ShouldBe(obj);
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_generic_sets_inner_exception()
-        {
-            var exception = new Exception("Test");
-            var result = await _context.TryAsyncResolve<int>(
-                c => throw exception);
-            result.ShouldBe(default);
-            _context.Errors.First().InnerException.ShouldBe(exception);
-        }
-
-        [Theory]
-        [InlineData(123)]
-        public async Task try_resolve_generic_async_invokes_error_handler(int value)
-        {
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return Task.FromResult(value);
-                }
-            );
-            result.ShouldBe(value);
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_async_properly_resolves_result()
-        {
-            var result = await _context.TryAsyncResolve(
-                c => Task.FromResult<object>("Test Result")
-            );
-            result.ShouldBe("Test Result");
-        }
-
-        [Fact]
         public void resolveFieldContextAdapter_throws_error_when_null()
         {
             Should.Throw<ArgumentNullException>(() =>
@@ -280,36 +192,6 @@ namespace GraphQL.Tests.Execution
         {
             One,
             Two
-        }
-    }
-
-    public static class ResolveFieldContextExtensions
-    {
-        public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-            => TryAsyncResolve<object>(context, resolve, error);
-
-        public static async Task<TResult> TryAsyncResolve<TResult>(this IResolveFieldContext context, Func<IResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
-        {
-            try
-            {
-                return await resolve(context).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                if (error == null)
-                {
-                    var er = new ExecutionError(ex.Message, ex);
-                    er.AddLocation(context.FieldAst, context.Document);
-                    er.Path = context.Path;
-                    context.Errors.Add(er);
-                    return default;
-                }
-                else
-                {
-                    var result = error(context.Errors);
-                    return result == null ? default : await result.ConfigureAwait(false);
-                }
-            }
         }
     }
 }
