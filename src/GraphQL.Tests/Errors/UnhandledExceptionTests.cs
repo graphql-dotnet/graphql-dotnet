@@ -117,7 +117,6 @@ namespace GraphQL.Tests.Errors
                     }
                 };
             }, new ExecutionResult { Errors = new ExecutionErrors { expectedError } });
-
         }
 
         public class DocListener : DocumentExecutionListenerBase
