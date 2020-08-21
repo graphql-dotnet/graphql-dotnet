@@ -320,6 +320,7 @@ namespace GraphQL
             }
             catch
             {
+                // TODO: refactor IsDefinedEnumValue
             }
 
             return false;
