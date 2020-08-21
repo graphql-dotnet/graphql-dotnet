@@ -5,7 +5,7 @@ using System.Text;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Perpares <see cref="ExecutionError"/>s for serialization by the <see cref="IDocumentWriter"/>
+    /// Prepares <see cref="ExecutionError"/>s for serialization by the <see cref="IDocumentWriter"/>
     /// </summary>
     public interface IErrorParser
     {
