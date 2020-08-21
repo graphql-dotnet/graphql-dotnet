@@ -17,7 +17,7 @@ namespace GraphQL.Tests.Utilities
         }
 
         protected readonly IDocumentExecuter Executer = new DocumentExecuter();
-        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true, errorParser: new ErrorParser(exposeExceptions: false));
+        protected readonly IDocumentWriter Writer = new DocumentWriter(indent: true);
         protected SchemaBuilder Builder { get; set; }
 
         public ExecutionResult AssertQuery(Action<ExecuteConfig> configure)
