@@ -52,7 +52,7 @@ namespace GraphQL.Execution
                     extensions.Add("data", executionError.Data);
             }
 
-            return new ParsedError()
+            return new ParsedError
             {
                 Message = _options.ExposeExceptions ? executionError.ToString() : executionError.Message,
                 Locations = executionError.Locations,
