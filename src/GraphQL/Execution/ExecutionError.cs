@@ -8,6 +8,9 @@ using GraphQLParser;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Represents an error generated while processing a document and intended to be returned within an <see cref="ExecutionResult"/>.
+    /// </summary>
     [Serializable]
     public class ExecutionError : Exception
     {
