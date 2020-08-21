@@ -55,7 +55,7 @@ namespace GraphQL
         /// <summary>
         /// Gets or sets a code for this error.
         /// </summary>
-        public virtual string Code { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// Returns true if there are any codes for this error.
