@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -74,7 +75,7 @@ namespace GraphQL.Validation.Rules
             if (appliedTo is InlineFragment) return DirectiveLocation.InlineFragment;
             if (appliedTo is FragmentDefinition) return DirectiveLocation.FragmentDefinition;
 
-            throw new ExecutionError($"Unable to determine directive location for \"{context.Print(appliedTo)}\".");
+            throw new InvalidOperationException($"Unable to determine directive location for \"{context.Print(appliedTo)}\".");
         }
     }
 }
