@@ -6,8 +6,6 @@ namespace GraphQL.Execution
 {
     /// <summary>
     /// Represents the fields of a GraphQL error entry. See https://spec.graphql.org/June2018/#sec-Errors
-    /// <br/><br/>
-    /// Note that the field names must be encoded as camelCase
     /// </summary>
     public class ParsedError
     {
