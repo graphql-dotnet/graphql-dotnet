@@ -15,17 +15,28 @@ namespace GraphQL
 
         private List<ErrorLocation> _errorLocations;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message.
+        /// </summary>
         public ExecutionError(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message and exception data.
+        /// </summary>
         public ExecutionError(string message, IDictionary data)
             : base(message)
         {
             SetData(data);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message. Sets the
+        /// <see cref="Code"/> and <see cref="Codes"/> properties based on the inner exception(s). Loads any exception data
+        /// from the inner exception into this instance.
+        /// </summary>
         public ExecutionError(string message, Exception exception)
             : base(message, exception)
         {
@@ -33,12 +44,24 @@ namespace GraphQL
             SetData(exception);
         }
 
+        /// <summary>
+        /// Returns a list of locations within the document that this error applies to.
+        /// </summary>
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
+        /// <summary>
+        /// Gets or sets a code for this error.
+        /// </summary>
         public virtual string Code { get; set; }
 
+        /// <summary>
+        /// Returns true if there are any codes for this error.
+        /// </summary>
         public virtual bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
 
+        /// <summary>
+        /// Returns a list of codes for this error.
+        /// </summary>
         public virtual IEnumerable<string> Codes
         {
             get
@@ -57,8 +80,14 @@ namespace GraphQL
             }
         }
 
+        /// <summary>
+        /// Gets or sets the path within the GraphQL document where this error applies to.
+        /// </summary>
         public IEnumerable<object> Path { get; set; }
 
+        /// <summary>
+        /// Adds a location to the list of locations that this error applies to.
+        /// </summary>
         public void AddLocation(int line, int column)
         {
             if (_errorLocations == null)
@@ -92,6 +121,10 @@ namespace GraphQL
             }
         }
 
+        /// <summary>
+        /// Generates an normalized error code for the specified exception by taking the type name, removing the "GraphQL" prefix, if any,
+        /// removing the "Exception" suffix, if any, and then converting the result from PascalCase to UPPER_CASE.
+        /// </summary>
         protected static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
 
         private static string NormalizeErrorCode(Type exceptionType)
@@ -154,6 +187,9 @@ namespace GraphQL
 
     public static class ExecutionErrorExtensions
     {
+        /// <summary>
+        /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
+        /// </summary>
         public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
         {
             if (abstractNode == null)
