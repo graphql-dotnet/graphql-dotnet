@@ -3,7 +3,7 @@ using System;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Represents an unhandled exception caught during document processing.
+    /// Represents an unhandled exception caught during document or subscription processing.
     /// </summary>
     [Serializable]
     public class UnhandledError : ExecutionError
