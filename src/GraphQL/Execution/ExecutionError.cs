@@ -35,11 +35,11 @@ namespace GraphQL
 
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
-        public string Code { get; set; }
+        public virtual string Code { get; set; }
 
-        public bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
+        public virtual bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
 
-        public IEnumerable<string> Codes
+        public virtual IEnumerable<string> Codes
         {
             get
             {
@@ -92,7 +92,7 @@ namespace GraphQL
             }
         }
 
-        private static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
+        protected static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
 
         private static string NormalizeErrorCode(Type exceptionType)
         {
