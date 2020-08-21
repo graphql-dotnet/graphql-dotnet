@@ -421,7 +421,7 @@ for an example.
 
 ### Exception Handling
 
-Exceptions have been split into two categories: input errors, and processing errors.  For instance, if an invalid
+Exceptions have been split into three categories: schema errors, input errors, and processing errors.  For instance, if an invalid
 query was passed to the `DocumentExecuter`, it would be considered an input error, and a `SyntaxError` would be
 thrown.  Or if an invalid enum string was passed as a variable to a query, an `InvalidValueError` would be thrown.
 All validation rules that fail their respective tests are treated as input errors.
@@ -435,6 +435,11 @@ Empty query document | NoOperationError | NO_OPERATION
 Query parsing error | SyntaxError | SYNTAX_ERROR
 Attempting a mutation or subscription when none are defined | InvalidOperationError | INVAILD_OPERATION
 Invalid variable values | InvalidVariableError | INVALID_VALUE
+
+Schema errors throw an exception during the process of defining or building the schema.  For instance, adding
+a two fields of the same name to a GraphQL type would result in an `ArgumentOutOfRangeException` while
+attempting to add the second field.  Another example would be if a schema defined an invalid union; an error
+would be thrown while the schema was being initialized within `DocumentExecuter` and caught as an unhandled exception.
 
 Processing errors should only occur if an exception is thrown from within a field resolver.  For instance, if
 an error in your code causes an NullReferenceException to be thrown.  Or if you execute `.Single()` on an empty
