@@ -16,7 +16,6 @@ namespace GraphQL.Execution
         public UnhandledError(string message, Exception innerException)
             : base(message, innerException)
         {
-            // do not set another code by default; only inner exception's codes will be returned
         }
     }
 }
