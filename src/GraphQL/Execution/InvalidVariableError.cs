@@ -18,8 +18,9 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidVariableError"/> class for a specified variable and error message. Sets the
-        /// <see cref="Codes"/> property based on the inner exception(s). Loads any exception data from the inner exception into this instance.
+        /// Initializes a new instance of the <see cref="InvalidVariableError"/> class for a specified variable
+        /// and error message. Sets the <see cref="ExecutionError.Codes">Codes</see> property based on the inner
+        /// exception(s). Loads any exception data from the inner exception into this instance.
         /// </summary>
         public InvalidVariableError(string variableName, string message, Exception innerException) :
             base($"Variable '${variableName}' is invalid. {message}", innerException)
