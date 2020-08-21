@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Utilities;
 using GraphQLParser.Exceptions;
