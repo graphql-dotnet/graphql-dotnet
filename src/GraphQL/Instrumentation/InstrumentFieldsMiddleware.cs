@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation

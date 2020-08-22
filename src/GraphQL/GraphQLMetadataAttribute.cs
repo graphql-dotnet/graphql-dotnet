@@ -1,5 +1,5 @@
-using GraphQL.Utilities;
 using System;
+using GraphQL.Utilities;
 
 namespace GraphQL
 {

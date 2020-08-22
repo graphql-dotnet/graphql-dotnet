@@ -20,8 +20,8 @@ namespace GraphQL.Utilities
         {
             return GetAstType<ASTNode>(type) switch
             {
-                GraphQLObjectTypeDefinition otd => otd.Fields.Any(),
-                GraphQLInterfaceTypeDefinition itd => itd.Fields.Any(),
+                GraphQLObjectTypeDefinition otd => otd.Fields?.Any() ?? false,
+                GraphQLInterfaceTypeDefinition itd => itd.Fields?.Any() ?? false,
                 _ => false
             };
         }

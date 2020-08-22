@@ -1,10 +1,10 @@
-using GraphQL.Types;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Types;
 
 namespace GraphQL
 {
@@ -33,11 +33,11 @@ namespace GraphQL
         /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
         /// GraphType contains information about this matching in Metadata property.
         /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
-        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         public static object ToObject(this IDictionary<string, object> source, Type type, IGraphType mappedType = null)
         {
-            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"  
+            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
             string GetPropertyName(string key, out FieldType field)
             {
                 var complexType = mappedType.GetNamedType() as IComplexGraphType;
@@ -146,7 +146,7 @@ namespace GraphQL
         /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
         /// GraphType contains information about this matching in Metadata property.
         /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
-        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.   
+        /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
         public static object GetPropertyValue(this object propertyValue, Type fieldType, IGraphType mappedType = null)
@@ -209,7 +209,7 @@ namespace GraphQL
                     {
                         newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
                     }
-                   
+
                     if (fieldType.IsArray)
                         newCollection = ((dynamic)newCollection).ToArray();
                 }
@@ -247,7 +247,7 @@ namespace GraphQL
 
                 if (!IsDefinedEnumValue(fieldType, value))
                 {
-                    throw new ExecutionError($"Unknown value '{value}' for enum '{fieldType.Name}'.");
+                    throw new InvalidOperationException($"Unknown value '{value}' for enum '{fieldType.Name}'.");
                 }
 
                 string str = value.ToString();
@@ -296,46 +296,34 @@ namespace GraphQL
         /// <param name="value">The value being tested.</param>
         public static bool IsDefinedEnumValue(Type type, object value)
         {
-            var names = Enum.GetNames(type);
-            if (names.Contains(value?.ToString() ?? "", StringComparer.OrdinalIgnoreCase))
+            try
             {
-                return true;
-            }
-
-            var underlyingType = Enum.GetUnderlyingType(type);
-            var converted = Convert.ChangeType(value, underlyingType);
-
-            var values = Enum.GetValues(type);
-
-            foreach (var val in values)
-            {
-                var convertedVal = Convert.ChangeType(val, underlyingType);
-                if (convertedVal.Equals(converted))
+                var names = Enum.GetNames(type);
+                if (names.Contains(value?.ToString() ?? "", StringComparer.OrdinalIgnoreCase))
                 {
                     return true;
                 }
+
+                var underlyingType = Enum.GetUnderlyingType(type);
+                var converted = Convert.ChangeType(value, underlyingType);
+
+                var values = Enum.GetValues(type);
+
+                foreach (var val in values)
+                {
+                    var convertedVal = Convert.ChangeType(val, underlyingType);
+                    if (convertedVal.Equals(converted))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                // TODO: refactor IsDefinedEnumValue
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Converts an object into a dictionary.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="flags">The binding flags used to control which properties are read.</param>
-        public static IDictionary<string, object> AsDictionary(
-            this object source,
-            BindingFlags flags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-        {
-            return source
-                .GetType()
-                .GetProperties(flags)
-                .ToDictionary
-                (
-                    propInfo => propInfo.Name,
-                    propInfo => propInfo.GetValue(source, null)
-                );
         }
     }
 }

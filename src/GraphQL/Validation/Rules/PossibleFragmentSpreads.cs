@@ -1,6 +1,6 @@
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using System.Threading.Tasks;
 
 namespace GraphQL.Validation.Rules
 {
@@ -14,14 +14,10 @@ namespace GraphQL.Validation.Rules
     public class PossibleFragmentSpreads : IValidationRule
     {
         public string TypeIncompatibleSpreadMessage(string fragName, string parentType, string fragType)
-        {
-            return $"Fragment \"{fragName}\" cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
-        }
+            => $"Fragment \"{fragName}\" cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
 
         public string TypeIncompatibleAnonSpreadMessage(string parentType, string fragType)
-        {
-            return $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
-        }
+            => $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
 
         public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
@@ -34,7 +30,7 @@ namespace GraphQL.Validation.Rules
                     var fragType = context.TypeInfo.GetLastType();
                     var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
-                    if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
+                    if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                     {
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,
@@ -46,11 +42,11 @@ namespace GraphQL.Validation.Rules
 
                 _.Match<FragmentSpread>(node =>
                 {
-                    var fragName = node.Name;
+                    string fragName = node.Name;
                     var fragType = getFragmentType(context, fragName);
                     var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
-                    if (fragType != null && parentType != null && !context.Schema.DoTypesOverlap(fragType, parentType))
+                    if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                     {
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,

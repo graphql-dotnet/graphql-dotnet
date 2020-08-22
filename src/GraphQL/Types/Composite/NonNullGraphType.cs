@@ -11,12 +11,13 @@ namespace GraphQL.Types
         }
     }
 
-    public class NonNullGraphType : GraphType
+    public class NonNullGraphType : GraphType, IProvideResolvedType
     {
         public NonNullGraphType(IGraphType type)
         {
             if (type is NonNullGraphType)
             {
+                // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
                 throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
             }
 
@@ -25,7 +26,7 @@ namespace GraphQL.Types
 
         protected NonNullGraphType(Type type)
         {
-            if (type == typeof (NonNullGraphType))
+            if (type == typeof(NonNullGraphType))
             {
                 throw new ArgumentException("Cannot nest NonNull inside NonNull.", nameof(type));
             }

@@ -35,9 +35,13 @@ You can install the latest stable version via [NuGet](https://www.nuget.org/pack
 ```
 
 For serialized results, you'll need an `IDocumentWriter` implementation.
-We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.SystemTextJson/) for .NET Core 3+,
-[GraphQL.NewtonsoftJson](https://www.nuget.org/packages/GraphQL.NewtonsoftJson/)
-(formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/)), or you can bring your own.
+We support several serializers (or you can bring your own):
+
+| Package | Downloads | Nuget Latest | MyGet Latest |
+|---------|-----------|--------------|--------------|
+| GraphQL.SystemTextJson | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson/) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.SystemTextJson)](https://www.nuget.org/packages/GraphQL.SystemTextJson) | [![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL.SystemTextJson?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) |
+| GraphQL.NewtonsoftJson, formerly included in [GraphQL](https://www.nuget.org/packages/GraphQL/) | [![Nuget](https://img.shields.io/nuget/dt/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![Nuget](https://img.shields.io/nuget/vpre/GraphQL.NewtonsoftJson)](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) | [![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL.NewtonsoftJson?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json) |
+
 ```
 > dotnet add package GraphQL.SystemTextJson
 > dotnet add package GraphQL.NewtonsoftJson
@@ -47,7 +51,7 @@ We support [GraphQL.SystemTextJson](https://www.nuget.org/packages/GraphQL.Syste
 > `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
 > which isn't recommended.*
 
-You can get the latest pre-release packages from the [MyGet feed](https://www.myget.org/F/graphql-dotnet/api/v3/index.json),
+You can get the latest pre-release packages from the [MyGet feed](src/NuGet.config),
 where you may want to explicitly pull a certain version using `-v`.
 ```
 > dotnet add package GraphQL.SystemTextJson -v 3.0.0-preview-1593
@@ -61,6 +65,9 @@ changes. Publication of each preview version to NuGet would create only unnecess
 ## Documentation
 
 http://graphql-dotnet.github.io
+
+> *Note: The current state of documentation corresponds to the state of the code in the master branch
+> which is used now to publish the **preview** package versions.*
 
 ## Examples
 
