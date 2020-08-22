@@ -80,10 +80,8 @@ namespace GraphQL.Tests.Errors
         {
             var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
             var error = new ExecutionError(innerException.Message, innerException);
-            error.Code.ShouldBe(ErrorCodeFor<ArgumentNullException>());
+            error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<ArgumentNullException>());
             error.Code.ShouldNotBeNull();
-            error.Codes.ShouldBe(new[] { ErrorCodeFor<ArgumentNullException>(), ErrorCodeFor<ArgumentOutOfRangeException>() });
-            error.Codes.Count().ShouldBe(2);
 
             var info = new ErrorInfoProvider().GetInfo(error);
             info.Message.ShouldBe(error.Message);
@@ -91,7 +89,8 @@ namespace GraphQL.Tests.Errors
             info.Extensions.Count.ShouldBe(2);
             info.Extensions.ShouldContainKeyAndValue("code", error.Code);
             info.Extensions.ShouldContainKey("codes");
-            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(error.Codes);
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(
+                new[] { ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>() });
         }
 
         [Fact]
@@ -99,8 +98,6 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError(null);
             error.Code.ShouldBeNull();
-            error.Codes.ShouldNotBeNull();
-            error.Codes.Count().ShouldBe(0);
             error.Data.ShouldNotBeNull();
             error.Data.Count.ShouldBe(0);
 
@@ -124,7 +121,8 @@ namespace GraphQL.Tests.Errors
             info.Extensions.Count.ShouldBe(3);
             info.Extensions.ShouldContainKeyAndValue("code", error.Code);
             info.Extensions.ShouldContainKey("codes");
-            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(error.Codes);
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(
+                new[] { ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>() });
             info.Extensions.ShouldContainKey("data");
             info.Extensions["data"].ShouldBeAssignableTo<IDictionary>().ShouldBe(error.Data);
         }
@@ -172,7 +170,6 @@ namespace GraphQL.Tests.Errors
                 Code = "",
             };
             error.Code.ShouldBe("");
-            error.HasCodes.ShouldBeFalse();
 
             var info = new ErrorInfoProvider(true).GetInfo(error);
             info.Extensions.ShouldBeNull();
@@ -182,9 +179,7 @@ namespace GraphQL.Tests.Errors
         public void inner_exception_of_type_exception_does_not_serialize_extensions()
         {
             var error = new ExecutionError("Test execution error", new Exception("Test exception"));
-            error.Code.ShouldBe(ErrorCodeFor<Exception>());
-            error.HasCodes.ShouldBeTrue();
-            error.Codes.ShouldBe(new[] { ErrorCodeFor<Exception>() });
+            error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
 
             var info = new ErrorInfoProvider().GetInfo(error);
             info.Extensions.ShouldBeNull();
@@ -194,10 +189,7 @@ namespace GraphQL.Tests.Errors
         public void codes_with_blank_code_has_undefined_behavior()
         {
             var error = new ExecutionError(null, new Exception(null, new ArgumentNullException("param")));
-            error.Code.ShouldBe(ErrorCodeFor<Exception>());
-            error.HasCodes.ShouldBeTrue();
-            error.Codes.ShouldBe(new[] { ErrorCodeFor<Exception>(), ErrorCodeFor<ArgumentNullException>() });
-            error.Codes.Count().ShouldBe(2);
+            error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
 
             var info = new ErrorInfoProvider().GetInfo(error);
             info.Extensions.ShouldBeNull();
@@ -208,17 +200,8 @@ namespace GraphQL.Tests.Errors
             info.Extensions.ShouldNotBeNull();
             info.Extensions.ShouldContainKey("data");
             info.Extensions.ShouldContainKey("codes");
-            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().Count().ShouldBe(2);
-        }
-
-        private string ErrorCodeFor<T>() where T : Exception, new() => ErrorCodeHelper.GetErrorCodeFor<T>();
-
-        private class ErrorCodeHelper : ExecutionError
-        {
-            private ErrorCodeHelper() : base("") { }
-
-            public static string GetErrorCodeFor<T>() where T : Exception, new()
-                => GetErrorCode(new T());
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
+                new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
         }
     }
 }

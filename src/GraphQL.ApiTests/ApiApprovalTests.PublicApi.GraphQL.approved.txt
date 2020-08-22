@@ -51,12 +51,9 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception exception) { }
         public string Code { get; set; }
-        public virtual System.Collections.Generic.IEnumerable<string> Codes { get; }
-        public virtual bool HasCodes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public void AddLocation(int line, int column) { }
-        protected static string GetErrorCode(System.Exception exception) { }
     }
     public static class ExecutionErrorExtensions
     {
@@ -588,7 +585,12 @@ namespace GraphQL.Execution
         public ErrorInfoProvider(GraphQL.Execution.ErrorInfoProviderOptions options) { }
         public ErrorInfoProvider(System.Action<GraphQL.Execution.ErrorInfoProviderOptions> optionsBuilder) { }
         public ErrorInfoProvider(bool exposeExceptions) { }
+        protected virtual System.Collections.Generic.IEnumerable<string> GetCodesForError(GraphQL.ExecutionError executionError) { }
         public virtual GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError) { }
+        public static string GetErrorCode(System.Exception exception) { }
+        public static string GetErrorCode(System.Type exceptionType) { }
+        public static string GetErrorCode<T>()
+            where T : System.Exception { }
     }
     public class ErrorInfoProviderOptions
     {
