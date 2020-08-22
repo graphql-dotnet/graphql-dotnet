@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 
 namespace GraphQL.Validation.Rules
 {
@@ -32,7 +31,7 @@ namespace GraphQL.Validation.Rules
                         var error = new ValidationError(
                             context.OriginalQuery,
                             "5.3.3.1",
-                            BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors),
+                            BadValueMessage(argAst.Name, context.Print(argAst.Value), errors),
                             argAst);
                         context.ReportError(error);
                     }
@@ -42,7 +41,6 @@ namespace GraphQL.Validation.Rules
 
         public string BadValueMessage(
             string argName,
-            IGraphType type,
             string value,
             IEnumerable<string> verboseErrors)
         {

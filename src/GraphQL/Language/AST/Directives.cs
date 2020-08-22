@@ -45,15 +45,7 @@ namespace GraphQL.Language.AST
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected bool Equals(Directives directives) => false;
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Directives)obj);
-        }
+        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
 
         public void Clear()
         {
