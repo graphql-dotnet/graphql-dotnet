@@ -52,19 +52,21 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WriteStartArray();
 
-            errors.Select(error => new { Error = error, Info = _errorInfoProvider.GetInfo(error) }).Apply(error =>
+            foreach (var error in errors)
             {
+                var info = _errorInfoProvider.GetInfo(error);
+
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
 
-                serializer.Serialize(writer, error.Info.Message);
+                serializer.Serialize(writer, info.Message);
 
-                if (error.Error.Locations != null)
+                if (error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Error.Locations.Apply(location =>
+                    error.Locations.Apply(location =>
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -76,20 +78,20 @@ namespace GraphQL.NewtonsoftJson
                     writer.WriteEndArray();
                 }
 
-                if (error.Error.Path != null && error.Error.Path.Any())
+                if (error.Path != null && error.Path.Any())
                 {
                     writer.WritePropertyName("path");
-                    serializer.Serialize(writer, error.Error.Path);
+                    serializer.Serialize(writer, error.Path);
                 }
 
-                if (error.Info.Extensions?.Count > 0)
+                if (info.Extensions?.Count > 0)
                 {
                     writer.WritePropertyName("extensions");
-                    serializer.Serialize(writer, error.Info.Extensions);
+                    serializer.Serialize(writer, info.Extensions);
                 } 
 
                 writer.WriteEndObject();
-            });
+            }
 
             writer.WriteEndArray();
         }

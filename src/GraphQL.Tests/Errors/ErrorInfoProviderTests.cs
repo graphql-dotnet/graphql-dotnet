@@ -221,5 +221,4 @@ namespace GraphQL.Tests.Errors
                 => GetErrorCode(new T());
         }
     }
-
 }
