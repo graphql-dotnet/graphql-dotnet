@@ -18,7 +18,7 @@ namespace GraphQL.Execution
         }
 
         public ErrorInfoProvider(bool exposeExceptions)
-            : this(new ErrorInfoProviderOptions() { ExposeExceptions = exposeExceptions })
+            : this(new ErrorInfoProviderOptions { ExposeExceptions = exposeExceptions })
         {
         }
 
