@@ -577,17 +577,22 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
-    public class ErrorParser : GraphQL.Execution.IErrorParser
+    public struct ErrorInfo
     {
-        public ErrorParser() { }
-        public ErrorParser(GraphQL.Execution.ErrorParserOptions options) { }
-        public ErrorParser(System.Action<GraphQL.Execution.ErrorParserOptions> optionsBuilder) { }
-        public ErrorParser(bool exposeExceptions) { }
-        public virtual GraphQL.Execution.ParsedError Parse(GraphQL.ExecutionError executionError) { }
+        public System.Collections.Generic.IDictionary<string, object> Extensions;
+        public string Message;
     }
-    public class ErrorParserOptions
+    public class ErrorInfoProvider : GraphQL.Execution.IErrorInfoProvider
     {
-        public ErrorParserOptions() { }
+        public ErrorInfoProvider() { }
+        public ErrorInfoProvider(GraphQL.Execution.ErrorInfoProviderOptions options) { }
+        public ErrorInfoProvider(System.Action<GraphQL.Execution.ErrorInfoProviderOptions> optionsBuilder) { }
+        public ErrorInfoProvider(bool exposeExceptions) { }
+        public virtual GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError) { }
+    }
+    public class ErrorInfoProviderOptions
+    {
+        public ErrorInfoProviderOptions() { }
         public bool ExposeExceptions { get; set; }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
@@ -670,9 +675,9 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
-    public interface IErrorParser
+    public interface IErrorInfoProvider
     {
-        GraphQL.Execution.ParsedError Parse(GraphQL.ExecutionError executionError);
+        GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError);
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {
@@ -719,14 +724,6 @@ namespace GraphQL.Execution
         public ParallelExecutionStrategy() { }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
-    }
-    public class ParsedError
-    {
-        public ParsedError() { }
-        public System.Collections.Generic.IDictionary<string, object> Extensions { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; set; }
-        public string Message { get; set; }
-        public System.Collections.Generic.IEnumerable<object> Path { get; set; }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
