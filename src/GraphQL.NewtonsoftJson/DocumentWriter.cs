@@ -12,7 +12,7 @@ namespace GraphQL.NewtonsoftJson
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
-        private static readonly Encoding Utf8Encoding = new UTF8Encoding(false);
+        private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
 
         public DocumentWriter()
             : this(indent: false)
@@ -61,7 +61,7 @@ namespace GraphQL.NewtonsoftJson
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var writer = new HttpResponseStreamWriter(stream, Utf8Encoding);
+            using var writer = new HttpResponseStreamWriter(stream, _utf8Encoding);
             using var jsonWriter = new JsonTextWriter(writer)
             {
                 ArrayPool = _jsonArrayPool,
