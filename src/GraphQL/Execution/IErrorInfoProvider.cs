@@ -8,7 +8,7 @@ namespace GraphQL.Execution
     public interface IErrorInfoProvider
     {
         /// <summary>
-        /// Parses an <see cref="ExecutionError"/> into a <see cref="ErrorInfo"/> class
+        /// Parses an <see cref="ExecutionError"/> into a <see cref="ErrorInfo"/> struct
         /// </summary>
         ErrorInfo GetInfo(ExecutionError executionError);
     }
