@@ -133,7 +133,7 @@ namespace GraphQL.Tests.Errors
             var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
             var error = new ExecutionError(innerException.Message, innerException);
 
-            var info = new ErrorInfoProvider(true).GetInfo(error);
+            var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
             info.Message.ShouldBe(error.ToString());
         }
 
@@ -158,7 +158,7 @@ namespace GraphQL.Tests.Errors
                 error = e;
             }
 
-            var info = new ErrorInfoProvider(true).GetInfo(error);
+            var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
             info.Message.ShouldBe(error.ToString());
         }
 
@@ -171,7 +171,7 @@ namespace GraphQL.Tests.Errors
             };
             error.Code.ShouldBe("");
 
-            var info = new ErrorInfoProvider(true).GetInfo(error);
+            var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
             info.Extensions.ShouldBeNull();
         }
 

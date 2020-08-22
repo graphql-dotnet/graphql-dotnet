@@ -13,12 +13,7 @@ namespace GraphQL.Execution
         private readonly ErrorInfoProviderOptions _options;
 
         public ErrorInfoProvider()
-            : this(false)
-        {
-        }
-
-        public ErrorInfoProvider(bool exposeExceptions)
-            : this(new ErrorInfoProviderOptions { ExposeExceptions = exposeExceptions })
+            : this(new ErrorInfoProviderOptions())
         {
         }
 
@@ -59,7 +54,7 @@ namespace GraphQL.Execution
 
             return new ErrorInfo
             {
-                Message = _options.ExposeExceptions ? executionError.ToString() : executionError.Message,
+                Message = _options.ExposeExceptionStackTrace ? executionError.ToString() : executionError.Message,
                 Extensions = extensions,
             };
         }

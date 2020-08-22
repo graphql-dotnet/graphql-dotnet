@@ -33,7 +33,7 @@ namespace GraphQL.Harness
             services.AddSingleton<IErrorInfoProvider>(services =>
             {
                 var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                return new ErrorInfoProvider(settings.Value.ExposeExceptions);
+                return new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = settings.Value.ExposeExceptions });
             });
 
             // add something like repository
