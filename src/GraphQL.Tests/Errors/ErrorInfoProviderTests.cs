@@ -2,14 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using GraphQL.Execution;
 using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Errors
 {
-    public class ErrorParserTests
+    public class ErrorInfoProviderTests
     {
         [Fact]
         public void null_executionError_throws()
