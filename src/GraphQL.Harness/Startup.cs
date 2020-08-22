@@ -30,10 +30,10 @@ namespace GraphQL.Harness
             // add execution components
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
-            services.AddSingleton<IErrorParser>(services =>
+            services.AddSingleton<IErrorInfoProvider>(services =>
             {
                 var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
-                return new ErrorParser(settings.Value.ExposeExceptions);
+                return new ErrorInfoProvider(settings.Value.ExposeExceptions);
             });
 
             // add something like repository

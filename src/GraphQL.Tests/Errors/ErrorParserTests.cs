@@ -14,8 +14,8 @@ namespace GraphQL.Tests.Errors
         [Fact]
         public void null_executionError_throws()
         {
-            var parser = new ErrorParser();
-            Should.Throw<ArgumentNullException>(() => parser.Parse(null));
+            var parser = new ErrorInfoProvider();
+            Should.Throw<ArgumentNullException>(() => parser.GetInfo(null));
         }
 
         [Fact]
@@ -23,10 +23,8 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError("test message");
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe("test message");
-            parsed.Locations.ShouldBeNull();
-            parsed.Path.ShouldBeNull();
             parsed.Extensions.ShouldBeNull();
         }
 
@@ -36,7 +34,7 @@ namespace GraphQL.Tests.Errors
             var error = new ExecutionError(null); // create executionerror with a default message
             error.Message.ShouldNotBeNull();
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe(error.Message);
         }
 
@@ -56,10 +54,8 @@ namespace GraphQL.Tests.Errors
             error.Data["test2"].ShouldBe(15);
             error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBeNull();
-            parsed.Path.ShouldBeNull();
             parsed.Extensions.ShouldNotBeNull();
             parsed.Extensions.Count.ShouldBe(1);
             parsed.Extensions.ShouldContainKey("data");
@@ -71,10 +67,8 @@ namespace GraphQL.Tests.Errors
         {
             var error = new ExecutionError(null) { Code = "test code" };
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBeNull();
-            parsed.Path.ShouldBeNull();
             parsed.Extensions.ShouldNotBeNull();
             parsed.Extensions.Count.ShouldBe(2);
             parsed.Extensions.ShouldContainKeyAndValue("code", "test code");
@@ -92,59 +86,13 @@ namespace GraphQL.Tests.Errors
             //error.Codes.ShouldBe(new[] { "ARGUMENT_NULL", "ARGUMENT_OUT_OF_RANGE" });
             error.Codes.Count().ShouldBe(2);
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBeNull();
-            parsed.Path.ShouldBeNull();
             parsed.Extensions.ShouldNotBeNull();
             parsed.Extensions.Count.ShouldBe(2);
             parsed.Extensions.ShouldContainKeyAndValue("code", error.Code);
             parsed.Extensions.ShouldContainKey("codes");
             parsed.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(error.Codes);
-        }
-
-        [Fact]
-        public void message_and_single_location()
-        {
-            var error = new ExecutionError(null);
-            error.AddLocation(1, 2);
-            error.Locations.Count().ShouldBe(1);
-
-            var parsed = new ErrorParser().Parse(error);
-            parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBe(error.Locations);
-            parsed.Path.ShouldBeNull();
-            parsed.Extensions.ShouldBeNull();
-        }
-
-        [Fact]
-        public void message_and_multiple_locations()
-        {
-            var error = new ExecutionError(null);
-            error.AddLocation(1, 2);
-            error.AddLocation(3, 4);
-            error.Locations.Count().ShouldBe(2);
-
-            var parsed = new ErrorParser().Parse(error);
-            parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBe(error.Locations);
-            parsed.Path.ShouldBeNull();
-            parsed.Extensions.ShouldBeNull();
-        }
-
-        [Fact]
-        public void message_and_path()
-        {
-            var error = new ExecutionError(null)
-            {
-                Path = new object[] { "root", 23, "child" },
-            };
-
-            var parsed = new ErrorParser().Parse(error);
-            parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBeNull();
-            parsed.Path.ShouldBe(new object[] { "root", 23, "child" });
-            parsed.Extensions.ShouldBeNull();
         }
 
         [Fact]
@@ -157,42 +105,22 @@ namespace GraphQL.Tests.Errors
             error.Data.ShouldNotBeNull();
             error.Data.Count.ShouldBe(0);
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Extensions.ShouldBeNull();
         }
 
         [Fact]
-        public void path_does_not_drop_when_empty()
+        public void multiple_innerExceptions()
         {
-            var error = new ExecutionError(null)
-            {
-                Path = new string[] { },
-            };
-            error.Path.ShouldNotBeNull();
-
-            var parsed = new ErrorParser().Parse(error);
-            parsed.Path.ShouldNotBeNull();
-            parsed.Path.ShouldBe(error.Path);
-        }
-
-        [Fact]
-        public void innerException_with_path()
-        {
-            var error = new ExecutionError("Test error message", new ArgumentNullException(null, new ArgumentOutOfRangeException()))
-            {
-                Path = new object[] { "path1", 22, "path2" },
-            };
+            var error = new ExecutionError("Test error message", new ArgumentNullException(null, new ArgumentOutOfRangeException()));
             error.Data.Add("test1", "object1");
             error.Data.Add("test2", 15);
             error.Data.Add("test3", new Dictionary<string, object>() { { "test4", "object4" } });
             error.AddLocation(5, 6);
             error.AddLocation(7, 8);
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Message.ShouldBe(error.Message);
-            parsed.Locations.ShouldBe(error.Locations);
-            parsed.Path.ShouldNotBeNull();
-            parsed.Path.ShouldBe(error.Path);
             parsed.Extensions.ShouldNotBeNull();
             parsed.Extensions.Count.ShouldBe(3);
             parsed.Extensions.ShouldContainKeyAndValue("code", error.Code);
@@ -208,7 +136,7 @@ namespace GraphQL.Tests.Errors
             var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
             var error = new ExecutionError(innerException.Message, innerException);
 
-            var parsed = new ErrorParser(true).Parse(error);
+            var parsed = new ErrorInfoProvider(true).GetInfo(error);
             parsed.Message.ShouldBe(error.ToString());
         }
 
@@ -233,7 +161,7 @@ namespace GraphQL.Tests.Errors
                 error = e;
             }
 
-            var parsed = new ErrorParser(true).Parse(error);
+            var parsed = new ErrorInfoProvider(true).GetInfo(error);
             parsed.Message.ShouldBe(error.ToString());
         }
 
@@ -247,7 +175,7 @@ namespace GraphQL.Tests.Errors
             error.Code.ShouldBe("");
             error.HasCodes.ShouldBeFalse();
 
-            var parsed = new ErrorParser(true).Parse(error);
+            var parsed = new ErrorInfoProvider(true).GetInfo(error);
             parsed.Extensions.ShouldBeNull();
         }
 
@@ -259,7 +187,7 @@ namespace GraphQL.Tests.Errors
             error.HasCodes.ShouldBeTrue();
             error.Codes.ShouldBe(new[] { "" });
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Extensions.ShouldBeNull();
         }
 
@@ -272,12 +200,12 @@ namespace GraphQL.Tests.Errors
             //error.Codes.ShouldBe(new[] { "", "ARGUMENT_NULL" });
             error.Codes.Count().ShouldBe(2);
 
-            var parsed = new ErrorParser().Parse(error);
+            var parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Extensions.ShouldBeNull();
 
             error.Data.Add("test1", "object1");
 
-            parsed = new ErrorParser().Parse(error);
+            parsed = new ErrorInfoProvider().GetInfo(error);
             parsed.Extensions.ShouldNotBeNull();
             parsed.Extensions.ShouldContainKey("data");
             parsed.Extensions.ShouldContainKey("codes");

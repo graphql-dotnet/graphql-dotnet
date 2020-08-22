@@ -5,34 +5,34 @@ using System.Text;
 
 namespace GraphQL.Execution
 {
-    public class ErrorParser : IErrorParser
+    public class ErrorInfoProvider : IErrorInfoProvider
     {
-        private readonly ErrorParserOptions _options;
+        private readonly ErrorInfoProviderOptions _options;
 
-        public ErrorParser()
+        public ErrorInfoProvider()
             : this(false)
         {
         }
 
-        public ErrorParser(bool exposeExceptions)
-            : this(new ErrorParserOptions() { ExposeExceptions = exposeExceptions })
+        public ErrorInfoProvider(bool exposeExceptions)
+            : this(new ErrorInfoProviderOptions() { ExposeExceptions = exposeExceptions })
         {
         }
 
-        public ErrorParser(ErrorParserOptions options)
+        public ErrorInfoProvider(ErrorInfoProviderOptions options)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public ErrorParser(Action<ErrorParserOptions> optionsBuilder)
+        public ErrorInfoProvider(Action<ErrorInfoProviderOptions> optionsBuilder)
         {
             if (optionsBuilder == null)
                 throw new ArgumentNullException(nameof(optionsBuilder));
-            _options = new ErrorParserOptions();
+            _options = new ErrorInfoProviderOptions();
             optionsBuilder(_options);
         }
 
-        public virtual ParsedError Parse(ExecutionError executionError)
+        public virtual ErrorInfo GetInfo(ExecutionError executionError)
         {
             if (executionError == null)
                 throw new ArgumentNullException(nameof(executionError));
@@ -52,11 +52,9 @@ namespace GraphQL.Execution
                     extensions.Add("data", executionError.Data);
             }
 
-            return new ParsedError
+            return new ErrorInfo
             {
                 Message = _options.ExposeExceptions ? executionError.ToString() : executionError.Message,
-                Locations = executionError.Locations,
-                Path = executionError.Path,
                 Extensions = extensions,
             };
         }

@@ -9,9 +9,9 @@ namespace GraphQL.SystemTextJson
 {
     public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
     {
-        private readonly IErrorParser _errorParser;
+        private readonly IErrorInfoProvider _errorParser;
 
-        public ExecutionResultJsonConverter(IErrorParser errorParser)
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorParser)
         {
             _errorParser = errorParser;
         }
@@ -132,7 +132,7 @@ namespace GraphQL.SystemTextJson
             }
         }
 
-        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, IErrorParser errorParser, JsonSerializerOptions options)
+        private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors errors, IErrorInfoProvider errorParser, JsonSerializerOptions options)
         {
             if (errors == null || errors.Count == 0)
             {
@@ -143,19 +143,19 @@ namespace GraphQL.SystemTextJson
 
             writer.WriteStartArray();
 
-            errors.Select(error => errorParser.Parse(error)).Apply(error =>
+            errors.Select(error => new { Error = error, Info = errorParser.GetInfo(error) }).Apply(error =>
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
 
-                JsonSerializer.Serialize(writer, error.Message, options);
+                JsonSerializer.Serialize(writer, error.Info.Message, options);
 
-                if (error.Locations != null)
+                if (error.Error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    error.Error.Locations.Apply(location =>
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -167,16 +167,16 @@ namespace GraphQL.SystemTextJson
                     writer.WriteEndArray();
                 }
 
-                if (error.Path != null && error.Path.Any())
+                if (error.Error.Path != null && error.Error.Path.Any())
                 {
                     writer.WritePropertyName("path");
-                    JsonSerializer.Serialize(writer, error.Path, options);
+                    JsonSerializer.Serialize(writer, error.Error.Path, options);
                 }
 
-                if (error.Extensions?.Count > 0)
+                if (error.Info.Extensions?.Count > 0)
                 {
                     writer.WritePropertyName("extensions");
-                    JsonSerializer.Serialize(writer, error.Extensions);
+                    JsonSerializer.Serialize(writer, error.Info.Extensions);
                 }
 
                 writer.WriteEndObject();

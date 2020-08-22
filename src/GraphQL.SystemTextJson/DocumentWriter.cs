@@ -11,7 +11,6 @@ namespace GraphQL.SystemTextJson
     public class DocumentWriter : IDocumentWriter
     {
         private readonly JsonSerializerOptions _options;
-        private readonly IErrorParser _errorParser;
 
         public DocumentWriter()
             : this(indent: false)
@@ -23,14 +22,13 @@ namespace GraphQL.SystemTextJson
         {
         }
 
-        public DocumentWriter(bool indent, IErrorParser errorParser)
-            : this(GetDefaultSerializerOptions(indent), errorParser ?? throw new ArgumentNullException(nameof(errorParser)))
+        public DocumentWriter(bool indent, IErrorInfoProvider errorInfoProvider)
+            : this(GetDefaultSerializerOptions(indent), errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)))
         {
-            _errorParser = errorParser;
         }
 
-        public DocumentWriter(IErrorParser errorParser)
-            : this(false, errorParser)
+        public DocumentWriter(IErrorInfoProvider errorInfoProvider)
+            : this(false, errorInfoProvider)
         {
         }
 
@@ -47,18 +45,18 @@ namespace GraphQL.SystemTextJson
         {
         }
 
-        private DocumentWriter(JsonSerializerOptions serializerOptions, IErrorParser errorParser)
+        private DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
-            ConfigureOptions(errorParser);
+            ConfigureOptions(errorInfoProvider);
         }
 
-        private void ConfigureOptions(IErrorParser errorParser)
+        private void ConfigureOptions(IErrorInfoProvider errorInfoProvider)
         {
             if (!_options.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
-                _options.Converters.Add(new ExecutionResultJsonConverter(errorParser ?? new ErrorParser()));
+                _options.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))

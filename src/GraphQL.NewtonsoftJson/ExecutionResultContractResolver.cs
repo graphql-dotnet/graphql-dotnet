@@ -9,9 +9,9 @@ namespace GraphQL.NewtonsoftJson
     public class ExecutionResultContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
-        private readonly IErrorParser _errorParser;
+        private readonly IErrorInfoProvider _errorParser;
 
-        public ExecutionResultContractResolver(IErrorParser errorParser)
+        public ExecutionResultContractResolver(IErrorInfoProvider errorParser)
         {
             _errorParser = errorParser;
         }

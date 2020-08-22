@@ -5,9 +5,9 @@ using System.Text;
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Provides options to be used with <see cref="ErrorParser"/>
+    /// Provides options to be used with <see cref="ErrorInfoProvider"/>
     /// </summary>
-    public class ErrorParserOptions
+    public class ErrorInfoProviderOptions
     {
         /// <summary>
         /// Specifies whether stack traces should be serialized

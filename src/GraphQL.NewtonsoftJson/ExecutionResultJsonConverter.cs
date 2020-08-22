@@ -7,9 +7,9 @@ namespace GraphQL.NewtonsoftJson
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
-        private readonly IErrorParser _errorParser;
+        private readonly IErrorInfoProvider _errorParser;
 
-        public ExecutionResultJsonConverter(IErrorParser errorParser)
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorParser)
         {
             _errorParser = errorParser;
         }
@@ -52,19 +52,19 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WriteStartArray();
 
-            errors.Select(error => _errorParser.Parse(error)).Apply(error =>
+            errors.Select(error => new { Error = error, Info = _errorParser.GetInfo(error) }).Apply(error =>
             {
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("message");
 
-                serializer.Serialize(writer, error.Message);
+                serializer.Serialize(writer, error.Info.Message);
 
-                if (error.Locations != null)
+                if (error.Error.Locations != null)
                 {
                     writer.WritePropertyName("locations");
                     writer.WriteStartArray();
-                    error.Locations.Apply(location =>
+                    error.Error.Locations.Apply(location =>
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName("line");
@@ -76,16 +76,16 @@ namespace GraphQL.NewtonsoftJson
                     writer.WriteEndArray();
                 }
 
-                if (error.Path != null && error.Path.Any())
+                if (error.Error.Path != null && error.Error.Path.Any())
                 {
                     writer.WritePropertyName("path");
-                    serializer.Serialize(writer, error.Path);
+                    serializer.Serialize(writer, error.Error.Path);
                 }
 
-                if (error.Extensions?.Count > 0)
+                if (error.Info.Extensions?.Count > 0)
                 {
                     writer.WritePropertyName("extensions");
-                    serializer.Serialize(writer, error.Extensions);
+                    serializer.Serialize(writer, error.Info.Extensions);
                 } 
 
                 writer.WriteEndObject();
