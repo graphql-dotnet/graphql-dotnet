@@ -7,11 +7,11 @@ namespace GraphQL.NewtonsoftJson
 {
     public class ExecutionResultJsonConverter : JsonConverter
     {
-        private readonly IErrorInfoProvider _errorParser;
+        private readonly IErrorInfoProvider _errorInfoProvider;
 
-        public ExecutionResultJsonConverter(IErrorInfoProvider errorParser)
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
         {
-            _errorParser = errorParser;
+            _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -52,7 +52,7 @@ namespace GraphQL.NewtonsoftJson
 
             writer.WriteStartArray();
 
-            errors.Select(error => new { Error = error, Info = _errorParser.GetInfo(error) }).Apply(error =>
+            errors.Select(error => new { Error = error, Info = _errorInfoProvider.GetInfo(error) }).Apply(error =>
             {
                 writer.WriteStartObject();
 

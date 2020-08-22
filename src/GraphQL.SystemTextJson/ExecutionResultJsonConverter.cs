@@ -9,11 +9,11 @@ namespace GraphQL.SystemTextJson
 {
     public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
     {
-        private readonly IErrorInfoProvider _errorParser;
+        private readonly IErrorInfoProvider _errorInfoProvider;
 
-        public ExecutionResultJsonConverter(IErrorInfoProvider errorParser)
+        public ExecutionResultJsonConverter(IErrorInfoProvider errorInfoProvider)
         {
-            _errorParser = errorParser;
+            _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
         }
 
         public override void Write(Utf8JsonWriter writer, ExecutionResult value, JsonSerializerOptions options)
@@ -22,7 +22,7 @@ namespace GraphQL.SystemTextJson
 
             // Important: Be careful with passing the same options down when recursively calling Serialize.
             // See docs: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
-            WriteErrors(writer, value.Errors, _errorParser, options);
+            WriteErrors(writer, value.Errors, _errorInfoProvider, options);
             WriteData(writer, value, options);
             WriteExtensions(writer, value, options);
 
