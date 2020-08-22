@@ -41,6 +41,7 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(executionError));
 
             IDictionary<string, object> extensions = null;
+            // TODO: change condition to allow "" code
             if (!string.IsNullOrWhiteSpace(executionError.Code) ||
                 // skip next check to match existing functionality
                 // (executionError.HasCodes) ||
