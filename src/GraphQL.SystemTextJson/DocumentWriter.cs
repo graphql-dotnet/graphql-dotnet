@@ -33,13 +33,22 @@ namespace GraphQL.SystemTextJson
         }
 
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
-            : this(configureSerializerOptions, null)
         {
+            if (configureSerializerOptions == null)
+                throw new ArgumentNullException(nameof(configureSerializerOptions));
+
+            _options = GetDefaultSerializerOptions(indent: false);
+            configureSerializerOptions.Invoke(_options);
+
+            ConfigureOptions(null);
         }
 
         public DocumentWriter(JsonSerializerOptions serializerOptions)
-            : this(serializerOptions, null)
         {
+            _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+
+            // TODO: fix this: it modifies serializerOptions
+            ConfigureOptions(null);
         }
 
         public DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
@@ -47,13 +56,19 @@ namespace GraphQL.SystemTextJson
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
             // TODO: fix this: it modifies serializerOptions
-            ConfigureOptions(errorInfoProvider);
+            ConfigureOptions(errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)));
         }
 
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions, IErrorInfoProvider errorInfoProvider)
         {
+            if (configureSerializerOptions == null)
+                throw new ArgumentNullException(nameof(configureSerializerOptions));
+
+            if (errorInfoProvider == null)
+                throw new ArgumentNullException(nameof(errorInfoProvider));
+
             _options = GetDefaultSerializerOptions(indent: false);
-            configureSerializerOptions?.Invoke(_options);
+            configureSerializerOptions.Invoke(_options);
 
             ConfigureOptions(errorInfoProvider);
         }
