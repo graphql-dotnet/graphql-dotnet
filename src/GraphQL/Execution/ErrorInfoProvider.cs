@@ -36,20 +36,25 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(executionError));
 
             IDictionary<string, object> extensions = null;
-            // TODO: change condition to allow "" code
-            if (!string.IsNullOrWhiteSpace(executionError.Code) ||
-                // skip next check to match existing functionality
-                // (executionError.HasCodes) ||
-                (executionError.Data?.Count > 0))
+
+            if (_options.ExposeExtensions)
             {
-                extensions = new Dictionary<string, object>();
-                if (!string.IsNullOrWhiteSpace(executionError.Code))
-                    extensions.Add("code", executionError.Code);
-                var codes = GetCodesForError(executionError).ToList();
-                if (codes.Any())
-                    extensions.Add("codes", codes);
-                if (executionError.Data?.Count > 0)
-                    extensions.Add("data", executionError.Data);
+                var code = _options.ExposeCode ? executionError.Code : null;
+                var codes = _options.ExposeCodes ? GetCodesForError(executionError).ToList() : null;
+                if (codes?.Count == 0)
+                    codes = null;
+                var data = _options.ExposeData && executionError.Data?.Count > 0 ? executionError.Data : null;
+
+                if (code != null || codes != null || data != null)
+                {
+                    extensions = new Dictionary<string, object>();
+                    if (code != null)
+                        extensions.Add("code", code);
+                    if (codes != null)
+                        extensions.Add("codes", codes);
+                    if (data != null)
+                        extensions.Add("data", data);
+                }
             }
 
             return new ErrorInfo
