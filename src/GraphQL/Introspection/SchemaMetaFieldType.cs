@@ -8,7 +8,7 @@ namespace GraphQL.Introspection
         public SchemaMetaFieldType()
         {
             Name = "__schema";
-            Type = typeof (__Schema);
+            Type = typeof(__Schema);
             Description = "Access the current type schema of this server.";
             Resolver = new FuncFieldResolver<ISchema>(context => context.Schema);
         }

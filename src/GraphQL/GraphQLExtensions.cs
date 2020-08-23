@@ -346,7 +346,7 @@ namespace GraphQL
         ///
         /// This function is commutative.
         /// </summary>
-        public static bool DoTypesOverlap(this ISchema schema, IGraphType typeA, IGraphType typeB)
+        public static bool DoTypesOverlap(IGraphType typeA, IGraphType typeB)
         {
             if (typeA.Equals(typeB))
             {

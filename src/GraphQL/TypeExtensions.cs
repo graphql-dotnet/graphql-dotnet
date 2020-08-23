@@ -77,6 +77,8 @@ namespace GraphQL
         /// <returns>A string containing a GraphQL compatible type name.</returns>
         public static string GraphQLName(this Type type)
         {
+            type = type.GetNamedType();
+
             var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
 
             if (!string.IsNullOrEmpty(attr?.Name))

@@ -891,7 +891,7 @@ namespace GraphQL.Tests.Validation
             }
 
             _.Error(
-                rule.BadValueMessage(argName, null, value, errors),
+                rule.BadValueMessage(argName, value, errors),
                 line,
                 column);
         }

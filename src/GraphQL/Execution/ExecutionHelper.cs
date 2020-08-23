@@ -48,7 +48,7 @@ namespace GraphQL.Execution
             return type;
         }
 
-        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -65,9 +65,7 @@ namespace GraphQL.Execution
 
             if (parentType == null)
             {
-                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
-                error.AddLocation(field, document);
-                throw error;
+                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
             }
 
             return parentType.GetField(field.Name);
