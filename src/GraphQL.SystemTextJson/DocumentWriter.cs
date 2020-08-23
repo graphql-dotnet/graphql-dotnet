@@ -46,6 +46,7 @@ namespace GraphQL.SystemTextJson
         {
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
+            // TODO: fix this: it modifies serializerOptions
             ConfigureOptions(errorInfoProvider);
         }
 

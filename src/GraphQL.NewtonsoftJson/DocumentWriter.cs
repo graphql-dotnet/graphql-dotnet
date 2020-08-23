@@ -41,11 +41,8 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(JsonSerializerSettings serializerSettings)
+            : this(serializerSettings, null)
         {
-            if (serializerSettings == null)
-                throw new ArgumentNullException(nameof(serializerSettings));
-
-            _serializer = BuildSerializer(serializerSettings);
         }
 
         public DocumentWriter(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
@@ -53,15 +50,7 @@ namespace GraphQL.NewtonsoftJson
             if (serializerSettings == null)
                 throw new ArgumentNullException(nameof(serializerSettings));
 
-            if (errorInfoProvider == null)
-                throw new ArgumentNullException(nameof(errorInfoProvider));
-
-            if (serializerSettings.ContractResolver != null)
-                throw new InvalidOperationException($"{nameof(serializerSettings)}.{nameof(JsonSerializerSettings.ContractResolver)} must be null to use this constructor");
-
-            serializerSettings.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider);
-
-            _serializer = BuildSerializer(serializerSettings);
+            _serializer = BuildSerializer(serializerSettings, errorInfoProvider);
         }
 
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
@@ -69,7 +58,7 @@ namespace GraphQL.NewtonsoftJson
             var serializerSettings = GetDefaultSerializerSettings(false, errorInfoProvider);
             configureSerializerSettings?.Invoke(serializerSettings);
 
-            _serializer = BuildSerializer(serializerSettings);
+            _serializer = BuildSerializer(serializerSettings, errorInfoProvider);
         }
 
         private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider errorInfoProvider)
@@ -80,12 +69,12 @@ namespace GraphQL.NewtonsoftJson
             };
         }
 
-        private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings)
+        private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
         {
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
             if (serializerSettings.ContractResolver == null)
-                serializer.ContractResolver = new ExecutionResultContractResolver(new ErrorInfoProvider());
+                serializer.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
 
             return serializer;
         }
