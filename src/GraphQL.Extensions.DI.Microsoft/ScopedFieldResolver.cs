@@ -10,7 +10,7 @@ namespace GraphQL.Extensions.DI.Microsoft
 
         private static Func<IResolveFieldContext, TReturnType> GetScopedResolver(Func<IResolveFieldContext, TReturnType> resolver)
         {
-            return (context) =>
+            return context =>
             {
                 using (var scope = context.RequestServices.CreateScope())
                 {
