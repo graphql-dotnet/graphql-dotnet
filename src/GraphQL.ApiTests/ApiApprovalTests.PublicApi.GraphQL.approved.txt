@@ -594,7 +594,11 @@ namespace GraphQL.Execution
     public class ErrorInfoProviderOptions
     {
         public ErrorInfoProviderOptions() { }
+        public bool ExposeCode { get; set; }
+        public bool ExposeCodes { get; set; }
+        public bool ExposeData { get; set; }
         public bool ExposeExceptionStackTrace { get; set; }
+        public bool ExposeExtensions { get; set; }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
     {
