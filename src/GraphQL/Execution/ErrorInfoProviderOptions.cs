@@ -16,7 +16,12 @@ namespace GraphQL.Execution
         public bool ExposeExtensions { get; set; }
 
         /// <summary>
-        /// Specifies whether the codes of inner exceptions should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// Specifies whether the code of this error should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// </summary>
+        public bool ExposeCode { get; set; }
+
+        /// <summary>
+        /// Specifies whether the codes of this error and inner exceptions should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
         /// </summary>
         public bool ExposeInnerCodes { get; set; }
 
