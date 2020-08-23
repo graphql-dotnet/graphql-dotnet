@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Execution;
 
 namespace GraphQL.SystemTextJson
 {
@@ -21,26 +22,41 @@ namespace GraphQL.SystemTextJson
         {
         }
 
+        public DocumentWriter(bool indent, IErrorInfoProvider errorInfoProvider)
+            : this(GetDefaultSerializerOptions(indent), errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)))
+        {
+        }
+
+        public DocumentWriter(IErrorInfoProvider errorInfoProvider)
+            : this(false, errorInfoProvider)
+        {
+        }
+
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
         {
             _options = GetDefaultSerializerOptions(indent: false);
             configureSerializerOptions?.Invoke(_options);
 
-            ConfigureOptions();
+            ConfigureOptions(null);
         }
 
         public DocumentWriter(JsonSerializerOptions serializerOptions)
+            : this(serializerOptions, null)
+        {
+        }
+
+        private DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
-            ConfigureOptions();
+            ConfigureOptions(errorInfoProvider);
         }
 
-        private void ConfigureOptions()
+        private void ConfigureOptions(IErrorInfoProvider errorInfoProvider)
         {
             if (!_options.Converters.Any(c => c.CanConvert(typeof(ExecutionResult))))
             {
-                _options.Converters.Add(new ExecutionResultJsonConverter());
+                _options.Converters.Add(new ExecutionResultJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
             }
 
             if (!_options.Converters.Any(c => c.CanConvert(typeof(JsonConverterBigInteger))))

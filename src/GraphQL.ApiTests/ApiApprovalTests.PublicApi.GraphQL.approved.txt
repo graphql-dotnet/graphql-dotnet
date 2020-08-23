@@ -51,12 +51,9 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception exception) { }
         public string Code { get; set; }
-        public virtual System.Collections.Generic.IEnumerable<string> Codes { get; }
-        public virtual bool HasCodes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.ErrorLocation> Locations { get; }
         public System.Collections.Generic.IEnumerable<object> Path { get; set; }
         public void AddLocation(int line, int column) { }
-        protected static string GetErrorCode(System.Exception exception) { }
     }
     public static class ExecutionErrorExtensions
     {
@@ -78,7 +75,6 @@ namespace GraphQL
         public GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public bool EnableMetrics { get; set; }
-        public bool ExposeExceptions { get; set; }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -102,7 +98,6 @@ namespace GraphQL
         public object Data { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
-        public bool ExposeExceptions { get; set; }
         public System.Collections.Generic.Dictionary<string, object> Extensions { get; set; }
         public GraphQL.Language.AST.Operation Operation { get; set; }
         public GraphQL.Instrumentation.PerfRecord[] Perf { get; set; }
@@ -579,6 +574,28 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
+    public struct ErrorInfo
+    {
+        public System.Collections.Generic.IDictionary<string, object> Extensions;
+        public string Message;
+    }
+    public class ErrorInfoProvider : GraphQL.Execution.IErrorInfoProvider
+    {
+        public ErrorInfoProvider() { }
+        public ErrorInfoProvider(GraphQL.Execution.ErrorInfoProviderOptions options) { }
+        public ErrorInfoProvider(System.Action<GraphQL.Execution.ErrorInfoProviderOptions> optionsBuilder) { }
+        protected virtual System.Collections.Generic.IEnumerable<string> GetCodesForError(GraphQL.ExecutionError executionError) { }
+        public virtual GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError) { }
+        public static string GetErrorCode(System.Exception exception) { }
+        public static string GetErrorCode(System.Type exceptionType) { }
+        public static string GetErrorCode<T>()
+            where T : System.Exception { }
+    }
+    public class ErrorInfoProviderOptions
+    {
+        public ErrorInfoProviderOptions() { }
+        public bool ExposeExceptionStackTrace { get; set; }
+    }
     public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
     {
         public ExecutionContext() { }
@@ -660,6 +677,10 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
+    }
+    public interface IErrorInfoProvider
+    {
+        GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError);
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {

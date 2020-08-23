@@ -1,8 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQLParser;
 
@@ -14,8 +13,6 @@ namespace GraphQL
     [Serializable]
     public class ExecutionError : Exception
     {
-        private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
-
         private List<ErrorLocation> _errorLocations;
 
         /// <summary>
@@ -58,32 +55,6 @@ namespace GraphQL
         public string Code { get; set; }
 
         /// <summary>
-        /// Returns true if there are any codes for this error.
-        /// </summary>
-        public virtual bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
-
-        /// <summary>
-        /// Returns a list of codes for this error.
-        /// </summary>
-        public virtual IEnumerable<string> Codes
-        {
-            get
-            {
-                // Code could be set explicitly, and not through the constructor with the exception
-                if (!string.IsNullOrWhiteSpace(Code) && (InnerException == null || Code != GetErrorCode(InnerException)))
-                    yield return Code;
-
-                var current = InnerException;
-
-                while (current != null)
-                {
-                    yield return GetErrorCode(current);
-                    current = current.InnerException;
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the path within the GraphQL document where this error applies to.
         /// </summary>
         public IEnumerable<object> Path { get; set; }
@@ -104,7 +75,7 @@ namespace GraphQL
         private void SetCode(Exception exception)
         {
             if (exception != null)
-                Code = GetErrorCode(exception);
+                Code = ErrorInfoProvider.GetErrorCode(exception);
         }
 
         private void SetData(Exception exception)
@@ -122,52 +93,6 @@ namespace GraphQL
                     Data[keyValuePair.Key] = keyValuePair.Value;
                 }
             }
-        }
-
-        /// <summary>
-        /// Generates an normalized error code for the specified exception by taking the type name, removing the "GraphQL" prefix, if any,
-        /// removing the "Exception" suffix, if any, and then converting the result from PascalCase to UPPER_CASE.
-        /// </summary>
-        protected static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
-
-        private static string NormalizeErrorCode(Type exceptionType)
-        {
-            var code = exceptionType.Name;
-
-            if (code.EndsWith(nameof(Exception), StringComparison.InvariantCulture))
-            {
-                code = code.Substring(0, code.Length - nameof(Exception).Length);
-            }
-
-            if (code.StartsWith("GraphQL", StringComparison.InvariantCulture))
-            {
-                code = code.Substring("GraphQL".Length);
-            }
-
-            return GetAllCapsRepresentation(code);
-        }
-
-        private static string GetAllCapsRepresentation(string str)
-        {
-            return Regex
-                .Replace(NormalizeString(str), @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
-                .ToUpperInvariant();
-        }
-
-        private static string NormalizeString(string str)
-        {
-            str = str?.Trim();
-            return string.IsNullOrWhiteSpace(str)
-                ? string.Empty
-                : NormalizeTypeName(str);
-        }
-
-        private static string NormalizeTypeName(string name)
-        {
-            var tickIndex = name.IndexOf('`');
-            return tickIndex >= 0
-                ? name.Substring(0, tickIndex)
-                : name;
         }
     }
 

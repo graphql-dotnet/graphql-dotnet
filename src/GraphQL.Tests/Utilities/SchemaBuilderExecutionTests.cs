@@ -266,7 +266,6 @@ namespace GraphQL.Tests.Utilities
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ resolve }";
-                _.ExposeExceptions = true;
             });
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");

@@ -133,7 +133,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = validationResult.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -143,7 +142,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = context.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -221,7 +219,6 @@ namespace GraphQL
             finally
             {
                 result ??= new ExecutionResult();
-                result.ExposeExceptions = options.ExposeExceptions;
                 result.Perf = metrics.Finish();
             }
 
