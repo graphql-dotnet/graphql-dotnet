@@ -218,5 +218,40 @@ namespace GraphQL.Tests.Errors
             info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
                 new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
         }
+
+        [Theory]
+        [InlineData(typeof(Exception), "")]
+        [InlineData(typeof(ArgumentException), "ARGUMENT")]
+        [InlineData(typeof(ArgumentNullException), "ARGUMENT_NULL")]
+        [InlineData(typeof(GraphQLParser.Exceptions.GraphQLSyntaxErrorException), "SYNTAX_ERROR")]
+        [InlineData(typeof(GraphQLException), "")]
+        [InlineData(typeof(GraphQlException), "GRAPH_QL")]
+        [InlineData(typeof(ExecutionError), "EXECUTION_ERROR")]
+        [InlineData(typeof(GraphQL.Validation.ValidationError), "VALIDATION_ERROR")]
+        public void geterrorcode_tests(Type type, string code)
+        {
+            ErrorInfoProvider.GetErrorCode(type).ShouldBe(code);
+        }
+
+        [Fact]
+        public void geterrorcode_null_throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => ErrorInfoProvider.GetErrorCode((Type)null));
+        }
+
+        [Fact]
+        public void geterrorcode_instance_works()
+        {
+            ErrorInfoProvider.GetErrorCode(new ArgumentNullException()).ShouldBe("ARGUMENT_NULL");
+        }
+
+        [Fact]
+        public void geterrorcode_generic_works()
+        {
+            ErrorInfoProvider.GetErrorCode<ArgumentNullException>().ShouldBe("ARGUMENT_NULL");
+        }
+
+        private class GraphQLException : Exception { }
+        private class GraphQlException : Exception { }
     }
 }
