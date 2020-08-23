@@ -33,11 +33,8 @@ namespace GraphQL.SystemTextJson
         }
 
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
+            : this(configureSerializerOptions, null)
         {
-            _options = GetDefaultSerializerOptions(indent: false);
-            configureSerializerOptions?.Invoke(_options);
-
-            ConfigureOptions(null);
         }
 
         public DocumentWriter(JsonSerializerOptions serializerOptions)
@@ -48,6 +45,14 @@ namespace GraphQL.SystemTextJson
         public DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
+
+            ConfigureOptions(errorInfoProvider);
+        }
+
+        public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions, IErrorInfoProvider errorInfoProvider)
+        {
+            _options = GetDefaultSerializerOptions(indent: false);
+            configureSerializerOptions?.Invoke(_options);
 
             ConfigureOptions(errorInfoProvider);
         }

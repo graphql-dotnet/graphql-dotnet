@@ -36,14 +36,12 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
+            : this(configureSerializerSettings, null)
         {
-            var serializerSettings = GetDefaultSerializerSettings(indent: false, errorInfoProvider: null);
-            configureSerializerSettings?.Invoke(serializerSettings);
-
-            _serializer = BuildSerializer(serializerSettings);
         }
 
         public DocumentWriter(JsonSerializerSettings serializerSettings)
+            : this(serializerSettings, null)
         {
             if (serializerSettings == null)
                 throw new ArgumentNullException(nameof(serializerSettings));
@@ -63,6 +61,14 @@ namespace GraphQL.NewtonsoftJson
                 throw new InvalidOperationException($"{nameof(serializerSettings)}.{nameof(JsonSerializerSettings.ContractResolver)} must be null to use this constructor");
 
             serializerSettings.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider);
+
+            _serializer = BuildSerializer(serializerSettings);
+        }
+
+        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
+        {
+            var serializerSettings = GetDefaultSerializerSettings(false, errorInfoProvider);
+            configureSerializerSettings?.Invoke(serializerSettings);
 
             _serializer = BuildSerializer(serializerSettings);
         }
