@@ -4,7 +4,6 @@ using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQL.DataLoader;
 
 namespace GraphQL.Builders
 {
