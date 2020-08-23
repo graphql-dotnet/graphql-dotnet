@@ -67,7 +67,7 @@ namespace GraphQL.Execution
         protected virtual IEnumerable<string> GetCodesForError(ExecutionError executionError)
         {
             // Code could be set explicitly, and not through the constructor with the exception
-            if (!string.IsNullOrWhiteSpace(executionError.Code) && (executionError.InnerException == null || executionError.Code != GetErrorCode(executionError.InnerException)))
+            if (executionError.Code != null && (executionError.InnerException == null || executionError.Code != GetErrorCode(executionError.InnerException)))
                 yield return executionError.Code;
 
             var current = executionError.InnerException;

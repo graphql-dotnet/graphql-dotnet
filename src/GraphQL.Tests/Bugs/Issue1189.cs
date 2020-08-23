@@ -25,9 +25,9 @@ namespace GraphQL.Tests.Bugs
         private const string _query = "{ hero { id name friend { name } } }";
 
         [Theory]
-        [InlineData(typeof(Issue1189_DroidType_ExecutionError), "Error Message")]
-        [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve field 'friend'.")]
-        public void Issue1189_Should_Work(Type resolverType, string errorMessage)
+        [InlineData(typeof(Issue1189_DroidType_ExecutionError), "Error Message", null)]
+        [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve field 'friend'.", "")]
+        public void Issue1189_Should_Work(Type resolverType, string errorMessage, string code)
         {
             Builder.Types.Include<Issue1189_Query>();
             Builder.Types.Include(resolverType);
@@ -38,6 +38,7 @@ namespace GraphQL.Tests.Bugs
             var error = new ExecutionError(errorMessage);
             error.AddLocation(1, 18);
             error.Path = new string[] { "hero", "friend" };
+            error.Code = code;
 
             var queryResult = new ExecutionResult()
             {

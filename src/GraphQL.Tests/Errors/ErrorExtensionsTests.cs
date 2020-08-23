@@ -25,22 +25,6 @@ namespace GraphQL.Tests.Errors
             AssertQuery(query, CreateQueryResult(expectedResult, errors), null, null);
         }
 
-        [Fact]
-        public void should_not_add_extension_object_when_exception_is_thrown_without_error_code()
-        {
-            string query = "{ uncodedSync }";
-
-            var errors = new ExecutionErrors();
-            var error = new ExecutionError("Error trying to resolve field 'uncodedSync'.");
-            error.AddLocation(1, 3);
-            error.Path = new[] { "uncodedSync" };
-            errors.Add(error);
-
-            var expectedResult = @"{ ""uncodedSync"": null}";
-
-            AssertQuery(query, CreateQueryResult(expectedResult, errors), null, null);
-        }
-
         public class TestQuery : ObjectGraphType
         {
             public TestQuery()
