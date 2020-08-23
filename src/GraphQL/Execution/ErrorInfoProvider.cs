@@ -37,20 +37,24 @@ namespace GraphQL.Execution
 
             IDictionary<string, object> extensions = null;
 
-            var code = executionError.Code;
-            var codes = GetCodesForError(executionError).ToList();
-            if (codes.Count == 0) codes = null;
-            var data = executionError.Data?.Count > 0 ? executionError.Data : null;
-
-            if (code != null || codes != null || data != null)
+            if (_options.ExposeExtensions)
             {
-                extensions = new Dictionary<string, object>();
-                if (code != null)
-                    extensions.Add("code", code);
-                if (codes != null)
-                    extensions.Add("codes", codes);
-                if (data != null)
-                    extensions.Add("data", data);
+                var code = _options.ExposeCode ? executionError.Code : null;
+                var codes = _options.ExposeCodes ? GetCodesForError(executionError).ToList() : null;
+                if (codes?.Count == 0)
+                    codes = null;
+                var data = _options.ExposeData && executionError.Data?.Count > 0 ? executionError.Data : null;
+
+                if (code != null || codes != null || data != null)
+                {
+                    extensions = new Dictionary<string, object>();
+                    if (code != null)
+                        extensions.Add("code", code);
+                    if (codes != null)
+                        extensions.Add("codes", codes);
+                    if (data != null)
+                        extensions.Add("data", data);
+                }
             }
 
             return new ErrorInfo

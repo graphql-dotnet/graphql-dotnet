@@ -219,6 +219,123 @@ namespace GraphQL.Tests.Errors
                 new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
         }
 
+        [Fact]
+        public void verify_exposeextensions_functionality_code()
+        {
+            var error = new ExecutionError("test")
+            {
+                Code = "test code"
+            };
+            var info = new ErrorInfoProvider(opts => opts.ExposeExtensions = false).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void verify_exposeextensions_functionality_codes()
+        {
+            var error = new ExecutionError("test", new ArgumentNullException())
+            {
+                Code = null
+            };
+            var info = new ErrorInfoProvider(opts => opts.ExposeExtensions = false).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void verify_exposeextensions_functionality_data()
+        {
+            var error = new ExecutionError("test");
+            error.Data["test"] = "abc";
+            var info = new ErrorInfoProvider(opts => opts.ExposeExtensions = false).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Theory]
+        [InlineData(false, false, false)]
+        [InlineData(false, false, true)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, false)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, true, true)]
+        public void verify_exposeextensions_functionality_ignore_other_properties(bool exposeCode, bool exposeCodes, bool exposeData)
+        {
+            var error = new ExecutionError("test", new ArgumentNullException())
+            {
+                Code = "code"
+            };
+            error.Data["test"] = "abc";
+            var info = new ErrorInfoProvider(opts => {
+                opts.ExposeExtensions = false;
+                opts.ExposeCode = exposeCode;
+                opts.ExposeCodes = exposeCodes;
+                opts.ExposeData = exposeData;
+            }).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void verify_exposecode_functionality()
+        {
+            var error = new ExecutionError("message")
+            {
+                Code = "code"
+            };
+            var info = new ErrorInfoProvider(opts => opts.ExposeCode = false).GetInfo(error);
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldNotContainKey("code");
+            info.Extensions.ShouldContainKey("codes");
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new[] { "code" });
+        }
+
+        [Fact]
+        public void verify_exposecodes_functionality_no_other_data()
+        {
+            var error = new ExecutionError("message", new ArgumentNullException())
+            {
+                Code = null
+            };
+            var info = new ErrorInfoProvider(opts => opts.ExposeCodes = false).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void verify_exposecodes_functionality_with_other_data()
+        {
+            var error = new ExecutionError("message", new ArgumentNullException())
+            {
+                Code = "code"
+            };
+            var info = new ErrorInfoProvider(opts => opts.ExposeCodes = false).GetInfo(error);
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions.ShouldNotContainKey("codes");
+        }
+
+        [Fact]
+        public void verify_exposedata_functionality_no_other_data()
+        {
+            var error = new ExecutionError("message");
+            error.Data["test"] = "abc";
+            var info = new ErrorInfoProvider(opts => opts.ExposeData = false).GetInfo(error);
+            info.Extensions.ShouldBeNull();
+        }
+
+        [Fact]
+        public void verify_exposedata_functionality_with_other_data()
+        {
+            var error = new ExecutionError("message")
+            {
+                Code = "code"
+            };
+            error.Data["test"] = "abc";
+            var info = new ErrorInfoProvider(opts => opts.ExposeData = false).GetInfo(error);
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions.ShouldNotContainKey("data");
+        }
+
         [Theory]
         [InlineData(typeof(Exception), "")]
         [InlineData(typeof(ArgumentException), "ARGUMENT")]
