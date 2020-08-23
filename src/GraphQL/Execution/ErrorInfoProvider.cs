@@ -36,20 +36,21 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(executionError));
 
             IDictionary<string, object> extensions = null;
-            // TODO: change condition to allow "" code
-            if (!string.IsNullOrWhiteSpace(executionError.Code) ||
-                // skip next check to match existing functionality
-                // (executionError.HasCodes) ||
-                (executionError.Data?.Count > 0))
+
+            var code = executionError.Code;
+            var codes = GetCodesForError(executionError).ToList();
+            if (codes.Count == 0) codes = null;
+            var data = executionError.Data?.Count > 0 ? executionError.Data : null;
+
+            if (code != null || codes != null || data != null)
             {
                 extensions = new Dictionary<string, object>();
-                if (!string.IsNullOrWhiteSpace(executionError.Code))
-                    extensions.Add("code", executionError.Code);
-                var codes = GetCodesForError(executionError).ToList();
-                if (codes.Any())
+                if (code != null)
+                    extensions.Add("code", code);
+                if (codes != null)
                     extensions.Add("codes", codes);
-                if (executionError.Data?.Count > 0)
-                    extensions.Add("data", executionError.Data);
+                if (data != null)
+                    extensions.Add("data", data);
             }
 
             return new ErrorInfo
@@ -62,7 +63,7 @@ namespace GraphQL.Execution
         protected virtual IEnumerable<string> GetCodesForError(ExecutionError executionError)
         {
             // Code could be set explicitly, and not through the constructor with the exception
-            if (!string.IsNullOrWhiteSpace(executionError.Code) && (executionError.InnerException == null || executionError.Code != GetErrorCode(executionError.InnerException)))
+            if (executionError.Code != null && (executionError.InnerException == null || executionError.Code != GetErrorCode(executionError.InnerException)))
                 yield return executionError.Code;
 
             var current = executionError.InnerException;
