@@ -59,7 +59,7 @@ namespace GraphQL.NewtonsoftJson
             if (errorInfoProvider == null)
                 throw new ArgumentNullException(nameof(errorInfoProvider));
 
-            if (serializerSettings.ContractResolver == null)
+            if (serializerSettings.ContractResolver != null)
                 throw new InvalidOperationException($"{nameof(serializerSettings)}.{nameof(JsonSerializerSettings.ContractResolver)} must be null to use this constructor");
 
             serializerSettings.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider);
