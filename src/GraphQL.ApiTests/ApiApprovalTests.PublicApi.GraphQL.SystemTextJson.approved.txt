@@ -7,6 +7,7 @@ namespace GraphQL.SystemTextJson
         public DocumentWriter(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
         public DocumentWriter(bool indent) { }
         public DocumentWriter(System.Text.Json.JsonSerializerOptions serializerOptions) { }
+        public DocumentWriter(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public DocumentWriter(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
