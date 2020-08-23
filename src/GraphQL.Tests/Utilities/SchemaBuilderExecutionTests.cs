@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -172,6 +173,42 @@ namespace GraphQL.Tests.Utilities
                 _.Definitions = defs;
                 _.ExpectedResult = expected;
             });
+        }
+
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
+        [Fact]
+        public void schemabuilder_should_throw_on_invalid_default_value()
+        {
+            var defs = @"
+                enum PetKind {
+                    CAT
+                    DOG
+                }
+
+                interface Pet {
+                    name: String!
+                }
+
+                type Dog implements Pet {
+                    name: String!
+                    barks: Boolean!
+                }
+
+                type Cat implements Pet {
+                    name: String!
+                    meows: Boolean!
+                }
+
+                type Query {
+                    pet(type: PetKind = DOGGY): Pet
+                }
+            ";
+
+            Builder.Types.For("Dog").IsTypeOf<Dog>();
+            Builder.Types.For("Cat").IsTypeOf<Cat>();
+            Builder.Types.Include<PetQueryType>();
+
+            Should.Throw<InvalidOperationException>(() => Builder.Build(defs));
         }
 
         [Fact]
