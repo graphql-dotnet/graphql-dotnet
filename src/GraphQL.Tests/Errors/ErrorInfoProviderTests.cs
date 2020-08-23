@@ -163,7 +163,7 @@ namespace GraphQL.Tests.Errors
         }
 
         [Fact]
-        public void blank_codes_do_not_serialize()
+        public void blank_codes_do_serialize()
         {
             var error = new ExecutionError(null)
             {
@@ -172,32 +172,47 @@ namespace GraphQL.Tests.Errors
             error.Code.ShouldBe("");
 
             var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
-            info.Extensions.ShouldBeNull();
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions["code"].ShouldBe("");
+            info.Extensions.ShouldContainKey("codes");
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new object[] { "" });
         }
 
         [Fact]
-        public void inner_exception_of_type_exception_does_not_serialize_extensions()
+        public void inner_exception_of_type_exception_does_serialize_extensions()
         {
             var error = new ExecutionError("Test execution error", new Exception("Test exception"));
             error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
 
             var info = new ErrorInfoProvider().GetInfo(error);
-            info.Extensions.ShouldBeNull();
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions["code"].ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
+            info.Extensions.ShouldContainKey("codes");
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new[] { ErrorInfoProvider.GetErrorCode<Exception>() });
         }
 
         [Fact]
-        public void codes_with_blank_code_has_undefined_behavior()
+        public void codes_with_blank_code_always_serialize()
         {
             var error = new ExecutionError(null, new Exception(null, new ArgumentNullException("param")));
             error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
 
             var info = new ErrorInfoProvider().GetInfo(error);
-            info.Extensions.ShouldBeNull();
+            info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions["code"].ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
+            info.Extensions.ShouldContainKey("codes");
+            info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
+                new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
 
             error.Data.Add("test1", "object1");
 
             info = new ErrorInfoProvider().GetInfo(error);
             info.Extensions.ShouldNotBeNull();
+            info.Extensions.ShouldContainKey("code");
+            info.Extensions["code"].ShouldBe("");
             info.Extensions.ShouldContainKey("data");
             info.Extensions.ShouldContainKey("codes");
             info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
