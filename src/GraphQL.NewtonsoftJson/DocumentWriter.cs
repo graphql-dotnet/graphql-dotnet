@@ -21,12 +21,12 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(bool indent)
-            : this(GetDefaultSerializerSettings(indent, null))
+            : this(BuildSerializer(indent, null, null))
         {
         }
 
         public DocumentWriter(bool indent, IErrorInfoProvider errorInfoProvider)
-            : this(GetDefaultSerializerSettings(indent, errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
+            : this(BuildSerializer(indent, null, errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
         {
         }
 
@@ -36,35 +36,58 @@ namespace GraphQL.NewtonsoftJson
         }
 
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
+            : this(BuildSerializer(false, configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)), null))
         {
-            var serializerSettings = GetDefaultSerializerSettings(indent: false, errorInfoProvider: null);
-            configureSerializerSettings?.Invoke(serializerSettings);
-
-            _serializer = BuildSerializer(serializerSettings);
         }
 
         public DocumentWriter(JsonSerializerSettings serializerSettings)
+            : this(BuildSerializer(serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)), null))
         {
-            if (serializerSettings == null)
-                throw new ArgumentNullException(nameof(serializerSettings));
+        }
 
-            _serializer = BuildSerializer(serializerSettings);
+        public DocumentWriter(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
+            : this(BuildSerializer(
+                serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)),
+                errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
+        {
+        }
+
+        public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
+            : this(BuildSerializer(false,
+                configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)),
+                errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
+        {
+        }
+
+        private DocumentWriter(JsonSerializer jsonSerializer)
+        {
+            _serializer = jsonSerializer;
         }
 
         private static JsonSerializerSettings GetDefaultSerializerSettings(bool indent, IErrorInfoProvider errorInfoProvider)
         {
-            return new JsonSerializerSettings {
+            return new JsonSerializerSettings
+            {
                 Formatting = indent ? Formatting.Indented : Formatting.None,
                 ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider()),
             };
         }
 
-        private JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings)
+        private static JsonSerializer BuildSerializer(bool indent, Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
+        {
+            var serializerSettings = GetDefaultSerializerSettings(indent, errorInfoProvider);
+            configureSerializerSettings?.Invoke(serializerSettings);
+            return BuildSerializer(serializerSettings, errorInfoProvider);
+        }
+
+        private static JsonSerializer BuildSerializer(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
         {
             var serializer = JsonSerializer.CreateDefault(serializerSettings);
 
             if (serializerSettings.ContractResolver == null)
-                serializer.ContractResolver = new ExecutionResultContractResolver(new ErrorInfoProvider());
+                serializer.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
+            else if (!(serializerSettings.ContractResolver is ExecutionResultContractResolver))
+                throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(ExecutionResultContractResolver)}");
 
             return serializer;
         }

@@ -7,6 +7,8 @@ namespace GraphQL.NewtonsoftJson
         public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
         public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
         public DocumentWriter(bool indent) { }
+        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
