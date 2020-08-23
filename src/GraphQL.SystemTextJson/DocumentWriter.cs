@@ -45,7 +45,7 @@ namespace GraphQL.SystemTextJson
         {
         }
 
-        private DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
+        public DocumentWriter(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
         {
             _options = serializerOptions ?? throw new ArgumentNullException(nameof(serializerOptions));
 
