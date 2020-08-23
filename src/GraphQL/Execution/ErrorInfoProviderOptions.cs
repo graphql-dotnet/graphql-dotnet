@@ -8,7 +8,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Specifies whether stack traces should be serialized.
         /// </summary>
-        public bool ExposeExceptionStackTrace { get; set; } = false;
+        public bool ExposeExceptionStackTrace { get; set; }
 
         /// <summary>
         /// Specifies whether the extensions property, including by default the 'code', 'codes' and 'data' properties, should be serialized.
