@@ -79,9 +79,9 @@ Processing errors should only occur if an exception is thrown from within a fiel
 
 Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the `ExecutionOptions.ThrowOnUnhandledExceptions` property to true. When this property is set to false, the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the inner exceptions of the wrapped exception and also returned along with data contained within the inner exception's `Data` property.
 
-You can also handle these processing exceptions by setting a delegate within the ExecutionOptions.UnhandledExceptionDelegate property. Within the delegate you can log the error message and stack trace for debugging needs. You can also override the generic error message with a more specific message, wrap the exception in your own ExecutionError class, and/or set the codes as necessary.
+You can also handle these processing exceptions by setting a delegate within the `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message and stack trace for debugging needs. You can also override the generic error message with a more specific message, wrap or replace the exception with your own `ExecutionError` class, and/or set the codes and data as necessary. Note that if `ThrowOnUnhandledExceptions` is true, the `UnhandledExceptionDelegate` will not be called.
 
-Here is a sample of a typical unhandled exception delegate which simply logs the error to a database:
+Here is a sample of a typical unhandled exception delegate which logs the error to a database.  It also returns the log id along with the error message:
 
 ```csharp
 var executer = new DocumentExecuter();
@@ -89,104 +89,57 @@ var result = executer.ExecuteAsync(options => {
 
     ...
 
-    options.UnhandledExecutionDelegate = ctx =>
+    options.UnhandledExecutionDelegate = context =>
     {
         try
         {
-            using var db = new MyDatabase();
-            db.ErrorLogs.Add(new ErrorLog {
+            using var db = new MyDatabaseContext();
+            var errorLog = new ErrorLog {
                 DateStamp = DateTime.UtcNow,
-                Message = ctx.Exception.Message,
-                Details = ctx.Exception.ToString()
-            });
+                Message = context.Exception.Message,
+                Details = context.Exception.ToString()
+            };
+            db.ErrorLogs.Add(errorLog);
             db.SaveChanges();
+            context.Exception.Data["errorLogId"] = errorLog.Id;
         }
         catch { }
     };
 });
 ```
 
-
-
-
-
-
-
-
-
-The `ExecutionResult` provides an `Errors` property which includes any errors encountered
-during execution. Errors are returned [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors),
-which means stack traces are excluded. The `ExecutionResult` is transformed to what the spec
-requires using one or the another `IDocumentWriter`.
-
-For example `GraphQL.NewtonsoftJson.DocumentWriter` uses [JSON.NET](https://www.nuget.org/packages/Newtonsoft.Json)
-and `GraphQL.SystemTextJson.DocumentWriter` uses new .NET Core memory optimized serializer from
-[`System.Text.Json`](https://docs.microsoft.com/en-us/dotnet/api/system.text.json). For JSON.NET you can change
-what information is provided by setting your values (`ContractResolver`, Converters`, etc.)
-in `JsonSerializerSettings` passed to `DocumentWriter` constructor. For `System.Text.Json`
-serializer you can configure `JsonSerializerOptions` passed to `DocumentWriter` constructor.
-
-You can also implement your own `IDocumentWriter`.
-
-To help debug errors, you can set `ExposeExceptions` on `ExecutionOptions` which will expose error stack traces.
+You can also override the serialized exception by setting `context.Exception`, or simply replace the message by setting `context.ErrorMessage` such as in this example:
 
 ```csharp
-var executor = new DocumentExecutor();
-ExecutionResult result = await executor.ExecuteAsync(_ =>
+options.UnhandledExecutionDelegate = ctx =>
 {
-  _.Query = "...";
-  _.ExposeExceptions = true;
-});
+    if (ctx.Exception is SqlException)
+        ctx.ErrorMessage = "A database error has occurred.";
+};
 ```
 
-You can throw an `ExecutionError` error in your resolver and it will be caught
-and displayed. You can also add errors to the `ResolveFieldContext.Errors` directly.
+## Error Serialization
+
+After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors, typically you will pass this object to an implementation of `IDocumentWriter` to convert the object tree into json. The GraphQL spec allows for four properties to be returned with each error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations provided for the `Newtonsoft.Json` and `System.Text.Json` libraries allow you to control the serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider` to the constructor of the document writer. The `ErrorInfoProvider` class contains 5 properties to control serialization behavior:
+
+* `ExposeExceptionStackTrace` when enabled sets the `message` property for unhandled exceptions (errors that derive from `UnhandledError`) to equal the exception's `.ToString()` method. This property defaults to false.
+* `ExposeCode` when enabled sets the `extensions`'s `code` property to equal the error's `Code` property. This property defaults to true.
+* `ExposeCodes` when enabled sets the `extensions`'s `codes` property to equal a list containing both the error's `Code` property, if any, and the type name of inner exceptions (after being converted to UPPER_CASE and removing the "Extension" suffix). So an `ExecutionError` with a code of `INVALID_FORMAT` that has an inner exception of type `ArgumentNullException` would contain a `codes` property of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to true.
+* `ExposeData` when enabled sets the `extension`'s `data` property to equal the data within the error's `Data` property. This property defaults to true.
+* `ExposeExtensions` when disabled hides the entire `extensions` property, including `code`, `codes`, and `data` (if enabled). This property defaults to true.
+
+For example, to show the stack trace for unhandled errors during development, you might write code like this:
 
 ```csharp
-Field<DroidType>(
-  "hero",
-  resolve: context => context.Errors.Add(new ExecutionError("Error Message"))
-);
-
-Field<DroidType>(
-  "hero",
-  resolve: context => throw new ExecutionError("Error Message")
-);
+#if DEBUG
+    var documentWriter = new DocumentWriter(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
+#else
+    var documentWriter = new DocumentWriter();
+#endif
 ```
 
-Also `ExecutionOptions.UnhandledExceptionDelegate` allows you to override, hide,
-modify or just log the unhandled exception from your resolver before wrap it into
-`ExecutionError`. This can be useful for hiding error messages that reveal server
-implementation details.
+You can also write your own implementation of `IErrorInfoProvider`. For example, if you want to override the numerical codes provided by the GraphQL framework for validation errors, or if you want to reveal stack traces only to logged-in administrators.
 
-```csharp
-var executor = new DocumentExecutor();
-ExecutionResult result = await executor.ExecuteAsync(_ =>
-{
-  _.Query = "...";
-  _.UnhandledExceptionDelegate = context => context.ErrorMessage = "Error Message";
-});
-```
+## Middleware
 
-Set `ExecutionOptions.ThrowOnUnhandledException` to `true` in cases where the thrown exception needs to propagate to an enclosing or global handler.
-
-Note that `UnhandledExceptionDelegate` will not be invoked in the case `ThrowOnUnhandledException` is `true`.
-
-```csharp
-try
-{
-  var result = await executor.ExecuteAsync(_ =>
-  {
-    _.Query = "...";
-    _.ThrowOnUnhandledException = true;
-  });
-  
-  //Process result...
-}
-catch (Exception ex)
-{
-  logger.Error(ex, "Error Message");
-}
-```
-
-You can provide additional error handling or logging for fields by adding Field Middleware.
+It is also possible to provide additional error handling or logging for fields by adding Field Middleware, but this is not recommended.
