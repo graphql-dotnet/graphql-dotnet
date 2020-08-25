@@ -47,7 +47,7 @@ Description | Error class | Code
 -|-|-
 Empty query document | NoOperationError | NO_OPERATION
 Query parsing error | SyntaxError | SYNTAX_ERROR
-Attempting a mutation or subscription when none are defined | InvalidOperationError | INVAILD_OPERATION
+Attempting a mutation or subscription when none are defined | InvalidOperationError | INVALID_OPERATION
 Invalid variable values | InvalidVariableError | INVALID_VALUE
 Validation errors | ValidationError | (varies)
 
