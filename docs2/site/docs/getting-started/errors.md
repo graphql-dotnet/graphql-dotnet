@@ -14,7 +14,7 @@ Here is a sample result of a `FormatException` thrown within a `product` field r
 {
   "errors": [
     {
-      "message": "Error trying to resolve product.",
+      "message": "Error trying to resolve field 'product'.",
       "locations": [
         {
           "line": 3,
