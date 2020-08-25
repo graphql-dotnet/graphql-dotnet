@@ -131,7 +131,7 @@ namespace GraphQL.Tests.Errors
         public void exposeExceptions()
         {
             var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
-            var error = new ExecutionError(innerException.Message, innerException);
+            var error = new UnhandledError(innerException.Message, innerException);
 
             var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
             info.Message.ShouldBe(error.ToString());
@@ -150,7 +150,7 @@ namespace GraphQL.Tests.Errors
                 }
                 catch (Exception innerException)
                 {
-                    throw new ExecutionError(innerException.Message, innerException);
+                    throw new UnhandledError(innerException.Message, innerException);
                 }
             }
             catch (ExecutionError e)
@@ -160,6 +160,24 @@ namespace GraphQL.Tests.Errors
 
             var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
             info.Message.ShouldBe(error.ToString());
+        }
+
+        [Fact]
+        public void exposeExceptions_with_exposestacktrace_does_not_expose_execution_errors()
+        {
+            // generate a real stack trace to serialize
+            ExecutionError error;
+            try
+            {
+                throw new ExecutionError("An error has occurred!");
+            }
+            catch (ExecutionError e)
+            {
+                error = e;
+            }
+
+            var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+            info.Message.ShouldBe(error.Message);
         }
 
         [Fact]

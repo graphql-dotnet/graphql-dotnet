@@ -6,7 +6,7 @@ namespace GraphQL.Execution
     public class ErrorInfoProviderOptions
     {
         /// <summary>
-        /// Specifies whether stack traces should be serialized.
+        /// Specifies whether stack traces of unhandled exceptions should be serialized.
         /// </summary>
         public bool ExposeExceptionStackTrace { get; set; }
 

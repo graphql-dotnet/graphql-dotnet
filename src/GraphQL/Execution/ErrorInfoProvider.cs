@@ -59,7 +59,8 @@ namespace GraphQL.Execution
 
             return new ErrorInfo
             {
-                Message = _options.ExposeExceptionStackTrace ? executionError.ToString() : executionError.Message,
+                Message = _options.ExposeExceptionStackTrace && executionError is UnhandledError ? executionError.ToString() : executionError.Message,
+                //Message = _options.ExposeExceptionStackTrace ? executionError.ToString() : executionError.Message,
                 Extensions = extensions,
             };
         }
