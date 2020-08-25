@@ -7,7 +7,7 @@ Input errors and processing errors are returned from the `DocumentExecuter` with
 * Within `codes`, the `Code` property of the `ExecutionError` along with generated codes of any inner exceptions, if any, and
 * Within `data`, the contents of the `ExecutionError.Data` property, which by default contains the data of the inner exception, if any.
 
-Note that by default, messages from unhandled processing errors are masked and a generic "Error trying to resolve product" or similar error is returned.
+Note that by default, messages from unhandled processing errors are masked and a generic "Error trying to resolve field '<FIELD_NAME>'" or similar error is returned.
 
 Here is a sample result of a `FormatException` thrown within a `product` field resolver (a processing error):
 ```json
