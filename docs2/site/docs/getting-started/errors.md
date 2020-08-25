@@ -126,7 +126,7 @@ options.UnhandledExecutionDelegate = ctx =>
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors, typically you will pass this object to an implementation of `IDocumentWriter` to convert the object tree into json. The GraphQL spec allows for four properties to be returned with each error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations provided for the `Newtonsoft.Json` and `System.Text.Json` libraries allow you to control the serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider` to the constructor of the document writer. The `ErrorInfoProvider` class contains 5 properties to control serialization behavior:
 
-* `ExposeExceptionStackTrace` when enabled sets the `message` property for unhandled exceptions (errors that derive from `UnhandledError`) to equal the exception's `.ToString()` method. This property defaults to false.
+* `ExposeExceptionStackTrace` when enabled sets the `message` property for errors to equal the exception's `.ToString()` method, which includes a stack trace. This property defaults to false.
 * `ExposeCode` when enabled sets the `extensions`'s `code` property to equal the error's `Code` property. This property defaults to true.
 * `ExposeCodes` when enabled sets the `extensions`'s `codes` property to equal a list containing both the error's `Code` property, if any, and the type name of inner exceptions (after being converted to UPPER_CASE and removing the "Extension" suffix). So an `ExecutionError` with a code of `INVALID_FORMAT` that has an inner exception of type `ArgumentNullException` would contain a `codes` property of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to true.
 * `ExposeData` when enabled sets the `extension`'s `data` property to equal the data within the error's `Data` property. This property defaults to true.
@@ -142,7 +142,7 @@ For example, to show the stack trace for unhandled errors during development, yo
 #endif
 ```
 
-You can also write your own implementation of `IErrorInfoProvider`. For example, if you want to override the numerical codes provided by the GraphQL framework for validation errors, or if you want to reveal stack traces only to logged-in administrators.
+You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override the numerical codes provided by the GraphQL framework for validation errors, or reveal stack traces only to logged-in administrators.
 
 ## Middleware
 
