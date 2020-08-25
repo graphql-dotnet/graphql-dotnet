@@ -76,7 +76,10 @@ Field<DroidType>(
 
 ## Processing Errors
 
-Processing errors should only occur if an exception is thrown from within a field resolver. For instance, if you execute `.Single()` on an empty array, causing an `InvalidOperationException` to be thrown. These types of errors are most likely to be bugs or connection problems, such as a connection error when communicating to a database. There are also two other types of processing errors to be aware of: (1) calling context.GetArgument<> with a type that does not match the argument type, when the system cannot perform the conversion – for instance, calling context.GetArgument<Guid>("arg") on an argument of type IntGraphType – and (2) returning data from a field resolver that does not match the graph type of field resolver, when the system cannot perform the conversion.
+Processing errors should only occur if an exception is thrown from within a field resolver. For instance, if you execute `.Single()` on an empty array, causing an `InvalidOperationException` to be thrown. These types of errors are most likely to be bugs or connection problems, such as a connection error when communicating to a database. There are also two other types of processing errors to be aware of:
+
+* Calling `context.GetArgument<>` with a type that does not match the argument type, when the system cannot perform the conversion – for instance, calling `context.GetArgument<Guid>("arg")` on an argument of type `IntGraphType`, and
+* Returning data from a field resolver that does not match the graph type of field resolver, when the system cannot perform the conversion.
 
 Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the `ExecutionOptions.ThrowOnUnhandledExceptions` property to true. When this property is set to false, the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the inner exceptions of the wrapped exception and also returned along with data contained within the inner exception's `Data` property.
 
