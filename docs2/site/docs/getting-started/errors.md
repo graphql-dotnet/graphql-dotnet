@@ -89,7 +89,8 @@ Here is a sample of a typical unhandled exception delegate which logs the error 
 
 ```csharp
 var executer = new DocumentExecuter();
-var result = executer.ExecuteAsync(options => {
+var result = executer.ExecuteAsync(options =>
+{
 
     ...
 
