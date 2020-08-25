@@ -51,7 +51,7 @@ Attempting a mutation or subscription when none are defined | InvalidOperationEr
 Invalid variable values | InvalidVariableError | INVALID_VALUE
 Validation errors | ValidationError | (varies)
 
-Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class. Any other thrown error is treated as a processing error (see below). Below is an example of typical validation within a query or mutation that returns an input error:
+Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class. Any other thrown error is treated as a processing error (see Processing Errors below). Here is an example of typical validation within a field resolver that returns an input error:
 
 ```csharp
 Field<NonNullGraphType<OrderGraph>>("order",
