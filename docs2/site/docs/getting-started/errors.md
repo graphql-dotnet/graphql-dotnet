@@ -85,7 +85,7 @@ Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteA
 
 You can also handle these processing exceptions by setting a delegate within the `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message and stack trace for debugging needs. You can also override the generic error message with a more specific message, wrap or replace the exception with your own `ExecutionError` class, and/or set the codes and data as necessary. Note that if `ThrowOnUnhandledExceptions` is `true`, the `UnhandledExceptionDelegate` will not be called.
 
-Here is a sample of a typical unhandled exception delegate which logs the error to a database.  It also returns the log id along with the error message:
+Here is a sample of a typical unhandled exception delegate which logs the error to a database. It also returns the log id along with the error message:
 
 ```csharp
 var executer = new DocumentExecuter();
