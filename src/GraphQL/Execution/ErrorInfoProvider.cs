@@ -44,19 +44,18 @@ namespace GraphQL.Execution
                 var codes = _options.ExposeCodes ? GetCodesForError(executionError).ToList() : null;
                 if (codes?.Count == 0)
                     codes = null;
+                var number = _options.ExposeCode && executionError is ValidationError validationError ? validationError.Number : null;
                 var data = _options.ExposeData && executionError.Data?.Count > 0 ? executionError.Data : null;
 
                 if (code != null || codes != null || data != null)
                 {
                     extensions = new Dictionary<string, object>();
                     if (code != null)
-                    {
                         extensions.Add("code", code);
-                        if (executionError is ValidationError validationError)
-                            extensions.Add("number", validationError.Number);
-                    }
                     if (codes != null)
                         extensions.Add("codes", codes);
+                    if (number != null)
+                        extensions.Add("number", number);
                     if (data != null)
                         extensions.Add("data", data);
                 }
