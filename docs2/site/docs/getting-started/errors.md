@@ -8,7 +8,7 @@ fail their respective tests are treated as input errors.  Processing errors typi
 exceptions occurring during the execution of a field resolver, such as a timeout during a database operation.
 
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
-property as a list of `ExecutionError` objects. `ExecutionError` inherits `Exception`, and the `Message`
+property as a list of `ExecutionError` objects. `ExecutionError` is derived from `Exception`, and the `Message`
 property is serialized [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors) with location and path information. In addition, by default three
 additional pieces of information are serialized to the `extensions` property of the GraphQL error which contain:
 
