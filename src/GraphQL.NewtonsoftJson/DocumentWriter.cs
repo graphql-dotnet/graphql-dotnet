@@ -9,42 +9,74 @@ using Newtonsoft.Json;
 
 namespace GraphQL.NewtonsoftJson
 {
+    /// <summary>
+    /// Serializes an ExecutionResult to a stream using the Newtonsoft.Json library.
+    /// </summary>
     public class DocumentWriter : IDocumentWriter
     {
         private readonly JsonArrayPool _jsonArrayPool = new JsonArrayPool(ArrayPool<char>.Shared);
         private readonly JsonSerializer _serializer;
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings.
+        /// </summary>
         public DocumentWriter()
             : this(indent: false)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="indent">Indicates if child objects should be indented</param>
         public DocumentWriter(bool indent)
             : this(BuildSerializer(indent, null, null))
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="indent">Indicates if child objects should be indented</param>
+        /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public DocumentWriter(bool indent, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(indent, null, errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider))))
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public DocumentWriter(IErrorInfoProvider errorInfoProvider)
             : this(false, errorInfoProvider)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="configureSerializerSettings">Specifies a callback used to configure the JSON serializer</param>
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings)
             : this(BuildSerializer(false, configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)), null))
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
         public DocumentWriter(JsonSerializerSettings serializerSettings)
             : this(BuildSerializer(serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)), null))
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
+        /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public DocumentWriter(JsonSerializerSettings serializerSettings, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(
                 serializerSettings ?? throw new ArgumentNullException(nameof(serializerSettings)),
@@ -52,6 +84,11 @@ namespace GraphQL.NewtonsoftJson
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// </summary>
+        /// <param name="configureSerializerSettings">Specifies a callback used to configure the JSON serializer</param>
+        /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public DocumentWriter(Action<JsonSerializerSettings> configureSerializerSettings, IErrorInfoProvider errorInfoProvider)
             : this(BuildSerializer(false,
                 configureSerializerSettings ?? throw new ArgumentNullException(nameof(configureSerializerSettings)),
