@@ -9,7 +9,7 @@ exceptions occurring during the execution of a field resolver, such as a timeout
 
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
 property as a list of `ExecutionError` objects. `ExecutionError` inherits from `Exception`, and the `Message`
-property is serialized according to the spec with location and path information. In addition, by default three
+property is serialized [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors) with location and path information. In addition, by default three
 additional pieces of information are serialized to the `extensions` property of the GraphQL error which contain:
 
 * Within `code`, the `Code` property of the `ExecutionError`, if any,
