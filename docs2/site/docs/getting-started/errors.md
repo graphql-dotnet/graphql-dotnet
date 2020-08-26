@@ -37,7 +37,7 @@ Here is a sample result of a `FormatException` thrown within a `product` field r
 
 ## Schema Errors
 
-Schema errors throw an exception during the process of defining or building the schema. For instance, adding a two fields of the same name to a GraphQL type would result in an `ArgumentOutOfRangeException` while attempting to add the second field. Another example would be if a schema defined an invalid union; an error would be thrown while the schema was being initialized within `DocumentExecuter` and caught as an unhandled exception (see Processing Errors, below).
+Schema errors throw an exception during the process of defining or building the schema. For instance, adding a two fields of the same name to a GraphQL type would result in an `ArgumentOutOfRangeException` while attempting to add the second field. Another example would be if a schema defined an invalid union; an error would be thrown while the schema was being initialized within `DocumentExecuter` and caught as an unhandled exception (see [Processing Errors](#ProcessingErrors) below).
 
 ## Input Errors
 
@@ -51,7 +51,7 @@ Attempting a mutation or subscription when none are defined | InvalidOperationEr
 Invalid variable values | InvalidVariableError | INVALID_VALUE
 Validation errors | ValidationError | (varies)
 
-Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class. Any other thrown error is treated as a processing error (see Processing Errors below). Here is an example of typical validation within a field resolver that returns an input error:
+Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class. Any other thrown error is treated as a processing error (see [Processing Errors](#ProcessingErrors) below). Here is an example of typical validation within a field resolver that returns an input error:
 
 ```csharp
 Field<NonNullGraphType<OrderGraph>>("order",
@@ -74,7 +74,7 @@ Field<DroidType>(
 );
 ```
 
-## Processing Errors
+## <a name="ProcessingErrors"></a>Processing Errors
 
 Processing errors should only occur if an exception is thrown from within a field resolver. For instance, if you execute `.Single()` on an empty array, causing an `InvalidOperationException` to be thrown. These types of errors are most likely to be bugs or connection problems, such as a connection error when communicating to a database. There are also two other types of processing errors to be aware of:
 
