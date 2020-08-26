@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -28,7 +29,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.RequiredSubselectionMessage("human", "Human"),
+                    message: RequiredSubselectionMessage("human", "Human"),
                     line: 3,
                     column: 19);
             });
@@ -48,7 +49,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.RequiredSubselectionMessage("pets", "[Pet]"),
+                    message: RequiredSubselectionMessage("pets", "[Pet]"),
                     line: 3,
                     column: 21);
             });
@@ -77,7 +78,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.NoSubselectionAllowedMessage("barks", "Boolean"),
+                    message: NoSubselectionAllowedMessage("barks", "Boolean"),
                     line: 3,
                     column: 25);
             });
@@ -96,7 +97,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.NoSubselectionAllowedMessage("furColor", "FurColor"),
+                    message: NoSubselectionAllowedMessage("furColor", "FurColor"),
                     line: 3,
                     column: 28);
             });
@@ -115,7 +116,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    message: NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
                     line: 3,
                     column: 52);
             });
@@ -134,7 +135,7 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.NoSubselectionAllowedMessage("name", "String"),
+                    message: NoSubselectionAllowedMessage("name", "String"),
                     line: 3,
                     column: 43);
             });
@@ -153,10 +154,16 @@ namespace GraphQL.Tests.Validation
             {
                 _.Query = query;
                 _.Error(
-                    message: Rule.NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
+                    message: NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
                     line: 3,
                     column: 71);
             });
         }
+
+        private string NoSubselectionAllowedMessage(string field, string type)
+            => ScalarLeafsError.NoSubselectionAllowedMessage(field, type);
+
+        private string RequiredSubselectionMessage(string field, string type)
+            => ScalarLeafsError.RequiredSubselectionMessage(field, type);
     }
 }

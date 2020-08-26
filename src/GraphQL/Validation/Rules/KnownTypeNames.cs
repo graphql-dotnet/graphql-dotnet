@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -14,16 +15,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class KnownTypeNames : IValidationRule
     {
-        public Func<string, string[], string> UnknownTypeMessage = (type, suggestedTypes) =>
-        {
-            var message = $"Unknown type {type}.";
-            if (suggestedTypes != null && suggestedTypes.Length > 0)
-            {
-                message += $" Did you mean {StringUtils.QuotedOrList(suggestedTypes)}?";
-            }
-            return message;
-        };
-
         public static readonly KnownTypeNames Instance = new KnownTypeNames();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -37,7 +28,7 @@ namespace GraphQL.Validation.Rules
                     {
                         var typeNames = context.Schema.AllTypes.Select(x => x.Name).ToArray();
                         var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
-                        context.ReportError(new ValidationError(context.OriginalQuery, "5.4.1.2", UnknownTypeMessage(node.Name, suggestionList), node));
+                        context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
                     }
                 });
             }).ToTask();

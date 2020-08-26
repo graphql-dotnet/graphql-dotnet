@@ -1,0 +1,25 @@
+using GraphQL.Language.AST;
+
+namespace GraphQL.Validation.Errors
+{
+    public class FragmentsOnCompositeTypesError : ValidationError
+    {
+        public const string PARAGRAPH = "5.5.1.3";
+
+        public FragmentsOnCompositeTypesError(ValidationContext context, InlineFragment node)
+            : base(context.OriginalQuery, PARAGRAPH, InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)), node.Type)
+        {
+        }
+
+        public FragmentsOnCompositeTypesError(ValidationContext context, FragmentDefinition node)
+            : base(context.OriginalQuery, PARAGRAPH, FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)), node.Type)
+        {
+        }
+
+        internal static string InlineFragmentOnNonCompositeErrorMessage(string type)
+            => $"Fragment cannot condition on non composite type \"{type}\".";
+
+        internal static string FragmentOnNonCompositeErrorMessage(string fragName, string type)
+            => $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
+    }
+}

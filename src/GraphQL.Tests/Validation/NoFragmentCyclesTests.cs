@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -67,7 +68,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = @"
                   fragment fragA on Human { relatives { ...fragA } },
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 2, 57);
+                _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 2, 57);
             });
         }
 
@@ -79,7 +80,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = @"
                   fragment fragA on Dog { ...fragA }
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 2, 43);
+                _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 2, 43);
             });
         }
 
@@ -95,7 +96,7 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-                _.Error(Rule.CycleErrorMessage("fragA", Array.Empty<string>()), 4, 23);
+                _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 4, 23);
             });
         }
 
@@ -110,7 +111,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
@@ -128,7 +129,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragB", new[] {"fragA"});
+                    e.Message = CycleErrorMessage("fragB", new[] {"fragA"});
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
@@ -154,7 +155,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
                     e.Loc(4, 23);
                     e.Loc(9, 23);
                 });
@@ -178,7 +179,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragB", "fragC", "fragO", "fragP"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragB", "fragC", "fragO", "fragP"});
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                     e.Loc(4, 43);
@@ -187,7 +188,7 @@ namespace GraphQL.Tests.Validation
                 });
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragO", new[] {"fragP", "fragX", "fragY", "fragZ"});
+                    e.Message = CycleErrorMessage("fragO", new[] {"fragP", "fragX", "fragY", "fragZ"});
                     e.Loc(8, 43);
                     e.Loc(9, 53);
                     e.Loc(5, 43);
@@ -209,13 +210,13 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragB"});
                     e.Loc(2, 43);
                     e.Loc(3, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragC"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragC"});
                     e.Loc(2, 53);
                     e.Loc(4, 43);
                 });
@@ -234,13 +235,13 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] {"fragC"});
+                    e.Message = CycleErrorMessage("fragA", new[] {"fragC"});
                     e.Loc(2, 43);
                     e.Loc(4, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragC", new[] {"fragB"});
+                    e.Message = CycleErrorMessage("fragC", new[] {"fragB"});
                     e.Loc(4, 53);
                     e.Loc(3, 43);
                 });
@@ -259,23 +260,26 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragB", Array.Empty<string>());
+                    e.Message = CycleErrorMessage("fragB", Array.Empty<string>());
                     e.Loc(3, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragA", new[] { "fragB", "fragC" });
+                    e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC" });
                     e.Loc(2, 43);
                     e.Loc(3, 53);
                     e.Loc(4, 43);
                 });
                 _.Error(e =>
                 {
-                    e.Message = Rule.CycleErrorMessage("fragB", new[] { "fragC" });
+                    e.Message = CycleErrorMessage("fragB", new[] { "fragC" });
                     e.Loc(3, 53);
                     e.Loc(4, 53);
                 });
             });
         }
+
+        private string CycleErrorMessage(string fragName, string[] spreadNames)
+            => NoFragmentCyclesError.CycleErrorMessage(fragName, spreadNames);
     }
 }

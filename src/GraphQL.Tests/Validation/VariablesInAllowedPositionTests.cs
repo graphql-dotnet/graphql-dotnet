@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -204,7 +205,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(2, 27);
                     err.Loc(4, 53);
                 });
@@ -231,7 +232,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(6, 27);
                     err.Loc(3, 51);
                 });
@@ -262,7 +263,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("intArg", "Int", "Int!");
+                    err.Message = BadVarPosMessage("intArg", "Int", "Int!");
                     err.Loc(10, 27);
                     err.Loc(7, 51);
                 });
@@ -285,7 +286,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "Boolean");
+                    err.Message = BadVarPosMessage("stringVar", "String", "Boolean");
                     err.Loc(2, 27);
                     err.Loc(4, 47);
                 });
@@ -308,7 +309,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "[String]");
+                    err.Message = BadVarPosMessage("stringVar", "String", "[String]");
                     err.Loc(2, 27);
                     err.Loc(4, 53);
                 });
@@ -329,7 +330,7 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("boolVar", "Boolean", "Boolean!");
+                    err.Message = BadVarPosMessage("boolVar", "Boolean", "Boolean!");
                     err.Loc(2, 27);
                     err.Loc(3, 34);
                 });
@@ -350,11 +351,14 @@ namespace GraphQL.Tests.Validation
                 _.Query = query;
                 _.Error(err =>
                 {
-                    err.Message = Rule.BadVarPosMessage("stringVar", "String", "Boolean!");
+                    err.Message = BadVarPosMessage("stringVar", "String", "Boolean!");
                     err.Loc(2, 27);
                     err.Loc(3, 34);
                 });
             });
         }
+
+        private string BadVarPosMessage(string varName, string varType, string expectedType)
+            => VariablesInAllowedPositionError.BadVarPosMessage(varName, varType, expectedType);
     }
 }

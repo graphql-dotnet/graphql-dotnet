@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -163,7 +164,7 @@ namespace GraphQL.Tests.Validation
     {
       _.Error(err =>
       {
-        err.Message = Rule.UnusedFragMessage(varName);
+        err.Message = NoUnusedFragmentsError.UnusedFragMessage(varName);
         err.Loc(line, column);
       });
     }

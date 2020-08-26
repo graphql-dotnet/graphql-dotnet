@@ -18,8 +18,8 @@ namespace GraphQL.Validation
         /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message and code.
         /// Sets locations based on the original query and specified AST nodes that this error applies to.
         /// </summary>
-        public ValidationError(string originalQuery, string errorCode, string message, params INode[] nodes)
-            : this(originalQuery, errorCode, message, null, nodes)
+        public ValidationError(string originalQuery, string number, string message, params INode[] nodes)
+            : this(originalQuery, number, message, null, nodes)
         {
         }
 
@@ -30,7 +30,7 @@ namespace GraphQL.Validation
         /// </summary>
         public ValidationError(
             string originalQuery,
-            string errorCode,
+            string number,
             string message,
             Exception innerException,
             params INode[] nodes)
@@ -39,7 +39,7 @@ namespace GraphQL.Validation
             Code = ErrorInfoProvider.GetErrorCode(GetType());
             if (Code != "VALIDATION_ERROR" && Code.EndsWith("_ERROR"))
                 Code = Code.Substring(0, Code.Length - 6);
-            Number = errorCode;
+            Number = number;
 
             nodes?.Apply(n =>
             {
@@ -58,7 +58,7 @@ namespace GraphQL.Validation
         public IEnumerable<INode> Nodes => _nodes;
 
         /// <summary>
-        /// Gets or sets the rule number of this validation error.
+        /// Gets or sets the rule number of this validation error corresponding to the paragraph number from the official specification.
         /// </summary>
         public string Number { get; set; }
     }

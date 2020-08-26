@@ -15,7 +15,10 @@ namespace GraphQL.Tests.Errors
             string code = "FIRST";
 
             var errors = new ExecutionErrors();
-            var error = new ValidationError(query, code, "Error trying to resolve field 'firstSync'.", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")));
+            var error = new ExecutionError("Error trying to resolve field 'firstSync'.", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")))
+            {
+                Code = code
+            };
             error.AddLocation(1, 3);
             error.Path = new[] { "firstSync" };
             errors.Add(error);

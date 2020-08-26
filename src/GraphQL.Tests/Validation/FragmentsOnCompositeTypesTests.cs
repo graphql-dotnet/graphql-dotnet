@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -113,13 +114,13 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-                _.Error(Rule.InlineFragmentOnNonCompositeErrorMessage("String"), 3, 28);
+                _.Error(FragmentsOnCompositeTypesError.InlineFragmentOnNonCompositeErrorMessage("String"), 3, 28);
             });
         }
 
         private void error(ValidationTestConfig _, string fragName, string typeName, int line, int column)
         {
-            _.Error(Rule.FragmentOnNonCompositeErrorMessage(fragName, typeName), line, column);
+            _.Error(FragmentsOnCompositeTypesError.FragmentOnNonCompositeErrorMessage(fragName, typeName), line, column);
         }
     }
 }
