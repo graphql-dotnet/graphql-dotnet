@@ -4,7 +4,7 @@ Errors within the GraphQL engine can be thought of as falling into one of three 
 input errors and processing errors. For instance, if an invalid query was passed to the `DocumentExecuter`,
 it would be considered an input error, and a `SyntaxError` would be thrown. Or if an invalid enum string
 was passed as a variable to a query, an `InvalidValueError` would be thrown. All validation rules that
-fail their respective tests are treated as input errors.  Processing errors typically represent unanticipated
+fail their respective tests are treated as input errors. Processing errors typically represent unanticipated
 exceptions occurring during the execution of a field resolver, such as a timeout during a database operation.
 
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
