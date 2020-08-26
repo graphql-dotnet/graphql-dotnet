@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using GraphQL.Validation;
 
 namespace GraphQL.Execution
 {
@@ -49,7 +50,11 @@ namespace GraphQL.Execution
                 {
                     extensions = new Dictionary<string, object>();
                     if (code != null)
+                    {
                         extensions.Add("code", code);
+                        if (executionError is ValidationError validationError)
+                            extensions.Add("number", validationError.Number);
+                    }
                     if (codes != null)
                         extensions.Add("codes", codes);
                     if (data != null)
