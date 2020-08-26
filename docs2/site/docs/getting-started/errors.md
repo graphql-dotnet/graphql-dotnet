@@ -187,7 +187,7 @@ of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to `true`.
 * `ExposeExtensions` when disabled hides the entire `extensions` property, including `code`, `codes`,
 and `data` (if enabled). This property defaults to `true`.
 
-For example, to show the stack trace for unhandled errors during development, you might write code like this:
+For example, to show the stack traces for unhandled errors during development, you might write code like this:
 
 ```csharp
 #if DEBUG
