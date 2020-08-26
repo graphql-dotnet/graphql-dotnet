@@ -143,7 +143,9 @@ var result = executer.ExecuteAsync(options =>
             db.SaveChanges();
             context.Exception.Data["errorLogId"] = errorLog.Id;
         }
-        catch { }
+        catch
+        {
+        }
     };
 });
 ```
