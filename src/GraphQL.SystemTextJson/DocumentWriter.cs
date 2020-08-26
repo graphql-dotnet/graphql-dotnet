@@ -16,7 +16,8 @@ namespace GraphQL.SystemTextJson
         private readonly JsonSerializerOptions _options;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings:
+        /// no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         public DocumentWriter()
             : this(indent: false)

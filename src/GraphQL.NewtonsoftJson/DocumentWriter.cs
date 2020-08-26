@@ -19,7 +19,8 @@ namespace GraphQL.NewtonsoftJson
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with default settings:
+        /// no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         public DocumentWriter()
             : this(indent: false)
