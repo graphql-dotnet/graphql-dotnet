@@ -194,7 +194,7 @@ For example, to show the stack trace for unhandled errors during development, yo
 ```
 
 You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
-the numerical codes provided by the GraphQL framework for validation errors, or reveal stack traces
+the numerical codes provided by GraphQL.NET for validation errors, or reveal stack traces
 only to logged-in administrators.
 
 ## Middleware
