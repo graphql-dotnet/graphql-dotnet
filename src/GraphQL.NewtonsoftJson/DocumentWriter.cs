@@ -69,9 +69,8 @@ namespace GraphQL.NewtonsoftJson
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
-        /// When not otherwise configured, defaults to no indenting and a default instance of
-        /// the <see cref="ErrorInfoProvider"/> class.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings
+        /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
         public DocumentWriter(JsonSerializerSettings serializerSettings)
