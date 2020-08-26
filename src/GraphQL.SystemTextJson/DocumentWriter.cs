@@ -9,7 +9,8 @@ using GraphQL.Execution;
 namespace GraphQL.SystemTextJson
 {
     /// <summary>
-    /// Serializes an ExecutionResult to a stream using the System.Text.Json library.
+    /// Serializes an <see cref="ExecutionResult"/> (or any other object) to a stream using
+    /// the <see cref="System.Text.Json"/> library.
     /// </summary>
     public class DocumentWriter : IDocumentWriter
     {
@@ -25,7 +26,8 @@ namespace GraphQL.SystemTextJson
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings
+        /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="indent">Indicates if child objects should be indented</param>
         public DocumentWriter(bool indent)
@@ -44,7 +46,8 @@ namespace GraphQL.SystemTextJson
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with no indenting and the
+        /// specified <see cref="IErrorInfoProvider"/>.
         /// </summary>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
         public DocumentWriter(IErrorInfoProvider errorInfoProvider)
@@ -53,7 +56,8 @@ namespace GraphQL.SystemTextJson
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Initializes a new instance of the <see cref="DocumentWriter"/> class configured with the specified callback.
+        /// Configuration defaults to no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
         public DocumentWriter(Action<JsonSerializerOptions> configureSerializerOptions)
@@ -69,6 +73,8 @@ namespace GraphQL.SystemTextJson
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// When not otherwise configured, defaults to no indenting and a default instance of
+        /// the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         public DocumentWriter(JsonSerializerOptions serializerOptions)
@@ -81,6 +87,7 @@ namespace GraphQL.SystemTextJson
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// When not otherwise configured, defaults to no indenting and the specified instance of <see cref="IErrorInfoProvider"/>.
         /// </summary>
         /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
@@ -94,6 +101,7 @@ namespace GraphQL.SystemTextJson
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
+        /// Configuration defaults to no indenting and the specified instance of the <see cref="ErrorInfoProvider"/> class.
         /// </summary>
         /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
