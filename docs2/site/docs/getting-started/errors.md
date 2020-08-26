@@ -17,7 +17,7 @@ additional pieces of information are serialized to the `extensions` property of 
 * Within `data`, the contents of the `ExecutionError.Data` property, which by default contains the data of the inner exception, if any.
 
 Note that by default, messages from unhandled processing errors are masked and a
-generic "Error trying to resolve field '<FIELD_NAME>'" or similar error is returned.
+generic "Error trying to resolve field '<FIELD_NAME>'." or similar error is returned.
 
 Here is a sample result of a `FormatException` thrown within a `product` field resolver (a processing error):
 ```json
