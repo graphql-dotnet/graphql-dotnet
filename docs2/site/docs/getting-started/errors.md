@@ -165,7 +165,7 @@ options.UnhandledExecutionDelegate = ctx =>
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
 typically you will pass this object to an implementation of `IDocumentWriter` to convert the
-object tree into json. The GraphQL spec allows for four properties to be returned with each
+object tree into json. The GraphQL spec allows for four properties to be returned within each
 error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations
 provided for the [`Newtonsoft.Json`](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) and
 [`System.Text.Json`](https://www.nuget.org/packages/GraphQL.SystemTextJson) libraries allow you to control the
