@@ -36,7 +36,10 @@ namespace GraphQL.Validation
             params INode[] nodes)
             : base(message, innerException)
         {
-            Code = errorCode;
+            Code = ErrorInfoProvider.GetErrorCode(GetType());
+            if (Code != "VALIDATION_ERROR" && Code.EndsWith("_ERROR"))
+                Code = Code.Substring(0, Code.Length - 6);
+            Number = errorCode;
 
             nodes?.Apply(n =>
             {
@@ -53,5 +56,10 @@ namespace GraphQL.Validation
         /// Returns a list of AST nodes that this error applies to.
         /// </summary>
         public IEnumerable<INode> Nodes => _nodes;
+
+        /// <summary>
+        /// Gets or sets the rule number of this validation error.
+        /// </summary>
+        public string Number { get; set; }
     }
 }
