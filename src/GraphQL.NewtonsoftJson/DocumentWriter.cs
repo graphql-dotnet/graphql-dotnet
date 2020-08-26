@@ -80,7 +80,6 @@ namespace GraphQL.NewtonsoftJson
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentWriter"/> class with the specified settings.
-        /// When not otherwise configured, defaults to no indenting and the specified instance of <see cref="IErrorInfoProvider"/>.
         /// </summary>
         /// <param name="serializerSettings">Specifies the JSON serializer settings</param>
         /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
