@@ -111,50 +111,135 @@ public void Install(IWindsorContainer container, IConfigurationStore store)
 }
 ```
 
-# Scoped Services
+# Schema Service Lifetime
 
-To use scoped services (e.g. HttpContext Scoped services in ASP.NET Core) you will either need to:
+Most dependency injection frameworks allow for specifying different service lifetimes for different
+services. Although they may have different names with different frameworks, the three most common
+lifetimes are as follows:
 
-* [Use Schema to get IHttpContextAccessor](#using-schema-to-get-ihttpcontextaccessor)
-* [Use SteroidsDI](#using-steroidsdi)
-* [Use UserContext Scoped IServiceProvider](#using-usercontext-scoped-iserviceprovider)
+* **Transient** services are created every time they are injected or requested.
+* **Scoped** services are created per scope. In a web application, every web request creates a new unique service scope. That means scoped services are generally created per web request.
+* **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
-## Using Schema to get IHttpContextAccessor
+It is highly recommended that the schema is registered as a singleton. This provides the best performance as
+the schema does not need to be built for every request. As all graph types are constructed at the
+same time as the schema, all graph types will effectively have a singleton lifetime, regardless
+of how it is registered with the DI framework.
 
-You can access scoped services by indirectly using the `IHttpContextAccessor` in order to retrieve the currently scoped `HttpContext` which in turn you can use to retrieve the required scoped services.
+Scoped lifetime can be used to allow the schema and all its graph types access to the current DI scope.
+This is not recommended; please see [Scoped Services](#scoped-services-with-a-singleton-schema-lifetime)
+below. With scoped schemas, it is **required** that all its graph types are registered within the DI
+framework as scoped or transient services.
 
-E.g. You can have the following extension method:
+Transient lifetime is also not recommended due to performance degradation. For schemas having a transient
+lifetime, it is **required** that all its graph types are also registered within the DI framework as
+transient services.
+
+# Scoped Services with a singleton schema lifetime
+
+For reasons described above, it is recommended that the schema is registered as a singleton within
+the dependency injection framework. However, this prevents including scoped services within the
+constructor of the schema or your custom graph types.
+
+To use scoped services (e.g. HttpContext scoped services in ASP.NET Core) you will need to pass
+the scoped service provider into the `ExecutionOptions.RequestServices` property. Then within
+any field resolver or field middleware, you can access the `IResolveFieldContext.RequestServices`
+property to resolve types via the scoped service provider. Typical integration with ASP.NET Core
+might look like this:
 
 ```csharp
-public static class ContextExtensions
+var result = await _executer.ExecuteAsync(options =>
 {
-    public static T GetRequiredScopedService<T>(this IResolveFieldContext context)
+    options.Schema = schema;
+    options.Query = request.Query;
+    options.Inputs = request.Variables.ToInputs();
+    options.RequestServices = context.RequestServices;
+});
+```
+
+You could then call scoped services from within field resolvers as shown in the following example:
+
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+    public StarWarsQuery()
     {
-        var rootServiceProvider = (IServiceProvider)context.Schema;
-
-        var contextAccessor = rootServiceProvider.GetRequiredService<IHttpContextAccessor>();
-
-        var scopedServiceProvider = contextAccessor.HttpContext.RequestServices;
-
-        return scopedServiceProvider.GetRequiredService<T>();
+        Field<DroidType>(
+            "hero",
+            resolve: context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2")
+        );
     }
 }
 ```
 
-Then you can use it as follows:
+When using scoped services, be aware that most scoped services are not thread-safe. Therefore you will likely
+need to use the `SerialExecutionStrategy` execution strategy, or write code to create a service scope
+for the duration of the execution of the field resolver that requires a scoped service. For instance, with
+Entity Framework Core, typically the database context is registered as a scoped service and obtained via
+dependency injection. To continue to use the database context in the same manner with a singleton schema,
+you would need to use a serial execution strategy, or create a scope within each field resolver that
+requires database access, as shown in the following example:
 
- ```csharp
- public class StarWarsQuery : ObjectGraphType
- {
-   public StarWarsQuery()
-   {
-     Field<DroidType>(
-       "hero",
-       resolve: context => context.GetRequiredScopedService<IDroidRepo>().GetDroid("R2-D2")
-     );
-   }
- }
- ```
+```csharp
+public class StarWarsQuery : ObjectGraphType
+{
+    public StarWarsQuery()
+    {
+        Field<DroidType>(
+            "hero",
+            resolve: context =>
+            {
+                using var scope = context.RequestServices.CreateScope();
+                var services = scope.ServiceProvider;
+                return services.GetRequiredService<MyDbContext>().Droids.Find(1);
+            }
+        );
+    }
+}
+```
+
+You can write extension methods to assist with this, as shown in the following sample:
+
+```csharp
+public static class ContextExtensions
+{
+    public static async Task<TReturn> RunScopedAsync<TSource, TReturn>(
+        this IResolveFieldContext<TSource> context,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    {
+        using (var scope = context.RequestServices.CreateScope()) {
+            return await func(context, scope.ServiceProvider);
+        }
+    }
+}
+
+public static class FieldBuilderExtensions
+{
+    public static FieldBuilder<TSource, TReturn> ResolveScopedAsync<TSource, TReturn>(
+        this FieldBuilder<TSource, TReturn> builder,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    {
+        return builder.ResolveAsync(context => context.RunScopedAsync(func));
+    }
+}
+
+public class MyGraphType : ObjectGraphType<Category>
+{
+    public MyGraphType()
+    {
+        Field("Name", context => context.Source.Name);
+        Field<ListGraphType<ProductGraphType>>("Products")
+            .ResolveScopedAsync((context, serviceProvider) => {
+                var db = serviceProvider.GetRequiredService<MyDbContext>();
+                return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
+            });
+    }
+}
+```
+
+Be aware that using the service locator in this fashion described in this section could be considered an
+Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
+Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
 
 ## Using SteroidsDI
 
@@ -198,79 +283,3 @@ public class StarWarsQuery : ObjectGraphType
 
 1. Add `Defer<T>` to be injected by the dependency injection container. This is a factory which upon calling `Defer.Value` will resolve the requested service using any currently registered scope provider (e.g. `AspNetCoreHttpScopeProvider`)
 2. Use the `Defer<T>` factory class to resolve the requested dependency using any currently registered scope provider. In our case it will attempt to use the `IHttpContextAccessor.HttpContext.RequestServices` which is the ASP.NET Core Scoped `IServiceProvider` in order to resolve the dependency.
-
-## Using UserContext Scoped IServiceProvider
-
-**Be Aware**: Exposing the service locator is considered an Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)
-
-You can add the relevant scoped `IServiceProvider` when creating the `UserContext` in order to run `IDocumentExecuter`.
-
-E.g. In ASP.NET Core [GraphQL.Harness](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Harness) example, you could add `IServiceProvider` to the [GraphQLUserContext](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Harness/GraphQLUserContext.cs) class, and then set it to the `HttpContext.RequestServices` when configuring the `GraphQLSettings.BuildUserContext`
-
-
-1. Add ServiceProvider to the UserContext
-
-    ```csharp
-    public class GraphQLUserContext: Dictionary<string, object>
-    {
-        ...
-        IServiceProvider ServiceProvider { get; set; }
-        ...
-    }
-    ```
-
-2. Set it to the `HttpContext.RequestServices` when building the `UserContext`.
-
-    > N.B The below uses [GraphQLSettings](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL.Harness/GraphQLSettings.cs) from the [GraphQL.Harness](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/src/GraphQL.Harness) example.
-
-    ```csharp
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext
-        {
-            User = ctx.User,
-            ServiceProvider = ctx.RequestServices
-        });
-    }
-    ```
-
-3. Use it in resolvers
-
-    ```csharp
-    public class StarWarsQuery : ObjectGraphType<object>
-    {
-        public StarWarsQuery()
-        {
-            ...
-            Field<CharacterInterface>("hero",
-                resolve: context =>
-                    ((GraphQLUserContext)context.UserContext)
-                    .GetRequiredService<IDroidRepo>()
-                    .GetDroidByIdAsync("3")
-            );
-
-            Field<CharacterInterface>("hero", resolve: context => context);
-        }
-    }
-    ```
-
- You could always create an extension method:
-
- ```csharp
-public static class GraphQLExtensions
-{
-    public static T GetRequiredService<T>(this IResolveFieldContext context) =>
-        ((GraphQLUserContext)context.UserContext).ServiceProvider.GetRequiredService<T>();
-}
- ```
-
-and use it as such:
-
-```csharp
-Field<CharacterInterface>("hero",
-            resolve: context =>
-                context
-                .GetRequiredService<IDroidRepo>()
-                .GetDroidByIdAsync("3")
-        );
-```
