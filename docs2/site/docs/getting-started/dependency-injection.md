@@ -144,7 +144,7 @@ constructor of the schema or your custom graph types.
 To use scoped services (e.g. HttpContext scoped services in ASP.NET Core) you will need to pass
 the scoped service provider into the `ExecutionOptions.RequestServices` property. Then within
 any field resolver or field middleware, you can access the `IResolveFieldContext.RequestServices`
-property to resolve types via the scoped service provider. Typical integration with Asp.Net Core
+property to resolve types via the scoped service provider. Typical integration with ASP.NET Core
 might look like this:
 
 ```csharp
