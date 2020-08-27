@@ -194,6 +194,45 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
+You can write extension functions to assist with this, as shown in the following sample:
+
+```csharp
+public static class ContextExtensions
+{
+    public static async Task<TReturn> RunScopedAsync<TSource, TReturn>(
+        this IResolveFieldContext<TSource> context,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    {
+        using (var scope = context.RequestServices.CreateScope()) {
+            return await func(context, scope.ServiceProvider);
+        }
+    }
+}
+
+public static class FieldBuilderExtensions
+{
+    public static FieldBuilder<TSource, TReturn> ResolveScopedAsync<TSource, TReturn>(
+        this FieldBuilder<TSource, TReturn> builder,
+        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
+    {
+        return builder.ResolveAsync(context => context.RunScopedAsync(func));
+    }
+}
+
+public class MyGraphType : ObjectGraphType<Category>
+{
+    public MyGraphType()
+    {
+        Field("Name", context => context.Source.Name);
+        Field<ListGraphType<ProductGraphType>>("Products")
+            .ResolveScopedAsync((context, serviceProvider) => {
+                var db = serviceProvider.GetRequiredService<MyDbContext>();
+                return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
+            });
+    }
+}
+```
+
 Be aware that using the service locator in this fashion described in this section could be considered an
 Anti-Pattern. See [Service Locator is an Anti-Pattern](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/).
 Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
