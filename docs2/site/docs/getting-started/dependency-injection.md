@@ -172,7 +172,7 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
-When using scoped services, be aware that most scoped services are not thread-safe. Therefor you will likely
+When using scoped services, be aware that most scoped services are not thread-safe. Therefore you will likely
 need to use the `SerialExecutionStrategy` execution strategy, or write code to create a service scope
 for the duration of the execution of the field resolver that requires a scoped service. For instance, with
 Entity Framework Core, typically the database context is registered as a scoped service and obtained via
