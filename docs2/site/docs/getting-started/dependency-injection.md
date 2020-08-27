@@ -121,7 +121,7 @@ lifetimes are as follows:
 * **Scoped** services are created per scope. In a web application, every web request creates a new unique service scope. That means scoped services are generally created per web request.
 * **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
-It is recommended that the schema is registered as a singleton. This provides the best performance as
+It is highly recommended that the schema is registered as a singleton. This provides the best performance as
 the schema does not need to be built for every request. As all graph types are constructed at the
 same time as the schema, all graph types will effectively have a singleton lifetime, regardless
 of how it is registered with the DI framework.
