@@ -173,8 +173,8 @@ need to use the `SerialExecutionStrategy` execution strategy, or write code to c
 for the duration of the execution of the field resolver that requires a scoped service. For instance, with
 Entity Framework Core, typically the database context is registered as a scoped service and obtained via
 dependency injection. To continue to use the database context in the same manner with a singleton schema,
-you would need to use a serial execution strategy, or create a scope within the field resolver, as shown in
-the following example:
+you would need to use a serial execution strategy, or create a scope within each field resolver that
+requires database access, as shown in the following example:
 
 ```csharp
 public class StarWarsQuery : ObjectGraphType
