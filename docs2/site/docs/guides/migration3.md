@@ -165,7 +165,7 @@ This is just a simplified example of the changes necessary. Note that typically 
 are registered as singletons within the dependency injection container, as they can safely be shared between requests.
 
 If you continue to use the `Newtonsoft.Json` converter, please note that ASP.NET Core 3.0 disallows synchronous IO by default,
-which is required by the converter.  You will need to make a change in the `ConfigureServices` section of `Startup.cs` as
+which is required by the converter. You will need to make a change in the `ConfigureServices` section of `Startup.cs` as
 follows:
 
 ```csharp
