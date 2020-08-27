@@ -212,7 +212,7 @@ please implement the `IDocumentExecutionListener` interface when creating a cust
 can also inherit from the `DocumentExecutionListenerBase` class to provide default implementations of events.
 
 The methods definitions have also changed from passing `userContext` and `cancellationToken` parameters to a
-single parameter `context` of type `IExecutionContext`.  The context has properties for accessing the user context,
+single parameter `context` of type `IExecutionContext`. The context has properties for accessing the user context,
 cancellation token, metrics, execution errors, and other information about the executing request.
 
 ```csharp
