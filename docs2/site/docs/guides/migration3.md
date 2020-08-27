@@ -305,7 +305,7 @@ including guidelines and restrictions on service lifetimes of middleware registe
 
 ### Data Loaders
 
-Data loaders now return an `IDataLoaderResult<T>` rather than a `Task<T>`.  Field resolver signatures may need to change
+Data loaders now return an `IDataLoaderResult<T>` rather than a `Task<T>`. Field resolver signatures may need to change
 as a result.  Lambda functions passed to field builders' `ResolveAsync` method should not need to change.
 
 ```csharp
