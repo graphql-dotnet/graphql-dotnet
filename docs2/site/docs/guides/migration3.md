@@ -60,88 +60,21 @@ public Schema(IServiceProvider serviceProvider)
 ```
 
 Also, the `Schema.DependencyResolver` property has been removed and not replaced. If you need to access the service provider
-from your graphs, you can include `IServiceProvider` in the constructor of the graph type.  Your DI container will pass
+from your graphs, you can include `IServiceProvider` in the constructor of the graph type. Your DI container will pass
 a reference to the service provider.  For singleton schemas, this will be the root service provider, from which you can
-obtain other singleton or transient services.  For scoped schemas with scoped graph types, this will be the service provider
-for the current executing scope.  Casting `Schema` to `IServiceProvider` is also possible, but not recommended, and will
+obtain other singleton or transient services. For scoped schemas with scoped graph types, this will be the service provider
+for the current executing scope. Casting `Schema` to `IServiceProvider` is also possible, but not recommended, and will
 yield similar results.
 
-If you wish to access a scoped service from within a resolver and want to use a singleton schema, you will need to pass a
-scoped service provider to `ExecutionOptions.RequestServices`, which can then be used to resolve scoped services.  For Asp.Net
-Core projects, you can add set this to equal `HttpContext.RequestServices`.  Here is a sample of such a method:
+If you wish to access a scoped service from within a resolver and want to use a singleton schema (as is recommended), you will
+need to pass a scoped service provider to `ExecutionOptions.RequestServices`, which can then be used to resolve scoped
+services. For Asp.Net Core projects, you can add set this to equal `HttpContext.RequestServices`. Be aware that if you
+are using a parallel execution strategy (default for 'query' requests), using scoped services within field resolvers can
+introduce thread safety issues; you may need to use a serial execution strategy or manually create a scope within each
+field resolver.
 
-```csharp
-private static async Task ExecuteAsync(HttpContext context, ISchema schema)
-{
-    ...
-
-    var executer = new DocumentExecuter();
-    var result = await executer.ExecuteAsync(options =>
-    {
-        ...
-
-        options.RequestServices = context.RequestServices;
-    });
-
-    ...
-}
-
-public class MyGraphType : ObjectGraphType<Category>
-{
-    public MyGraphType()
-    {
-        Field("Name", context => context.Source.Name);
-        Field<ListGraphType<ProductGraphType>>("Products", resolve: (context) => {
-            var db = context.RequestServices.GetRequiredService<MyDbContext>();
-            return db.Products.Where(x => x.CategoryId == context.Source.Id);
-        });
-    }
-}
-```
-
-Be aware that when using a parallel execution strategy, scoped services will all be returned from the same scope.  This
-will commonly produce execution errors with those scoped services, as they would be singleton services if they were designed
-to run in parallel.  You will need to use a serial execution strategy or request services from a created service scope within
-your field resolver's execution.  You can write extension functions to assist with this, as shown in the following sample:
-
-```csharp
-public static class ContextExtensions
-{
-    public static async Task<TReturn> RunScopedAsync<TSource, TReturn>(
-        this IResolveFieldContext<TSource> context,
-        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
-    {
-        using (var scope = context.RequestServices.CreateScope()) {
-            return await func(context, scope.ServiceProvider);
-        }
-    }
-}
-
-public static class FieldBuilderExtensions
-{
-    public static FieldBuilder<TSource, TReturn> ResolveScopedAsync<TSource, TReturn>(
-        this FieldBuilder<TSource, TReturn> builder,
-        Func<IResolveFieldContext<TSource>, IServiceProvider, Task<TReturn>> func)
-    {
-        return builder.ResolveAsync(context => context.RunScopedAsync(func));
-    }
-}
-
-public class MyGraphType : ObjectGraphType<Category>
-{
-    public MyGraphType()
-    {
-        Field("Name", context => context.Source.Name);
-        Field<ListGraphType<ProductGraphType>>("Products")
-            .ResolveScopedAsync((context, serviceProvider) => {
-                var db = serviceProvider.GetRequiredService<MyDbContext>();
-                return db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync();
-            });
-    }
-}
-```
-
-See the [Dependency Injection documentation](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection) for more details.
+See the [Dependency Injection documentation](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection) for
+more details.
 
 ### Json parsing and serialization
 
