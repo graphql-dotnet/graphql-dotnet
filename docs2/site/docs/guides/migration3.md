@@ -23,7 +23,7 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 
 * Based on .Net Standard 2.0, supporting .Net Core applications
 * Supports scoped services (see below under [Dependency Injection](#dependency-injection))
-* Supports the `System.Text.Json` library for JSON serialization, in addition to the Newtonsoft.Json library
+* Supports the `System.Text.Json` package for JSON serialization, in addition to the `Newtonsoft.Json` package
 * Data loaders work with serial execution strategies and can be chained together
 * Name converters can be configured to use a different function for field names versus argument names
 * Field builders can take an optional configuration action parameter
