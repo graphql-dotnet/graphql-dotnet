@@ -358,7 +358,7 @@ for an example.
 
 ### Exception Handling
 
-Exceptions have been split into three categories: schema errors, input errors, and processing errors.  For instance,
+Exceptions have been split into three categories: schema errors, input errors, and processing errors. For instance,
 if an invalid query was passed to the `DocumentExecuter`, it would be considered an input error, and a `SyntaxError`
 would be thrown. Or if an invalid enum string was passed as a variable to a query, an `InvalidValueError` would be
 thrown. All validation rules that fail their respective tests are treated as input errors.
