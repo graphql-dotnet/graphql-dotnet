@@ -217,10 +217,10 @@ KnownArgumentNames           | KNOWN_ARGUMENT_NAMES             | 5.4.1
 UniqueArgumentNames          | UNIQUE_ARGUMENT_NAMES            | 5.4.2
 ProvidedNonNullArguments     | PROVIDED_NON_NULL_ARGUMENTS      | 5.4.2.1
 UniqueFragmentNames          | UNIQUE_FRAGMENT_NAMES            | 5.5.1.1
-KnownFragmentNames           | KNOWN_FRAGMENT_NAMES             | 5.5.1.2
 KnownTypeNames               | KNOWN_TYPE_NAMES                 | 5.5.1.2
 FragmentsOnCompositeTypes    | FRAGMENTS_ON_COMPOSITE_TYPES     | 5.5.1.3
 NoUnusedFragments            | NO_UNUSED_FRAGMENTS              | 5.5.1.4
+KnownFragmentNames           | KNOWN_FRAGMENT_NAMES             | 5.5.2.1
 NoFragmentCycles             | NO_FRAGMENT_CYCLES               | 5.5.2.2
 PossibleFragmentSpreads      | POSSIBLE_FRAGMENT_SPREADS        | 5.5.2.3
 ArgumentsOfCorrectType       | ARGUMENTS_OF_CORRECT_TYPE        | 5.6.1

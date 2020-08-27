@@ -48,7 +48,7 @@ namespace GraphQL.Tests.Validation
         [InlineData(FragmentsOnCompositeTypesError.NUMBER, "5.5.1.3")]
         [InlineData(KnownArgumentNamesError.NUMBER, "5.4.1")]
         [InlineData(KnownDirectivesError.NUMBER, "5.7.1")]
-        [InlineData(KnownFragmentNamesError.NUMBER, "5.5.1.2")]
+        [InlineData(KnownFragmentNamesError.NUMBER, "5.5.2.1")]
         [InlineData(KnownTypeNamesError.NUMBER, "5.5.1.2")]
         [InlineData(LoneAnonymousOperationError.NUMBER, "5.2.2.1")]
         [InlineData(NoFragmentCyclesError.NUMBER, "5.5.2.2")]
