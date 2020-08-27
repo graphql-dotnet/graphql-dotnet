@@ -239,7 +239,7 @@ class MyListener : DocumentExecutionListenerBase
 ### IResolveFieldContext and IResolveConnectionContext
 
 Field resolver methods now are passed a reference to an `IResolveFieldContext` interface, rather than a
-`ResolveFieldContext` class.  Inline lambda functions are typically unaffected, but if you define your
+`ResolveFieldContext` class. Inline lambda functions are typically unaffected, but if you define your
 resolvers separately, you will need to change the function signature.
 
 ```csharp
