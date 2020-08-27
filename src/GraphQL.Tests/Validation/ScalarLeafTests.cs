@@ -160,7 +160,7 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        private string NoSubselectionAllowedMessage(string field, string type)
+        private static string NoSubselectionAllowedMessage(string field, string type)
             => ScalarLeafsError.NoSubselectionAllowedMessage(field, type);
 
         private string RequiredSubselectionMessage(string field, string type)
