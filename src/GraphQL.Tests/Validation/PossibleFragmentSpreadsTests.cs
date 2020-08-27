@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -251,12 +252,12 @@ namespace GraphQL.Tests.Validation
 
         private void error(ValidationTestConfig _, string fragName, string parentType, string fragType, int line, int column)
         {
-            _.Error(Rule.TypeIncompatibleSpreadMessage(fragName, parentType, fragType), line, column);
+            _.Error(PossibleFragmentSpreadsError.TypeIncompatibleSpreadMessage(fragName, parentType, fragType), line, column);
         }
 
         private void errorAnon(ValidationTestConfig _, string parentType, string fragType, int line, int column)
         {
-            _.Error(Rule.TypeIncompatibleAnonSpreadMessage(parentType, fragType), line, column);
+            _.Error(PossibleFragmentSpreadsError.TypeIncompatibleAnonSpreadMessage(parentType, fragType), line, column);
         }
     }
 }

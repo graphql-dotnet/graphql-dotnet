@@ -1,3 +1,5 @@
+using GraphQL.Validation;
+
 namespace GraphQL.Execution
 {
     /// <summary>
@@ -16,7 +18,9 @@ namespace GraphQL.Execution
         public bool ExposeExtensions { get; set; } = true;
 
         /// <summary>
-        /// Specifies whether the code of this error should be returned. Not applicable when <see cref="ExposeExtensions"/> is false.
+        /// Specifies whether the code of this error should be returned.
+        /// For validation errors, also returns the <see cref="ValidationError.Number"/>.
+        /// Not applicable when <see cref="ExposeExtensions"/> is false.
         /// </summary>
         public bool ExposeCode { get; set; } = true;
 

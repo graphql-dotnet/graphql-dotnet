@@ -65,7 +65,7 @@ Empty query document | NoOperationError | NO_OPERATION
 Query parsing error | SyntaxError | SYNTAX_ERROR
 Attempting a mutation or subscription when none are defined | InvalidOperationError | INVALID_OPERATION
 Invalid variable values | InvalidVariableError | INVALID_VALUE
-Validation errors | ValidationError | (varies)
+Validation errors | derived from ValidationError | [(varies; see list below)](#ValidationErrors)
 
 Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class.
 Any other thrown error is treated as a processing error (see [Processing Errors](#ProcessingErrors) below).
@@ -200,3 +200,36 @@ For example, to show the stack traces for unhandled errors during development, y
 You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
 the numerical codes provided by GraphQL.NET for validation errors, or reveal stack traces
 only to logged-in administrators.
+
+## <a name="ValidationErrors"></a>Validation error reference list
+
+Here is a full list of validation errors produced by GraphQL.NET:
+
+Rule                         | Code                             | Number
+-----------------------------|----------------------------------|-----------
+UniqueOperationNames         | UNIQUE_OPERATION_NAMES           | 5.2.1.1
+LoneAnonymousOperation       | LONE_ANONYMOUS_OPERATION         | 5.2.2.1
+SingleRootFieldSubscriptions | SINGLE_ROOT_FIELD_SUBSCRIPTIONS  | 5.2.3.1
+FieldsOnCorrectType          | FIELDS_ON_CORRECT_TYPE           | 5.3.1
+OverlappingFieldsCanBeMerged | OVERLAPPING_FIELDS_CAN_BE_MERGED | 5.3.2
+ScalarLeafs                  | SCALAR_LEAFS                     | 5.3.3
+KnownArgumentNames           | KNOWN_ARGUMENT_NAMES             | 5.4.1
+UniqueArgumentNames          | UNIQUE_ARGUMENT_NAMES            | 5.4.2
+ProvidedNonNullArguments     | PROVIDED_NON_NULL_ARGUMENTS      | 5.4.2.1
+UniqueFragmentNames          | UNIQUE_FRAGMENT_NAMES            | 5.5.1.1
+KnownTypeNames               | KNOWN_TYPE_NAMES                 | 5.5.1.2
+FragmentsOnCompositeTypes    | FRAGMENTS_ON_COMPOSITE_TYPES     | 5.5.1.3
+NoUnusedFragments            | NO_UNUSED_FRAGMENTS              | 5.5.1.4
+KnownFragmentNames           | KNOWN_FRAGMENT_NAMES             | 5.5.2.1
+NoFragmentCycles             | NO_FRAGMENT_CYCLES               | 5.5.2.2
+PossibleFragmentSpreads      | POSSIBLE_FRAGMENT_SPREADS        | 5.5.2.3
+ArgumentsOfCorrectType       | ARGUMENTS_OF_CORRECT_TYPE        | 5.6.1
+DefaultValuesOfCorrectType   | DEFAULT_VALUES_OF_CORRECT_TYPE   | 5.6.1
+UniqueInputFieldNames        | UNIQUE_INPUT_FIELD_NAMES         | 5.6.3
+KnownDirectives              | KNOWN_DIRECTIVES                 | 5.7.1
+UniqueDirectivesPerLocation  | UNIQUE_DIRECTIVES_PER_LOCATION   | 5.7.3
+UniqueVariableNames          | UNIQUE_VARIABLE_NAMES            | 5.8.1
+VariablesAreInputTypes       | VARIABLES_ARE_INPUT_TYPES        | 5.8.2
+NoUndefinedVariables         | NO_UNDEFINED_VARIABLES           | 5.8.3
+NoUnusedVariables            | NO_UNUSED_VARIABLES              | 5.8.4
+VariablesInAllowedPosition   | VARIABLES_IN_ALLOWED_POSITION    | 5.8.5

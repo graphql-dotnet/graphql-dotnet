@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -41,7 +42,7 @@ namespace GraphQL.Tests.Validation
                     }
                     ";
 
-                _.Error(Rule.UnknownTypeMessage("Abcd", null), 2, 37);
+                _.Error(KnownTypeNamesError.UnknownTypeMessage("Abcd", null), 2, 37);
             });
         }
 
@@ -61,9 +62,9 @@ namespace GraphQL.Tests.Validation
                     name
                   }
                 ";
-                _.Error(Rule.UnknownTypeMessage("JumbledUpLetters", null), 2, 35);
-                _.Error(Rule.UnknownTypeMessage("Badger", null), 5, 37);
-                _.Error(Rule.UnknownTypeMessage("Peettt", new[] {"Pet"}), 8, 41);
+                _.Error(KnownTypeNamesError.UnknownTypeMessage("JumbledUpLetters", null), 2, 35);
+                _.Error(KnownTypeNamesError.UnknownTypeMessage("Badger", null), 5, 37);
+                _.Error(KnownTypeNamesError.UnknownTypeMessage("Peettt", new[] {"Pet"}), 8, 41);
             });
         }
     }

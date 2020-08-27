@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -28,12 +29,7 @@ namespace GraphQL.Validation.Rules
                     if (string.IsNullOrWhiteSpace(op.Name)
                         && operationCount > 1)
                     {
-                        var error = new ValidationError(
-                            context.OriginalQuery,
-                            "5.1.2.1",
-                            AnonOperationNotAloneMessage(),
-                            op);
-                        context.ReportError(error);
+                        context.ReportError(new LoneAnonymousOperationError(context, op));
                     }
                 });
             }).ToTask();
