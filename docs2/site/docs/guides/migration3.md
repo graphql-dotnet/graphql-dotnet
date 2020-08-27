@@ -74,7 +74,7 @@ introduce thread safety issues; you may need to use a serial execution strategy 
 field resolver.
 
 See the [Dependency Injection documentation](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection) for
-more details.
+more details, including service lifetime guidelines and restrictions when registering your schema and graph types.
 
 ### Json parsing and serialization
 
@@ -297,7 +297,8 @@ public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext contex
 You also must ensure that your schema implements `IServiceProvider`. This is handled
 automatically if you inherit from `Schema`.
 
-See [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware) for more details.
+See [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware) for more details,
+including guidelines and restrictions on service lifetimes of middleware registered through your DI framework.
 
 ### Data Loaders
 
