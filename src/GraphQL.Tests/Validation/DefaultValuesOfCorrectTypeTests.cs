@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -49,8 +50,8 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(Rule.BadValueForNonNullArgMessage("a", "Int!", "Int"), 2, 63);
-                _.Error(Rule.BadValueForNonNullArgMessage("b", "String!", "String"), 2, 80);
+                _.Error(BadValueForNonNullArgMessage("a", "Int!", "Int"), 2, 63);
+                _.Error(BadValueForNonNullArgMessage("b", "String!", "String"), 2, 80);
             });
         }
 
@@ -68,9 +69,9 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(Rule.BadValueForDefaultArgMessage("a", "Int", "\"one\"", new []{"Expected type \"Int\", found \"one\"."}), 3, 35);
-                _.Error(Rule.BadValueForDefaultArgMessage("b", "String", "4", new []{"Expected type \"String\", found 4."}), 4, 38);
-                _.Error(Rule.BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new []{"Expected \"ComplexInput\", found not an object."}), 5, 44);
+                _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new []{"Expected type \"Int\", found \"one\"."}), 3, 35);
+                _.Error(BadValueForDefaultArgMessage("b", "String", "4", new []{"Expected type \"String\", found 4."}), 4, 38);
+                _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new []{"Expected \"ComplexInput\", found not an object."}), 5, 44);
             });
         }
 
@@ -84,7 +85,7 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(Rule.BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new []{"In field \"requiredField\": Expected \"Boolean!\", found null."}), 2, 67);
+                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new []{"In field \"requiredField\": Expected \"Boolean!\", found null."}), 2, 67);
             });
         }
 
@@ -97,8 +98,14 @@ namespace GraphQL.Tests.Validation
                     query InvalidItem($a: [String] = [""one"", 2]) {
                       dog { name }
                     }";
-                _.Error(Rule.BadValueForDefaultArgMessage("a", "[String]", "[\"one\", 2]", new[] { "In element #1: Expected type \"String\", found 2." }), 2, 54);
+                _.Error(BadValueForDefaultArgMessage("a", "[String]", "[\"one\", 2]", new[] { "In element #1: Expected type \"String\", found 2." }), 2, 54);
             });
         }
+
+        private static string BadValueForDefaultArgMessage(string varName, string type, string value, string[] verboseErrors)
+            => DefaultValuesOfCorrectTypeError.BadValueForDefaultArgMessage(varName, type, value, verboseErrors);
+
+        private static string BadValueForNonNullArgMessage(string varName, string type, string guessType)
+            => DefaultValuesOfCorrectTypeError.BadValueForNonNullArgMessage(varName, type, guessType);
     }
 }

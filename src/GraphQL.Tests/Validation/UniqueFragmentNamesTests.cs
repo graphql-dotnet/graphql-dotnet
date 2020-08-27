@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -127,7 +128,7 @@ namespace GraphQL.Tests.Validation
     {
       _.Error(err =>
       {
-        err.Message = Rule.DuplicateFragmentNameMessage(fragName);
+        err.Message = UniqueFragmentNamesError.DuplicateFragmentNameMessage(fragName);
         err.Loc(line1, column1);
         err.Loc(line2, column2);
       });

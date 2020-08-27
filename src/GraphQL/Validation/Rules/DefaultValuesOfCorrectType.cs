@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -15,18 +14,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class DefaultValuesOfCorrectType : IValidationRule
     {
-        public readonly Func<string, string, string, string> BadValueForNonNullArgMessage =
-            (varName, type, guessType) => $"Variable \"{varName}\" of type \"{type}\" is required and" +
-                                          " will not use default value. " +
-                                          $"Perhaps you mean to use type \"{guessType}\"?";
-
-        public readonly Func<string, string, string, IEnumerable<string>, string> BadValueForDefaultArgMessage =
-            (varName, type, value, verboseErrors) =>
-            {
-                var message = verboseErrors != null ? "\n" + string.Join("\n", verboseErrors) : "";
-                return $"Variable \"{varName}\" of type \"{type}\" has invalid default value {value}.{message}";
-            };
-
         public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -41,14 +28,7 @@ namespace GraphQL.Validation.Rules
 
                     if (inputType is NonNullGraphType nonNullType && defaultValue != null)
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.7.2",
-                            BadValueForNonNullArgMessage(
-                                name,
-                                context.Print(nonNullType),
-                                context.Print(nonNullType.ResolvedType)),
-                            defaultValue));
+                        context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, nonNullType));
                     }
 
                     if (inputType != null && defaultValue != null)
@@ -56,15 +36,7 @@ namespace GraphQL.Validation.Rules
                         var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
                         if (errors.Count > 0)
                         {
-                            context.ReportError(new ValidationError(
-                                context.OriginalQuery,
-                                "5.7.2",
-                                BadValueForDefaultArgMessage(
-                                    name,
-                                    context.Print(inputType),
-                                    context.Print(defaultValue),
-                                    errors),
-                                defaultValue));
+                            context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
                         }
                     }
                 });

@@ -5,6 +5,7 @@ using GraphQL.Language.AST;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Errors;
 using Shouldly;
 using Xunit;
 
@@ -637,9 +638,12 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var error = new ExecutionError("Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.");
+            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.")
+            {
+                Code = "ARGUMENTS_OF_CORRECT_TYPE",
+            };
             error.AddLocation(3, 45);
-            error.Code = "5.3.3.1";
+            
             var expected = new ExecutionResult
             {
                 Errors = new ExecutionErrors { error },

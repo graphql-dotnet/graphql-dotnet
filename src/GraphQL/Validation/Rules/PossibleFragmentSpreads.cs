@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,12 +14,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class PossibleFragmentSpreads : IValidationRule
     {
-        public string TypeIncompatibleSpreadMessage(string fragName, string parentType, string fragType)
-            => $"Fragment \"{fragName}\" cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
-
-        public string TypeIncompatibleAnonSpreadMessage(string parentType, string fragType)
-            => $"Fragment cannot be spread here as objects of type \"{parentType}\" can never be of type \"{fragType}\".";
-
         public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -32,11 +27,7 @@ namespace GraphQL.Validation.Rules
 
                     if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.4.2.3",
-                            TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)),
-                            node));
+                        context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
                     }
                 });
 
@@ -48,11 +39,7 @@ namespace GraphQL.Validation.Rules
 
                     if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.4.2.3",
-                            TypeIncompatibleSpreadMessage(fragName, context.Print(parentType), context.Print(fragType)),
-                            node));
+                        context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
                     }
                 });
             }).ToTask();

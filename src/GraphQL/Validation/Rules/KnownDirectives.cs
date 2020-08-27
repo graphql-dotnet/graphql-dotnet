@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -14,16 +15,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class KnownDirectives : IValidationRule
     {
-        public string UnknownDirectiveMessage(string directiveName)
-        {
-            return $"Unknown directive \"{directiveName}\".";
-        }
-
-        public string MisplacedDirectiveMessage(string directiveName, string location)
-        {
-            return $"Directive \"{directiveName}\" may not be used on {location}.";
-        }
-
         public static readonly KnownDirectives Instance = new KnownDirectives();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -35,18 +26,14 @@ namespace GraphQL.Validation.Rules
                     var directiveDef = context.Schema.FindDirective(node.Name);
                     if (directiveDef == null)
                     {
-                        context.ReportError(new ValidationError(context.OriginalQuery, "5.6.1", UnknownDirectiveMessage(node.Name), node));
+                        context.ReportError(new KnownDirectivesError(context, node));
                         return;
                     }
 
                     var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
                     if (!directiveDef.Locations.Any(x => x == candidateLocation))
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.6.1",
-                            MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()),
-                            node));
+                        context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
                     }
                 });
             }).ToTask();

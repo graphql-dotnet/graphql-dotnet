@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,12 +13,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoFragmentCycles : IValidationRule
     {
-        public string CycleErrorMessage(string fragName, string[] spreadNames)
-        {
-            var via = spreadNames.Length > 0 ? " via " + string.Join(", ", spreadNames) : "";
-            return $"Cannot spread fragment \"{fragName}\" within itself{via}.";
-        }
-
         public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -92,11 +87,7 @@ namespace GraphQL.Validation.Rules
                     var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
                     var nodes = cyclePath.OfType<INode>().Concat(new[] {spreadNode}).ToArray();
 
-                    context.ReportError(new ValidationError(
-                        context.OriginalQuery,
-                        "5.4",
-                        CycleErrorMessage(spreadName, cyclePath.Select(x => x.Name).ToArray()),
-                        nodes));
+                    context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.Name).ToArray(), nodes));
                 }
             }
 
