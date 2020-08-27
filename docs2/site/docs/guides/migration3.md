@@ -368,7 +368,7 @@ the thrown error is a native exception -- for instance, an `ArgumentOutOfRange` 
 trying to add a field to a type with the same name as one that already exists.
 
 In 3.x, `ExecutionError` (and derived classes) are returned directly from the `DocumentExecuter` for parsing
-and validation errors (input errors). Field resovlers and middleware can also return input errors by
+and validation errors (input errors). Field resolvers and middleware can also return input errors by
 throwing an `ExecutionError` exception.
 
 Processing errors are now able to be caught within an optional `UnhandledExceptionDelegate` and processed,
