@@ -122,14 +122,18 @@ lifetimes are as follows:
 * **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
 It is recommended that the schema is registered as a singleton. This provides the best performance as
-the schema does not need to be built for every request. Note that when the schema is constructed, all
-graph types are instantiated at the same time. This means that all graph types will share the same
-lifetime as that of the schema; you cannot have a scoped graph type with a singleton schema.
+the schema does not need to be built for every request. As all graph types are constructed at the
+same time as the schema, all graph types will effectively have a singleton lifetime, regardless
+of how it is registered with the DI framework.
 
 Scoped lifetime can be used to allow the schema and all its graph types access to the current DI scope.
-This is not recommended; please see [Scoped Services](#scoped-services-with-a-singleton-schema-lifetime) below.
+This is not recommended; please see [Scoped Services](#scoped-services-with-a-singleton-schema-lifetime)
+below. With scoped schemas, it is **required** that all its graph types are registered within the DI
+framework as scoped or transient services.
 
-Transient lifetime is also not recommended due to performance degradation.
+Transient lifetime is also not recommended due to performance degradation. For schemas having a transient
+lifetime, it is **required** that all its graph types are also registered within the DI framework as
+transient services.
 
 # Scoped Services with a singleton schema lifetime
 
