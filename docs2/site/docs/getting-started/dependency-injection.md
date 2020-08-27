@@ -198,7 +198,7 @@ public class StarWarsQuery : ObjectGraphType
 }
 ```
 
-You can write extension functions to assist with this, as shown in the following sample:
+You can write extension methods to assist with this, as shown in the following sample:
 
 ```csharp
 public static class ContextExtensions
