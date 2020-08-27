@@ -65,7 +65,7 @@ Empty query document | NoOperationError | NO_OPERATION
 Query parsing error | SyntaxError | SYNTAX_ERROR
 Attempting a mutation or subscription when none are defined | InvalidOperationError | INVALID_OPERATION
 Invalid variable values | InvalidVariableError | INVALID_VALUE
-Validation errors | dervied from ValidationError | [(varies; see list below)](#ValidationErrors)
+Validation errors | derived from ValidationError | [(varies; see list below)](#ValidationErrors)
 
 Field resolvers can manually trigger an input error by throwing an `ExecutionError` or derived class.
 Any other thrown error is treated as a processing error (see [Processing Errors](#ProcessingErrors) below).
