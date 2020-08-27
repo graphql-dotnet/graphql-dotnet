@@ -158,13 +158,13 @@ You could then call scoped services from within field resolvers as shown in the 
 ```csharp
 public class StarWarsQuery : ObjectGraphType
 {
-  public StarWarsQuery()
-  {
-    Field<DroidType>(
-      "hero",
-      resolve: context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2")
-    );
-  }
+    public StarWarsQuery()
+    {
+        Field<DroidType>(
+            "hero",
+            resolve: context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2")
+        );
+    }
 }
 ```
 
@@ -179,18 +179,18 @@ requires database access, as shown in the following example:
 ```csharp
 public class StarWarsQuery : ObjectGraphType
 {
-  public StarWarsQuery()
-  {
-    Field<DroidType>(
-      "hero",
-      resolve: context =>
-      {
-        using var scope = context.RequestServices.CreateScope();
-        var services = scope.ServiceProvider;
-        return services.GetRequiredService<IDroidRepo>().GetDroid("R2-D2");
-      }
-    );
-  }
+    public StarWarsQuery()
+    {
+        Field<DroidType>(
+            "hero",
+            resolve: context =>
+            {
+                using var scope = context.RequestServices.CreateScope();
+                var services = scope.ServiceProvider;
+                return services.GetRequiredService<MyDbContext>().Droids.Find(1);
+            }
+        );
+    }
 }
 ```
 
