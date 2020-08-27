@@ -129,7 +129,7 @@ var result = executer.ExecuteAsync(options =>
 
     ...
 
-    options.UnhandledExecutionDelegate = context =>
+    options.UnhandledExceptionDelegate = context =>
     {
         try
         {
