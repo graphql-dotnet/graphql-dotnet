@@ -36,9 +36,7 @@ namespace GraphQL.Validation
             params INode[] nodes)
             : base(message, innerException)
         {
-            Code = ErrorInfoProvider.GetErrorCode(GetType());
-            if (Code != "VALIDATION_ERROR" && Code.EndsWith("_ERROR"))
-                Code = Code.Substring(0, Code.Length - 6);
+            Code = GetValidationErrorCode(GetType());
             Number = number;
 
             nodes?.Apply(n =>
@@ -50,6 +48,14 @@ namespace GraphQL.Validation
                     AddLocation(location.Line, location.Column);
                 }
             });
+        }
+
+        internal static string GetValidationErrorCode(Type type)
+        {
+            var code = ErrorInfoProvider.GetErrorCode(type);
+            if (code != "VALIDATION_ERROR" && code.EndsWith("_ERROR"))
+                code = code.Substring(0, code.Length - 6);
+            return code;
         }
 
         /// <summary>
