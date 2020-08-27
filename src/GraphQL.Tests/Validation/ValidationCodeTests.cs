@@ -8,6 +8,8 @@ namespace GraphQL.Tests.Validation
 {
     public class ValidationCodeTests
     {
+        // be sure to update the documentation if any of these codes or numbers change - see errors.md
+        
         [Theory]
         [InlineData(typeof(ValidationError), "VALIDATION_ERROR")]
         [InlineData(typeof(ArgumentsOfCorrectTypeError), "ARGUMENTS_OF_CORRECT_TYPE")]
