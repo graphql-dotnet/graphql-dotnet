@@ -51,6 +51,5 @@ namespace GraphQL.Validation.Errors
             }
             return message;
         }
-
     }
 }

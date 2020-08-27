@@ -33,6 +33,5 @@ namespace GraphQL.Validation.Errors
                 return reasonMessage.Msg;
             }
         }
-
     }
 }
