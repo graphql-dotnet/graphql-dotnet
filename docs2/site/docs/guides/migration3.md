@@ -61,7 +61,7 @@ public Schema(IServiceProvider serviceProvider)
 
 Also, the `Schema.DependencyResolver` property has been removed and not replaced. If you need to access the service provider
 from your graphs, you can include `IServiceProvider` in the constructor of the graph type. Your DI container will pass
-a reference to the service provider.  For singleton schemas, this will be the root service provider, from which you can
+a reference to the service provider. For singleton schemas, this will be the root service provider, from which you can
 obtain other singleton or transient services. For scoped schemas with scoped graph types, this will be the service provider
 for the current executing scope. Casting `Schema` to `IServiceProvider` is also possible, but not recommended, and will
 yield similar results.
