@@ -216,8 +216,8 @@ ScalarLeafs                  | SCALAR_LEAFS                     | 5.3.3
 KnownArgumentNames           | KNOWN_ARGUMENT_NAMES             | 5.4.1
 UniqueArgumentNames          | UNIQUE_ARGUMENT_NAMES            | 5.4.2
 ProvidedNonNullArguments     | PROVIDED_NON_NULL_ARGUMENTS      | 5.4.2.1
-KnownFragmentNames           | KNOWN_FRAGMENT_NAMES             | 5.5.1.1
 UniqueFragmentNames          | UNIQUE_FRAGMENT_NAMES            | 5.5.1.1
+KnownFragmentNames           | KNOWN_FRAGMENT_NAMES             | 5.5.1.2
 KnownTypeNames               | KNOWN_TYPE_NAMES                 | 5.5.1.2
 FragmentsOnCompositeTypes    | FRAGMENTS_ON_COMPOSITE_TYPES     | 5.5.1.3
 NoUnusedFragments            | NO_UNUSED_FRAGMENTS              | 5.5.1.4
