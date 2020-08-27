@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class OverlappingFieldsCanBeMergedError : ValidationError
     {
         internal const string NUMBER = "5.3.2";

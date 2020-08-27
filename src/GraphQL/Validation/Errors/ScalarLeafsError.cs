@@ -1,8 +1,10 @@
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class ScalarLeafsError : ValidationError
     {
         internal const string NUMBER = "5.3.3";

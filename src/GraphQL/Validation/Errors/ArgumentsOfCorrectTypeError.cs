@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class ArgumentsOfCorrectTypeError : ValidationError
     {
         internal const string NUMBER = "5.6.1";

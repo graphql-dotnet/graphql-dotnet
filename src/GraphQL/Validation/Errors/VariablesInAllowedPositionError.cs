@@ -1,9 +1,11 @@
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQLParser;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class VariablesInAllowedPositionError : ValidationError
     {
         internal const string NUMBER = "5.8.5";

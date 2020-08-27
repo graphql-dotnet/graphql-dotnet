@@ -2747,113 +2747,139 @@ namespace GraphQL.Validation.Complexity
 }
 namespace GraphQL.Validation.Errors
 {
+    [System.Serializable]
     public class ArgumentsOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
         public ArgumentsOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
     }
+    [System.Serializable]
     public class DefaultValuesOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
         public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.NonNullGraphType nonNullType) { }
         public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
     }
+    [System.Serializable]
     public class FieldsOnCorrectTypeError : GraphQL.Validation.ValidationError
     {
         public FieldsOnCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Field node, GraphQL.Types.IGraphType type, System.Collections.Generic.IEnumerable<string> suggestedTypeNames, System.Collections.Generic.IEnumerable<string> suggestedFieldNames) { }
     }
+    [System.Serializable]
     public class FragmentsOnCompositeTypesError : GraphQL.Validation.ValidationError
     {
         public FragmentsOnCompositeTypesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentDefinition node) { }
         public FragmentsOnCompositeTypesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.InlineFragment node) { }
     }
+    [System.Serializable]
     public class KnownArgumentNamesError : GraphQL.Validation.ValidationError
     {
         public KnownArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, GraphQL.Types.DirectiveGraphType directive) { }
         public KnownArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, GraphQL.Types.FieldType fieldDef, GraphQL.Types.IGraphType parentType) { }
     }
+    [System.Serializable]
     public class KnownDirectivesError : GraphQL.Validation.ValidationError
     {
         public KnownDirectivesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node) { }
         public KnownDirectivesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Types.DirectiveLocation candidateLocation) { }
     }
+    [System.Serializable]
     public class KnownFragmentNamesError : GraphQL.Validation.ValidationError
     {
         public KnownFragmentNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentSpread node, string fragmentName) { }
     }
+    [System.Serializable]
     public class KnownTypeNamesError : GraphQL.Validation.ValidationError
     {
         public KnownTypeNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.NamedType node, string[] suggestedTypes) { }
     }
+    [System.Serializable]
     public class LoneAnonymousOperationError : GraphQL.Validation.ValidationError
     {
         public LoneAnonymousOperationError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Operation node) { }
     }
+    [System.Serializable]
     public class NoFragmentCyclesError : GraphQL.Validation.ValidationError
     {
         public NoFragmentCyclesError(GraphQL.Validation.ValidationContext context, string fragName, string[] spreadNames, params GraphQL.Language.AST.INode[] nodes) { }
     }
+    [System.Serializable]
     public class NoUndefinedVariablesError : GraphQL.Validation.ValidationError
     {
         public NoUndefinedVariablesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Operation node, GraphQL.Language.AST.VariableReference variableReference) { }
     }
+    [System.Serializable]
     public class NoUnusedFragmentsError : GraphQL.Validation.ValidationError
     {
         public NoUnusedFragmentsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentDefinition node) { }
     }
+    [System.Serializable]
     public class NoUnusedVariablesError : GraphQL.Validation.ValidationError
     {
         public NoUnusedVariablesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition node, GraphQL.Language.AST.Operation op) { }
     }
+    [System.Serializable]
     public class OverlappingFieldsCanBeMergedError : GraphQL.Validation.ValidationError
     {
         public OverlappingFieldsCanBeMergedError(GraphQL.Validation.ValidationContext context, GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Conflict conflict) { }
     }
+    [System.Serializable]
     public class PossibleFragmentSpreadsError : GraphQL.Validation.ValidationError
     {
         public PossibleFragmentSpreadsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentSpread node, GraphQL.Types.IGraphType parentType, GraphQL.Types.IGraphType fragType) { }
         public PossibleFragmentSpreadsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.InlineFragment node, GraphQL.Types.IGraphType parentType, GraphQL.Types.IGraphType fragType) { }
     }
+    [System.Serializable]
     public class ProvidedNonNullArgumentsError : GraphQL.Validation.ValidationError
     {
         public ProvidedNonNullArgumentsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Types.QueryArgument arg) { }
         public ProvidedNonNullArgumentsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Field node, GraphQL.Types.QueryArgument arg) { }
     }
+    [System.Serializable]
     public class ScalarLeafsError : GraphQL.Validation.ValidationError
     {
         public ScalarLeafsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Field node, GraphQL.Types.IGraphType type) { }
         public ScalarLeafsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.SelectionSet node, GraphQL.Language.AST.Field field, GraphQL.Types.IGraphType type) { }
     }
+    [System.Serializable]
     public class SingleRootFieldSubscriptionsError : GraphQL.Validation.ValidationError
     {
         public SingleRootFieldSubscriptionsError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Operation operation, params GraphQL.Language.AST.ISelection[] nodes) { }
     }
+    [System.Serializable]
     public class UniqueArgumentNamesError : GraphQL.Validation.ValidationError
     {
         public UniqueArgumentNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Argument node, GraphQL.Language.AST.Argument otherNode) { }
     }
+    [System.Serializable]
     public class UniqueDirectivesPerLocationError : GraphQL.Validation.ValidationError
     {
         public UniqueDirectivesPerLocationError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Directive node, GraphQL.Language.AST.Directive altNode) { }
     }
+    [System.Serializable]
     public class UniqueFragmentNamesError : GraphQL.Validation.ValidationError
     {
         public UniqueFragmentNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.FragmentDefinition node, GraphQL.Language.AST.FragmentDefinition altNode) { }
     }
+    [System.Serializable]
     public class UniqueInputFieldNamesError : GraphQL.Validation.ValidationError
     {
         public UniqueInputFieldNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.IValue node, GraphQL.Language.AST.ObjectField altNode) { }
     }
+    [System.Serializable]
     public class UniqueOperationNamesError : GraphQL.Validation.ValidationError
     {
         public UniqueOperationNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.Operation node) { }
     }
+    [System.Serializable]
     public class UniqueVariableNamesError : GraphQL.Validation.ValidationError
     {
         public UniqueVariableNamesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition node, GraphQL.Language.AST.VariableDefinition altNode) { }
     }
+    [System.Serializable]
     public class VariablesAreInputTypesError : GraphQL.Validation.ValidationError
     {
         public VariablesAreInputTypesError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition node, GraphQL.Types.IGraphType type) { }
     }
+    [System.Serializable]
     public class VariablesInAllowedPositionError : GraphQL.Validation.ValidationError
     {
         public VariablesInAllowedPositionError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDef, GraphQL.Types.IGraphType varType, GraphQL.Validation.VariableUsage usage) { }

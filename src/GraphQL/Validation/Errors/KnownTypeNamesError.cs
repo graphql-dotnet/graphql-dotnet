@@ -1,8 +1,10 @@
+using System;
 using GraphQL.Language.AST;
 using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class KnownTypeNamesError : ValidationError
     {
         internal const string NUMBER = "5.5.1.2";

@@ -1,7 +1,9 @@
+using System;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Errors
 {
+    [Serializable]
     public class UniqueVariableNamesError : ValidationError
     {
         internal const string NUMBER = "5.8.1";
