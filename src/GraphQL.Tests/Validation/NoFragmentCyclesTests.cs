@@ -279,7 +279,7 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        private string CycleErrorMessage(string fragName, string[] spreadNames)
+        private static string CycleErrorMessage(string fragName, string[] spreadNames)
             => NoFragmentCyclesError.CycleErrorMessage(fragName, spreadNames);
     }
 }
