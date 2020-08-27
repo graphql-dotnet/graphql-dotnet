@@ -358,7 +358,7 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        private string BadVarPosMessage(string varName, string varType, string expectedType)
+        private static string BadVarPosMessage(string varName, string varType, string expectedType)
             => VariablesInAllowedPositionError.BadVarPosMessage(varName, varType, expectedType);
     }
 }

@@ -102,10 +102,10 @@ namespace GraphQL.Tests.Validation
             });
         }
 
-        private string BadValueForDefaultArgMessage(string varName, string type, string value, string[] verboseErrors)
+        private static string BadValueForDefaultArgMessage(string varName, string type, string value, string[] verboseErrors)
             => DefaultValuesOfCorrectTypeError.BadValueForDefaultArgMessage(varName, type, value, verboseErrors);
 
-        private string BadValueForNonNullArgMessage(string varName, string type, string guessType)
+        private static string BadValueForNonNullArgMessage(string varName, string type, string guessType)
             => DefaultValuesOfCorrectTypeError.BadValueForNonNullArgMessage(varName, type, guessType);
     }
 }
