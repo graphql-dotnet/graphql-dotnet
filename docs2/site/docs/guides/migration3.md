@@ -205,7 +205,9 @@ class MyContext : Dictionary<string, object>
 }
 ```
 
-If you are going to use GraphQL.NET in ASP.NET Core application, then you may be interested in the [server](https://github.com/graphql-dotnet/server) project. It already implements all the necessary integration with GraphQL.NET via the custom ASP.NET Core middleware.
+If you are going to use GraphQL.NET in an ASP.NET Core application, then you may be interested in the
+[server](https://github.com/graphql-dotnet/server) project. It already implements all the necessary integration
+with GraphQL.NET via the custom ASP.NET Core middleware.
 ### Document Listeners
 
 The `DocumentExecutionListenerBase<T>` class and `IDocumentExecutionListener<T>` interface have been removed;
