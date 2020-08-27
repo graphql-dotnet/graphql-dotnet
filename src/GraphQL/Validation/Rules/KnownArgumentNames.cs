@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
