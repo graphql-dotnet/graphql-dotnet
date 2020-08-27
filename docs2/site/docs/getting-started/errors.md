@@ -198,5 +198,18 @@ For example, to show the stack traces for unhandled errors during development, y
 ```
 
 You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
-the numerical codes provided by GraphQL.NET for validation errors, or reveal stack traces
-only to logged-in administrators.
+the numerical codes provided by GraphQL.NET for validation errors, reveal stack traces
+only to logged-in administrators, or simply add information to the returned error object. Below is a sample
+of a custom `IErrorInfoProvider` that adds a date stamp to returned error objects:
+
+```csharp
+public class MyErrorInfoProvider : GraphQL.Execution.ErrorInfoProvider
+{
+    public override ErrorInfo GetInfo(ExecutionError executionError)
+    {
+        var info = base.GetInfo(executionError);
+        info.Extensions["timestamp"] = DateTime.Now.ToString("u");
+        return info;
+    }
+}
+```
