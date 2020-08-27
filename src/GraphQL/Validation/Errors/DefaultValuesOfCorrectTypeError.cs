@@ -8,11 +8,6 @@ namespace GraphQL.Validation.Errors
     {
         internal const string NUMBER = "5.6.1";
 
-        public DefaultValuesOfCorrectTypeError(ValidationContext context, IValue node, string message)
-            : base(context.OriginalQuery, NUMBER, message, node)
-        {
-        }
-
         public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, NonNullGraphType nonNullType)
             : base(context.OriginalQuery, NUMBER, BadValueForNonNullArgMessage(varDefAst.Name, context.Print(nonNullType), context.Print(nonNullType.ResolvedType)), varDefAst.DefaultValue)
         {
