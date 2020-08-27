@@ -403,7 +403,7 @@ var result = executer.ExecuteAsync(options => {
 
 If you have written a custom name converter, you must now implement `INameConverter` rather than
 `IFieldNameConverter`, which has two methods, `NameForField` and `NameForArgument`, rather than
-only `NameFor`. There is also no need to check for introspection types, as the framework will
+only `NameFor`. There is also no need to check for introspection types, as GraphQL.NET will
 handle this automatically. Below is a sample of the changes required:
 
 ```csharp
