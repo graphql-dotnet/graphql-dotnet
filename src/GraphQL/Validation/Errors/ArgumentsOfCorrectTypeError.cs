@@ -5,10 +5,10 @@ namespace GraphQL.Validation.Errors
 {
     public class ArgumentsOfCorrectTypeError : ValidationError
     {
-        public const string PARAGRAPH = "5.6.1";
+        internal const string NUMBER = "5.6.1";
 
         public ArgumentsOfCorrectTypeError(ValidationContext context, Argument node, IEnumerable<string> verboseErrors)
-            : base(context.OriginalQuery, PARAGRAPH, BadValueMessage(node.Name, context.Print(node.Value), verboseErrors), node)
+            : base(context.OriginalQuery, NUMBER, BadValueMessage(node.Name, context.Print(node.Value), verboseErrors), node)
         {
         }
 

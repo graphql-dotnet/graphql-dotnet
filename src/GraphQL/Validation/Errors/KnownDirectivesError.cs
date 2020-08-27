@@ -5,15 +5,15 @@ namespace GraphQL.Validation.Errors
 {
     public class KnownDirectivesError : ValidationError
     {
-        public const string PARAGRAPH = "5.7.1";
+        internal const string NUMBER = "5.7.1";
 
         public KnownDirectivesError(ValidationContext context, Directive node)
-            : base(context.OriginalQuery, PARAGRAPH, UnknownDirectiveMessage(node.Name), node)
+            : base(context.OriginalQuery, NUMBER, UnknownDirectiveMessage(node.Name), node)
         {
         }
 
         public KnownDirectivesError(ValidationContext context, Directive node, DirectiveLocation candidateLocation)
-            : base(context.OriginalQuery, PARAGRAPH, MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()), node)
+            : base(context.OriginalQuery, NUMBER, MisplacedDirectiveMessage(node.Name, candidateLocation.ToString()), node)
         {
         }
 

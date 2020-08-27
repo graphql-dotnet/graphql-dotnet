@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class LoneAnonymousOperationError : ValidationError
     {
-        public const string PARAGRAPH = "5.2.2.1";
+        internal const string NUMBER = "5.2.2.1";
 
         public LoneAnonymousOperationError(ValidationContext context, Operation node)
-            : base(context.OriginalQuery, PARAGRAPH, AnonOperationNotAloneMessage(), node)
+            : base(context.OriginalQuery, NUMBER, AnonOperationNotAloneMessage(), node)
         {
         }
 

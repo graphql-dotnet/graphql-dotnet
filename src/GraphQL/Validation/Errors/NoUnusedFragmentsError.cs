@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class NoUnusedFragmentsError : ValidationError
     {
-        public const string PARAGRAPH = "5.5.1.4";
+        internal const string NUMBER = "5.5.1.4";
 
         public NoUnusedFragmentsError(ValidationContext context, FragmentDefinition node)
-            : base(context.OriginalQuery, PARAGRAPH, UnusedFragMessage(node.Name), node)
+            : base(context.OriginalQuery, NUMBER, UnusedFragMessage(node.Name), node)
         {
         }
 

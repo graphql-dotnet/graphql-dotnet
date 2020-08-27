@@ -5,10 +5,10 @@ namespace GraphQL.Validation.Errors
 {
     public class OverlappingFieldsCanBeMergedError : ValidationError
     {
-        public const string PARAGRAPH = "5.3.2";
+        internal const string NUMBER = "5.3.2";
 
         public OverlappingFieldsCanBeMergedError(ValidationContext context, Conflict conflict)
-            : base(context.OriginalQuery, PARAGRAPH, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
+            : base(context.OriginalQuery, NUMBER, FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
                   conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray())
         {
         }

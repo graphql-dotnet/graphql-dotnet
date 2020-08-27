@@ -8,10 +8,10 @@ namespace GraphQL.Validation.Errors
 {
     public class FieldsOnCorrectTypeError : ValidationError
     {
-        public const string PARAGRAPH = "5.3.1";
+        internal const string NUMBER = "5.3.1";
 
         public FieldsOnCorrectTypeError(ValidationContext context, Field node, IGraphType type, IEnumerable<string> suggestedTypeNames, IEnumerable<string> suggestedFieldNames)
-            : base(context.OriginalQuery, PARAGRAPH, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
+            : base(context.OriginalQuery, NUMBER, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
         {
         }
 

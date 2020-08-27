@@ -55,13 +55,13 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_Valid2() => AssertQuerySuccess("{ input(arg: SLEEPY) }", @"{ ""input"": ""Sleepy"" }");
 
         [Fact]
-        public void Input_Enum_InvalidEnum() => AssertQueryWithError("{ input(arg: DOPEY) }", null, "Argument \u0022arg\u0022 has invalid value DOPEY.\nExpected type \u0022Bug1699Enum\u0022, found DOPEY.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.PARAGRAPH);
+        public void Input_Enum_InvalidEnum() => AssertQueryWithError("{ input(arg: DOPEY) }", null, "Argument \u0022arg\u0022 has invalid value DOPEY.\nExpected type \u0022Bug1699Enum\u0022, found DOPEY.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER);
 
         [Fact]
-        public void Input_Enum_InvalidString() => AssertQueryWithError(@"{ input(arg: ""SLEEPY"") }", null, "Argument \u0022arg\u0022 has invalid value \u0022SLEEPY\u0022.\nExpected type \u0022Bug1699Enum\u0022, found \u0022SLEEPY\u0022.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.PARAGRAPH);
+        public void Input_Enum_InvalidString() => AssertQueryWithError(@"{ input(arg: ""SLEEPY"") }", null, "Argument \u0022arg\u0022 has invalid value \u0022SLEEPY\u0022.\nExpected type \u0022Bug1699Enum\u0022, found \u0022SLEEPY\u0022.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER);
 
         [Fact]
-        public void Input_Enum_InvalidInt() => AssertQueryWithError(@"{ input(arg: 2) }", null, "Argument \u0022arg\u0022 has invalid value 2.\nExpected type \u0022Bug1699Enum\u0022, found 2.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.PARAGRAPH);
+        public void Input_Enum_InvalidInt() => AssertQueryWithError(@"{ input(arg: 2) }", null, "Argument \u0022arg\u0022 has invalid value 2.\nExpected type \u0022Bug1699Enum\u0022, found 2.", 1, 9, (object[])null, code: "ARGUMENTS_OF_CORRECT_TYPE", number: ArgumentsOfCorrectTypeError.NUMBER);
 
         [Fact]
         public void Input_Enum_Valid_Variable() => AssertQuerySuccess("query($arg: Bug1699Enum!) { input(arg: $arg) }", @"{ ""input"": ""Grumpy"" }", "{\"arg\":\"GRUMPY\"}".ToInputs());
@@ -82,7 +82,7 @@ namespace GraphQL.Tests.Bugs
         public void Input_Enum_OverrideDefault() => AssertQuerySuccess("{ inputWithDefault(arg: SLEEPY) }", @"{ ""inputWithDefault"": ""Sleepy"" }");
 
         [Fact]
-        public void Input_Enum_MissingRequired() => AssertQueryWithError(@"{ inputRequired }", null, "Argument \u0022arg\u0022 of type \u0022Bug1699Enum!\u0022 is required for field \u0022inputRequired\u0022 but not provided.", 1, 3, (object[])null, code: "PROVIDED_NON_NULL_ARGUMENTS", number: ProvidedNonNullArgumentsError.PARAGRAPH);
+        public void Input_Enum_MissingRequired() => AssertQueryWithError(@"{ inputRequired }", null, "Argument \u0022arg\u0022 of type \u0022Bug1699Enum!\u0022 is required for field \u0022inputRequired\u0022 but not provided.", 1, 3, (object[])null, code: "PROVIDED_NON_NULL_ARGUMENTS", number: ProvidedNonNullArgumentsError.NUMBER);
 
         [Fact]
         public void Input_Enum_RequiredWithDefault() => AssertQuerySuccess("{ inputRequiredWithDefault }", @"{ ""inputRequiredWithDefault"": ""Happy"" }");

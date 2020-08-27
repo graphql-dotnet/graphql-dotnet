@@ -638,7 +638,7 @@ namespace GraphQL.Tests.Execution
             }
             ";
 
-            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.PARAGRAPH, "Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.")
+            var error = new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0022input\u0022 has invalid value WRONG_TYPE.\nExpected type \u0022String\u0022, found WRONG_TYPE.")
             {
                 Code = "ARGUMENTS_OF_CORRECT_TYPE",
             };

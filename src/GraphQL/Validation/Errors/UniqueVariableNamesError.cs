@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class UniqueVariableNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.8.1";
+        internal const string NUMBER = "5.8.1";
 
         public UniqueVariableNamesError(ValidationContext context, VariableDefinition node, VariableDefinition altNode)
-            : base(context.OriginalQuery, PARAGRAPH, DuplicateVariableMessage(node.Name), node, altNode)
+            : base(context.OriginalQuery, NUMBER, DuplicateVariableMessage(node.Name), node, altNode)
         {
         }
 

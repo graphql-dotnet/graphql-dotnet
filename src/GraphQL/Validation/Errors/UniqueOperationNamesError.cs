@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class UniqueOperationNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.2.1.1";
+        internal const string NUMBER = "5.2.1.1";
 
         public UniqueOperationNamesError(ValidationContext context, Operation node)
-            : base(context.OriginalQuery, PARAGRAPH, DuplicateOperationNameMessage(node.Name), node)
+            : base(context.OriginalQuery, NUMBER, DuplicateOperationNameMessage(node.Name), node)
         {
         }
 

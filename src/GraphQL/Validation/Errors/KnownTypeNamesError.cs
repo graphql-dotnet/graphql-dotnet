@@ -5,10 +5,10 @@ namespace GraphQL.Validation.Errors
 {
     public class KnownTypeNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.5.1.2";
+        internal const string NUMBER = "5.5.1.2";
 
         public KnownTypeNamesError(ValidationContext context, NamedType node, string[] suggestedTypes)
-            : base(context.OriginalQuery, PARAGRAPH, UnknownTypeMessage(node.Name, suggestedTypes), node)
+            : base(context.OriginalQuery, NUMBER, UnknownTypeMessage(node.Name, suggestedTypes), node)
         {
         }
 

@@ -4,15 +4,15 @@ namespace GraphQL.Validation.Errors
 {
     public class FragmentsOnCompositeTypesError : ValidationError
     {
-        public const string PARAGRAPH = "5.5.1.3";
+        internal const string NUMBER = "5.5.1.3";
 
         public FragmentsOnCompositeTypesError(ValidationContext context, InlineFragment node)
-            : base(context.OriginalQuery, PARAGRAPH, InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)), node.Type)
+            : base(context.OriginalQuery, NUMBER, InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)), node.Type)
         {
         }
 
         public FragmentsOnCompositeTypesError(ValidationContext context, FragmentDefinition node)
-            : base(context.OriginalQuery, PARAGRAPH, FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)), node.Type)
+            : base(context.OriginalQuery, NUMBER, FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)), node.Type)
         {
         }
 

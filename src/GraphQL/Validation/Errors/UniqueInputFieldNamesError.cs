@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class UniqueInputFieldNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.6.3";
+        internal const string NUMBER = "5.6.3";
 
         public UniqueInputFieldNamesError(ValidationContext context, IValue node, ObjectField altNode)
-            : base(context.OriginalQuery, PARAGRAPH, DuplicateInputField(altNode.Name), node, altNode.Value)
+            : base(context.OriginalQuery, NUMBER, DuplicateInputField(altNode.Name), node, altNode.Value)
         {
         }
 

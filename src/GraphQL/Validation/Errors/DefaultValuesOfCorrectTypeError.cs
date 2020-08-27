@@ -6,20 +6,20 @@ namespace GraphQL.Validation.Errors
 {
     public class DefaultValuesOfCorrectTypeError : ValidationError
     {
-        public const string PARAGRAPH = "5.6.1";
+        internal const string NUMBER = "5.6.1";
 
         public DefaultValuesOfCorrectTypeError(ValidationContext context, IValue node, string message)
-            : base(context.OriginalQuery, PARAGRAPH, message, node)
+            : base(context.OriginalQuery, NUMBER, message, node)
         {
         }
 
         public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, NonNullGraphType nonNullType)
-            : base(context.OriginalQuery, PARAGRAPH, BadValueForNonNullArgMessage(varDefAst.Name, context.Print(nonNullType), context.Print(nonNullType.ResolvedType)), varDefAst.DefaultValue)
+            : base(context.OriginalQuery, NUMBER, BadValueForNonNullArgMessage(varDefAst.Name, context.Print(nonNullType), context.Print(nonNullType.ResolvedType)), varDefAst.DefaultValue)
         {
         }
 
         public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, IGraphType inputType, IEnumerable<string> verboseErrors)
-            : base(context.OriginalQuery, PARAGRAPH, BadValueForDefaultArgMessage(varDefAst.Name, context.Print(inputType), context.Print(varDefAst.DefaultValue), verboseErrors), varDefAst.DefaultValue)
+            : base(context.OriginalQuery, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, context.Print(inputType), context.Print(varDefAst.DefaultValue), verboseErrors), varDefAst.DefaultValue)
         {
         }
 

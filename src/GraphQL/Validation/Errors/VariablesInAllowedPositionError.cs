@@ -6,10 +6,10 @@ namespace GraphQL.Validation.Errors
 {
     public class VariablesInAllowedPositionError : ValidationError
     {
-        public const string PARAGRAPH = "5.8.5";
+        internal const string NUMBER = "5.8.5";
 
         public VariablesInAllowedPositionError(ValidationContext context, VariableDefinition varDef, IGraphType varType, VariableUsage usage)
-            : base(context.OriginalQuery, PARAGRAPH, BadVarPosMessage(usage.Node.Name, context.Print(varType), context.Print(usage.Type)))
+            : base(context.OriginalQuery, NUMBER, BadVarPosMessage(usage.Node.Name, context.Print(varType), context.Print(usage.Type)))
         {
             var source = new Source(context.OriginalQuery);
             var varDefPos = new Location(source, varDef.SourceLocation.Start);

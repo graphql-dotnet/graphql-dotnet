@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class UniqueFragmentNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.5.1.1";
+        internal const string NUMBER = "5.5.1.1";
 
         public UniqueFragmentNamesError(ValidationContext context, FragmentDefinition node, FragmentDefinition altNode)
-            : base(context.OriginalQuery, PARAGRAPH, DuplicateFragmentNameMessage(node.Name), node, altNode)
+            : base(context.OriginalQuery, NUMBER, DuplicateFragmentNameMessage(node.Name), node, altNode)
         {
         }
 

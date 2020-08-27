@@ -5,15 +5,15 @@ namespace GraphQL.Validation.Errors
 {
     public class ScalarLeafsError : ValidationError
     {
-        public const string PARAGRAPH = "5.3.3";
+        internal const string NUMBER = "5.3.3";
 
         public ScalarLeafsError(ValidationContext context, SelectionSet node, Field field, IGraphType type)
-            : base(context.OriginalQuery, PARAGRAPH, NoSubselectionAllowedMessage(field.Name, context.Print(type)), node)
+            : base(context.OriginalQuery, NUMBER, NoSubselectionAllowedMessage(field.Name, context.Print(type)), node)
         {
         }
 
         public ScalarLeafsError(ValidationContext context, Field node, IGraphType type)
-            : base(context.OriginalQuery, PARAGRAPH, RequiredSubselectionMessage(node.Name, context.Print(type)), node)
+            : base(context.OriginalQuery, NUMBER, RequiredSubselectionMessage(node.Name, context.Print(type)), node)
         {
         }
 

@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class NoUnusedVariablesError : ValidationError
     {
-        public const string PARAGRAPH = "5.8.4";
+        internal const string NUMBER = "5.8.4";
 
         public NoUnusedVariablesError(ValidationContext context, VariableDefinition node, Operation op)
-            : base(context.OriginalQuery, PARAGRAPH, UnusedVariableMessage(node.Name, op.Name), node)
+            : base(context.OriginalQuery, NUMBER, UnusedVariableMessage(node.Name, op.Name), node)
         {
         }
 

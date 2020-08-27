@@ -7,10 +7,10 @@ namespace GraphQL.Validation.Errors
 {
     public class KnownArgumentNamesError : ValidationError
     {
-        public const string PARAGRAPH = "5.4.1";
+        internal const string NUMBER = "5.4.1";
 
         public KnownArgumentNamesError(ValidationContext context, Argument node, FieldType fieldDef, IGraphType parentType)
-            : base(context.OriginalQuery, PARAGRAPH,
+            : base(context.OriginalQuery, NUMBER,
                 UnknownArgMessage(
                     node.Name,
                     fieldDef.Name,
@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Errors
         }
 
         public KnownArgumentNamesError(ValidationContext context, Argument node, DirectiveGraphType directive)
-            : base(context.OriginalQuery, PARAGRAPH,
+            : base(context.OriginalQuery, NUMBER,
                 UnknownDirectiveArgMessage(
                     node.Name,
                     directive.Name,

@@ -34,7 +34,7 @@ namespace GraphQL.Tests.Bugs
             {
                 Errors = new ExecutionErrors
                 {
-                    new ValidationError(null, ArgumentsOfCorrectTypeError.PARAGRAPH, "Argument \"in\" has invalid value 636474637870330463.\nExpected type \"Int\", found 636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463.\nExpected type \"Int\", found 636474637870330463.")
                     {
                         Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }
@@ -89,7 +89,7 @@ namespace GraphQL.Tests.Bugs
             {
                 Errors = new ExecutionErrors
                 {
-                    new ValidationError(null, ArgumentsOfCorrectTypeError.PARAGRAPH, "Argument \"in\" has invalid value 636474637870330463636474637870330463636474637870330463.\nExpected type \"Long\", found 636474637870330463636474637870330463636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463636474637870330463636474637870330463.\nExpected type \"Long\", found 636474637870330463636474637870330463636474637870330463.")
                     {
                         Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }

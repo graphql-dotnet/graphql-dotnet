@@ -4,10 +4,10 @@ namespace GraphQL.Validation.Errors
 {
     public class UniqueDirectivesPerLocationError : ValidationError
     {
-        public const string PARAGRAPH = "5.7.3";
+        internal const string NUMBER = "5.7.3";
 
         public UniqueDirectivesPerLocationError(ValidationContext context, Directive node, Directive altNode)
-            : base(context.OriginalQuery, PARAGRAPH, DuplicateDirectiveMessage(node.Name), node, altNode)
+            : base(context.OriginalQuery, NUMBER, DuplicateDirectiveMessage(node.Name), node, altNode)
         {
         }
 

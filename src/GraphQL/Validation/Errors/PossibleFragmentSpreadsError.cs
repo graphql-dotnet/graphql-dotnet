@@ -5,15 +5,15 @@ namespace GraphQL.Validation.Errors
 {
     public class PossibleFragmentSpreadsError : ValidationError
     {
-        public const string PARAGRAPH = "5.5.2.3";
+        internal const string NUMBER = "5.5.2.3";
 
         public PossibleFragmentSpreadsError(ValidationContext context, InlineFragment node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery, PARAGRAPH, TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)), node)
+            : base(context.OriginalQuery, NUMBER, TypeIncompatibleAnonSpreadMessage(context.Print(parentType), context.Print(fragType)), node)
         {
         }
 
         public PossibleFragmentSpreadsError(ValidationContext context, FragmentSpread node, IGraphType parentType, IGraphType fragType)
-            : base(context.OriginalQuery, PARAGRAPH, TypeIncompatibleSpreadMessage(node.Name, context.Print(parentType), context.Print(fragType)), node)
+            : base(context.OriginalQuery, NUMBER, TypeIncompatibleSpreadMessage(node.Name, context.Print(parentType), context.Print(fragType)), node)
         {
         }
 
