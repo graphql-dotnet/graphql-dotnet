@@ -118,7 +118,7 @@ services. Although they may have different names with different frameworks, the 
 lifetimes are as follows:
 
 * **Transient** services are created every time they are injected or requested.
-* **Scoped** services are created per scope. In a web application, every web request creates a new separated service scope. That means scoped services are generally created per web request.
+* **Scoped** services are created per scope. In a web application, every web request creates a new unique service scope. That means scoped services are generally created per web request.
 * **Singleton** services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
 
 It is recommended that the schema is registered as a singleton. This provides the best performance as
