@@ -40,7 +40,7 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 
 ## Breaking Changes
 
-### .Net compatibility
+### .NET compatibility
 
 This project now requires the .Net Standard 2.0 framework, and breaks compatibility with applications based on
 .Net Framework 4.6 and earlier.  See https://docs.microsoft.com/en-us/dotnet/standard/net-standard for a list of
