@@ -66,9 +66,9 @@ obtain other singleton or transient services. For scoped schemas with scoped gra
 for the current executing scope. Casting `Schema` to `IServiceProvider` is also possible, but not recommended, and will
 yield similar results.
 
-If you wish to access a scoped service from within a resolver and want to use a singleton schema (as is recommended), you will
-need to pass a scoped service provider to `ExecutionOptions.RequestServices`, which can then be used to resolve scoped
-services. For Asp.Net Core projects, you can add set this to equal `HttpContext.RequestServices`. Be aware that if you
+If you wish to access a scoped service from within a resolver and want to use a singleton schema (as is recommended), you
+can pass a scoped service provider to `ExecutionOptions.RequestServices`, which can then be used to resolve scoped
+services. For Asp.Net Core projects, you can set this to equal `HttpContext.RequestServices`. Be aware that if you
 are using a parallel execution strategy (default for 'query' requests), using scoped services within field resolvers can
 introduce thread safety issues; you may need to use a serial execution strategy or manually create a scope within each
 field resolver.
