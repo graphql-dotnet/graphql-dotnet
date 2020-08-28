@@ -79,9 +79,8 @@ namespace GraphQL.Tests.Bugs
         {
             // in this case, the converstion returned null, and GraphQL threw an InvalidOperationException
             AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
-                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'"));
+                new InvalidOperationException("Unable to serialize 'test' to 'Bug1773Enum'."));
         }
-
     }
 
     public class Bug1773Schema : Schema

@@ -69,7 +69,7 @@ namespace GraphQL.Execution
                 if (!ShouldIncludeNode(context, field.Directives))
                     continue;
 
-                var fieldDefinition = GetFieldDefinition(context.Document, context.Schema, parentType, field);
+                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
 
                 if (fieldDefinition == null)
                     continue;
@@ -204,7 +204,7 @@ namespace GraphQL.Execution
                     else if (node is ValueExecutionNode valueNode)
                     {
                         node.Result = valueNode.GraphType.Serialize(node.Result)
-                            ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'");
+                            ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'.");
                     }
                 }
             }

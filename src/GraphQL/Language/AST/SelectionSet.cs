@@ -40,15 +40,7 @@ namespace GraphQL.Language.AST
             return new SelectionSet(newSelection);
         }
 
-        protected bool Equals(SelectionSet selectionSet) => false;
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((SelectionSet)obj);
-        }
+        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
 
         public override string ToString()
         {

@@ -11,9 +11,11 @@ namespace GraphQL.Language.AST
         }
 
         public int Start { get; }
+
         public int End { get; }
 
         public int Line { get; }
+
         public int Column { get; }
 
         public override string ToString()

@@ -346,7 +346,7 @@ namespace GraphQL
         ///
         /// This function is commutative.
         /// </summary>
-        public static bool DoTypesOverlap(this ISchema schema, IGraphType typeA, IGraphType typeB)
+        public static bool DoTypesOverlap(IGraphType typeA, IGraphType typeB)
         {
             if (typeA.Equals(typeB))
             {
@@ -426,18 +426,15 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            if (!type.IsInputType())
+            if (!(type is ScalarGraphType inputType))
                 throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
-
-            var inputType = type as ScalarGraphType;
 
             // Since value is an internally represented value, it must be serialized
             // to an externally represented value before converting into an AST.
-            var serialized = inputType.Serialize(value);
+            var serialized = inputType.Serialize(value) ?? throw new InvalidOperationException($"Unable to serialize '{value}' to '{inputType.Name}'.");
 
             return serialized switch
             {
-                null => null,
                 bool b => new BooleanValue(b),
                 int i => new IntValue(i),
                 BigInteger bi => new BigIntValue(bi),

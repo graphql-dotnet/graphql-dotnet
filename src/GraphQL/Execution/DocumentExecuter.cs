@@ -133,7 +133,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = validationResult.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -143,7 +142,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = context.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -202,9 +200,10 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                UnhandledExceptionContext exceptionContext = null;
                 if (options.UnhandledExceptionDelegate != null)
                 {
-                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, null, ex);
                     options.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
@@ -213,14 +212,13 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new UnhandledError("Error executing document.", ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex)
                     }
                 };
             }
             finally
             {
                 result ??= new ExecutionResult();
-                result.ExposeExceptions = options.ExposeExceptions;
                 result.Perf = metrics.Finish();
             }
 

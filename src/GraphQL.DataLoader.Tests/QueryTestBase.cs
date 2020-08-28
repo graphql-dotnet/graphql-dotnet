@@ -84,7 +84,6 @@ namespace GraphQL.DataLoader.Tests
             {
                 options(opts);
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
             }));
 
             var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
@@ -113,7 +112,6 @@ namespace GraphQL.DataLoader.Tests
             return executer.ExecuteAsync(opts =>
             {
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
                 opts.Query = query;
                 foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
                 {

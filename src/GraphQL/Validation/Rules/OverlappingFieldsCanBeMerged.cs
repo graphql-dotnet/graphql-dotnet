@@ -4,30 +4,12 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
-        public static string FieldsConflictMessage(string responseName, ConflictReason reason) =>
-            $"Fields {responseName} conflicts because {ReasonMessage(reason.Message)}. " +
-            "Use different aliases on the fields to fetch both if this was intentional.";
-
-        public static string ReasonMessage(Message reasonMessage)
-        {
-            if (reasonMessage.Msgs?.Count > 0)
-            {
-                return string.Join(
-                    " and ",
-                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
-                );
-            }
-            else
-            {
-                return reasonMessage.Msg;
-            }
-        }
-
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var comparedFragmentPairs = new PairSet();
@@ -46,12 +28,7 @@ namespace GraphQL.Validation.Rules
 
                     foreach (var conflict in conflicts)
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.3.2",
-                            FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
-                            conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray()
-                            ));
+                        context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
                     }
                 });
             }).ToTask();

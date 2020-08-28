@@ -25,7 +25,7 @@ namespace GraphQL.Introspection
                     return KindForInstance(type);
                 }
 
-                throw new ExecutionError($"Unknown kind of type: {context.Source}");
+                throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
             Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
             Field<StringGraphType>("description");
@@ -122,7 +122,7 @@ namespace GraphQL.Introspection
             IInputObjectGraphType _ => TypeKindBoxed.INPUT_OBJECT,
             ListGraphType _ => TypeKindBoxed.LIST,
             NonNullGraphType _ => TypeKindBoxed.NON_NULL,
-            _ => throw new ExecutionError("Unknown kind of type: {0}".ToFormat(type))
+            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unknown kind of type: {type}")
         };
     }
 }
