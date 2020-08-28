@@ -346,6 +346,17 @@ If you need to process the data loader result before it is returned, additional 
 The data loader also now supports chained data loaders, and asynchronous code prior to queuing the data loader. See
 [Data loader documentation](https://graphql-dotnet.github.io/docs/getting-started/dataloader) for more details.
 
+### DateGraphType parsing changes
+
+In 2.x, the `DateGraphType` will always serialize to a date in the format of `yyyy-MM-dd`, ignoring any time
+component of the `DateTime` value. As an input type it would accept any date/time format accepted by the
+`DateTime.Parse` method. This allowed for ambiguous dates such as '09-10-2015', which has a different meaning
+depending on locale.
+
+In 3.x, the output date format has not changed, but will throw an error if the `DateTime` value has a time
+component. The input date format now only accepts a format of `yyyy-MM-dd`. Any other format will trigger
+an input error. Note that the `DateTime.Kind` property for returned dates is set to `DateTimeKind.Utc`.
+
 ### ExecutionStrategy changes
 
 If you utilize data loaders along with a custom implementation of `IExecutionStrategy` (typically inheriting
@@ -366,7 +377,9 @@ thrown. All validation rules that fail their respective tests are treated as inp
 
 In 2.x, most schema errors would throw an exception of the `ExecutionError` type. This has been changed; now
 the thrown error is a native exception -- for instance, an `ArgumentOutOfRange` exception would be thrown when
-trying to add a field to a type with the same name as one that already exists.
+trying to add a field to a type with the same name as one that already exists. Many of these exceptions
+occur prior to executing a document; however, some occur during the schema initialization within the
+`DocumentExecuter` and are then treated as processing errors.
 
 In 3.x, `ExecutionError` (and derived classes) are returned directly from the `DocumentExecuter` for parsing
 and validation errors (input errors). Field resolvers and middleware can also return input errors by
