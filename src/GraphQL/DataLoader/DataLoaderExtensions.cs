@@ -11,16 +11,6 @@ namespace GraphQL.DataLoader
     public static class DataLoaderExtensions
     {
         /// <summary>
-        /// Returns an IDataLoaderResult that will return the specified value
-        /// </summary>
-        public static IDataLoaderResult<T> FromResult<T>(T result) => new DataLoaderResult<T>(result);
-
-        /// <summary>
-        /// Returns an IDataLoaderResult that will return the specified asynchronous task
-        /// </summary>
-        public static IDataLoaderResult<T> FromResult<T>(Task<T> result) => new DataLoaderResult<T>(result);
-
-        /// <summary>
         /// Asynchronously load data for the provided given keys
         /// </summary>
         /// <param name="dataLoader">The dataloader to use</param>
