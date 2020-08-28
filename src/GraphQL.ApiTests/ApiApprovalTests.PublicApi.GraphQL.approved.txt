@@ -605,7 +605,9 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
     public struct ErrorInfo
@@ -717,7 +719,9 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult);
         System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context);
+        [System.Obsolete]
         System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
+        [System.Obsolete]
         System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
     public interface IErrorInfoProvider
