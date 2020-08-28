@@ -9,7 +9,7 @@ This functionality is not provided by GraphQL.NET. See [issue #576](https://gith
 ### Is it possible to auto-generate a graph type from a class?
 
 Yes, via the `AutoRegisteringObjectGraphType`/`AutoRegisteringInputObjectGraphType` classes.
-You can also override auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
+You can also configure auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
 
 (todo: code samples here; maybe expand the paragraph)
 
