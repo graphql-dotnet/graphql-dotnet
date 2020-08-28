@@ -43,7 +43,7 @@ accept a `StringGraphType` argument consisting of a data url with base64 encoded
 
 > InvalidOperationException: Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead
 
-ASP.Net Core 3 does not by default allow synchronous reading/writing of input/output streams. When using the `Newtonsoft.Json` package,
+ASP.NET Core 3 does not by default allow synchronous reading/writing of input/output streams. When using the `Newtonsoft.Json` package,
 you will need to set the `AllowSynchronousIO` property to `true`. The `System.Text.Json` package fully supports
 asynchronous reading of json data streams and should not be a problem.
 
@@ -114,4 +114,3 @@ passed from another service. Therefore, the database context must remain scoped.
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
 [dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
-
