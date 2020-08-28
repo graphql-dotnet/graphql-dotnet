@@ -148,7 +148,7 @@ public class UserType : ObjectGraphType<User>
 
                 // Add this UserId to the pending keys to fetch data for
                 // The execution strategy will trigger the data loader to fetch the data via GetOrdersByUserId() at the
-                //   appropriate time, and the field will be resolved with an instance of IEnumerable<User> once
+                //   appropriate time, and the field will be resolved with an instance of IEnumerable<Order> once
                 //   GetOrdersByUserId() returns with the batched results
                 return ordersLoader.LoadAsync(ctx.Source.UserId);
             });

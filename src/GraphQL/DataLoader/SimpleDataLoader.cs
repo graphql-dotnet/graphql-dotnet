@@ -19,7 +19,7 @@ namespace GraphQL.DataLoader
         /// <param name="fetchDelegate">An asynchronous delegate that accepts a cancellation token and returns data</param>
         public SimpleDataLoader(Func<CancellationToken, Task<T>> fetchDelegate)
         {
-            _fetchDelegate = fetchDelegate;
+            _fetchDelegate = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,7 +62,7 @@ namespace GraphQL.DataLoader.Tests
             orders.ForEach(o => o.UserId = 1);
 
             mock.Setup(store => store.GetOrdersByUserIdAsync(It.IsAny<IEnumerable<int>>(), default))
-                .ReturnsAsync(orders.ToLookup(o => o.UserId));
+                .ReturnsAsync(orders.ToLookup(o => o.UserId), delay: TimeSpan.FromMilliseconds(20));
 
             var ordersStore = mock.Object;
 

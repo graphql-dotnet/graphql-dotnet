@@ -20,7 +20,7 @@ namespace GraphQL.DataLoader.Tests
             var users = Fake.Users.Generate(2);
 
             mock.Setup(store => store.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
-                .ReturnsAsync(() => users.ToDictionary(x => x.UserId));
+                .ReturnsAsync(users.ToDictionary(x => x.UserId), delay: TimeSpan.FromMilliseconds(20));
 
             var usersStore = mock.Object;
 

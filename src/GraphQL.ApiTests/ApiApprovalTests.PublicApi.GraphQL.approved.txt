@@ -493,8 +493,6 @@ namespace GraphQL.DataLoader
         public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
         protected abstract System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken);
         public virtual GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync(TKey key) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(System.Threading.Tasks.Task<T> result) { }
-        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult(T result) { }
     }
     public class DataLoaderContext
     {
@@ -533,6 +531,8 @@ namespace GraphQL.DataLoader
     }
     public static class DataLoaderExtensions
     {
+        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult<T>(System.Threading.Tasks.Task<T> result) { }
+        public static GraphQL.DataLoader.IDataLoaderResult<T> FromResult<T>(T result) { }
         public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, System.Collections.Generic.IEnumerable<TKey> keys) { }
         public static GraphQL.DataLoader.IDataLoaderResult<T[]> LoadAsync<TKey, T>(this GraphQL.DataLoader.IDataLoader<TKey, T> dataLoader, params TKey[] keys) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<GraphQL.DataLoader.IDataLoaderResult<TReturnType>>>> resolve) { }

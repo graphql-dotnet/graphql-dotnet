@@ -195,10 +195,8 @@ namespace GraphQL.Execution
             }
             catch (Exception ex)
             {
-                if (context.ThrowOnUnhandledException)
+                if (ProcessNodeUnhandledException(context, node, ex))
                     throw;
-
-                ProcessNodeUnhandledException(context, node, ex);
             }
         }
 

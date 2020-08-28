@@ -106,16 +106,6 @@ namespace GraphQL.DataLoader
         }
 
         /// <summary>
-        /// Returns an IDataLoaderResult that will return the specified value
-        /// </summary>
-        public static IDataLoaderResult<T> FromResult(T result) => new DataLoaderResult<T>(result);
-
-        /// <summary>
-        /// Returns an IDataLoaderResult that will return the specified asynchronous task
-        /// </summary>
-        public static IDataLoaderResult<T> FromResult(Task<T> result) => new DataLoaderResult<T>(result);
-
-        /// <summary>
         /// An abstract asynchronous function to load the values for a given list of keys
         /// </summary>
         /// <remarks>

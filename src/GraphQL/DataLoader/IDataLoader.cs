@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace GraphQL.DataLoader
 {
     /// <summary>
-    /// Provides a method to dispatch pending a operation to load data.
+    /// Provides a method to dispatch a pending operation to load data.
     /// </summary>
     public interface IDataLoader
     {
