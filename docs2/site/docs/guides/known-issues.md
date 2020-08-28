@@ -8,7 +8,7 @@ This functionality is not provided by GraphQL.NET. See [issue #576](https://gith
 
 ### Is it possible to auto-generate a graph type from a class?
 
-Yes, via the `AutoRegisteringObjectGraphType` class. Similar classes are provided for input objects and enums.
+Yes, via the `AutoRegisteringObjectGraphType`/`AutoRegisteringInputObjectGraphType` classes.
 You can also override auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
 
 (todo: code samples here; maybe expand the paragraph)
@@ -114,6 +114,5 @@ passed from another service. Therefore, the database context must remain scoped.
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
 [dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
-
 
 
