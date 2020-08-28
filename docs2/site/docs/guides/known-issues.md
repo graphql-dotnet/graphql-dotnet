@@ -11,7 +11,7 @@ This functionality is not provided by GraphQL.NET. See [issue #576](https://gith
 Yes, via the `AutoRegisteringObjectGraphType` class. Similar classes are provided for input objects and enums.
 You can also override auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
 
- (code samples here; maybe expand the paragraph)
+(todo: code samples here; maybe expand the paragraph)
 
 ### Is it possible to download/upload a file with GraphQL?
 
@@ -29,7 +29,7 @@ accept a `StringGraphType` argument consisting of a data url with base64 encoded
 
 ### Other
 
- (todo: write brief paragraph for each item in the below list)
+(todo: write brief paragraph for each item in the below list)
 
 * Note about two authorization models - see [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897)
 * Note about descriptions inheritance - see authorization [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
