@@ -77,5 +77,7 @@
             file: schema-generation.md
           - title: Version Migration Guide
             file: migration.md
+          - title: Known Issues & FAQ
+            file: known-issues.md
           - title: Links
             file: links.md
