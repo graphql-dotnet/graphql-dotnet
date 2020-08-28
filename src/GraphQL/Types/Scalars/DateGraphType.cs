@@ -37,9 +37,9 @@ namespace GraphQL.Types
 
             if (value is string valueAsString)
             {
-                if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var date))
+                if (DateTime.TryParseExact(valueAsString, "yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
                 {
-                    return date.ToUniversalTime();
+                    return date;
                 }
                 throw new FormatException($"Could not parse date. Expected yyyy-MM-dd. Value: {valueAsString}");
             }
