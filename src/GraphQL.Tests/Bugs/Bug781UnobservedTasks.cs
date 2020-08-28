@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Bugs
     {
         private bool _unobserved;
 
-        [Theory]
+        [Theory(Skip = "for demonstration purposes only, unreliable results")]
         [InlineData("{ do(throwCanceled: false) cancellation never }", true)]
         [InlineData("{ do(throwCanceled: true) cancellation never }", false)]
         public async Task cancel_execution_with_different_error_types(string query, bool unobserved)
