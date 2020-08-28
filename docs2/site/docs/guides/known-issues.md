@@ -72,7 +72,7 @@ framework is the 'singleton' lifetime. This prevents the schema from having to b
 for every GraphQL request. Since the graph types are constructed at the same time as the
 schema, it is not possible to register the graph types as scoped services while leaving
 the schema as a singleton. Instead, you will need to pull your scoped services from within
-the field resolver via the `IResolveFieldContext.RequestServices` property.  Detailed
+the field resolver via the `IResolveFieldContext.RequestServices` property. Detailed
 information on this technique, its configuration requirements, and alternatives are outlined
 in the [Dependency Injection](../getting-started/dependency-injection) documentation.
 
