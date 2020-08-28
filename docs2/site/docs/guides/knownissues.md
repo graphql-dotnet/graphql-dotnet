@@ -1,5 +1,38 @@
 # Known Issues / FAQ
 
+## FAQ
+
+### Is it possible to auto-generate classes from a schema?
+
+This functionality is not provided by GraphQL.NET. See [issue #576](https://github.com/graphql-dotnet/graphql-dotnet/issues/576).
+
+### Is it possible to auto-generate a graph type from a class?
+
+Yes, via the `AutoRegisteringObjectGraphType` class. Similar classes are provided for input objects and enums.
+You can also override auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
+
+### Is it possible to download/upload a file with GraphQL?
+
+Files would need to be encoded in some form that is transmissible via JSON (e.g. Base64). If the file isn't part of some other
+structured data result, it may not be a good candidate for a GraphQL API.
+
+Note that Base64 is significantly less efficient bandwidth-wise than binary transfer, and you won't get an automatic browser
+download prompt from receiving it.
+
+If you are attempting to return pictures to be directly consumed in a web front-end, you can encode the picture as Base64 and
+prepend a data URL tag (e.g. "`data:image/jpg;base64,`") which can be interpreted by common web browsers.
+
+Similarly, if you are attempting a mutation to allow file uploading from a web browser, similarly, you can have a field resolver
+accept a `StringGraphType` argument consisting of a data url with base64 encoded data.
+
+### Other
+
+* Note about two authorization models - see [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897)
+* Note about descriptions inheritance - see authorization [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
+* Subscription authentication - see [issue #1244](https://github.com/graphql-dotnet/graphql-dotnet/issues/1244)
+* Flag enums - see [issue #1666](https://github.com/graphql-dotnet/graphql-dotnet/issues/1666)
+* `null` in scalars - see [issue #1542](https://github.com/graphql-dotnet/graphql-dotnet/issues/1542)
+
 ## Common Errors
 
 ### Synchronous operations are disallowed.
