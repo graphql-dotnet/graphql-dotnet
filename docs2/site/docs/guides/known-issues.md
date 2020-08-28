@@ -24,7 +24,7 @@ download prompt from receiving it.
 If you are attempting to return pictures to be directly consumed in a web front-end, you can encode the picture as Base64 and
 prepend a data URL tag (e.g. "`data:image/jpg;base64,`") which can be interpreted by common web browsers.
 
-Similarly, if you are attempting a mutation to allow file uploading from a web browser, similarly, you can have a field resolver
+Similarly, if you are attempting a mutation to allow file uploading from a web browser, you can have a field resolver
 accept a `StringGraphType` argument consisting of a data url with base64 encoded data.
 
 ### Other
@@ -114,5 +114,4 @@ passed from another service. Therefore, the database context must remain scoped.
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
 [dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
-
 
