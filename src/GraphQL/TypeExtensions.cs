@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -109,6 +110,11 @@ namespace GraphQL
         /// <example><see>IList<string></see> -> <see>ListGraphType<StringGraphType></see></example>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
+            while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 type = type.GetGenericArguments()[0];

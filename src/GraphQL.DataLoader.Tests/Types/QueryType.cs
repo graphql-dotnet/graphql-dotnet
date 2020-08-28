@@ -23,6 +23,20 @@ namespace GraphQL.DataLoader.Tests.Types
                     return loader.LoadAsync();
                 });
 
+            Field<ListGraphType<UserType>, IEnumerable<User>>()
+                .Name("UsersWithDelay")
+                .Description("Get all Users")
+                .Returns<IEnumerable<User>>()
+                .ResolveAsync(async ctx =>
+                {
+                    await System.Threading.Tasks.Task.Delay(20);
+
+                    var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
+                        users.GetAllUsersAsync);
+
+                    return loader.LoadAsync();
+                });
+
             Field<OrderType, Order>()
                 .Name("Order")
                 .Description("Get Order by ID")

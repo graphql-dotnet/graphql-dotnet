@@ -16,7 +16,7 @@ namespace GraphQL.DataLoader.Tests
         {
             var mock = new Mock<IDataLoader<int, User>>();
             mock.Setup(dl => dl.LoadAsync(It.IsAny<int>()))
-                .ReturnsAsync((int key) => new User { UserId = key });
+                .Returns((int key) => new DataLoaderResult<User>(new User() { UserId = key }));
             return mock;
         }
 
@@ -25,7 +25,7 @@ namespace GraphQL.DataLoader.Tests
         {
             var mock = GetMockDataLoader();
             var keys = new[] { 1, 2 };
-            var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys);
+            var users = await DataLoaderExtensions.LoadAsync(mock.Object, keys).GetResultAsync();
 
             users.ShouldNotBeNull();
             users.Length.ShouldBe(keys.Length, "Should return array of same length as number of keys provided");
@@ -43,7 +43,7 @@ namespace GraphQL.DataLoader.Tests
         public async Task LoadAsync_MultipleKeysAsParams_CallsSingularMultipleTimes()
         {
             var mock = GetMockDataLoader();
-            var users = await DataLoaderExtensions.LoadAsync(mock.Object, 1, 2);
+            var users = await DataLoaderExtensions.LoadAsync(mock.Object, 1, 2).GetResultAsync();
 
             users.ShouldNotBeNull();
             users.Length.ShouldBe(2, "Should return array of same length as number of keys provided");
@@ -80,11 +80,13 @@ namespace GraphQL.DataLoader.Tests
                 var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
                 // Start async tasks to load by ID
-                var task1 = loader.LoadAsync(new int[] { 1, 2 });
-                var task2 = loader.LoadAsync(new int[] { 1, 2, 3 });
+                var result1 = loader.LoadAsync(new int[] { 1, 2 });
+                var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
 
                 // Dispatch loading
                 await loader.DispatchAsync();
+                var task1 = result1.GetResultAsync();
+                var task2 = result2.GetResultAsync();
 
                 // Now await tasks
                 users1 = await task1;
