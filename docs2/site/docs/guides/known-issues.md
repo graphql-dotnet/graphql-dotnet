@@ -9,7 +9,8 @@ This functionality is not provided by GraphQL.NET. See [issue #576](https://gith
 ### Is it possible to auto-generate a graph type from a class?
 
 Yes, via the `AutoRegisteringObjectGraphType`/`AutoRegisteringInputObjectGraphType` classes.
-You can also configure auto-generated fields and auto-create enum types.
+You can also configure auto-generated fields and auto-create enum types via the `EnumerationGraphType<>`
+generic class.
 
 Here is a sample of using an enumeration graph type:
 
@@ -67,7 +68,7 @@ services.AddSingleton<AutoRegisteringInputGraphType<Person>>();
 services.AddSingleton<ProductGraphType>();
 ```
 
-Alternatively, you can also choose to register the auto classes globally instead:
+Alternatively, you can register the generic auto classes:
 
 ```csharp
 services.AddSingleton(typeof(AutoRegisteringInputGraphType<>));
