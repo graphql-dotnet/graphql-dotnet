@@ -96,6 +96,58 @@ Note that automatic conversion from Base64 string to byte array (but not byte ar
 GraphQL.NET. This means you can use `GetArgument<byte[]>()` to retrieve a byte array from a field argument, provided that
 the argument was a Base64 string.
 
+### Can you use flag enumerations - enumerations marked with the `FlagsAttribute`?
+
+Flag enumerations are not natively supported by the GraphQL specification. However,
+you can provide a similar behavior by converting your enumeration values to and from
+a list of enums. Here is a sample of some extension methods to facilitate this:
+
+```csharp
+public static class EnumExtensions
+{
+    public static IEnumerable<T> FromFlags<T>(this T value) where T : struct, Enum
+        => Enum.GetValues(typeof(T)).Cast<T>().Distinct().Where(x => value.HasFlag(x));
+
+    public static IEnumerable<T> FromFlags<T>(this T? value) where T : struct, Enum
+        => value.HasValue ? value.Value.FromFlags() : null;
+
+    public static T CombineFlags<T>(this IEnumerable<T> values) where T : struct, Enum
+    {
+        if (values == null)
+            throw new ArgumentNullException(nameof(values));
+        var enumType = typeof(T).GetEnumUnderlyingType();
+        if (enumType == typeof(int))
+            return (T)Enum.ToObject(typeof(T), values.Cast<int>().Aggregate((a, b) => a | b));
+        // add support for uint/long/etc here
+        throw new NotSupportedException("Enum type not supported");
+    }
+}
+
+[Flags]
+enum MyFlags
+{
+    Grumpy = 1,
+    Happy = 2,
+    Sleepy = 4,
+}
+
+// this returns the list ["GRUMPY", "HAPPY"]
+Field<ListGraphType<EnumerationGraphType<MyFlags>>>(
+    "getFlagEnum",
+    resolve: ctx => {
+        var myFlags = MyFlags.Grumpy | MyFlags.Happy;
+        return myFlags.FromFlags()
+    });
+
+// when calling convertEnumListToString(arg: [GRUMPY, HAPPY]), it returns the string "Grumpy, Happy"
+Field<StringGraphType>(
+    "convertEnumListToString",
+    arguments: new QueryArguments(
+        new QueryArgument<ListGraphType<EnumerationGraphType<MyFlags>>> { Name = "arg" }),
+    resolve: ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString()
+    );
+```
+
 ### Other
 
 (todo: write brief paragraph for each item in the below list)
