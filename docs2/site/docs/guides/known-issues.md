@@ -18,7 +18,7 @@ Here is a sample of using an enumeration graph type:
 Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn", "Which movie they appear in.");
 ```
 
-Here is a sample of an auto registering input graph:
+Here is a sample of an auto registering input graph type:
 
 ```csharp
 class Person
