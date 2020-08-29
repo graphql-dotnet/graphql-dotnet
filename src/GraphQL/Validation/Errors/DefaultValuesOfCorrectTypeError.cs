@@ -10,19 +10,10 @@ namespace GraphQL.Validation.Errors
     {
         internal const string NUMBER = "5.6.1";
 
-        public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, NonNullGraphType nonNullType)
-            : base(context.OriginalQuery, NUMBER, BadValueForNonNullArgMessage(varDefAst.Name, context.Print(nonNullType), context.Print(nonNullType.ResolvedType)), varDefAst.DefaultValue)
-        {
-        }
-
         public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, IGraphType inputType, IEnumerable<string> verboseErrors)
             : base(context.OriginalQuery, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, context.Print(inputType), context.Print(varDefAst.DefaultValue), verboseErrors), varDefAst.DefaultValue)
         {
         }
-
-        internal static string BadValueForNonNullArgMessage(string varName, string type, string guessType)
-            => $"Variable \"{varName}\" of type \"{type}\" is required and will not use default value. " +
-               $"Perhaps you mean to use type \"{guessType}\"?";
 
         internal static string BadValueForDefaultArgMessage(string varName, string type, string value, IEnumerable<string> verboseErrors)
         {

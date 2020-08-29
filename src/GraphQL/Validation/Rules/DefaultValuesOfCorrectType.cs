@@ -26,11 +26,6 @@ namespace GraphQL.Validation.Rules
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
 
-                    if (inputType is NonNullGraphType nonNullType && defaultValue != null)
-                    {
-                        context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, nonNullType));
-                    }
-
                     if (inputType != null && defaultValue != null)
                     {
                         var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
