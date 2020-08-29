@@ -656,7 +656,7 @@ namespace GraphQL.Execution
     }
     public static class ExecutionHelper
     {
-        public static void AssertValidVariableValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, object input, string variableName) { }
+        public static void AssertValidVariableValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, object input, string variableName, bool hasDefaultValue) { }
         public static object CoerceValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue input, GraphQL.Language.AST.Variables variables = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFields(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public static bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
