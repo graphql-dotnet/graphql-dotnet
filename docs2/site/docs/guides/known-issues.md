@@ -92,6 +92,10 @@ prepend a data URL tag (e.g. "`data:image/jpg;base64,`") which can be interprete
 Similarly, if you are attempting a mutation to allow file uploading from a web browser, you can have a field resolver
 accept a `StringGraphType` argument consisting of a data url with base64 encoded data.
 
+Note that automatic conversion from Base64 string to byte array (but not byte array to Base64 string) is provided by
+GraphQL.NET. This means you can use `GetArgument<byte[]>()` to retrieve a byte array from a field argument, provided that
+the argument was a Base64 string.
+
 ### Other
 
 (todo: write brief paragraph for each item in the below list)
