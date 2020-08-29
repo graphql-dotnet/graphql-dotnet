@@ -29,7 +29,7 @@ class Person
 
 Field<StringGraphType>("addPerson",
     arguments: new QueryArguments(
-        new QueryArgument<AutoRegisteringInputGraphType<Person>> { Name = "value" }
+        new QueryArgument<AutoRegisteringInputObjectGraphType<Person>> { Name = "value" }
     ),
     resolve: context => {
         var person = context.GetArgument<Person>("value");
