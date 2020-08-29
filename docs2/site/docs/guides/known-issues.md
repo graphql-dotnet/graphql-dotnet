@@ -222,7 +222,7 @@ you will retrieve an instance of the database context that, although unique
 to this request, is shared between all field resolvers within this request.
 
 The easiest option is to change the execution strategy to `SerialExecutionStrategy`. Although
-this would solve concurrency issues in this case, there is a may be an objectionable performance
+this would solve concurrency issues in this case, there may be an objectionable performance
 degredation, since only a single field resolver can execute at a time.
 
 A second option would be to change the database context lifetime to 'transient'. This means
