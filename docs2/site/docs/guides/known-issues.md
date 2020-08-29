@@ -38,7 +38,7 @@ Field<StringGraphType>("addPerson",
     });
 ```
 
-Here is a sample of an auto registering object graph that modifies some of the fields:
+Here is a sample of an auto registering object graph type that modifies some of the fields:
 
 ```csharp
 class Product
