@@ -2793,7 +2793,6 @@ namespace GraphQL.Validation.Errors
     [System.Serializable]
     public class DefaultValuesOfCorrectTypeError : GraphQL.Validation.ValidationError
     {
-        public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.NonNullGraphType nonNullType) { }
         public DefaultValuesOfCorrectTypeError(GraphQL.Validation.ValidationContext context, GraphQL.Language.AST.VariableDefinition varDefAst, GraphQL.Types.IGraphType inputType, System.Collections.Generic.IEnumerable<string> verboseErrors) { }
     }
     [System.Serializable]

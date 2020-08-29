@@ -41,18 +41,12 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void no_required_variables_with_default_values()
+        public void allows_required_variables_with_default_values()
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
-                    query UnreachableDefaultValues($a: Int! = 3, $b: String! = ""default"") {
-                      dog { name }
-                    }";
-
-                _.Error(BadValueForNonNullArgMessage("a", "Int!", "Int"), 2, 63);
-                _.Error(BadValueForNonNullArgMessage("b", "String!", "String"), 2, 80);
-            });
+            ShouldPassRule(@"
+                query UnreachableDefaultValues($a: Int! = 3, $b: String! = ""default"") {
+                    dog { name }
+                }");
         }
 
         [Fact]
@@ -104,8 +98,5 @@ namespace GraphQL.Tests.Validation
 
         private static string BadValueForDefaultArgMessage(string varName, string type, string value, string[] verboseErrors)
             => DefaultValuesOfCorrectTypeError.BadValueForDefaultArgMessage(varName, type, value, verboseErrors);
-
-        private static string BadValueForNonNullArgMessage(string varName, string type, string guessType)
-            => DefaultValuesOfCorrectTypeError.BadValueForNonNullArgMessage(varName, type, guessType);
     }
 }
