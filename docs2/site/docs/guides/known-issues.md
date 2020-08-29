@@ -9,9 +9,73 @@ This functionality is not provided by GraphQL.NET. See [issue #576](https://gith
 ### Is it possible to auto-generate a graph type from a class?
 
 Yes, via the `AutoRegisteringObjectGraphType`/`AutoRegisteringInputObjectGraphType` classes.
-You can also configure auto-generated fields. See [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897).
+You can also configure auto-generated fields and auto-create enum types.
 
-(todo: code samples here; maybe expand the paragraph)
+Here is a sample of using an enumeration graph type:
+
+```csharp
+Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn", "Which movie they appear in.");
+```
+
+Here is a sample of an auto registering input graph:
+
+```csharp
+class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+Field<StringGraphType>("addPerson",
+    arguments: new QueryArguments(
+        new QueryArgument<AutoRegisteringInputGraphType<Person>> { Name = "value" }
+    ),
+    resolve: context => {
+        var person = context.GetArgument<Person>("value");
+        db.Add(person);
+        return "ok";
+    });
+```
+
+Here is a sample of an auto registering object graph that modifies some of the fields:
+
+```csharp
+class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public DateTime LastUpdated { get; set; }
+}
+
+class ProductGraphType : AutoRegisteringObjectGraphType<Product>
+{
+    public ProductGraphType()
+        : base(x => x.LastUpdated)
+    {
+        GetField("Name").Description = "A short name of the product";
+    }
+}
+
+Field<ListGraphType<ProductGraphType>>("products", resolve: _ => db.Products);
+```
+
+Note that you may need to register the classes within your dependency injection framework:
+
+```csharp
+services.AddSingleton<EnumerationGraphType<Episodes>>();
+services.AddSingleton<AutoRegisteringInputGraphType<Person>>();
+services.AddSingleton<ProductGraphType>();
+```
+
+Alternatively, you can also choose to register the auto classes globally instead:
+
+```csharp
+services.AddSingleton(typeof(AutoRegisteringInputGraphType<>));
+services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>));
+services.AddSingleton(typeof(EnumerationGraphType<>));
+```
+
+In the above sample, you would still need to register `ProductGraphType` separately.
 
 ### Is it possible to download/upload a file with GraphQL?
 
