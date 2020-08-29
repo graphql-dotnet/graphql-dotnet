@@ -101,7 +101,7 @@ namespace GraphQL.Execution
 
             try
             {
-                AssertValidVariableValue(schema, type, input, variable.Name);
+                AssertValidVariableValue(schema, type, input, variable.Name, variable.DefaultValue != null);
             }
             catch (InvalidVariableError error)
             {
@@ -117,19 +117,19 @@ namespace GraphQL.Execution
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
-        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName)
+        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
         {
             // see also GraphQLExtensions.IsValidLiteralValue
             if (type is NonNullGraphType graphType)
             {
                 var nonNullType = graphType.ResolvedType;
 
-                if (input == null)
+                if (input == null && !hasDefaultValue)
                 {
                     throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
                 }
 
-                AssertValidVariableValue(schema, nonNullType, input, variableName);
+                AssertValidVariableValue(schema, nonNullType, input, variableName, hasDefaultValue);
                 return;
             }
 
@@ -186,11 +186,11 @@ namespace GraphQL.Execution
                 {
                     var index = -1;
                     foreach (var item in list)
-                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]");
+                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]", hasDefaultValue);
                 }
                 else
                 {
-                    AssertValidVariableValue(schema, listItemType, input, variableName);
+                    AssertValidVariableValue(schema, listItemType, input, variableName, hasDefaultValue);
                 }
                 return;
             }
@@ -224,7 +224,7 @@ namespace GraphQL.Execution
                 foreach (var field in complexType.Fields)
                 {
                     dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}");
+                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}", hasDefaultValue);
                 }
                 return;
             }

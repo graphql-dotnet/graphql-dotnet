@@ -4,7 +4,7 @@ namespace GraphQL.DataLoader
 {
     public class DataLoaderContextAccessor : IDataLoaderContextAccessor
     {
-        private readonly AsyncLocal<DataLoaderContext> _current = new AsyncLocal<DataLoaderContext>();
+        private static readonly AsyncLocal<DataLoaderContext> _current = new AsyncLocal<DataLoaderContext>();
 
         public DataLoaderContext Context
         {

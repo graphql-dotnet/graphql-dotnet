@@ -9,7 +9,8 @@ namespace GraphQL.DataLoader.Tests
         public DataLoaderTestSchema(IServiceProvider services, QueryType query, SubscriptionType subscriptionType)
             : base(services)
         {
-            Query = query;
+            Query = query; //runs with parallel execution strategy
+            Mutation = query; //runs with serial execution strategy
             Subscription = subscriptionType;
         }
     }
