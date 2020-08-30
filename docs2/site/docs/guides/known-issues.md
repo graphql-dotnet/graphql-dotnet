@@ -68,7 +68,7 @@ services.AddSingleton<AutoRegisteringInputGraphType<Person>>();
 services.AddSingleton<ProductGraphType>();
 ```
 
-Alternatively, you can register the generic auto classes:
+Alternatively, you can register open generic classes:
 
 ```csharp
 services.AddSingleton(typeof(AutoRegisteringInputGraphType<>));
