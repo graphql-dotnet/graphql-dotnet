@@ -148,15 +148,36 @@ Field<StringGraphType>(
     );
 ```
 
-### Other
+### Can custom scalars serialize non-null data to a null value and vice versa?
 
-(todo: write brief paragraph for each item in the below list)
+No, that is not currently possible, as returning null from `Serialize`, `ParseLiteral` or `ParseValue`
+indicates a failed conversion. Further, upon output serialization, null values are not passed
+through the serializer.
 
-* Note about two authorization models - see [issue #897](https://github.com/graphql-dotnet/graphql-dotnet/issues/897)
-* Note about descriptions inheritance - see authorization [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
-* Subscription authentication - see [issue #1244](https://github.com/graphql-dotnet/graphql-dotnet/issues/1244)
-* Flag enums - see [issue #1666](https://github.com/graphql-dotnet/graphql-dotnet/issues/1666)
-* `null` in scalars - see [issue #1542](https://github.com/graphql-dotnet/graphql-dotnet/issues/1542)
+For example, let's say you want to write a custom serializer for date/time data types where it changes
+strings of the format "MM-dd-yyyy" into `DateTime` values, and empty strings into null values. That is
+not possible. The custom scalar also cannot do the reverse: change null values back into an empty string.
+
+If this type of functionality is necessary for your data types, you will need to write code within your
+field resolvers to perform the conversion, as a custom scalar cannot do this. This is a limitation
+of GraphQL.NET.
+
+### Should I use `GraphQLAuthorizeAttribute` or the `AuthorizeWith` method?
+
+`GraphQLAuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
+with the code-first approach.
+
+See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74).
+
+### Can descriptions be inherited if a graph type implements an GraphQL interface?
+
+Yes; although descriptions directly set on the graph type take precedence.
+
+### Authorization headers are not being received by subscriptions; why?
+
+Web sockets do not allow authorization headers. Assuming you are using HTTPS, you may be able to
+transmit the token via the querystring. See [issue #1244](https://github.com/graphql-dotnet/graphql-dotnet/issues/1244)
+for more details.
 
 ## Common Errors
 
