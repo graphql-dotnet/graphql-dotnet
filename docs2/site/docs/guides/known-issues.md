@@ -167,7 +167,8 @@ of GraphQL.NET.
 `GraphQLAuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
 with the code-first approach.
 
-See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74).
+See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
+within the [authorization](https://github.com/graphql-dotnet/authorization) package.
 
 ### Can descriptions be inherited if a graph type implements an GraphQL interface?
 
