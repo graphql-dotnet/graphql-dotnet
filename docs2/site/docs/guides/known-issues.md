@@ -180,6 +180,12 @@ Web sockets do not allow authorization headers. Assuming you are using HTTPS, yo
 transmit the token via the querystring. See [issue #1244](https://github.com/graphql-dotnet/graphql-dotnet/issues/1244)
 for more details.
 
+### How can I use the data loader for a many-to-many relationship?
+
+This is done within your database queries; it is not a function of the dataloader. Use the same
+`CollectionBatchDataLoader` as you would for a one-to-many relationship; then when you are loading
+data from your database within the fetch delegate, use an inner join to retrieve the proper data.
+
 ## Common Errors
 
 ### Synchronous operations are disallowed.
