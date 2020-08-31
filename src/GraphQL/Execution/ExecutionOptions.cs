@@ -61,9 +61,6 @@ namespace GraphQL
         /// <summary>Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/></summary>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
-        /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
-        public bool ExposeExceptions { get; set; }
-
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
         public bool EnableMetrics { get; set; } = true;
 
@@ -82,5 +79,11 @@ namespace GraphQL
 
         /// <summary>Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.</summary>
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
+
+        /// <summary>
+        /// The service provider for the executing request. Typically this is set to a scoped service provider
+        /// from your dependency injection framework.
+        /// </summary>
+        public IServiceProvider RequestServices { get; set; }
     }
 }

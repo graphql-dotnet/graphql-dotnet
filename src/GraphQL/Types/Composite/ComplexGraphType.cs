@@ -1,13 +1,13 @@
-using GraphQL.Builders;
-using GraphQL.Resolvers;
-using GraphQL.Subscription;
-using GraphQL.Types.Relay;
-using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GraphQL.Builders;
+using GraphQL.Resolvers;
+using GraphQL.Subscription;
+using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -65,13 +65,13 @@ namespace GraphQL.Types
                 {
                     if (fieldType.ResolvedType?.IsInputType() == false || fieldType.Type?.IsInputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
-                            $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+                            $"Input type '{Name ?? GetType().GetFriendlyName()}' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field '{fieldType.Name}' has an output type.");
                 }
                 else
                 {
                     if (fieldType.ResolvedType?.IsOutputType() == false || fieldType.Type?.IsOutputType() == false)
                         throw new ArgumentOutOfRangeException(nameof(fieldType),
-                            $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
+                            $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType. Field '{fieldType.Name}' has an input type.");
                 }
             }
 

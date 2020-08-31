@@ -1,3 +1,4 @@
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -97,7 +98,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.DuplicateOperationNameMessage("Foo"), 6, 17);
+                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
             });
         }
 
@@ -117,7 +118,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.DuplicateOperationNameMessage("Foo"), 6, 17);
+                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
             });
         }
 
@@ -137,7 +138,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.DuplicateOperationNameMessage("Foo"), 6, 17);
+                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
             });
         }
     }

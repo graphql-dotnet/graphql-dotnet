@@ -3,20 +3,24 @@ namespace GraphQL.NewtonsoftJson
     public class DocumentWriter : GraphQL.IDocumentWriter
     {
         public DocumentWriter() { }
+        public DocumentWriter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
         public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
         public DocumentWriter(bool indent) { }
+        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
     public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
-        public ExecutionResultContractResolver() { }
+        public ExecutionResultContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
         protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
     }
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
-        public ExecutionResultJsonConverter() { }
+        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public override bool CanRead { get; }
         public override bool CanConvert(System.Type objectType) { }
         public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }

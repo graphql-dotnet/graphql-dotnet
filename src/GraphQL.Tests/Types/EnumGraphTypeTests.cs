@@ -1,8 +1,8 @@
-using GraphQL.Types;
-using Shouldly;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 #pragma warning disable 0618

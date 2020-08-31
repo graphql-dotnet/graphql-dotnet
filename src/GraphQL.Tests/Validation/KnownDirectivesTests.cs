@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -8,12 +9,12 @@ namespace GraphQL.Tests.Validation
     {
         private void unknownDirective(ValidationTestConfig _, string name, int line, int column)
         {
-            _.Error(Rule.UnknownDirectiveMessage(name), line, column);
+            _.Error(KnownDirectivesError.UnknownDirectiveMessage(name), line, column);
         }
 
         private void misplacedDirective(ValidationTestConfig _, string name, DirectiveLocation placement, int line, int column)
         {
-            _.Error(Rule.MisplacedDirectiveMessage(name, placement.ToString()), line, column);
+            _.Error(KnownDirectivesError.MisplacedDirectiveMessage(name, placement.ToString()), line, column);
         }
 
         [Fact]

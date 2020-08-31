@@ -1,10 +1,10 @@
-using GraphQL.Language.AST;
-using GraphQL.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {

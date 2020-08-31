@@ -79,7 +79,8 @@ namespace GraphQL.Execution
                     CancellationToken = context.CancellationToken,
                     Metrics = context.Metrics,
                     Errors = context.Errors,
-                    Path = node.Path
+                    Path = node.Path,
+                    RequestServices = context.RequestServices,
                 };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
@@ -97,7 +98,7 @@ namespace GraphQL.Execution
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Subscriber not set for field {node.Field.Name}");
+                    throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
                 return subscription
@@ -142,17 +143,17 @@ namespace GraphQL.Execution
                                 {
                                     GenerateError(
                                         context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'.",
                                         node.Field,
-                                        node.Path,
+                                        node.ResponsePath,
                                         exception)
                                 }
                             }.With(context)));
             }
             catch (Exception ex)
             {
-                var message = $"Error trying to resolve {node.Field.Name}.";
-                var error = GenerateError(context, message, node.Field, node.Path, ex);
+                var message = $"Error trying to resolve field '{node.Field.Name}'.";
+                var error = GenerateError(context, message, node.Field, node.ResponsePath, ex);
                 context.Errors.Add(error);
                 return null;
             }

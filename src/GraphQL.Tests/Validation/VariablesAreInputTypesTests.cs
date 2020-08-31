@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -26,15 +27,15 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
                 _.Error(
-                    message: Rule.UndefinedVarMessage("a", "Dog"),
+                    message: VariablesAreInputTypesError.UndefinedVarMessage("a", "Dog"),
                     line: 2,
                     column: 29);
                 _.Error(
-                    message: Rule.UndefinedVarMessage("b", "[[CatOrDog!]]!"),
+                    message: VariablesAreInputTypesError.UndefinedVarMessage("b", "[[CatOrDog!]]!"),
                     line: 2,
                     column: 38);
                 _.Error(
-                    message: Rule.UndefinedVarMessage("c", "Pet"),
+                    message: VariablesAreInputTypesError.UndefinedVarMessage("c", "Pet"),
                     line: 2,
                     column: 58);
             });

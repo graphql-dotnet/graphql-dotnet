@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -12,7 +11,7 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext, IProvideUserContext
+    public class ResolveFieldContext : IResolveFieldContext
     {
         public string FieldName { get; set; }
 
@@ -50,7 +49,11 @@ namespace GraphQL
 
         public IEnumerable<object> Path { get; set; }
 
+        public IEnumerable<object> ResponsePath { get; set; }
+
         public IDictionary<string, Field> SubFields { get; set; }
+
+        public IServiceProvider RequestServices { get; set; }
 
         public IDictionary<string, object> Extensions { get; set; }
 
@@ -80,6 +83,8 @@ namespace GraphQL
             Errors = context.Errors;
             SubFields = context.SubFields;
             Path = context.Path;
+            ResponsePath = context.ResponsePath;
+            RequestServices = context.RequestServices;
             Extensions = context.Extensions;
         }
     }
@@ -105,39 +110,6 @@ namespace GraphQL
         {
             get => (TSource)base.Source;
             set => base.Source = value;
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="ResolveFieldContext{TSource}"/> based on the specified <see cref="Execution.ExecutionContext"/> and other specified parameters
-        /// </summary>
-        /// <param name="context">The current <see cref="Execution.ExecutionContext"/> containing a number of parameters relating to the current GraphQL request</param>
-        /// <param name="field">The field AST derived from the query request</param>
-        /// <param name="type">The <see cref="FieldType"/> definition specified in the parent graph type</param>
-        /// <param name="source">The value of the parent object in the graph</param>
-        /// <param name="parentType">The field's parent graph type</param>
-        /// <param name="arguments">A dictionary of arguments passed to the field</param>
-        /// <param name="path">The path to the current executing field from the request root</param>
-        public ResolveFieldContext(GraphQL.Execution.ExecutionContext context, Field field, FieldType type, TSource source, IObjectGraphType parentType, Dictionary<string, object> arguments, IEnumerable<string> path)
-        {
-            Source = source;
-            FieldName = field.Name;
-            FieldAst = field;
-            FieldDefinition = type;
-            ReturnType = type.ResolvedType;
-            ParentType = parentType;
-            Arguments = arguments;
-            Schema = context.Schema;
-            Document = context.Document;
-            Fragments = context.Fragments;
-            RootValue = context.RootValue;
-            UserContext = context.UserContext;
-            Operation = context.Operation;
-            Variables = context.Variables;
-            CancellationToken = context.CancellationToken;
-            Metrics = context.Metrics;
-            Errors = context.Errors;
-            Extensions = context.Extensions;
-            Path = path;
         }
     }
 }

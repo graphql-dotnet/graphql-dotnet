@@ -2,10 +2,9 @@ using System;
 
 namespace GraphQL.Types
 {
-    public interface IHaveDefaultValue
+    public interface IHaveDefaultValue : IProvideResolvedType
     {
         object DefaultValue { get; }
         Type Type { get; }
-        IGraphType ResolvedType { get; }
     }
 }

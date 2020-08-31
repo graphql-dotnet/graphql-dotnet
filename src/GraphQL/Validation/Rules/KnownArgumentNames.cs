@@ -1,7 +1,7 @@
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Utilities;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,26 +13,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class KnownArgumentNames : IValidationRule
     {
-        public string UnknownArgMessage(string argName, string fieldName, string type, string[] suggestedArgs)
-        {
-            var message = $"Unknown argument \"{argName}\" on field \"{fieldName}\" of type \"{type}\".";
-            if (suggestedArgs != null && suggestedArgs.Length > 0)
-            {
-                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
-            }
-            return message;
-        }
-
-        public string UnknownDirectiveArgMessage(string argName, string directiveName, string[] suggestedArgs)
-        {
-            var message = $"Unknown argument \"{argName}\" on directive \"{directiveName}\".";
-            if (suggestedArgs != null && suggestedArgs.Length > 0)
-            {
-                message += $" Did you mean {StringUtils.QuotedOrList(suggestedArgs)}";
-            }
-            return message;
-        }
-
         public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -51,17 +31,8 @@ namespace GraphQL.Validation.Rules
                             var fieldArgDef = fieldDef.Arguments?.Find(node.Name);
                             if (fieldArgDef == null)
                             {
-                                var parentType = context.TypeInfo.GetParentType();
-                                Invariant.Check(parentType != null, "Parent type must not be null.");
-                                context.ReportError(new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.1",
-                                    UnknownArgMessage(
-                                        node.Name,
-                                        fieldDef.Name,
-                                        context.Print(parentType),
-                                        StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.Select(q => q.Name))),
-                                    node));
+                                var parentType = context.TypeInfo.GetParentType() ?? throw new InvalidOperationException("Parent type must not be null.");
+                                context.ReportError(new KnownArgumentNamesError(context, node, fieldDef, parentType));
                             }
                         }
                     }
@@ -73,14 +44,7 @@ namespace GraphQL.Validation.Rules
                             var directiveArgDef = directive.Arguments?.Find(node.Name);
                             if (directiveArgDef == null)
                             {
-                                context.ReportError(new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.1",
-                                    UnknownDirectiveArgMessage(
-                                        node.Name,
-                                        directive.Name,
-                                        StringUtils.SuggestionList(node.Name, directive.Arguments?.Select(q => q.Name))),
-                                    node));
+                                context.ReportError(new KnownArgumentNamesError(context, node, directive));
                             }
                         }
                     }

@@ -1,9 +1,9 @@
-using GraphQL.Reflection;
-using GraphQL.Resolvers;
-using GraphQL.Types;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using GraphQL.Reflection;
+using GraphQL.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {

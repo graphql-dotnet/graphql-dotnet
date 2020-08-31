@@ -52,11 +52,5 @@ namespace GraphQL.Builders
         public string Before => this.GetArgument<string>("before");
 
         public int? PageSize => First ?? Last ?? _defaultPageSize;
-
-        public int? NumberOfSkippedEntries { get; set; }
-
-        public int? TotalCount { get; set; }
-
-        public bool IsPartial { get; set; }
     }
 }

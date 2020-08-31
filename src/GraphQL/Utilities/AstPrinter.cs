@@ -35,7 +35,7 @@ namespace GraphQL.Utilities
         {
             if (FieldsList.Exists(x => x.Name == field.Name))
             {
-                throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
+                throw new ArgumentException($"A field with name \"{field.Name}\" already exists!", nameof(field));
             }
 
             FieldsList.Add(field);
@@ -307,6 +307,16 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (double)f.Arg(x => x.Value);
+                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                });
+            });
+
+            Config<DecimalValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f =>
+                {
+                    var val = (decimal)f.Arg(x => x.Value);
                     return val.ToString("0.0##############", CultureInfo.InvariantCulture);
                 });
             });

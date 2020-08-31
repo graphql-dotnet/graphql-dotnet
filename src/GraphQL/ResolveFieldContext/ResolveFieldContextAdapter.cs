@@ -67,6 +67,8 @@ namespace GraphQL
 
         public IEnumerable<object> Path => _baseContext.Path;
 
+        public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
+
         public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
@@ -74,5 +76,7 @@ namespace GraphQL
         public IDictionary<string, object> Extensions => _baseContext.Extensions;
 
         object IResolveFieldContext.Source => Source;
+
+        public IServiceProvider RequestServices => _baseContext.RequestServices;
     }
 }
