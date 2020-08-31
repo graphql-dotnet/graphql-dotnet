@@ -69,6 +69,10 @@ namespace GraphQL.DI
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 
+        public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
+
+        public IServiceProvider RequestServices => _baseContext.RequestServices;
+
         object IResolveFieldContext.Source => Source;
     }
 }

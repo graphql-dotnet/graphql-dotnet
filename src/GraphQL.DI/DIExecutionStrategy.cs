@@ -1,12 +1,10 @@
-using GraphQL.DI.DelayLoader;
-using GraphQL.Execution;
-using GraphQL.Resolvers;
-using GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static GraphQL.Execution.ExecutionHelper;
+using GraphQL.DataLoader;
+using GraphQL.Execution;
+using GraphQL.Resolvers;
 
 namespace GraphQL.DI
 {
@@ -102,7 +100,7 @@ namespace GraphQL.DI
                         //if the result of the node is an IDelayLoadedResult, then add this
                         //  node to a list of nodes to be loaded once everything else possible
                         //  has been loaded
-                        if (node.Result is IDelayLoadedResult)
+                        if (node.Result is IDataLoaderResult)
                         {
                             pendingNodes.Enqueue(node);
                         }
@@ -182,7 +180,7 @@ namespace GraphQL.DI
 
                 node.Result = result;
 
-                if (!(result is IDelayLoadedResult))
+                if (!(result is IDataLoaderResult))
                 {
                     ValidateNodeResult(context, node);
 
@@ -234,7 +232,7 @@ namespace GraphQL.DI
             context.CancellationToken.ThrowIfCancellationRequested();
 
             if (!node.IsResultSet) throw new InvalidOperationException("This execution node has not yet been executed");
-            if (!(node.Result is DelayLoader.IDelayLoadedResult delayLoadedResult)) throw new InvalidOperationException("This execution node is not pending completion");
+            if (!(node.Result is IDataLoaderResult delayLoadedResult)) throw new InvalidOperationException("This execution node is not pending completion");
 
             ResolveFieldContext resolveContext = null;
 
