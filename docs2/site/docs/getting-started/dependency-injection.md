@@ -135,7 +135,7 @@ Transient lifetime is also not recommended due to performance degradation. For s
 lifetime, it is **required** that all its graph types are also registered within the DI framework as
 transient services.
 
-# Scoped Services with a singleton schema lifetime
+# Scoped services with a singleton schema lifetime
 
 For reasons described above, it is recommended that the schema is registered as a singleton within
 the dependency injection framework. However, this prevents including scoped services within the
@@ -171,6 +171,8 @@ public class StarWarsQuery : ObjectGraphType
     }
 }
 ```
+
+# Thread safety with scoped services
 
 When using scoped services, be aware that most scoped services are not thread-safe. Therefore you will likely
 need to use the `SerialExecutionStrategy` execution strategy, or write code to create a service scope

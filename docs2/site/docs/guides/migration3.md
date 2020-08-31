@@ -14,8 +14,9 @@ These .Net types now are automatically mapped to corresponding built-in custom s
 * Guid (maps to `IdGraphType` by default; also supports `GuidGraphType`)
 * BigInt
 
-There is also support for converting byte arrays to base-64 encoded strings and vice versa. See
-the `ValueConverter` class for more details.
+There is also support for converting base-64 encoded strings to byte arrays. See
+the [FAQ](known-issues#can-custom-scalars-serialize-non-null-data-to-a-null-value-and-vice-versa)
+and the `ValueConverter` class for more details.
 
 See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-types) for more details.
 
