@@ -265,6 +265,11 @@ Also please note that all `IResolveFieldContext` and similar interfaces and clas
 the `GraphQL.Types` namespace to the `GraphQL` namespace. You may need to add a `using GraphQL;`
 statement to some of your files.
 
+There are also several new properties of `IResolveFieldContext` that were not present on the prior
+`ResolveFieldContext` class, such as `RequestServices` and `RequestPath`, and the constructor of
+the `ResolveFieldContext` class has changed. Custom implementations will need to implement these
+additional properties.
+
 ### Connection Builders
 
 The connection builders have changed slightly. Please see https://graphql-dotnet.github.io/docs/getting-started/relay for current implementation details.
@@ -366,8 +371,11 @@ values, and execute `GetResultAsync` at the appropriate time to retrieve the act
 If the field resolver returns a `Task<IDataLoaderResult>`, the execution strategy should start the task as
 usual, only queuing the data loader once the `IDataLoaderResult` has been returned. Note that
 `await IDataLoaderResult.GetResultAsync()` may return another `IDataLoaderResult` which must again
-be queued to execute at the proper time. Please refer to the reference implementation of `ParallelExecutionStrategy`
-for an example.
+be queued to execute at the proper time.
+
+To accomodate these changes, the `ExecuteNodeAsync` method has been split into three methods; the new methods
+are `CompleteDataLoaderNodeAsync` and `CompleteNode`. Please refer to the reference implementation of
+`ParallelExecutionStrategy` for an example.
 
 ### Exception Handling
 
