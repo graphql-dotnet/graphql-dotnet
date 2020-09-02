@@ -266,9 +266,10 @@ the `GraphQL.Types` namespace to the `GraphQL` namespace. You may need to add a 
 statement to some of your files.
 
 There are also several new properties of `IResolveFieldContext` that were not present on the prior
-`ResolveFieldContext` class, such as `RequestServices` and `RequestPath`, and the constructor of
-the `ResolveFieldContext` class has changed. Custom implementations will need to implement these
-additional properties.
+`ResolveFieldContext` class, such as `RequestServices` and `ResponsePath`, and the constructor of
+the `ResolveFieldContext` class has changed. Custom implementations will need to implement the
+new properties. Please see the `IResolveFieldContext` interface for a complete list of properties
+that are required to be implemented.
 
 ### Connection Builders
 
