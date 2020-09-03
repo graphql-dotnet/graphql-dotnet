@@ -271,6 +271,31 @@ the `ResolveFieldContext` class has changed. Custom implementations will need to
 new properties. Please see the `IResolveFieldContext` interface for a complete list of properties
 that are required to be implemented.
 
+### Enumeration Graph Types
+
+Version 3.0 has stricter type checking when serializing or deserializing between types, including
+enumeration types. Since C# does not equate a enumeration member to its value (e.g. the number `1`
+does not equal `MyEnum.Value1`), you may need to make changes to your custom enumeration graph
+types as shown in the following example:
+
+```csharp
+public enum IsSet
+{
+    NotSet = 0,
+    Set = 1
+}
+
+public class AssignmentStateEnumType  : EnumerationGraphType {
+    public AssignmentStateEnumType()
+    {
+        //AddValue(name: "NotAssigned", description: "There is no assignment", value: 0);
+        //AddValue(name: "Assigned", description: "There is an assignment", value: 1);
+        AddValue(name: "NotAssigned", description: "There is no assignment", value: IsSet.NotSet);
+        AddValue(name: "Assigned", description: "There is an assignment", value: IsSet.Set);
+    }
+}
+```
+
 ### Connection Builders
 
 The connection builders have changed slightly. Please see https://graphql-dotnet.github.io/docs/getting-started/relay for current implementation details.

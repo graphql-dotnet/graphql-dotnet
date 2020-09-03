@@ -92,6 +92,15 @@ namespace GraphQL.Tests.Bugs
 
         [Fact]
         public void Input_Enum_RequiredWithDefault() => AssertQuerySuccess("{ inputRequiredWithDefault }", @"{ ""inputRequiredWithDefault"": ""Happy"" }");
+
+        [Fact]
+        public void Custom_Enum() => AssertQuerySuccess("{ customEnum }", @"{ ""customEnum"": ""ISHAPPY"" }");
+
+        [Fact]
+        public void Custom_Enum_Input() => AssertQuerySuccess("{ customEnumInput (arg: ISHAPPY) }", @"{ ""customEnumInput"": ""Happy"" }");
+
+        [Fact]
+        public void Custom_Enum_Input_Variable() => AssertQuerySuccess("query($arg: Bug1699CustomEnum!) { customEnumInput (arg: $arg) }", @"{ ""customEnumInput"": ""Happy"" }", @"{ ""arg"": ""ISHAPPY"" }".ToInputs());
     }
 
     public class Bug1699InvalidEnumSchema : Schema
@@ -144,6 +153,13 @@ namespace GraphQL.Tests.Bugs
                 "inputRequiredWithDefault",
                 arguments: new QueryArguments(new QueryArgument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
                 resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+            Field<Bug1699CustomEnumGraphType>(
+                "customEnum",
+                resolve: context => Bug1699Enum.Happy);
+            Field<StringGraphType>(
+                "customEnumInput",
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<Bug1699CustomEnumGraphType>> { Name = "arg" }),
+                resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
         }
     }
 
@@ -152,5 +168,15 @@ namespace GraphQL.Tests.Bugs
         Grumpy,
         Happy,
         Sleepy,
+    }
+
+    public class Bug1699CustomEnumGraphType : EnumerationGraphType
+    {
+        public Bug1699CustomEnumGraphType()
+        {
+            AddValue(new EnumValueDefinition() { Name = "ISGRUMPY", Value = Bug1699Enum.Grumpy });
+            AddValue(new EnumValueDefinition() { Name = "ISHAPPY", Value = Bug1699Enum.Happy });
+            AddValue(new EnumValueDefinition() { Name = "ISSLEEPY", Value = Bug1699Enum.Sleepy });
+        }
     }
 }
