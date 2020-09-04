@@ -135,7 +135,7 @@ namespace GraphQL.Types
 
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in _values)
-                if (def.Value.Equals(value))
+                if (def.UnderlyingValue.Equals(value))
                     return def;
 
             return null;
@@ -156,13 +156,15 @@ namespace GraphQL.Types
         {
             get => _value;
             set {
+                _value = value;
                 if (value != null)
                 {
                     if (value is Enum)
                         value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
                 }
-                _value = value;
+                UnderlyingValue = value;
             }
         }
+        internal object UnderlyingValue { get; set; }
     }
 }
