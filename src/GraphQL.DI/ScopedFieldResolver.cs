@@ -16,19 +16,12 @@ namespace GraphQL.DI
         {
             return async (context) =>
             {
-                var serviceProvider = AsyncServiceProvider.Current ?? throw new InvalidOperationException("No service provider defined in this context");
-                try
+                var serviceProvider = context.RequestServices ?? throw new InvalidOperationException("No service provider defined in this context");
+                using (var newScope = serviceProvider.CreateScope())
                 {
-                    using (var newScope = serviceProvider.CreateScope())
-                    {
-                        AsyncServiceProvider.Current = newScope.ServiceProvider;
-                        var ret = resolver(context);
-                        return await ret.ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    AsyncServiceProvider.Current = serviceProvider;
+                    context = new ContextWrapper(context, newScope.ServiceProvider);
+                    var ret = resolver(context);
+                    return await ret.ConfigureAwait(false);
                 }
             };
         }
@@ -42,19 +35,12 @@ namespace GraphQL.DI
         {
             return async (context) =>
             {
-                var serviceProvider = AsyncServiceProvider.Current ?? throw new InvalidOperationException("No service provider defined in this context");
-                try
+                var serviceProvider = context.RequestServices ?? throw new InvalidOperationException("No service provider defined in this context");
+                using (var newScope = serviceProvider.CreateScope())
                 {
-                    using (var newScope = serviceProvider.CreateScope())
-                    {
-                        AsyncServiceProvider.Current = newScope.ServiceProvider;
-                        var ret = resolver(context);
-                        return await ret.ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    AsyncServiceProvider.Current = serviceProvider;
+                    context = new ContextWrapper<TSourceType>(context, newScope.ServiceProvider);
+                    var ret = resolver(context);
+                    return await ret.ConfigureAwait(false);
                 }
             };
         }

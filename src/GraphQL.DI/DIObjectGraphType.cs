@@ -40,11 +40,11 @@ namespace GraphQL.DI
         }
 
         //grab some methods via reflection for us to use later
-        private static readonly MethodInfo getRequiredServiceMethod = typeof(AsyncServiceProvider).GetMethods(BindingFlags.Public | BindingFlags.Static).Single(x => x.Name == nameof(AsyncServiceProvider.GetRequiredService) && !x.IsGenericMethod);
+        private static readonly MethodInfo getRequiredServiceMethod = typeof(ServiceProviderServiceExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static).Single(x => x.Name == nameof(ServiceProviderServiceExtensions.GetRequiredService) && !x.IsGenericMethod);
         private static readonly MethodInfo asMethod = typeof(ResolveFieldContextExtensions).GetMethod(nameof(ResolveFieldContextExtensions.As), BindingFlags.Static | BindingFlags.Public);
         private static readonly MethodInfo getArgumentMethod = typeof(GraphQL.ResolveFieldContextExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static).Single(x => x.Name == nameof(GraphQL.ResolveFieldContextExtensions.GetArgument) && x.IsGenericMethod);
         private static readonly PropertyInfo sourceProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source), BindingFlags.Instance | BindingFlags.Public);
-        private static readonly PropertyInfo currentServiceProviderProperty = typeof(AsyncServiceProvider).GetProperty(nameof(AsyncServiceProvider.Current), BindingFlags.Public | BindingFlags.Static);
+        private static readonly PropertyInfo requestServicesProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.RequestServices), BindingFlags.Instance | BindingFlags.Public);
         private static readonly PropertyInfo cancellationTokenProperty = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.CancellationToken), BindingFlags.Public | BindingFlags.Instance);
 
         protected virtual List<DIFieldType> CreateFieldTypeList()
@@ -226,14 +226,14 @@ namespace GraphQL.DI
 
         protected virtual Expression GetServiceProviderExpression(ParameterExpression resolveFieldContextParameter)
         {
-            //returns: AsyncServiceProvider.Current
-            return Expression.Property(null, currentServiceProviderProperty);
+            //returns: context.RequestServices
+            return Expression.Property(resolveFieldContextParameter, requestServicesProperty);
         }
 
         protected virtual Expression GetServiceExpression(ParameterExpression resolveFieldContextParameter, Type serviceType)
         {
-            //returns: (serviceType)(AsyncServiceProvider.GetRequiredService(serviceType))
-            return Expression.Convert(Expression.Call(getRequiredServiceMethod, Expression.Constant(serviceType)), serviceType);
+            //returns: (serviceType)(context.RequestServices.GetRequiredService(serviceType))
+            return Expression.Convert(Expression.Call(getRequiredServiceMethod, GetServiceProviderExpression(resolveFieldContextParameter), Expression.Constant(serviceType)), serviceType);
         }
 
         protected virtual IFieldResolver CreateUnscopedResolver(Func<IResolveFieldContext, object> resolveFunc)
@@ -245,25 +245,18 @@ namespace GraphQL.DI
         {
             return new AsyncFieldResolver<object>(async (context) =>
             {
-                var serviceProvider = AsyncServiceProvider.Current ?? throw new InvalidOperationException("No service provider defined in this context");
-                try
+                var serviceProvider = context.RequestServices ?? throw new InvalidOperationException("No service provider defined in this context");
+                using (var newScope = serviceProvider.CreateScope())
                 {
-                    using (var newScope = serviceProvider.CreateScope())
+                    context = new ContextWrapper(context, newScope.ServiceProvider);
+                    //run the compiled resolve function, which should return a Task<>
+                    var ret = resolverFunc(context);
+                    if (ret is Task task)
                     {
-                        AsyncServiceProvider.Current = newScope.ServiceProvider;
-                        //run the compiled resolve function, which should return a Task<>
-                        var ret = resolverFunc(context);
-                        if (ret is Task task)
-                        {
-                            await task.ConfigureAwait(false);
-                            return task.GetResult();
-                        }
-                        return ret; //cannot occur, since the return type has already been determined to be a Task<>
+                        await task.ConfigureAwait(false);
+                        return task.GetResult();
                     }
-                }
-                finally
-                {
-                    AsyncServiceProvider.Current = serviceProvider;
+                    return ret; //cannot occur, since the return type has already been determined to be a Task<>
                 }
             });
         }
@@ -314,7 +307,7 @@ namespace GraphQL.DI
             if (param.ParameterType == typeof(IServiceProvider))
             {
                 //if they want the service provider, just pass it in
-                //e.g. Func<ResolveFieldContext, IServiceProvider> = (context) => AsyncServiceProvider.Current;
+                //e.g. Func<ResolveFieldContext, IServiceProvider> = (context) => context.RequestServices;
                 expr = GetServiceProviderExpression(resolveFieldContextParameter);
                 //note that we have a parameter that pulls from the service provider
                 usesServices = true;

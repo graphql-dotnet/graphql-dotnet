@@ -4,24 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
-using GraphQL.Resolvers;
 
 namespace GraphQL.DI
 {
     public class DIExecutionStrategy : ExecutionStrategy
     {
-        protected IServiceProvider _serviceProvider;
-
-        public DIExecutionStrategy(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
             Func<Task, ExecutionNode, Task<ExecutionNode>> taskFunc = async (task, node) => { await task; return node; };
-            //set up the service provider
-            AsyncServiceProvider.Current = _serviceProvider;
 
             var nodes = new Stack<ExecutionNode>(); //synchronous nodes to be executed
             nodes.Push(rootNode);

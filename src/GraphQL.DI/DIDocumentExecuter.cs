@@ -22,7 +22,7 @@ namespace GraphQL.DI
                 (IDocumentValidator)serviceProvider.GetService(typeof(IDocumentValidator)) ?? new DocumentValidator(),
                 (IComplexityAnalyzer)serviceProvider.GetService(typeof(IComplexityAnalyzer)) ?? new ComplexityAnalyzer())
         {
-            _diExecutionStrategy = (DIExecutionStrategy)serviceProvider.GetService(typeof(DIExecutionStrategy)) ?? new DIExecutionStrategy(serviceProvider);
+            _diExecutionStrategy = (DIExecutionStrategy)serviceProvider.GetService(typeof(DIExecutionStrategy)) ?? new DIExecutionStrategy();
             _subscriptionExecutionStrategy = (SubscriptionExecutionStrategy)serviceProvider.GetService(typeof(SubscriptionExecutionStrategy)) ?? new SubscriptionExecutionStrategy();
         }
 
