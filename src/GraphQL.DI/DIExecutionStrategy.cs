@@ -132,6 +132,10 @@ namespace GraphQL.DI
                 //  then load any IDelayLoadedResult values
                 if (nodes.Count == 0 && asyncNodes.Count == 0 && waitingTasks.Count == 0)
                 {
+                    //if no data loader nodes either, we are all done
+                    if (pendingNodes.Count == 0)
+                        return;
+
                     //must be synchronously, as all DelayLoaders will exist in the same scope
                     //however, once a single node is resolved, all the rest of the tasks from the same DelayLoader will already be completed
                     //also, must execute all these nodes at once, otherwise
@@ -151,9 +155,6 @@ namespace GraphQL.DI
                         await task.ConfigureAwait(false); //execute synchronously
                         DICompleteNode(pendingNode);
                     }
-                    //if there were no pending nodes, there would be no waitingTasks, and that means there's no more nodes left to execute
-                    if (waitingTasks.Count == 0) return;
-                    //otherwise, the pending waitingTasks will all need to execute before the DelayLoaders attempt to execute again
                 }
             }
         }
