@@ -87,7 +87,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void adds_values_from_enum_custom_casing()
         {
-            type.ParseValue("rED").ShouldBe(Colors.Red);
+            type.ParseValue("rED").ShouldBe((int)Colors.Red);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void parses_from_name()
         {
-            type.ParseValue("RED").ShouldBe(Colors.Red);
+            type.ParseValue("RED").ShouldBe((int)Colors.Red);
         }
 
         [Fact]

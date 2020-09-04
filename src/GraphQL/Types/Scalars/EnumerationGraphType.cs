@@ -114,7 +114,14 @@ namespace GraphQL.Types
 
         public EnumValueDefinition this[string name] => FindByName(name);
 
-        public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
+        public void Add(EnumValueDefinition value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            if (value.Value is Enum enumValue)
+                value.Value = Convert.ChangeType(enumValue, Enum.GetUnderlyingType(enumValue.GetType()));
+            _values.Add(value);
+        }
 
         public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
@@ -128,6 +135,11 @@ namespace GraphQL.Types
 
         public EnumValueDefinition FindByValue(object value)
         {
+            if (value is Enum)
+            {
+                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+            }
+
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in _values)
                 if (def.Value.Equals(value))
