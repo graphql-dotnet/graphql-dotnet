@@ -136,6 +136,7 @@ namespace GraphQL.Tests
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
                 options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
+                options.RequestServices = (IServiceProvider)Schema;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;

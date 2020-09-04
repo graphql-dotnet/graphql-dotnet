@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Tests.StarWars;
@@ -18,6 +19,7 @@ namespace GraphQL.Tests.Complexity
             await StarWarsTestBase.Executer.ExecuteAsync(options =>
             {
                 options.Schema = new StarWarsTestBase().Schema;
+                options.RequestServices = (IServiceProvider)options.Schema;
                 options.Query = query;
                 options.ComplexityConfiguration = complexityConfig;
             });
