@@ -14,6 +14,12 @@ namespace GraphQL.DI
         protected DIExecutionStrategy _diExecutionStrategy;
         protected SubscriptionExecutionStrategy _subscriptionExecutionStrategy;
 
+        public DIDocumentExecuter() : base()
+        {
+            _diExecutionStrategy = new DIExecutionStrategy();
+            _subscriptionExecutionStrategy = new SubscriptionExecutionStrategy();
+        }
+
         //pull IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, DIExecutionStrategy, and SubscriptionExecutionStrategy from DI if they have been registered
         //if any of them have not been registered, use default implementations
         public DIDocumentExecuter(
