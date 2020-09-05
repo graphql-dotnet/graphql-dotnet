@@ -274,7 +274,7 @@ that are required to be implemented.
 ### Enumeration Graph Types
 
 Version 3.0 has stricter type checking when serializing or deserializing between types, including
-enumeration types. Since C# does not equate a enumeration member to its value (e.g. the number `1`
+enumeration types. Since C# does not equate an enumeration member to its value (e.g. the number `1`
 does not equal `MyEnum.Value1`), you may need to make changes to your custom enumeration graph
 types as shown in the following example:
 
