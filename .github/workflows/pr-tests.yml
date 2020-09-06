@@ -91,4 +91,4 @@ jobs:
           path: |
             out/*.nupkg
       - name: Publish Nuget packages to GitHub registry
-        run: dotnet nuget push out/*.nupkg -s https://nuget.pkg.github.com/Shane32/index.json -k ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet nuget push out/*.nupkg -s "github-packages" -k ${{ secrets.GITHUB_TOKEN }}
