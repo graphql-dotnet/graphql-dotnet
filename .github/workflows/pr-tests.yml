@@ -20,13 +20,9 @@ jobs:
         dotnet-version: 3.1.401
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
-    - name: Build - .NET Core 2.1
-      run: dotnet build --configuration Release --no-restore src/GraphQL.sln --framework netcoreapp2.1
-    - name: Build - .NET Core 3.1
-      run: dotnet build --configuration Release --no-restore src/GraphQL.sln --framework netcoreapp3.1
-    - name: Test - .NET Core 2.1
+    - name: Build & Test - .NET Core 2.1
       run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp2.1
-    - name: Test - .NET Core 3.1
+    - name: Build & Test - .NET Core 3.1
       run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp3.1
       
   test-windows:
