@@ -21,11 +21,9 @@ jobs:
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
     - name: Build
-      run: dotnet build --configuration Release --no-restore src/GraphQL.sln
-    - name: Test - .NET Core 2.1
-      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp2.1
-    - name: Test - .NET Core 3.1
-      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp3.1
+      run: dotnet --no-restore src/GraphQL.sln
+    - name: Test
+      run: dotnet test --no-restore src/GraphQL.sln
       
   test-windows:
     runs-on: windows-2019
@@ -43,10 +41,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore src\GraphQL.sln
     - name: Build
-      run: dotnet build --configuration Release --no-restore src\GraphQL.sln
-    - name: Test - .NET Core 2.1
-      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework netcoreapp2.1
-    - name: Test - .NET Core 3.1
-      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework netcoreapp3.1
-    - name: Test - .NET Framework 4.8
-      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework net48
+      run: dotnet build --no-restore src\GraphQL.sln
+    - name: Test
+      run: dotnet test --no-restore src\GraphQL.sln
