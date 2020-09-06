@@ -83,12 +83,14 @@ jobs:
       - name: Build solution (release config)
         run: dotnet build --no-restore src/GraphQL.sln -c Release -p:NoWarn=CS1591 -p:VersionSuffix=${{ github.run_id }}
       - name: Pack solution (release config)
-        run: dotnet pack --no-restore src/GraphQL.sln -c Release -p:VersionSuffix=${{ github.run_id }}
+        run: dotnet pack --no-restore src/GraphQL.sln -c Release -p:VersionSuffix=${{ github.run_id }} -o out
       - name: Publish artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Nuget packages
           path: |
-            src/GraphQL/bin/Release/*.nupkg
-            src/GraphQL.NewtonsoftJson/bin/Release/*.nupkg
-            src/GraphQL.SystemTextJson/bin/Release/*.nupkg
+            out/*.nupkg
+      - name: Publish Nuget packages to GitHub registry
+        run: dotnet nuget push ./out/$(ls ./out) -s https://nuget.pkg.github.com/Shane32/index.json -k ${GITHUB_TOKEN}  
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
