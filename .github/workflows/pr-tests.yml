@@ -19,11 +19,11 @@ jobs:
       with:
         dotnet-version: 3.1.401
     - name: Install dependencies
-      run: dotnet restore src\GraphQL.sln
+      run: dotnet restore src/GraphQL.sln
     - name: Build (release config)
-      run: dotnet build --configuration Release --no-restore src\GraphQL.sln
+      run: dotnet build --configuration Release --no-restore src/GraphQL.sln
     - name: Test
-      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln
+      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln
       
   test-windows:
     runs-on: windows-2019
