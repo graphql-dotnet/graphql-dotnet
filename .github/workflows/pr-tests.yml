@@ -5,8 +5,28 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    runs-on: windows-latest
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.809
+    - name: Setup .NET Core 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.401
+    - name: Install dependencies
+      run: dotnet restore src\GraphQL.sln
+    - name: Build (release config)
+      run: dotnet build --configuration Release --no-restore src\GraphQL.sln
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln
+      
+  test-windows:
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v2
@@ -18,11 +38,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.401
-    - name: Change to src folder
-      run: cd src
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore src\GraphQL.sln
     - name: Build (release config)
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore src\GraphQL.sln
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln
