@@ -9,7 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet: ['2.1.x', '3.1.x']
+        dotnet: ['3.1.x', '2.1.x']
+        include:
+          - dotnet: '3.1.x'
+            framework: 'netcoreapp3.1'
+          - dotnet: '2.1.x'
+            framework: 'netcoreapp2.1'
     
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +27,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore src/GraphQL.sln
     - name: Test
-      run: dotnet test --no-restore src/GraphQL.sln
+      run: dotnet test --framework ${{ matrix.framework }} --no-restore src/GraphQL.sln
       
   test-windows:
     runs-on: windows-2019
