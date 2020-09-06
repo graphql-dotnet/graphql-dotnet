@@ -236,10 +236,13 @@ namespace GraphQL.Language
 
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
-                    double dbl = double.Parse(
+                    if (double.TryParse(
                         str.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
-                        CultureInfo.InvariantCulture);
+                        CultureInfo.InvariantCulture,
+                        out var dbl) == false) {
+                        dbl = str.Value.StartsWith("-") ? double.NegativeInfinity : double.PositiveInfinity;
+                    }
 
                     //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
                     if (decimal.TryParse(
