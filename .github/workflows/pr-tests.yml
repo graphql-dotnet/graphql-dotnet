@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test-netcore31:
+  test:
     runs-on: windows-latest
 
     steps:
@@ -18,6 +18,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.401
+    - name: Change to src folder
+      run: cd src
     - name: Install dependencies
       run: dotnet restore
     - name: Build (release config)
