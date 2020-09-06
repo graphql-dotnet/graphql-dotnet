@@ -7,17 +7,16 @@ on:
 jobs:
   test-ubuntu:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet: ['2.1.x', '3.1.x']
     
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core 2.1 LTS
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.1.809
-    - name: Setup .NET Core 3.1 LTS
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.401
+        dotnet-version: ${{ matrix.dotnet }}
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
     - name: Build
