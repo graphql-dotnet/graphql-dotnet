@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test-ubuntu-netcoreapp3.1:
+  test-ubuntu-netcoreapp3_1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -20,7 +20,7 @@ jobs:
     - name: Test solution (debug config) using netcoreapp3.1
       run: dotnet test --framework netcoreapp3.1 --no-restore src/GraphQL.sln
       
-  test-ubuntu-netcoreapp2.1:
+  test-ubuntu-netcoreapp2_1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
