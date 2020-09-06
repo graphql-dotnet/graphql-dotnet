@@ -5,33 +5,36 @@ on:
     branches: [ master ]
 
 jobs:
-  test-ubuntu-netcoreapp3_1:
+  test-ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK 3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.x'
-    - name: Install dependencies
-      run: dotnet restore src/GraphQL.sln
-    - name: Build solution (debug config) - all targets
-      run: dotnet build --no-restore src/GraphQL.sln
-    - name: Test solution (debug config) using netcoreapp3.1
-      run: dotnet test --framework netcoreapp3.1 --no-restore src/GraphQL.sln
-      
-  test-ubuntu-netcoreapp2_1:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK 2.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '2.1.x'
-    - name: Test GraphQL.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 src/GraphQL.Tests/GraphQL.Tests.csproj -p:FORCEFRAMEWORK=netcoreapp2.1
-    - name: Test GraphQL.DataLoader.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj -p:FORCEFRAMEWORK=netcoreapp2.1
+      - uses: actions/checkout@v2
+      - name: Use .NET Core 2.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '2.1.x'
+      - name: Use .NET Core 3.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: '**DOTNET HACK**'
+        shell: pwsh
+        run: |
+          $version = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Leaf;
+          $root = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Parent;
+          $directories = Get-ChildItem $root | Where-Object { $_.Name -ne $version };
+          foreach ($dir in $directories) {
+            $from = $dir.FullName;
+            $to = "$root/$version";
+            Write-Host Copying from $from to $to;
+            Copy-Item "$from\*" $to -Recurse -Force;
+          }
+      - name: Install dependencies
+        run: dotnet restore src/GraphQL.sln
+      - name: Build solution (debug config)
+        run: dotnet build --no-restore src/GraphQL.sln
+      - name: Test solution (debug config)
+        run: dotnet test --no-restore src/GraphQL.sln
       
   test-windows-net48:
     runs-on: windows-2019
