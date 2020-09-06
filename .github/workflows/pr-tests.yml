@@ -29,9 +29,9 @@ jobs:
       with:
         dotnet-version: '2.1.x'
     - name: Test GraphQL.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 src/GraphQL.Tests/GraphQL.Tests.csproj
+      run: dotnet test --framework netcoreapp2.1 src/GraphQL.Tests/GraphQL.Tests.csproj -p:FORCEFRAMEWORK=netcoreapp2.1
     - name: Test GraphQL.DataLoader.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj
+      run: dotnet test --framework netcoreapp2.1 src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj -p:FORCEFRAMEWORK=netcoreapp2.1
       
   test-windows-net48:
     runs-on: windows-2019
