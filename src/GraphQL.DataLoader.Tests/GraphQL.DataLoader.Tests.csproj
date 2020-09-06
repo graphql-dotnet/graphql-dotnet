@@ -2,7 +2,7 @@
   <Import Project="../Tests.props" />
   
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp2.1;net48</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
