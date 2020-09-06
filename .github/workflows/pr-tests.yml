@@ -10,31 +10,35 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core 2.1
+    - name: Setup .NET Core 2.1 LTS
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.1.809
-    - name: Setup .NET Core 3.1
+    - name: Setup .NET Core 3.1 LTS
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.401
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
-    - name: Build (release config)
-      run: dotnet build --configuration Release --no-restore src/GraphQL.sln
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln
+    - name: Build - .NET Core 2.1
+      run: dotnet build --configuration Release --no-restore src/GraphQL.sln --framework netcoreapp2.1
+    - name: Build - .NET Core 3.1
+      run: dotnet build --configuration Release --no-restore src/GraphQL.sln --framework netcoreapp3.1
+    - name: Test - .NET Core 2.1
+      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp2.1
+    - name: Test - .NET Core 3.1
+      run: dotnet test --no-restore --verbosity normal src/GraphQL.sln --framework netcoreapp3.1
       
   test-windows:
     runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core 2.1
+    - name: Setup .NET Core 2.1 LTS
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.1.809
-    - name: Setup .NET Core 3.1
+    - name: Setup .NET Core 3.1 LTS
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.401
@@ -42,5 +46,9 @@ jobs:
       run: dotnet restore src\GraphQL.sln
     - name: Build (release config)
       run: dotnet build --configuration Release --no-restore src\GraphQL.sln
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln
+    - name: Test - .NET Core 2.1
+      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework netcoreapp2.1
+    - name: Test - .NET Core 3.1
+      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework netcoreapp3.1
+    - name: Test - .NET Framework 4.8
+      run: dotnet test --no-restore --verbosity normal src\GraphQL.sln --framework net48
