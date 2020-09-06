@@ -4,44 +4,36 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  NODE_VERSION: '10.x'   # set this to the node version to use
+  PYTHON_VERSION: '3.x'
+
 jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: npm install
+        working-directory: docs2
+        run: npm install
+      - name: npm run build
+        working-directory: docs2
+        run: npm run build
+      
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use .NET Core 2.1 SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '2.1.x'
-      - name: Use .NET Core 3.1 SDK
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-      - name: Allow both runtimes
-        # https://github.com/actions/setup-dotnet/issues/25#issuecomment-646925506
-        shell: pwsh
-        run: |
-          $version = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Leaf;
-          $root = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Parent;
-          $directories = Get-ChildItem $root | Where-Object { $_.Name -ne $version };
-          foreach ($dir in $directories) {
-            $from = $dir.FullName;
-            $to = "$root/$version";
-            Write-Host Copying from $from to $to;
-            Copy-Item "$from\*" $to -Recurse -Force;
-          }
-      - name: Install dependencies
-        run: dotnet restore src/GraphQL.sln
-      - name: Build solution (debug config)
-        run: dotnet build --no-restore src/GraphQL.sln -p:NoWarn=CS1591
-      - name: Test solution (debug config)
-        run: dotnet test --no-restore src/GraphQL.sln
-      
-  windows:
-    runs-on: windows-2019
-
-    steps:
-      - uses: actions/checkout@v2
+      - name: Checkout source
+        uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
         uses: actions/setup-dotnet@v1
         with:
@@ -66,8 +58,47 @@ jobs:
       - name: Install dependencies
         run: dotnet restore src/GraphQL.sln
       - name: Build solution (release config)
-        run: dotnet build --no-restore src/GraphQL.sln -c Release -p:NoWarn=CS1591
+        working-directory: src
+        run: dotnet build --no-restore -c Release -p:NoWarn=CS1591
       - name: Build solution (debug config)
-        run: dotnet build --no-restore src/GraphQL.sln -p:NoWarn=CS1591
+        working-directory: src
+        run: dotnet build --no-restore -p:NoWarn=CS1591
       - name: Test solution (debug config)
-        run: dotnet test --no-restore src/GraphQL.sln
+        working-directory: src
+        run: dotnet test --no-restore
+      
+  windows:
+    runs-on: windows-2019
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Use .NET Core 2.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '2.1.x'
+      - name: Use .NET Core 3.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: Allow both runtimes
+        # https://github.com/actions/setup-dotnet/issues/25#issuecomment-646925506
+        shell: pwsh
+        run: |
+          $version = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Leaf;
+          $root = Split-Path (Split-Path $ENV:DOTNET_ROOT -Parent) -Parent;
+          $directories = Get-ChildItem $root | Where-Object { $_.Name -ne $version };
+          foreach ($dir in $directories) {
+            $from = $dir.FullName;
+            $to = "$root/$version";
+            Write-Host Copying from $from to $to;
+            Copy-Item "$from\*" $to -Recurse -Force;
+          }
+      - name: Install dependencies
+        run: dotnet restore src/GraphQL.sln
+      - name: Build solution (debug config)
+        working-directory: src
+        run: dotnet build --no-restore -p:NoWarn=CS1591
+      - name: Test solution (debug config)
+        working-directory: src
+        run: dotnet test --no-restore
