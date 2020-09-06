@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore src/GraphQL.sln
       - name: Build solution (debug config)
-        run: dotnet build --no-restore src/GraphQL.sln
+        run: dotnet build --no-restore src/GraphQL.sln -p:NoWarn=CS1591
       - name: Test solution (debug config)
         run: dotnet test --no-restore src/GraphQL.sln
       
@@ -66,6 +66,29 @@ jobs:
       - name: Install dependencies
         run: dotnet restore src/GraphQL.sln
       - name: Build solution (debug config)
-        run: dotnet build --no-restore src/GraphQL.sln
+        run: dotnet build --no-restore src/GraphQL.sln -p:NoWarn=CS1591
       - name: Test solution (debug config)
         run: dotnet test --no-restore src/GraphQL.sln
+
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use .NET Core 3.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: Install dependencies
+        run: dotnet restore src/GraphQL.sln
+      - name: Build solution (release config)
+        run: dotnet build --no-restore src/GraphQL.sln -c Release -p:NoWarn=CS1591 -p:VersionSuffix=${{ GITHUB_RUN_ID }}
+      - name: Pack solution (release config)
+        run: dotnet pack --no-restore src/GraphQL.sln -c Release -p:VersionSuffix=${{ GITHUB_RUN_ID }}
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Nuget packages
+          path: |
+            src/GraphQL/bin/Release/*.nupkg
+            src/GraphQL.NewtonsoftJson/bin/Release/*.nupkg
+            src/GraphQL.SystemTextJson/bin/Release/*.nupkg
