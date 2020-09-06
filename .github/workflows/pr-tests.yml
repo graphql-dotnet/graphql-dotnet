@@ -1,0 +1,26 @@
+name: Run tests
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test-netcore31:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.809
+    - name: Setup .NET Core 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.401
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build (release config)
+      run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
