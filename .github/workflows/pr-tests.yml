@@ -91,6 +91,6 @@ jobs:
           path: |
             out/*.nupkg
       - name: Publish Nuget packages to GitHub registry
-        run: dotnet nuget push out/$(ls ./out/GraphQL.3.0.0-*.nupkg) -s https://nuget.pkg.github.com/Shane32/index.json -k ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet nuget push $(ls ./out/GraphQL.3.0.0-*.nupkg) -s https://nuget.pkg.github.com/Shane32/index.json -k ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
