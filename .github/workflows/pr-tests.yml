@@ -81,9 +81,9 @@ jobs:
       - name: Install dependencies
         run: dotnet restore src/GraphQL.sln
       - name: Build solution (release config)
-        run: dotnet build --no-restore src/GraphQL.sln -c Release -p:NoWarn=CS1591 -p:VersionSuffix=${ GITHUB_RUN_ID }
+        run: dotnet build --no-restore src/GraphQL.sln -c Release -p:NoWarn=CS1591 -p:VersionSuffix=${{ github.run_id }}
       - name: Pack solution (release config)
-        run: dotnet pack --no-restore src/GraphQL.sln -c Release -p:VersionSuffix=${ GITHUB_RUN_ID }
+        run: dotnet pack --no-restore src/GraphQL.sln -c Release -p:VersionSuffix=${{ github.run_id }}
       - name: Publish artifacts
         uses: actions/upload-artifact@v2
         with:
