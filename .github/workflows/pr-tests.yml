@@ -91,6 +91,6 @@ jobs:
           path: |
             out/*.nupkg
       - name: Publish Nuget packages to GitHub registry
-        run: dotnet nuget push ./out/$(ls ./out) -s https://nuget.pkg.github.com/Shane32/index.json -k ${GITHUB_TOKEN}  
+        run: dotnet nuget push ./out/$(ls ./out) -s https://nuget.pkg.github.com/Shane32/graphql-dotnet/index.json -k ${GITHUB_TOKEN}  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
