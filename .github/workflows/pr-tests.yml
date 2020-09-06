@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
     - name: Build
-      run: dotnet --no-restore src/GraphQL.sln
+      run: dotnet build --no-restore src/GraphQL.sln
     - name: Test
       run: dotnet test --no-restore src/GraphQL.sln
       
