@@ -15,7 +15,7 @@ jobs:
         dotnet-version: '3.1.x'
     - name: Install dependencies
       run: dotnet restore src/GraphQL.sln
-    - name: Build solution (debug config)
+    - name: Build solution (debug config) - all targets
       run: dotnet build --no-restore src/GraphQL.sln
     - name: Test solution (debug config) using netcoreapp3.1
       run: dotnet test --framework netcoreapp3.1 --no-restore src/GraphQL.sln
@@ -29,9 +29,9 @@ jobs:
       with:
         dotnet-version: '2.1.x'
     - name: Test GraphQL.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 --no-restore src/GraphQL.Tests/GraphQL.Tests.csproj
+      run: dotnet test --framework netcoreapp2.1 src/GraphQL.Tests/GraphQL.Tests.csproj
     - name: Test GraphQL.DataLoader.Tests.csproj
-      run: dotnet test --framework netcoreapp2.1 --no-restore src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj
+      run: dotnet test --framework netcoreapp2.1 src/GraphQL.DataLoader.Tests/GraphQL.DataLoader.Tests.csproj
       
   test-windows-net48:
     runs-on: windows-2019
@@ -44,7 +44,7 @@ jobs:
         dotnet-version: '3.1.x'
     - name: Install dependencies
       run: dotnet restore src\GraphQL.sln
-    - name: Build all targets
+    - name: Build (debug config) - all targets
       run: dotnet build --no-restore src\GraphQL.sln
     - name: Test GraphQL.Tests.csproj with net48
       run: dotnet test --framework net48 --no-restore src\GraphQL.Tests\GraphQL.Tests.csproj
