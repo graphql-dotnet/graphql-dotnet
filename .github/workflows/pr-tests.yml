@@ -18,10 +18,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+#      - name: Set up Python ${{ env.PYTHON_VERSION }}
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: ${{ env.PYTHON_VERSION }}
       - name: yarn
         working-directory: docs2
         run: yarn
@@ -43,7 +43,7 @@ jobs:
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 10.x
 #      - name: Set up Python ${{ env.PYTHON_VERSION }}
 #        uses: actions/setup-python@v2
 #        with:
