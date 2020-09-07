@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 env:
-  NODE_VERSION: '12.x'   # set this to the node version to use
+  NODE_VERSION: '11.x'   # set this to the node version to use
   PYTHON_VERSION: '3.x'
 
 jobs:
@@ -35,6 +35,7 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
+      - run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
@@ -74,6 +75,7 @@ jobs:
     runs-on: windows-2019
 
     steps:
+      - run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
