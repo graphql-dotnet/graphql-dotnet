@@ -9,8 +9,6 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - name: Temporarily disable tests
-        run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
@@ -50,8 +48,6 @@ jobs:
     runs-on: windows-2019
 
     steps:
-      - name: Temporarily disable tests
-        run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
