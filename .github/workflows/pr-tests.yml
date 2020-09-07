@@ -25,9 +25,9 @@ jobs:
       - name: npm install
         working-directory: docs2
         run: npm install
-      - name: yarn gatsby build
-        working-directory: docs2
-        run: yarn gatsby build
+#      - name: yarn gatsby build
+#        working-directory: docs2
+#        run: yarn gatsby build
       - name: npm run build
         working-directory: docs2
         run: npm run build
