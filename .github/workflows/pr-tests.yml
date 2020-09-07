@@ -6,7 +6,6 @@ on:
 
 env:
   NODE_VERSION: '11.x'   # set this to the node version to use
-  PYTHON_VERSION: '3.x'
 
 jobs:
   build-docs:
@@ -18,53 +17,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
-#      - name: Set up Python ${{ env.PYTHON_VERSION }}
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{ env.PYTHON_VERSION }}
       - name: yarn
         working-directory: docs2
         run: yarn
-#      - name: npm install
-#        working-directory: docs2
-#        run: npm install
-#      - name: yarn gatsby build
-#        working-directory: docs2
-#        run: yarn gatsby build
       - name: yarn gatsby build
         working-directory: docs2
         run: yarn gatsby build
 
-  build-docs2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v2
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 10.x
-#      - name: Set up Python ${{ env.PYTHON_VERSION }}
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{ env.PYTHON_VERSION }}
-      - name: yarn
-        working-directory: docs2
-        run: yarn
-#      - name: npm install
-#        working-directory: docs2
-#        run: npm install
-#      - name: yarn gatsby build
-#        working-directory: docs2
-#        run: yarn gatsby build
-      - name: yarn gatsby build
-        working-directory: docs2
-        run: yarn gatsby build
-      
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - run: abdsfds
+      - name: Temporarily disable tests
+        run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
@@ -104,7 +68,8 @@ jobs:
     runs-on: windows-2019
 
     steps:
-      - run: abdsfds
+      - name: Temporarily disable tests
+        run: abdsfds
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Use .NET Core 2.1 SDK
