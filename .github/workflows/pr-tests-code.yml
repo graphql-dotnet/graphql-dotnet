@@ -2,8 +2,10 @@ name: Run code tests
 
 on:
   pull_request:
-    branches: [ master ]
-    paths: src
+    branches: 
+      - develop
+    paths: 
+      - src
 
 jobs:
   ubuntu:
@@ -11,11 +13,11 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Use .NET Core 2.1 SDK
+      - name: Use .NET Core 2.1 LTS SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '2.1.x'
-      - name: Use .NET Core 3.1 SDK
+      - name: Use .NET Core 3.1 LTS SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
@@ -33,7 +35,8 @@ jobs:
             Copy-Item "$from\*" $to -Recurse -Force;
           }
       - name: Install dependencies
-        run: dotnet restore src/GraphQL.sln
+        working-directory: src
+        run: dotnet restore
       - name: Build solution (release config)
         working-directory: src
         run: dotnet build --no-restore -c Release -p:NoWarn=CS1591
@@ -50,11 +53,11 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Use .NET Core 2.1 SDK
+      - name: Use .NET Core 2.1 LTS SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '2.1.x'
-      - name: Use .NET Core 3.1 SDK
+      - name: Use .NET Core 3.1 LTS SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
@@ -72,7 +75,8 @@ jobs:
             Copy-Item "$from\*" $to -Recurse -Force;
           }
       - name: Install dependencies
-        run: dotnet restore src/GraphQL.sln
+        working-directory: src
+        run: dotnet restore
       - name: Build solution (debug config)
         working-directory: src
         run: dotnet build --no-restore -p:NoWarn=CS1591
