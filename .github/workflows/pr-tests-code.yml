@@ -1,31 +1,11 @@
-name: Run tests
+name: Run code tests
 
 on:
   pull_request:
     branches: [ master ]
-
-env:
-  NODE_VERSION: '11.x'   # set this to the node version to use
+    paths: src
 
 jobs:
-  build-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: yarn
-        run: yarn
-      - name: yarn docs2
-        working-directory: docs2
-        run: yarn
-      - name: yarn gatsby build
-        working-directory: docs2
-        run: yarn gatsby build
-
   ubuntu:
     runs-on: ubuntu-latest
     steps:
