@@ -22,12 +22,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: yarn gatsby build
-        working-directory: docs2
-        run: yarn gatsby build
       - name: npm install
         working-directory: docs2
         run: npm install
+      - name: yarn gatsby build
+        working-directory: docs2
+        run: yarn gatsby build
       - name: npm run build
         working-directory: docs2
         run: npm run build
