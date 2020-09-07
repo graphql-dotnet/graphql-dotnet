@@ -23,6 +23,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: yarn gatsby build
+        working-directory: docs2
         run: yarn gatsby build
       - name: npm install
         working-directory: docs2
