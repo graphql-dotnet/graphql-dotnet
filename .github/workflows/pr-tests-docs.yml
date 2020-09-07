@@ -10,7 +10,7 @@ on:
       - yarn.lock
 
 env:
-  NODE_VERSION: '11.x'   # set this to the node version to use
+  NODE_VERSION: '10.x'   # Node 10 LTS
 
 jobs:
   build-docs:
