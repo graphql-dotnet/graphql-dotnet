@@ -2,7 +2,8 @@ name: Run documentation tests
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: 
+      - master
     paths: 
       - docs2/**
       - package.json
