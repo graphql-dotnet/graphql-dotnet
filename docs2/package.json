@@ -14,6 +14,7 @@
     "classnames": "^2.2.6",
     "gatsby": "^2.24.53",
     "gatsby-link": "^2.4.13",
+    "gatsby-plugin-sharp": "^2.6.31",
     "gatsby-plugin-react-helmet": "^3.3.10",
     "gatsby-remark-autolink-headers": "^2.3.11",
     "gatsby-remark-images": "^3.3.28",
