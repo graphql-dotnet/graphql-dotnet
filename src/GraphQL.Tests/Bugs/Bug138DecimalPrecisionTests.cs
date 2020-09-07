@@ -5,11 +5,7 @@ namespace GraphQL.Tests.Bugs
 {
     public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
     {
-#if NETCOREAPP3_1
         [Fact]
-#else
-        [Fact(Skip = "Deserialization error with .NET Core 2.1")]
-#endif
         public void double_to_decimal_does_not_lose_precision()
         {
             var query = @"

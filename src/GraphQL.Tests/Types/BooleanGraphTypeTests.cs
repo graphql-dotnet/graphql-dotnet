@@ -63,8 +63,7 @@ namespace GraphQL.Tests.Types
         public void coerces_input_to_exception(string input)
         {
             var formatException = Should.Throw<FormatException>(() => type.ParseValue(input));
-            var formatException2 = Should.Throw<FormatException>(() => bool.Parse(input));
-            formatException.Message.ShouldBe(formatException2.Message);
+            formatException.Message.ShouldBe($"String '{input}' was not recognized as a valid Boolean.");
         }
 
         [Theory]

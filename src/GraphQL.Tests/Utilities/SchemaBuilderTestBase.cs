@@ -68,7 +68,7 @@ namespace GraphQL.Tests.Utilities
         public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 
         protected string ReadSchema(string fileName)
-            => File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "Files", fileName));
+            => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
     }
 
     public class ExecuteConfig

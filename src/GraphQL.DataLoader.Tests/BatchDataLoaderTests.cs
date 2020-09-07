@@ -312,16 +312,7 @@ namespace GraphQL.DataLoader.Tests
                 var user2 = await task2.GetResultAsync();
             });
 
-            var actualException = Should.Throw<ArgumentException>(() =>
-            {
-                var d = new Dictionary<int, int>
-                {
-                    { 1, 1 },
-                    { 1, 1 }
-                };
-            });
-
-            ex.Message.ShouldBe(actualException.Message);
+            ex.Message.ShouldBe("An item with the same key has already been added. Key: 1");
         }
 
         [Fact]
