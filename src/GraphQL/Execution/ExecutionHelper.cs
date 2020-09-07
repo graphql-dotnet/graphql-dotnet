@@ -25,7 +25,7 @@ namespace GraphQL.Execution
                     type = schema.Mutation;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for mutations");
+                        error = new InvalidOperationError("Schema is not configured for mutations");
                         error.AddLocation(operation, document);
                         throw error;
                     }
@@ -35,22 +35,20 @@ namespace GraphQL.Execution
                     type = schema.Subscription;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error = new InvalidOperationError("Schema is not configured for subscriptions");
                         error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
 
                 default:
-                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation, document);
-                    throw error;
+                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
             }
 
             return type;
         }
 
-        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -67,9 +65,7 @@ namespace GraphQL.Execution
 
             if (parentType == null)
             {
-                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
-                error.AddLocation(field, document);
-                throw error;
+                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
             }
 
             return parentType.GetField(field.Name);
@@ -105,9 +101,9 @@ namespace GraphQL.Execution
 
             try
             {
-                AssertValidVariableValue(schema, type, input, variable.Name);
+                AssertValidVariableValue(schema, type, input, variable.Name, variable.DefaultValue != null);
             }
-            catch (InvalidValueException error)
+            catch (InvalidVariableError error)
             {
                 error.AddLocation(variable, document);
                 throw;
@@ -121,19 +117,19 @@ namespace GraphQL.Execution
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
-        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName)
+        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
         {
             // see also GraphQLExtensions.IsValidLiteralValue
             if (type is NonNullGraphType graphType)
             {
                 var nonNullType = graphType.ResolvedType;
 
-                if (input == null)
+                if (input == null && !hasDefaultValue)
                 {
-                    throw new InvalidValueException(variableName, "Received a null input for a non-null variable.");
+                    throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
                 }
 
-                AssertValidVariableValue(schema, nonNullType, input, variableName);
+                AssertValidVariableValue(schema, nonNullType, input, variableName, hasDefaultValue);
                 return;
             }
 
@@ -148,27 +144,35 @@ namespace GraphQL.Execution
 
                 if (input is IValue value)
                 {
+                    bool conversionFailed;
+
                     try
                     {
-                        if (scalar.ParseLiteral(value) == null)
-                            throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
+                        conversionFailed = scalar.ParseLiteral(value) == null;
                     }
                     catch (Exception ex)
                     {
-                        throw new InvalidValueException(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
                     }
+
+                    if (conversionFailed)
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
                 }
                 else
                 {
+                    bool conversionFailed;
+
                     try
                     {
-                        if (scalar.ParseValue(input) == null)
-                            throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'");
+                        conversionFailed = scalar.ParseValue(input) == null;
                     }
                     catch (Exception ex)
                     {
-                        throw new InvalidValueException(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
                     }
+
+                    if (conversionFailed)
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'");
                 }
 
                 return;
@@ -182,11 +186,11 @@ namespace GraphQL.Execution
                 {
                     var index = -1;
                     foreach (var item in list)
-                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]");
+                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]", hasDefaultValue);
                 }
                 else
                 {
-                    AssertValidVariableValue(schema, listItemType, input, variableName);
+                    AssertValidVariableValue(schema, listItemType, input, variableName, hasDefaultValue);
                 }
                 return;
             }
@@ -197,7 +201,7 @@ namespace GraphQL.Execution
 
                 if (!(input is Dictionary<string, object> dict))
                 {
-                    throw new InvalidValueException(variableName,
+                    throw new InvalidVariableError(variableName,
                         $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
@@ -213,19 +217,19 @@ namespace GraphQL.Execution
 
                 if (unknownFields?.Count > 0)
                 {
-                    throw new InvalidValueException(variableName,
+                    throw new InvalidVariableError(variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
                 }
 
                 foreach (var field in complexType.Fields)
                 {
                     dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}");
+                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}", hasDefaultValue);
                 }
                 return;
             }
 
-            throw new InvalidValueException(variableName ?? "input", "Invalid input");
+            throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)

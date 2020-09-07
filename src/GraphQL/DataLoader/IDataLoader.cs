@@ -4,19 +4,19 @@ using System.Threading.Tasks;
 namespace GraphQL.DataLoader
 {
     /// <summary>
-    /// Provides a method to dispatch pending a operation to load data.
+    /// Provides a method to dispatch a pending operation to load data.
     /// </summary>
     public interface IDataLoader
     {
         /// <summary>
         /// Dispatch any pending operations
         /// </summary>
-        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
+        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to the fetch delegate</param>
         Task DispatchAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>
-    /// Provides a method of queueing a data loading operation to be dispatched later.
+    /// Provides a method of queuing a data loading operation to be dispatched later.
     /// </summary>
     /// <typeparam name="T">The type of data to be loaded</typeparam>
     public interface IDataLoader<T>
@@ -25,10 +25,9 @@ namespace GraphQL.DataLoader
         /// Asynchronously load data
         /// </summary>
         /// <returns>
-        /// A task that will complete when the DataLoader has been dispatched,
-        /// or a completed task if the result is already cached.
+        /// An object representing a pending operation.
         /// </returns>
-        Task<T> LoadAsync();
+        IDataLoaderResult<T> LoadAsync();
     }
 
     /// <summary>
@@ -43,9 +42,8 @@ namespace GraphQL.DataLoader
         /// </summary>
         /// <param name="key">Key to use for loading data</param>
         /// <returns>
-        /// A task that will complete when the DataLoader has been dispatched,
-        /// or a completed task if the result is already cached.
+        /// An object representing a pending operation
         /// </returns>
-        Task<T> LoadAsync(TKey key);
+        IDataLoaderResult<T> LoadAsync(TKey key);
     }
 }

@@ -36,15 +36,7 @@ namespace GraphQL.Language.AST
             return null;
         }
 
-        protected bool Equals(Arguments args) => false;
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Arguments)obj);
-        }
+        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
 
         public IEnumerator<Argument> GetEnumerator()
         {

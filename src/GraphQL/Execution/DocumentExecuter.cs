@@ -75,10 +75,7 @@ namespace GraphQL
 
                 if (document.Operations.Count == 0)
                 {
-                    throw new ExecutionError("Cannot execute query if no operation is specified.")
-                    {
-                        Code = "NO_OPERATION"
-                    };
+                    throw new NoOperationError();
                 }
 
                 var operation = GetOperation(options.OperationName, document);
@@ -133,7 +130,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = validationResult.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -143,7 +139,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = context.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -187,14 +182,25 @@ namespace GraphQL
                     result.Errors = context.Errors;
                 }
             }
+            catch (ExecutionError ex)
+            {
+                result = new ExecutionResult
+                {
+                    Errors = new ExecutionErrors
+                    {
+                        ex
+                    }
+                };
+            }
             catch (Exception ex)
             {
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                UnhandledExceptionContext exceptionContext = null;
                 if (options.UnhandledExceptionDelegate != null)
                 {
-                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, null, ex);
                     options.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
@@ -203,14 +209,13 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new ExecutionError(ex.Message, ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex)
                     }
                 };
             }
             finally
             {
                 result ??= new ExecutionResult();
-                result.ExposeExceptions = options.ExposeExceptions;
                 result.Perf = metrics.Finish();
             }
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -11,11 +12,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueFragmentNames : IValidationRule
     {
-        public string DuplicateFragmentNameMessage(string fragName)
-        {
-            return $"There can only be one fragment named \"{fragName}\"";
-        }
-
         public static readonly UniqueFragmentNames Instance = new UniqueFragmentNames();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -29,13 +25,7 @@ namespace GraphQL.Validation.Rules
                     var fragmentName = fragmentDefinition.Name;
                     if (knownFragments.ContainsKey(fragmentName))
                     {
-                        var error = new ValidationError(
-                            context.OriginalQuery,
-                            "5.4.1.1",
-                            DuplicateFragmentNameMessage(fragmentName),
-                            knownFragments[fragmentName],
-                            fragmentDefinition);
-                        context.ReportError(error);
+                        context.ReportError(new UniqueFragmentNamesError(context, knownFragments[fragmentName], fragmentDefinition));
                     }
                     else
                     {

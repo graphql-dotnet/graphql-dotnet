@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -41,7 +42,7 @@ namespace GraphQL.Tests.Validation
     {
       _.Error(err =>
       {
-        err.Message = Rule.DuplicateVariableMessage(variableName);
+        err.Message = UniqueVariableNamesError.DuplicateVariableMessage(variableName);
         err.Loc(line1, column1);
         err.Loc(line2, column2);
       });

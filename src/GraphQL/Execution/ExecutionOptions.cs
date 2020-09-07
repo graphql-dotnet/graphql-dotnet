@@ -58,9 +58,6 @@ namespace GraphQL
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
-        /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
-        public bool ExposeExceptions { get; set; }
-
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
         public bool EnableMetrics { get; set; } = true;
 

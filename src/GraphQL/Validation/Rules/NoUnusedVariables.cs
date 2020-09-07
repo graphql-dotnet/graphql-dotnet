@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -14,13 +15,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoUnusedVariables : IValidationRule
     {
-        public string UnusedVariableMessage(string varName, string opName)
-        {
-            return !string.IsNullOrWhiteSpace(opName)
-              ? $"Variable \"${varName}\" is never used in operation \"${opName}\"."
-              : $"Variable \"${varName}\" is never used.";
-        }
-
         public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -44,8 +38,7 @@ namespace GraphQL.Validation.Rules
                         var variableName = variableDef.Name;
                         if (!usages.Contains(variableName))
                         {
-                            var error = new ValidationError(context.OriginalQuery, "5.7.5", UnusedVariableMessage(variableName, op.Name), variableDef);
-                            context.ReportError(error);
+                            context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
                         }
                     }
                 });

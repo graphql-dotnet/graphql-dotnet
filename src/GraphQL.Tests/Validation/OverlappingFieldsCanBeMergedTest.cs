@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -122,7 +123,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("fido", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("fido", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -149,7 +150,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("name", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("name", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -177,7 +178,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -205,7 +206,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -233,7 +234,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("doesKnowCommand", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -288,7 +289,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -333,7 +334,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -346,7 +347,7 @@ namespace GraphQL.Tests.Validation
 
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -359,7 +360,7 @@ namespace GraphQL.Tests.Validation
 
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("x", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -391,7 +392,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -437,7 +438,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -495,7 +496,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -558,7 +559,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("deepField", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("deepField", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -617,7 +618,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("deeperField", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("deeperField", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -675,7 +676,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("field", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -785,7 +786,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("fido", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("fido", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -822,7 +823,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -888,7 +889,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -957,7 +958,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("other", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("other", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -1006,7 +1007,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("scalar", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -1047,7 +1048,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -1082,7 +1083,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -1125,7 +1126,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("val", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("val", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
@@ -1166,7 +1167,7 @@ namespace GraphQL.Tests.Validation
                 config.Query = query;
                 config.Error(e =>
                 {
-                    e.Message = OverlappingFieldsCanBeMerged.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
+                    e.Message = OverlappingFieldsCanBeMergedError.FieldsConflictMessage("box", new OverlappingFieldsCanBeMerged.ConflictReason
                     {
                         Message = new OverlappingFieldsCanBeMerged.Message
                         {
