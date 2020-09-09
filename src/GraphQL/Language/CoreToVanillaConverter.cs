@@ -240,7 +240,8 @@ namespace GraphQL.Language
                         str.Value,
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
-                        out var dbl) == false) {
+                        out var dbl) == false)
+                    {
                         dbl = str.Value.StartsWith("-") ? double.NegativeInfinity : double.PositiveInfinity;
                     }
 
