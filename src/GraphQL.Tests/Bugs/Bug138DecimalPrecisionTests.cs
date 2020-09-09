@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Bugs
 #if NETCOREAPP3_1
         [Fact]
 #else
-        [Fact(Skip = "Deserialization error with .NET Core 2.1")]
+        [Fact(Skip = "Deserialization error with .NET Core < 3.1")]
 #endif
         public void double_to_decimal_does_not_lose_precision()
         {
