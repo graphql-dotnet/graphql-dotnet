@@ -242,7 +242,7 @@ namespace GraphQL.Language
                         CultureInfo.InvariantCulture,
                         out var dbl) == false)
                     {
-                        dbl = str.Value.StartsWith("-") ? double.NegativeInfinity : double.PositiveInfinity;
+                        dbl = str.Value[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
                     }
 
                     //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
