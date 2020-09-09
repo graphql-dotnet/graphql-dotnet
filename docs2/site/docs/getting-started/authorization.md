@@ -23,7 +23,7 @@ public class MyGraphType : ObjectGraphType
 ```csharp
 public class RequiresAuthValidationRule : IValidationRule
 {
-  public INodeVisitor ValidateAsync(ValidationContext context)
+  public Task<INodeVisitor> ValidateAsync(ValidationContext context)
   {
     var userContext = context.UserContext as GraphQLUserContext;
     var authenticated = userContext.User?.IsAuthenticated() ?? false;
