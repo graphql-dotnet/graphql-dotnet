@@ -117,7 +117,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -153,7 +152,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -201,7 +199,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();

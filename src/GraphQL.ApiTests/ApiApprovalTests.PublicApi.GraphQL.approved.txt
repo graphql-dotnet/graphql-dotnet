@@ -79,13 +79,11 @@ namespace GraphQL
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
-        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
         public System.IServiceProvider RequestServices { get; set; }
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
@@ -1993,10 +1991,10 @@ namespace GraphQL.Types
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
         string Description { get; set; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        GraphQL.Introspection.ISchemaFilter Filter { get; set; }
+        GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
-        GraphQL.Conversion.INameConverter NameConverter { get; set; }
+        GraphQL.Conversion.INameConverter NameConverter { get; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
