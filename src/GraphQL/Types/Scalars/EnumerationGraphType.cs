@@ -155,7 +155,8 @@ namespace GraphQL.Types
         public object Value
         {
             get => _value;
-            set {
+            set
+            {
                 _value = value;
                 if (value != null)
                 {
