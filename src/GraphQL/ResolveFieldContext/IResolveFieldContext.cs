@@ -39,7 +39,7 @@ namespace GraphQL
         /// </summary>
         IDictionary<string, object> Arguments { get; }
 
-        /// <summary>The root value of the graph, as defined by <see cref="ExecutionContext.RootValue"/></summary>
+        /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/></summary>
         object RootValue { get; }
 
         /// <summary>The value of the parent object in the graph</summary>

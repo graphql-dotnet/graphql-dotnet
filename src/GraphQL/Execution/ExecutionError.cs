@@ -34,7 +34,7 @@ namespace GraphQL
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message. Sets the
-        /// <see cref="Code"/> and <see cref="Codes"/> properties based on the inner exception(s). Loads any exception data
+        /// <see cref="Code"/> property based on the inner exception. Loads any exception data
         /// from the inner exception into this instance.
         /// </summary>
         public ExecutionError(string message, Exception exception)

@@ -38,7 +38,7 @@ namespace GraphQL.DataLoader
         /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
         /// <param name="keySelector">A selector for the key from the returned object</param>
         /// <param name="keyComparer">An optional equality comparer for the keys</param>
-        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
         /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
