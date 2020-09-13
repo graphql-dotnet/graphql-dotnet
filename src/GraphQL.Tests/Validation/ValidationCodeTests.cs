@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Validation
     public class ValidationCodeTests
     {
         // be sure to update the documentation if any of these codes or numbers change - see errors.md
-        
+
         [Theory]
         [InlineData(typeof(ValidationError), "VALIDATION_ERROR")]
         [InlineData(typeof(ArgumentsOfCorrectTypeError), "ARGUMENTS_OF_CORRECT_TYPE")]
@@ -39,9 +39,7 @@ namespace GraphQL.Tests.Validation
         [InlineData(typeof(VariablesAreInputTypesError), "VARIABLES_ARE_INPUT_TYPES")]
         [InlineData(typeof(VariablesInAllowedPositionError), "VARIABLES_IN_ALLOWED_POSITION")]
         public void Verify_GetValidationErrorCode(Type type, string code)
-        {
-            ValidationError.GetValidationErrorCode(type).ShouldBe(code);
-        }
+            => ValidationError.GetValidationErrorCode(type).ShouldBe(code);
 
         [Theory]
         [InlineData(ArgumentsOfCorrectTypeError.NUMBER, "5.6.1")]
@@ -70,9 +68,8 @@ namespace GraphQL.Tests.Validation
         [InlineData(UniqueVariableNamesError.NUMBER, "5.8.1")]
         [InlineData(VariablesAreInputTypesError.NUMBER, "5.8.2")]
         [InlineData(VariablesInAllowedPositionError.NUMBER, "5.8.5")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1025:InlineData should be unique within the Theory it belongs to")]
         public void Verify_Validation_Number(string actualCode, string expectedCode)
-        {
-            actualCode.ShouldBe(expectedCode);
-        }
+            => actualCode.ShouldBe(expectedCode);
     }
 }

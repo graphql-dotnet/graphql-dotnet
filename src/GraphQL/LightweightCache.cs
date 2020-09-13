@@ -88,7 +88,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="TValue"/> with the specified key.
+        /// Gets or sets the <typeparamref name="TValue"/> with the specified key.
         /// </summary>
         /// <param name="key">The key.</param>
         public TValue this[TKey key]
@@ -142,10 +142,7 @@ namespace GraphQL
         /// If it does not already exist, it's created using the OnMissing action.
         /// </summary>
         /// <param name="key">The key.</param>
-        public void FillDefault(TKey key)
-        {
-            Fill(key, _onMissing(key));
-        }
+        public void FillDefault(TKey key) => Fill(key, _onMissing(key));
 
         /// <summary>
         /// Guarantees that the Cache has a value for a given key.
@@ -270,10 +267,7 @@ namespace GraphQL
         /// <summary>
         /// Clears this instance of all key/value pairs.
         /// </summary>
-        public void Clear()
-        {
-            _values.Clear();
-        }
+        public void Clear() => _values.Clear();
 
         /// <summary>
         /// If the dictionary contains the indicated key, performs the action with its value.
@@ -291,9 +285,6 @@ namespace GraphQL
         /// <summary>
         /// Equivalent to Clear()
         /// </summary>
-        public void ClearAll()
-        {
-            _values.Clear();
-        }
+        public void ClearAll() => _values.Clear();
     }
 }

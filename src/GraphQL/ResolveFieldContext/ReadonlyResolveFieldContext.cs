@@ -9,7 +9,7 @@ using Field = GraphQL.Language.AST.Field;
 namespace GraphQL
 {
     /// <summary>
-    /// A readonly implementation of <see cref="IResolveFieldContext{object}"/>
+    /// A readonly implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
     public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
     {

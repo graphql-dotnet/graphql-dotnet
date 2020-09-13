@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Language.AST;
@@ -68,9 +69,7 @@ namespace GraphQL.Types
         }
 
         public override object ParseLiteral(IValue value)
-        {
-            return !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
-        }
+            => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
     }
 
     /// <summary>
