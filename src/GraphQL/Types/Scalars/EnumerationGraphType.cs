@@ -158,11 +158,8 @@ namespace GraphQL.Types
             set
             {
                 _value = value;
-                if (value != null)
-                {
-                    if (value is Enum)
-                        value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
-                }
+                if (value is Enum)
+                    value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
                 UnderlyingValue = value;
             }
         }
