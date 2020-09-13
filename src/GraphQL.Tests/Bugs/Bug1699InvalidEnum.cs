@@ -32,11 +32,16 @@ namespace GraphQL.Tests.Bugs
         public void Simple_Enum() => AssertQuerySuccess("{ grumpy }", @"{ ""grumpy"": ""GRUMPY"" }");
 
         [Fact]
+        public void Enum_From_Number() => AssertQuerySuccess("{ enumByNumber }", @"{ ""enumByNumber"": ""HAPPY"" }");
+
+        [Fact]
+        public void Custom_Enum_Numbered_From_Name() => AssertQuerySuccess("{ customEnumSleepy }", @"{ ""customEnumSleepy"": ""ISSLEEPY"" }");
+
+        [Fact]
         public void String_Enum() => AssertQuerySuccess("{ sleepy }", @"{ ""sleepy"": ""SLEEPY"" }");
 
-        // within C#, (int)Bug1699Enum.Happy does not equal Bug1699.Happy
         [Fact]
-        public void Int_Enum() => AssertQueryWithError("{ happy }", @"{ ""happy"": null }", "Error trying to resolve field 'happy'.", 1, 3, "happy", exception: new InvalidOperationException());
+        public void Int_Enum() => AssertQuerySuccess("{ happy }", @"{ ""happy"": ""HAPPY"" }");
 
         [Fact]
         public void Invalid_Enum() => AssertQueryWithError("{ invalidEnum }", @"{ ""invalidEnum"": null }", "Error trying to resolve field 'invalidEnum'.", 1, 3, "invalidEnum", exception: new InvalidOperationException());
@@ -92,6 +97,21 @@ namespace GraphQL.Tests.Bugs
 
         [Fact]
         public void Input_Enum_RequiredWithDefault() => AssertQuerySuccess("{ inputRequiredWithDefault }", @"{ ""inputRequiredWithDefault"": ""Happy"" }");
+
+        [Fact]
+        public void Custom_Enum() => AssertQuerySuccess("{ customEnum }", @"{ ""customEnum"": ""ISHAPPY"" }");
+
+        [Fact]
+        public void Custom_Enum_Input() => AssertQuerySuccess("{ customEnumInput (arg: ISHAPPY) }", @"{ ""customEnumInput"": ""Happy"" }");
+
+        [Fact]
+        public void Custom_Enum_Input_Variable() => AssertQuerySuccess("query($arg: Bug1699CustomEnum!) { customEnumInput (arg: $arg) }", @"{ ""customEnumInput"": ""Happy"" }", @"{ ""arg"": ""ISHAPPY"" }".ToInputs());
+
+        [Fact]
+        public void Custom_Enum_Input_Num() => AssertQuerySuccess("{ customEnumInput (arg: ISSLEEPY) }", @"{ ""customEnumInput"": ""Sleepy"" }");
+
+        [Fact]
+        public void Custom_Enum_Input_Num_Variable() => AssertQuerySuccess("query($arg: Bug1699CustomEnum!) { customEnumInput (arg: $arg) }", @"{ ""customEnumInput"": ""Sleepy"" }", @"{ ""arg"": ""ISSLEEPY"" }".ToInputs());
     }
 
     public class Bug1699InvalidEnumSchema : Schema
@@ -118,6 +138,9 @@ namespace GraphQL.Tests.Bugs
             Field<EnumerationGraphType<Bug1699Enum>>(
                 "invalidEnum",
                 resolve: ctx => 50);
+            Field<EnumerationGraphType<Bug1699Enum>>(
+                "enumByNumber",
+                resolve: ctx => (int)Bug1699Enum.Happy);
             Field<ListGraphType<EnumerationGraphType<Bug1699Enum>>>(
                 "invalidEnumWithinList",
                 resolve: ctx => new Bug1699Enum[] { Bug1699Enum.Happy, Bug1699Enum.Sleepy, (Bug1699Enum)50 });
@@ -144,13 +167,33 @@ namespace GraphQL.Tests.Bugs
                 "inputRequiredWithDefault",
                 arguments: new QueryArguments(new QueryArgument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
                 resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+            Field<Bug1699CustomEnumGraphType>(
+                "customEnum",
+                resolve: context => Bug1699Enum.Happy);
+            Field<StringGraphType>(
+                "customEnumInput",
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<Bug1699CustomEnumGraphType>> { Name = "arg" }),
+                resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+            Field<Bug1699CustomEnumGraphType>(
+                "customEnumSleepy",
+                resolve: context => Bug1699Enum.Sleepy);
         }
     }
 
     public enum Bug1699Enum
     {
-        Grumpy,
-        Happy,
-        Sleepy,
+        Grumpy = 0,
+        Happy = 1,
+        Sleepy = 2,
+    }
+
+    public class Bug1699CustomEnumGraphType : EnumerationGraphType
+    {
+        public Bug1699CustomEnumGraphType()
+        {
+            AddValue(new EnumValueDefinition() { Name = "ISGRUMPY", Value = Bug1699Enum.Grumpy });
+            AddValue(new EnumValueDefinition() { Name = "ISHAPPY", Value = Bug1699Enum.Happy });
+            AddValue(new EnumValueDefinition() { Name = "ISSLEEPY", Value = 2 });
+        }
     }
 }
