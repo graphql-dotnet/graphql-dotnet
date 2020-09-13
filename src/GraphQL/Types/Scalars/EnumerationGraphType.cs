@@ -163,6 +163,9 @@ namespace GraphQL.Types
                 UnderlyingValue = value;
             }
         }
+        /// <summary>
+        /// For enums, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
+        /// </summary>
         internal object UnderlyingValue { get; set; }
     }
 }
