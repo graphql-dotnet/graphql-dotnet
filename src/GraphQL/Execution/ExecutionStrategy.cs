@@ -189,6 +189,10 @@ namespace GraphQL.Execution
                     CompleteNode(context, node);
                 }
             }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (ExecutionError error)
             {
                 SetNodeError(context, node, error);
@@ -218,6 +222,10 @@ namespace GraphQL.Execution
                 {
                     CompleteNode(context, node);
                 }
+            }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (ExecutionError error)
             {

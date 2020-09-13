@@ -85,7 +85,7 @@ namespace GraphQL
         }
 
         /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveEventStreamContext.Source"/> property cannot be cast to the specified type</exception>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
             if (context is IResolveEventStreamContext<T> typedContext)

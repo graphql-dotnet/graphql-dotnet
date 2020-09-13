@@ -182,6 +182,10 @@ namespace GraphQL
                     result.Errors = context.Errors;
                 }
             }
+            catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (ExecutionError ex)
             {
                 result = new ExecutionResult
