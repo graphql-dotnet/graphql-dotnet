@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQL.Validation.Errors;
 using Shouldly;
 using Xunit;
 
@@ -11,10 +13,30 @@ namespace GraphQL.Tests.Bugs
     public class Bug1831 : QueryTestBase<Bug1831Schema>
     {
         [Fact]
-        public void TestVariableObject() => AssertQuerySuccess("query($arg: Bug1831InputGraphType!) { test1 (arg: $arg) }", @"{ ""test1"": ""ok"" }", @"{ ""arg"": { ""id"": ""id"", ""rows"": [{""id"": ""id1"", ""name"": ""name1""}, {""Id"": ""id2"", ""Name"": ""name2""}]} }".ToInputs());
+        public void TestVariableObject() => AssertQuerySuccess("query($arg: Bug1831Input!) { test1 (arg: $arg) }", @"{ ""test1"": ""ok"" }", @"{ ""arg"": { ""id"": ""id"", ""rows"": [{""id"": ""id1"", ""name"": ""name1""}, {""id"": ""id2"", ""name"": ""name2""}]} }".ToInputs());
 
         [Fact]
         public void TestLiteralObject() => AssertQuerySuccess("{ test1 (arg: { id: \"id\", rows: [ {id: \"id1\", name: \"name1\"}, {id: \"id2\", name: \"name2\"}]}) }", @"{ ""test1"": ""ok"" }");
+
+        [Theory]
+        [InlineData("null")]
+        [InlineData("1")]
+        public void TestVariableObject_InvalidType(string param) {
+            var error1 = new ValidationError(null, VariablesAreInputTypesError.NUMBER,
+                VariablesAreInputTypesError.UndefinedVarMessage("arg", "abcdefg"))
+            {
+                Code = "VARIABLES_ARE_INPUT_TYPES"
+            };
+            error1.AddLocation(1, 7);
+            var error2 = new ValidationError(null, KnownTypeNamesError.NUMBER,
+                KnownTypeNamesError.UnknownTypeMessage("abcdefg", null))
+            {
+                Code = "KNOWN_TYPE_NAMES"
+            };
+            error2.AddLocation(1, 13);
+            var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 });
+            AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, inputs: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 2, renderErrors: true);
+        }
     }
 
     public class Bug1831Schema : Schema
