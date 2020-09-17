@@ -56,9 +56,9 @@ public class RequiresAuthValidationRule : IValidationRule
         {
           context.ReportError(new ValidationError(
               context.OriginalQuery,
-              "6.1.1",
+              "6.1.1", // the rule number of this validation error corresponding to the paragraph number from the official specification
               $"You are not authorized to run this query.",
-              fieldAst) { Code = auth-required });
+              fieldAst) { Code = "auth-required" });
         }
       });
     }));
