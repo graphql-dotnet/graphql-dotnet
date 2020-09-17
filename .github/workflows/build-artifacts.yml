@@ -35,7 +35,7 @@ jobs:
         with:
           name: Nuget packages
           path: |
-            src/out/*.nupkg
+            src/out/*
       - name: Publish Nuget packages to GitHub registry
         working-directory: src
         run: dotnet nuget push out/*.nupkg
