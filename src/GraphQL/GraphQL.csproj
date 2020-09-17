@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>GraphQL for .NET</Description>
     <Authors>Joe McBride</Authors>
-    <Copyright>Copyright 2015-2017 Joseph T. McBride et al. All rights reserved.</Copyright>
+    <Copyright>Copyright 2015-2020 Joseph T. McBride et al. All rights reserved.</Copyright>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageTags>GraphQL;json;api</PackageTags>
   </PropertyGroup>
