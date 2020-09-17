@@ -38,4 +38,4 @@ jobs:
             src/out/*
       - name: Publish Nuget packages to GitHub registry
         working-directory: src
-        run: dotnet nuget push out/*.nupkg
+        run: dotnet nuget push out/*
