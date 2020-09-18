@@ -82,7 +82,7 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Upgrade Guides
 
-* [3.x to 4.x](https://graphql-dotnet.github.io/docs/guides/migration4)
+* [3.x to 4.x - under development](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/docs2/site/docs/guides/migration4.md)
 * [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/guides/migration3)
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
 * [0.11.0](upgrade-guides/v0.11.0.md)
