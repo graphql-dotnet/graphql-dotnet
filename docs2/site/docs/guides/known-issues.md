@@ -180,6 +180,61 @@ This is done within your database queries; it is not a function of the dataloade
 `CollectionBatchDataLoader` as you would for a one-to-many relationship; then when you are loading
 data from your database within the fetch delegate, use an inner join to retrieve the proper data.
 
+### How to authenticate subscriptions?
+
+> Note. This question has more to do with the transport layer, not GraphQL.NET itself.
+
+GraphQL subscriptions usually work over WebSockets at the transport level. If the subscription is over
+WebSockets, then the handshake is still over HTTP(HTTPS) and handshake does not allow authorization headers.
+You should instead use [GQL_CONNECTION_INIT](https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md#gql_connection_init)
+message to send additional data to the server. If you are using [server project](https://github.com/graphql-dotnet/server)
+then you can write your `IOperationMessageListener` and add the listener as a transient service:
+
+```c#
+public class AuthListener : IOperationMessageListener
+{
+    private readonly IHttpContextAccessor _accessor;
+
+    public AuthListener(IHttpContextAccessor accessor)
+    {
+        _accessor = accessor;
+    }
+
+    public Task BeforeHandleAsync(MessageHandlingContext context)
+    {
+        if (context.Message.Type == MessageType.GQL_CONNECTION_INIT)
+        {
+            // Extract the auth header and validate it.
+            // Then get the user and store it in the HttpContext (or something).
+            dynamic payload = context.Message.Payload;
+            string auth = payload["Authorization"];
+            _accessor.HttpContext.User = new ...
+        }
+        return Task.FromResult(true);
+    }
+
+    public Task HandleAsync(MessageHandlingContext context) => Task.CompletedTask;
+
+    public Task AfterHandleAsync(MessageHandlingContext context) => Task.CompletedTask;
+}
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddHttpContextAccessor();
+    services.AddTransient<IOperationMessageListener, AuthListener>();
+}
+```
+
+`GQL_CONNECTION_INIT` message looks like this:
+```json
+{
+  "type": "connection_init",
+  "payload": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI..."
+  }
+}
+```
+
 ## Common Errors
 
 ### Synchronous operations are disallowed.
