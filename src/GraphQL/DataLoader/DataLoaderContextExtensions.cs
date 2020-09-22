@@ -60,9 +60,10 @@ namespace GraphQL.DataLoader
         /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
         /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -70,7 +71,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keyComparer, defaultValue, maxBatchSize));
         }
 
         /// <summary>
@@ -83,9 +84,10 @@ namespace GraphQL.DataLoader
         /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
         /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IDictionary<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
+            IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -93,7 +95,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, defaultValue, maxBatchSize));
         }
 
         /// <summary>
@@ -107,9 +109,10 @@ namespace GraphQL.DataLoader
         /// <param name="keySelector">A function to extract a key from each element.</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
         /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -120,7 +123,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize));
         }
 
         /// <summary>
@@ -134,9 +137,10 @@ namespace GraphQL.DataLoader
         /// <param name="keySelector">A function to extract a key from each element.</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
         /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -147,7 +151,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, defaultValue));
+            return context.GetOrAdd(loaderKey, () => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, defaultValue, maxBatchSize));
         }
 
         /// <summary>
@@ -159,9 +163,10 @@ namespace GraphQL.DataLoader
         /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
         /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null)
+            IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -169,7 +174,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keyComparer, maxBatchSize));
         }
 
         /// <summary>
@@ -181,9 +186,10 @@ namespace GraphQL.DataLoader
         /// <param name="loaderKey">A unique key to identify the DataLoader instance</param>
         /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<ILookup<TKey, T>>> fetchFunc,
-            IEqualityComparer<TKey> keyComparer = null)
+            IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -191,7 +197,7 @@ namespace GraphQL.DataLoader
             if (fetchFunc == null)
                 throw new ArgumentNullException(nameof(fetchFunc));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keyComparer, maxBatchSize));
         }
 
         /// <summary>
@@ -204,9 +210,10 @@ namespace GraphQL.DataLoader
         /// <param name="fetchFunc">A cancellable delegate to fetch data for some keys asynchronously</param>
         /// <param name="keySelector">A function to extract a key from each element.</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -217,7 +224,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(fetchFunc, keySelector, keyComparer, maxBatchSize));
         }
 
         /// <summary>
@@ -230,9 +237,10 @@ namespace GraphQL.DataLoader
         /// <param name="fetchFunc">A delegate to fetch data for some keys asynchronously</param>
         /// <param name="keySelector">A function to extract a key from each element.</param>
         /// <param name="keyComparer">An <seealso cref="IEqualityComparer{T}"/> to compare keys.</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
         /// <returns>A new or existing DataLoader instance</returns>
         public static IDataLoader<TKey, IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this DataLoaderContext context, string loaderKey, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> fetchFunc,
-            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null)
+            Func<T, TKey> keySelector, IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = int.MaxValue)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -243,7 +251,7 @@ namespace GraphQL.DataLoader
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer));
+            return context.GetOrAdd(loaderKey, () => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(fetchFunc), keySelector, keyComparer, maxBatchSize));
         }
     }
 }
