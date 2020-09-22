@@ -9,11 +9,32 @@ on:
     paths:
       - src/**
 
+env:
+  NODE_VERSION: '10.x'   # Node 10 LTS
+
 jobs:
   pack:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: yarn
+        run: yarn
+      - name: yarn docs2
+        working-directory: docs2
+        run: yarn
+      - name: yarn gatsby build
+        working-directory: docs2
+        run: yarn gatsby build
+      - name: Publish docs artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Documentation
+          path: docs2/public/**
+          if-no-files-found: error
       - name: Use .NET Core 3.1 SDK
         uses: actions/setup-dotnet@v1
         with:
