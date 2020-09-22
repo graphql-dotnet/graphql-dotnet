@@ -300,7 +300,7 @@ to this request, is shared between all field resolvers within this request.
 
 The easiest option is to change the execution strategy to `SerialExecutionStrategy`. Although
 this would solve concurrency issues in this case, there may be an objectionable performance
-degredation, since only a single field resolver can execute at a time.
+degradation, since only a single field resolver can execute at a time.
 
 A second option would be to change the database context lifetime to 'transient'. This means
 that each time the database context was requested, it would receive a different copy, solving
@@ -312,3 +312,5 @@ passed from another service. Therefore, the database context must remain scoped.
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
 [dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
+
+Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/issues/1310) with related issues.
