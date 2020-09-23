@@ -24,11 +24,6 @@ by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license.
 
 ## Installation
 
-> WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
-> If errors occur, it is recommended that you first check the behavior on the latest available preview version before
-> reporting a issue. Latest 3.0.0-preview-XXXX versions are **backwards incompatible** with latest stable 2.4.0 version.
-> You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0-preview-1490/lib/netstandard2.0/diff/2.4.0/).
-
 You can install the latest stable version via [NuGet](https://www.nuget.org/packages/GraphQL/).
 ```
 > dotnet add package GraphQL
@@ -46,10 +41,10 @@ We support several serializers (or you can bring your own):
 > dotnet add package GraphQL.SystemTextJson
 > dotnet add package GraphQL.NewtonsoftJson
 ```
-> *Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
+> Note: You can use `GraphQL.NewtonsoftJson` with .NET Core 3+, just be aware it lacks async writing 
 > capabilities so writing to an ASP.NET Core 3.0 `HttpResponse.Body` will require you to set 
 > `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
-> which isn't recommended.*
+> which isn't recommended.
 
 You can get the latest pre-release packages from the [MyGet feed](src/NuGet.config),
 where you may want to explicitly pull a certain version using `-v`.
@@ -66,8 +61,7 @@ changes. Publication of each preview version to NuGet would create only unnecess
 
 http://graphql-dotnet.github.io
 
-> *Note: The current state of documentation corresponds to the state of the code in the master branch
-> which is used now to publish the **preview** package versions.*
+> Note: The current state of documentation corresponds to the state of the code in the master branch.
 
 ## Examples
 
@@ -88,10 +82,13 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Upgrade Guides
 
-* 2.4.0 to 3.0 - under development
+* [3.x to 4.x - under development](https://github.com/graphql-dotnet/graphql-dotnet/blob/develop/docs2/site/docs/guides/migration4.md)
+* [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/guides/migration3)
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration)
-* [0.11.0](/upgrade-guides/v0.11.0.md)
-* [0.8.0](/upgrade-guides/v0.8.0.md)
+* [0.11.0](upgrade-guides/v0.11.0.md)
+* [0.8.0](upgrade-guides/v0.8.0.md)
+
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0/lib/netstandard2.0/diff/2.4.0/).
 
 ## Basic Usage
 

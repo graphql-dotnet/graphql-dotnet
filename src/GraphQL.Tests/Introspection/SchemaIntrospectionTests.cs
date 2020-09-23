@@ -38,8 +38,8 @@ namespace GraphQL.Tests.Introspection
                 _.Schema = new Schema
                 {
                     Query = new TestQuery(),
+                    NameConverter = PascalCaseNameConverter.Instance,
                 };
-                _.NameConverter = PascalCaseNameConverter.Instance;
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             });
 
@@ -58,8 +58,8 @@ namespace GraphQL.Tests.Introspection
                 _.Schema = new Schema
                 {
                     Query = new TestQuery(),
+                    NameConverter = new TestNameConverter(),
                 };
-                _.NameConverter = new TestNameConverter();
                 _.Query = SchemaIntrospection.IntrospectionQuery;
             });
 

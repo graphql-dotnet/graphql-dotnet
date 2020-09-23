@@ -1,0 +1,36 @@
+name: Build artifacts
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - src/**
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use .NET Core 3.1 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - name: Install dependencies
+        working-directory: src
+        run: dotnet restore
+      - name: Build solution (release config)
+        working-directory: src
+        run: dotnet build --no-restore -c Release -p:NoWarn=CS1591 -p:VersionSuffix=${{ github.run_id }}
+      - name: Pack solution (release config)
+        working-directory: src
+        run: dotnet pack --no-restore -c Release -p:VersionSuffix=${{ github.run_id }} -o out
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Nuget packages
+          path: |
+            src/out/*.nupkg
+#      - name: Publish Nuget packages to GitHub registry
+#        working-directory: src
+#        run: dotnet nuget push out/*.nupkg -s "myget-graphql-dotnet" -k ${{ secrets.GITHUB_TOKEN }}

@@ -60,7 +60,6 @@ namespace GraphQL.Tests.Conversion
             {
                 _.Schema = build_schema(converter);
                 _.Query = "{ PeRsoN { naME: Name } }";
-                _.NameConverter = converter;
             },
             @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
@@ -73,7 +72,6 @@ namespace GraphQL.Tests.Conversion
             {
                 _.Schema = build_schema(converter);
                 _.Query = "{ PeRsoN { naME: Name } }";
-                _.NameConverter = converter;
             },
             @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
         }
