@@ -111,7 +111,7 @@ private static async Task ExecuteAsync(HttpContext context, ISchema schema)
     context.Response.ContentType = "application/json";
     context.Response.StatusCode = result.Errors?.Any() == true ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.OK;
 
-    var writer = new GraphQL.Http.DocumentWriter();
+    var writer = new GraphQL.NewtonsoftJson.DocumentWriter();
     await writer.WriteAsync(context.Response.Body, result);
 }
 
