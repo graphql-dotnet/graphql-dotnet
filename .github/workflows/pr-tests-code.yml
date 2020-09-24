@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: 
       - develop
-#    paths: 
-#      - src/**
+    paths: 
+      - src/**
 
 jobs:
   ubuntu:
