@@ -17,18 +17,21 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using mdg.engine.proto;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using ProtoBuf;
 
 namespace GraphQL.ApolloStudio
 {
     /// <summary>
     /// Records GraphQL execution results to Apollo Studio
+    /// Implemented according to https://www.apollographql.com/docs/studio/setup-analytics/
+    /// Supports reporting traces and errors with client name and version
     /// </summary>
-    public class ApolloReportingTraceLogger : ITraceLogger
+    public class ApolloStudioTraceLogger : ITraceLogger
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _apiKey;
+        private readonly IOptions<ApolloStudioTraceOptions> _options;
         private readonly ReportHeader _reportHeader;
         private ConcurrentDictionary<string, TracesAndStats> _traces = new ConcurrentDictionary<string, TracesAndStats>();
         private readonly MetricsToTraceConverter _metricsToTraceConverter = new MetricsToTraceConverter();
@@ -36,18 +39,17 @@ namespace GraphQL.ApolloStudio
         private const int BATCH_THRESHOLD_SIZE = 2 * 1024 * 1024;
 
         /// <summary>
-        /// Creates a new Apollo Reporting trace logger for sending queries to Apollo Studio
+        /// Creates a new Apollo Studio trace logger for sending queries to Apollo Studio
         /// </summary>
         /// <param name="httpClientFactory">HttpClient factory from DI</param>
         /// <param name="httpContextAccessor">HttpContext accessor for the current request (for headers)</param>
         /// <param name="schema">The current GraphQL schema</param>
-        /// <param name="apiKey">Apollo Studio API Key</param>
-        /// <param name="schemaTag">Schema tag (usually indicates environment)</param>
-        public ApolloReportingTraceLogger(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, ISchema schema, string apiKey, string schemaTag)
+        /// <param name="options">Options from DI</param>
+        public ApolloStudioTraceLogger(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, ISchema schema, IOptions<ApolloStudioTraceOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
-            _apiKey = apiKey;
+            _options = options;
             _reportHeader = new ReportHeader
             {
                 Hostname = Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME") ?? Environment.MachineName,
@@ -55,7 +57,7 @@ namespace GraphQL.ApolloStudio
                 ServiceVersion = Assembly.GetExecutingAssembly().FullName,
                 RuntimeVersion = $".NET Core {Environment.Version}",
                 Uname = Environment.OSVersion.ToString(),
-                SchemaTag = schemaTag,
+                SchemaTag = _options.Value.SchemaTag,
                 ExecutableSchemaId = ComputeSha256Hash(new SchemaPrinter(schema).Print())
             };
         }
@@ -75,10 +77,10 @@ namespace GraphQL.ApolloStudio
             {
                 var httpContext = _httpContextAccessor.HttpContext;
                 var userAgent = (httpContext.Request.Headers.TryGetValue("User-Agent", out var userAgentHeader) ? userAgentHeader.ToString() : "Unknown/Unknown").Split('/');
-                trace.ClientName = httpContext.Request.Headers.TryGetValue("apollographql-client-name", out var clientName) ? clientName.ToString() : userAgent.First();
-                trace.ClientVersion = httpContext.Request.Headers.TryGetValue("apollographql-client-version", out var clientVersion) ? clientVersion.ToString() : userAgent.Last();
+                trace.ClientName = httpContext.Request.Headers.TryGetValue(_options.Value.ClientNameHeader, out var clientName) ? clientName.ToString() : userAgent.First();
+                trace.ClientVersion = httpContext.Request.Headers.TryGetValue(_options.Value.ClientVersionHeader, out var clientVersion) ? clientVersion.ToString() : userAgent.Last();
 
-                var tracesAndStats = _traces.GetOrAdd($"# ${(string.IsNullOrWhiteSpace(operationName) ? "-" : operationName)}\n{MinimalWhitespace(query)}",
+                var tracesAndStats = _traces.GetOrAdd($"# {(string.IsNullOrWhiteSpace(operationName) ? "-" : operationName)}\n{MinimalWhitespace(query)}",
                     key => new TracesAndStats());
                 tracesAndStats.Traces.Add(trace);
 
@@ -113,8 +115,8 @@ namespace GraphQL.ApolloStudio
                     bytes = memoryStream.ToArray();
                 }
 
-                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, new Uri("https://engine-report.apollodata.com/api/ingress/traces"));
-                httpRequestMessage.Headers.Add("X-Api-Key", _apiKey);
+                var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _options.Value.ReportingUri);
+                httpRequestMessage.Headers.Add("X-Api-Key", _options.Value.ApiKey);
 
                 httpRequestMessage.Content = new ByteArrayContent(bytes)
                 {
