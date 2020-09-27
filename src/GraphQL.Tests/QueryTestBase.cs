@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
+using GraphQL.Logging;
 using GraphQL.StarWars.IoC;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
@@ -26,7 +27,7 @@ namespace GraphQL.Tests
         public QueryTestBase()
         {
             Services = new SimpleContainer();
-            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new NullTraceLogger());
             Writer = new DocumentWriter(indent: true);
         }
 

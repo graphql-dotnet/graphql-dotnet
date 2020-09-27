@@ -15,7 +15,7 @@ namespace GraphQL
     public class DocumentExecuter : GraphQL.IDocumentExecuter
     {
         public DocumentExecuter() { }
-        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Logging.ITraceLogger traceLogger) { }
         public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQL.Language.AST.Operation GetOperation(string operationName, GraphQL.Language.AST.Document document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
@@ -1530,6 +1530,28 @@ namespace GraphQL.Language
     {
         public static T WithLocation<T>(this T node, int line, int column, int start = -1, int end = -1)
             where T : GraphQL.Language.AST.AbstractNode { }
+    }
+}
+namespace GraphQL.Logging
+{
+    public class AsyncAutoResetEvent
+    {
+        public AsyncAutoResetEvent() { }
+        public void Set() { }
+        public System.Threading.Tasks.Task WaitAsync() { }
+    }
+    public interface ITraceLogger
+    {
+        GraphQL.Logging.AsyncAutoResetEvent ForceSendTrigger { get; }
+        void LogTrace(System.DateTime start, string operationName, string query, GraphQL.ExecutionResult result);
+        System.Threading.Tasks.Task Send();
+    }
+    public class NullTraceLogger : GraphQL.Logging.ITraceLogger
+    {
+        public NullTraceLogger() { }
+        public GraphQL.Logging.AsyncAutoResetEvent ForceSendTrigger { get; }
+        public void LogTrace(System.DateTime start, string operationName, string query, GraphQL.ExecutionResult result) { }
+        public System.Threading.Tasks.Task Send() { }
     }
 }
 namespace GraphQL.Reflection

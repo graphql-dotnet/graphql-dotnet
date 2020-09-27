@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
+using GraphQL.Logging;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
@@ -24,17 +25,19 @@ namespace GraphQL
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
+        private readonly ITraceLogger _traceLogger;
 
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new NullTraceLogger())
         {
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, ITraceLogger traceLogger)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
+            _traceLogger = traceLogger ?? throw new ArgumentNullException(nameof(traceLogger));
         }
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
@@ -48,6 +51,7 @@ namespace GraphQL
             if (options.FieldMiddleware == null)
                 throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
+            DateTime start = DateTime.UtcNow;
             var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
 
             options.Schema.NameConverter = options.NameConverter;
@@ -224,6 +228,15 @@ namespace GraphQL
             {
                 result ??= new ExecutionResult();
                 result.Perf = metrics.Finish();
+            }
+
+            try
+            {
+                _traceLogger.LogTrace(start, options.OperationName, options.Query, result);
+            }
+            catch
+            {
+                // We don't want log tracing to break it - but we should notify the user of this
             }
 
             return result;
