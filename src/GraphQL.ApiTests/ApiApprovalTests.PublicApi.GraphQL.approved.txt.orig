@@ -1683,7 +1683,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringObjectGraphType() { }
         public AutoRegisteringObjectGraphType(params System.Linq.Expressions.Expression<>[] excludesMembers) { }
-        public AutoRegisteringObjectGraphType(bool registerMethods, params System.Linq.Expressions.Expression<>[] excludesMembers) { }
+        public bool RegisterMethods { get; set; }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MethodInfo> GetRegisteredMethods() { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.PropertyInfo> GetRegisteredProperties() { }
     }

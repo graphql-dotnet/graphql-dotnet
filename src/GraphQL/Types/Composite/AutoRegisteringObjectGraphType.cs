@@ -6,6 +6,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
+using GraphQL.Resolvers;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -18,18 +20,34 @@ namespace GraphQL.Types
     /// <typeparam name="TSourceType"></typeparam>
     public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
     {
+        ///// <summary>
+        ///// Register all methods of <see cref="GetRegisteredMethods"/>
+        ///// </summary>
+        //public bool RegisterMethods { get; set; }
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
         /// </summary>
-        public AutoRegisteringObjectGraphType() : this(null) { }
+        public AutoRegisteringObjectGraphType() : this(false, null) { }
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
-        /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
-        public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
+        /// <param name="excludesMembers"> Expressions for excluding fields, for example 'o => o.Age' or 'o => o.Age(defaul, ...). </param>
+        public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludesMembers): this(false, excludesMembers)
         {
-            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
+        }
+
+        /// <summary>
+        /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
+        /// </summary>
+        /// <param name="registerMethods"> Register methods of <see cref="GetRegisteredMethods"/> </param>
+        /// <param name="excludesMembers"> Expressions for excluding fields, for example 'o => o.Age' or 'o => o.Age(defaul, ...). </param>
+        public AutoRegisteringObjectGraphType(bool registerMethods, params Expression<Func<TSourceType, object>>[] excludesMembers)
+        {
+            Name = typeof(TSourceType).GraphQLName();
+            AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludesMembers);
+            if (registerMethods)
+                AutoRegisteringHelper.SetFields(this, GetRegisteredMethods(), excludesMembers);
         }
 
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
@@ -37,6 +55,13 @@ namespace GraphQL.Types
             return typeof(TSourceType)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => AutoRegisteringHelper.IsEnabledForRegister(p.PropertyType, true));
+        }
+
+        protected virtual IEnumerable<MethodInfo> GetRegisteredMethods()
+        {
+            return typeof(TSourceType)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Where(m => !m.IsSpecialName && AutoRegisteringHelper.IsEnabledForRegister(m.ReturnType, true));
         }
     }
 
@@ -60,6 +85,7 @@ namespace GraphQL.Types
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
         public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
+            Name = typeof(TSourceType).GraphQLName();
             AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
         }
 
@@ -75,15 +101,13 @@ namespace GraphQL.Types
     {
         internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<PropertyInfo> properties, params Expression<Func<TSourceType, object>>[] excludedProperties)
         {
-            type.Name = typeof(TSourceType).GraphQLName();
-
             foreach (var propertyInfo in properties)
             {
-                if (excludedProperties?.Any(p => GetPropertyName(p) == propertyInfo.Name) == true)
+                if (excludedProperties?.Any(p => GetMemberInfo(p) == propertyInfo) == true)
                     continue;
 
                 type.Field(
-                    type: propertyInfo.PropertyType.GetGraphTypeFromType(IsNullableProperty(propertyInfo)),
+                    type: propertyInfo.PropertyType.GetGraphTypeFromType(propertyInfo.GraphTypeIsNullable()),
                     name: propertyInfo.Name,
                     description: propertyInfo.Description(),
                     deprecationReason: propertyInfo.ObsoleteMessage()
@@ -91,62 +115,88 @@ namespace GraphQL.Types
             }
         }
 
-        private static bool IsNullableProperty(PropertyInfo propertyInfo)
+        internal static void SetFields<TSourceType>(ComplexGraphType<TSourceType> type, IEnumerable<MethodInfo> methods, params Expression<Func<TSourceType, object>>[] excludedMethods)
         {
-            if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute))) return false;
+            foreach (var methodInfo in methods)
+            {
+                if (excludedMethods?.Any(p => GetMemberInfo(p) == methodInfo) == true)
+                    continue;
 
-            if (!propertyInfo.PropertyType.IsValueType) return true;
+                var methodResolver = new MethodResolver(methodInfo);
 
-            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                methodResolver.CreateQueryArguments();
+
+                var result = type.Field(
+                    type: methodInfo.ReturnType.GetGraphTypeFromType(methodInfo.GraphTypeIsNullable()),
+                    name: methodInfo.Name,
+                    arguments: methodResolver.CreateQueryArguments(),
+                    description: methodInfo.Description(),
+                    deprecationReason: methodInfo.ObsoleteMessage()
+                );
+
+                result.Resolver = methodResolver;
+            }
         }
 
-        private static string GetPropertyName<TSourceType>(Expression<Func<TSourceType, object>> expression)
+
+        private static MemberInfo GetMemberInfo(LambdaExpression expression)
         {
-            if (expression.Body is MemberExpression m1)
-                return m1.Member.Name;
+            var expr = (expression.Body is UnaryExpression u) ? u.Operand : expression.Body;
 
-            if (expression.Body is UnaryExpression u && u.Operand is MemberExpression m2)
-                return m2.Member.Name;
+            if (expr is MemberExpression m)
+                return m.Member;
 
-            throw new NotSupportedException($"Unsupported type of expression: {expression.GetType().Name}");
+            if (expr is MethodCallExpression c)
+                return c.Method;
+
+            throw new NotSupportedException($"Unsupported type of expression: {expr.GetType().Name}");
         }
 
-        internal static bool IsEnabledForRegister(Type propertyType, bool firstCall)
+        internal static bool IsEnabledForRegister(Type returnType, bool firstCall)
         {
-            if (propertyType == typeof(string)) return true;
+            if (returnType == typeof(string))
+                return true;
 
-            if (propertyType.IsValueType) return true; // TODO: requires discussion: Nullable<T>, enums, any struct
+            if (returnType.IsValueType)
+                return true; // TODO: requires discussion: Nullable<T>, enums, any struct
 
-            if (GraphTypeTypeRegistry.Contains(propertyType)) return true;
+            if (GraphTypeTypeRegistry.Contains(returnType))
+                return true;
 
             if (firstCall)
             {
-                var realType = GetRealType(propertyType);
-                if (realType != propertyType)
+                var realType = GetRealType(returnType);
+                if (realType != returnType)
                     return IsEnabledForRegister(realType, false);
             }
 
             return false;
         }
 
-        private static Type GetRealType(Type propertyType)
+        private static Type GetRealType(Type returnType)
         {
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                return propertyType.GetGenericArguments()[0];
+                return returnType.GetGenericArguments()[0];
             }
 
-            if (propertyType.IsArray)
+            if (returnType.IsArray)
             {
-                return propertyType.GetElementType();
+                return returnType.GetElementType();
             }
 
-            if (propertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(propertyType))
+            if (returnType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(returnType))
             {
-                return propertyType.GetEnumerableElementType();
+                return returnType.GetEnumerableElementType();
             }
 
-            return propertyType;
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                return returnType.GetGenericArguments()[0];
+            }
+
+            return returnType;
         }
     }
 }

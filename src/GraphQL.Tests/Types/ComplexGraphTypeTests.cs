@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -16,7 +17,8 @@ namespace GraphQL.Tests.Types
 
     public class ComplexGraphTypeTests
     {
-        internal class ComplexType<T> : ComplexGraphType<T> {
+        internal class ComplexType<T> : ComplexGraphType<T>
+        {
             public ComplexType()
             {
                 Name = typeof(T).GetFriendlyName().Replace("<", "Of").Replace(">", "");
@@ -58,6 +60,12 @@ namespace GraphQL.Tests.Types
             public List<int?> someRequiredListWithNullable { get; set; }
             public int someNotNullInt { get; set; }
             public Money someMoney { get; set; }
+            public Task<Money> someTaskMoneyMethod() => default;
+            public Money someMoneyMethod() => default;
+            public int someIntMethod1(IResolveFieldContext ctx, int a, int b) => default;
+            public int someIntMethod2(int a, IResolveFieldContext ctx, int b) => default;
+            public int? someIntMethod3(int a, IResolveFieldContext ctx, int b) => default;
+            public string someStringMethod(string a, int b) => default;
         }
 
         internal class Money
@@ -82,11 +90,16 @@ namespace GraphQL.Tests.Types
         {
             GraphTypeTypeRegistry.Register<Money, AutoRegisteringObjectGraphType<Money>>();
 
-            var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
+            var type = new AutoRegisteringObjectGraphType<TestObject>(
+                true,
+                o => o.valuePair,
+                o => o.someEnumerable,
+                o => o.someIntMethod2(default, default, default)
+            );
             type.Name.ShouldBe(nameof(TestObject));
             type.Description.ShouldBe("Object for test");
             type.DeprecationReason.ShouldBe("Obsolete for test");
-            type.Fields.Count().ShouldBe(18);
+            type.Fields.Count().ShouldBe(23);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
@@ -103,6 +116,12 @@ namespace GraphQL.Tests.Types
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someTaskMoneyMethod)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someMoneyMethod)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someIntMethod1)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someIntMethod3)).Type.ShouldBe(typeof(IntGraphType));
+            type.Fields.First(f => f.Name == nameof(TestObject.someStringMethod)).Type.ShouldBe(typeof(StringGraphType));
+
 
             var enumType = new EnumerationGraphType<Direction>();
             enumType.Values["DESC"].Description.ShouldBe("Descending Order");
@@ -374,5 +393,5 @@ namespace GraphQL.Tests.Types
         }
     }
 
-    #pragma warning restore 618
+#pragma warning restore 618
 }
