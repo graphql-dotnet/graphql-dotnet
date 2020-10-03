@@ -13,7 +13,7 @@ namespace GraphQL.Resolvers
     /// </summary>
     internal class MethodResolver : IFieldResolver
     {
-        public static readonly ConcurrentDictionary<MethodInfo, Func<object, object[], object>> cache = new ConcurrentDictionary<MethodInfo, Func<object, object[], object>>();
+        private static readonly ConcurrentDictionary<MethodInfo, Func<object, object[], object>> cache = new ConcurrentDictionary<MethodInfo, Func<object, object[], object>>();
         private readonly MethodInfo _methodInfo;
 
         public MethodResolver(MethodInfo methodInfo)
