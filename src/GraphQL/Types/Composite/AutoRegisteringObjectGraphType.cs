@@ -152,51 +152,51 @@ namespace GraphQL.Types
             throw new NotSupportedException($"Unsupported type of expression: {expr.GetType().Name}");
         }
 
-        internal static bool IsEnabledForRegister(Type returnType, bool firstCall)
+        internal static bool IsEnabledForRegister(Type propertyType, bool firstCall)
         {
-            if (returnType == typeof(string))
+            if (propertyType == typeof(string))
                 return true;
 
-            if (returnType.IsValueType)
+            if (propertyType.IsValueType)
                 return true; // TODO: requires discussion: Nullable<T>, enums, any struct
 
-            if (GraphTypeTypeRegistry.Contains(returnType))
+            if (GraphTypeTypeRegistry.Contains(propertyType))
                 return true;
 
             if (firstCall)
             {
-                var realType = GetRealType(returnType);
-                if (realType != returnType)
+                var realType = GetRealType(propertyType);
+                if (realType != propertyType)
                     return IsEnabledForRegister(realType, false);
             }
 
             return false;
         }
 
-        private static Type GetRealType(Type returnType)
+        private static Type GetRealType(Type propertyType)
         {
 
-            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                return returnType.GetGenericArguments()[0];
+                return propertyType.GetGenericArguments()[0];
             }
 
-            if (returnType.IsArray)
+            if (propertyType.IsArray)
             {
-                return returnType.GetElementType();
+                return propertyType.GetElementType();
             }
 
-            if (returnType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(returnType))
+            if (propertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(propertyType))
             {
-                return returnType.GetEnumerableElementType();
+                return propertyType.GetEnumerableElementType();
             }
 
-            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Task<>))
             {
-                return returnType.GetGenericArguments()[0];
+                return propertyType.GetGenericArguments()[0];
             }
 
-            return returnType;
+            return propertyType;
         }
     }
 }
