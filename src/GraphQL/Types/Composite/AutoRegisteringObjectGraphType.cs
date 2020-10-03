@@ -32,7 +32,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
-        /// <param name="excludesMembers"> Expressions for excluding fields, for example 'o => o.Age' or 'o => o.Age(defaul, ...). </param>
+        /// <param name="excludesMembers"> Expressions for excluding fields, for example 'o => o.Age' or 'o => o.Age(default, ...). </param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object>>[] excludesMembers): this(false, excludesMembers)
         {
         }
