@@ -103,8 +103,6 @@ namespace GraphQL
                 : typeName;
         }
 
-
-
         /// <summary>
         /// Gets the graph type for the indicated type.
         /// </summary>
