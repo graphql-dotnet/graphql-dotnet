@@ -11,7 +11,7 @@ namespace GraphQL.Resolvers
     /// Experimental. Probably should be a part of <see cref="NameFieldResolver"/>
     /// It has <see cref="CreateQueryArguments"/> for field registration
     /// </summary>
-    public class MethodResolver : IFieldResolver
+    internal class MethodResolver : IFieldResolver
     {
         public static readonly ConcurrentDictionary<MethodInfo, Func<object, object[], object>> cache = new ConcurrentDictionary<MethodInfo, Func<object, object[], object>>();
         private readonly MethodInfo _methodInfo;
