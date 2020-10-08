@@ -82,34 +82,23 @@ namespace GraphQL.Types
         {
             var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
-            lookup.Initialize(types, directives, resolveType, seal);
-
-            return lookup;
-        }
-
-        public virtual void Initialize(
-            IEnumerable<IGraphType> types,
-            IEnumerable<DirectiveGraphType> directives,
-            Func<Type, IGraphType> resolveType,
-            bool seal = false)
-        {
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
-                if (this[name] == null)
+                if (lookup[name] == null)
                 {
-                    AddType(graphType, context);
+                    lookup.AddType(graphType, context);
                 }
             });
 
             foreach (var type in types)
             {
-                AddType(type, ctx);
+                lookup.AddType(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
-            HandleField(null, SchemaMetaFieldType, ctx, false);
-            HandleField(null, TypeMetaFieldType, ctx, false);
-            HandleField(null, TypeNameMetaFieldType, ctx, false);
+            lookup.HandleField(null, lookup.SchemaMetaFieldType, ctx, false);
+            lookup.HandleField(null, lookup.TypeMetaFieldType, ctx, false);
+            lookup.HandleField(null, lookup.TypeNameMetaFieldType, ctx, false);
 
             foreach (var directive in directives)
             {
@@ -120,19 +109,21 @@ namespace GraphQL.Types
                 {
                     if (arg.ResolvedType != null)
                     {
-                        arg.ResolvedType = ConvertTypeReference(directive, arg.ResolvedType);
+                        arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
                     }
                     else
                     {
-                        arg.ResolvedType = BuildNamedType(arg.Type, ctx.ResolveType);
+                        arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
                     }
                 }
             }
 
-            ApplyTypeReferences();
+            lookup.ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
-            _sealed = seal;
+            lookup._sealed = seal;
+
+            return lookup;
         }
 
         public INameConverter NameConverter { get; set; }

@@ -302,7 +302,7 @@ namespace GraphQL.Types
                 yield return Subscription;
         }
 
-        protected GraphTypesLookup CreateTypesLookup()
+        private GraphTypesLookup CreateTypesLookup()
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
