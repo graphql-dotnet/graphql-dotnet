@@ -65,7 +65,7 @@ namespace GraphQL.Types
             NameConverter = nameConverter;
         }
 
-        public virtual IReadOnlyCollection<Type> BuiltInCustomScalars { get; }
+        public virtual IEnumerable<Type> BuiltInCustomScalars { get; }
 
         private void CheckSealed()
         {
