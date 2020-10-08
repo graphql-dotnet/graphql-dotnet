@@ -14,5 +14,5 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 If you do not explicitly specify an endpoints through the optional `options` argument then
-Altair by default will run on `/altair` endpoint and will send requests to `/graphql`
+Altair by default will run on `/ui/altair` endpoint and will send requests to `/graphql`
 GraphQL API endpoint.
