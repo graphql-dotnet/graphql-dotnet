@@ -1901,6 +1901,7 @@ namespace GraphQL.Types
     {
         public GraphTypesLookup() { }
         public GraphTypesLookup(GraphQL.Conversion.INameConverter nameConverter) { }
+        public virtual System.Collections.Generic.IReadOnlyCollection<System.Type> BuiltInCustomScalars { get; }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
@@ -1916,6 +1917,7 @@ namespace GraphQL.Types
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
         public void Clear() { }
+        public virtual void Initialize(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, bool seal = false) { }
         public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter, bool seal = false) { }
     }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
@@ -2160,6 +2162,7 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType Subscription { get; set; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        protected GraphQL.Types.GraphTypesLookup CreateTypesLookup() { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public GraphQL.Types.DirectiveGraphType FindDirective(string name) { }

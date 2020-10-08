@@ -30,22 +30,25 @@ namespace GraphQL.Types
             AddType<IdGraphType>();
 
             // .NET custom scalars
-            AddType<DateGraphType>();
-            AddType<DateTimeGraphType>();
-            AddType<DateTimeOffsetGraphType>();
-            AddType<TimeSpanSecondsGraphType>();
-            AddType<TimeSpanMillisecondsGraphType>();
-            AddType<DecimalGraphType>();
-            AddType<UriGraphType>();
-            AddType<GuidGraphType>();
-            AddType<ShortGraphType>();
-            AddType<UShortGraphType>();
-            AddType<UIntGraphType>();
-            AddType<LongGraphType>();
-            AddType<BigIntGraphType>();
-            AddType<ULongGraphType>();
-            AddType<ByteGraphType>();
-            AddType<SByteGraphType>();
+            BuiltInCustomScalars = new HashSet<Type>
+            {
+                typeof(DateGraphType),
+                typeof(DateTimeGraphType),
+                typeof(DateTimeOffsetGraphType),
+                typeof(TimeSpanSecondsGraphType),
+                typeof(TimeSpanMillisecondsGraphType),
+                typeof(DecimalGraphType),
+                typeof(UriGraphType),
+                typeof(GuidGraphType),
+                typeof(ShortGraphType),
+                typeof(UShortGraphType),
+                typeof(UIntGraphType),
+                typeof(LongGraphType),
+                typeof(BigIntGraphType),
+                typeof(ULongGraphType),
+                typeof(ByteGraphType),
+                typeof(SByteGraphType),
+            };
 
             // Add introspection types.  Note that introspection types rely on the
             //   CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
@@ -62,6 +65,8 @@ namespace GraphQL.Types
             NameConverter = nameConverter;
         }
 
+        public virtual IReadOnlyCollection<Type> BuiltInCustomScalars { get; }
+
         private void CheckSealed()
         {
             if (_sealed)
@@ -77,23 +82,34 @@ namespace GraphQL.Types
         {
             var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
+            lookup.Initialize(types, directives, resolveType, seal);
+
+            return lookup;
+        }
+
+        public virtual void Initialize(
+            IEnumerable<IGraphType> types,
+            IEnumerable<DirectiveGraphType> directives,
+            Func<Type, IGraphType> resolveType,
+            bool seal = false)
+        {
             var ctx = new TypeCollectionContext(resolveType, (name, graphType, context) =>
             {
-                if (lookup[name] == null)
+                if (this[name] == null)
                 {
-                    lookup.AddType(graphType, context);
+                    AddType(graphType, context);
                 }
             });
 
             foreach (var type in types)
             {
-                lookup.AddType(type, ctx);
+                AddType(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
-            lookup.HandleField(null, lookup.SchemaMetaFieldType, ctx, false);
-            lookup.HandleField(null, lookup.TypeMetaFieldType, ctx, false);
-            lookup.HandleField(null, lookup.TypeNameMetaFieldType, ctx, false);
+            HandleField(null, SchemaMetaFieldType, ctx, false);
+            HandleField(null, TypeMetaFieldType, ctx, false);
+            HandleField(null, TypeNameMetaFieldType, ctx, false);
 
             foreach (var directive in directives)
             {
@@ -104,21 +120,19 @@ namespace GraphQL.Types
                 {
                     if (arg.ResolvedType != null)
                     {
-                        arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
+                        arg.ResolvedType = ConvertTypeReference(directive, arg.ResolvedType);
                     }
                     else
                     {
-                        arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                        arg.ResolvedType = BuildNamedType(arg.Type, ctx.ResolveType);
                     }
                 }
             }
 
-            lookup.ApplyTypeReferences();
+            ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
-            lookup._sealed = seal;
-
-            return lookup;
+            _sealed = seal;
         }
 
         public INameConverter NameConverter { get; set; }
@@ -182,6 +196,36 @@ namespace GraphQL.Types
                     return result.Value;
                 }
             }
+        }
+
+        private void AddType(Type builtInGraphType)
+        {
+            //CheckSealed();
+
+            //if (builtInGraphType == null)
+            //    throw new ArgumentNullException(nameof(builtInGraphType));
+            //if (!typeof(IGraphType).IsAssignableFrom(builtInGraphType))
+            //    throw new ArgumentOutOfRangeException(nameof(builtInGraphType), $"Type {builtInGraphType} does not implement IGraphType.");
+            //if (builtInGraphType.GetConstructor(Type.EmptyTypes) == null)
+            //    throw new ArgumentOutOfRangeException(nameof(builtInGraphType), $"Type {builtInGraphType} does not have a default constructor.");
+
+            var context = new TypeCollectionContext(
+                type => BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t)),
+                (name, type, ctx) =>
+                {
+                    var trimmed = name.TrimGraphQLTypes();
+                    lock (_lock)
+                    {
+                        SetGraphType(trimmed, type);
+                    }
+                    ctx?.AddType(trimmed, type, null);
+                });
+
+            var type = builtInGraphType.GetNamedType();
+            var instance = context.ResolveType(type);
+            AddType(instance, context);
+
+            Debug.Assert(context.InFlightRegisteredTypes.Count == 0);
         }
 
         public void AddType<TType>()
@@ -403,6 +447,11 @@ Make sure that your ServiceProvider is configured correctly.");
                         AddType((IGraphType)Activator.CreateInstance(namedType), context);
                         return;
                     }
+                }
+                if (BuiltInCustomScalars.Contains(namedType))
+                {
+                    AddType(namedType);
+                    return;
                 }
                 AddTypeWithLoopCheck(context.ResolveType(namedType), context, namedType);
             }

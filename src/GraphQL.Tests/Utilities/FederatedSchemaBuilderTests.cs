@@ -32,41 +32,9 @@ namespace GraphQL.Tests.Utilities
 
             var query = "{ _service { sdl } }";
 
-            var sdl = @"scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
-extend type Query {
+            var sdl = @"extend type Query {
   me: User
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type User @key(fields: ""id"") {
   id: ID! @external

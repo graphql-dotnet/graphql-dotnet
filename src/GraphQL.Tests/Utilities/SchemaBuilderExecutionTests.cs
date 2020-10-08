@@ -11,8 +11,8 @@ namespace GraphQL.Tests.Utilities
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         [Theory]
-        [InlineData("PetAfterAll.graphql", 33)]
-        [InlineData("PetBeforeAll.graphql", 33)]
+        [InlineData("PetAfterAll.graphql", 17)]
+        [InlineData("PetBeforeAll.graphql", 17)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
@@ -32,7 +32,7 @@ namespace GraphQL.Tests.Utilities
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(33);
+            schema.AllTypes.Count().ShouldBe(17);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
