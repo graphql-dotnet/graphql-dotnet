@@ -1901,7 +1901,6 @@ namespace GraphQL.Types
     {
         public GraphTypesLookup() { }
         public GraphTypesLookup(GraphQL.Conversion.INameConverter nameConverter) { }
-        public virtual System.Collections.Generic.IEnumerable<System.Type> BuiltInCustomScalars { get; }
         public GraphQL.Types.IGraphType this[string typeName] { get; set; }
         public GraphQL.Types.IGraphType this[System.Type type] { get; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }

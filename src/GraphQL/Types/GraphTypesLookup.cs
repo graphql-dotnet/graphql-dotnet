@@ -30,7 +30,7 @@ namespace GraphQL.Types
             AddType<IdGraphType>();
 
             // .NET custom scalars
-            BuiltInCustomScalars = new HashSet<Type>
+            _builtInCustomScalars = new HashSet<Type>
             {
                 typeof(DateGraphType),
                 typeof(DateTimeGraphType),
@@ -65,7 +65,7 @@ namespace GraphQL.Types
             NameConverter = nameConverter;
         }
 
-        public virtual IEnumerable<Type> BuiltInCustomScalars { get; }
+        private IEnumerable<Type> _builtInCustomScalars;
 
         private void CheckSealed()
         {
@@ -430,7 +430,7 @@ Make sure that your ServiceProvider is configured correctly.");
                         return;
                     }
                 }
-                if (BuiltInCustomScalars.Contains(namedType))
+                if (_builtInCustomScalars.Contains(namedType))
                 {
                     AddType(namedType);
                     return;
