@@ -200,15 +200,6 @@ namespace GraphQL.Types
 
         private void AddType(Type builtInGraphType)
         {
-            //CheckSealed();
-
-            //if (builtInGraphType == null)
-            //    throw new ArgumentNullException(nameof(builtInGraphType));
-            //if (!typeof(IGraphType).IsAssignableFrom(builtInGraphType))
-            //    throw new ArgumentOutOfRangeException(nameof(builtInGraphType), $"Type {builtInGraphType} does not implement IGraphType.");
-            //if (builtInGraphType.GetConstructor(Type.EmptyTypes) == null)
-            //    throw new ArgumentOutOfRangeException(nameof(builtInGraphType), $"Type {builtInGraphType} does not have a default constructor.");
-
             var context = new TypeCollectionContext(
                 type => BuildNamedType(type, t => (IGraphType)Activator.CreateInstance(t)),
                 (name, type, ctx) =>
