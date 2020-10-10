@@ -52,7 +52,7 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType);
+            result = arg.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
