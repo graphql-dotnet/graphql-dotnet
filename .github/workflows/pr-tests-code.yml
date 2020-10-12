@@ -36,7 +36,7 @@ jobs:
         run: dotnet test --no-restore
       
   windows:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
       - name: Checkout source
