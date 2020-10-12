@@ -22,6 +22,7 @@ namespace GraphQL
             where T : class
             => item as T;
 
+        
         /// <summary>
         /// Determines whether this instance is a concrete type.
         /// </summary>
