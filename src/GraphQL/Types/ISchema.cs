@@ -15,7 +15,7 @@ namespace GraphQL.Types
     public interface ISchema
     {
         /// <summary>
-        /// Returns true once the schema has been initialized
+        /// Returns true once the schema has been initialized.
         /// </summary>
         bool Initialized { get; }
 
@@ -31,20 +31,23 @@ namespace GraphQL.Types
         /// </summary>
         INameConverter NameConverter { get; }
 
+        /// <summary>
+        /// Description of the provided schema.
+        /// </summary>
         string Description { get; set; }
 
         /// <summary>
-        /// The 'query' base graph type; required
+        /// The 'query' base graph type; required.
         /// </summary>
         IObjectGraphType Query { get; set; }
 
         /// <summary>
-        /// The 'mutation' base graph type; optional
+        /// The 'mutation' base graph type; optional.
         /// </summary>
         IObjectGraphType Mutation { get; set; }
 
         /// <summary>
-        /// The 'subscription' base graph type; optional
+        /// The 'subscription' base graph type; optional.
         /// </summary>
         IObjectGraphType Subscription { get; set; }
 
@@ -59,17 +62,17 @@ namespace GraphQL.Types
         IEnumerable<DirectiveGraphType> Directives { get; set; }
 
         /// <summary>
-        /// Returns a list of all the graph types utilized by this schema
+        /// Returns a list of all the graph types utilized by this schema.
         /// </summary>
         IEnumerable<IGraphType> AllTypes { get; }
 
         /// <summary>
-        /// Returns a <see cref="IGraphType"/> for a given name
+        /// Returns a <see cref="IGraphType"/> for a given name.
         /// </summary>
         IGraphType FindType(string name);
 
         /// <summary>
-        /// Returns a <see cref="DirectiveGraphType"/> for a given name
+        /// Returns a <see cref="DirectiveGraphType"/> for a given name.
         /// </summary>
         DirectiveGraphType FindDirective(string name);
 
@@ -137,24 +140,32 @@ namespace GraphQL.Types
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
 
         /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.
-        /// Note that this filter in fact does not prohibit the execution of queries that contain hidden types. To limit
-        /// access to the particular fields, you should use some authorization logic.
+        /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
+        /// This is set by <see cref="IDocumentExecuter"/> to the filter passed to it within <see cref="ExecutionOptions.SchemaFilter"/>.
+        /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
+        /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; }
 
         /// <summary>
-        /// Returns a reference to the __schema introspection field available on the query graph type
+        /// Provides the ability to order the schema elements upon introspection. This is set by <see cref="IDocumentExecuter"/>
+        /// to the comparer passed to it within <see cref="ExecutionOptions.SchemaComparer"/>. By default only fields are ordered by
+        /// their names within enclosing type.
+        /// </summary>
+        ISchemaComparer Comparer { get; set; }
+
+        /// <summary>
+        /// Returns a reference to the __schema introspection field available on the query graph type.
         /// </summary>
         FieldType SchemaMetaFieldType { get; }
 
         /// <summary>
-        /// Returns a reference to the __type introspection field available on the query graph type
+        /// Returns a reference to the __type introspection field available on the query graph type.
         /// </summary>
         FieldType TypeMetaFieldType { get; }
 
         /// <summary>
-        /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type
+        /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
         /// </summary>
         FieldType TypeNameMetaFieldType { get; }
     }
