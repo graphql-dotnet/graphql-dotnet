@@ -30,7 +30,7 @@ jobs:
         run: dotnet build --no-restore -c Release -p:NoWarn=CS1591
       - name: Build solution (debug config)
         working-directory: src
-        run: dotnet build --no-restore -p:NoWarn=CS1591
+        run: dotnet build --no-restore -c Debug -p:NoWarn=CS1591
       - name: Test solution (debug config)
         working-directory: src
         run: dotnet test --no-restore
