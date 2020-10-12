@@ -85,6 +85,7 @@ namespace GraphQL
         public System.IServiceProvider RequestServices { get; set; }
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
+        public GraphQL.Introspection.ISchemaComparer SchemaComparer { get; set; }
         public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
@@ -974,6 +975,15 @@ namespace GraphQL.Instrumentation
 }
 namespace GraphQL.Introspection
 {
+    public class DefaultSchemaComparer : GraphQL.Introspection.ISchemaComparer
+    {
+        public DefaultSchemaComparer() { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
+    }
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
         public DefaultSchemaFilter() { }
@@ -982,6 +992,14 @@ namespace GraphQL.Introspection
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
+    }
+    public interface ISchemaComparer
+    {
+        System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field);
+        System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
+        System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent);
     }
     public interface ISchemaFilter
     {
@@ -1991,6 +2009,7 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
         GraphQL.Introspection.ISchemaFilter Filter { get; set; }
@@ -2149,6 +2168,7 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }

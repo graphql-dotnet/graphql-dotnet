@@ -77,8 +77,11 @@ namespace GraphQL
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }
 
-        /// <summary>Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.</summary>
+        /// <summary>Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives. By default nothing is hidden.</summary>
         public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
+
+        /// <summary>Provides the ability to order the schema elements upon introspection. By default only fields are ordered by their names within enclosing type.</summary>
+        public ISchemaComparer SchemaComparer { get; set; } = new DefaultSchemaComparer();
 
         /// <summary>
         /// The service provider for the executing request. Typically this is set to a scoped service provider

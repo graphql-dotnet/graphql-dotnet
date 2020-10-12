@@ -52,6 +52,7 @@ namespace GraphQL
 
             options.Schema.NameConverter = options.NameConverter;
             options.Schema.Filter = options.SchemaFilter;
+            options.Schema.Comparer = options.SchemaComparer;
 
             ExecutionResult result = null;
             ExecutionContext context = null;
