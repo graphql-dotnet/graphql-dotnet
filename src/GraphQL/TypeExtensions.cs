@@ -21,7 +21,6 @@ namespace GraphQL
         public static T As<T>(this object item)
             where T : class
             => item as T;
-
         
         /// <summary>
         /// Determines whether this instance is a concrete type.
