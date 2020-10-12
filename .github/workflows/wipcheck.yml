@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fail if pull request title '${{ github.event.pull_request.title }}' contains 'WIP'
+      - name: Fail build if pull request title contains 'WIP'
         if: ${{ contains(github.event.pull_request.title, 'wip') }}
         run: |
           echo Error! PR title contains WIP: ${{ github.event.pull_request.title }}
