@@ -141,15 +141,13 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
-        /// This is set by <see cref="IDocumentExecuter"/> to the filter passed to it within <see cref="ExecutionOptions.SchemaFilter"/>.
         /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
         /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
         /// </summary>
         ISchemaFilter Filter { get; }
 
         /// <summary>
-        /// Provides the ability to order the schema elements upon introspection. This is set by <see cref="IDocumentExecuter"/>
-        /// to the comparer passed to it within <see cref="ExecutionOptions.SchemaComparer"/>. By default only fields are ordered by
+        /// Provides the ability to order the schema elements upon introspection. By default only fields are ordered by
         /// their names within enclosing type.
         /// </summary>
         ISchemaComparer Comparer { get; set; }
