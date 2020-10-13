@@ -5,3 +5,5 @@
 ## Breaking Changes
 
 * `NameConverter` and `SchemaFilter` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
+
+* New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
