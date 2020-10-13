@@ -27,9 +27,9 @@ namespace GraphQL.Types
         void Initialize();
 
         /// <summary>
-        /// The <see cref="INameConverter"/> used by the schema. This is set by <see cref="IDocumentExecuter"/> to the converter passed to it within <see cref="ExecutionOptions.NameConverter"/>.
+        /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
         /// </summary>
-        INameConverter NameConverter { get; set; }
+        INameConverter NameConverter { get; }
 
         string Description { get; set; }
 
@@ -137,12 +137,11 @@ namespace GraphQL.Types
         IAstFromValueConverter FindValueConverter(object value, IGraphType type);
 
         /// <summary>
-        /// Provides the ability to filter the schema upon introspection to hide types. This is set by <see cref="IDocumentExecuter"/>
-        /// to the filter passed to it within <see cref="ExecutionOptions.SchemaFilter"/>. By default, no types are hidden.
+        /// Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.
         /// Note that this filter in fact does not prohibit the execution of queries that contain hidden types. To limit
         /// access to the particular fields, you should use some authorization logic.
         /// </summary>
-        ISchemaFilter Filter { get; set; }
+        ISchemaFilter Filter { get; }
 
         /// <summary>
         /// Returns a reference to the __schema introspection field available on the query graph type

@@ -33,6 +33,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A87E-4E8B-B068-8B396D00945A}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\sitemap.yml = ..\docs2\site\sitemap.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-started", "{587B3CCD-8B68-491B-9AC5-0E04DF3E9507}"
 	ProjectSection(SolutionItems) = preProject
@@ -76,6 +79,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
 		..\docs2\site\docs\guides\migration.md = ..\docs2\site\docs\guides\migration.md
 		..\docs2\site\docs\guides\migration3.md = ..\docs2\site\docs\guides\migration3.md
+		..\docs2\site\docs\guides\migration4.md = ..\docs2\site\docs\guides\migration4.md
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
 	EndProjectSection
 EndProject
