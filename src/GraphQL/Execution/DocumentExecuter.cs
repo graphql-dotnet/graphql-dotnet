@@ -124,7 +124,7 @@ namespace GraphQL
                         options.MaxParallelExecutionCount,
                         options.RequestServices);
                 }
-                catch
+                catch (InvalidVariableError)
                 {
                     // error parsing variables
                     // attempt to run AfterValidationAsync with null for the 'ExecutionContext.Variables' property
