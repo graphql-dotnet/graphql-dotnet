@@ -430,7 +430,7 @@ namespace GraphQL.Tests.Utilities
                 }
                 type Blog {
                     title: String!
-                    post(id: ID!): Post
+                    post(id: ID!, unused: Long!): Post
                 }
                 type Query {
                     blog(id: ID!): Blog
@@ -440,7 +440,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<BlogQueryType>();
             Builder.Types.Include<Blog>();
 
-            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
+            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
             var expected = @"{ ""blog"": { ""title"": ""New blog"", ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } } }";
             var variables = @"{ ""blogId"": ""1"", ""postId"": ""1"" }";
 
@@ -560,7 +560,7 @@ namespace GraphQL.Tests.Utilities
     public class Blog
     {
         public string Title { get; set; }
-        public Post Post(string id)
+        public Post Post(string id, long unused)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }

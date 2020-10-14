@@ -546,7 +546,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 type = this[reference.TypeName];
                 if (type == null)
                 {
-                    type = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
+                    type = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                     if (type != null)
                         this[type.Name] = type;
                 }
