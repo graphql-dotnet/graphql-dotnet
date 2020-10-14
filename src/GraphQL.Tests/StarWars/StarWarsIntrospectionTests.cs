@@ -203,6 +203,18 @@ namespace GraphQL.Tests.StarWars
                 ""__schema"": {
                     ""types"": [
                     {
+                        ""name"": ""__DirectiveLocation"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""__TypeKind"",
+                        ""kind"": ""ENUM""
+                    },
+                    {
+                        ""name"": ""__EnumValue"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
                         ""name"": ""String"",
                         ""kind"": ""SCALAR""
                     },
@@ -211,95 +223,7 @@ namespace GraphQL.Tests.StarWars
                         ""kind"": ""SCALAR""
                     },
                     {
-                        ""name"": ""Float"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Int"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""ID"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Date"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""DateTime"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""DateTimeOffset"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Seconds"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Milliseconds"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Decimal"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Uri"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Guid"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Short"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""UShort"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""UInt"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Long"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""BigInt"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""ULong"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""Byte"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""SByte"",
-                        ""kind"": ""SCALAR""
-                    },
-                    {
-                        ""name"": ""__Schema"",
-                        ""kind"": ""OBJECT""
-                    },
-                    {
-                        ""name"": ""__Type"",
-                        ""kind"": ""OBJECT""
-                    },
-                    {
-                        ""name"": ""__TypeKind"",
-                        ""kind"": ""ENUM""
-                    },
-                    {
-                        ""name"": ""__Field"",
+                        ""name"": ""__Directive"",
                         ""kind"": ""OBJECT""
                     },
                     {
@@ -307,16 +231,16 @@ namespace GraphQL.Tests.StarWars
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__EnumValue"",
+                        ""name"": ""__Type"",
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__Directive"",
+                        ""name"": ""__Field"",
                         ""kind"": ""OBJECT""
                     },
                     {
-                        ""name"": ""__DirectiveLocation"",
-                        ""kind"": ""ENUM""
+                        ""name"": ""__Schema"",
+                        ""kind"": ""OBJECT""
                     },
                     {
                         ""name"": ""Query"",
@@ -329,6 +253,10 @@ namespace GraphQL.Tests.StarWars
                     {
                         ""name"": ""CharacterInterfaceConnection"",
                         ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""Int"",
+                        ""kind"": ""SCALAR""
                     },
                     {
                         ""name"": ""PageInfo"",
