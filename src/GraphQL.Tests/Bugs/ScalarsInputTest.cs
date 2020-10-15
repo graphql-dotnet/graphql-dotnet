@@ -170,6 +170,7 @@ mutation {
             AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
         }
 
+        // TODO: rework to throw exception
         [Fact]
         public void Should_Accept_String_As_Long_In_Variable()
         {
