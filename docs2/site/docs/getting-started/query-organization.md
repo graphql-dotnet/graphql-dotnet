@@ -73,3 +73,25 @@ public class RetailGroupGraphType : ObjectGraphType
   }
 }
 ```
+
+This allows you to separate out your queries into separate source files to keep your code base cleaner. However, it will mean that your queries are 'nested' a layer deeper than before, and you will need to take this into account when querying. For example, the above 'Retail' example, which could be queried in the playground with:
+
+```graphql
+{
+  products {
+    name
+  }
+}
+```
+
+Will now require
+
+```graphql
+{
+  retail {
+    products {
+      name
+    }
+  }
+}
+```

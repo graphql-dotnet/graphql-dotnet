@@ -47,7 +47,7 @@ The query depth setting is a good estimation of complexity for most use cases an
 One step further would be specifying ```MaxComplexity``` and ```FieldImpact``` to look at the estimated number of entities (or cells in a database) that are expected to be returned by each query. Obviously this depends on the size of your database (i.e. number of records per entity) so you will need to find the average number of records per database entity and input that into ```FieldImpact```. For example if I have 3 tables with 100, 120 and 98 rows and I know I will be querying the first table twice as much then a good estimation for ```avgImpact``` would be 105.
 
 Note: I highly recommend setting a higher bound on the number of returned entities by each resolve function in your code. if you use this approach already in your code then you can input that upper bound (which would be the maximum possible items returned per entity) as your avgImpact.
-It is also possilbe to use a theorical value for this (for example 2.0) to asses the query's impact on a theorical database hence decoupling this calculation from your actual database.
+It is also possible to use a theoretical value for this (for example 2.0) to asses the query's impact on a theoretical database hence decoupling this calculation from your actual database.
 
 Imagine if we had a simple test database for the query in the previous example and we assume an average impact of 2.0 (each entity will return ~2 results) then we can calculate the complexity as following:
 

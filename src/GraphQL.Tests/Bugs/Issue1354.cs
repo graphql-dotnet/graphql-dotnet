@@ -1,6 +1,6 @@
+using System;
 using GraphQL.Types;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Bugs
         public void can_resolve_property_on_value_type()
         {
             var query = "query { seconds }";
-            var expected = "{ seconds: 42 }";
+            var expected = @"{ ""seconds"": 42 }";
             AssertQuerySuccess(query, expected, root: TimeSpan.FromSeconds(42));
         }
 
@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Bugs
         public void should_throw_on_unknown_property()
         {
             var query = "query { seconds1 }";
-            var expected = "{ seconds1: null }";
+            var expected = @"{ ""seconds1"": null }";
             var result = AssertQueryWithErrors(query, expected, root: TimeSpan.FromSeconds(42), renderErrors: false, expectedErrorCount: 1);
             result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>();
         }

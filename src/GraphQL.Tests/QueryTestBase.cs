@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
 using GraphQL.StarWars.IoC;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser.Exceptions;
-using Newtonsoft.Json.Linq;
 using Shouldly;
 
 namespace GraphQL.Tests
@@ -36,7 +35,6 @@ namespace GraphQL.Tests
         public TSchema Schema => Services.Get<TSchema>();
 
         public IDocumentExecuter Executer { get; private set; }
-
         public IDocumentWriter Writer { get; private set; }
 
         public ExecutionResult AssertQuerySuccess(
@@ -47,10 +45,11 @@ namespace GraphQL.Tests
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
-            IFieldNameConverter fieldNameConverter = null)
+            INameConverter nameConverter = null,
+            IDocumentWriter writer = null)
         {
             var queryResult = CreateQueryResult(expected);
-            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, fieldNameConverter);
+            return AssertQuery(query, queryResult, inputs, root, userContext, cancellationToken, rules, null, nameConverter, writer);
         }
 
         public ExecutionResult AssertQueryWithErrors(
@@ -115,14 +114,15 @@ namespace GraphQL.Tests
 
         public ExecutionResult AssertQuery(
             string query,
-            ExecutionResult expectedExecutionResult,
+            object expectedExecutionResultOrJson,
             Inputs inputs,
             object root,
             IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default,
             IEnumerable<IValidationRule> rules = null,
             Action<UnhandledExceptionContext> unhandledExceptionDelegate = null,
-            IFieldNameConverter fieldNameConverter = null)
+            INameConverter nameConverter = null,
+            IDocumentWriter writer = null)
         {
             var runResult = Executer.ExecuteAsync(options =>
             {
@@ -134,11 +134,13 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
-                options.FieldNameConverter = fieldNameConverter ?? CamelCaseFieldNameConverter.Instance;
+                options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
+            writer ??= Writer;
+
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
-            var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
+            var expectedResult = expectedExecutionResultOrJson is string s ? s : Writer.WriteToStringAsync((ExecutionResult)expectedExecutionResultOrJson).GetAwaiter().GetResult();
 
             string additionalInfo = null;
 
@@ -155,14 +157,6 @@ namespace GraphQL.Tests
         }
 
         public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null)
-        {
-            object data = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                data = JObject.Parse(result);
-            }
-
-            return new ExecutionResult { Data = data, Errors = errors };
-        }
+            => result.ToExecutionResult(errors);
     }
 }

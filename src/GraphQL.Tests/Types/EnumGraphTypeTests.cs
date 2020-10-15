@@ -1,8 +1,8 @@
-using GraphQL.Types;
-using Shouldly;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 #pragma warning disable 0618
@@ -25,7 +25,7 @@ namespace GraphQL.Tests.Types
             Mauve
         }
 
-        class ColorEnum : EnumerationGraphType<Colors>
+        private class ColorEnum : EnumerationGraphType<Colors>
         {
             public ColorEnum()
             {
@@ -33,7 +33,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        class ColorEnumInverseCasing : EnumerationGraphType<Colors>
+        private class ColorEnumInverseCasing : EnumerationGraphType<Colors>
         {
             public ColorEnumInverseCasing()
             {
@@ -46,7 +46,7 @@ namespace GraphQL.Tests.Types
             }
         }
 
-        private EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
+        private readonly EnumerationGraphType<Colors> type = new EnumerationGraphType<Colors>();
 
         [Fact]
         public void adds_values_from_enum()

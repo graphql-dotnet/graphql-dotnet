@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Types;
-using GraphQL.NewtonsoftJson;
+using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +17,8 @@ namespace GraphQL.Tests.Execution
             _context = new ResolveFieldContext
             {
                 Arguments = new Dictionary<string, object>(),
-                Errors = new ExecutionErrors()
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
             };
         }
 
@@ -104,100 +104,12 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void argument_returns_list_from_array()
         {
-            _context.Arguments = "{a: ['one', 'two']}".ToInputs();
+            _context.Arguments = @"{ ""a"": [""one"", ""two""]}".ToInputs();
             var result = _context.GetArgument<List<string>>("a");
             result.ShouldNotBeNull();
             result.Count.ShouldBe(2);
             result[0].ShouldBe("one");
             result[1].ShouldBe("two");
-        }
-
-        [Fact]
-        public async Task try_resolve_async_handles_null()
-        {
-            var result = await _context.TryAsyncResolve(c => null);
-            result.ShouldBe(null);
-        }
-
-        [Fact]
-        public async Task try_resolve_async_handles_exception()
-        {
-            var result = await _context.TryAsyncResolve(c => throw new InvalidOperationException("Test Error"));
-            result.ShouldBeNull();
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_sets_inner_exception()
-        {
-            var exception = new Exception("Test");
-            var result = await _context.TryAsyncResolve(
-                c => throw exception);
-            result.ShouldBeNull();
-            _context.Errors.First().InnerException.ShouldBe(exception);
-        }
-
-        [Fact]
-        public async Task try_resolve_async_invokes_error_handler()
-        {
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return null;
-                }
-            );
-            result.ShouldBeNull();
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_async_not_null_invokes_error_handler()
-        {
-            var obj = new object();
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return Task.FromResult(obj);
-                }
-            );
-            result.ShouldBe(obj);
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_generic_sets_inner_exception()
-        {
-            var exception = new Exception("Test");
-            var result = await _context.TryAsyncResolve<int>(
-                c => throw exception);
-            result.ShouldBe(default);
-            _context.Errors.First().InnerException.ShouldBe(exception);
-        }
-
-        [Theory]
-        [InlineData(123)]
-        public async Task try_resolve_generic_async_invokes_error_handler(int value)
-        {
-            var result = await _context.TryAsyncResolve(
-                c => throw new InvalidOperationException(),
-                e => {
-                    e.Add(new ExecutionError("Test Error"));
-                    return Task.FromResult(value);
-                }
-            );
-            result.ShouldBe(value);
-            _context.Errors.First().Message.ShouldBe("Test Error");
-        }
-
-        [Fact]
-        public async Task try_resolve_async_properly_resolves_result()
-        {
-            var result = await _context.TryAsyncResolve(
-                c => Task.FromResult<object>("Test Result")
-            );
-            result.ShouldBe("Test Result");
         }
 
         [Fact]
@@ -212,7 +124,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void resolveFieldContextAdapter_throws_error_if_invalid_type()
         {
-            var context = new ResolveFieldContext() { Source = "test" };
+            var context = new ResolveFieldContext { Source = "test" };
             Should.Throw<ArgumentException>(() =>
             {
                 var adapter = new ResolveFieldContextAdapter<int>(context);
@@ -245,7 +157,38 @@ namespace GraphQL.Tests.Execution
             });
         }
 
-        enum SomeEnum
+        [Fact]
+        public void GetSetExtension_Should_Throw_On_Null()
+        {
+            IResolveFieldContext context = null;
+            Should.Throw<ArgumentNullException>(() => context.GetExtension("e"));
+            Should.Throw<ArgumentNullException>(() => context.SetExtension("e", 1));
+
+            context = new ResolveFieldContext();
+            context.GetExtension("a").ShouldBe(null);
+            context.GetExtension("a.b.c.d").ShouldBe(null);
+            Should.Throw<ArgumentException>(() => context.SetExtension("e", 1));
+        }
+
+        [Fact]
+        public void GetSetExtension_Should_Get_And_Set_Values()
+        {
+            _context.GetExtension("a").ShouldBe(null);
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
+
+            _context.SetExtension("a", 5);
+            _context.GetExtension("a").ShouldBe(5);
+
+            _context.SetExtension("a.b.c.d", "value");
+            _context.GetExtension("a.b.c.d").ShouldBe("value");
+            var d = _context.GetExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
+            d.Count.ShouldBe(1);
+
+            _context.SetExtension("a.b.c", "override");
+            _context.GetExtension("a.b.c.d").ShouldBe(null);
+        }
+
+        private enum SomeEnum
         {
             One,
             Two

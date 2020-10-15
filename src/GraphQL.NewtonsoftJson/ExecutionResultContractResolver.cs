@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using GraphQL.Execution;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -8,10 +9,16 @@ namespace GraphQL.NewtonsoftJson
     public class ExecutionResultContractResolver : DefaultContractResolver
     {
         private readonly CamelCaseNamingStrategy _camelCase = new CamelCaseNamingStrategy();
+        private readonly IErrorInfoProvider _errorInfoProvider;
+
+        public ExecutionResultContractResolver(IErrorInfoProvider errorInfoProvider)
+        {
+            _errorInfoProvider = errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider));
+        }
 
         protected override JsonConverter ResolveContractConverter(Type objectType) =>
-            objectType == typeof(ExecutionResult)
-                ? new ExecutionResultJsonConverter()
+            typeof(ExecutionResult).IsAssignableFrom(objectType)
+                ? new ExecutionResultJsonConverter(_errorInfoProvider)
                 : base.ResolveContractConverter(objectType);
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)

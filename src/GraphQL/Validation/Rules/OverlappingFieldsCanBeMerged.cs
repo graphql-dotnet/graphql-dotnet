@@ -1,33 +1,15 @@
-using GraphQL.Language.AST;
-using GraphQL.Types;
-using GraphQL.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
-        public static string FieldsConflictMessage(string responseName, ConflictReason reason) =>
-            $"Fields {responseName} conflicts because {ReasonMessage(reason.Message)}. " +
-            "Use different aliases on the fields to fetch both if this was intentional.";
-
-        public static string ReasonMessage(Message reasonMessage)
-        {
-            if (reasonMessage.Msgs?.Count > 0)
-            {
-                return string.Join(
-                    " and ",
-                    reasonMessage.Msgs.Select(x => $"subfields \"{x.Name}\" conflict because {ReasonMessage(x.Message)}").ToArray()
-                );
-            }
-            else
-            {
-                return reasonMessage.Msg;
-            }
-        }
-
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var comparedFragmentPairs = new PairSet();
@@ -46,12 +28,7 @@ namespace GraphQL.Validation.Rules
 
                     foreach (var conflict in conflicts)
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.3.2",
-                            FieldsConflictMessage(conflict.Reason.Name, conflict.Reason),
-                            conflict.FieldsLeft.Concat(conflict.FieldsRight).ToArray()
-                            ));
+                        context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
                     }
                 });
             }).ToTask();
@@ -64,7 +41,7 @@ namespace GraphQL.Validation.Rules
             IGraphType parentType,
             SelectionSet selectionSet)
         {
-            List<Conflict> conflicts = new List<Conflict>();
+            var conflicts = new List<Conflict>();
 
             CachedField cachedField = GetFieldsAndFragmentNames(
                 context,
@@ -86,7 +63,7 @@ namespace GraphQL.Validation.Rules
             {
                 // (B) Then collect conflicts between these fields and those represented by
                 // each spread fragment name found.
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
                 for (int i = 0; i < fragmentNames.Count; i++)
                 {
                     CollectConflictsBetweenFieldsAndFragment(
@@ -292,7 +269,7 @@ namespace GraphQL.Validation.Rules
             IGraphType parentType2,
             SelectionSet selectionSet2)
         {
-            List<Conflict> conflicts = new List<Conflict>();
+            var conflicts = new List<Conflict>();
 
             var cachedField1 = GetFieldsAndFragmentNames(
                 context,
@@ -326,7 +303,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the second.
             if (fragmentNames2.Count != 0)
             {
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
 
                 for (var j = 0; j < fragmentNames2.Count; j++)
                 {
@@ -346,7 +323,7 @@ namespace GraphQL.Validation.Rules
             // those referenced by each fragment name associated with the first.
             if (fragmentNames1.Count != 0)
             {
-                ObjMap<bool> comparedFragments = new ObjMap<bool>();
+                var comparedFragments = new ObjMap<bool>();
 
                 for (var i = 0; i < fragmentNames1.Count; i++)
                 {
@@ -826,7 +803,7 @@ namespace GraphQL.Validation.Rules
 
         public class PairSet
         {
-            private ObjMap<ObjMap<bool>> _data;
+            private readonly ObjMap<ObjMap<bool>> _data;
 
             public PairSet()
             {
@@ -876,7 +853,7 @@ namespace GraphQL.Validation.Rules
         }
     }
 
-    public static class ISelectionExtensions
+    internal static class ISelectionExtensions
     {
         public static string GetName(this ISelection selection)
         {
@@ -897,10 +874,10 @@ namespace GraphQL.Validation.Rules
         {
             if (selection is Field field)
             {
-                return field.Arguments;
+                return field.Arguments ?? Arguments.Empty;
             }
 
-            return new Arguments();
+            return Arguments.Empty;
         }
 
         public static SelectionSet GetSelectionSet(this ISelection selection)

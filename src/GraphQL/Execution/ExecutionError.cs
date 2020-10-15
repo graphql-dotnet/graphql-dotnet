@@ -1,31 +1,42 @@
-using GraphQL.Language.AST;
-using GraphQLParser;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using GraphQL.Execution;
+using GraphQL.Language.AST;
+using GraphQLParser;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Represents an error generated while processing a document and intended to be returned within an <see cref="ExecutionResult"/>.
+    /// </summary>
     [Serializable]
     public class ExecutionError : Exception
     {
-        private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
-
         private List<ErrorLocation> _errorLocations;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message.
+        /// </summary>
         public ExecutionError(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message and exception data.
+        /// </summary>
         public ExecutionError(string message, IDictionary data)
             : base(message)
         {
             SetData(data);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message. Sets the
+        /// <see cref="Code"/> property based on the inner exception. Loads any exception data
+        /// from the inner exception into this instance.
+        /// </summary>
         public ExecutionError(string message, Exception exception)
             : base(message, exception)
         {
@@ -33,36 +44,24 @@ namespace GraphQL
             SetData(exception);
         }
 
+        /// <summary>
+        /// Returns a list of locations within the document that this error applies to.
+        /// </summary>
         public IEnumerable<ErrorLocation> Locations => _errorLocations;
 
+        /// <summary>
+        /// Gets or sets a code for this error.
+        /// </summary>
         public string Code { get; set; }
 
-        public bool HasCodes => InnerException != null || !string.IsNullOrWhiteSpace(Code);
+        /// <summary>
+        /// Gets or sets the path within the GraphQL document where this error applies to.
+        /// </summary>
+        public IEnumerable<object> Path { get; set; }
 
-        public IEnumerable<string> Codes
-        {
-            get
-            {
-                // Code could be set explicitly, and not through the constructor with the exception
-                if (!string.IsNullOrWhiteSpace(Code) && (InnerException == null || Code != GetErrorCode(InnerException)))
-                    yield return Code;
-
-                var current = InnerException;
-
-                while (current != null)
-                {
-                    yield return GetErrorCode(current);
-                    current = current.InnerException;
-                }
-            }
-        }
-
-        public IEnumerable<string> Path { get; set; }
-
-        public Dictionary<string, object> DataAsDictionary { get; } = new Dictionary<string, object>();
-
-        public override IDictionary Data => DataAsDictionary;
-
+        /// <summary>
+        /// Adds a location to the list of locations that this error applies to.
+        /// </summary>
         public void AddLocation(int line, int column)
         {
             if (_errorLocations == null)
@@ -76,7 +75,7 @@ namespace GraphQL
         private void SetCode(Exception exception)
         {
             if (exception != null)
-                Code = GetErrorCode(exception);
+                Code = ErrorInfoProvider.GetErrorCode(exception);
         }
 
         private void SetData(Exception exception)
@@ -91,53 +90,9 @@ namespace GraphQL
             {
                 foreach (DictionaryEntry keyValuePair in dict)
                 {
-                    var key = keyValuePair.Key.ToString();
-                    var value = keyValuePair.Value;
-                    Data[key] = value;
+                    Data[keyValuePair.Key] = keyValuePair.Value;
                 }
             }
-        }
-
-        private static string GetErrorCode(Exception exception) => _exceptionErrorCodes.GetOrAdd(exception.GetType(), NormalizeErrorCode);
-
-        private static string NormalizeErrorCode(Type exceptionType)
-        {
-            var code = exceptionType.Name;
-
-            if (code.EndsWith(nameof(Exception), StringComparison.InvariantCulture))
-            {
-                code = code.Substring(0, code.Length - nameof(Exception).Length);
-            }
-
-            if (code.StartsWith("GraphQL", StringComparison.InvariantCulture))
-            {
-                code = code.Substring("GraphQL".Length);
-            }
-
-            return GetAllCapsRepresentation(code);
-        }
-
-        private static string GetAllCapsRepresentation(string str)
-        {
-            return Regex
-                .Replace(NormalizeString(str), @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
-                .ToUpperInvariant();
-        }
-
-        private static string NormalizeString(string str)
-        {
-            str = str?.Trim();
-            return string.IsNullOrWhiteSpace(str)
-                ? string.Empty
-                : NormalizeTypeName(str);
-        }
-
-        private static string NormalizeTypeName(string name)
-        {
-            var tickIndex = name.IndexOf('`');
-            return tickIndex >= 0
-                ? name.Substring(0, tickIndex)
-                : name;
         }
     }
 
@@ -160,6 +115,9 @@ namespace GraphQL
 
     public static class ExecutionErrorExtensions
     {
+        /// <summary>
+        /// Adds a location to an <see cref="ExecutionError"/> based on a <see cref="AbstractNode"/> within a <see cref="Document"/>.
+        /// </summary>
         public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
         {
             if (abstractNode == null)

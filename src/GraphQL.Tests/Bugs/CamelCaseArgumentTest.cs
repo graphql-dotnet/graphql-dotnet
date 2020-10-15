@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using GraphQL.Types;
 using Shouldly;
-using System.Collections.Generic;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -11,7 +11,7 @@ namespace GraphQL.Tests.Bugs
         public void get_argument_pascal_to_camel_case()
         {
             var query = "{ query(argumentValue: 42) }";
-            var expectedResult = "{ 'query': 42 }";
+            var expectedResult = @"{ ""query"": 42 }";
             AssertQuery(query, CreateQueryResult(expectedResult), null, null);
         }
 

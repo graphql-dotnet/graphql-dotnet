@@ -1,5 +1,6 @@
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
+using GraphQL.Types;
 using Moq;
 using Shouldly;
 using System;
@@ -26,17 +27,18 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var delayResult = loader.LoadAsync();
 
             await loader.DispatchAsync();
 
-            var result1 = await task;
+            var result1 = await delayResult.GetResultAsync();
 
             result1.ShouldNotBeNull();
             result1.Count().ShouldBe(2);
 
             // Load again. Result should be cached
-            var task2 = loader.LoadAsync();
+            var delayResult2 = loader.LoadAsync();
+            var task2 = delayResult2.GetResultAsync();
 
             task2.Status.ShouldBe(TaskStatus.RanToCompletion);
 
@@ -59,7 +61,7 @@ namespace GraphQL.DataLoader.Tests
             mock.Setup(store => store.GetAllUsersAsync(cts.Token))
                 .Returns(async (CancellationToken ct) =>
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(60000, ct);
                     ct.ThrowIfCancellationRequested();
 
                     return users;
@@ -69,11 +71,11 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
             cts.CancelAfter(TimeSpan.FromMilliseconds(5));
 
-            await loader.DispatchAsync(cts.Token);
+            var task = result.GetResultAsync(cts.Token);
 
             await Should.ThrowAsync<TaskCanceledException>(task);
 
@@ -94,13 +96,11 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
             cts.Cancel();
 
-            await loader.DispatchAsync(cts.Token);
-
-            await Should.ThrowAsync<TaskCanceledException>(task);
+            await Should.ThrowAsync<OperationCanceledException>(() => result.GetResultAsync(cts.Token));
 
             // Fetch delegate should not be called
             mock.VerifyNoOtherCalls();
@@ -122,9 +122,9 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
+            var result = loader.LoadAsync();
 
-            await loader.DispatchAsync();
+            var task = result.GetResultAsync();
 
             var ex = await Should.ThrowAsync<Exception>(task);
 
@@ -143,12 +143,19 @@ namespace GraphQL.DataLoader.Tests
 
             var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
-            var task = loader.LoadAsync();
-            await loader.DispatchAsync();
+            var result = loader.LoadAsync();
 
-            var ex = await Should.ThrowAsync<Exception>(task);
+            var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync());
 
             ex.Message.ShouldBe("Immediate");
+        }
+
+        [Fact]
+        public void GetGraphTypeFromType_Works_With_IDataLoaderResult()
+        {
+            var type = typeof(IDataLoaderResult<int>);
+            var result = type.GetGraphTypeFromType(false);
+            result.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
         }
     }
 }

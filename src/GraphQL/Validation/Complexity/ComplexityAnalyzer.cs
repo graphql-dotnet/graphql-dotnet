@@ -8,36 +8,32 @@ namespace GraphQL.Validation.Complexity
 {
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
-        private class FragmentComplexity
+        private sealed class FragmentComplexity
         {
             public int Depth { get; set; }
             public double Complexity { get; set; }
         }
 
-        private class AnalysisContext
+        private sealed class AnalysisContext
         {
             public ComplexityResult Result { get; } = new ComplexityResult();
             public int LoopCounter { get; set; }
+            public int MaxRecursionCount { get; set; }
             public Dictionary<string, FragmentComplexity> FragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
-        }
 
-        private readonly int _maxRecursionCount;
-
-        /// <summary>
-        /// Creates a new instance of ComplexityAnalyzer
-        /// </summary>
-        /// <param name="maxRecursionCount">
-        /// Max. number of times to traverse tree nodes. GraphiQL queries take ~95 iterations, adjust as needed.
-        /// </param>
-        public ComplexityAnalyzer(int maxRecursionCount = 250)
-        {
-            _maxRecursionCount = maxRecursionCount;
+            public void AssertRecursion()
+            {
+                if (LoopCounter++ > MaxRecursionCount)
+                {
+                    throw new InvalidOperationException("Query is too complex to validate.");
+                }
+            }
         }
 
         public void Validate(Document document, ComplexityConfiguration complexityParameters)
         {
             if (complexityParameters == null) return;
-            var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f);
+            var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f, complexityParameters.MaxRecursionCount);
 
             Analyzed(document, complexityParameters, complexityResult);
 
@@ -63,11 +59,11 @@ namespace GraphQL.Validation.Complexity
         /// <summary>
         /// Analyzes the complexity of a document.
         /// </summary>
-        internal ComplexityResult Analyze(Document doc, double avgImpact = 2.0d)
+        internal ComplexityResult Analyze(Document doc, double avgImpact, int maxRecursionCount)
         {
             if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
-            var context = new AnalysisContext();
+            var context = new AnalysisContext { MaxRecursionCount = maxRecursionCount };
 
             foreach (var node in doc.Children.OfType<FragmentDefinition>())
             {
@@ -81,17 +77,9 @@ namespace GraphQL.Validation.Complexity
             return context.Result;
         }
 
-        private void AssertRecursion(AnalysisContext context)
-        {
-            if (context.LoopCounter++ > _maxRecursionCount)
-            {
-                throw new InvalidOperationException("Query is too complex to validate.");
-            }
-        }
-
         private void FragmentIterator(AnalysisContext context, INode node, FragmentComplexity qDepthComplexity, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
-            AssertRecursion(context);
+            context.AssertRecursion();
 
             if (node.Children != null &&
                 node.Children.Any(
@@ -115,7 +103,7 @@ namespace GraphQL.Validation.Complexity
 
         private void TreeIterator(AnalysisContext context, INode node, double avgImpact, double currentSubSelectionImpact, double currentEndNodeImpact)
         {
-            AssertRecursion(context);
+            context.AssertRecursion();
 
             if (node is FragmentDefinition) return;
 
@@ -147,7 +135,7 @@ namespace GraphQL.Validation.Complexity
         private static double? GetImpactFromArgs(INode node)
         {
             double? newImpact = null;
-            if (!(node.Children.First(n => n is Arguments) is Arguments args)) return null;
+            if (!(node.Children.FirstOrDefault(n => n is Arguments) is Arguments args)) return null;
 
             if (args.ValueFor("id") != null) newImpact = 1;
             else

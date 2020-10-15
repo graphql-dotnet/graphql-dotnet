@@ -1,13 +1,13 @@
+using System;
 using GraphQL.Types;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.Tests.Types
 {
     public class UriGraphTypeTests
     {
-        private UriGraphType uriGraphType = new UriGraphType();
+        private readonly UriGraphType uriGraphType = new UriGraphType();
 
         [Fact]
         public void ParseValue_uriIsAString_ReturnValidUriGraphType() =>

@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AstField = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Instrumentation
@@ -32,7 +32,7 @@ namespace GraphQL.Instrumentation
 
         public FieldStat[] Fields
         {
-            get { return _fields.GetAll(); }
+            get => _fields.GetAll();
             set
             {
                 _fields.Clear();

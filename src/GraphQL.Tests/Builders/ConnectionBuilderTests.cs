@@ -65,18 +65,18 @@ namespace GraphQL.Tests.Builders
                     items { field1 field2 }
                   }
                 }}",
-                @"{ parent: {
-                connection1: {
-                  totalCount: 3,
-                  edges: [
-                    { cursor: '1', node: { field1: 'one', field2: 1 } },
-                    { cursor: '2', node: { field1: 'two', field2: 2 } },
-                    { cursor: '3', node: { field1: 'three', field2: 3 } }
+                @"{ ""parent"": {
+                ""connection1"": {
+                  ""totalCount"": 3,
+                  ""edges"": [
+                    { ""cursor"": ""1"", ""node"": { ""field1"": ""one"", ""field2"": 1 } },
+                    { ""cursor"": ""2"", ""node"": { ""field1"": ""two"", ""field2"": 2 } },
+                    { ""cursor"": ""3"", ""node"": { ""field1"": ""three"", ""field2"": 3 } }
                   ],
-                  items: [
-                    { field1: 'one', field2: 1 },
-                    { field1: 'two', field2: 2 },
-                    { field1: 'three', field2: 3 }
+                  ""items"": [
+                    { ""field1"": ""one"", ""field2"": 1 },
+                    { ""field1"": ""two"", ""field2"": 2 },
+                    { ""field1"": ""three"", ""field2"": 3 }
                   ]
                 } } }");
         }
@@ -92,20 +92,20 @@ namespace GraphQL.Tests.Builders
                     edges { cursor node { field1 field2 } }
                     items { field1 field2 }
                   } }}",
-                @"{ parent: {
-                connection2: {
-                  totalCount: 3,
-                  pageInfo: {
-                    hasNextPage: true,
-                    hasPreviousPage: true,
-                    startCursor: '2',
-                    endCursor: '2',
+                @"{ ""parent"": {
+                ""connection2"": {
+                  ""totalCount"": 3,
+                  ""pageInfo"": {
+                    ""hasNextPage"": true,
+                    ""hasPreviousPage"": true,
+                    ""startCursor"": ""2"",
+                    ""endCursor"": ""2""
                   },
-                  edges: [
-                    { cursor: '2', node: { field1: 'TWO', field2: 22 } }
+                  ""edges"": [
+                    { ""cursor"": ""2"", ""node"": { ""field1"": ""TWO"", ""field2"": 22 } }
                   ],
-                  items: [
-                    { field1: 'TWO', field2: 22 }
+                  ""items"": [
+                    { ""field1"": ""TWO"", ""field2"": 22 }
                   ]
                 } } }");
         }

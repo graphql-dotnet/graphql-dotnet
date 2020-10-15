@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Utilities.Federation;
 using Xunit;
-using Newtonsoft.Json.Linq;
 
 namespace GraphQL.Tests.Utilities
 {
@@ -38,8 +41,7 @@ type User @key(fields: ""id"") {
   username: String!
 }
 ";
-
-            var expected = $@"{{ '_service': {{ 'sdl' : '{sdl}' }}}}";
+            var expected = @"{ ""_service"": { ""sdl"" : """ + JsonEncodedText.Encode(sdl) + @""" } }";
 
             AssertQuery(_ =>
             {
@@ -75,8 +77,8 @@ type User @key(fields: ""id"") {
                     }
                 }";
 
-            var variables = "{ '_representations': [{ '__typename': 'User', 'id': '123' }] }";
-            var expected = @"{ '_entities': [{ '__typename': 'User', 'id' : '123', 'username': 'Quinn' }] }";
+            var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123"", ""username"": ""Quinn"" }] }";
 
             AssertQuery(_ =>
             {
@@ -107,13 +109,77 @@ type User @key(fields: ""id"") {
 
             var query = "{ __schema { types { name kind possibleTypes { name } } } }";
 
-            var data = JObject.FromObject(Executer.ExecuteAsync(_ =>
+            var executionResult = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Builder.Build(definitions);
                 _.Query = query;
-            }).Result.Data).SelectToken("$.__schema.types[?(@.name == '_Entity')].possibleTypes..name");
+            }).GetAwaiter().GetResult();
+
+            var data = (Dictionary<string, object>)executionResult.Data;
+            var schema = (Dictionary<string, object>)data["__schema"];
+            var types = (List<object>)schema["types"];
+            var entityType = (Dictionary<string, object>)types.Single(t => (string)((Dictionary<string, object>)t)["name"] == "_Entity");
+            var possibleTypes = (List<object>)entityType["possibleTypes"];
+            var possibleType = (Dictionary<string, object>)possibleTypes[0];
+            var name = (string)possibleType["name"];
             
-            Assert.Equal("User", data.ToString());
+            Assert.Equal("User", name);
+        }
+
+        [Fact]
+        public void resolve_reference_is_not_trying_to_await_for_each_field_individialy_and_plays_well_with_dataloader_issue_1565()
+        {
+            var definitions = @"
+                extend type Query {
+                    user(id: ID!): User
+                }
+                type User @key(fields: ""id"") {
+                    id: ID!
+                    username: String!
+                }
+            ";
+
+            var users = new List<User> {
+                new User { Id = "1", Username = "One" },
+                new User { Id = "2", Username = "Two" },
+            };
+
+
+            var accessor = new DataLoaderContextAccessor
+            {
+                Context = new DataLoaderContext()
+            };
+            var listener = new DataLoaderDocumentListener(accessor);
+
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => {
+                var id = ctx.Arguments["id"].ToString();
+                // return Task.FromResult(users.FirstOrDefault(user => user.Id == id));
+                var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids => {
+                    var results = users.Where(user => ids.Contains(user.Id));
+                    return Task.FromResult((IDictionary<string, User>)results.ToDictionary(c => c.Id));
+                });
+                return Task.FromResult(loader.LoadAsync(id));
+            });
+
+            var query = @"
+                {
+                    _entities(representations: [{__typename: ""User"", id: ""1"" }, {__typename: ""User"", id: ""2"" }]) {
+                        ... on User {
+                            id
+                            username
+                        }
+                    }
+                }";
+
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""1"", ""username"": ""One"" }, { ""__typename"": ""User"", ""id"" : ""2"", ""username"": ""Two"" }] }";
+
+            AssertQuery(_ =>
+            {
+                _.Definitions = definitions;
+                _.Query = query;
+                _.ExpectedResult = expected;
+                _.Listeners.Add(listener);
+            });
         }
     }
 }

@@ -11,104 +11,6 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaPrinterTests
     {
-        private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
-        {
-            {
-                "BigInt",
-                "scalar BigInt"
-            },
-            {
-                "Boolean",
-                "scalar Boolean"
-            },
-            {
-                "Byte",
-                "scalar Byte"
-            },
-            {
-                "Date",
-@"# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date"
-            },
-            {
-                "DateTime",
-@"# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime"
-            },
-            {
-                "DateTimeOffset",
-@"# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset"
-            },
-            {
-                "Decimal",
-                "scalar Decimal"
-            },
-            {
-                "Float",
-                "scalar Float"
-            },
-            {
-                "ID",
-                "scalar ID"
-            },
-            {
-                "Int",
-                "scalar Int"
-            },
-            {
-                "Milliseconds",
-@"# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds"
-            },
-            {
-                "SByte",
-                "scalar SByte"
-            },
-            {
-                "Seconds",
-@"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds"
-            },
-            {
-                "Uri",
-                "scalar Uri"
-            },
-            {
-                "Guid",
-                "scalar Guid"
-            },
-            {
-                "Long",
-                "scalar Long"
-            },
-            {
-                "Short",
-                "scalar Short"
-            },
-            {
-                "String",
-                "scalar String"
-            },
-            {
-                "UShort",
-                "scalar UShort"
-            },
-            {
-                "UInt",
-                "scalar UInt"
-            },
-            {
-                "ULong",
-                "scalar ULong"
-            }
-        };
-
         private string printSingleFieldSchema<T>(
             IEnumerable<QueryArgument> arguments = null)
             where T : GraphType
@@ -165,9 +67,7 @@ scalar Seconds"
             }
             else
             {
-                var orderedScalars = built_in_scalars
-                    .ToDictionary(x => x.Key, x => x.Value)
-                    .Union(expected)
+                var orderedScalars = expected
                     .OrderBy(x => x.Key, StringComparer.Ordinal)
                     .Select(x => x.Value);
                 exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
@@ -486,67 +386,15 @@ type Bar implements IFoo {
   str: String
 }
 
-scalar BigInt
-
-scalar Boolean
-
-scalar Byte
-
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Float
-
-scalar Guid
-
-scalar ID
-
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
 
-scalar Int
-
-scalar Long
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
-
 type Root {
   bar: Bar
 }
-
-scalar SByte
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
-
-scalar Short
-
-scalar String
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 ", excludeScalars: true);
         }
 
@@ -573,67 +421,15 @@ type Bar implements IFoo & Baaz {
   int: Int
 }
 
-scalar BigInt
-
-scalar Boolean
-
-scalar Byte
-
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Float
-
-scalar Guid
-
-scalar ID
-
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
 
-scalar Int
-
-scalar Long
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
-
 type Query {
   bar: Bar
 }
-
-scalar SByte
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
-
-scalar Short
-
-scalar String
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 ", excludeScalars: true);
         }
 
@@ -731,30 +527,6 @@ type Bar implements IFoo {
   str: String
 }
 
-scalar BigInt
-
-scalar Boolean
-
-scalar Byte
-
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Float
-
 # This is a Foo object type
 type Foo {
   # This is of type String
@@ -763,22 +535,11 @@ type Foo {
   int: Int
 }
 
-scalar Guid
-
-scalar ID
-
 # This is a Foo interface type
 interface IFoo {
   # This is of type String
   str: String
 }
-
-scalar Int
-
-scalar Long
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
 
 union MultipleUnion = Foo | Bar
 
@@ -787,24 +548,7 @@ type Query {
   multiple: MultipleUnion
 }
 
-scalar SByte
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
-
-scalar Short
-
 union SingleUnion = Foo
-
-scalar String
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 ", excludeScalars: true);
         }
 
@@ -858,6 +602,98 @@ scalar Uri
         }
 
         [Fact]
+        public void prints_builtin_scalars()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BigIntGraphType>("bigint");
+            root.Field<ByteGraphType>("byte");
+            root.Field<DateGraphType>("date");
+            root.Field<DateTimeGraphType>("datetime");
+            root.Field<DateTimeOffsetGraphType>("datetimeoffset");
+            root.Field<DecimalGraphType>("decimal");
+            root.Field<GuidGraphType>("guid");
+            root.Field<LongGraphType>("long");
+            root.Field<TimeSpanMillisecondsGraphType>("milliseconds");
+            root.Field<SByteGraphType>("sbyte");
+            root.Field<TimeSpanSecondsGraphType>("seconds");
+            root.Field<ShortGraphType>("short");
+            root.Field<UIntGraphType>("uint");
+            root.Field<ULongGraphType>("ulong");
+            root.Field<UShortGraphType>("ushort");
+            root.Field<UriGraphType>("uri");
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"scalar BigInt
+
+scalar Byte
+
+# The `Date` scalar type represents a year, month and day in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
+scalar Decimal
+
+scalar Guid
+
+scalar Long
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
+type Query {
+  bigint: BigInt
+  byte: Byte
+  date: Date
+  datetime: DateTime
+  datetimeoffset: DateTimeOffset
+  decimal: Decimal
+  guid: Guid
+  long: Long
+  milliseconds: Milliseconds
+  sbyte: SByte
+  seconds: Seconds
+  short: Short
+  uint: UInt
+  ulong: ULong
+  ushort: UShort
+  uri: Uri
+}
+
+scalar SByte
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
+
+scalar Uri"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_enum()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -871,6 +707,44 @@ scalar Uri
                     "Query",
 @"type Query {
   rgb: RGB
+}"
+                },
+                {
+                    "RGB",
+@"enum RGB {
+  RED
+  GREEN
+  BLUE
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_enum_default_args()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            
+            var f = new FieldType
+            {
+                Name = "bestColor",
+                Arguments = new QueryArguments(new QueryArgument<RgbEnum>
+                {
+                    Name = "color",
+                    DefaultValue = "RED"
+                }),
+                Type = typeof(RgbEnum)
+            };
+            root.AddField(f);
+            var schema = new Schema { Query = root };
+            schema.RegisterType<RgbEnum>();
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"type Query {
+  bestColor(color: RGB = RED): RGB
 }"
                 },
                 {
@@ -993,6 +867,7 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  description: String
   # A list of all types supported by this server.
   types: [__Type!]!
   # The type that query operations will be rooted at.
@@ -1147,20 +1022,9 @@ enum __TypeKind {
                 Name = "Odd";
             }
 
-            public override object Serialize(object value)
-            {
-                return null;
-            }
+            public override object ParseValue(object value) => null;
 
-            public override object ParseValue(object value)
-            {
-                return null;
-            }
-
-            public override object ParseLiteral(IValue value)
-            {
-                return null;
-            }
+            public override object ParseLiteral(IValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

@@ -1,27 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
-  
+
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Files\*.graphql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Introspection\IntrospectionResult.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Dummy\GraphQL.Dummy.csproj" />
-    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
-    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
   </ItemGroup>
 
 </Project>

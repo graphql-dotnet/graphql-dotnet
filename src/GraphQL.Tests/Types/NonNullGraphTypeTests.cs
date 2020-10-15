@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -12,7 +13,7 @@ namespace GraphQL.Tests.Types
         {
             AssertQuerySuccess(
                 "{ nullable { a b c } }",
-                "{ nullable: { a: 99, b: true, c: 'Hello world' } }",
+                @"{ ""nullable"": { ""a"": 99, ""b"": true, ""c"": ""Hello world"" } }",
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
@@ -20,8 +21,8 @@ namespace GraphQL.Tests.Types
         public void nullable_fields_without_values_never_complain()
         {
             AssertQuerySuccess(
-                "{ nullable { a b c } }",
-                "{ nullable: { a: null, b: null, c: null } }",
+                @"{ nullable { a b c } }",
+                @"{ ""nullable"": { ""a"": null, ""b"": null, ""c"": null } }",
                 root: new ExampleContext(null, null, null));
         }
 
@@ -30,7 +31,7 @@ namespace GraphQL.Tests.Types
         {
             AssertQuerySuccess(
                 "{ nonNullable { a b c } }",
-                "{ nonNullable: { a: 99, b: true, c: 'Hello world' } }",
+                @"{ ""nonNullable"": { ""a"": 99, ""b"": true, ""c"": ""Hello world"" } }",
                 root: new ExampleContext(99, true, "Hello world"));
         }
 
@@ -39,14 +40,23 @@ namespace GraphQL.Tests.Types
         {
             var result = AssertQueryWithErrors(
                 "{ nonNullable { a b c } }",
-                "{ nonNullable: null }",
+                @"{ ""nonNullable"": null }",
                 root: new ExampleContext(null, null, null),
                 expectedErrorCount: 3);
 
             var errors = result.Errors.ToArray();
-            errors[0].Message.ShouldBe("Cannot return null for non-null type. Field: a, Type: Int!.");
-            errors[1].Message.ShouldBe("Cannot return null for non-null type. Field: b, Type: Boolean!.");
-            errors[2].Message.ShouldBe("Cannot return null for non-null type. Field: c, Type: String!.");
+            errors[0].Message.ShouldBe("Error trying to resolve field 'a'.");
+            errors[0].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: a, Type: Int!.");
+            errors[1].Message.ShouldBe("Error trying to resolve field 'b'.");
+            errors[1].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: b, Type: Boolean!.");
+            errors[2].Message.ShouldBe("Error trying to resolve field 'c'.");
+            errors[2].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: c, Type: String!.");
+        }
+
+        [Fact]
+        public void NonNull_Wrapped_With_NonNull_Should_Throw()
+        {
+             Should.Throw<ArgumentException>(() => new NonNullGraphType(new NonNullGraphType(new StringGraphType()))).ParamName.ShouldBe("type");
         }
     }
 
@@ -69,7 +79,8 @@ namespace GraphQL.Tests.Types
     public class NullableSchema : Schema
     {
         public NullableSchema()
-        {   var query = new ObjectGraphType();
+        {
+            var query = new ObjectGraphType();
 
             query.Field<NullableSchemaType>("nullable",
                 resolve: c => new NullableSchemaType { Data = c.Source as ExampleContext });
@@ -96,7 +107,6 @@ namespace GraphQL.Tests.Types
     {
         public NonNullableSchemaType()
         {
-
             Field<NonNullGraphType<IntGraphType>>("a", resolve: _ => _.Source.Data.A);
             Field<NonNullGraphType<BooleanGraphType>>("b", resolve: _ => _.Source.Data.B);
             Field<NonNullGraphType<StringGraphType>>("c", resolve: _ => _.Source.Data.C);

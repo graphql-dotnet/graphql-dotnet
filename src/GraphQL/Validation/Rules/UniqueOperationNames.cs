@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,9 +13,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueOperationNames : IValidationRule
     {
-        public Func<string, string> DuplicateOperationNameMessage => opName =>
-            $"There can only be one operation named {opName}.";
-
         public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -37,12 +35,7 @@ namespace GraphQL.Validation.Rules
 
                         if (!frequency.Add(op.Name))
                         {
-                            var error = new ValidationError(
-                                context.OriginalQuery,
-                                "5.1.1.1",
-                                DuplicateOperationNameMessage(op.Name),
-                                op);
-                            context.ReportError(error);
+                            context.ReportError(new UniqueOperationNamesError(context, op));
                         }
                     });
             }).ToTask();

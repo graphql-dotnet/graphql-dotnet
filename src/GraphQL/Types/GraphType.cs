@@ -1,7 +1,7 @@
-using GraphQL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -99,7 +99,7 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// This sucks, find a better way
+    /// TODO: This sucks, find a better way
     /// </summary>
     public class TypeCollectionContext
     {

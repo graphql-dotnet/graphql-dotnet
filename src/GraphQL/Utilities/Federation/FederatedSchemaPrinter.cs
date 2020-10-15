@@ -25,7 +25,7 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private CoreToVanillaConverter _converter;
+        private readonly CoreToVanillaConverter _converter;
 
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)
@@ -41,12 +41,12 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
-            var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return "";
+            var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
+            if (astDirectives == null) return "";
 
             var dirs = string.Join(
                 " ",
-                ast.Directives
+                astDirectives
                     .Where(x => IsFederatedDirective(x.Name.Value))
                     .Select(PrintAstDirective)
             );
@@ -64,7 +64,6 @@ namespace GraphQL.Utilities.Federation
         {
             var isExtension = type.IsExtensionType();
 
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
             var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
             var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
@@ -75,7 +74,7 @@ namespace GraphQL.Utilities.Federation
 
             var extended = isExtension ? "extend " : "";
 
-            return description + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
+            return FormatDescription(type.Description) + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
         }
 
         public override string PrintInterface(IInterfaceGraphType type)
@@ -83,8 +82,7 @@ namespace GraphQL.Utilities.Federation
             var isExtension = type.IsExtensionType();
             var extended = isExtension ? "extend " : "";
 
-            var description = Options.IncludeDescriptions ? PrintDescription(type.Description) : "";
-            return description + "{1}interface {2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, PrintFields(type));
+            return FormatDescription(type.Description) + "{1}interface {2} {{{0}{3}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, PrintFields(type));
         }
 
         public override string PrintFields(IComplexGraphType type)
@@ -97,7 +95,7 @@ namespace GraphQL.Utilities.Federation
                     x.Name,
                     Type = ResolveName(x.ResolvedType),
                     Args = PrintArgs(x),
-                    Description = Options.IncludeDescriptions ? PrintDescription(x.Description, "  ") : string.Empty,
+                    Description = FormatDescription(x.Description, "  "),
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : string.Empty,
                     FederatedDirectives = PrintFederatedDirectivesFromAst(x)
                 }).ToList();

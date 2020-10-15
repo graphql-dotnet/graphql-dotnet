@@ -15,15 +15,9 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<T> Subscribe(IResolveEventStreamContext context)
-        {
-            return _subscriber(context);
-        }
+        public IObservable<T> Subscribe(IResolveEventStreamContext context) => _subscriber(context);
 
-        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }
 
     public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
@@ -36,15 +30,9 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<TReturnType> Subscribe(IResolveEventStreamContext context)
-        {
-            return _subscriber(context.As<TSourceType>());
-        }
+        public IObservable<TReturnType> Subscribe(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
 
-        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context)
-        {
-            return (IObservable<object>)Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }
 
     public class EventStreamResolver : IEventStreamResolver
@@ -61,14 +49,11 @@ namespace GraphQL.Resolvers
         public IObservable<object> Subscribe(IResolveEventStreamContext context)
         {
             var parameters = _accessor.Parameters;
-            var arguments = ReflectionHelper.BuildArguments(parameters, context);
-            var target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
+            object[] arguments = ReflectionHelper.BuildArguments(parameters, context);
+            object target = _serviceProvider.GetRequiredService(_accessor.DeclaringType);
             return (IObservable<object>)_accessor.GetValue(target, arguments);
         }
 
-        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context)
-        {
-            return Subscribe(context);
-        }
+        IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => Subscribe(context);
     }
 }

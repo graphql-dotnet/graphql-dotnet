@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,11 +13,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueDirectivesPerLocation : IValidationRule
     {
-        public string DuplicateDirectiveMessage(string directiveName)
-        {
-            return $"The directive \"{directiveName}\" can only be used once at this location.";
-        }
-
         public static readonly UniqueDirectivesPerLocation Instance = new UniqueDirectivesPerLocation();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -49,14 +45,7 @@ namespace GraphQL.Validation.Rules
             {
                 if (knownDirectives.ContainsKey(directive.Name))
                 {
-                    var error = new ValidationError(
-                        context.OriginalQuery,
-                        "5.6.3",
-                        DuplicateDirectiveMessage(directive.Name),
-                        knownDirectives[directive.Name],
-                        directive);
-
-                    context.ReportError(error);
+                    context.ReportError(new UniqueDirectivesPerLocationError(context, knownDirectives[directive.Name], directive));
                 }
                 else
                 {

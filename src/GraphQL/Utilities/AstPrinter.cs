@@ -15,11 +15,11 @@ namespace GraphQL.Utilities
         // was killing the performance of introspection queries (20-30% of the call time)
         // because of continually re-running its constructor lambdas
         // so we cache one copy of it here - it's not changed ever anyway
-        private static readonly AstPrintVisitor Visitor = new AstPrintVisitor();
+        private static readonly AstPrintVisitor _visitor = new AstPrintVisitor();
 
         public static string Print(INode node)
         {
-            var result = Visitor.Visit(node);
+            var result = _visitor.Visit(node);
             return result?.ToString() ?? string.Empty;
         }
     }
@@ -35,7 +35,7 @@ namespace GraphQL.Utilities
         {
             if (FieldsList.Exists(x => x.Name == field.Name))
             {
-                throw new ExecutionError($"A field with name \"{field.Name}\" already exists!");
+                throw new ArgumentException($"A field with name \"{field.Name}\" already exists!", nameof(field));
             }
 
             FieldsList.Add(field);
@@ -307,6 +307,16 @@ namespace GraphQL.Utilities
                 c.Print(f =>
                 {
                     var val = (double)f.Arg(x => x.Value);
+                    return val.ToString("0.0##############", CultureInfo.InvariantCulture);
+                });
+            });
+
+            Config<DecimalValue>(c =>
+            {
+                c.Field(x => x.Value);
+                c.Print(f =>
+                {
+                    var val = (decimal)f.Arg(x => x.Value);
                     return val.ToString("0.0##############", CultureInfo.InvariantCulture);
                 });
             });

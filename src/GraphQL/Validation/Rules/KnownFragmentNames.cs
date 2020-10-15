@@ -1,5 +1,6 @@
-using GraphQL.Language.AST;
 using System.Threading.Tasks;
+using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -11,11 +12,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class KnownFragmentNames : IValidationRule
     {
-        public string UnknownFragmentMessage(string fragName)
-        {
-            return $"Unknown fragment \"{fragName}\".";
-        }
-
         public static readonly KnownFragmentNames Instance = new KnownFragmentNames();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -28,8 +24,7 @@ namespace GraphQL.Validation.Rules
                     var fragment = context.GetFragment(fragmentName);
                     if (fragment == null)
                     {
-                        var error = new ValidationError(context.OriginalQuery, "5.4.2.1", UnknownFragmentMessage(fragmentName), node);
-                        context.ReportError(error);
+                        context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
                     }
                 });
             }).ToTask();

@@ -52,10 +52,7 @@ namespace GraphQL.StarWars.IoC
             Register(() => lazy.Value);
         }
 
-        public T Get<T>()
-        {
-            return (T)Get(typeof(T));
-        }
+        public T Get<T>() => (T)Get(typeof(T));
 
         public object Get(Type serviceType)
         {

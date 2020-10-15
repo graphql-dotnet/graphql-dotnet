@@ -10,24 +10,18 @@ namespace GraphQL.Builders
     {
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
             where TNodeType : IGraphType
-        {
-            return ConnectionBuilder<TSourceType>.Create<TNodeType>();
-        }
+            => ConnectionBuilder<TSourceType>.Create<TNodeType>();
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
-        {
-            return ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
-        }
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-        {
-            return ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
-        }
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
     }
 
     public class ConnectionBuilder<TSourceType>
@@ -53,17 +47,12 @@ namespace GraphQL.Builders
         }
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
-            where TNodeType : IGraphType
-        {
-            return Create<TNodeType, EdgeType<TNodeType>>(name);
-        }
+            where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
-        {
-            return Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
-        }
+            => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
 
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
             where TNodeType : IGraphType
@@ -201,10 +190,6 @@ namespace GraphQL.Builders
             if (args.IsUnidirectional && args.Last.HasValue)
             {
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
-            }
-            if (args.IsPartial && args.NumberOfSkippedEntries.HasValue)
-            {
-                throw new ArgumentException("Cannot specify `numberOfSkippedEntries` with partial connection resolvers.");
             }
         }
     }

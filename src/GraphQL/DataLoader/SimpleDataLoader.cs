@@ -4,48 +4,67 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class SimpleDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
+    /// <summary>
+    /// Provides an IDataLoader that always returns the same data
+    /// </summary>
+    /// <typeparam name="T">The type of data that is returned</typeparam>
+    public class SimpleDataLoader<T> : IDataLoader, IDataLoader<T>, IDataLoaderResult<T>
     {
-        private readonly object _lock = new object();
-        private readonly Func<CancellationToken, Task<T>> _loader;
+        private readonly Func<CancellationToken, Task<T>> _fetchDelegate;
+        private Task<T> _result;
 
-        private Task<T> _cachedTask;
-
-        public SimpleDataLoader(Func<CancellationToken, Task<T>> loader)
+        /// <summary>
+        /// Initializes a new SimpleDataLoader with the given fetch delegate
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that accepts a cancellation token and returns data</param>
+        public SimpleDataLoader(Func<CancellationToken, Task<T>> fetchDelegate)
         {
-            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            _fetchDelegate = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
         }
 
-        public Task<T> LoadAsync()
-        {
-            // Return the cached task if we have one
-            if (_cachedTask != null)
-                return _cachedTask;
+        /// <summary>
+        /// Asynchronously executes the fetch delegate if it has not already been run
+        /// </summary>
+        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
+        public Task DispatchAsync(CancellationToken cancellationToken = default) => GetResultAsync(cancellationToken);
 
-            lock (_lock)
+        /// <summary>
+        /// Asynchronously executes the fetch delegate if it has not already been run, then returns the data
+        /// </summary>
+        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
+        public Task<T> GetResultAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (_result != null)
+                return _result;
+
+            lock (this)
             {
-                return _cachedTask ?? DataLoaded;
+                if (_result != null)
+                    return _result;
+
+                try
+                {
+                    return (_result = _fetchDelegate(cancellationToken));
+                }
+                catch (Exception ex)
+                {
+                    _result = Task.FromException<T>(ex);
+                    throw;
+                }
             }
         }
 
-        protected override bool IsFetchNeeded()
-        {
-            lock (_lock)
-            {
-                // No need to re-fetch if we have a cached task
-                return _cachedTask == null;
-            }
-        }
+        /// <summary>
+        /// Asynchronously load data
+        /// </summary>
+        /// <returns>
+        /// An object representing a pending operation.
+        /// </returns>
+        public IDataLoaderResult<T> LoadAsync() => this;
 
-        protected override Task<T> FetchAsync(CancellationToken cancellationToken)
-        {
-            lock (_lock)
-            {
-                // Cache the task
-                _cachedTask = _loader(cancellationToken);
-            }
-
-            return _cachedTask;
-        }
+        async Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken)
+            => await GetResultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -17,37 +18,6 @@ namespace GraphQL.Validation.Rules
     public class FieldsOnCorrectType : IValidationRule
     {
         public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
-
-        public string UndefinedFieldMessage(
-            string fieldName,
-            string type,
-            IEnumerable<string> suggestedTypeNames,
-            IEnumerable<string> suggestedFieldNames)
-        {
-            var message = $"Cannot query field \"{fieldName}\" on type \"{type}\".";
-
-            if (suggestedTypeNames != null)
-            {
-                var suggestedTypeNamesList = suggestedTypeNames.ToList();
-                if (suggestedTypeNamesList.Count > 0)
-                {
-                    var suggestions = StringUtils.QuotedOrList(suggestedTypeNamesList);
-                    message += $" Did you mean to use an inline fragment on {suggestions}?";
-                    return message;
-                }
-            }
-
-            if (suggestedFieldNames != null)
-            {
-                var suggestedFieldNamesList = suggestedFieldNames.ToList();
-                if (suggestedFieldNamesList.Count > 0)
-                {
-                    message += $" Did you mean {StringUtils.QuotedOrList(suggestedFieldNamesList)}?";
-                }
-            }
-
-            return message;
-        }
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
@@ -74,12 +44,7 @@ namespace GraphQL.Validation.Rules
                                 : GetSuggestedFieldNames(type, fieldName);
 
                             // Report an error, including helpful suggestions.
-                            context.ReportError(new ValidationError(
-                                context.OriginalQuery,
-                                "5.2.1",
-                                UndefinedFieldMessage(fieldName, type.Name, suggestedTypeNames, suggestedFieldNames),
-                                node
-                                ));
+                            context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
                         }
                     }
                 });
