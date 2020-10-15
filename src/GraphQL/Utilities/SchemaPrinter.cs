@@ -8,10 +8,18 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
+    /// <summary>
+    /// Enables printing schema as SDL (Schema Definition Language) document - http://spec.graphql.org/June2018/#sec-Type-System
+    /// </summary>
     public class SchemaPrinter
     {
         protected SchemaPrinterOptions Options { get; }
 
+        /// <summary>
+        /// Creates printer with specified options.
+        /// </summary>
+        /// <param name="schema"> Schema to print. </param>
+        /// <param name="options"> Printer options. </param>
         public SchemaPrinter(
             ISchema schema,
             SchemaPrinterOptions options = null)
@@ -22,6 +30,10 @@ namespace GraphQL.Utilities
 
         private ISchema Schema { get; set; }
 
+        /// <summary>
+        /// Print schema.
+        /// </summary>
+        /// <returns> SDL document. </returns>
         public string Print()
         {
             return PrintFilteredSchema(n => !n.IsBuiltInDirective(), IsDefinedType);
@@ -165,6 +177,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
+        //TODO: print deprecationreason for enumvalue
         public string PrintEnum(EnumerationGraphType type)
         {
             var values = string.Join(Environment.NewLine, type.Values.Select(x => "  " + x.Name));
@@ -233,10 +246,7 @@ namespace GraphQL.Utilities
         public string PrintDirective(DirectiveGraphType directive)
         {
             var builder = new StringBuilder();
-            if (Options.IncludeDescriptions)
-            {
-                builder.Append(PrintDescription(directive.Description));
-            }
+            builder.Append(FormatDescription(directive.Description));
             builder.AppendLine($"directive @{directive.Name}(");
             builder.AppendLine(FormatDirectiveArguments(directive.Arguments));
             builder.Append($") on {FormatDirectiveLocationList(directive.Locations)}");
