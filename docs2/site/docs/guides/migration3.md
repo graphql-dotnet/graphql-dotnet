@@ -351,7 +351,7 @@ public class OrderType : ObjectGraphType<Order>
 
 If you need to process the data loader result before it is returned, additional refactoring will need to be done.
 The data loader also now supports chained data loaders, and asynchronous code prior to queuing the data loader. See
-[Data loader documentation](https://graphql-dotnet.github.io/docs/getting-started/dataloader) for more details.
+[Data loader documentation](https://graphql-dotnet.github.io/docs/guides/dataloader) for more details.
 
 ### DateGraphType parsing changes
 
