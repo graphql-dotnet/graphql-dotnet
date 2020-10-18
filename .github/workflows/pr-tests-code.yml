@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
+        env:
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
