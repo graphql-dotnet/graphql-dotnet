@@ -26,7 +26,8 @@ jobs:
         working-directory: src
         run: dotnet restore
         env:
-          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+          DOTNET_NOLOGO: true
+          DOTNET_CLI_TELEMETRY_OPTOUT: true
       - name: Build solution (release config)
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
