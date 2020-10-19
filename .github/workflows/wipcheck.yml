@@ -4,7 +4,7 @@ on:
   pull_request:
     types: 
       - opened        # when PR is opened
-      - edited        # when PR title is edited
+      - edited        # when PR is edited
       - synchronize   # when code is added
       - reopened      # when a closed PR is reopened
 

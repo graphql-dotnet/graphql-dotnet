@@ -46,6 +46,9 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
+        env:
+          DOTNET_NOLOGO: true
+          DOTNET_CLI_TELEMETRY_OPTOUT: true
       - name: Build solution (release config)
         working-directory: src
         run: dotnet build --no-restore -c Release -p:NoWarn=CS1591 -p:VersionSuffix=$GITHUB_RUN_NUMBER
