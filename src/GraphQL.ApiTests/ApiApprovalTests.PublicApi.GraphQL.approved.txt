@@ -2526,11 +2526,6 @@ namespace GraphQL.Utilities
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }
     }
-    public static class ServiceProviderExtensions
-    {
-        public static object GetRequiredService(this System.IServiceProvider provider, System.Type serviceType) { }
-        public static T GetRequiredService<T>(this System.IServiceProvider provider) { }
-    }
     public static class StringUtils
     {
         public static string Capitalize(string str) { }
