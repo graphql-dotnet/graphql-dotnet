@@ -4,11 +4,10 @@ on:
   push:
     branches:
       - master
-      - publish_workflow
-#    paths:
-#      - docs2/**
-#      - package.json
-#      - yarn.lock
+    paths:
+      - docs2/**
+      - package.json
+      - yarn.lock
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
@@ -37,11 +36,11 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
-      - uses: seanmiddleditch/gha-publish-to-git@v2
+      - name: Deploy documentation
+        uses: seanmiddleditch/gha-publish-to-git@v2
         with:
           repository: graphql-dotnet/graphql-dotnet.github.io
           branch: master
           github_token: '${{ secrets.GITHUB_TOKEN  }}'
           github_pat: '${{ secrets.ORG_PAT_TOKEN }}'
           source_folder: docs2/public
-          dry_run: yes
