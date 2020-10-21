@@ -83,7 +83,7 @@ namespace GraphQL.Types
                    }
                    ctx.AddType(trimmed, type, null);
                });
-            
+
             // Add introspection types. Note that introspection types rely on the
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
             NameConverter = CamelCaseNameConverter.Instance;
@@ -112,13 +112,36 @@ namespace GraphQL.Types
         {
             var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
-            var ctx = new TypeCollectionContext(t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
-            {
-                if (lookup[name] == null)
+            var ctx = new TypeCollectionContext(
+                resolver: t =>
                 {
-                    lookup.AddType(graphType, context);
-                }
-            });
+                    if (_builtInScalars.TryGetValue(t, out var graphType))
+                    {
+                        return graphType;
+                    }
+
+                    graphType = resolveType(t);
+                    if (graphType != null)
+                    {
+                        return graphType;
+                    }
+
+                    if (t.IsGenericType &&
+                        t.GetGenericTypeDefinition() == typeof(EnumerationGraphType<>))
+                    {
+                        var constructor = t.GetConstructor(new Type[]{});
+                        return (IGraphType) constructor.Invoke(null);
+                    }
+
+                    throw new InvalidOperationException($"Could not resolve a GraphType for '{t.FullName}'.");
+                },
+                addType: (name, graphType, context) =>
+                {
+                    if (lookup[name] == null)
+                    {
+                        lookup.AddType(graphType, context);
+                    }
+                });
 
             foreach (var type in types)
             {
@@ -170,7 +193,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Removes all discovered types from lookup. 
+        /// Removes all discovered types from lookup.
         /// </summary>
         public void Clear() => Clear(false);
 

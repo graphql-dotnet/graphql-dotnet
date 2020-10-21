@@ -8,6 +8,19 @@ namespace GraphQL.Tests.Utilities
 {
     public class GetGraphTypeFromTypeTests
     {
+        public enum AutoDetectEnum
+        {
+            Grumpy = 0,
+            Happy = 1,
+            Sleepy = 2,
+        }
+
+        [Fact]
+        public void supports_enum_autoDetection()
+        {
+            typeof(AutoDetectEnum).GetGraphTypeFromType(false).ShouldBe(typeof(DecimalGraphType));
+        }
+
         [Fact]
         public void supports_decimal_type()
         {

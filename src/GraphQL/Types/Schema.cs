@@ -311,7 +311,7 @@ namespace GraphQL.Types
             return GraphTypesLookup.Create(
                 types,
                 _directives,
-                type => (IGraphType)_services.GetRequiredService(type),
+                type => (IGraphType)_services.GetService(type),
                 NameConverter,
                 seal: true);
         }
