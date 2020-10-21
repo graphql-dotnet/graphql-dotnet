@@ -126,14 +126,13 @@ namespace GraphQL.Types
                         return graphType;
                     }
 
-                    if (t.IsGenericType &&
-                        t.GetGenericTypeDefinition() == typeof(EnumerationGraphType<>))
+                    var constructor = t.GetConstructor(new Type[]{});
+                    if (constructor != null)
                     {
-                        var constructor = t.GetConstructor(new Type[]{});
                         return (IGraphType) constructor.Invoke(null);
                     }
 
-                    throw new InvalidOperationException($"Could not resolve a GraphType for '{t.FullName}'.");
+                    throw new InvalidOperationException($"Could not resolve a GraphType for '{t.FullName}'. Tried resolving from service provider and searched for a public empty constructor.");
                 },
                 addType: (name, graphType, context) =>
                 {

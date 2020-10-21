@@ -7,13 +7,13 @@ using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
-    public class AutoDetectEnumGraph
+    public class AutoDetectEmptyConstructorGraph
     {
         [Fact]
-        public async Task Simple_Enum()
+        public async Task Simple()
         {
             var collection = new ServiceCollection();
-            collection.AddSingleton<ISchema, AutoDetectEnumGraphSchema>();
+            collection.AddSingleton<ISchema, AutoDetectEmptyConstructorSchema>();
             var provider = collection.BuildServiceProvider();
             var options = new ExecutionOptions
             {
@@ -30,29 +30,26 @@ namespace GraphQL.Tests.Bugs
         }
     }
 
-    public class AutoDetectEnumGraphSchema : Schema
+    public class AutoDetectEmptyConstructorSchema : Schema
     {
-        public AutoDetectEnumGraphSchema(IServiceProvider services)
+        public AutoDetectEmptyConstructorSchema(IServiceProvider services)
             : base(services)
         {
-            Query = new AutoDetectEnumGraphQuery();
+            Query = new AutoDetectEmptyConstructorQuery();
         }
     }
 
-    public class AutoDetectEnumGraphQuery : ObjectGraphType
+    public class AutoDetectEmptyConstructorQuery : ObjectGraphType
     {
-        public AutoDetectEnumGraphQuery()
+        public AutoDetectEmptyConstructorQuery()
         {
-            Field<EnumerationGraphType<AutoDetectEnum>>(
+            Field<EnumerationGraphType<MyEnum>>(
                 "grumpy",
-                resolve: ctx =>
-                {
-                    return AutoDetectEnum.Grumpy;
-                });
+                resolve: ctx => MyEnum.Grumpy);
         }
     }
 
-    public enum AutoDetectEnum
+    public enum MyEnum
     {
         Grumpy = 0,
         Happy = 1,
