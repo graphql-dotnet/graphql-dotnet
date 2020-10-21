@@ -1,4 +1,4 @@
-name: Run documentation tests
+name: PR tests for documentation
 
 on:
   pull_request:
