@@ -39,7 +39,7 @@ jobs:
           if-no-files-found: error
       - uses: seanmiddleditch/gha-publish-to-git@v2
         with:
-          repository: https://github.com/graphql-dotnet/graphql-dotnet.github.io.git
+          repository: graphql-dotnet/graphql-dotnet.github.io
           branch: master
           github_token: '${{ secrets.GITHUB_TOKEN  }}'
           github_pat: '${{ secrets.ORG_PAT_TOKEN }}'
