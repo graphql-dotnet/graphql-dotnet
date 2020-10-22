@@ -129,7 +129,7 @@ namespace GraphQL.Types
                     var constructor = t.GetConstructor(Type.EmptyTypes);
                     if (constructor != null)
                     {
-                        return (IGraphType) constructor.Invoke(null);
+                        return (IGraphType)constructor.Invoke(null);
                     }
 
                     throw new InvalidOperationException($"Could not resolve a GraphType for '{t.FullName}'. Tried resolving from service provider and searched for a public empty constructor.");
