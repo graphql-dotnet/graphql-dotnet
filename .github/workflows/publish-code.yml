@@ -70,4 +70,5 @@ jobs:
           path: |
             src/out/*
       - name: Publish Nuget packages to Nuget registry
-        run: dotnet nuget push src/out/*
+        working-directory: src
+        run: dotnet nuget push out/* -k ${{secrets.NUGET_AUTH_TOKEN}}
