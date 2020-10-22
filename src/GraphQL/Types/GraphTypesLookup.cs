@@ -126,7 +126,7 @@ namespace GraphQL.Types
                         return graphType;
                     }
 
-                    var constructor = t.GetConstructor(new Type[]{});
+                    var constructor = t.GetConstructor(Type.EmptyTypes);
                     if (constructor != null)
                     {
                         return (IGraphType) constructor.Invoke(null);
