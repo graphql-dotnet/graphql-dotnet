@@ -14,7 +14,7 @@ env:
   NODE_VERSION: '10.x'   # Node 10 LTS
 
 jobs:
-  build-docs:
+  buildcheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
