@@ -62,5 +62,5 @@ jobs:
           path: |
             src/out/*
       - name: Publish Nuget packages to GitHub registry
-        working-directory: src/out
-        run: dotnet nuget push "*.nupkg" -k ${{secrets.GITHUB_TOKEN}}
+        working-directory: src
+        run: dotnet nuget push "out/*.nupkg" -k ${{secrets.GITHUB_TOKEN}}
