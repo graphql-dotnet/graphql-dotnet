@@ -9,6 +9,7 @@ on:
       - docs2/**
       - package.json
       - yarn.lock
+      - .github/**
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
