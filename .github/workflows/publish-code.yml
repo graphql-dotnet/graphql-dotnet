@@ -25,7 +25,7 @@ jobs:
         run: |
           ref="${github_ref:10}"
           echo $ref
-          echo "::set-env name=ref::$ref"
+          echo "ref=$ref" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v1
         with:
