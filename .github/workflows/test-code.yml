@@ -38,3 +38,10 @@ jobs:
       - name: Test solution (debug config)
         working-directory: src
         run: dotnet test --no-restore
+  buildcheck:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pass build check
+        run: exit 0
