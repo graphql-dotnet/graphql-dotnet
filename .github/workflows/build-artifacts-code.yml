@@ -7,7 +7,7 @@ on:
     branches:
       - master
       - develop
-    paths: 
+    paths:
       - src/**
 
 env:
