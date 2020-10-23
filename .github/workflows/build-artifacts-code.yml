@@ -7,8 +7,7 @@ on:
     branches:
       - master
       - develop
-    paths:
-      - src/**
+      - fix_nuget
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
@@ -62,5 +61,9 @@ jobs:
           path: |
             src/out/*
       - name: Publish Nuget packages to GitHub registry
-        working-directory: src
-        run: dotnet nuget push out/* -k ${{secrets.GITHUB_TOKEN}}
+        working-directory: src/out
+        run: |
+          for file in *
+          do
+            dotnet nuget push "$file" -k ${{secrets.GITHUB_TOKEN}}
+          done
