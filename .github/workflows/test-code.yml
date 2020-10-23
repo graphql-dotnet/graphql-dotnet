@@ -7,7 +7,7 @@ on:
       - develop
     paths: 
       - src/**
-      - .github/**
+      - .github/workflows/**
 
 jobs:
   test:
