@@ -89,13 +89,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2A7F
 	ProjectSection(SolutionItems) = preProject
 		..\.github\dependabot.yml = ..\.github\dependabot.yml
 		..\.github\FUNDING.yml = ..\.github\FUNDING.yml
+		..\.github\labeler.yml = ..\.github\labeler.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{4B4D88E2-B20E-45E0-94E5-D9DD19BDDC29}"
 	ProjectSection(SolutionItems) = preProject
 		..\.github\workflows\build-artifacts-code.yml = ..\.github\workflows\build-artifacts-code.yml
-		..\.github\workflows\pr-tests-code.yml = ..\.github\workflows\pr-tests-code.yml
-		..\.github\workflows\pr-tests-docs.yml = ..\.github\workflows\pr-tests-docs.yml
+		..\.github\workflows\label.yml = ..\.github\workflows\label.yml
+		..\.github\workflows\publish-code.yml = ..\.github\workflows\publish-code.yml
+		..\.github\workflows\publish-documentation.yml = ..\.github\workflows\publish-documentation.yml
+		..\.github\workflows\test-code.yml = ..\.github\workflows\test-code.yml
+		..\.github\workflows\test-documentation.yml = ..\.github\workflows\test-documentation.yml
 		..\.github\workflows\wipcheck.yml = ..\.github\workflows\wipcheck.yml
 	EndProjectSection
 EndProject
