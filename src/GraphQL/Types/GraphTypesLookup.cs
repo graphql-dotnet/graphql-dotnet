@@ -27,6 +27,8 @@ namespace GraphQL.Types
         }
         .ToDictionary(t => t.GetType());
 
+        protected virtual IReadOnlyDictionary<Type, IGraphType> IntrospectionTypes => _introspectionTypes;
+
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
         private static readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
         {
@@ -37,6 +39,8 @@ namespace GraphQL.Types
             new IdGraphType(),
         }
         .ToDictionary(t => t.GetType());
+
+        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInScalars => _builtInScalars;
 
         // .NET custom scalars
         private static readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
@@ -60,6 +64,8 @@ namespace GraphQL.Types
         }
         .ToDictionary(t => t.GetType());
 
+        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInCustomScalars => _builtInCustomScalars;
+
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly TypeCollectionContext _context;
         private readonly object _lock = new object();
@@ -73,7 +79,7 @@ namespace GraphQL.Types
                 throw new ArgumentNullException(nameof(nameConverter));
 
             _context = new TypeCollectionContext(
-               type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
+               type => BuildNamedType(type, t => BuiltInScalars.TryGetValue(t, out var graphType) ? graphType : IntrospectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
                (name, type, ctx) =>
                {
                    string trimmed = name.TrimGraphQLTypes();
@@ -88,7 +94,7 @@ namespace GraphQL.Types
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
             NameConverter = CamelCaseNameConverter.Instance;
 
-            foreach (var introspectionType in _introspectionTypes.Values)
+            foreach (var introspectionType in IntrospectionTypes.Values)
                 AddType(introspectionType, _context);
 
             // set the name converter properly
@@ -103,6 +109,7 @@ namespace GraphQL.Types
 
         private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => this[t] ?? resolver(t));
 
+        [Obsolete("Please use a constructor along with the Initialize method.")]
         public static GraphTypesLookup Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
@@ -112,23 +119,34 @@ namespace GraphQL.Types
         {
             var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
-            var ctx = new TypeCollectionContext(t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
+            lookup.Initialize(types, directives, resolveType, seal);
+
+            return lookup;
+        }
+
+        public virtual void Initialize(
+            IEnumerable<IGraphType> types,
+            IEnumerable<DirectiveGraphType> directives,
+            Func<Type, IGraphType> resolveType,
+            bool seal = false)
+        {
+            var ctx = new TypeCollectionContext(t => BuiltInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {
-                if (lookup[name] == null)
+                if (this[name] == null)
                 {
-                    lookup.AddType(graphType, context);
+                    AddType(graphType, context);
                 }
             });
 
             foreach (var type in types)
             {
-                lookup.AddType(type, ctx);
+                AddType(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
-            lookup.HandleField(null, lookup.SchemaMetaFieldType, ctx, false);
-            lookup.HandleField(null, lookup.TypeMetaFieldType, ctx, false);
-            lookup.HandleField(null, lookup.TypeNameMetaFieldType, ctx, false);
+            HandleField(null, SchemaMetaFieldType, ctx, false);
+            HandleField(null, TypeMetaFieldType, ctx, false);
+            HandleField(null, TypeNameMetaFieldType, ctx, false);
 
             foreach (var directive in directives)
             {
@@ -139,21 +157,19 @@ namespace GraphQL.Types
                 {
                     if (arg.ResolvedType != null)
                     {
-                        arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
+                        arg.ResolvedType = ConvertTypeReference(directive, arg.ResolvedType);
                     }
                     else
                     {
-                        arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                        arg.ResolvedType = BuildNamedType(arg.Type, ctx.ResolveType);
                     }
                 }
             }
 
-            lookup.ApplyTypeReferences();
+            ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
-            lookup._sealed = seal;
-
-            return lookup;
+            _sealed = seal;
         }
 
         public INameConverter NameConverter { get; set; }
@@ -428,7 +444,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 {
                     AddType((IGraphType)Activator.CreateInstance(namedType), context);
                 }
-                else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
+                else if (BuiltInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
                 {
                     AddType(builtInCustomScalar, _context);
                 }
@@ -546,7 +562,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 type = this[reference.TypeName];
                 if (type == null)
                 {
-                    type = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
+                    type = BuiltInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? BuiltInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                     if (type != null)
                         this[type.Name] = type;
                 }

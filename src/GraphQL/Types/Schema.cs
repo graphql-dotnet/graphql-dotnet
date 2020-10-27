@@ -308,12 +308,23 @@ namespace GraphQL.Types
                 .Union(GetRootTypes())
                 .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
-            return GraphTypesLookup.Create(
+            return CreateTypesLookup(
                 types,
                 _directives,
-                type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter,
+                type => (IGraphType)_services.GetRequiredService(type));
+        }
+
+        protected virtual GraphTypesLookup CreateTypesLookup(IEnumerable<IGraphType> types, IEnumerable<DirectiveGraphType> directives, Func<Type, IGraphType> graphTypeResolver)
+        {
+            var lookup = new GraphTypesLookup(NameConverter);
+
+            lookup.Initialize(
+                types,
+                directives,
+                graphTypeResolver,
                 seal: true);
+
+            return lookup;
         }
     }
 }
