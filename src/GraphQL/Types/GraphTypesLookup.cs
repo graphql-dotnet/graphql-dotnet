@@ -14,7 +14,7 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-        private static readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
         {
             new __DirectiveLocation(),
             new __TypeKind(),
@@ -30,7 +30,7 @@ namespace GraphQL.Types
         protected virtual IReadOnlyDictionary<Type, IGraphType> IntrospectionTypes => _introspectionTypes;
 
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
-        private static readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
         {
             new StringGraphType(),
             new BooleanGraphType(),
@@ -43,7 +43,7 @@ namespace GraphQL.Types
         protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInScalars => _builtInScalars;
 
         // .NET custom scalars
-        private static readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
         {
             new DateGraphType(),
             new DateTimeGraphType(),
