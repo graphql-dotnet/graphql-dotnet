@@ -14,7 +14,7 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-        private readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
+        protected virtual IReadOnlyDictionary<Type, IGraphType> IntrospectionTypes { get; } = new IGraphType[]
         {
             new __DirectiveLocation(),
             new __TypeKind(),
@@ -27,10 +27,8 @@ namespace GraphQL.Types
         }
         .ToDictionary(t => t.GetType());
 
-        protected virtual IReadOnlyDictionary<Type, IGraphType> IntrospectionTypes => _introspectionTypes;
-
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
-        private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
+        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInScalars { get; } = new IGraphType[]
         {
             new StringGraphType(),
             new BooleanGraphType(),
@@ -40,10 +38,8 @@ namespace GraphQL.Types
         }
         .ToDictionary(t => t.GetType());
 
-        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInScalars => _builtInScalars;
-
         // .NET custom scalars
-        private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
+        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInCustomScalars { get; } = new IGraphType[]
         {
             new DateGraphType(),
             new DateTimeGraphType(),
@@ -63,8 +59,6 @@ namespace GraphQL.Types
             new SByteGraphType(),
         }
         .ToDictionary(t => t.GetType());
-
-        protected virtual IReadOnlyDictionary<Type, IGraphType> BuiltInCustomScalars => _builtInCustomScalars;
 
         private readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly TypeCollectionContext _context;

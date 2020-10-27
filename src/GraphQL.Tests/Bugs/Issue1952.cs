@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
-using GraphQL.Introspection;
 using GraphQL.Types;
-using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -73,24 +71,6 @@ query {
 
                 return builtInScalars;
             }
-
-            // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-            private static readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
-            {
-                new __DirectiveLocation(),
-                new __TypeKind(),
-                new __EnumValue(),
-                new __Directive(),
-                new __Field(),
-                new __InputValue(),
-                new __Type(),
-                new __Schema()
-            }
-            .ToDictionary(t => t.GetType());
-
-            // the standard introspection types are static, which would cause conflicts between the resolved
-            // instances of StringGraphType inside them and the custom StringGraphType in this class
-            protected override IReadOnlyDictionary<Type, IGraphType> IntrospectionTypes => _introspectionTypes;
         }
 
         [GraphQLMetadata("String")]
@@ -98,7 +78,7 @@ query {
         {
             public override object Serialize(object value)
             {
-                return value.ToString().ToUpper();
+                return value?.ToString().ToUpper();
             }
         }
 
