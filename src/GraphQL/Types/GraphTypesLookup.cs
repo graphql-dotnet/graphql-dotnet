@@ -14,7 +14,7 @@ namespace GraphQL.Types
     public class GraphTypesLookup
     {
         // Introspection types http://spec.graphql.org/June2018/#sec-Schema-Introspection
-        private static readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
         {
             new __DirectiveLocation(),
             new __TypeKind(),
@@ -28,7 +28,7 @@ namespace GraphQL.Types
         .ToDictionary(t => t.GetType());
 
         // Standard scalars https://graphql.github.io/graphql-spec/June2018/#sec-Scalars
-        private static readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
         {
             new StringGraphType(),
             new BooleanGraphType(),
@@ -39,7 +39,7 @@ namespace GraphQL.Types
         .ToDictionary(t => t.GetType());
 
         // .NET custom scalars
-        private static readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
+        private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
         {
             new DateGraphType(),
             new DateTimeGraphType(),
@@ -112,7 +112,7 @@ namespace GraphQL.Types
         {
             var lookup = nameConverter == null ? new GraphTypesLookup() : new GraphTypesLookup(nameConverter);
 
-            var ctx = new TypeCollectionContext(t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
+            var ctx = new TypeCollectionContext(t => lookup._builtInScalars.TryGetValue(t, out var graphType) ? graphType : resolveType(t), (name, graphType, context) =>
             {
                 if (lookup[name] == null)
                 {
