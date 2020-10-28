@@ -74,7 +74,7 @@ jobs:
         run: dotnet nuget push "out/*" -k ${{secrets.NUGET_AUTH_TOKEN}}
       - name: Zip documentation
         working-directory: docs2/public
-        run: zip -r ../../src/out/Documentation.zip ./*
+        run: zip -r ../../src/out/Documentation.zip "./*"
       - name: Publish release artifacts
         uses: actions/github-script@v2
         with:
