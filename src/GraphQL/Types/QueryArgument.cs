@@ -41,7 +41,8 @@ namespace GraphQL.Types
         public string Name
         {
             get => _name;
-            set {
+            set
+            {
                 NameValidator.ValidateNameNotNull(value, "argument");
                 _name = value;
             }
