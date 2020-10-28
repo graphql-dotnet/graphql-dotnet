@@ -84,7 +84,7 @@ jobs:
             const fs = require('fs').promises;
             const { repo: { owner, repo }, sha } = context;
 
-            for (let file of await fs.readdir('.')) {
+            for (let file of await fs.readdir('src/out')) {
               console.log('uploading', file);
 
               await github.repos.uploadReleaseAsset({
@@ -92,6 +92,6 @@ jobs:
                 repo,
                 release_id: ${{ github.event.release.id }},
                 name: file,
-                data: await fs.readFile(`./${file}`)
+                data: await fs.readFile(`src/out/${file}`)
               });
             }
