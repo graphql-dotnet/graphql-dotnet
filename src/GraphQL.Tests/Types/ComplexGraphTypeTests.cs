@@ -345,7 +345,7 @@ namespace GraphQL.Tests.Types
         [InlineData("i#d")]
         [InlineData("i$d")]
         [InlineData("id$")]
-        public void does_not_throw_with_filtering_namevalidator(string fieldName)
+        public void does_not_throw_with_filtering_nameconverter(string fieldName)
         {
             var type = new ObjectGraphType();
             type.Field<StringGraphType>(fieldName);
