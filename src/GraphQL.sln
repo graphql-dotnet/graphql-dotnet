@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		..\.gitignore = ..\.gitignore
 		..\appveyor.yml = ..\appveyor.yml
 		Directory.Build.props = Directory.Build.props
-		NuGet.config = NuGet.config
 		..\README.md = ..\README.md
 		Tests.props = Tests.props
 	EndProjectSection
