@@ -16,10 +16,19 @@ namespace GraphQL.Types
         public string Name
         {
             get => _name;
-            set
+            set => SetName(value, validate: true);
+        }
+
+        internal void SetName(string name, bool validate)
+        {
+            if (_name != name)
             {
-                NameValidator.ValidateNameNotNull(value);
-                _name = value;
+                if (validate)
+                {
+                    NameValidator.ValidateName(name);
+                }
+
+                _name = name;
             }
         }
 

@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     {
         public TypeMetaFieldType()
         {
-            Name = "__type";
+            SetName("__type", validate: false);
             Type = typeof(__Type);
             Description = "Request the type information of a single type.";
             Arguments = new QueryArguments(

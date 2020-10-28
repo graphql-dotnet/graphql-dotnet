@@ -347,8 +347,10 @@ namespace GraphQL.Tests.Types
         [InlineData("id$")]
         public void does_not_throw_with_filtering_nameconverter(string fieldName)
         {
+            NameValidator.Validation = (n, t) => { };
             var type = new ObjectGraphType();
             type.Field<StringGraphType>(fieldName);
+            NameValidator.Validation = NameValidator.ValidateDefault;
             var schema = new Schema
             {
                 Query = type,
