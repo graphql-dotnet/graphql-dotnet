@@ -28,7 +28,7 @@ namespace GraphQL.Types
             get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
             set
             {
-                if (value != null)
+                if (value != null && string.IsNullOrEmpty(value.Name))
                 {
                     NameValidator.ValidateName(value.Name, "argument");
                 }
@@ -49,7 +49,8 @@ namespace GraphQL.Types
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            NameValidator.ValidateName(argument.Name, "argument");
+            if (string.IsNullOrEmpty(argument.Name))
+                NameValidator.ValidateName(argument.Name, "argument");
 
             if (ArgumentsList == null)
                 ArgumentsList = new List<QueryArgument>();

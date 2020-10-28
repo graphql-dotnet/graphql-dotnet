@@ -55,7 +55,8 @@ namespace GraphQL.Builders
 
         public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
-            NameValidator.ValidateName(name);
+            if (string.IsNullOrEmpty(name))
+                NameValidator.ValidateName(name);
 
             FieldType.Name = name;
             return this;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using GraphQL.Conversion;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -302,13 +303,27 @@ namespace GraphQL.Tests.Types
             exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
+        private Exception test_field_name(string fieldName)
+        {
+            // test failure
+            return Should.Throw<ArgumentOutOfRangeException>(() =>
+            {
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>(fieldName);
+                var schema = new Schema
+                {
+                    Query = type
+                };
+                schema.Initialize();
+            });
+        }
+
         [Theory]
         [InlineData("__id")]
         [InlineData("___id")]
         public void throws_when_field_name_prefix_with_reserved_underscores(string fieldName)
         {
-            var type = new ComplexType<TestObject>();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+            var exception = test_field_name(fieldName);
 
             exception.Message.ShouldStartWith($"A field name: {fieldName} must not begin with \"__\", which is reserved by GraphQL introspection.");
         }
@@ -319,10 +334,44 @@ namespace GraphQL.Tests.Types
         [InlineData("id$")]
         public void throws_when_field_name_doesnot_follow_spec(string fieldName)
         {
-            var type = new ComplexType<TestObject>();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+            var exception = test_field_name(fieldName);
 
             exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {fieldName} does not.");
+        }
+
+        [Theory]
+        [InlineData("__id")]
+        [InlineData("___id")]
+        [InlineData("i#d")]
+        [InlineData("i$d")]
+        [InlineData("id$")]
+        public void does_not_throw_with_filtering_namevalidator(string fieldName)
+        {
+            var type = new ObjectGraphType();
+            type.Field<StringGraphType>(fieldName);
+            var schema = new Schema
+            {
+                Query = type,
+                NameConverter = new TestNameConverter(fieldName, "pass")
+            };
+            schema.Initialize();
+        }
+
+        private class TestNameConverter : INameConverter
+        {
+            private readonly string _from;
+            private readonly string _to;
+            public TestNameConverter(string from, string to)
+            {
+                _from = from;
+                _to = to;
+            }
+
+            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field)
+                => argumentName == _from ? _to : argumentName;
+
+            public string NameForField(string fieldName, IComplexGraphType parentGraphType)
+                => fieldName == _from ? _to : fieldName;
         }
 
         [Theory]
