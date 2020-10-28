@@ -55,7 +55,8 @@ We support several serializers (or you can bring your own):
 > `AllowSynchronousIO` to `true` as per [this announcement](https://github.com/aspnet/Announcements/issues/342);
 > which isn't recommended.*
 
-You can get all preview versions from [GitHub registry](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
+You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
+Note that GitHub requires authentication to consume the feed.  See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
 
 ## Examples
 
