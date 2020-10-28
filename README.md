@@ -270,7 +270,7 @@ The package publishing process is automated with [GitHub Actions](https://github
 
 After your PR is merged into `master` or `develop` preview packages are published to [GitHub registry](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 
-Stable versions of packages are published to Nuget when a [release](https://github.com/graphql-dotnet/graphql-dotnet/releases) is created.
+Stable versions of packages are published to NuGet when a [release](https://github.com/graphql-dotnet/graphql-dotnet/releases) is created.
 
 ### Running on OSX with mono
 
