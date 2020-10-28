@@ -24,6 +24,12 @@ Now the [specification](https://github.com/graphql/graphql-spec) is being develo
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
 by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
 
+## Documentation
+
+http://graphql-dotnet.github.io
+
+> *Note: The current state of documentation corresponds to the state of the code in the master branch.
+
 ## Installation
 
 > WARNING: The latest stable version 2.4.0 has many known issues that have been fixed in 3.0.0-preview-XXXX versions.
@@ -63,13 +69,6 @@ where you may want to explicitly pull a certain version using `-v`.
 where you can find all preview versions built from the `master` branch. Periodically (usually once every
 few months) the latest preview version is published to NuGet manually. This is due to fairly frequent
 changes. Publication of each preview version to NuGet would create only unnecessary noise.
-
-## Documentation
-
-http://graphql-dotnet.github.io
-
-> *Note: The current state of documentation corresponds to the state of the code in the master branch
-> which is used now to publish the **preview** package versions.*
 
 ## Examples
 
