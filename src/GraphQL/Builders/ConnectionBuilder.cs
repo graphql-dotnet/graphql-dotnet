@@ -107,8 +107,6 @@ namespace GraphQL.Builders
 
         public ConnectionBuilder<TSourceType> Name(string name)
         {
-            NameValidator.ValidateName(name);
-
             FieldType.Name = name;
             return this;
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -362,6 +363,7 @@ namespace GraphQL.Types
             if (applyNameConverter)
             {
                 field.Name = NameConverter.NameForField(field.Name, parentType);
+                NameValidator.ValidateName(field.Name);
             }
 
             if (field.ResolvedType == null)
@@ -382,6 +384,7 @@ namespace GraphQL.Types
                 if (applyNameConverter)
                 {
                     arg.Name = NameConverter.NameForArgument(arg.Name, parentType, field);
+                    NameValidator.ValidateName(arg.Name, "argument");
                 }
 
                 if (arg.ResolvedType != null)
