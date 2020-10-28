@@ -3,6 +3,8 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/graphql-dotnet/graphql-dotnet?branch=master&svg=true)](https://ci.appveyor.com/project/graphql-dotnet-ci/graphql-dotnet)
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
+
 [![NuGet](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
 [![Nuget](https://img.shields.io/nuget/vpre/GraphQL)](https://www.nuget.org/packages/GraphQL)
 [![MyGet](https://img.shields.io/myget/graphql-dotnet/vpre/GraphQL?label=myget)](https://www.myget.org/F/graphql-dotnet/api/v3/index.json)
@@ -21,6 +23,12 @@ Now the [specification](https://github.com/graphql/graphql-spec) is being develo
 
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
 by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
+
+## Documentation
+
+http://graphql-dotnet.github.io
+
+> *Note: The current state of documentation corresponds to the state of the code in the master branch.
 
 ## Installation
 
@@ -61,13 +69,6 @@ where you may want to explicitly pull a certain version using `-v`.
 where you can find all preview versions built from the `master` branch. Periodically (usually once every
 few months) the latest preview version is published to NuGet manually. This is due to fairly frequent
 changes. Publication of each preview version to NuGet would create only unnecessary noise.
-
-## Documentation
-
-http://graphql-dotnet.github.io
-
-> *Note: The current state of documentation corresponds to the state of the code in the master branch
-> which is used now to publish the **preview** package versions.*
 
 ## Examples
 
@@ -295,3 +296,33 @@ See the following for more details:
 
 * [Building VS 2017 MSBuild csproj Projects with Mono on Linux](https://stackoverflow.com/questions/42747722/building-vs-2017-msbuild-csproj-projects-with-mono-on-linux)
 * [using .NET Framework as targets framework, the osx/unix build fails](https://github.com/dotnet/netcorecli-fsc/wiki/.NET-Core-SDK-rc4#using-net-framework-as-targets-framework-the-osxunix-build-fails)
+
+## Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="https://github.com/graphql-dotnet/graphql-dotnet/graphs/contributors"><img src="https://opencollective.com/graphql-net/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
+
+<a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/graphql-net#sponsor).
+
+<a href="https://opencollective.com/graphql-net/sponsor/0/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/1/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/2/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/3/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/4/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/5/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/6/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/7/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/8/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-net/sponsor/9/website" target="_blank"><img src="https://opencollective.com/graphql-net/sponsor/9/avatar.svg"></a>
+
+
