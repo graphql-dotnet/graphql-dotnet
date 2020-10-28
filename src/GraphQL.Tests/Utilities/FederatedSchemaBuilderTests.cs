@@ -89,6 +89,54 @@ type User @key(fields: ""id"") {
             });
         }
 
+        [Theory]
+        [InlineData("...on User { id }", false)]
+        [InlineData("__typename ...on User { id }", false)]
+        [InlineData("...on User { __typename id }", false)]
+        [InlineData("...on User { ...TypeAndId }", true)]
+        public void result_includes_typename(string selectionSet, bool includeFragment)
+        {
+            var definitions = @"
+                extend type Query {
+                    me: User
+                }
+
+                type User @key(fields: ""id"") {
+                    id: ID!
+                    username: String!
+                }
+            ";
+
+            Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
+
+            var query = @$"
+                query ($_representations: [_Any!]!) {{
+                    _entities(representations: $_representations) {{
+                        {selectionSet}
+                    }}
+                }}";
+            if (includeFragment)
+            {
+                query += @"
+                fragment TypeAndId on User {
+                    __typename
+                    id
+                }
+                ";
+            }
+
+            var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
+            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123""}] }";
+
+            AssertQuery(_ =>
+            {
+                _.Definitions = definitions;
+                _.Query = query;
+                _.Variables = variables;
+                _.ExpectedResult = expected;
+            });
+        }
+
         [Fact]
         public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
         {
