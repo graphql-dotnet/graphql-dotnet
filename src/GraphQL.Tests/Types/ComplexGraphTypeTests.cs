@@ -357,6 +357,24 @@ namespace GraphQL.Tests.Types
             schema.Initialize();
         }
 
+        [Fact]
+        public void throws_with_bad_namevalidator()
+        {
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() =>
+            {
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>("hello");
+                var schema = new Schema
+                {
+                    Query = type,
+                    NameConverter = new TestNameConverter("hello", "hello$")
+                };
+                schema.Initialize();
+            });
+
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but hello$ does not.");
+        }
+
         private class TestNameConverter : INameConverter
         {
             private readonly string _from;
