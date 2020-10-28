@@ -38,7 +38,7 @@ jobs:
       - name: yarn gatsby build
         working-directory: docs2
         run: yarn gatsby build
-      - name: Publish docs artifacts
+      - name: Upload documentation as workflow artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Documentation
@@ -75,7 +75,7 @@ jobs:
       - name: Zip documentation
         working-directory: docs2/public
         run: zip -r ../../src/out/Documentation.zip "./*"
-      - name: Upload nuget packages as release artifacts
+      - name: Upload nuget packages and documentation as release artifacts
         uses: actions/github-script@v2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
