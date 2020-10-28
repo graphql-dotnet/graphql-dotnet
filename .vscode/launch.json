@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/GraphQL.Harness/bin/Debug/netcoreapp2.0/GraphQL.Harness.dll",
+            "program": "${workspaceRoot}/src/GraphQL.Harness/bin/Debug/netcoreapp2.2/GraphQL.Harness.dll",
             "args": [],
             "cwd": "${workspaceRoot}/src/GraphQL.Harness",
             "stopAtEntry": false,

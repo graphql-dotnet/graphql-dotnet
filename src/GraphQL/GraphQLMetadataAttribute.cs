@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -41,7 +40,7 @@ namespace GraphQL
             type.DeprecationReason = DeprecationReason;
 
             if (IsTypeOf != null)
-                type.IsTypeOfFunc = t => IsTypeOf.GetTypeInfo().IsAssignableFrom(t.GetType().GetTypeInfo());
+                type.IsTypeOfFunc = t => IsTypeOf.IsAssignableFrom(t.GetType());
         }
 
         public override void Modify(FieldConfig field)

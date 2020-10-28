@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,7 +13,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ArgumentsOfCorrectType : IValidationRule
     {
-        public INodeVisitor Validate(ValidationContext context)
+        public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -23,29 +25,13 @@ namespace GraphQL.Validation.Rules
                     if (argDef == null) return;
 
                     var type = argDef.ResolvedType;
-                    var errors = type.IsValidLiteralValue(argAst.Value, context.Schema).ToList();
-                    if (errors.Any())
+                    var errors = type.IsValidLiteralValue(argAst.Value ?? argDef.GetDefaultValueAST(context.Schema), context.Schema).ToList();
+                    if (errors.Count > 0)
                     {
-                        var error = new ValidationError(
-                            context.OriginalQuery,
-                            "5.3.3.1",
-                            BadValueMessage(argAst.Name, type, context.Print(argAst.Value), errors),
-                            argAst);
-                        context.ReportError(error);
+                        context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));
                     }
                 });
-            });
-        }
-
-        public string BadValueMessage(
-            string argName,
-            IGraphType type,
-            string value,
-            IEnumerable<string> verboseErrors)
-        {
-            var message = verboseErrors != null ? $"\n{string.Join("\n", verboseErrors)}" : "";
-
-            return $"Argument \"{argName}\" has invalid value {value}.{message}";
+            }).ToTask();
         }
     }
 }

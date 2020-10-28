@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -9,27 +11,23 @@ namespace GraphQL.Validation.Rules
     /// to fragments defined in the same document.
     /// </summary>
     public class KnownFragmentNames : IValidationRule
-  {
-    public string UnknownFragmentMessage(string fragName)
     {
-      return $"Unknown fragment \"{fragName}\".";
-    }
+        public static readonly KnownFragmentNames Instance = new KnownFragmentNames();
 
-    public INodeVisitor Validate(ValidationContext context)
-    {
-      return new EnterLeaveListener(_ =>
-      {
-        _.Match<FragmentSpread>(node =>
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-          var fragmentName = node.Name;
-          var fragment = context.GetFragment(fragmentName);
-          if (fragment == null)
-          {
-            var error = new ValidationError(context.OriginalQuery, "5.4.2.1", UnknownFragmentMessage(fragmentName), node);
-            context.ReportError(error);
-          }
-        });
-      });
+            return new EnterLeaveListener(_ =>
+            {
+                _.Match<FragmentSpread>(node =>
+                {
+                    var fragmentName = node.Name;
+                    var fragment = context.GetFragment(fragmentName);
+                    if (fragment == null)
+                    {
+                        context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
+                    }
+                });
+            }).ToTask();
+        }
     }
-  }
 }

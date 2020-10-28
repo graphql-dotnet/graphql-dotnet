@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace GraphQL.StarWars.IoC
 {
@@ -30,8 +29,8 @@ namespace GraphQL.StarWars.IoC
             _registrations.Add(typeof(TService),
                 () =>
                 {
-                    var implType = typeof (TImpl);
-                    return typeof (TService) == implType
+                    var implType = typeof(TImpl);
+                    return typeof(TService) == implType
                         ? CreateInstance(implType)
                         : Get(implType);
                 });
@@ -53,10 +52,7 @@ namespace GraphQL.StarWars.IoC
             Register(() => lazy.Value);
         }
 
-        public T Get<T>()
-        {
-            return (T)Get(typeof (T));
-        }
+        public T Get<T>() => (T)Get(typeof(T));
 
         public object Get(Type serviceType)
         {
@@ -65,7 +61,7 @@ namespace GraphQL.StarWars.IoC
                 return creator();
             }
 
-            if (!serviceType.GetTypeInfo().IsAbstract)
+            if (!serviceType.IsAbstract)
             {
                 return CreateInstance(serviceType);
             }

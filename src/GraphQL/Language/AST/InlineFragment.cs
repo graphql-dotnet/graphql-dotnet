@@ -40,17 +40,12 @@ namespace GraphQL.Language.AST
                 .ToFormat(Type, Directives, SelectionSet);
         }
 
-        protected bool Equals(InlineFragment other)
-        {
-            return Equals(Type, other.Type);
-        }
-
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((InlineFragment) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals(Type, ((InlineFragment)obj).Type);
         }
     }
 }

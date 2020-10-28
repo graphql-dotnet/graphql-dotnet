@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -23,7 +24,7 @@ namespace GraphQL.Language.AST
 
         public void AddDefinition(IDefinition definition)
         {
-            _definitions.Add(definition);
+            _definitions.Add(definition ?? throw new ArgumentNullException(nameof(definition)));
 
             if (definition is FragmentDefinition fragmentDefinition)
             {
@@ -35,7 +36,7 @@ namespace GraphQL.Language.AST
             }
             else
             {
-                throw new ExecutionError("Unhandled document definition");
+                throw new ArgumentOutOfRangeException(nameof(definition), $"Unhandled document definition '{definition.GetType().Name}'");
             }
         }
 
@@ -46,9 +47,9 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode node)
         {
-            if (ReferenceEquals(null, node)) return false;
+            if (node is null) return false;
             if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != this.GetType()) return false;
+            if (node.GetType() != GetType()) return false;
 
             return true;
         }

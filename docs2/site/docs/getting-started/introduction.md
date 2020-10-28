@@ -6,16 +6,18 @@
 
 > A GraphQL service is created by defining types and fields on those types, then providing functions for each field on each type.
 
-Here is a "Hello World" example for GraphQL .NET.
+Here is a "Hello World" example for GraphQL .NET using the System.Text.Json serialization engine.
 
 ```csharp
 using System;
+using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+using GraphQL.SystemTextJson;
 
 public class Program
 {
-  public static void Main(string[] args)
+  public static async Task Main(string[] args)
   {
     var schema = Schema.For(@"
       type Query {
@@ -23,7 +25,7 @@ public class Program
       }
     ");
 
-    var json = schema.Execute(_ =>
+    var json = await schema.ExecuteAsync(_ =>
     {
       _.Query = "{ hello }";
       _.Root = new { Hello = "Hello World!" };
@@ -93,7 +95,7 @@ var schema = Schema.For(@"
     _.Types.Include<Query>();
 });
 
-var json = schema.Execute(_ =>
+var json = await schema.ExecuteAsync(_ =>
 {
   _.Query = "{ hero { id name } }";
 });
@@ -117,6 +119,7 @@ The `GraphType` first approach can be more verbose, but gives you access to all 
 
 ```csharp
 using System;
+using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
 
@@ -148,11 +151,11 @@ public class StarWarsQuery : ObjectGraphType
 
 public class Program
 {
-  public static void Main(string[] args)
+  public static async Task Main(string[] args)
   {
     var schema = new Schema { Query = new StarWarsQuery() };
 
-    var json = schema.Execute(_ =>
+    var json = await schema.ExecuteAsync(_ =>
     {
       _.Query = "{ hero { id name } }";
     });
@@ -206,36 +209,45 @@ public class DroidType
   public string Name(Droid droid) => droid.Name;
 
   // these two parameters are optional
-  // ResolveFieldContext provides contextual information about the field
-  public Character Friend(ResolveFieldContext context, Droid source)
+  // IResolveFieldContext provides contextual information about the field
+  public Character Friend(IResolveFieldContext context, Droid source)
   {
     return new Character { Name = "C3-PO" };
   }
 }
 
-var schema = Schema.For(@"
-  type Droid {
-    id: String!
-    name: String!
-    friend: Character
-  }
-
-  type Character {
-    name: String!
-  }
-
-  type Query {
-    hero: Droid
-  }
-", _ => {
-    _.Types.Include<DroidType>();
-    _.Types.Include<Query>();
-});
-
-var json = schema.Execute(_ =>
+public class Program
 {
-  _.Query = "{ hero { id name friend { name } } }";
-});
+    public static async Task Main(string[] args)
+    {
+        var schema = Schema.For(@"
+          type Droid {
+            id: String!
+            name: String!
+            friend: Character
+          }
+
+          type Character {
+            name: String!
+          }
+
+          type Query {
+            hero: Droid
+          }
+        ", _ =>
+        {
+            _.Types.Include<DroidType>();
+            _.Types.Include<Query>();
+        });
+
+        var json = await schema.ExecuteAsync(_ =>
+        {
+            _.Query = "{ hero { id name friend { name } } }";
+        });
+
+        Console.WriteLine(json);
+    }
+}
 ```
 
 Output

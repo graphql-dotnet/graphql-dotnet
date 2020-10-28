@@ -1,19 +1,22 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GraphQL.Types.Relay.DataObjects
 {
-    public class Connection<T>
+    public class Connection<TNode, TEdge>
+        where TEdge : Edge<TNode>
     {
         public int TotalCount { get; set; }
 
         public PageInfo PageInfo { get; set; }
 
-        public List<Edge<T>> Edges { get; set; }
+        public List<TEdge> Edges { get; set; }
 
-        public List<T> Items
-        {
-            get { return Edges?.Select(edge => edge.Node).ToList(); }
-        }
+        public List<TNode> Items => Edges?.Select(edge => edge.Node).ToList();
+    }
+
+    public class Connection<TNode> : Connection<TNode, Edge<TNode>>
+    {
+
     }
 }

@@ -1,6 +1,7 @@
-﻿using System;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -12,10 +13,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class VariablesAreInputTypes : IValidationRule
     {
-        public Func<string, string, string> UndefinedVarMessage = (variableName, typeName) =>
-            $"Variable \"{variableName}\" cannot be non-input type \"{typeName}\".";
+        public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -25,10 +25,10 @@ namespace GraphQL.Validation.Rules
 
                     if (!type.IsInputType())
                     {
-                        context.ReportError(new ValidationError(context.OriginalQuery, "5.7.3", UndefinedVarMessage(varDef.Name, type != null ? context.Print(type) : varDef.Type.Name()), varDef));
+                        context.ReportError(new VariablesAreInputTypesError(context, varDef, type));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

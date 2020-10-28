@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,10 @@ namespace GraphQL.Language.AST
     {
         public ObjectValue(IEnumerable<ObjectField> fields)
         {
-            ObjectFields = fields;
+            if (fields == null)
+                ObjectFields = Array.Empty<ObjectField>();
+            else
+                ObjectFields = fields;
         }
 
         public object Value
@@ -22,10 +26,7 @@ namespace GraphQL.Language.AST
 
         public IEnumerable<ObjectField> ObjectFields { get; }
 
-        public IEnumerable<string> FieldNames
-        {
-            get { return ObjectFields.Select(x => x.Name).ToList(); }
-        }
+        public IEnumerable<string> FieldNames => ObjectFields.Select(x => x.Name).ToList();
 
         public override IEnumerable<INode> Children => ObjectFields;
 
@@ -41,9 +42,9 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
 
             return true;
         }

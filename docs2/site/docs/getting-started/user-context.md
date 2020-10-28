@@ -1,13 +1,13 @@
 # User Context
 
-You can pass a `UserContext` to provide access to your specific data.  The `UserContext` is accessible in field resolvers and validation rules.
+You can pass a `UserContext` (any `IDictionary<string, object>`) to provide access to your specific data.  The `UserContext` is accessible in field resolvers and validation rules.
 
 ```csharp
-public class MyGraphQLUserContext
+public class MyGraphQLUserContext : Dictionary<string, object>
 {
 }
 
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.UserContext = new MyGraphQLUserContext();
@@ -26,5 +26,4 @@ public class Query : ObjectGraphType
       });
   }
 }
-
 ```

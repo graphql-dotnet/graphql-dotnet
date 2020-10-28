@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -10,12 +12,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class UniqueVariableNames : IValidationRule
     {
-        public string DuplicateVariableMessage(string variableName)
-        {
-            return $"There can be only one variable named \"{variableName}\"";
-        }
+        public static readonly UniqueVariableNames Instance = new UniqueVariableNames();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             Dictionary<string, VariableDefinition> knownVariables = null;
 
@@ -29,20 +28,14 @@ namespace GraphQL.Validation.Rules
 
                     if (knownVariables.ContainsKey(variableName))
                     {
-                        var error = new ValidationError(
-                            context.OriginalQuery,
-                            "5.7.1",
-                            DuplicateVariableMessage(variableName),
-                            knownVariables[variableName],
-                            variableDefinition);
-                        context.ReportError(error);
+                        context.ReportError(new UniqueVariableNamesError(context, knownVariables[variableName], variableDefinition));
                     }
                     else
                     {
                         knownVariables[variableName] = variableDefinition;
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

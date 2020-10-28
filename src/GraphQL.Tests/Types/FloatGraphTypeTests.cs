@@ -7,7 +7,7 @@ namespace GraphQL.Tests.Types
 {
     public class FloatGraphTypeTests
     {
-        private FloatGraphType type = new FloatGraphType();
+        private readonly FloatGraphType type = new FloatGraphType();
 
         [Fact]
         public void coerces_null_to_null()
@@ -18,7 +18,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_invalid_string_to_exception()
         {
-            Assert.Throws<FormatException>(()=>type.ParseValue("abcd"));
+            Should.Throw<FormatException>(() => type.ParseValue("abcd"));
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_double_to_value()
         {
-            type.ParseValue(1.79769313486231e308).ShouldBe((double)1.79769313486231e308);
+            type.ParseValue(1.79769313486231e308).ShouldBe(1.79769313486231e308);
         }
     }
 }

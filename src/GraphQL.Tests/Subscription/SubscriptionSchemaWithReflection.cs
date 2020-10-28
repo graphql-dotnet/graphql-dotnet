@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Subscription;
@@ -6,9 +7,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
 {
-    public class SubscriptionSchemaWithReflection
+    public static class SubscriptionSchemaWithReflection
     {
-        public static string TypeDefs = @"
+        private const string TypeDefs = @"
             type MessageFrom {
                 id: String
                 displayName: String
@@ -25,6 +26,7 @@ namespace GraphQL.Tests.Subscription
                 messageAddedByUser(id: String!) : Message
                 messageAddedAsync : Message
                 messageAddedByUserAsync(id: String!) : Message
+                messageGetAll : [Message]
             }
         ";
 
@@ -36,10 +38,7 @@ namespace GraphQL.Tests.Subscription
             Chat = chat;
             Schema = GraphQL.Types.Schema.For(
                 TypeDefs,
-                (config) =>
-                {
-                    config.Types.Include<Subscription>();
-                });
+                config => config.Types.Include<Subscription>());
         }
     }
 
@@ -55,6 +54,18 @@ namespace GraphQL.Tests.Subscription
         public Message ResolveMessageAdded(ResolveFieldContext context)
         {
             return context.Source as Message;
+        }
+
+        [GraphQLMetadata(Name = "messageGetAll", Type = ResolverType.Subscriber)]
+        public IObservable<List<Message>> SubscribeMessageGetAll(ResolveEventStreamContext context)
+        {
+            return SubscriptionSchemaWithReflection.Chat.MessagesGetAll();
+        }
+
+        [GraphQLMetadata(Name = "messageGetAll")]
+        public List<Message> ResolveMessageGetAll(ResolveFieldContext context)
+        {
+            return context.Source as List<Message>;
         }
 
         [GraphQLMetadata(Name = "messageAddedByUser", Type = ResolverType.Subscriber)]

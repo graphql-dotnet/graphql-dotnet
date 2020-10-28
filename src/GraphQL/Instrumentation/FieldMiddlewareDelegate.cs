@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using GraphQL.Types;
+using System.Threading.Tasks;
 
 namespace GraphQL.Instrumentation
 {
-    public delegate Task<object> FieldMiddlewareDelegate(ResolveFieldContext context);
+    public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext context);
 }

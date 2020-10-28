@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
@@ -11,12 +13,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class VariablesInAllowedPosition : IValidationRule
     {
-        public Func<string, string, string, string> BadVarPosMessage =>
-            (varName, varType, expectedType) =>
-                $"Variable \"${varName}\" of type \"{varType}\" used in position " +
-                $"expecting type \"{expectedType}\".";
+        public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
 
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();
 
@@ -44,25 +43,13 @@ namespace GraphQL.Validation.Rules
                                 if (varType != null &&
                                     !effectiveType(varType, varDef).IsSubtypeOf(usage.Type, context.Schema))
                                 {
-                                    var error = new ValidationError(
-                                        context.OriginalQuery,
-                                        "5.7.6",
-                                        BadVarPosMessage(varName, context.Print(varType), context.Print(usage.Type)));
-
-                                    var source = new Source(context.OriginalQuery);
-                                    var varDefPos = new Location(source, varDef.SourceLocation.Start);
-                                    var usagePos = new Location(source, usage.Node.SourceLocation.Start);
-
-                                    error.AddLocation(varDefPos.Line, varDefPos.Column);
-                                    error.AddLocation(usagePos.Line, usagePos.Column);
-
-                                    context.ReportError(error);
+                                    context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
                                 }
                             }
                         }
                     }
                 );
-            });
+            }).ToTask();
         }
 
         /// <summary>

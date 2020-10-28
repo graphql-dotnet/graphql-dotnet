@@ -1,44 +1,93 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
-        protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
+        protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
+            => ExecuteNodeTreeAsync(context, rootNode);
+
+        protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
-            var pendingNodes = new List<ExecutionNode>
-            {
-                rootNode
-            };
+            var pendingNodes = new Queue<ExecutionNode>();
+            pendingNodes.Enqueue(rootNode);
+            var pendingDataLoaders = new Queue<ExecutionNode>();
 
-            while (pendingNodes.Count > 0)
+            var currentTasks = new List<Task>();
+            var currentNodes = new List<ExecutionNode>();
+            while (pendingNodes.Count > 0 || pendingDataLoaders.Count > 0 || currentTasks.Count > 0)
             {
-                var currentTasks = new Task<ExecutionNode>[pendingNodes.Count];
-
-                // Start executing all pending nodes
-                for (int i = 0; i < pendingNodes.Count; i++)
+                while (pendingNodes.Count > 0 || currentTasks.Count > 0)
                 {
-                    context.CancellationToken.ThrowIfCancellationRequested();
-                    currentTasks[i] = ExecuteNodeAsync(context, pendingNodes[i]);
+                    // Start executing pending nodes, while limiting the maximum number of parallel executed nodes to the set limit
+                    while ((context.MaxParallelExecutionCount == null || currentTasks.Count < context.MaxParallelExecutionCount)
+                        && pendingNodes.Count > 0)
+                    {
+                        context.CancellationToken.ThrowIfCancellationRequested();
+                        var pendingNode = pendingNodes.Dequeue();
+                        var pendingNodeTask = ExecuteNodeAsync(context, pendingNode);
+                        if (pendingNodeTask.IsCompleted)
+                        {
+                            // Throw any caught exceptions
+                            await pendingNodeTask;
+
+                            // Node completed synchronously, so no need to add it to the list of currently executing nodes
+                            // instead add any child nodes to the pendingNodes queue directly here
+                            if (pendingNode.Result is IDataLoaderResult)
+                            {
+                                pendingDataLoaders.Enqueue(pendingNode);
+                            }
+                            else if (pendingNode is IParentExecutionNode parentExecutionNode)
+                            {
+                                foreach (var childNode in parentExecutionNode.GetChildNodes())
+                                {
+                                    pendingNodes.Enqueue(childNode);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Node is actually asynchronous, so add it to the list of current tasks being executed in parallel
+                            currentTasks.Add(pendingNodeTask);
+                            currentNodes.Add(pendingNode);
+                        }
+
+                    }
+
+                    await OnBeforeExecutionStepAwaitedAsync(context)
+                        .ConfigureAwait(false);
+
+                    // Await tasks for this execution step
+                    await Task.WhenAll(currentTasks)
+                        .ConfigureAwait(false);
+
+                    // Add child nodes to pending nodes to execute the next level in parallel
+                    foreach (var node in currentNodes)
+                    {
+                        if (node.Result is IDataLoaderResult)
+                        {
+                            pendingDataLoaders.Enqueue(node);
+                        }
+                        else if (node is IParentExecutionNode p)
+                        {
+                            foreach (var childNode in p.GetChildNodes())
+                                pendingNodes.Enqueue(childNode);
+                        }
+                    }
+
+                    currentTasks.Clear();
+                    currentNodes.Clear();
                 }
 
-                pendingNodes.Clear();
-
-                await OnBeforeExecutionStepAwaitedAsync(context)
-                    .ConfigureAwait(false);
-
-                // Await tasks for this execution step
-                var completedNodes = await Task.WhenAll(currentTasks)
-                    .ConfigureAwait(false);
-
-                // Add child nodes to pending nodes to execute the next level in parallel
-                var childNodes = completedNodes
-                    .OfType<IParentExecutionNode>()
-                    .SelectMany(x => x.GetChildNodes());
-
-                pendingNodes.AddRange(childNodes);
+                //run pending data loaders
+                while (pendingDataLoaders.Count > 0)
+                {
+                    var dataLoaderNode = pendingDataLoaders.Dequeue();
+                    currentTasks.Add(CompleteDataLoaderNodeAsync(context, dataLoaderNode));
+                    currentNodes.Add(dataLoaderNode);
+                }
             }
         }
     }

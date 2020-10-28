@@ -16,10 +16,14 @@
             file: installation.md
           - title: GraphiQL
             file: graphiql.md
+          - title: Altair GraphQL
+            file: altair-graphql.md
           - title: Queries
             file: queries.md
           - title: Schema Types
             file: schema-types.md
+          - title: Custom Scalars
+            file: custom-scalars.md
           - title: Lists and Non-Null
             file: lists-non-null.md
           - title: Arguments
@@ -71,7 +75,11 @@
             file: dataloader.md
           - title: Schema Generation
             file: schema-generation.md
-          - title: Version Migration Guide
+          - title: Migration Guide [v0.17.x -> v2]
             file: migration.md
+          - title: Migration Guide [v2 -> v3]
+            file: migration3.md
+          - title: Known Issues & FAQ
+            file: known-issues.md
           - title: Links
             file: links.md

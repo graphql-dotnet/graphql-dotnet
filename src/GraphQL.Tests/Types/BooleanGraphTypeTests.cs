@@ -1,13 +1,13 @@
+using System;
 using GraphQL.Types;
 using Shouldly;
-using System;
 using Xunit;
 
 namespace GraphQL.Tests.Types
 {
     public class BooleanGraphTypeTests
     {
-        private BooleanGraphType type = new BooleanGraphType();
+        private readonly BooleanGraphType type = new BooleanGraphType();
 
         [Fact]
         public void coerces_0_to_false()
@@ -62,8 +62,9 @@ namespace GraphQL.Tests.Types
         [InlineData("21")]
         public void coerces_input_to_exception(string input)
         {
-            FormatException formatException = Assert.Throws<FormatException>(() => type.ParseValue(input));
-            formatException.Message.ShouldBe("String was not recognized as a valid Boolean.");
+            var formatException = Should.Throw<FormatException>(() => type.ParseValue(input));
+            var formatException2 = Should.Throw<FormatException>(() => bool.Parse(input));
+            formatException.Message.ShouldBe(formatException2.Message);
         }
 
         [Theory]

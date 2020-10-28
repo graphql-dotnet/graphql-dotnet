@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GraphQL.Types
 {
+    [DebuggerDisplay("ref {TypeName,nq}")]
     public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         public GraphQLTypeReference(string typeName)
         {
-            Name = "__GraphQLTypeReference";
+            SetName("__GraphQLTypeReference", validate: false);
             TypeName = typeName;
         }
 
@@ -15,38 +17,26 @@ namespace GraphQL.Types
 
         public Func<object, bool> IsTypeOf
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+             get => throw Invalid();
+             set => throw Invalid();
         }
 
-        public void AddResolvedInterface(IInterfaceGraphType graphType)
-        {
-            throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-        }
+        public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
         public IEnumerable<Type> Interfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+             get => throw Invalid();
+             set => throw Invalid();
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
-             get {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
-             set {
-                throw new InvalidOperationException("This is just a reference.  Resolve the real type first.");
-             }
+            get => throw Invalid();
+            set => throw Invalid();
         }
+
+        private InvalidOperationException Invalid() => new InvalidOperationException(
+            $"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         public override bool Equals(object obj)
         {
@@ -57,9 +47,7 @@ namespace GraphQL.Types
             return base.Equals(obj);
         }
 
-        public override int GetHashCode()
-        {
-            return TypeName?.GetHashCode() ?? 0;
-        }
+        /// <inheritdoc />
+        public override int GetHashCode() => TypeName?.GetHashCode() ?? 0;
     }
 }

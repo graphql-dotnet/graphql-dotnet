@@ -4,15 +4,21 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
-    public class Directives : AbstractNode, IEnumerable<Directive>
+    public class Directives : AbstractNode, ICollection<Directive>
     {
-        private readonly List<Directive> _directives = new List<Directive>();
+        private List<Directive> _directives;
         private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
 
         public override IEnumerable<INode> Children => _directives;
 
         public void Add(Directive directive)
         {
+            if (directive == null)
+                throw new ArgumentNullException(nameof(directive));
+
+            if (_directives == null)
+                _directives = new List<Directive>();
+
             _directives.Add(directive);
 
             if (!_unique.ContainsKey(directive.Name))
@@ -21,37 +27,36 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public Directive Find(string name)
-        {
-            _unique.TryGetValue(name, out Directive value);
-            return value;
-        }
+        public Directive Find(string name) => _unique.TryGetValue(name, out Directive value) ? value : null;
 
-        public int Count => _directives.Count;
+        public int Count => _directives?.Count ?? 0;
 
-        public bool HasDuplicates => _directives.Count != _unique.Count;
+        public bool HasDuplicates => _directives?.Count != _unique.Count;
+
+        public bool IsReadOnly => false;
 
         public IEnumerator<Directive> GetEnumerator()
         {
+            if (_directives == null)
+                return System.Linq.Enumerable.Empty<Directive>().GetEnumerator();
+
             return _directives.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
+
+        public void Clear()
         {
-            return GetEnumerator();
+            _directives.Clear();
+            _unique.Clear();
         }
 
-        protected bool Equals(Directives directives)
-        {
-            return false;
-        }
+        public bool Contains(Directive item) => _directives.Contains(item);
 
-        public override bool IsEqualTo(INode obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Directives) obj);
-        }
+        public void CopyTo(Directive[] array, int arrayIndex) => _directives.CopyTo(array, arrayIndex);
+
+        public bool Remove(Directive item) => _directives.Remove(item) && _unique.Remove(item.Name);
     }
 }

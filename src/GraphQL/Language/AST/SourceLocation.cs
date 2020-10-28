@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Language.AST
+namespace GraphQL.Language.AST
 {
     public class SourceLocation
     {
@@ -11,9 +11,11 @@
         }
 
         public int Start { get; }
+
         public int End { get; }
 
         public int Line { get; }
+
         public int Column { get; }
 
         public override string ToString()
@@ -28,10 +30,10 @@
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SourceLocation) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((SourceLocation)obj);
         }
 
         public override int GetHashCode()

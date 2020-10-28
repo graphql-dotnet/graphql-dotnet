@@ -15,7 +15,7 @@ namespace GraphQL.Introspection
                 {
                     Name = "name"
                 });
-            Resolver = new FuncFieldResolver<object>(context => context.Schema.FindType((string) context.Arguments["name"]));
+            Resolver = new FuncFieldResolver<object>(context => context.Schema.FindType(context.GetArgument<string>("name")));
         }
     }
 }

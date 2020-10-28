@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -242,7 +243,7 @@ namespace GraphQL.Tests.Validation
     {
       _.Error(err =>
       {
-        err.Message = Rule.UnusedVariableMessage(varName, opName);
+        err.Message = NoUnusedVariablesError.UnusedVariableMessage(varName, opName);
         err.Loc(line, column);
       });
     }

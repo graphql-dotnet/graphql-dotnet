@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Bugs
                 }";
             var expected = @"
                 {
-                    'example': ""null""
+                    ""example"": ""null""
                 }";
             AssertQuerySuccess(query, expected);
         }
@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Bugs
                 }";
             var expected = @"
                 {
-                    'example': ""null""
+                    ""example"": ""null""
                 }";
             AssertQuerySuccess(query, expected, inputs: new Inputs(new Dictionary<string, object>
             {

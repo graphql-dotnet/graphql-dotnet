@@ -1,8 +1,9 @@
-﻿namespace GraphQL.Validation
+namespace GraphQL.Validation
 {
     public interface IValidationResult
     {
         bool IsValid { get; }
-        ExecutionErrors Errors { get; set; }
+
+        ExecutionErrors Errors { get; }
     }
 }

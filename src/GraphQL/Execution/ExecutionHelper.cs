@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -25,7 +25,7 @@ namespace GraphQL.Execution
                     type = schema.Mutation;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for mutations");
+                        error = new InvalidOperationError("Schema is not configured for mutations");
                         error.AddLocation(operation, document);
                         throw error;
                     }
@@ -35,41 +35,37 @@ namespace GraphQL.Execution
                     type = schema.Subscription;
                     if (type == null)
                     {
-                        error = new ExecutionError("Schema is not configured for subscriptions");
+                        error = new InvalidOperationError("Schema is not configured for subscriptions");
                         error.AddLocation(operation, document);
                         throw error;
                     }
                     break;
 
                 default:
-                    error = new ExecutionError("Can only execute queries, mutations and subscriptions.");
-                    error.AddLocation(operation, document);
-                    throw error;
+                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
             }
 
             return type;
         }
 
-        public static FieldType GetFieldDefinition(Document document, ISchema schema, IObjectGraphType parentType, Field field)
+        public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
-            if (field.Name == SchemaIntrospection.SchemaMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.SchemaMeta;
+                return schema.SchemaMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeMeta.Name && schema.Query == parentType)
+            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
             {
-                return SchemaIntrospection.TypeMeta;
+                return schema.TypeMetaFieldType;
             }
-            if (field.Name == SchemaIntrospection.TypeNameMeta.Name)
+            if (field.Name == schema.TypeNameMetaFieldType.Name)
             {
-                return SchemaIntrospection.TypeNameMeta;
+                return schema.TypeNameMetaFieldType;
             }
 
             if (parentType == null)
             {
-                var error = new ExecutionError($"Schema is not configured correctly to fetch {field.Name}.  Are you missing a root type?");
-                error.AddLocation(field, document);
-                throw error;
+                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
             }
 
             return parentType.GetField(field.Name);
@@ -105,9 +101,9 @@ namespace GraphQL.Execution
 
             try
             {
-                AssertValidValue(schema, type, input, variable.Name);
+                AssertValidVariableValue(schema, type, input, variable.Name, variable.DefaultValue != null);
             }
-            catch (InvalidValueException error)
+            catch (InvalidVariableError error)
             {
                 error.AddLocation(variable, document);
                 throw;
@@ -121,18 +117,19 @@ namespace GraphQL.Execution
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
-        public static void AssertValidValue(ISchema schema, IGraphType type, object input, string fieldName)
+        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
         {
+            // see also GraphQLExtensions.IsValidLiteralValue
             if (type is NonNullGraphType graphType)
             {
                 var nonNullType = graphType.ResolvedType;
 
-                if (input == null)
+                if (input == null && !hasDefaultValue)
                 {
-                    throw new InvalidValueException(fieldName, "Received a null input for a non-null field.");
+                    throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
                 }
 
-                AssertValidValue(schema, nonNullType, input, fieldName);
+                AssertValidVariableValue(schema, nonNullType, input, variableName, hasDefaultValue);
                 return;
             }
 
@@ -143,8 +140,40 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalar)
             {
-                if (ValueFromScalar(scalar, input) == null)
-                    throw new InvalidValueException(fieldName, "Invalid Scalar value for input field.");
+                // verify value can be converted successfully
+
+                if (input is IValue value)
+                {
+                    bool conversionFailed;
+
+                    try
+                    {
+                        conversionFailed = scalar.ParseLiteral(value) == null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
+                    }
+
+                    if (conversionFailed)
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
+                }
+                else
+                {
+                    bool conversionFailed;
+
+                    try
+                    {
+                        conversionFailed = scalar.ParseValue(input) == null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
+                    }
+
+                    if (conversionFailed)
+                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'");
+                }
 
                 return;
             }
@@ -157,11 +186,11 @@ namespace GraphQL.Execution
                 {
                     var index = -1;
                     foreach (var item in list)
-                        AssertValidValue(schema, listItemType, item, $"{fieldName}[{++index}]");
+                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]", hasDefaultValue);
                 }
                 else
                 {
-                    AssertValidValue(schema, listItemType, input, fieldName);
+                    AssertValidVariableValue(schema, listItemType, input, variableName, hasDefaultValue);
                 }
                 return;
             }
@@ -172,7 +201,7 @@ namespace GraphQL.Execution
 
                 if (!(input is Dictionary<string, object> dict))
                 {
-                    throw new InvalidValueException(fieldName,
+                    throw new InvalidVariableError(variableName,
                         $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
@@ -188,29 +217,19 @@ namespace GraphQL.Execution
 
                 if (unknownFields?.Count > 0)
                 {
-                    throw new InvalidValueException(fieldName,
+                    throw new InvalidVariableError(variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
                 }
 
                 foreach (var field in complexType.Fields)
                 {
                     dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidValue(schema, field.ResolvedType, fieldValue, $"{fieldName}.{field.Name}");
+                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}", hasDefaultValue);
                 }
                 return;
             }
 
-            throw new InvalidValueException(fieldName ?? "input", "Invalid input");
-        }
-
-        private static object ValueFromScalar(ScalarGraphType scalar, object input)
-        {
-            if (input is IValue value)
-            {
-                return scalar.ParseLiteral(value);
-            }
-
-            return scalar.ParseValue(input);
+            throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
 
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
@@ -222,7 +241,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments)
+            foreach (var arg in definitionArguments.ArgumentsList)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -286,10 +305,11 @@ namespace GraphQL.Execution
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        var fieldValue = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
-                        fieldValue = fieldValue ?? field.DefaultValue;
-
-                        obj[field.Name] = fieldValue;
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                    }
+                    else if (field.DefaultValue != null)
+                    {
+                        obj[field.Name] = field.DefaultValue;
                     }
                 }
 
@@ -298,7 +318,7 @@ namespace GraphQL.Execution
 
             if (type is ScalarGraphType scalarType)
             {
-                return scalarType.ParseLiteral(input);
+                return scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'");
             }
 
             return null;
@@ -313,7 +333,7 @@ namespace GraphQL.Execution
         {
             if (selectionSet != null)
             {
-                foreach (var selection in selectionSet.Selections)
+                foreach (var selection in selectionSet.SelectionsList)
                 {
                     if (selection is Field field)
                     {
@@ -356,7 +376,6 @@ namespace GraphQL.Execution
 
                         CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
                     }
-
                 }
             }
 
@@ -371,6 +390,10 @@ namespace GraphQL.Execution
             return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
+        // Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
+        // directives are provided on the same field or fragment, it must be queried only if the @skip condition
+        // is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
+        // if either the @skip condition is true or the @include condition is false.
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
         {
             if (directives != null)
@@ -384,9 +407,8 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    values.TryGetValue("if", out object ifObj);
-
-                    return !(bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal);
+                    if (values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
+                        return false;
                 }
 
                 directive = directives.Find(DirectiveGraphType.Include.Name);
@@ -398,8 +420,7 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    values.TryGetValue("if", out object ifObj);
-                    return bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
+                    return values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
                 }
             }
 
@@ -441,17 +462,6 @@ namespace GraphQL.Execution
                 return null;
             }
             return CollectFields(context, fieldType, field.SelectionSet);
-        }
-
-        public static string[] AppendPath(string[] path, string pathSegment)
-        {
-            var newPath = new string[path.Length + 1];
-
-            path.CopyTo(newPath, 0);
-
-            newPath[path.Length] = pathSegment;
-
-            return newPath;
         }
     }
 }

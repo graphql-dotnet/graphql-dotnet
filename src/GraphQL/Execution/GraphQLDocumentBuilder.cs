@@ -1,6 +1,8 @@
 using GraphQL.Language;
 using GraphQL.Language.AST;
 using GraphQLParser;
+using GraphQLParser.AST;
+using GraphQLParser.Exceptions;
 
 namespace GraphQL.Execution
 {
@@ -17,7 +19,15 @@ namespace GraphQL.Execution
         public Document Build(string body)
         {
             var source = new Source(body);
-            var result = _parser.Parse(source);
+            GraphQLDocument result;
+            try
+            {
+                result = _parser.Parse(source);
+            }
+            catch (GraphQLSyntaxErrorException ex)
+            {
+                throw new SyntaxError(ex);
+            }
 
             var document = CoreToVanillaConverter.Convert(body, result);
             document.OriginalQuery = body;

@@ -1,4 +1,6 @@
-﻿using GraphQL.Language.AST;
+using System.Threading.Tasks;
+using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -11,17 +13,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class FragmentsOnCompositeTypes : IValidationRule
     {
-        public string InlineFragmentOnNonCompositeErrorMessage(string type)
-        {
-            return $"Fragment cannot condition on non composite type \"{type}\".";
-        }
+        public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
 
-        public string FragmentOnNonCompositeErrorMessage(string fragName, string type)
-        {
-            return $"Fragment \"{fragName}\" cannot condition on non composite type \"{type}\".";
-        }
-
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -30,11 +24,7 @@ namespace GraphQL.Validation.Rules
                     var type = context.TypeInfo.GetLastType();
                     if (node.Type != null && type != null && !type.IsCompositeType())
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.4.1.3",
-                            InlineFragmentOnNonCompositeErrorMessage(context.Print(node.Type)),
-                            node.Type));
+                        context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                     }
                 });
 
@@ -43,14 +33,10 @@ namespace GraphQL.Validation.Rules
                     var type = context.TypeInfo.GetLastType();
                     if (type != null && !type.IsCompositeType())
                     {
-                        context.ReportError(new ValidationError(
-                            context.OriginalQuery,
-                            "5.4.1.3",
-                            FragmentOnNonCompositeErrorMessage(node.Name, context.Print(node.Type)),
-                            node.Type));
+                        context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,11 @@ namespace GraphQL.Language.AST
     {
         private readonly List<Operation> _operations = new List<Operation>();
 
-        public int Count
-        {
-            get { return _operations.Count; }
-        }
+        public int Count => _operations.Count;
 
         public void Add(Operation operation)
         {
-            _operations.Add(operation);
+            _operations.Add(operation ?? throw new ArgumentNullException(nameof(operation)));
         }
 
         public Operation WithName(string operationName)

@@ -6,118 +6,69 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class BatchDataLoader<TKey, T> : DataLoaderBase<IDictionary<TKey, T>>, IDataLoader<TKey, T>
+    /// <summary>
+    /// A data loader that returns a single value for each given unique key
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key</typeparam>
+    /// <typeparam name="T">The type of the return value</typeparam>
+    public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> _loader;
-        private readonly HashSet<TKey> _pendingKeys;
-        private readonly Dictionary<TKey, T> _cache;
         private readonly T _defaultValue;
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> loader,
-            IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default)
+        /// <summary>
+        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns a dictionary of keys and values</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="defaultValue">The value returned when no match is found in the dictionary, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> fetchDelegate,
+               IEqualityComparer<TKey> keyComparer = null,
+               T defaultValue = default,
+               int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
-            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
-
-            keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
-
-            _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+            _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
             _defaultValue = defaultValue;
         }
 
-        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader,
+        /// <summary>
+        /// Initializes a new instance of BatchDataLoader with the specified fetch delegate and key selector
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
+        /// <param name="keySelector">A selector for the key from the returned object</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="defaultValue">The value returned when no match is found in the list, or default(T) if unspecified</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+        public BatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
             Func<T, TKey> keySelector,
             IEqualityComparer<TKey> keyComparer = null,
-            T defaultValue = default)
+            T defaultValue = default,
+            int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
-            if (loader == null)
-                throw new ArgumentNullException(nameof(loader));
-
+            if (fetchDelegate == null)
+                throw new ArgumentNullException(nameof(fetchDelegate));
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
-
-            async Task<IDictionary<TKey, T>> LoadAndMapToDictionary(IEnumerable<TKey> keys, CancellationToken cancellationToken)
+            _loader = async (keys, cancellationToken) =>
             {
-                var values = await loader(keys, cancellationToken).ConfigureAwait(false);
-                return values.ToDictionary(keySelector, keyComparer);
-            }
-
-            _loader = LoadAndMapToDictionary;
-            _pendingKeys = new HashSet<TKey>(keyComparer);
-            _cache = new Dictionary<TKey, T>(keyComparer);
+                var ret = await fetchDelegate(keys, cancellationToken);
+                return ret.ToDictionary(keySelector, keyComparer);
+            };
             _defaultValue = defaultValue;
         }
 
-        public async Task<T> LoadAsync(TKey key)
+        protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken)
         {
-            lock (_cache)
+            var keys = list.Select(x => x.Key);
+            var dictionary = await _loader(keys, cancellationToken);
+            foreach (var item in list)
             {
-                // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out T cacheValue))
-                {
-                    return cacheValue;
-                }
-
-                // Otherwise add to pending keys
-                if (!_pendingKeys.Contains(key))
-                {
-                    _pendingKeys.Add(key);
-                }
+                if (!dictionary.TryGetValue(item.Key, out var value))
+                    value = _defaultValue;
+                item.SetResult(value);
             }
-
-            var result = await DataLoaded;
-
-            if (result.TryGetValue(key, out T value))
-            {
-                return value;
-            }
-            else
-            {
-                return _defaultValue;
-            }
-        }
-
-        protected override bool IsFetchNeeded()
-        {
-            lock (_cache)
-            {
-                return _pendingKeys.Count > 0;
-            }
-        }
-
-        protected override async Task<IDictionary<TKey, T>> FetchAsync(CancellationToken cancellationToken)
-        {
-            IList<TKey> keys;
-
-            lock (_cache)
-            {
-                // Get pending keys and clear pending list
-                keys = _pendingKeys.ToArray();
-                _pendingKeys.Clear();
-            }
-
-            var dictionary = await _loader(keys, cancellationToken).ConfigureAwait(false);
-
-            // Populate cache
-            lock (_cache)
-            {
-                foreach (TKey key in keys)
-                {
-                    if (dictionary.TryGetValue(key, out T value))
-                    {
-                        _cache[key] = value;
-                    }
-                    else
-                    {
-                        _cache[key] = _defaultValue;
-                    }
-                }
-            }
-
-            return dictionary;
         }
     }
 }

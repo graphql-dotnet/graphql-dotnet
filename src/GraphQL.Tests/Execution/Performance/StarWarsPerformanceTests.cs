@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using System.Threading;
 using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
+using Shouldly;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +16,7 @@ namespace GraphQL.Tests.Execution.Performance
             _output = output;
         }
 
-        [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
+        [Fact(Skip = "Benchmarks only, these numbers are machine dependent.")]
         // [Fact]
         public void Executes_StarWarsBasicQuery_Performant()
         {
@@ -43,16 +43,15 @@ namespace GraphQL.Tests.Execution.Performance
             {
                 runResult2 = Executer.ExecuteAsync(_ =>
                 {
-                    _.SetFieldMiddleware = false;
                     _.EnableMetrics = false;
                     _.Schema = Schema;
                     _.Query = query;
                     _.Root = null;
                     _.Inputs = null;
                     _.UserContext = null;
-                    _.CancellationToken = default(CancellationToken);
+                    _.CancellationToken = default;
                     _.ValidationRules = null;
-                    _.FieldNameConverter = new CamelCaseFieldNameConverter();
+                    _.NameConverter = CamelCaseNameConverter.Instance;
                 }).GetAwaiter().GetResult();
             }
 
@@ -60,8 +59,8 @@ namespace GraphQL.Tests.Execution.Performance
 
             _output.WriteLine($"Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-            Assert.Null(runResult2.Errors);
-            Assert.True(smallListTimer.ElapsedMilliseconds < 9400 * 2); //machine specific data with a buffer
+            runResult2.Errors.ShouldBeNull();
+            smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(9400 * 2); //machine specific data with a buffer
         }
     }
 }

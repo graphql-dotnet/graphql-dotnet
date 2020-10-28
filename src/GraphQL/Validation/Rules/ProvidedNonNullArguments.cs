@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -11,17 +13,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class ProvidedNonNullArguments : IValidationRule
     {
-        public string MissingFieldArgMessage(string fieldName, string argName, string type)
-        {
-            return $"Field \"{fieldName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
-        }
+        public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
 
-        public string MissingDirectiveArgMessage(string directiveName, string argName, string type)
-        {
-            return $"Directive \"{directiveName}\" argument \"{argName}\" of type \"{type}\" is required but not provided.";
-        }
-
-        public INodeVisitor Validate(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
             {
@@ -36,17 +30,11 @@ namespace GraphQL.Validation.Rules
 
                     foreach (var arg in fieldDef.Arguments)
                     {
-                        var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = arg.ResolvedType;
-
-                        if (argAst == null && type is NonNullGraphType)
+                        if (arg.DefaultValue == null &&
+                            arg.ResolvedType is NonNullGraphType &&
+                            node.Arguments?.ValueFor(arg.Name) == null)
                         {
-                            context.ReportError(
-                                new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.3.2",
-                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(type)),
-                                    node));
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                         }
                     }
                 });
@@ -55,28 +43,23 @@ namespace GraphQL.Validation.Rules
                 {
                     var directive = context.TypeInfo.GetDirective();
 
-                    if (directive == null || directive.Arguments == null)
+                    if (directive?.Arguments?.ArgumentsList == null)
                     {
                         return;
                     }
 
-                    foreach (var arg in directive.Arguments)
+                    foreach (var arg in directive.Arguments.ArgumentsList)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;
 
                         if (argAst == null && type is NonNullGraphType)
                         {
-                            context.ReportError(
-                                new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.3.2",
-                                    MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(type)),
-                                    node));
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                         }
                     }
                 });
-            });
+            }).ToTask();
         }
     }
 }

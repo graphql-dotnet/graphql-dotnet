@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
+using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL.Validation
 {
-    public class ValidationContext
+    public class ValidationContext : IProvideUserContext
     {
         private readonly List<ValidationError> _errors = new List<ValidationError>();
 
@@ -25,16 +27,17 @@ namespace GraphQL.Validation
 
         public TypeInfo TypeInfo { get; set; }
 
-        public object UserContext { get; set; }
+        public IDictionary<string, object> UserContext { get; set; }
 
         public IEnumerable<ValidationError> Errors => _errors;
+
+        public bool HasErrors => _errors.Count > 0;
 
         public Inputs Inputs { get; set; }
 
         public void ReportError(ValidationError error)
         {
-            Invariant.Check(error != null, "Must provide a validation error.");
-            _errors.Add(error);
+            _errors.Add(error ?? throw new ArgumentNullException(nameof(error), "Must provide a validation error."));
         }
 
         public List<VariableUsage> GetVariables(IHaveSelectionSet node)
@@ -89,7 +92,7 @@ namespace GraphQL.Validation
             {
                 var set = setsToVisit.Pop();
 
-                foreach (var selection in set.Selections)
+                foreach (var selection in set.SelectionsList)
                 {
                     if (selection is FragmentSpread spread)
                     {

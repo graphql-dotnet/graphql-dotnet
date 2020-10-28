@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Execution;
@@ -11,8 +12,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void BeforeExecutionAwaited_Called_Correctly()
         {
-            var schema = new Schema();
-            schema.Query = new AsyncGraphType();
+            var schema = new Schema {Query = new AsyncGraphType()};
 
             var userContext = new TestContext();
 
@@ -24,8 +24,7 @@ namespace GraphQL.Tests.Execution
                 opts.Query = "{ foo }";
                 opts.UserContext = userContext;
                 opts.Listeners.Add(new TestExecutionListener());
-                opts.ExposeExceptions = true;
-            }, @"{ foo: ""bar"" }");
+            }, @"{ ""foo"": ""bar"" }");
 
             breaker.Dispose();
         }
@@ -43,17 +42,18 @@ namespace GraphQL.Tests.Execution
             }
         }
 
-        public class TestExecutionListener : DocumentExecutionListenerBase<TestContext>
+        public class TestExecutionListener : DocumentExecutionListenerBase
         {
-            public override Task BeforeExecutionAwaitedAsync(TestContext userContext, CancellationToken token)
+            public override Task BeforeExecutionAwaitedAsync(IExecutionContext context)
             {
-                userContext.Complete("bar");
+                var testContext = context.UserContext as TestContext;
+                testContext.Complete("bar");
 
                 return Task.CompletedTask;
             }
         }
 
-        public class TestContext
+        public class TestContext : Dictionary<string, object>
         {
             private TaskCompletionSource<string> _tcs;
 

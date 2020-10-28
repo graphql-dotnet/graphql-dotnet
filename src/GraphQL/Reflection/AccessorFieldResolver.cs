@@ -1,27 +1,26 @@
 using System;
 using GraphQL.Resolvers;
-using GraphQL.Types;
 
 namespace GraphQL.Reflection
 {
     internal class AccessorFieldResolver : IFieldResolver
     {
         private readonly IAccessor _accessor;
-        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AccessorFieldResolver(IAccessor accessor, IDependencyResolver dependencyResolver)
+        public AccessorFieldResolver(IAccessor accessor, IServiceProvider serviceProvider)
         {
             _accessor = accessor;
-            _dependencyResolver = dependencyResolver;
+            _serviceProvider = serviceProvider;
         }
 
-        public object Resolve(ResolveFieldContext context)
+        public object Resolve(IResolveFieldContext context)
         {
             var arguments = ReflectionHelper.BuildArguments(_accessor.Parameters, context);
 
             var target = _accessor.DeclaringType.IsInstanceOfType(context.Source)
                     ? context.Source
-                    : _dependencyResolver.Resolve(_accessor.DeclaringType);
+                    : _serviceProvider.GetService(_accessor.DeclaringType);
 
             if (target == null)
             {

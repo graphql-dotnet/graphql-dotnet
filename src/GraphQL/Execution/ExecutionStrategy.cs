@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -68,7 +70,7 @@ namespace GraphQL.Execution
                 if (!ShouldIncludeNode(context, field.Directives))
                     continue;
 
-                var fieldDefinition = GetFieldDefinition(context.Document, context.Schema, parentType, field);
+                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
 
                 if (fieldDefinition == null)
                     continue;
@@ -78,7 +80,7 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
-                subFields[kvp.Key] = node;
+                subFields[name] = node;
             }
 
             parent.SubFields = subFields;
@@ -94,8 +96,7 @@ namespace GraphQL.Execution
 
             if (!(parent.Result is IEnumerable data))
             {
-                var error = new ExecutionError("User error: expected an IEnumerable list though did not find one.");
-                throw error;
+                throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
             var index = 0;
@@ -105,101 +106,74 @@ namespace GraphQL.Execution
 
             foreach (var d in data)
             {
-                var path = AppendPath(parent.Path, (index++).ToString());
-
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path);
+                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     node.Result = d;
 
                     if (node is ObjectExecutionNode objectNode)
                     {
                         SetSubFieldNodes(context, objectNode);
                     }
+                    else if (node is ArrayExecutionNode arrayNode)
+                    {
+                        SetArrayItemNodes(context, arrayNode);
+                    }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = valueNode.GraphType.Serialize(d)
+                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                    }
 
                     arrayItems.Add(node);
                 }
                 else
                 {
-                    var valueExecutionNode = new ValueExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, path)
+                    if (listType.ResolvedType is NonNullGraphType)
                     {
-                        Result = null
-                    };
-                    arrayItems.Add(valueExecutionNode);
+                        throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
+                    }
+
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
+                    arrayItems.Add(nullExecutionNode);
                 }
+
+                index++;
             }
 
             parent.Items = arrayItems;
         }
 
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, string[] path = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
-            path = path ?? AppendPath(parent.Path, field.Name);
-
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
-            switch (graphType)
+            return graphType switch
             {
-                case ListGraphType listGraphType:
-                    return new ArrayExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IObjectGraphType objectGraphType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case IAbstractGraphType abstractType:
-                    return new ObjectExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                case ScalarGraphType scalarType:
-                    return new ValueExecutionNode(parent, graphType, field, fieldDefinition, path);
-
-                default:
-                    throw new InvalidOperationException($"Unexpected type: {graphType}");
-            }
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
+            };
         }
 
         /// <summary>
-        /// Execute a single node
+        /// Execute a single node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
         /// </summary>
-        /// <remarks>
-        /// Builds child nodes, but does not execute them
-        /// </remarks>
-        protected virtual async Task<ExecutionNode> ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
+        protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             if (node.IsResultSet)
-                return node;
+                return;
 
             try
             {
-                var arguments = GetArgumentValues(context.Schema, node.FieldDefinition.Arguments, node.Field.Arguments, context.Variables);
-                var subFields = SubFieldsFor(context, node.FieldDefinition.ResolvedType, node.Field);
+                var resolveContext = new ReadonlyResolveFieldContext(node, context);
 
-                var resolveContext = new ResolveFieldContext
-                {
-                    FieldName = node.Field.Name,
-                    FieldAst = node.Field,
-                    FieldDefinition = node.FieldDefinition,
-                    ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GetParentType(context.Schema),
-                    Arguments = arguments,
-                    Source = node.Source,
-                    Schema = context.Schema,
-                    Document = context.Document,
-                    Fragments = context.Fragments,
-                    RootValue = context.RootValue,
-                    UserContext = context.UserContext,
-                    Operation = context.Operation,
-                    Variables = context.Variables,
-                    CancellationToken = context.CancellationToken,
-                    Metrics = context.Metrics,
-                    Errors = context.Errors,
-                    Path = node.Path,
-                    SubFields = subFields
-                };
-
-                var resolver = node.FieldDefinition.Resolver ?? new NameFieldResolver();
+                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
 
                 if (result is Task task)
@@ -210,6 +184,70 @@ namespace GraphQL.Execution
 
                 node.Result = result;
 
+                if (!(result is IDataLoaderResult))
+                {
+                    CompleteNode(context, node);
+                }
+            }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (ExecutionError error)
+            {
+                SetNodeError(context, node, error);
+            }
+            catch (Exception ex)
+            {
+                if (ProcessNodeUnhandledException(context, node, ex))
+                    throw;
+            }
+        }
+
+        /// <summary>
+        /// Completes a pending data loader node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
+        /// </summary>
+        protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
+        {
+            if (!node.IsResultSet)
+                throw new InvalidOperationException("This execution node has not yet been executed");
+            if (!(node.Result is IDataLoaderResult dataLoaderResult))
+                throw new InvalidOperationException("This execution node is not pending completion");
+
+            try
+            {
+                node.Result = await dataLoaderResult.GetResultAsync(context.CancellationToken).ConfigureAwait(false);
+
+                if (!(node.Result is IDataLoaderResult))
+                {
+                    CompleteNode(context, node);
+                }
+            }
+            catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (ExecutionError error)
+            {
+                SetNodeError(context, node, error);
+            }
+            catch (Exception ex)
+            {
+                if (ProcessNodeUnhandledException(context, node, ex))
+                    throw;
+            }
+        }
+
+        /// <summary>
+        /// Builds child nodes, but does not execute them.
+        /// </summary>
+        protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
+        {
+            if (!node.IsResultSet)
+                throw new InvalidOperationException("This execution node has not yet been executed");
+
+            try
+            {
                 ValidateNodeResult(context, node);
 
                 // Build child nodes
@@ -223,30 +261,59 @@ namespace GraphQL.Execution
                     {
                         SetArrayItemNodes(context, arrayNode);
                     }
+                    else if (node is ValueExecutionNode valueNode)
+                    {
+                        node.Result = valueNode.GraphType.Serialize(node.Result)
+                            ?? throw new InvalidOperationException($"Unable to serialize '{node.Result}' to '{valueNode.GraphType.Name}'.");
+                    }
                 }
             }
             catch (ExecutionError error)
             {
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
-
-                node.Result = null;
+                SetNodeError(context, node, error);
             }
             catch (Exception ex)
             {
-                if (context.ThrowOnUnhandledException)
+                if (ProcessNodeUnhandledException(context, node, ex))
                     throw;
+            }
+        }
 
-                var error = new ExecutionError($"Error trying to resolve {node.Name}.", ex);
-                error.AddLocation(node.Field, context.Document);
-                error.Path = node.Path;
-                context.Errors.Add(error);
+        /// <summary>
+        /// Sets the location and path information to the error and adds it to the document. Sets the node result to null.
+        /// </summary>
+        protected void SetNodeError(ExecutionContext context, ExecutionNode node, ExecutionError error)
+        {
+            error.AddLocation(node.Field, context.Document);
+            error.Path = node.ResponsePath;
+            context.Errors.Add(error);
 
-                node.Result = null;
+            node.Result = null;
+        }
+
+        /// <summary>
+        /// Processes unhandled field resolver exceptions
+        /// </summary>
+        /// <returns>A value that indicates when the exception should be rethrown</returns>
+        protected bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
+        {
+            if (context.ThrowOnUnhandledException)
+                return true;
+
+            UnhandledExceptionContext exceptionContext = null;
+            if (context.UnhandledExceptionDelegate != null)
+            {
+                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
+                context.UnhandledExceptionDelegate(exceptionContext);
+                ex = exceptionContext.Exception;
             }
 
-            return node;
+            var error = ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? $"Error trying to resolve field '{node.Name}'.", ex);
+
+            SetNodeError(context, node, error);
+
+            return false;
         }
 
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
@@ -258,15 +325,13 @@ namespace GraphQL.Execution
 
             if (fieldType is NonNullGraphType nonNullType)
             {
-                objectType = nonNullType?.ResolvedType as IObjectGraphType;
-
                 if (result == null)
                 {
-                    var type = nonNullType.ResolvedType;
-
-                    var error = new ExecutionError($"Cannot return null for non-null type. Field: {node.Name}, Type: {type.Name}!.");
-                    throw error;
+                    throw new InvalidOperationException("Cannot return null for non-null type."
+                        + $" Field: {node.Name}, Type: {nonNullType}.");
                 }
+
+                objectType = nonNullType.ResolvedType as IObjectGraphType;
             }
 
             if (result == null)
@@ -280,34 +345,32 @@ namespace GraphQL.Execution
 
                 if (objectType == null)
                 {
-                    var error = new ExecutionError(
+                    throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
                         $"runtime for field {node.Parent.GraphType.Name}.{node.Name} " +
                         $"with value '{result}', received 'null'.");
-                    throw error;
                 }
 
                 if (!abstractType.IsPossibleType(objectType))
                 {
-                    var error = new ExecutionError($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\"");
-                    throw error;
+                    throw new InvalidOperationException($"Runtime Object type \"{objectType}\" is not a possible type for \"{abstractType}\".");
                 }
             }
 
             if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
             {
-                var error = new ExecutionError($"Expected value of type \"{objectType}\" for \"{objectType.Name}\" but got: {result}.");
-                throw error;
+                throw new InvalidOperationException($"\"{result}\" value of type \"{result.GetType()}\" is not allowed for \"{objectType.Name}\". Either change IsTypeOf method of \"{objectType.Name}\" to accept this value or return another value from your resolver.");
             }
         }
 
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
-            foreach (var listener in context.Listeners)
-            {
-                await listener.BeforeExecutionStepAwaitedAsync(context.UserContext, context.CancellationToken)
-                    .ConfigureAwait(false);
-            }
+            if (context.Listeners != null)
+                foreach (var listener in context.Listeners)
+                {
+                    await listener.BeforeExecutionStepAwaitedAsync(context)
+                        .ConfigureAwait(false);
+                }
         }
     }
 }

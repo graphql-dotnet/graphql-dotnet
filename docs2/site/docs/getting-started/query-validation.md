@@ -1,9 +1,9 @@
 # Query Validation
 
-There [are a number of query validation rules](http://facebook.github.io/graphql/June2018/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by setting the `ValidationRules` property.
+There [are a number of query validation rules](https://graphql.github.io/graphql-spec/June2018/#sec-Validation) that are ran when a query is executed.  All of these are turned on by default.  You can add your own validation rules or clear out the existing ones by setting the `ValidationRules` property.
 
 ```csharp
-schema.Execute(_ =>
+await schema.ExecuteAsync(_ =>
 {
   _.Query = "...";
   _.ValidationRules =
@@ -11,6 +11,6 @@ schema.Execute(_ =>
     {
       new RequiresAuthValidationRule()
     }
-    .Concat(DocumentValidator.CoreRules());
+    .Concat(DocumentValidator.CoreRules);
 });
 ```

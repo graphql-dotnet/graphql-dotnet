@@ -1,8 +1,11 @@
 # Authorization
 
-> See the [Authorization](https://github.com/graphql-dotnet/authorization) project for a more in depth implemenation of the following idea.
+> See the [Authorization](https://github.com/graphql-dotnet/authorization) project for a
+> more in depth implementation of the following idea.
 
-You can write validation rules that will run before a query is executed.  You can use this pattern to check that the user is authenticated or has permissions for a specific field.  This example uses the `Metadata` dictionary available on Fields to set permissons per field.
+You can write validation rules that will run before a query is executed. You can use this
+pattern to check that the user is authenticated or has permissions for a specific field.
+This example uses the `Metadata` dictionary available on Fields to set permissions per field.
 
 ```csharp
 public class MyGraphType : ObjectGraphType
@@ -20,12 +23,12 @@ public class MyGraphType : ObjectGraphType
 ```csharp
 public class RequiresAuthValidationRule : IValidationRule
 {
-  public INodeVisitor Validate(ValidationContext context)
+  public Task<INodeVisitor> ValidateAsync(ValidationContext context)
   {
     var userContext = context.UserContext as GraphQLUserContext;
     var authenticated = userContext.User?.IsAuthenticated() ?? false;
 
-    return new EnterLeaveListener(_ =>
+    return Task.FromResult(new EnterLeaveListener(_ =>
     {
       _.Match<Operation>(op =>
       {
@@ -56,7 +59,7 @@ public class RequiresAuthValidationRule : IValidationRule
               fieldAst));
         }
       });
-    });
+    }));
   }
 }
 ```

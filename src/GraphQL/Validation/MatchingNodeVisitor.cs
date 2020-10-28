@@ -13,7 +13,7 @@ namespace GraphQL.Validation
         {
             if (enter == null && leave == null)
             {
-                throw new ExecutionError("Must provide an enter or leave function.");
+                throw new ArgumentException("Must provide an enter or leave function.");
             }
 
             _enter = enter;

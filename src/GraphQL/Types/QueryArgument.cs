@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
@@ -11,8 +14,14 @@ namespace GraphQL.Types
         }
     }
 
-    public class QueryArgument : IHaveDefaultValue
+    [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
+    public class QueryArgument : MetadataProvider, IHaveDefaultValue
     {
+        private Type _type;
+        private IGraphType _resolvedType;
+        private object _defaultValue;
+        private IValue _defaultValueAST;
+
         public QueryArgument(IGraphType type)
         {
             ResolvedType = type ?? throw new ArgumentOutOfRangeException(nameof(type), "QueryArgument type is required");
@@ -28,14 +37,69 @@ namespace GraphQL.Types
             Type = type;
         }
 
-        public string Name { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                NameValidator.ValidateNameNotNull(value, "argument");
+                _name = value;
+            }
+        }
 
         public string Description { get; set; }
 
-        public object DefaultValue { get; set; }
+        public object DefaultValue
+        {
+            get => _defaultValue;
+            set
+            {
+                if (!(ResolvedType is GraphQLTypeReference))
+                    _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
 
-        public IGraphType ResolvedType { get; set; }
+                _defaultValue = value;
+                _defaultValueAST = null;
+            }
+        }
 
-        public Type Type { get; private set; }
+        public IGraphType ResolvedType
+        {
+            get => _resolvedType;
+            set => _resolvedType = CheckResolvedType(value);
+        }
+
+        public Type Type
+        {
+            get => _type;
+            private set => _type = CheckType(value);
+        }
+
+        private Type CheckType(Type type)
+        {
+            if (type?.IsInputType() == false)
+                throw Create(nameof(Type), type);
+
+            return type;
+        }
+
+        private IGraphType CheckResolvedType(IGraphType type)
+        {
+            if (!(type.GetNamedType() is GraphQLTypeReference) && type?.IsInputType() == false)
+                throw Create(nameof(ResolvedType), type.GetType());
+
+            return type;
+        }
+
+        private ArgumentOutOfRangeException Create(string paramName, Type value) => new ArgumentOutOfRangeException(paramName,
+            $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+
+        internal IValue GetDefaultValueAST(ISchema schema)
+        {
+            if (_defaultValueAST == null && _defaultValue != null)
+                _defaultValueAST = _defaultValue.AstFromValue(schema, ResolvedType);
+
+            return _defaultValueAST;
+        }
     }
 }

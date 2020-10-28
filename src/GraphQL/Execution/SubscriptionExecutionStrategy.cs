@@ -16,7 +16,7 @@ namespace GraphQL.Execution
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
-            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields);
+            var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
 
             ExecutionResult result = new SubscriptionExecutionResult
             {
@@ -35,10 +35,10 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var node = kvp.Value;
 
-                if (!(node.FieldDefinition is EventStreamFieldType fieldDefinition))
+                if (!(node.FieldDefinition is EventStreamFieldType))
                     continue;
 
-                streams[name] = await ResolveEventStreamAsync(context, node);
+                streams[name] = await ResolveEventStreamAsync(context, node).ConfigureAwait(false);
             }
 
             return streams;
@@ -66,7 +66,7 @@ namespace GraphQL.Execution
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
                     ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GraphType as IObjectGraphType,
+                    ParentType = node.GetParentType(context.Schema),
                     Arguments = arguments,
                     Source = source,
                     Schema = context.Schema,
@@ -79,7 +79,8 @@ namespace GraphQL.Execution
                     CancellationToken = context.CancellationToken,
                     Metrics = context.Metrics,
                     Errors = context.Errors,
-                    Path = node.Path
+                    Path = node.Path,
+                    RequestServices = context.RequestServices,
                 };
 
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
@@ -93,41 +94,44 @@ namespace GraphQL.Execution
                 }
                 else if (eventStreamField?.AsyncSubscriber != null)
                 {
-                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext);
+                    subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Subscriber not set for field {node.Field.Name}");
+                    throw new InvalidOperationException($"Subscriber not set for field '{node.Field.Name}'.");
                 }
 
                 return subscription
-                    .Select(value => new ObjectExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.Path)
+                    .Select(value =>
                     {
-                        Source = value
+                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
+                        executionNode.Source = value;
+                        return executionNode;
                     })
-                    .SelectMany(async objectNode =>
+                    .SelectMany(async executionNode =>
                     {
-                        foreach (var listener in context.Listeners)
-                        {
-                            await listener.BeforeExecutionAsync(context.UserContext, context.CancellationToken)
-                                .ConfigureAwait(false);
-                        }
+                        if (context.Listeners != null)
+                            foreach (var listener in context.Listeners)
+                            {
+                                await listener.BeforeExecutionAsync(context)
+                                    .ConfigureAwait(false);
+                            }
 
                         // Execute the whole execution tree and return the result
-                        await ExecuteNodeTreeAsync(context, objectNode)
-                            .ConfigureAwait(false);
+                        await ExecuteNodeTreeAsync(context, executionNode).ConfigureAwait(false);
 
-                        foreach (var listener in context.Listeners)
-                        {
-                            await listener.AfterExecutionAsync(context.UserContext, context.CancellationToken)
-                                .ConfigureAwait(false);
-                        }
+                        if (context.Listeners != null)
+                            foreach (var listener in context.Listeners)
+                            {
+                                await listener.AfterExecutionAsync(context)
+                                    .ConfigureAwait(false);
+                            }
 
                         return new ExecutionResult
                         {
                             Data = new Dictionary<string, object>
                             {
-                                { objectNode.Name, objectNode.ToValue() }
+                                { executionNode.Name, executionNode.ToValue() }
                             }
                         }.With(context);
                     })
@@ -139,17 +143,17 @@ namespace GraphQL.Execution
                                 {
                                     GenerateError(
                                         context,
-                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'",
+                                        $"Could not subscribe to field '{node.Field.Name}' in query '{context.Document.OriginalQuery}'.",
                                         node.Field,
-                                        node.Path,
+                                        node.ResponsePath,
                                         exception)
                                 }
                             }.With(context)));
             }
             catch (Exception ex)
             {
-                var message = $"Error trying to resolve {node.Field.Name}.";
-                var error = GenerateError(context, message, node.Field, node.Path, ex);
+                var message = $"Error trying to resolve field '{node.Field.Name}'.";
+                var error = GenerateError(context, message, node.Field, node.ResponsePath, ex);
                 context.Errors.Add(error);
                 return null;
             }
@@ -159,24 +163,13 @@ namespace GraphQL.Execution
             ExecutionContext context,
             string message,
             Field field,
-            IEnumerable<string> path,
+            IEnumerable<object> path,
             Exception ex = null)
         {
             var error = new ExecutionError(message, ex);
             error.AddLocation(field, context.Document);
             error.Path = path;
             return error;
-        }
-    }
-
-    internal static class ExecutionContextExtensions
-    {
-        public static ExecutionResult With(this ExecutionResult result, ExecutionContext context)
-        {
-            result.Query = context.Document.OriginalQuery;
-            result.Document = context.Document;
-            result.Operation = context.Operation;
-            return result;
         }
     }
 }

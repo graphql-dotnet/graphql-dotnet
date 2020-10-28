@@ -8,19 +8,24 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
-        public static ConnectionBuilder<TGraphType, TSourceType> Create<TGraphType, TSourceType>()
-            where TGraphType : IGraphType
-        {
-            return ConnectionBuilder<TGraphType, TSourceType>.Create();
-        }
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
+            where TNodeType : IGraphType
+            => ConnectionBuilder<TSourceType>.Create<TNodeType>();
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
     }
 
-    public class ConnectionBuilder<TGraphType, TSourceType>
-        where TGraphType : IGraphType
+    public class ConnectionBuilder<TSourceType>
     {
-
-        private readonly Func<object, TSourceType> _objectResolver;
-
         private bool _isUnidirectional;
 
         private bool _isBidirectional;
@@ -31,31 +36,40 @@ namespace GraphQL.Builders
 
         private ConnectionBuilder(
             FieldType fieldType,
-            Func<object, TSourceType> objectResolver,
             bool isUnidirectional,
             bool isBidirectional,
             int? pageSize)
         {
-            _objectResolver = objectResolver;
             _isUnidirectional = isUnidirectional;
             _isBidirectional = isBidirectional;
             _pageSize = pageSize;
             FieldType = fieldType;
         }
 
-        public static ConnectionBuilder<TGraphType, TSourceType> Create(string name = "default")
+        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
+            where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
+
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
             var fieldType = new FieldType
             {
                 Name = name,
-                Type = typeof(ConnectionType<TGraphType>),
-                Arguments = new QueryArguments(new QueryArgument[0]),
+                Type = typeof(TConnectionType),
+                Arguments = new QueryArguments(),
             };
-            return new ConnectionBuilder<TGraphType, TSourceType>(fieldType, null, false, false, null)
+            return new ConnectionBuilder<TSourceType>(fieldType, false, false, null)
                 .Unidirectional();
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Unidirectional()
+        public ConnectionBuilder<TSourceType> Unidirectional()
         {
             if (_isUnidirectional)
             {
@@ -73,7 +87,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Bidirectional()
+        public ConnectionBuilder<TSourceType> Bidirectional()
         {
             if (_isBidirectional)
             {
@@ -91,39 +105,37 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Name(string name)
+        public ConnectionBuilder<TSourceType> Name(string name)
         {
-            NameValidator.ValidateName(name);
-
             FieldType.Name = name;
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Description(string description)
+        public ConnectionBuilder<TSourceType> Description(string description)
         {
             FieldType.Description = description;
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> DeprecationReason(string deprecationReason)
+        public ConnectionBuilder<TSourceType> DeprecationReason(string deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> PageSize(int pageSize)
+        public ConnectionBuilder<TSourceType> PageSize(int pageSize)
         {
             _pageSize = pageSize;
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> ReturnAll()
+        public ConnectionBuilder<TSourceType> ReturnAll()
         {
             _pageSize = null;
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Argument<TArgumentGraphType>(string name, string description)
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string description)
             where TArgumentGraphType : IGraphType
         {
             FieldType.Arguments.Add(new QueryArgument(typeof(TArgumentGraphType))
@@ -134,7 +146,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public ConnectionBuilder<TGraphType, TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
+        public ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string description,
             TArgumentType defaultValue = default)
             where TArgumentGraphType : IGraphType
         {
@@ -147,7 +159,7 @@ namespace GraphQL.Builders
             return this;
         }
 
-        public void Resolve(Func<ResolveConnectionContext<TSourceType>, object> resolver)
+        public void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
         {
             FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
@@ -157,7 +169,7 @@ namespace GraphQL.Builders
             });
         }
 
-        public void ResolveAsync(Func<ResolveConnectionContext<TSourceType>, Task<object>> resolver)
+        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object>> resolver)
         {
             FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
             {
@@ -167,7 +179,7 @@ namespace GraphQL.Builders
             });
         }
 
-        private void CheckForErrors(ResolveConnectionContext<TSourceType> args)
+        private void CheckForErrors(IResolveConnectionContext<TSourceType> args)
         {
             if (args.First.HasValue && args.Last.HasValue)
             {
@@ -176,10 +188,6 @@ namespace GraphQL.Builders
             if (args.IsUnidirectional && args.Last.HasValue)
             {
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
-            }
-            if (args.IsPartial && args.NumberOfSkippedEntries.HasValue)
-            {
-                throw new ArgumentException("Cannot specify `numberOfSkippedEntries` with partial connection resolvers.");
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -56,29 +57,28 @@ namespace GraphQL.Language.AST
 
         protected bool Equals(Field other)
         {
-            return string.Equals(Name, other.Name) && string.Equals(Alias, other.Alias);
+            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && string.Equals(Alias, other.Alias, StringComparison.InvariantCulture);
         }
 
         public override bool IsEqualTo(INode obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((Field)obj);
         }
 
         public Field MergeSelectionSet(Field other)
         {
-            if (this.Equals(other))
+            if (Equals(other))
             {
-                var field = new Field(this.AliasNode, this.NameNode)
+                return new Field(AliasNode, NameNode)
                 {
-                    Arguments = this.Arguments,
-                    SelectionSet = this.SelectionSet.Merge(other.SelectionSet),
-                    Directives = this.Directives,
-                    SourceLocation = this.SourceLocation
+                    Arguments = Arguments,
+                    SelectionSet = SelectionSet.Merge(other.SelectionSet),
+                    Directives = Directives,
+                    SourceLocation = SourceLocation,
                 };
-                return field;
             }
             return this;
         }

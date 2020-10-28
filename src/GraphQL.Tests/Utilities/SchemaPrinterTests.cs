@@ -11,52 +11,13 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaPrinterTests
     {
-        private static readonly Dictionary<string, string> built_in_scalars = new Dictionary<string, string>
-        {
-            {
-                "Date",
-@"# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date"
-            },
-            {
-                "DateTime",
-@"# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime"
-            },
-            {
-                "DateTimeOffset",
-@"# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset"
-            },
-            {
-                "Decimal",
-@"scalar Decimal"
-            },
-            {
-                "Milliseconds",
-@"# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds"
-            },
-            {
-                "Seconds",
-@"# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds"
-            },
-        };
-
         private string printSingleFieldSchema<T>(
             IEnumerable<QueryArgument> arguments = null)
             where T : GraphType
         {
             var args = arguments != null ? new QueryArguments(arguments) : null;
 
-            var root = new ObjectGraphType();
-            root.Name = "Query";
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<T>(
                 "singleField",
                 arguments: args);
@@ -78,7 +39,12 @@ scalar Seconds"
 
         private string print(ISchema schema)
         {
-            var printer = new SchemaPrinter(schema);
+            return print(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
+        }
+
+        private string print(ISchema schema, SchemaPrinterOptions options)
+        {
+            var printer = new SchemaPrinter(schema, options);
             return Environment.NewLine + printer.Print();
         }
 
@@ -101,10 +67,8 @@ scalar Seconds"
             }
             else
             {
-                var orderedScalars = built_in_scalars
-                    .ToDictionary(x => x.Key, x => x.Value)
-                    .Union(expected)
-                    .OrderBy(x => x.Key)
+                var orderedScalars = expected
+                    .OrderBy(x => x.Key, StringComparer.Ordinal)
                     .Select(x => x.Value);
                 exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
             }
@@ -115,7 +79,7 @@ scalar Seconds"
         [Fact]
         public void prints_directive()
         {
-            var printer = new SchemaPrinter(null);
+            var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
             var arg = DirectiveGraphType.Skip.Arguments.First();
             arg.ResolvedType = arg.Type.BuildNamedType();
 
@@ -186,7 +150,7 @@ directive @skip(
         [Fact]
         public void prints_object_field()
         {
-            var root = new ObjectGraphType {Name = "Query"};
+            var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
             var schema = new Schema {Query = root};
@@ -195,8 +159,12 @@ directive @skip(
             {
                 {
                     "Foo",
-@"type Foo {
+@"# This is a Foo object type
+type Foo {
+  # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }"
                 },
                 {
@@ -210,12 +178,84 @@ directive @skip(
         }
 
         [Fact]
+        public void prints_object_field_with_field_descriptions()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<FooType>("foo");
+
+            var schema = new Schema {Query = root};
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"# This is a Foo object type
+type Foo {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}"
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            AssertEqual(print(schema, options), expected);
+        }
+
+        [Fact]
+        public void prints_object_field_with_field_descriptions_and_deprecation_reasons()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<FooType>("foo");
+
+            var schema = new Schema {Query = root};
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true,
+                IncludeDeprecationReasons = true
+            };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Foo",
+@"# This is a Foo object type
+type Foo {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
+                },
+                {
+                    "Query",
+@"type Query {
+  foo: Foo
+}"
+                },
+            };
+            var result = print(schema, options);
+            AssertEqual(result, expected);
+        }
+
+        [Fact]
         public void prints_string_field_with_int_arg()
         {
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" }
                 });
 
             const string expected =
@@ -231,7 +271,7 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne", DefaultValue = 2}
+                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
                 });
 
             const string expected =
@@ -247,7 +287,7 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new[]
                 {
-                    new QueryArgument<NonNullGraphType<IntGraphType>> {Name = "argOne"}
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
                 });
 
             const string expected =
@@ -263,8 +303,8 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" }
                 });
 
             const string expected =
@@ -280,9 +320,9 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne", DefaultValue = 1},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree"}
+                    new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
                 });
 
             const string expected =
@@ -298,9 +338,9 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo", DefaultValue = "foo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree"}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo", DefaultValue = "foo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree" }
                 });
 
             const string expected =
@@ -316,9 +356,9 @@ directive @skip(
             var result = printSingleFieldSchema<StringGraphType>(
                 new QueryArgument[]
                 {
-                    new QueryArgument<IntGraphType> {Name = "argOne"},
-                    new QueryArgument<StringGraphType> {Name = "argTwo"},
-                    new QueryArgument<BooleanGraphType> {Name = "argThree", DefaultValue = false}
+                    new QueryArgument<IntGraphType> { Name = "argOne" },
+                    new QueryArgument<StringGraphType> { Name = "argTwo" },
+                    new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
                 });
 
             const string expected =
@@ -341,39 +381,20 @@ schema {
   query: Root
 }
 
-type Bar implements Foo {
+type Bar implements IFoo {
+  # This is of type String
   str: String
 }
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-interface Foo {
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
   str: String
 }
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
 
 type Root {
   bar: Bar
 }
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
 ", excludeScalars: true);
         }
 
@@ -385,44 +406,109 @@ scalar Seconds
 
             var schema = new Schema { Query = root };
 
-            AssertEqual(print(schema), "", @"
+            var result = print(schema);
+
+            AssertEqual(result, "", @"
 interface Baaz {
+  # This is of type Integer
   int: Int
 }
 
-type Bar implements Foo, Baaz {
+type Bar implements IFoo & Baaz {
+  # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-interface Foo {
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
   str: String
 }
-
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
 
 type Query {
   bar: Bar
 }
+", excludeScalars: true);
+        }
 
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
+        [Fact]
+        public void prints_multiple_interfaces_with_old_implements_syntax()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                OldImplementsSyntax = true,
+                IncludeDescriptions = true
+            };
+
+            AssertEqual(print(schema, options), "", @"
+interface Baaz {
+  # This is of type Integer
+  int: Int
+}
+
+type Bar implements IFoo, Baaz {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}
+
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
+  str: String
+}
+
+type Query {
+  bar: Bar
+}
+", excludeScalars: true);
+        }
+
+        [Fact]
+        public void prints_multiple_interfaces_with_field_descriptions()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BarMultipleType>("bar");
+
+            var schema = new Schema { Query = root };
+
+            var options = new SchemaPrinterOptions
+            {
+                IncludeDescriptions = true
+            };
+
+            var result = print(schema, options);
+
+            AssertEqual(result, "", @"
+interface Baaz {
+  # This is of type Integer
+  int: Int
+}
+
+type Bar implements IFoo & Baaz {
+  # This is of type String
+  str: String
+  # This is of type Integer
+  int: Int
+}
+
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
+  str: String
+}
+
+type Query {
+  bar: Bar
+}
 ", excludeScalars: true);
         }
 
@@ -436,32 +522,24 @@ scalar Seconds
             var schema = new Schema { Query = root };
 
             AssertEqual(print(schema), "", @"
-type Bar implements Foo {
+type Bar implements IFoo {
+  # This is of type String
   str: String
 }
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
-
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
-
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
-
-scalar Decimal
-
-interface Foo {
+# This is a Foo object type
+type Foo {
+  # This is of type String
   str: String
+  # This is of type Integer
+  int: Int
 }
 
-# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
-scalar Milliseconds
+# This is a Foo interface type
+interface IFoo {
+  # This is of type String
+  str: String
+}
 
 union MultipleUnion = Foo | Bar
 
@@ -469,9 +547,6 @@ type Query {
   single: SingleUnion
   multiple: MultipleUnion
 }
-
-# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
-scalar Seconds
 
 union SingleUnion = Foo
 ", excludeScalars: true);
@@ -483,7 +558,7 @@ union SingleUnion = Foo
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<NonNullGraphType<StringGraphType>>(
                 "str",
-                arguments: new QueryArguments(new QueryArgument<InputType> {Name = "argOne"}));
+                arguments: new QueryArguments(new QueryArgument<InputType> { Name = "argOne" }));
 
             var schema = new Schema { Query = root };
 
@@ -527,6 +602,98 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_builtin_scalars()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<BigIntGraphType>("bigint");
+            root.Field<ByteGraphType>("byte");
+            root.Field<DateGraphType>("date");
+            root.Field<DateTimeGraphType>("datetime");
+            root.Field<DateTimeOffsetGraphType>("datetimeoffset");
+            root.Field<DecimalGraphType>("decimal");
+            root.Field<GuidGraphType>("guid");
+            root.Field<LongGraphType>("long");
+            root.Field<TimeSpanMillisecondsGraphType>("milliseconds");
+            root.Field<SByteGraphType>("sbyte");
+            root.Field<TimeSpanSecondsGraphType>("seconds");
+            root.Field<ShortGraphType>("short");
+            root.Field<UIntGraphType>("uint");
+            root.Field<ULongGraphType>("ulong");
+            root.Field<UShortGraphType>("ushort");
+            root.Field<UriGraphType>("uri");
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"scalar BigInt
+
+scalar Byte
+
+# The `Date` scalar type represents a year, month and day in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar Date
+
+# The `DateTime` scalar type represents a date and time. `DateTime` expects
+# timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTime
+
+# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+# `DateTimeOffset` expects timestamps to be formatted in accordance with the
+# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+scalar DateTimeOffset
+
+scalar Decimal
+
+scalar Guid
+
+scalar Long
+
+# The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.
+scalar Milliseconds
+
+type Query {
+  bigint: BigInt
+  byte: Byte
+  date: Date
+  datetime: DateTime
+  datetimeoffset: DateTimeOffset
+  decimal: Decimal
+  guid: Guid
+  long: Long
+  milliseconds: Milliseconds
+  sbyte: SByte
+  seconds: Seconds
+  short: Short
+  uint: UInt
+  ulong: ULong
+  ushort: UShort
+  uri: Uri
+}
+
+scalar SByte
+
+# The `Seconds` scalar type represents a period of time represented as the total number of seconds.
+scalar Seconds
+
+scalar Short
+
+scalar UInt
+
+scalar ULong
+
+scalar UShort
+
+scalar Uri"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_enum()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -551,6 +718,45 @@ union SingleUnion = Foo
 }"
                 },
             };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
+        public void prints_enum_default_args()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            
+            var f = new FieldType
+            {
+                Name = "bestColor",
+                Arguments = new QueryArguments(new QueryArgument<RgbEnum>
+                {
+                    Name = "color",
+                    DefaultValue = "RED"
+                }),
+                Type = typeof(RgbEnum)
+            };
+            root.AddField(f);
+            var schema = new Schema { Query = root };
+            schema.RegisterType<RgbEnum>();
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "Query",
+@"type Query {
+  bestColor(color: RGB = RED): RGB
+}"
+                },
+                {
+                    "RGB",
+@"enum RGB {
+  RED
+  GREEN
+  BLUE
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
         }
 
         [Fact]
@@ -563,13 +769,18 @@ union SingleUnion = Foo
                     Name = "Root"
                 }
             };
-            var printer = new SchemaPrinter(schema);
+            var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true });
             var result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
             const string expected = @"
 schema {
   query: Root
 }
+
+# Marks an element of a GraphQL schema as no longer supported.
+directive @deprecated(
+  reason: String = ""No longer supported""
+) on FIELD_DEFINITION | ENUM_VALUE
 
 # Directs the executor to include this field or fragment only when the 'if' argument is true.
 directive @include(
@@ -580,11 +791,6 @@ directive @include(
 directive @skip(
   if: Boolean!
 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-
-# Marks an element of a GraphQL schema as no longer supported.
-directive @deprecated(
-  reason: String = ""No longer supported""
-) on FIELD_DEFINITION | ENUM_VALUE
 
 # A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.
 #
@@ -631,7 +837,7 @@ enum __DirectiveLocation {
 type __EnumValue {
   name: String!
   description: String
-  isDeprecated: String!
+  isDeprecated: Boolean!
   deprecationReason: String
 }
 
@@ -653,6 +859,7 @@ type __InputValue {
   name: String!
   description: String
   type: __Type!
+  # A GraphQL-formatted string representing the default value for this input value.
   defaultValue: String
 }
 
@@ -660,10 +867,16 @@ type __InputValue {
 # available types and directives on the server, as well as the entry points for
 # query, mutation, and subscription operations.
 type __Schema {
+  description: String
+  # A list of all types supported by this server.
   types: [__Type!]!
+  # The type that query operations will be rooted at.
   queryType: __Type!
+  # If this server supports mutation, the type that mutation operations will be rooted at.
   mutationType: __Type
+  # If this server supports subscription, the type that subscription operations will be rooted at.
   subscriptionType: __Type
+  # A list of all directives supported by this server.
   directives: [__Directive!]!
 }
 
@@ -708,7 +921,14 @@ enum __TypeKind {
             public FooType()
             {
                 Name = "Foo";
-                Field<StringGraphType>("str");
+                Description = "This is a Foo object type";
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
+                Field<IntGraphType>(
+                    name: "int",
+                    description: "This is of type Integer",
+                    deprecationReason: "This field is now deprecated");
             }
         }
 
@@ -716,9 +936,12 @@ enum __TypeKind {
         {
             public FooInterfaceType()
             {
-                Name = "Foo";
+                Name = "IFoo";
+                Description = "This is a Foo interface type";
                 ResolveType = obj => null;
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
             }
         }
 
@@ -728,7 +951,9 @@ enum __TypeKind {
             {
                 Name = "Baaz";
                 ResolveType = obj => null;
-                Field<IntGraphType>("int");
+                Field<IntGraphType>(
+                    name: "int",
+                    description: "This is of type Integer");
             }
         }
 
@@ -737,7 +962,9 @@ enum __TypeKind {
             public BarType()
             {
                 Name = "Bar";
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
                 Interface<FooInterfaceType>();
             }
         }
@@ -747,7 +974,12 @@ enum __TypeKind {
             public BarMultipleType()
             {
                 Name = "Bar";
-                Field<StringGraphType>("str");
+                Field<StringGraphType>(
+                    name: "str",
+                    description: "This is of type String");
+                Field<IntGraphType>(
+                  name: "int",
+                  description: "This is of type Integer");
                 Interface<FooInterfaceType>();
                 Interface<BaazInterfaceType>();
             }
@@ -790,20 +1022,9 @@ enum __TypeKind {
                 Name = "Odd";
             }
 
-            public override object Serialize(object value)
-            {
-                return null;
-            }
+            public override object ParseValue(object value) => null;
 
-            public override object ParseValue(object value)
-            {
-                return null;
-            }
-
-            public override object ParseLiteral(IValue value)
-            {
-                return null;
-            }
+            public override object ParseLiteral(IValue value) => null;
         }
 
         public class RgbEnum : EnumerationGraphType

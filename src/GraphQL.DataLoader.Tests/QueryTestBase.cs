@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.DataLoader.Tests.Types;
 using GraphQL.Execution;
-using GraphQL.Http;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Shouldly;
 
@@ -60,7 +59,7 @@ namespace GraphQL.DataLoader.Tests
             string query,
             string expected,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
@@ -81,11 +80,10 @@ namespace GraphQL.DataLoader.Tests
             var schema = Services.GetRequiredService<TSchema>();
 
             // Run the executer within an async context to make sure there are no deadlock issues
-            var runResult = AsyncContext.Run(() => executer.ExecuteAsync((opts) =>
+            var runResult = AsyncContext.Run(() => executer.ExecuteAsync(opts =>
             {
                 options(opts);
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
             }));
 
             var writtenResult = AsyncContext.Run(() => writer.WriteToStringAsync(runResult));
@@ -111,10 +109,9 @@ namespace GraphQL.DataLoader.Tests
             var schema = Services.GetRequiredService<TSchema>();
 
             // Run the executer within an async context to make sure there are no deadlock issues
-            return executer.ExecuteAsync((opts) =>
+            return executer.ExecuteAsync(opts =>
             {
                 opts.Schema = schema;
-                opts.ExposeExceptions = true;
                 opts.Query = query;
                 foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
                 {
@@ -127,32 +124,29 @@ namespace GraphQL.DataLoader.Tests
             string query,
             ExecutionResult expectedExecutionResult,
             Inputs inputs = null,
-            object userContext = null,
+            IDictionary<string, object> userContext = null,
             CancellationToken cancellationToken = default)
             where TSchema : ISchema
         {
-            return AssertQuery<TSchema>(opts =>
-            {
-                opts.Query = query;
-                opts.Inputs = inputs;
-                opts.UserContext = userContext;
-                opts.CancellationToken = cancellationToken;
-
-                foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+            return AssertQuery<TSchema>(
+                opts =>
                 {
-                    opts.Listeners.Add(listener);
-                }
+                    opts.Query = query;
+                    opts.Inputs = inputs;
+                    opts.UserContext = userContext;
+                    opts.CancellationToken = cancellationToken;
 
-            }, expectedExecutionResult);
+                    foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
+                    {
+                        opts.Listeners.Add(listener);
+                    }
+                },
+                expectedExecutionResult);
         }
 
         public ExecutionResult CreateQueryResult(string result)
         {
-            object expected = null;
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                expected = JObject.Parse(result);
-            }
+            object expected = string.IsNullOrWhiteSpace(result) ? null : result.ToDictionary();
             return new ExecutionResult { Data = expected };
         }
     }
