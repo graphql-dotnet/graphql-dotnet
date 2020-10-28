@@ -10,6 +10,17 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
+        [Fact]
+        public void can_read_schema_with_custom_root_names()
+        {
+            var schema = Schema.For(ReadSchema("CustomSubscription.graphql"));
+
+            schema.Query.Name.ShouldBe("CustomQuery");
+            schema.Mutation.Name.ShouldBe("CustomMutation");
+            schema.Subscription.Name.ShouldBe("CustomSubscription");
+            schema.Subscription.Fields.All(f => f is EventStreamFieldType).ShouldBeTrue();
+        }
+
         [Theory]
         [InlineData("PetAfterAll.graphql", 15)]
         [InlineData("PetBeforeAll.graphql", 15)]
