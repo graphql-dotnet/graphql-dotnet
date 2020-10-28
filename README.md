@@ -269,7 +269,7 @@ var json = await schema.ExecuteAsync(_ =>
 
 The package publishing process is automated with [GitHub Actions](https://github.com/features/actions).
 
-After your PR is merged into `master` or `develop` preview packages are published to [GitHub registry](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
+After your PR is merged into `master` or `develop`, preview packages are published to [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 
 Stable versions of packages are published to NuGet when a [release](https://github.com/graphql-dotnet/graphql-dotnet/releases) is created.
 
