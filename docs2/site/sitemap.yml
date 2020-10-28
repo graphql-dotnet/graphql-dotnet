@@ -75,8 +75,12 @@
             file: dataloader.md
           - title: Schema Generation
             file: schema-generation.md
+          - title: Migration Guide [v0.8.0]
+            file: v0.8.0.md
+          - title: Migration Guide [v0.11.0]
+            file: v0.11.0.md
           - title: Migration Guide [v0.17.x -> v2]
-            file: migration.md
+            file: migration2.md
           - title: Migration Guide [v2 -> v3]
             file: migration3.md
           - title: Known Issues & FAQ
