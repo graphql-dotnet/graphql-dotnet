@@ -331,7 +331,7 @@ namespace GraphQL
             {
                 OperationType.Query => new ParallelExecutionStrategy(),
                 OperationType.Mutation => new SerialExecutionStrategy(),
-                OperationType.Subscription => new SubscriptionExecutionStrategy(),
+                OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.Subscriptions package to execute subscriptions."),
                 _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
             };
         }

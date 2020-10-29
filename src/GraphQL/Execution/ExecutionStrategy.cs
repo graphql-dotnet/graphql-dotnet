@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
@@ -26,8 +25,12 @@ namespace GraphQL.Execution
 
             return new ExecutionResult
             {
-                Data = data
-            }.With(context);
+                Data = data,
+                Query = context.Document.OriginalQuery,
+                Document = context.Document,
+                Operation = context.Operation,
+                Extensions = context.Extensions
+            };
         }
 
         protected abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode);
