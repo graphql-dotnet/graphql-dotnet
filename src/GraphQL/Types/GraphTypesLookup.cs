@@ -18,6 +18,8 @@ namespace GraphQL.Types
         private readonly Dictionary<Type, IGraphType> _introspectionTypes = new IGraphType[]
         {
             new __DirectiveLocation(),
+            new __DirectiveArgument(),
+            new __DirectiveUsage(),
             new __TypeKind(),
             new __EnumValue(),
             new __Directive(),
