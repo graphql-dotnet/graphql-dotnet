@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
@@ -43,42 +41,6 @@ namespace GraphQL.DataLoader
             }
 
             return (TDataLoader)loader;
-        }
-
-        /// <summary>
-        /// Dispatch all registered data loaders
-        /// </summary>
-        /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        public async Task DispatchAllAsync(CancellationToken cancellationToken = default)
-        {
-            Task task;
-
-            lock (_loaders)
-            {
-                if (_queue.Count == 0)
-                {
-                    return;
-                }
-                else if (_queue.Count == 1)
-                {
-                    var loader = _queue.Peek();
-                    task = loader.DispatchAsync(cancellationToken);
-                }
-                else
-                {
-                    var tasks = new List<Task>(_queue.Count);
-
-                    // We don't want to pop any loaders off the queue because they may get more work later
-                    foreach (var loader in _queue)
-                    {
-                        tasks.Add(loader.DispatchAsync(cancellationToken));
-                    }
-
-                    task = Task.WhenAll(tasks);
-                }
-            }
-
-            await task.ConfigureAwait(false);
         }
     }
 }

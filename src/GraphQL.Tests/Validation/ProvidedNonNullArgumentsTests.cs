@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -233,7 +234,7 @@ namespace GraphQL.Tests.Validation
             int line,
             int column)
         {
-            _.Error(Rule.MissingFieldArgMessage(fieldName, argName, typeName), line, column);
+            _.Error(ProvidedNonNullArgumentsError.MissingFieldArgMessage(fieldName, argName, typeName), line, column);
         }
 
         private void missingDirectiveArg(
@@ -244,7 +245,7 @@ namespace GraphQL.Tests.Validation
             int line,
             int column)
         {
-            _.Error(Rule.MissingDirectiveArgMessage(directiveName, argName, typeName), line, column);
+            _.Error(ProvidedNonNullArgumentsError.MissingDirectiveArgMessage(directiveName, argName, typeName), line, column);
         }
     }
 }

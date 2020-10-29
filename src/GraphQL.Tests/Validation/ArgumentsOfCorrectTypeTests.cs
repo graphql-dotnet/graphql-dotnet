@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -891,7 +892,7 @@ namespace GraphQL.Tests.Validation
             }
 
             _.Error(
-                rule.BadValueMessage(argName, null, value, errors),
+                ArgumentsOfCorrectTypeError.BadValueMessage(argName, value, errors),
                 line,
                 column);
         }

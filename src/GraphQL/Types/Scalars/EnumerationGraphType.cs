@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Language.AST;
@@ -68,9 +69,7 @@ namespace GraphQL.Types
         }
 
         public override object ParseLiteral(IValue value)
-        {
-            return !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
-        }
+            => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
     }
 
     /// <summary>
@@ -128,9 +127,14 @@ namespace GraphQL.Types
 
         public EnumValueDefinition FindByValue(object value)
         {
+            if (value is Enum)
+            {
+                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+            }
+
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in _values)
-                if (def.Value.Equals(value))
+                if (def.UnderlyingValue.Equals(value))
                     return def;
 
             return null;
@@ -146,6 +150,21 @@ namespace GraphQL.Types
         public string Name { get; set; }
         public string Description { get; set; }
         public string DeprecationReason { get; set; }
-        public object Value { get; set; }
+        private object _value;
+        public object Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                if (value is Enum)
+                    value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+                UnderlyingValue = value;
+            }
+        }
+        /// <summary>
+        /// For enums, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
+        /// </summary>
+        internal object UnderlyingValue { get; set; }
     }
 }

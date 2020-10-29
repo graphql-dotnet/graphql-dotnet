@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -104,7 +105,7 @@ namespace GraphQL.Tests.Validation
                     noArgsField(first: 1)
                   }
                 ";
-                _.Error(Rule.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 3, 33);
+                _.Error(KnownArgumentNamesError.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 3, 33);
             });
         }
 
@@ -118,7 +119,7 @@ namespace GraphQL.Tests.Validation
                     dog @skip(unless: true)
                   }
                 ";
-                _.Error(Rule.UnknownDirectiveArgMessage("unless", "skip", null), 3, 31);
+                _.Error(KnownArgumentNamesError.UnknownDirectiveArgMessage("unless", "skip", null), 3, 31);
             });
         }
 
@@ -132,8 +133,8 @@ namespace GraphQL.Tests.Validation
                     doesKnowCommand(whoknows: 1, dogCommand: SIT, unknown: true)
                   }
                 ";
-                _.Error(Rule.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog", null), 3, 37);
-                _.Error(Rule.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 3, 67);
+                _.Error(KnownArgumentNamesError.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog", null), 3, 37);
+                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 3, 67);
             });
         }
 
@@ -156,8 +157,8 @@ namespace GraphQL.Tests.Validation
                     }
                   }
                 ";
-                _.Error(Rule.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 4, 39);
-                _.Error(Rule.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 9, 43);
+                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 4, 39);
+                _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 9, 43);
             });
         }
     }

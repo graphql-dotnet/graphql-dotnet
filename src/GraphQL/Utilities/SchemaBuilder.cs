@@ -15,6 +15,7 @@ namespace GraphQL.Utilities
     {
         protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
+        private GraphQLSchemaDefinition schemaDef;
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
@@ -90,8 +91,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             PreConfigure(schema);
 
             var directives = new List<DirectiveGraphType>();
-
-            GraphQLSchemaDefinition schemaDef = null;
 
             foreach (var def in document.Definitions)
             {
@@ -209,6 +208,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        private bool IsSubscriptionType(ObjectGraphType type)
+        {
+            var operationDefinition = schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
+            if (operationDefinition == null)
+                return type.Name == "Subscription";
+
+            return type.Name == operationDefinition.Type.Name.Value;
+        }
+
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var typeConfig = Types.For(astType.Name.Value);
@@ -232,7 +240,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             CopyMetadata(type, typeConfig);
 
             Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (type.Name == "Subscription")
+            if (IsSubscriptionType(type))
             {
                 constructFieldType = ToSubscriptionFieldType;
             }
@@ -441,7 +449,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 return (DirectiveLocation)result;
             }
 
-            throw new ExecutionError($"{name} is an unknown directive location");
+            throw new ArgumentOutOfRangeException(nameof(name), $"{name} is an unknown directive location");
         }
 
         private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef)
@@ -584,7 +592,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         return bigIntegerResult;
                     }
 
-                    throw new ExecutionError($"Invalid number {str.Value}");
+                    throw new InvalidOperationException($"Invalid number {str.Value}");
                 }
                 case ASTNodeKind.FloatValue:
                 {
@@ -626,7 +634,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     return values;
                 }
                 default:
-                    throw new ExecutionError($"Unsupported value type {source.Kind}");
+                    throw new InvalidOperationException($"Unsupported value type {source.Kind}");
             }
         }
     }

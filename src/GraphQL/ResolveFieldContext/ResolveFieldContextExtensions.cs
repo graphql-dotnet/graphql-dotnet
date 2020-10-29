@@ -52,7 +52,7 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType);
+            result = arg.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
@@ -85,40 +85,13 @@ namespace GraphQL
         }
 
         /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveEventStreamContext.Source"/> property cannot be cast to the specified type</exception>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
             if (context is IResolveEventStreamContext<T> typedContext)
                 return typedContext;
 
             return new ResolveEventStreamContext<T>(context);
-        }
-
-        public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-            => TryAsyncResolve<object>(context, resolve, error);
-
-        public static async Task<TResult> TryAsyncResolve<TResult>(this IResolveFieldContext context, Func<IResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
-        {
-            try
-            {
-                return await resolve(context).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                if (error == null)
-                {
-                    var er = new ExecutionError(ex.Message, ex);
-                    er.AddLocation(context.FieldAst, context.Document);
-                    er.Path = context.Path;
-                    context.Errors.Add(er);
-                    return default;
-                }
-                else
-                {
-                    var result = error(context.Errors);
-                    return result == null ? default : await result.ConfigureAwait(false);
-                }
-            }
         }
 
         private static readonly char[] _separators = { '.' };

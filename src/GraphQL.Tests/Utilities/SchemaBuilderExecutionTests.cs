@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,9 +10,20 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
+        [Fact]
+        public void can_read_schema_with_custom_root_names()
+        {
+            var schema = Schema.For(ReadSchema("CustomSubscription.graphql"));
+
+            schema.Query.Name.ShouldBe("CustomQuery");
+            schema.Mutation.Name.ShouldBe("CustomMutation");
+            schema.Subscription.Name.ShouldBe("CustomSubscription");
+            schema.Subscription.Fields.All(f => f is EventStreamFieldType).ShouldBeTrue();
+        }
+
         [Theory]
-        [InlineData("PetAfterAll.graphql", 35)]
-        [InlineData("PetBeforeAll.graphql", 35)]
+        [InlineData("PetAfterAll.graphql", 17)]
+        [InlineData("PetBeforeAll.graphql", 17)]
         public void can_read_schema(string fileName, int expectedCount)
         {
             var schema = Schema.For(
@@ -31,7 +43,7 @@ namespace GraphQL.Tests.Utilities
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(35);
+            schema.AllTypes.Count().ShouldBe(18);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
@@ -174,6 +186,42 @@ namespace GraphQL.Tests.Utilities
             });
         }
 
+        // https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
+        [Fact]
+        public void schemabuilder_should_throw_on_invalid_default_value()
+        {
+            var defs = @"
+                enum PetKind {
+                    CAT
+                    DOG
+                }
+
+                interface Pet {
+                    name: String!
+                }
+
+                type Dog implements Pet {
+                    name: String!
+                    barks: Boolean!
+                }
+
+                type Cat implements Pet {
+                    name: String!
+                    meows: Boolean!
+                }
+
+                type Query {
+                    pet(type: PetKind = DOGGY): Pet
+                }
+            ";
+
+            Builder.Types.For("Dog").IsTypeOf<Dog>();
+            Builder.Types.For("Cat").IsTypeOf<Cat>();
+            Builder.Types.Include<PetQueryType>();
+
+            Should.Throw<InvalidOperationException>(() => Builder.Build(defs));
+        }
+
         [Fact]
         public async Task minimal_schema()
         {
@@ -229,7 +277,6 @@ namespace GraphQL.Tests.Utilities
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ resolve }";
-                _.ExposeExceptions = true;
             });
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
@@ -394,7 +441,7 @@ namespace GraphQL.Tests.Utilities
                 }
                 type Blog {
                     title: String!
-                    post(id: ID!): Post
+                    post(id: ID!, unused: Long!): Post
                 }
                 type Query {
                     blog(id: ID!): Blog
@@ -404,7 +451,7 @@ namespace GraphQL.Tests.Utilities
             Builder.Types.Include<BlogQueryType>();
             Builder.Types.Include<Blog>();
 
-            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId) { id title } } }";
+            var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
             var expected = @"{ ""blog"": { ""title"": ""New blog"", ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } } }";
             var variables = @"{ ""blogId"": ""1"", ""postId"": ""1"" }";
 
@@ -524,7 +571,7 @@ namespace GraphQL.Tests.Utilities
     public class Blog
     {
         public string Title { get; set; }
-        public Post Post(string id)
+        public Post Post(string id, long unused)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }

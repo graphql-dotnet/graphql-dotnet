@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -9,8 +10,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class SingleRootFieldSubscriptions : IValidationRule
     {
-        private const string RuleCode = "5.2.3.1";
-
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -28,12 +27,8 @@ namespace GraphQL.Validation.Rules
 
                     if (rootFields != 1)
                     {
-                        context.ReportError(
-                            new ValidationError(
-                                context.OriginalQuery,
-                                RuleCode,
-                                InvalidNumberOfRootFieldMessage(operation.Name),
-                                operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
+                        context.ReportError(new SingleRootFieldSubscriptionsError(context, operation,
+                            operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
                     }
 
                     var fragment = operation.SelectionSet.SelectionsList.FirstOrDefault(IsFragment);
@@ -55,22 +50,11 @@ namespace GraphQL.Validation.Rules
 
                     if (rootFields != 1)
                     {
-                        context.ReportError(
-                            new ValidationError(
-                                context.OriginalQuery,
-                                RuleCode,
-                                InvalidNumberOfRootFieldMessage(operation.Name),
-                                fragment));
+                        context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, fragment));
                     }
 
                 });
             }).ToTask();
-        }
-
-        public static string InvalidNumberOfRootFieldMessage(string name)
-        {
-            string prefix = name != null ? $"Subscription '{name}'" : "Anonymous Subscription";
-            return $"{prefix} must select only one top level field.";
         }
 
         private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;

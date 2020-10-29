@@ -115,12 +115,13 @@ namespace GraphQL
 
                 if (found == null)
                 {
-                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Type '{type.Name}' has no field '{field.Name}'.") : false;
+                    return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. It has no field '{field.Name}'.") : false;
                 }
 
-                if (found.Type != field.Type)
+                if (found.ResolvedType != null && field.ResolvedType != null)
                 {
-                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Field '{type.Name}.{field.Name}' must be of type '{field.Type.GetFriendlyName()}', but in fact it is of type '{found.Type.GetFriendlyName()}'.") : false;
+                    if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType, null))
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. Field '{field.Name}' must be of type '{field.ResolvedType}' or covariant from it, but in fact it is of type '{found.ResolvedType}'.") : false;
                 }
             }
 
@@ -290,7 +291,7 @@ namespace GraphQL
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
-        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema)
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema) // TODO: remove unused schema parameter in v4.0.0
         {
             if (maybeSubType.Equals(superType))
             {
@@ -302,14 +303,14 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, null);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType, superType, schema);
+                return IsSubtypeOf(sub.ResolvedType, superType, null);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -317,7 +318,7 @@ namespace GraphQL
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, null);
                 }
 
                 return false;
@@ -330,8 +331,7 @@ namespace GraphQL
 
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
-            if (superType is IAbstractGraphType type &&
-                maybeSubType is IObjectGraphType)
+            if (superType is IAbstractGraphType type && maybeSubType is IObjectGraphType)
             {
                 return type.IsPossibleType(maybeSubType);
             }
@@ -348,7 +348,7 @@ namespace GraphQL
         ///
         /// This function is commutative.
         /// </summary>
-        public static bool DoTypesOverlap(this ISchema schema, IGraphType typeA, IGraphType typeB)
+        public static bool DoTypesOverlap(IGraphType typeA, IGraphType typeB)
         {
             if (typeA.Equals(typeB))
             {
@@ -428,18 +428,15 @@ namespace GraphQL
                 return new ObjectValue(fields);
             }
 
-            if (!type.IsInputType())
+            if (!(type is ScalarGraphType inputType))
                 throw new ArgumentOutOfRangeException(nameof(type), $"Must provide Input Type, cannot use: {type}");
-
-            var inputType = type as ScalarGraphType;
 
             // Since value is an internally represented value, it must be serialized
             // to an externally represented value before converting into an AST.
-            var serialized = inputType.Serialize(value);
+            var serialized = inputType.Serialize(value) ?? throw new InvalidOperationException($"Unable to serialize '{value}' to '{inputType.Name}'.");
 
             return serialized switch
             {
-                null => null,
                 bool b => new BooleanValue(b),
                 int i => new IntValue(i),
                 BigInteger bi => new BigIntValue(bi),

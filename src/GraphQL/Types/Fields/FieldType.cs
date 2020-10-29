@@ -12,7 +12,16 @@ namespace GraphQL.Types
         private object _defaultValue;
         private IValue _defaultValueAST;
 
-        public string Name { get; set; }
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                NameValidator.ValidateNameNotNull(value);
+                _name = value;
+            }
+        }
 
         public string Description { get; set; }
 
@@ -23,6 +32,9 @@ namespace GraphQL.Types
             get => _defaultValue;
             set
             {
+                if (!(ResolvedType is GraphQLTypeReference))
+                    _ = value.AstFromValue(null, ResolvedType); // HACK: https://github.com/graphql-dotnet/graphql-dotnet/issues/1795
+
                 _defaultValue = value;
                 _defaultValueAST = null;
             }

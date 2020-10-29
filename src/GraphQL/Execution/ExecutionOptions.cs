@@ -48,7 +48,7 @@ namespace GraphQL
         /// <summary>
         /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
         /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
-        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(Action{ExecutionOptions})">ExecuteAsync</see>.
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
         /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
 
@@ -60,9 +60,6 @@ namespace GraphQL
 
         /// <summary>Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/></summary>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
-
-        /// <summary>Allows unhandled <see cref="Exception"/> stack traces to be serialized into GraphQL query result json along with exception messages; defaults to only <see cref="Exception.Message"/></summary>
-        public bool ExposeExceptions { get; set; }
 
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
         public bool EnableMetrics { get; set; } = true;

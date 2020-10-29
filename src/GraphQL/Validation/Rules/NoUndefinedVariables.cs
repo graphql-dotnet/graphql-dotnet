@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,11 +14,6 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoUndefinedVariables : IValidationRule
     {
-        public Func<string, string, string> UndefinedVarMessage = (varName, opName) =>
-            !string.IsNullOrWhiteSpace(opName)
-                ? $"Variable \"${varName}\" is not defined by operation \"{opName}\"."
-                : $"Variable \"${varName}\" is not defined.";
-
         public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
@@ -37,13 +33,7 @@ namespace GraphQL.Validation.Rules
                             var varName = usage.Node.Name;
                             if (!variableNameDefined.TryGetValue(varName, out bool found))
                             {
-                                var error = new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.7.4",
-                                    UndefinedVarMessage(varName, op.Name),
-                                    usage.Node,
-                                    op);
-                                context.ReportError(error);
+                                context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
                             }
                         }
                     });

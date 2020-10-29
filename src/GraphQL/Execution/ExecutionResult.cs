@@ -39,11 +39,6 @@ namespace GraphQL
         public PerfRecord[] Perf { get; set; }
 
         /// <summary>
-        /// Indicates that unhandled <see cref="Exception"/> stack traces should be serialized into GraphQL response json along with exception messages; otherwise only <see cref="Exception.Message"/> should be serialized
-        /// </summary>
-        public bool ExposeExceptions { get; set; }
-
-        /// <summary>
         /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public Dictionary<string, object> Extensions { get; set; }
@@ -63,7 +58,6 @@ namespace GraphQL
             Operation = result.Operation;
             Document = result.Document;
             Perf = result.Perf;
-            ExposeExceptions = result.ExposeExceptions;
             Extensions = result.Extensions;
         }
     }

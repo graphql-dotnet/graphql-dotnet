@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -285,7 +286,7 @@ namespace GraphQL.Tests.Validation
             suggestedTypes ??= Enumerable.Empty<string>();
             suggestedFields ??= Enumerable.Empty<string>();
 
-            _.Error(Rule.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
+            _.Error(FieldsOnCorrectTypeError.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
         }
     }
 }

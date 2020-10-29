@@ -78,10 +78,7 @@ namespace GraphQL
 
                 if (document.Operations.Count == 0)
                 {
-                    throw new ExecutionError("Cannot execute query if no operation is specified.")
-                    {
-                        Code = "NO_OPERATION"
-                    };
+                    throw new NoOperationError();
                 }
 
                 var operation = GetOperation(options.OperationName, document);
@@ -110,20 +107,70 @@ namespace GraphQL
                         _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
                 }
 
-                context = BuildExecutionContext(
-                    options.Schema,
-                    options.Root,
-                    document,
-                    operation,
-                    options.Inputs,
-                    options.UserContext,
-                    options.CancellationToken,
-                    metrics,
-                    options.Listeners,
-                    options.ThrowOnUnhandledException,
-                    options.UnhandledExceptionDelegate,
-                    options.MaxParallelExecutionCount,
-                    options.RequestServices);
+                try
+                {
+                    context = BuildExecutionContext(
+                        options.Schema,
+                        options.Root,
+                        document,
+                        operation,
+                        options.Inputs ?? Inputs.Empty,
+                        options.UserContext,
+                        options.CancellationToken,
+                        metrics,
+                        options.Listeners,
+                        options.ThrowOnUnhandledException,
+                        options.UnhandledExceptionDelegate,
+                        options.MaxParallelExecutionCount,
+                        options.RequestServices);
+                }
+                catch (InvalidVariableError)
+                {
+                    // error parsing variables
+                    // attempt to run AfterValidationAsync with null for the 'ExecutionContext.Variables' property
+
+                    context = BuildExecutionContext(
+                        options.Schema,
+                        options.Root,
+                        document,
+                        operation,
+                        null,
+                        options.UserContext,
+                        options.CancellationToken,
+                        metrics,
+                        options.Listeners,
+                        options.ThrowOnUnhandledException,
+                        options.UnhandledExceptionDelegate,
+                        options.MaxParallelExecutionCount,
+                        options.RequestServices);
+
+                    try
+                    {
+                        foreach (var listener in options.Listeners)
+                        {
+                            await listener.AfterValidationAsync(context, validationResult)
+                                .ConfigureAwait(false);
+                        }
+
+                        // if there was a validation error, return that, and ignore the variable parsing error
+                        if (!validationResult.IsValid)
+                        {
+                            return new ExecutionResult
+                            {
+                                Errors = validationResult.Errors,
+                                Perf = metrics.Finish()
+                            };
+                        }
+                    }
+                    catch
+                    {
+                        // if there was an error within AfterValidationAsync (such as a NullReferenceException
+                        // due to ExecutionContext.Variables being null), skip this step and throw the variable parsing error
+                    }
+
+                    // if there was no validation errors returned, throw the variable parsing error
+                    throw;
+                }
 
                 foreach (var listener in options.Listeners)
                 {
@@ -136,7 +183,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = validationResult.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -146,7 +192,6 @@ namespace GraphQL
                     return new ExecutionResult
                     {
                         Errors = context.Errors,
-                        ExposeExceptions = options.ExposeExceptions,
                         Perf = metrics.Finish()
                     };
                 }
@@ -190,6 +235,10 @@ namespace GraphQL
                     result.Errors = context.Errors;
                 }
             }
+            catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (ExecutionError ex)
             {
                 result = new ExecutionResult
@@ -205,9 +254,10 @@ namespace GraphQL
                 if (options.ThrowOnUnhandledException)
                     throw;
 
+                UnhandledExceptionContext exceptionContext = null;
                 if (options.UnhandledExceptionDelegate != null)
                 {
-                    var exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                    exceptionContext = new UnhandledExceptionContext(context, null, ex);
                     options.UnhandledExceptionDelegate(exceptionContext);
                     ex = exceptionContext.Exception;
                 }
@@ -216,14 +266,13 @@ namespace GraphQL
                 {
                     Errors = new ExecutionErrors
                     {
-                        ex is ExecutionError executionError ? executionError : new ExecutionError("Error executing document.", ex)
+                        ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex)
                     }
                 };
             }
             finally
             {
                 result ??= new ExecutionResult();
-                result.ExposeExceptions = options.ExposeExceptions;
                 result.Perf = metrics.Finish();
             }
 
@@ -253,7 +302,7 @@ namespace GraphQL
                 UserContext = userContext,
 
                 Operation = operation,
-                Variables = GetVariableValues(document, schema, operation?.Variables, inputs),
+                Variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs),
                 Fragments = document.Fragments,
                 CancellationToken = cancellationToken,
 

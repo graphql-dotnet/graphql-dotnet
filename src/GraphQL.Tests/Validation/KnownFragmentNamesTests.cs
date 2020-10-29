@@ -1,3 +1,4 @@
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -66,7 +67,7 @@ namespace GraphQL.Tests.Validation
         {
             _.Error(err =>
             {
-                err.Message = Rule.UnknownFragmentMessage(fragName);
+                err.Message = KnownFragmentNamesError.UnknownFragmentMessage(fragName);
                 err.Loc(line, column);
             });
         }

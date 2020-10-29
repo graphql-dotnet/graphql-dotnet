@@ -24,7 +24,6 @@ namespace GraphQL.Tests.Execution
                 opts.Query = "{ foo }";
                 opts.UserContext = userContext;
                 opts.Listeners.Add(new TestExecutionListener());
-                opts.ExposeExceptions = true;
             }, @"{ ""foo"": ""bar"" }");
 
             breaker.Dispose();

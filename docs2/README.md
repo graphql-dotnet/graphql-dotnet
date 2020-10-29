@@ -11,7 +11,10 @@ yarn develop
 
 # Publishing
 
-Publishing documentation requires access to https://github.com/graphql-dotnet/graphql-dotnet.github.io
+Publishing documentation requires:
+
+* write access to https://github.com/graphql-dotnet/graphql-dotnet.github.io
+* running node on version v10.22.0 (v12.x seems to currently have issues)
 
 ```
 yarn deploy

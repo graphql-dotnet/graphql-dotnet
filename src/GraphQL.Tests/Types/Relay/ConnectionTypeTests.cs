@@ -7,11 +7,19 @@ namespace GraphQL.Tests.Types.Relay
 {
     public class ConnectionTypeTests
     {
-        private readonly ConnectionType<ObjectGraphType> type = new ConnectionType<ObjectGraphType>();
-
         [Fact]
         public void should_derive_name()
         {
+            var type = new ConnectionType<ObjectGraphType>();
+
+            type.Name.ShouldBe("ObjectConnection");
+        }
+
+        [Fact]
+        public void should_derive_name_for_non_null()
+        {
+            var type = new ConnectionType<NonNullGraphType<ObjectGraphType>>();
+
             type.Name.ShouldBe("ObjectConnection");
         }
     }

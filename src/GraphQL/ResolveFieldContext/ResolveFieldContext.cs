@@ -99,7 +99,7 @@ namespace GraphQL
         /// <summary>
         /// Clone the specified <see cref="IResolveFieldContext"/>
         /// </summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <see cref="TSource"/></exception>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <typeparamref name="TSource"/></exception>
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
             if (context.Source != null && !(context.Source is TSource))
