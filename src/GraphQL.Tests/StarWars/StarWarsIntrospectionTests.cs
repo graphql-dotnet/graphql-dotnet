@@ -207,16 +207,24 @@ namespace GraphQL.Tests.StarWars
                         ""kind"": ""ENUM""
                     },
                     {
+                        ""name"": ""__DirectiveArgument"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
+                        ""name"": ""String"",
+                        ""kind"": ""SCALAR""
+                    },
+                    {
+                        ""name"": ""__DirectiveUsage"",
+                        ""kind"": ""OBJECT""
+                    },
+                    {
                         ""name"": ""__TypeKind"",
                         ""kind"": ""ENUM""
                     },
                     {
                         ""name"": ""__EnumValue"",
                         ""kind"": ""OBJECT""
-                    },
-                    {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
                     },
                     {
                         ""name"": ""Boolean"",
@@ -236,14 +244,6 @@ namespace GraphQL.Tests.StarWars
                     },
                     {
                         ""name"": ""__Field"",
-                        ""kind"": ""OBJECT""
-                    },
-                    {
-                        ""name"": ""__DirectiveUsage"",
-                        ""kind"": ""OBJECT""
-                    },
-                    {
-                        ""name"": ""__DirectiveArgument"",
                         ""kind"": ""OBJECT""
                     },
                     {
