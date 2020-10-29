@@ -81,6 +81,7 @@
             file: links.md
       - title: Migration Guides
         dir: migrations
+        items:
           - title: Migration Guide [v2 -> v3]
             file: migration3.md
           - title: Migration Guide [v0.17.x -> v2]
