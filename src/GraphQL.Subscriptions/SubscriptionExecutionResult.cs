@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GraphQL.Subscription
+namespace GraphQL
 {
     public class SubscriptionExecutionResult : ExecutionResult
     {

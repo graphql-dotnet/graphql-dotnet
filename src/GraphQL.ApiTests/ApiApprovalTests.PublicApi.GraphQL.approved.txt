@@ -1639,10 +1639,6 @@ namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext { }
     public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>, GraphQL.Subscription.IResolveEventStreamContext { }
-    public interface ISubscriptionExecuter
-    {
-        System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
-    }
     public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }
@@ -1651,12 +1647,6 @@ namespace GraphQL.Subscription
     {
         public ResolveEventStreamContext() { }
         public ResolveEventStreamContext(GraphQL.Subscription.IResolveEventStreamContext context) { }
-    }
-    public class SubscriptionExecutionResult : GraphQL.ExecutionResult
-    {
-        public SubscriptionExecutionResult() { }
-        public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
-        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>> Streams { get; set; }
     }
 }
 namespace GraphQL.Types
