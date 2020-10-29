@@ -5,7 +5,9 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
-    // TODO: better to rename QueryArguments and QueryArgument to something like FieldArguments and FieldArgument thought directives have arguments too.
+    // TODO: better to rename QueryArguments and QueryArgument to something like GraphQLArguments and GraphQLArgument.
+    // [Obsolete]
+    // public class QueryArgument : GraphQLArgument { }
     public class QueryArguments : IEnumerable<QueryArgument>
     {
         public QueryArguments(params QueryArgument[] args)
