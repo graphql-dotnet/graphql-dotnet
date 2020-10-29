@@ -1,5 +1,4 @@
 using System;
-using GraphQL.Execution;
 using GraphQL.Types;
 using PublicApiGenerator;
 using Shouldly;
@@ -12,7 +11,7 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
-        [InlineData(typeof(SubscriptionExecutionStrategy))]
+        [InlineData(typeof(SubscriptionDocumentExecuter))]
         [InlineData(typeof(SystemTextJson.DocumentWriter))]
         [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
         public void PublicApi(Type type)
