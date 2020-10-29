@@ -76,9 +76,9 @@
           - title: Schema Generation
             file: schema-generation.md
           - title: Migration Guide [v0.8.0]
-            file: v0.8.0.md
+            file: v0_8_0.md
           - title: Migration Guide [v0.11.0]
-            file: v0.11.0.md
+            file: v0_11_0.md
           - title: Migration Guide [v0.17.x -> v2]
             file: migration2.md
           - title: Migration Guide [v2 -> v3]
