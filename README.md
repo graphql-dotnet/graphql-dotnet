@@ -81,8 +81,8 @@ You can see the changes in public APIs using [fuget.org](https://www.fuget.org/p
  
 * [2.4.0 to 3.0](https://graphql-dotnet.github.io/docs/guides/migration3)
 * [0.17.x to 2.x](https://graphql-dotnet.github.io/docs/guides/migration2)
-* [0.11.0](https://graphql-dotnet.github.io/docs/guides/v0.11.0)
-* [0.8.0](https://graphql-dotnet.github.io/docs/guides/v0.8.0)
+* [0.11.0](https://graphql-dotnet.github.io/docs/guides/v0_11_0)
+* [0.8.0](https://graphql-dotnet.github.io/docs/guides/v0_8_0)
 
 ## Basic Usage
 
