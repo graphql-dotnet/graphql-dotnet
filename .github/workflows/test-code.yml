@@ -9,6 +9,10 @@ on:
       - src/**
       - .github/workflows/**
 
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
 jobs:
   test:
     strategy:
@@ -26,17 +30,14 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
-        env:
-          DOTNET_NOLOGO: true
-          DOTNET_CLI_TELEMETRY_OPTOUT: true
-      - name: Build solution (release config)
+      - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: dotnet build --no-restore -c Release -p:NoWarn=CS1591
-      - name: Build solution (debug config)
+      - name: Build solution [Debug]
         working-directory: src
         run: dotnet build --no-restore -c Debug -p:NoWarn=CS1591
-      - name: Test solution (debug config)
+      - name: Test solution [Debug]
         working-directory: src
         run: dotnet test --no-restore
 
