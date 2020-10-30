@@ -28,6 +28,7 @@ query {
             var result = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
+                _.RequestServices = (IServiceProvider)Schema;
                 _.Query = query;
                 _.EnableMetrics = true;
                 _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();

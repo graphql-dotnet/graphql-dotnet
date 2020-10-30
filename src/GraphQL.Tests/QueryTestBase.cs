@@ -26,7 +26,8 @@ namespace GraphQL.Tests
         public QueryTestBase()
         {
             Services = new SimpleContainer();
-            Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+            //Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
+            Executer = new DI.DIDocumentExecuter(Services);
             Writer = new DocumentWriter(indent: true);
         }
 
@@ -135,6 +136,7 @@ namespace GraphQL.Tests
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
                 options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
+                options.RequestServices = (IServiceProvider)Schema;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;

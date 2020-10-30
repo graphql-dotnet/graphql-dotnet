@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.StarWars.Types;
 
@@ -71,7 +72,7 @@ namespace GraphQL.StarWars
             return character;
         }
 
-        public Task<Human> GetHumanByIdAsync(string id)
+        public Task<Human> GetHumanByIdAsync(string id, CancellationToken token = default)
         {
             return Task.FromResult(_characters.FirstOrDefault(h => h.Id == id && h is Human) as Human);
         }
