@@ -140,10 +140,12 @@ namespace GraphQL.Types
                 {
                     if (arg.ResolvedType != null)
                     {
+                        lookup.AddTypeIfNotRegistered(arg.ResolvedType, ctx);
                         arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
                     }
                     else
                     {
+                        lookup.AddTypeIfNotRegistered(arg.Type, ctx);
                         arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
                     }
                 }
