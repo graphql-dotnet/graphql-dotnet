@@ -15,7 +15,7 @@ namespace GraphQL.Utilities
     {
         protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
-        private GraphQLSchemaDefinition schemaDef;
+        private GraphQLSchemaDefinition _schemaDef;
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
@@ -98,8 +98,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     case ASTNodeKind.SchemaDefinition:
                     {
-                        schemaDef = def as GraphQLSchemaDefinition;
-                        schema.SetAstType(schemaDef);
+                        _schemaDef = def as GraphQLSchemaDefinition;
+                        schema.SetAstType(_schemaDef);
 
                         VisitNode(schema, v => v.VisitSchema(schema));
                         break;
@@ -156,11 +156,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 }
             }
 
-            if (schemaDef != null)
+            if (_schemaDef != null)
             {
-                schema.Description = schemaDef.Comment?.Text;
+                schema.Description = _schemaDef.Comment?.Text;
 
-                foreach (var operationTypeDef in schemaDef.OperationTypes)
+                foreach (var operationTypeDef in _schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;
                     var type = GetType(typeName) as IObjectGraphType;
@@ -210,7 +210,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         private bool IsSubscriptionType(ObjectGraphType type)
         {
-            var operationDefinition = schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
+            var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
             if (operationDefinition == null)
                 return type.Name == "Subscription";
 

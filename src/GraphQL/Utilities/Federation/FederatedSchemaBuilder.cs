@@ -111,21 +111,35 @@ namespace GraphQL.Utilities.Federation
 
         private void AddTypeNameToSelection(Field field, Document document)
         {
-            foreach (var selection in field.SelectionSet.SelectionsList)
+            if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
             {
-                // TODO: check to see if the SelectionSet already has the __typename field?
+                setToAlter.Prepend(new Field(null, new NameNode("__typename")));
+            }
+        }
+
+        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
+        {
+            foreach (var selection in selectionSet.Selections)
+            {
+                if (selection is Field childField && childField.Name == "__typename")
+                {
+                    setToAlter = null;
+                    return false;
+                }
 
                 if (selection is InlineFragment frag)
                 {
-                    frag.SelectionSet.Prepend(new Field(null, new NameNode("__typename")));
+                    return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
                 }
 
                 if (selection is FragmentSpread spread)
                 {
                     var def = document.Fragments.FindDefinition(spread.Name);
-                    def.SelectionSet.Prepend(new Field(null, new NameNode("__typename")));
+                    return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }
+            setToAlter = selectionSet;
+            return true;
         }
 
         private UnionGraphType BuildEntityGraphType(ISchema schema)
