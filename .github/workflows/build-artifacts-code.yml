@@ -5,6 +5,7 @@ name: Build artifacts
 on:
   push:
     branches:
+      - master
       - develop
     paths:
       - src/**

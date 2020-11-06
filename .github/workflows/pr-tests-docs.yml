@@ -3,6 +3,7 @@ name: Run documentation tests
 on:
   pull_request:
     branches: 
+      - master
       - develop
     paths: 
       - docs2/**
