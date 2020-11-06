@@ -75,7 +75,8 @@ namespace GraphQL.Types
                 }
             }
 
-            NameValidator.ValidateName(fieldType.Name);
+            //check if fieldType.Name has never been set
+            NameValidator.ValidateNameNotNull(fieldType.Name);
 
             if (HasField(fieldType.Name))
             {

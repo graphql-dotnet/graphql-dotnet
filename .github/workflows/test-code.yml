@@ -1,4 +1,4 @@
-name: Run code tests
+name: Test code
 
 on:
   pull_request:
@@ -7,6 +7,11 @@ on:
       - develop
     paths: 
       - src/**
+      - .github/workflows/**
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   test:
@@ -29,13 +34,26 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
-      - name: Build solution (release config)
+      - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: dotnet build --no-restore -c Release -p:NoWarn=CS1591
-      - name: Build solution (debug config)
+      - name: Build solution [Debug]
         working-directory: src
         run: dotnet build --no-restore -c Debug -p:NoWarn=CS1591
-      - name: Test solution (debug config)
+      - name: Test solution [Debug]
         working-directory: src
         run: dotnet test --no-restore
+
+  buildcheck:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Pass build check
+        if: ${{ needs.test.result == 'success' }}
+        run: exit 0
+      - name: Fail build check
+        if: ${{ needs.test.result != 'success' }}
+        run: exit 1

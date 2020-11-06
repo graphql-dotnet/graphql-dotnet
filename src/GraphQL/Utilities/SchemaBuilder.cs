@@ -15,6 +15,7 @@ namespace GraphQL.Utilities
     {
         protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
+        private GraphQLSchemaDefinition _schemaDef;
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
@@ -91,16 +92,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var directives = new List<DirectiveGraphType>();
 
-            GraphQLSchemaDefinition schemaDef = null;
-
             foreach (var def in document.Definitions)
             {
                 switch (def.Kind)
                 {
                     case ASTNodeKind.SchemaDefinition:
                     {
-                        schemaDef = def as GraphQLSchemaDefinition;
-                        schema.SetAstType(schemaDef);
+                        _schemaDef = def as GraphQLSchemaDefinition;
+                        schema.SetAstType(_schemaDef);
 
                         VisitNode(schema, v => v.VisitSchema(schema));
                         break;
@@ -157,11 +156,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 }
             }
 
-            if (schemaDef != null)
+            if (_schemaDef != null)
             {
-                schema.Description = schemaDef.Comment?.Text;
+                schema.Description = _schemaDef.Comment?.Text;
 
-                foreach (var operationTypeDef in schemaDef.OperationTypes)
+                foreach (var operationTypeDef in _schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;
                     var type = GetType(typeName) as IObjectGraphType;
@@ -209,6 +208,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        private bool IsSubscriptionType(ObjectGraphType type)
+        {
+            var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
+            if (operationDefinition == null)
+                return type.Name == "Subscription";
+
+            return type.Name == operationDefinition.Type.Name.Value;
+        }
+
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var typeConfig = Types.For(astType.Name.Value);
@@ -232,7 +240,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             CopyMetadata(type, typeConfig);
 
             Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (type.Name == "Subscription")
+            if (IsSubscriptionType(type))
             {
                 constructFieldType = ToSubscriptionFieldType;
             }
