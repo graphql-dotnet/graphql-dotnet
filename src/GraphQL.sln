@@ -111,7 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{3C62C155-7603-4926-A4A5-C91AED6C4EA7}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs2\site\docs\migrations\migration.md = ..\docs2\site\docs\migrations\migration.md
+		..\docs2\site\docs\migrations\migration2.md = ..\docs2\site\docs\migrations\migration2.md
 		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
 		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
