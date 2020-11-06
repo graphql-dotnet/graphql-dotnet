@@ -99,7 +99,7 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// This sucks, find a better way
+    /// TODO: This sucks, find a better way
     /// </summary>
     public class TypeCollectionContext
     {
