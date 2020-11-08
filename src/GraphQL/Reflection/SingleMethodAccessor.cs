@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace GraphQL.Reflection
 {
@@ -29,7 +30,8 @@ namespace GraphQL.Reflection
             }
             catch (TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw ex.InnerException; //necessary only for intellisense
             }
         }
     }
