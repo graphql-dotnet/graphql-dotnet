@@ -116,7 +116,7 @@ namespace GraphQL
             catch (TargetInvocationException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                throw ex.InnerException; //necessary only for intellisense
+                return null; // never executed, necessary only for intellisense
             }
 
             foreach (var item in source)
