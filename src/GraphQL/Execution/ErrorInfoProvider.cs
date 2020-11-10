@@ -31,7 +31,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Initializes an <see cref="ErrorInfoProvider"/> with a set of <see cref="ErrorInfoProviderOptions"/> indiciated by the specified builder.
+        /// Initializes an <see cref="ErrorInfoProvider"/> with a set of <see cref="ErrorInfoProviderOptions"/> filled out by the specified delegate.
         /// </summary>
         public ErrorInfoProvider(Action<ErrorInfoProviderOptions> optionsBuilder)
         {
@@ -83,7 +83,7 @@ namespace GraphQL.Execution
         /// <para>Returns a list of error codes derived from a specified <see cref="ExecutionError"/> instance.</para>
         /// <para>
         /// By default, this returns the <see cref="ExecutionError.Code"/> value if set, along with
-        /// codes generated from the type of the <see cref="Exception.InnerException"/> and their inner exceptions.
+        /// codes generated from the type of the <see cref="Exception.InnerException"/> and all their inner exceptions.
         /// </para>
         /// </summary>
         protected virtual IEnumerable<string> GetCodesForError(ExecutionError executionError)
