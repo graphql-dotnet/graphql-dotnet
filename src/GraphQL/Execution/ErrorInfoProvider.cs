@@ -80,10 +80,11 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns a list of error codes derived from a specified <see cref="ExecutionError"/> instance.
-        /// <br/><br/>
+        /// <para>Returns a list of error codes derived from a specified <see cref="ExecutionError"/> instance.</para>
+        /// <para>
         /// By default, this returns the <see cref="ExecutionError.Code"/> value if set, along with
         /// codes generated from the type of the <see cref="Exception.InnerException"/> and their inner exceptions.
+        /// </para>
         /// </summary>
         protected virtual IEnumerable<string> GetCodesForError(ExecutionError executionError)
         {
