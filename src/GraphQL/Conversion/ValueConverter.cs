@@ -132,6 +132,9 @@ namespace GraphQL
             Register<char, int>(value => Convert.ToInt32(value));
         }
 
+        /// <summary>
+        /// Returns an object of the specified type and whose value is equivalent to the specified object.
+        /// </summary>
         public static T ConvertTo<T>(object value)
         {
             object v = ConvertTo(value, typeof(T));
@@ -139,6 +142,9 @@ namespace GraphQL
             return v == null ? default : (T)v;
         }
 
+        /// <summary>
+        /// Returns an object of the specified type and whose value is equivalent to the specified object.
+        /// </summary>
         public static object ConvertTo(object value, Type targetType)
         {
             if (!TryConvertTo(value, targetType, out object result))
@@ -147,6 +153,9 @@ namespace GraphQL
             return result;
         }
 
+        /// <summary>
+        /// Tries to convert an object to the specified type and returns a boolean indicating it the conversion was a success.
+        /// </summary>
         internal static bool TryConvertTo(object value, Type targetType, out object result, Type sourceType = null)
         {
             if (value == null || targetType.IsInstanceOfType(value))
