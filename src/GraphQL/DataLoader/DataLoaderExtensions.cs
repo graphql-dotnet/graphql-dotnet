@@ -9,7 +9,7 @@ using GraphQL.Resolvers;
 namespace GraphQL.DataLoader
 {
     /// <summary>
-    /// Provides extension functions useful for data loaders
+    /// Provides extension methods useful for data loaders
     /// </summary>
     public static class DataLoaderExtensions
     {

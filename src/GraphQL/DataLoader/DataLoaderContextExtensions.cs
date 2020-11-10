@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace GraphQL.DataLoader
 {
     /// <summary>
-    /// Provides extension functions for retrieving <see cref="IDataLoader"/> implementations via a <see cref="DataLoaderContext"/>
+    /// Provides extension methods for retrieving <see cref="IDataLoader"/> implementations via a <see cref="DataLoaderContext"/>
     /// </summary>
     public static class DataLoaderContextExtensions
     {

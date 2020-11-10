@@ -154,7 +154,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Tries to convert an object to the specified type and returns a boolean indicating it the conversion was a success.
+        /// Tries to convert an object to the specified type and returns a boolean indicating whether the conversion was successful.
         /// </summary>
         internal static bool TryConvertTo(object value, Type targetType, out object result, Type sourceType = null)
         {
