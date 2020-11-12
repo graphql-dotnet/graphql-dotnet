@@ -8,7 +8,7 @@ namespace GraphQL.Resolvers
     /// Attempts to return a value for a field from the graph's source object, matching the name of
     /// the field to a property or a method with the same name on the source object.
     /// <br/><br/>
-    /// Call <see cref="NameFieldResolver.Instance"/> to retrieve an instance of this class.
+    /// Call <see cref="Instance"/> to retrieve an instance of this class.
     /// </summary>
     public class NameFieldResolver : IFieldResolver
     {
@@ -82,7 +82,7 @@ namespace GraphQL.Resolvers
                 }
                 catch (InvalidOperationException)
                 {
-                    throw new InvalidOperationException($"Expected to find property or method {name} on {target.Name} but it does not exist.");
+                    throw new InvalidOperationException($"Expected to find property or method '{name}' on type '{target.Name}' but it does not exist.");
                 }
             }
         }

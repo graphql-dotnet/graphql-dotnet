@@ -7,9 +7,9 @@ namespace GraphQL.Reflection
 {
     internal class SingleMethodAccessor : IAccessor
     {
-        public SingleMethodAccessor(MethodInfo getter)
+        public SingleMethodAccessor(MethodInfo method)
         {
-            MethodInfo = getter;
+            MethodInfo = method;
         }
 
         public string FieldName => MethodInfo.Name;
@@ -17,10 +17,7 @@ namespace GraphQL.Reflection
         public Type DeclaringType => MethodInfo.DeclaringType;
         public ParameterInfo[] Parameters => MethodInfo.GetParameters();
         public MethodInfo MethodInfo { get; }
-        public IEnumerable<T> GetAttributes<T>() where T : Attribute
-        {
-            return MethodInfo.GetCustomAttributes<T>();
-        }
+        public IEnumerable<T> GetAttributes<T>() where T : Attribute => MethodInfo.GetCustomAttributes<T>();
 
         public object GetValue(object target, object[] arguments)
         {
