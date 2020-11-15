@@ -33,7 +33,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a list of proprties that should have fields created for them.
+        /// Returns a list of properties that should have fields created for them.
         /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
         {
@@ -67,7 +67,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a list of proprties that should have fields created for them.
+        /// Returns a list of properties that should have fields created for them.
         /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
         {

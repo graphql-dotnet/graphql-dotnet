@@ -10,7 +10,7 @@ namespace GraphQL.Resolvers
         private readonly Func<IResolveFieldContext, TReturnType> _resolver;
 
         /// <summary>
-        /// Initializes a new instance that runs the specified delegate.
+        /// Initializes a new instance that runs the specified delegate when resolving a field.
         /// </summary>
         public FuncFieldResolver(Func<IResolveFieldContext, TReturnType> resolver)
         {
