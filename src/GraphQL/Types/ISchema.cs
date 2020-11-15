@@ -15,7 +15,7 @@ namespace GraphQL.Types
     public interface ISchema
     {
         /// <summary>
-        /// Returns true once the schema has been initialized
+        /// Returns true once the schema has been initialized.
         /// </summary>
         bool Initialized { get; }
 
@@ -31,20 +31,23 @@ namespace GraphQL.Types
         /// </summary>
         INameConverter NameConverter { get; set; }
 
+        /// <summary>
+        /// Description of the schema.
+        /// </summary>
         string Description { get; set; }
 
         /// <summary>
-        /// The 'query' base graph type; required
+        /// The 'query' base graph type; required.
         /// </summary>
         IObjectGraphType Query { get; set; }
 
         /// <summary>
-        /// The 'mutation' base graph type; optional
+        /// The 'mutation' base graph type; optional.
         /// </summary>
         IObjectGraphType Mutation { get; set; }
 
         /// <summary>
-        /// The 'subscription' base graph type; optional
+        /// The 'subscription' base graph type; optional.
         /// </summary>
         IObjectGraphType Subscription { get; set; }
 
@@ -59,17 +62,17 @@ namespace GraphQL.Types
         IEnumerable<DirectiveGraphType> Directives { get; set; }
 
         /// <summary>
-        /// Returns a list of all the graph types utilized by this schema
+        /// Returns a list of all the graph types utilized by this schema.
         /// </summary>
         IEnumerable<IGraphType> AllTypes { get; }
 
         /// <summary>
-        /// Returns a <see cref="IGraphType"/> for a given name
+        /// Returns a <see cref="IGraphType"/> for a given name.
         /// </summary>
         IGraphType FindType(string name);
 
         /// <summary>
-        /// Returns a <see cref="DirectiveGraphType"/> for a given name
+        /// Returns a <see cref="DirectiveGraphType"/> for a given name.
         /// </summary>
         DirectiveGraphType FindDirective(string name);
 
