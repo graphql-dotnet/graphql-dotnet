@@ -11,7 +11,7 @@ namespace GraphQL.Resolvers
         private readonly Func<TSourceType, TProperty> _property;
 
         /// <summary>
-        /// Initializes a new instance that runs the specified expression.
+        /// Initializes a new instance that runs the specified expression when resolving a field.
         /// </summary>
         /// <param name="property"></param>
         public ExpressionFieldResolver(Expression<Func<TSourceType, TProperty>> property)

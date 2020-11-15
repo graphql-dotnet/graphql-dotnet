@@ -80,7 +80,7 @@ namespace GraphQL
         public IDictionary<string, object> Extensions { get; set; }
 
         /// <summary>
-        /// Initialize an instance with all fields set to their default values.
+        /// Initializes a new instance with all fields set to their default values.
         /// </summary>
         public ResolveFieldContext() { }
 

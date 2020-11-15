@@ -7,7 +7,7 @@ using GraphQL.Language.AST;
 namespace GraphQL
 {
     /// <summary>
-    /// Represents the result of an execution
+    /// Represents the result of an execution.
     /// </summary>
     public class ExecutionResult
     {
