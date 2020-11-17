@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Compilation;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -26,12 +27,17 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field of this node.
         /// </summary>
-        public Field Field { get; }
+        public Field Field  => CompiledField.Field;
 
         /// <summary>
         /// Returns the graph's field type of this node.
         /// </summary>
-        public FieldType FieldDefinition { get; }
+        public FieldType FieldDefinition => CompiledField.Definition;
+
+        /// <summary>
+        /// Returns performance optimized field of this node.
+        /// </summary>
+        public CompiledField CompiledField { get; set; }
 
         /// <summary>
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, null.
@@ -99,15 +105,15 @@ namespace GraphQL.Execution
         /// </summary>
         /// <param name="parent">The parent node, or null if this is the root node</param>
         /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>. Array nodes will be a <see cref="ListGraphType"/> instance.</param>
-        /// <param name="field">The AST field of this node</param>
-        /// <param name="fieldDefinition">The graph's field type of this node</param>
+        /// <param name="compiled">The optimized compiled field of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, CompiledField compiled, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;
-            Field = field;
-            FieldDefinition = fieldDefinition;
+            //Field = field;
+            //FieldDefinition = fieldDefinition;
+            CompiledField = compiled;
             IndexInParentNode = indexInParentNode;
         }
 
@@ -232,24 +238,9 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
         /// </summary>
-        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, CompiledField compiled, int? indexInParentNode)
+            : base(parent, graphType, compiled, indexInParentNode)
         {
-        }
-
-        /// <summary>
-        /// For execution nodes that represent a field that is an <see cref="IAbstractGraphType"/>, returns the
-        /// proper <see cref="IObjectGraphType"/> based on the set <see cref="ExecutionNode.Result"/>.
-        /// Otherwise returns the value of <see cref="ExecutionNode.GraphType"/>.
-        /// </summary>
-        public IObjectGraphType GetObjectGraphType(ISchema schema)
-        {
-            var objectGraphType = GraphType as IObjectGraphType;
-
-            if (GraphType is IAbstractGraphType abstractGraphType && IsResultSet)
-                objectGraphType = abstractGraphType.GetObjectType(Result, schema);
-
-            return objectGraphType;
         }
 
         /// <summary>
@@ -293,7 +284,7 @@ namespace GraphQL.Execution
         /// Initializes a new instance for the specified root graph type.
         /// </summary>
         public RootExecutionNode(IObjectGraphType graphType)
-            : base(null, graphType, null, null, null)
+            : base(null, graphType, null, null)
         {
 
         }
@@ -312,8 +303,8 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
         /// </summary>
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, CompiledField compiled, int? indexInParentNode)
+            : base(parent, graphType, compiled, indexInParentNode)
         {
 
         }
@@ -363,8 +354,8 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ValueExecutionNode"/> with the specified values.
         /// </summary>
-        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, CompiledField compiled, int? indexInParentNode)
+            : base(parent, graphType, compiled, indexInParentNode)
         {
 
         }
@@ -391,8 +382,8 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="NullExecutionNode"/> with the specified values.
         /// </summary>
-        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-            : base(parent, graphType, field, fieldDefinition, indexInParentNode)
+        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, CompiledField compiled, int? indexInParentNode)
+            : base(parent, graphType, compiled, indexInParentNode)
         {
             Result = null;
         }

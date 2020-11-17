@@ -1,4 +1,5 @@
 using System.Linq;
+using GraphQL.Compilation;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Shouldly;
@@ -44,8 +45,11 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
-                objectGraphType.GetField("value"),
+                new CompiledField
+                {
+                    Definition = objectGraphType.GetField("value"),
+                    Field = new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name"))
+                },
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
@@ -60,8 +64,11 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
-                objectGraphType.GetField("value"),
+                new CompiledField
+                {
+                    Definition = objectGraphType.GetField("value"),
+                    Field = new AST.Field(null, new AST.NameNode("name"))
+                },
                 indexInParentNode: null);
 
             var path = node.Path.ToList();
@@ -76,8 +83,11 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
-                objectGraphType.GetField("value"),
+                new CompiledField
+                {
+                    Definition = objectGraphType.GetField("value"),
+                    Field = new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name"))
+                },
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();
@@ -92,8 +102,11 @@ namespace GraphQL.Tests.Execution
             var node = new ValueExecutionNode(
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
-                new AST.Field(null, new AST.NameNode("name")),
-                objectGraphType.GetField("value"),
+                new CompiledField
+                {
+                    Definition = objectGraphType.GetField("value"),
+                    Field = new AST.Field(null, new AST.NameNode("name"))
+                },
                 indexInParentNode: null);
 
             var path = node.ResponsePath.ToList();

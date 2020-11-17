@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Compilation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -12,75 +13,6 @@ namespace GraphQL.Execution
     /// </summary>
     public static class ExecutionHelper
     {
-        /// <summary>
-        /// Returns the root graph type for the execution -- for a specified schema and operation type.
-        /// </summary>
-        public static IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
-        {
-            IObjectGraphType type;
-
-            ExecutionError error;
-
-            switch (operation.OperationType)
-            {
-                case OperationType.Query:
-                    type = schema.Query;
-                    break;
-
-                case OperationType.Mutation:
-                    type = schema.Mutation;
-                    if (type == null)
-                    {
-                        error = new InvalidOperationError("Schema is not configured for mutations");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
-                    break;
-
-                case OperationType.Subscription:
-                    type = schema.Subscription;
-                    if (type == null)
-                    {
-                        error = new InvalidOperationError("Schema is not configured for subscriptions");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(operation), "Can only execute queries, mutations and subscriptions.");
-            }
-
-            return type;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
-        /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
-        /// </summary>
-        public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
-        {
-            if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
-            {
-                return schema.SchemaMetaFieldType;
-            }
-            if (field.Name == schema.TypeMetaFieldType.Name && schema.Query == parentType)
-            {
-                return schema.TypeMetaFieldType;
-            }
-            if (field.Name == schema.TypeNameMetaFieldType.Name)
-            {
-                return schema.TypeNameMetaFieldType;
-            }
-
-            if (parentType == null)
-            {
-                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
-            }
-
-            return parentType.GetField(field.Name);
-        }
-
         /// <summary>
         /// Returns all of the variable values defined for the document from the attached <see cref="Inputs"/> object.
         /// </summary>
@@ -382,154 +314,6 @@ namespace GraphQL.Execution
             return null;
         }
 
-        private static Fields CollectFields(
-            ExecutionContext context,
-            IGraphType specificType,
-            SelectionSet selectionSet,
-            Fields fields,
-            List<string> visitedFragmentNames)
-        {
-            if (selectionSet != null)
-            {
-                foreach (var selection in selectionSet.SelectionsList)
-                {
-                    if (selection is Field field)
-                    {
-                        if (!ShouldIncludeNode(context, field.Directives))
-                        {
-                            continue;
-                        }
-
-                        fields.Add(field);
-                    }
-                    else if (selection is FragmentSpread spread)
-                    {
-                        if (visitedFragmentNames.Contains(spread.Name)
-                            || !ShouldIncludeNode(context, spread.Directives))
-                        {
-                            continue;
-                        }
-
-                        visitedFragmentNames.Add(spread.Name);
-
-                        var fragment = context.Fragments.FindDefinition(spread.Name);
-                        if (fragment == null
-                            || !ShouldIncludeNode(context, fragment.Directives)
-                            || !DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
-                    }
-                    else if (selection is InlineFragment inline)
-                    {
-                        var name = inline.Type != null ? inline.Type.Name : specificType.Name;
-
-                        if (!ShouldIncludeNode(context, inline.Directives)
-                          || !DoesFragmentConditionMatch(context, name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
-                    }
-                }
-            }
-
-            return fields;
-        }
-
-        /// <summary>
-        /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
-        /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
-        /// otherwise the field name). This ensures all fields with the same response key included via referenced
-        /// fragments are executed at the same time.
-        /// <br/><br/>
-        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
-        /// </summary>
-        public static Dictionary<string, Field> CollectFields(
-            ExecutionContext context,
-            IGraphType specificType,
-            SelectionSet selectionSet)
-        {
-            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
-        }
-
-        /// <summary>
-        /// Examines @skip and @include directives for a node and returns a value indicating if the node should be included or not.
-        /// <br/><br/>
-        /// Note: Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
-        /// directives are provided on the same field or fragment, it must be queried only if the @skip condition
-        /// is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
-        /// if either the @skip condition is true or the @include condition is false.
-        /// </summary>
-        public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
-        {
-            if (directives != null)
-            {
-                var directive = directives.Find(DirectiveGraphType.Skip.Name);
-                if (directive != null)
-                {
-                    var values = GetArgumentValues(
-                        context.Schema,
-                        DirectiveGraphType.Skip.Arguments,
-                        directive.Arguments,
-                        context.Variables);
-
-                    if (values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
-                        return false;
-                }
-
-                directive = directives.Find(DirectiveGraphType.Include.Name);
-                if (directive != null)
-                {
-                    var values = GetArgumentValues(
-                        context.Schema,
-                        DirectiveGraphType.Include.Arguments,
-                        directive.Arguments,
-                        context.Variables);
-
-                    return values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
-        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
-        /// <br/><br/>
-        /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
-        /// </summary>
-        public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
-        {
-            if (string.IsNullOrWhiteSpace(fragmentName))
-            {
-                return true;
-            }
-
-            var conditionalType = context.Schema.FindType(fragmentName);
-
-            if (conditionalType == null)
-            {
-                return false;
-            }
-
-            if (conditionalType.Equals(type))
-            {
-                return true;
-            }
-
-            if (conditionalType is IAbstractGraphType abstractType)
-            {
-                return abstractType.IsPossibleType(type);
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Returns a list of subfields (child nodes) for a result node based on the selection set from the document.
         /// </summary>
@@ -540,7 +324,7 @@ namespace GraphQL.Execution
             {
                 return null;
             }
-            return CollectFields(context, fieldType, field.SelectionSet);
+            return QueryCompilation.CollectFields(context.Schema, context.Variables, context.Document, fieldType, field.SelectionSet);
         }
     }
 }

@@ -78,7 +78,7 @@ type User @key(fields: ""id"") {
                 }";
 
             var variables = @"{ ""_representations"": [{ ""__typename"": ""User"", ""id"": ""123"" }] }";
-            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""123"", ""username"": ""Quinn"" }] }";
+            var expected = @"{ ""_entities"": [{ ""id"" : ""123"", ""username"": ""Quinn"" }] }";
 
             AssertQuery(_ =>
             {
@@ -221,7 +221,7 @@ type User @key(fields: ""id"") {
                     }
                 }";
 
-            var expected = @"{ ""_entities"": [{ ""__typename"": ""User"", ""id"" : ""1"", ""username"": ""One"" }, { ""__typename"": ""User"", ""id"" : ""2"", ""username"": ""Two"" }] }";
+            var expected = @"{ ""_entities"": [{ ""id"" : ""1"", ""username"": ""One"" }, { ""id"" : ""2"", ""username"": ""Two"" }] }";
 
             AssertQuery(_ =>
             {

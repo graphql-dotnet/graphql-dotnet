@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Compilation;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;

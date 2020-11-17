@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Compilation;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -305,6 +306,9 @@ namespace GraphQL
             int? maxParallelExecutionCount,
             IServiceProvider requestServices)
         {
+            var variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs);
+            var compiled = QueryCompilation.Compile(schema, document, variables, operation);
+                
             var context = new ExecutionContext
             {
                 Document = document,
@@ -313,8 +317,9 @@ namespace GraphQL
                 UserContext = userContext,
 
                 Operation = operation,
-                Variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs),
+                Variables = variables,
                 Fragments = document.Fragments,
+                CompiledRootNode = compiled,
                 CancellationToken = cancellationToken,
 
                 Metrics = metrics,

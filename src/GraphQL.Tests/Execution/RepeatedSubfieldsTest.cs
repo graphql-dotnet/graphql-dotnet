@@ -1,3 +1,4 @@
+using GraphQL.Compilation;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -40,7 +41,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = QueryCompilation.CollectFields(new Schema(), new Variables(), new Document(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
@@ -54,7 +55,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(AliasedTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = QueryCompilation.CollectFields(new Schema(), new Variables(), new Document(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
@@ -73,23 +74,21 @@ namespace GraphQL.Tests.Execution
                 new NameNode("Person"));
 
             var fragments = new Fragments { fragment };
+            var document = new Document();
+            document.AddDefinition(fragment);
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
-
-            var context = new ExecutionContext
-            {
-                Fragments = fragments,
-                Schema = schema
-            };
 
             var fragSpread = new FragmentSpread(new NameNode("fragment"));
             var outerSelection = new SelectionSet();
             outerSelection.Add(fragSpread);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(
-                context,
+            var fields = QueryCompilation.CollectFields(
+                schema,
+                new Variables(),
+                document,
                 new PersonType(),
                 outerSelection);
 
