@@ -8,18 +8,15 @@ namespace GraphQL.Compilation
 {
     public class CompiledField
     {
-        public FieldType Definition { get; set; }
-        public Field Field { get; set; }
+        public FieldType Definition { get; }
+        public Field Field { get; }
+        public Func<object, bool, CompiledNode> Resolve { get; }
 
-        internal Func<object, bool, CompiledNode> Resolve { get; set; }
-        //{
-        //    var GraphType = Definition.ResolvedType;
-        //    var objectGraphType = GraphType as IObjectGraphType;
-
-        //    if (GraphType is IAbstractGraphType abstractGraphType && isResultSet)
-        //        objectGraphType = abstractGraphType.GetObjectType(result, Schema);
-
-        //    return new CompiledNode(objectGraphType, new Dictionary<string, CompiledField>());
-        //}
+        public CompiledField(FieldType definition, Field field, Func<object, bool, CompiledNode> resolve)
+        {
+            Definition = definition;
+            Field = field;
+            Resolve = resolve;
+        }
     }
 }

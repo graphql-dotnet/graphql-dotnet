@@ -96,42 +96,6 @@ namespace GraphQL.Execution
              SetSubFieldNodes(parent, compiledNode.Fields);
         }
 
-        //public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
-        //{
-        //    var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
-        //    SetSubFieldNodes(context, parent, fields);
-        //}
-
-        //public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
-        //{
-        //    var parentType = parent.GetObjectGraphType(context.Schema);
-
-        //    var subFields = new Dictionary<string, ExecutionNode>(fields.Count);
-
-        //    foreach (var kvp in fields)
-        //    {
-        //        var name = kvp.Key;
-        //        var field = kvp.Value;
-
-        //        if (!ShouldIncludeNode(context, field.Directives))
-        //            continue;
-
-        //        var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
-
-        //        if (fieldDefinition == null)
-        //            continue;
-
-        //        var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
-
-        //        if (node == null)
-        //            continue;
-
-        //        subFields[name] = node;
-        //    }
-
-        //    parent.SubFields = subFields;
-        //}
-        
         /// <summary>
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not null.

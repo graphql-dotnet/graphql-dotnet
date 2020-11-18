@@ -18,7 +18,12 @@ namespace GraphQL.Compilation
             return rootNode;
         }
 
-        private static Dictionary<string, CompiledField> CollectFieldsRecursive(ISchema schema, Document document, Variables variables, SelectionSet selectionSet, IObjectGraphType rootOperationType)
+        private static Dictionary<string, CompiledField> CollectFieldsRecursive(
+            ISchema schema,
+            Document document,
+            Variables variables,
+            SelectionSet selectionSet,
+            IObjectGraphType rootOperationType)
         {
             var fields = new Dictionary<string, CompiledField>();
             var collected = CollectFields(schema, variables, document, rootOperationType, selectionSet);
@@ -35,14 +40,8 @@ namespace GraphQL.Compilation
         {
             var definition = GetFieldDefinition(schema, graphType, value);
             var resolve = GetResolve(schema, document, variables,  definition, value);
-            var field = new CompiledField
-            {
-                Field = value,
-                Definition = definition,
-                Resolve = resolve
-            };
 
-            return field;
+            return new CompiledField(definition, value, resolve);
         }
 
         private static Func<object, bool, CompiledNode>? GetResolve(ISchema schema, Document document, Variables variables, FieldType definition,Field field)
@@ -64,11 +63,7 @@ namespace GraphQL.Compilation
                         gqlToNode.Add(possilbe, rootNode);
                     }
                     var defaultType = new CompiledNode(abstractType, new Dictionary<string, CompiledField>());
-                    //if(gqlToNode.Count == 1)
-                    //{
-                    //    var type = gqlToNode.Values.Single();
-                    //    return (value, isResolved) => type;
-                    //}
+
                     return (value, isResolved) =>
                     {
                         var objType = abstractType.GetObjectType(value, schema);
@@ -81,6 +76,7 @@ namespace GraphQL.Compilation
                 {
                     var fields = CollectFieldsRecursive(schema, document, variables, field.SelectionSet, objectType);
                     var rootNode = new CompiledNode(objectType, fields);
+
                     return (value, isResolved) => rootNode;
                 }
                 case ScalarGraphType scalar:

@@ -61,6 +61,7 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
 
+        /// <inheritdoc/>
         public CompiledNode CompiledRootNode { get; set; }
     }
 }

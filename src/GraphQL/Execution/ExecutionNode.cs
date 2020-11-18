@@ -34,6 +34,8 @@ namespace GraphQL.Execution
         /// </summary>
         public FieldType FieldDefinition => CompiledField.Definition;
 
+        public CompiledField CompiledField { get; }
+
         /// <summary>
         /// Returns performance optimized field of this node.
         /// </summary>
