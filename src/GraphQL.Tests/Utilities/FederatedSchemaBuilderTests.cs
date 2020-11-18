@@ -90,7 +90,6 @@ type User @key(fields: ""id"") {
         }
 
         [Theory]
-        [InlineData("...on User { id }", false)]
         [InlineData("__typename ...on User { id }", false)]
         [InlineData("...on User { __typename id }", false)]
         [InlineData("...on User { ...TypeAndId }", true)]

@@ -12,7 +12,7 @@ namespace GraphQL.Compilation
         public Field Field { get; }
         public Func<object, bool, CompiledNode> Resolve { get; }
 
-        public CompiledField(FieldType definition, Field field, Func<object, bool, CompiledNode> resolve)
+        public CompiledField(FieldType definition, Field field, Func<object, bool, CompiledNode> resolve = null)
         {
             Definition = definition;
             Field = field;
