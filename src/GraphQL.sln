@@ -73,7 +73,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 		..\docs2\site\docs\guides\known-issues.md = ..\docs2\site\docs\guides\known-issues.md
 		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
 		..\docs2\site\docs\guides\migration.md = ..\docs2\site\docs\guides\migration.md
-		..\docs2\site\docs\guides\migration3.md = ..\docs2\site\docs\guides\migration3.md
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
 	EndProjectSection
 EndProject
@@ -106,6 +105,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		..\.github\ISSUE_TEMPLATE\bug_report.md = ..\.github\ISSUE_TEMPLATE\bug_report.md
 		..\.github\ISSUE_TEMPLATE\feature_request.md = ..\.github\ISSUE_TEMPLATE\feature_request.md
 		..\.github\ISSUE_TEMPLATE\question.md = ..\.github\ISSUE_TEMPLATE\question.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{74E5F778-9FF7-42EE-A4D8-74509F79931F}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\migrations\migration2.md = ..\docs2\site\docs\migrations\migration2.md
+		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
+		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
+		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
 EndProject
 Global
@@ -174,6 +181,7 @@ Global
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
 		{4B4D88E2-B20E-45E0-94E5-D9DD19BDDC29} = {2A7FA3F9-B04C-463E-80EF-144433458FAD}
 		{FF7D1FB7-2288-4D87-989F-1E9D7BFB0AAF} = {2A7FA3F9-B04C-463E-80EF-144433458FAD}
+		{74E5F778-9FF7-42EE-A4D8-74509F79931F} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}
