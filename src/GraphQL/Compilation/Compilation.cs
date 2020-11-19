@@ -44,7 +44,7 @@ namespace GraphQL.Compilation
             return new CompiledField(definition, value, resolve);
         }
 
-        private static Func<object, bool, CompiledNode>? GetResolve(ISchema schema, Document document, Variables variables, FieldType definition,Field field)
+        private static Func<object, bool, CompiledNode> GetResolve(ISchema schema, Document document, Variables variables, FieldType definition,Field field)
         {
             var unwrapped = definition?.ResolvedType;
             while(unwrapped is IProvideResolvedType provideResolvedType)
