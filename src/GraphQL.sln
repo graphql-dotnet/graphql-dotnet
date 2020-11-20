@@ -72,7 +72,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
 		..\docs2\site\docs\guides\known-issues.md = ..\docs2\site\docs\guides\known-issues.md
 		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
-		..\docs2\site\docs\guides\migration.md = ..\docs2\site\docs\guides\migration.md
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
 	EndProjectSection
 EndProject
