@@ -195,10 +195,9 @@ namespace GraphQL.Types
                 }
 
                 IGraphType type;
-                var name = typeName.TrimGraphQLTypes();
                 lock (_lock)
                 {
-                    _types.TryGetValue(name, out type);
+                    _types.TryGetValue(typeName, out type);
                 }
                 return type;
             }
@@ -268,7 +267,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
             }
 
-            var name = type.CollectTypes(context).TrimGraphQLTypes();
+            string name = context.CollectTypes(type);
             lock (_lock)
             {
                 SetGraphType(name, type);

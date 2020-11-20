@@ -1889,7 +1889,6 @@ namespace GraphQL.Types
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
-        public virtual string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
@@ -1951,7 +1950,6 @@ namespace GraphQL.Types
     {
         string DeprecationReason { get; set; }
         string Description { get; set; }
-        string CollectTypes(GraphQL.Types.TypeCollectionContext context);
     }
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
@@ -2055,7 +2053,6 @@ namespace GraphQL.Types
         protected ListGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
-        public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
     public class ListGraphType<T> : GraphQL.Types.ListGraphType
@@ -2075,7 +2072,6 @@ namespace GraphQL.Types
         protected NonNullGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
-        public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
     public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType

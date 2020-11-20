@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Utilities;
 
@@ -69,20 +68,7 @@ namespace GraphQL.Types
 
         public string DeprecationReason { get; set; }
 
-        public virtual string CollectTypes(TypeCollectionContext context)
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                Name = GetType().Name;
-            }
-
-            return Name;
-        }
-
-        public override string ToString() =>
-            string.IsNullOrWhiteSpace(Name)
-                ? GetType().Name
-                : Name;
+        public override string ToString() => Name;
 
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
@@ -96,23 +82,5 @@ namespace GraphQL.Types
         }
 
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
-    }
-
-    /// <summary>
-    /// TODO: This sucks, find a better way
-    /// </summary>
-    public class TypeCollectionContext
-    {
-        public TypeCollectionContext(
-            Func<Type, IGraphType> resolver,
-            Action<string, IGraphType, TypeCollectionContext> addType)
-        {
-            ResolveType = resolver;
-            AddType = addType;
-        }
-
-        public Func<Type, IGraphType> ResolveType { get; private set; }
-        public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
-        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }
