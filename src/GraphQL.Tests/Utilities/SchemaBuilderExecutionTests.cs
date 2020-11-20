@@ -10,6 +10,144 @@ namespace GraphQL.Tests.Utilities
 {
     public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
+        public class Query
+        {
+            public virtual Test Test() => new Test();
+
+            public string Method() => throw new OverflowException("just test");
+
+            public int Property => throw new DivideByZeroException("test too");
+        }
+
+        public class Test
+        {
+            public string Id => "foo";
+        }
+
+        public class TestEx : Test
+        {
+            public string Name => "bar";
+        }
+
+        public class QueryEx : Query
+        {
+            public override Test Test() => new TestEx();
+        }
+
+        [Fact]
+        public async Task schema_first_generate_exception_with_normal_stack_trace_for_method()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                    method: String!
+                    property: Int!
+                }
+                ", builder =>
+            {
+                builder.Types.Include<Query>();
+            });
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ method }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("OVERFLOW");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
+            result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.Method()");
+        }
+
+        [Fact]
+        public async Task schema_first_generate_exception_with_normal_stack_trace_for_property()
+        {
+            var schema = Schema.For(@"
+                type Query {
+                    method: String!
+                    property: Int!
+                }
+                ", builder =>
+            {
+                builder.Types.Include<Query>();
+            });
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ property }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
+            result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace.ShouldStartWith("   at GraphQL.Tests.Utilities.SchemaBuilderExecutionTests.Query.get_Property()");
+        }
+
+        [Fact]
+        public async Task issue_1155_throws()
+        {
+            var schema = Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder =>
+                {
+                    builder.Types.Include<Query>();
+                });
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ test { id name } }";
+            }).ConfigureAwait(false);
+
+            result.Errors.Count.ShouldBe(1);
+            result.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+            result.Errors[0].Message.ShouldBe("Error trying to resolve field 'name'.");
+            result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Expected to find property or method 'name' on type 'Test' but it does not exist.");
+        }
+
+        [Fact]
+        public async Task issue_1155_with_custom_root_does_not_throw()
+        {
+            var schema = Schema.For(@"
+                type Test {
+                    id: ID!
+                    name: String!
+                }
+
+                type Query {
+                    test: Test!
+                }
+                ", builder =>
+            {
+                builder.Types.Include<Query>();
+            });
+
+            var executor = new DocumentExecuter();
+            var result = await executor.ExecuteAsync(options =>
+            {
+                options.Schema = schema;
+                options.Query = "{ test { id name } }";
+                options.Root = new QueryEx();
+            }).ConfigureAwait(false);
+
+            result.Errors.ShouldBeNull();
+            var data = result.Data.ShouldBeOfType<Dictionary<string, object>>();
+            var t = data["test"].ShouldBeOfType<Dictionary<string, object>>();
+            t["id"].ShouldBe("foo");
+            t["name"].ShouldBe("bar");
+        }
+
         [Fact]
         public void can_read_schema_with_custom_root_names()
         {
