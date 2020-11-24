@@ -265,27 +265,13 @@ var json = await schema.ExecuteAsync(_ =>
   - [x] directives
 
 
-### Publishing NuGet packages
+## Publishing NuGet packages
 
 The package publishing process is automated with [GitHub Actions](https://github.com/features/actions).
 
 After your PR is merged into `master` or `develop`, preview packages are published to [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 
 Stable versions of packages are published to NuGet when a [release](https://github.com/graphql-dotnet/graphql-dotnet/releases) is created.
-
-### Running on OSX with mono
-
-To run this project on OSX with mono you will need to add some configuration.
-Make sure mono is installed and add the following to your bash configuration:
-
-```bash
-export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/
-```
-
-See the following for more details:
-
-* [Building VS 2017 MSBuild csproj Projects with Mono on Linux](https://stackoverflow.com/questions/42747722/building-vs-2017-msbuild-csproj-projects-with-mono-on-linux)
-* [using .NET Framework as targets framework, the osx/unix build fails](https://github.com/dotnet/netcorecli-fsc/wiki/.NET-Core-SDK-rc4#using-net-framework-as-targets-framework-the-osxunix-build-fails)
 
 ## Contributors
 

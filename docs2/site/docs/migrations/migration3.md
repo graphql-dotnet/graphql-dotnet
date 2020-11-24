@@ -47,6 +47,23 @@ This project now requires the .NET Standard 2.0 and breaks compatibility with ap
 .NET Framework 4.6 and earlier. See https://docs.microsoft.com/en-us/dotnet/standard/net-standard for a list of
 frameworks that support .Net Standard 2.0.
 
+### Naming
+
+By default, the `GraphType.Name` property now is initialized in constructor and is the same as the name of the .NET type
+unless the name of .NET type ends in _GraphType_. In this case, the _GraphType_ suffix is truncated and `GraphType.Name`
+is set to this value.
+
+Examples:
+
+| .NET GraphType Name | Default Name |
+|---------------------|--------------|
+| MoneyType           | MoneyType    |
+| MoneyGraphType      | Money        |
+
+You can always set your own type name either in the constructor or externally. The result of this change is that it is no
+longer possible to have Graph Types with unspecified (`null`) or invalid names. This allows to avoid a number of errors
+and incomprehensible behavior at runtime.
+
 ### Dependency Injection
 
 The previous `IDependencyResolver` interface and `FuncDependencyResolver` class have been replaced by the
