@@ -8,15 +8,14 @@ on:
       - synchronize   # when code is added
       - reopened      # when a closed PR is reopened
 
-env:
-  TITLE: ${{ github.event.pull_request.title }}
-
 jobs:
   check-title:
     runs-on: ubuntu-latest
     steps:
       - name: Fail build if pull request title contains [WIP]
-        if: ${{ contains(${{ TITLE }}, '[WIP]') }} # This function is not case sensitive.
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        if: ${{ contains(github.event.pull_request.title, '[WIP]') }} # This function is not case sensitive.
         run: |
           echo Warning! PR title "$TITLE" contains [WIP]. Remove [WIP] from the title when PR is ready.
           exit 1
