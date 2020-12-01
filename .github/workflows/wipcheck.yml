@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fail build if pull request title contains [WIP]
-        if: ${{ contains($TITLE, '[WIP]') }} # This function is not case sensitive.
+        if: ${{ contains(${{ TITLE }}, '[WIP]') }} # This function is not case sensitive.
         run: |
           echo Warning! PR title "$TITLE" contains [WIP]. Remove [WIP] from the title when PR is ready.
           exit 1
