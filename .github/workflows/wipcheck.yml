@@ -11,6 +11,7 @@ on:
 jobs:
   check-title:
     runs-on: ubuntu-latest
+
     steps:
       - name: Fail build if pull request title contains [WIP]
         env:
