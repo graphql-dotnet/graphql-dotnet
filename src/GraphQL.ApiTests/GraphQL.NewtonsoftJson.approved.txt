@@ -12,7 +12,7 @@ namespace GraphQL.NewtonsoftJson
         public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
     }
-    public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver1
+    public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
     {
         public ExecutionResultContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
