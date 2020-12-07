@@ -472,3 +472,8 @@ public class MyConverter : INameConverter
 The three introspection field definitions for `__schema`, `__type`, and `__typename` have moved from static properties on the `SchemaIntrospection` class
 to properties of the `ISchema` interface, typically provided by the `Schema` class. Custom implementations of `ISchema` must implement three new properties:
 `SchemaMetaFieldType`, `TypeMetaFieldType`, and `TypeNameMetaFieldType`. These can be provided by the `GraphTypesLookup` class.
+
+### `ISchema` now implements `IProvideMetadata` (only for GraphQL.NET >= v3.2.0)
+
+Formally it is a breaking change but practically clients shouldn't run into problems, as hardly anyone creates their own `ISchema` implementations preferring
+to inherit from `Schema` class. 
