@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <VersionPrefix>3.1.7-preview</VersionPrefix>
+    <VersionPrefix>3.2.0-preview</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
