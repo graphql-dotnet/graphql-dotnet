@@ -6,6 +6,9 @@ using GraphQL.Language.AST;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Represents the result of an execution.
+    /// </summary>
     public class ExecutionResult
     {
         /// <summary>
@@ -43,10 +46,16 @@ namespace GraphQL
         /// </summary>
         public Dictionary<string, object> Extensions { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance with all properties set to their defaults.
+        /// </summary>
         public ExecutionResult()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance as a clone of an existing <see cref="ExecutionResult"/>.
+        /// </summary>
         public ExecutionResult(ExecutionResult result)
         {
             if (result == null)

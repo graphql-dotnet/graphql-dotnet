@@ -32,6 +32,9 @@ namespace GraphQL.Types
             AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
         }
 
+        /// <summary>
+        /// Returns a list of properties that should have fields created for them.
+        /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
         {
             return typeof(TSourceType)
@@ -63,6 +66,9 @@ namespace GraphQL.Types
             AutoRegisteringHelper.SetFields(this, GetRegisteredProperties(), excludedProperties);
         }
 
+        /// <summary>
+        /// Returns a list of properties that should have fields created for them.
+        /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetRegisteredProperties()
         {
             return typeof(TSourceType)
