@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL.Conversion;
+using GraphQL.Introspection;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -81,6 +85,72 @@ namespace GraphQL.Tests.Introspection
             {
                 Name = "TestQuery";
             }
+        }
+
+        [Theory]
+        [ClassData(typeof(DocumentWritersTestData))]
+        public async Task validate_null_field_schema_comparer_gives_original_order_of_fields(IDocumentWriter documentWriter)
+        {
+            var documentExecuter = new DocumentExecuter();
+            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            {
+                _.Schema = new Schema
+                {
+                    Query = TestQueryType(),
+                    Comparer = new NulledOutTestSchemaComparer()
+                };
+                _.Query = SchemaIntrospection.GetFieldNamesOfTypesQuery;
+            });
+            var scalarTypeNames = new[] { "String", "Boolean", "Int" };
+
+            static string GetName(JsonElement el) => el.GetProperty("name").GetString();
+
+            var json = JsonDocument.Parse(await documentWriter.WriteToStringAsync(executionResult));
+
+            var types = json.RootElement
+                .GetProperty("data")
+                .GetProperty("__schema")
+                .GetProperty("types")
+                .EnumerateArray()
+                .Where(el => !GetName(el).StartsWith("__") && !scalarTypeNames.Contains(GetName(el))) // not interested in introspection or scalar types
+                .ToList(); 
+
+            Assert.Equal(3, types.Count);
+            ShouldBe(GetName(types[0]), "Query");
+            Assert.Equal(new[] { "field2", "field1" }, types[0].GetProperty("fields").EnumerateArray().Select(GetName));
+            ShouldBe(GetName(types[1]), "Things");
+            Assert.Equal(new[] { "foo", "bar", "baz" }, types[1].GetProperty("fields").EnumerateArray().Select(GetName));
+            ShouldBe(GetName(types[2]), "Letters");
+            Assert.Equal(new[] { "bravo", "charlie", "alfa", "delta" }, types[2].GetProperty("fields").EnumerateArray().Select(GetName));
+        }
+
+        private static IObjectGraphType TestQueryType()
+        {
+            var type1 = new ObjectGraphType { Name = "Letters" };
+            type1.AddField(new FieldType { Name = "bravo",   ResolvedType = new StringGraphType() });
+            type1.AddField(new FieldType { Name = "charlie", ResolvedType = new IntGraphType() });
+            type1.AddField(new FieldType { Name = "alfa",   ResolvedType = new ListGraphType(new IntGraphType()) });
+            type1.AddField(new FieldType { Name = "delta",   ResolvedType = new StringGraphType() });
+
+            var type2 = new ObjectGraphType { Name = "Things" };
+            type2.AddField(new FieldType { Name = "foo", ResolvedType = new IntGraphType() });
+            type2.AddField(new FieldType { Name = "bar", ResolvedType = new IntGraphType() });
+            type2.AddField(new FieldType { Name = "baz", ResolvedType = new NonNullGraphType(new IntGraphType()) });
+
+            var queryType = new ObjectGraphType { Name = "Query" };
+            queryType.AddField(new FieldType { Name = "field2", ResolvedType = type2 });
+            queryType.AddField(new FieldType { Name = "field1", ResolvedType = type1 });
+
+            return queryType;
+        }
+
+        private class NulledOutTestSchemaComparer : ISchemaComparer
+        {
+            public IComparer<IGraphType> TypeComparer => null;
+            public IComparer<IFieldType> FieldComparer(IGraphType parent) => null;
+            public IComparer<QueryArgument> ArgumentComparer(IFieldType field) => null;
+            public IComparer<EnumValueDefinition> EnumValueComparer(EnumerationGraphType parent) => null;
+            public IComparer<DirectiveGraphType> DirectiveComparer => null;
         }
 
         [Theory]

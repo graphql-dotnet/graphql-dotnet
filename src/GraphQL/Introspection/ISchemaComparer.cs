@@ -15,6 +15,7 @@ namespace GraphQL.Introspection
 
         /// <summary>
         /// Returns a comparer for fields withing enclosing type.
+        /// If this returns null then the original field ordering is preserved.
         /// </summary>
         /// <param name="parent"> Parent type to which the fields belong. </param>
         IComparer<IFieldType> FieldComparer(IGraphType parent);
