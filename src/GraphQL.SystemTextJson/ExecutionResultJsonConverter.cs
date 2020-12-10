@@ -198,5 +198,7 @@ namespace GraphQL.SystemTextJson
 
         public override ExecutionResult Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => throw new NotImplementedException();
+
+        public override bool CanConvert(Type typeToConvert) => typeof(ExecutionResult).IsAssignableFrom(typeToConvert);
     }
 }

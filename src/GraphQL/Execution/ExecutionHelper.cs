@@ -65,7 +65,7 @@ namespace GraphQL.Execution
 
             if (parentType == null)
             {
-                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
+                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
             }
 
             return parentType.GetField(field.Name);

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>exe</OutputType>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
