@@ -184,7 +184,7 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// A class that represents an enumeratoin definition.
+    /// A class that represents an enumeration definition.
     /// </summary>
     public class EnumValueDefinition : MetadataProvider
     {
@@ -220,7 +220,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// When mapped to an <see cref="Enum"/> member, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
+        /// When mapped to a member of an <see cref="Enum"/>, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
         /// </summary>
         internal object UnderlyingValue { get; set; }
     }

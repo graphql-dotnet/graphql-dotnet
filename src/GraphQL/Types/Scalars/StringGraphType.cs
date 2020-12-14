@@ -3,7 +3,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The String scalar graph type represents a string value
+    /// The String scalar graph type represents a string value.
     /// </summary>
     public class StringGraphType : ScalarGraphType
     {

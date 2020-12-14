@@ -10,7 +10,7 @@ namespace GraphQL.Types
     public class DateGraphType : ScalarGraphType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DateGraphType"/> class
+        /// Initializes a new instance of the <see cref="DateGraphType"/> class.
         /// </summary>
         public DateGraphType()
         {

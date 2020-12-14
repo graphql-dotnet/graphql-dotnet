@@ -9,7 +9,7 @@ namespace GraphQL.Types
     public class TimeSpanSecondsGraphType : ScalarGraphType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TimeSpanSecondsGraphType"/> class
+        /// Initializes a new instance of the <see cref="TimeSpanSecondsGraphType"/> class.
         /// </summary>
         public TimeSpanSecondsGraphType()
         {
