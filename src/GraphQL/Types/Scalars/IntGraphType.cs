@@ -8,6 +8,7 @@ namespace GraphQL.Types
     /// </summary>
     public class IntGraphType : ScalarGraphType
     {
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
         {
             if (value is IntValue intValue)
@@ -18,6 +19,7 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(int));
     }
 }

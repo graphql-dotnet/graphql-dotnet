@@ -2,8 +2,12 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The SByte scalar graph type represents a signed 8-bit integer value.
+    /// </summary>
     public class SByteGraphType : ScalarGraphType
     {
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             SByteValue sbyteValue => sbyteValue.Value,
@@ -11,6 +15,7 @@ namespace GraphQL.Types
             _ => null
         };
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(sbyte));
     }
 }

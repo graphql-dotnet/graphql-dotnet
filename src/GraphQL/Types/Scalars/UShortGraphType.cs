@@ -2,8 +2,12 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The UShort scalar graph type represents an unsigned 16-bit integer value.
+    /// </summary>
     public class UShortGraphType : ScalarGraphType
     {
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             UShortValue ushortValue => ushortValue.Value,
@@ -11,6 +15,7 @@ namespace GraphQL.Types
             _ => null
         };
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(ushort));
     }
 }

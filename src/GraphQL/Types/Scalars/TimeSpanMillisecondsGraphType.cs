@@ -3,8 +3,14 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The Milliseconds scalar graph type represents a period of time represented as a total number of milliseconds.
+    /// </summary>
     public class TimeSpanMillisecondsGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TimeSpanMillisecondsGraphType"/> class
+        /// </summary>
         public TimeSpanMillisecondsGraphType()
         {
             Name = "Milliseconds";
@@ -12,6 +18,7 @@ namespace GraphQL.Types
                 "The `Milliseconds` scalar type represents a period of time represented as the total number of milliseconds.";
         }
 
+        /// <inheritdoc/>
         public override object Serialize(object value) => value switch
         {
             TimeSpan timeSpan => (long)timeSpan.TotalMilliseconds,
@@ -20,6 +27,7 @@ namespace GraphQL.Types
             _ => null
         };
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => value switch
         {
             int i => TimeSpan.FromMilliseconds(i),
@@ -28,6 +36,7 @@ namespace GraphQL.Types
             _ => null
         };
 
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             TimeSpanValue spanValue => ParseValue(spanValue.Value),

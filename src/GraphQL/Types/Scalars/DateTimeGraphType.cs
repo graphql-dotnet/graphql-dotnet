@@ -3,8 +3,14 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The DateTime scalar graph type represents a date and time.
+    /// </summary>
     public class DateTimeGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateTimeGraphType"/> class
+        /// </summary>
         public DateTimeGraphType()
         {
             Description =
@@ -12,8 +18,10 @@ namespace GraphQL.Types
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
 
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
         {
             if (value is DateTimeValue timeValue)

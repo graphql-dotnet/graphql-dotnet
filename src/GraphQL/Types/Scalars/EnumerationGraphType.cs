@@ -17,11 +17,17 @@ namespace GraphQL.Types
     /// </summary>
     public class EnumerationGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumerationGraphType"/> class.
+        /// </summary>
         public EnumerationGraphType()
         {
             Values = new EnumValues();
         }
 
+        /// <summary>
+        /// Adds a value to the allowed set of enumeration values.
+        /// </summary>
         public void AddValue(string name, string description, object value, string deprecationReason = null)
         {
             AddValue(new EnumValueDefinition
@@ -33,6 +39,9 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a value to the allowed set of enumeration values.
+        /// </summary>
         public void AddValue(EnumValueDefinition value)
         {
             if (value == null)
@@ -42,8 +51,12 @@ namespace GraphQL.Types
             Values.Add(value);
         }
 
+        /// <summary>
+        /// Returns the allowed set of enumeration values.
+        /// </summary>
         public EnumValues Values { get; }
 
+        /// <inheritdoc/>
         public override object Serialize(object value)
         {
             var valueString = value.ToString();
@@ -57,6 +70,7 @@ namespace GraphQL.Types
             return foundByValue?.Name;
         }
 
+        /// <inheritdoc/>
         public override object ParseValue(object value)
         {
             if (value == null)
@@ -68,6 +82,7 @@ namespace GraphQL.Types
             return found?.Value;
         }
 
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
             => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
     }
@@ -80,6 +95,9 @@ namespace GraphQL.Types
     /// <typeparam name="TEnum"> The enum to take values from. </typeparam>
     public class EnumerationGraphType<TEnum> : EnumerationGraphType where TEnum : Enum
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumerationGraphType"/> class.
+        /// </summary>
         public EnumerationGraphType()
         {
             var type = typeof(TEnum);
@@ -104,17 +122,33 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Changes the case of the specified string to constant case (uppercase, using underscores to separate words).
+        /// </summary>
         protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
     }
 
+    /// <summary>
+    /// A class that represents a set of enumeration definitions.
+    /// </summary>
     public class EnumValues : IEnumerable<EnumValueDefinition>
     {
         private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
 
+        /// <summary>
+        /// Returns an enumeration definition for the specified name.
+        /// </summary>
         public EnumValueDefinition this[string name] => FindByName(name);
 
+        /// <summary>
+        /// Adds an enumeration definition to the set.
+        /// </summary>
+        /// <param name="value"></param>
         public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
+        /// <summary>
+        /// Returns an enumeration definition for the specified name.
+        /// </summary>
         public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             // DO NOT USE LINQ ON HOT PATH
@@ -125,6 +159,9 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <summary>
+        /// Returns an enumeration definition for the specified value.
+        /// </summary>
         public EnumValueDefinition FindByValue(object value)
         {
             if (value is Enum)
@@ -140,17 +177,36 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    /// <summary>
+    /// A class that represents an enumeratoin definition.
+    /// </summary>
     public class EnumValueDefinition : MetadataProvider
     {
+        /// <summary>
+        /// The name of the enumeration member.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// A description of the enumeration member.
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The reason this enumeration member has been deprecated; null if this member has not been deprecated.
+        /// </summary>
         public string DeprecationReason { get; set; }
+
         private object _value;
+        /// <summary>
+        /// The value of the enumeration member.
+        /// </summary>
         public object Value
         {
             get => _value;
@@ -162,8 +218,9 @@ namespace GraphQL.Types
                 UnderlyingValue = value;
             }
         }
+
         /// <summary>
-        /// For enums, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
+        /// When mapped to an <see cref="Enum"/> member, contains the underlying enumeration value; otherwise contains <see cref="Value" />.
         /// </summary>
         internal object UnderlyingValue { get; set; }
     }
