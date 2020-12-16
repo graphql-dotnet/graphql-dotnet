@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The Seconds scalar graph type represents a period of time represented as a total number of seconds.
+    /// The Seconds scalar graph type represents a period of time represented as an integer value of the total number of seconds.
     /// </summary>
     public class TimeSpanSecondsGraphType : ScalarGraphType
     {

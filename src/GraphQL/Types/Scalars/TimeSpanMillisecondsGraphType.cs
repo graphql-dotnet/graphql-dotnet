@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The Milliseconds scalar graph type represents a period of time represented as a total number of milliseconds.
+    /// The Milliseconds scalar graph type represents a period of time represented as an integer value of the total number of milliseconds.
     /// </summary>
     public class TimeSpanMillisecondsGraphType : ScalarGraphType
     {

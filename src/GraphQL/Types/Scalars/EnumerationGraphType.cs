@@ -123,7 +123,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Changes the case of the specified string to constant case (uppercase, using underscores to separate words).
+        /// Changes the case of the specified enum name. By default changes it to constant case (uppercase, using underscores to separate words).
         /// </summary>
         protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
     }

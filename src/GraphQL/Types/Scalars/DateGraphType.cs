@@ -5,7 +5,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The Date scalar graph type represents a year, month and day.
+    /// The Date scalar graph type represents a year, month and day in accordance with the ISO-8601 standard.
     /// </summary>
     public class DateGraphType : ScalarGraphType
     {

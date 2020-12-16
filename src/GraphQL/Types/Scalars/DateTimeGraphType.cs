@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The DateTime scalar graph type represents a date and time.
+    /// The DateTime scalar graph type represents a date and time in accordance with the ISO-8601 standard.
     /// </summary>
     public class DateTimeGraphType : ScalarGraphType
     {

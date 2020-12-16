@@ -3,7 +3,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The ULong scalar graph type represents an unsigned 32-bit integer value.
+    /// The UInt scalar graph type represents an unsigned 32-bit integer value.
     /// </summary>
     public class UIntGraphType : ScalarGraphType
     {
