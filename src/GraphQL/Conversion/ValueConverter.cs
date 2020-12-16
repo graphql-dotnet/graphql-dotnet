@@ -57,58 +57,58 @@ namespace GraphQL
             Register<DateTimeOffset, DateTime>(value => value.UtcDateTime);
             Register<TimeSpan, long>(value => (long)value.TotalSeconds);
 
-            Register<int, sbyte>(value => { checked { return (sbyte)value; } });
-            Register<int, byte>(value => { checked { return (byte)value; } });
-            Register<int, short>(value => { checked { return (short)value; } });
-            Register<int, ushort>(value => { checked { return (ushort)value; } });
+            Register<int, sbyte>(value => checked((sbyte)value));
+            Register<int, byte>(value => checked((byte)value));
+            Register<int, short>(value => checked((short)value));
+            Register<int, ushort>(value => checked((ushort)value));
             Register(typeof(int), typeof(bool), value => Convert.ToBoolean(value, NumberFormatInfo.InvariantInfo).Boxed());
-            Register<int, uint>(value => { checked { return (uint)value; } });
+            Register<int, uint>(value => checked((uint)value));
             Register<int, long>(value => value);
-            Register<int, ulong>(value => { checked { return (ulong)value; } });
+            Register<int, ulong>(value => checked((ulong)value));
             Register<int, BigInteger>(value => new BigInteger(value));
             Register<int, double>(value => value);
             Register<int, float>(value => value);
             Register<int, decimal>(value => value);
             Register<int, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register<long, sbyte>(value => { checked { return (sbyte)value; } });
-            Register<long, byte>(value => { checked { return (byte)value; } });
-            Register<long, short>(value => { checked { return (short)value; } });
-            Register<long, ushort>(value => { checked { return (ushort)value; } });
-            Register<long, int>(value => { checked { return (int)value; } });
-            Register<long, uint>(value => { checked { return (uint)value; } });
-            Register<long, ulong>(value => { checked { return (ulong)value; } });
+            Register<long, sbyte>(value => checked((sbyte)value));
+            Register<long, byte>(value => checked((byte)value));
+            Register<long, short>(value => checked((short)value));
+            Register<long, ushort>(value => checked((ushort)value));
+            Register<long, int>(value => checked((int)value));
+            Register<long, uint>(value => checked((uint)value));
+            Register<long, ulong>(value => checked((ulong)value));
             Register<long, BigInteger>(value => new BigInteger(value));
             Register<long, double>(value => value);
             Register<long, float>(value => value);
             Register<long, decimal>(value => value);
             Register<long, TimeSpan>(value => TimeSpan.FromSeconds(value));
 
-            Register<BigInteger, sbyte>(value => { checked { return (sbyte)value; } });
-            Register<BigInteger, byte>(value => { checked { return (byte)value; } });
-            Register<BigInteger, decimal>(value => { checked { return (decimal)value; } });
-            Register<BigInteger, double>(value => { checked { return (double)value; } });
-            Register<BigInteger, short>(value => { checked { return (short)value; } });
-            Register<BigInteger, long>(value => { checked { return (long)value; } });
-            Register<BigInteger, sbyte>(value => { checked { return (sbyte)value; } });
-            Register<BigInteger, ushort>(value => { checked { return (ushort)value; } });
-            Register<BigInteger, uint>(value => { checked { return (uint)value; } });
-            Register<BigInteger, ulong>(value => { checked { return (ulong)value; } });
-            Register<BigInteger, int>(value => { checked { return (int)value; } });
-            Register<BigInteger, float>(value => { checked { return (float)value; } });
+            Register<BigInteger, sbyte>(value => checked((sbyte)value));
+            Register<BigInteger, byte>(value => checked((byte)value));
+            Register<BigInteger, decimal>(value => checked((decimal)value));
+            Register<BigInteger, double>(value => checked((double)value));
+            Register<BigInteger, short>(value => checked((short)value));
+            Register<BigInteger, long>(value => checked((long)value));
+            Register<BigInteger, sbyte>(value => checked((sbyte)value));
+            Register<BigInteger, ushort>(value => checked((ushort)value));
+            Register<BigInteger, uint>(value => checked((uint)value));
+            Register<BigInteger, ulong>(value => checked((ulong)value));
+            Register<BigInteger, int>(value => checked((int)value));
+            Register<BigInteger, float>(value => checked((float)value));
 
-            Register<uint, sbyte>(value => { checked { return (sbyte)value; } });
-            Register<uint, byte>(value => { checked { return (byte)value; } });
-            Register<uint, int>(value => { checked { return (int)value; } });
+            Register<uint, sbyte>(value => checked((sbyte)value));
+            Register<uint, byte>(value => checked((byte)value));
+            Register<uint, int>(value => checked((int)value));
             Register<uint, long>(value => value);
             Register<uint, ulong>(value => value);
-            Register<uint, short>(value => { checked { return (short)value; } });
-            Register<uint, ushort>(value => { checked { return (ushort)value; } });
+            Register<uint, short>(value => checked((short)value));
+            Register<uint, ushort>(value => checked((ushort)value));
             Register<uint, BigInteger>(value => new BigInteger(value));
 
             Register<ulong, BigInteger>(value => new BigInteger(value));
 
-            Register<byte, sbyte>(value => { checked { return (sbyte)value; } });
+            Register<byte, sbyte>(value => checked((sbyte)value));
             Register<byte, int>(value => value);
             Register<byte, long>(value => value);
             Register<byte, ulong>(value => value);
@@ -116,25 +116,25 @@ namespace GraphQL
             Register<byte, ushort>(value => value);
             Register<byte, BigInteger>(value => new BigInteger(value));
 
-            Register<sbyte, byte>(value => { checked { return (byte)value; } });
+            Register<sbyte, byte>(value => checked((byte)value));
             Register<sbyte, int>(value => value);
             Register<sbyte, long>(value => value);
-            Register<sbyte, ulong>(value => { checked { return (ulong)value; } });
+            Register<sbyte, ulong>(value => checked((ulong)value));
             Register<sbyte, short>(value => value);
-            Register<sbyte, ushort>(value => { checked { return (ushort)value; } });
+            Register<sbyte, ushort>(value => checked((ushort)value));
             Register<sbyte, BigInteger>(value => new BigInteger(value));
 
             Register<float, double>(value => value);
-            Register<float, decimal>(value => { checked { return (decimal)value; } });
+            Register<float, decimal>(value => checked((decimal)value));
             Register<float, BigInteger>(value => new BigInteger(value));
 
-            Register<double, float>(value => { checked { return (float)value; } });
-            Register<double, decimal>(value => { checked { return (decimal)value; } });
+            Register<double, float>(value => checked((float)value));
+            Register<double, decimal>(value => checked((decimal)value));
 
-            Register<char, byte>(value => { checked { return (byte)value; } });
+            Register<char, byte>(value => checked((byte)value));
             Register<char, int>(value => value);
 
-            Register<decimal, double>(value => { checked { return (double)value; } });
+            Register<decimal, double>(value => checked((double)value));
         }
 
         /// <summary>

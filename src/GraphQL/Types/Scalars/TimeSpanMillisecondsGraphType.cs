@@ -20,19 +20,19 @@ namespace GraphQL.Types
             _ => null
         };
 
-        public override object ParseValue(object value) => value switch
+        public override object ParseLiteral(IValue value) => value switch
         {
-            int i => TimeSpan.FromMilliseconds(i),
-            long l => TimeSpan.FromMilliseconds(l),
-            TimeSpan t => t,
+            TimeSpanValue spanValue => spanValue.Value,
+            IntValue intValue => TimeSpan.FromMilliseconds(intValue.Value),
+            LongValue longValue => TimeSpan.FromMilliseconds(longValue.Value),
             _ => null
         };
 
-        public override object ParseLiteral(IValue value) => value switch
+        public override object ParseValue(object value) => value switch
         {
-            TimeSpanValue spanValue => ParseValue(spanValue.Value),
-            LongValue longValue => ParseValue(longValue.Value),
-            IntValue intValue => ParseValue(intValue.Value),
+            TimeSpan t => t,
+            int i => TimeSpan.FromMilliseconds(i),
+            long l => TimeSpan.FromMilliseconds(l),
             _ => null
         };
     }
