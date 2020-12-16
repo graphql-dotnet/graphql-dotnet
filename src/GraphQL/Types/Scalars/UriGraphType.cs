@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The Uri scalar graph type represents an Uri represented as a string value.
+    /// The Uri scalar graph type represents a string Uri specified in RFC 2396, RFC 2732, RFC 3986, and RFC 3987.
     /// </summary>
     public class UriGraphType : ScalarGraphType
     {
