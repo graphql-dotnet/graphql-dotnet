@@ -12,8 +12,6 @@ namespace GraphQL.Types
                 "to be formatted in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
-
         public override object ParseLiteral(IValue value)
         {
             if (value is DateTimeValue timeValue)
@@ -28,5 +26,7 @@ namespace GraphQL.Types
 
             return null;
         }
+
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
     }
 }
