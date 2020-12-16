@@ -40,15 +40,15 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_int_to_value()
         {
-            type.ParseValue(1234567).ShouldBe(1234567);
-            type.ParseLiteral(new IntValue(1234567)).ShouldBe(1234567);
+            type.ParseValue(1234567).ShouldBe(1234567d);
+            type.ParseLiteral(new IntValue(1234567)).ShouldBe(1234567d);
         }
 
         [Fact]
         public void coerces_long_to_value()
         {
-            type.ParseValue(12345678901234).ShouldBe(12345678901234);
-            type.ParseLiteral(new LongValue(12345678901234)).ShouldBe(12345678901234);
+            type.ParseValue(12345678901234).ShouldBe(12345678901234d);
+            type.ParseLiteral(new LongValue(12345678901234)).ShouldBe(12345678901234d);
         }
 
         [Fact]
