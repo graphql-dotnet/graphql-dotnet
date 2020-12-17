@@ -1,9 +1,19 @@
+using System;
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The ID scalar graph type represents a string identifier, not intended to be human-readable. It is one of the five built-in scalars.
+    /// When expected as an input type, any string or integer input value will be accepted as an ID.
+    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="Guid"/> .NET values to this scalar graph type.
+    /// </summary>
     public class IdGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdGraphType"/> class.
+        /// </summary>
         public IdGraphType()
         {
             Name = "ID";
@@ -14,8 +24,10 @@ namespace GraphQL.Types
             //    "as `\"4\"`) or integer (such as `4`) input value will be accepted as an `ID`.";
         }
 
+        /// <inheritdoc/>
         public override object Serialize(object value) => value?.ToString();
 
+        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             StringValue str => ParseValue(str.Value),
@@ -24,6 +36,7 @@ namespace GraphQL.Types
             _ => null,
         };
 
+        /// <inheritdoc/>
         public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
     }
 }
