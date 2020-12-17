@@ -11,14 +11,14 @@ namespace GraphQL.Types
     public class UriGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             UriValue uriValue => uriValue.Value,
             StringValue stringValue => ParseValue(stringValue.Value),
             _ => null
         };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(Uri));
     }
 }

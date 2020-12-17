@@ -32,6 +32,22 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
+        public override object ParseLiteral(IValue value)
+        {
+            if (value is DateTimeValue timeValue)
+            {
+                return timeValue.Value;
+            }
+
+            if (value is StringValue stringValue)
+            {
+                return ParseValue(stringValue.Value);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
         public override object ParseValue(object value)
         {
             if (value is DateTime dateTime)
@@ -53,22 +69,6 @@ namespace GraphQL.Types
             }
 
             throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}");
-        }
-
-        /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-        {
-            if (value is DateTimeValue timeValue)
-            {
-                return timeValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
         }
     }
 }

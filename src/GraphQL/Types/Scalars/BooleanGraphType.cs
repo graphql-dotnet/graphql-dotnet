@@ -10,9 +10,9 @@ namespace GraphQL.Types
     public class BooleanGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(bool));
+        public override object ParseLiteral(IValue value) => ((value as BooleanValue)?.Value).Boxed();
 
         /// <inheritdoc/>
-        public override object ParseLiteral(IValue value) => ((value as BooleanValue)?.Value).Boxed();
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(bool));
     }
 }

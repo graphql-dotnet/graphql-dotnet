@@ -21,14 +21,14 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             DateTimeOffsetValue offsetValue => offsetValue.Value,
             StringValue stringValue => ParseValue(stringValue.Value),
             _ => null
         };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTimeOffset));
     }
 }

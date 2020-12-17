@@ -71,6 +71,9 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
+        public override object ParseLiteral(IValue value) => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
+
+        /// <inheritdoc/>
         public override object ParseValue(object value)
         {
             if (value == null)
@@ -81,10 +84,6 @@ namespace GraphQL.Types
             var found = Values.FindByName(value.ToString());
             return found?.Value;
         }
-
-        /// <inheritdoc/>
-        public override object ParseLiteral(IValue value)
-            => !(value is EnumValue enumValue) ? null : ParseValue(enumValue.Name);
     }
 
     /// <summary>

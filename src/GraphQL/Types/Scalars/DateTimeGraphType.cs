@@ -21,9 +21,6 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value)
         {
             if (value is DateTimeValue timeValue)
@@ -38,5 +35,8 @@ namespace GraphQL.Types
 
             return null;
         }
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => ValueConverter.ConvertTo(value, typeof(DateTime));
     }
 }

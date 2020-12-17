@@ -28,9 +28,6 @@ namespace GraphQL.Types
         public override object Serialize(object value) => value?.ToString();
 
         /// <inheritdoc/>
-        public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
-
-        /// <inheritdoc/>
         public override object ParseLiteral(IValue value) => value switch
         {
             StringValue str => ParseValue(str.Value),
@@ -38,5 +35,8 @@ namespace GraphQL.Types
             LongValue longVal => longVal.Value,
             _ => null,
         };
+
+        /// <inheritdoc/>
+        public override object ParseValue(object value) => value?.ToString().Trim(' ', '"');
     }
 }
