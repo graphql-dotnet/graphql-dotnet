@@ -1,9 +1,11 @@
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
-    /// The Float scalar graph type represents an IEEE 754 double-precision floating point value.
+    /// The Float scalar graph type represents an IEEE 754 double-precision floating point value. It is one of the five built-in scalars.
+    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="double"/> and <see cref="float"/> .NET values to this scalar graph type.
     /// </summary>
     public class FloatGraphType : ScalarGraphType
     {

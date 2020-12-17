@@ -1,10 +1,12 @@
 using System;
 using GraphQL.Language.AST;
+using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
     /// <summary>
     /// The DateTimeOffset scalar graph type represents a date, time and offset from UTC.
+    /// By default <see cref="GraphTypeTypeRegistry"/> maps all <see cref="DateTimeOffset"/> .NET values to this scalar graph type.
     /// </summary>
     public class DateTimeOffsetGraphType : ScalarGraphType
     {
