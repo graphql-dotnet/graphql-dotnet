@@ -188,7 +188,7 @@ namespace GraphQL.Types
     public class EnumValueDefinition : MetadataProvider
     {
         /// <summary>
-        /// The name of the enumeration member.
+        /// The name of the enumeration member, as exposed through the GraphQL endpoint (e.g. "RED").
         /// </summary>
         public string Name { get; set; }
 
@@ -204,7 +204,7 @@ namespace GraphQL.Types
 
         private object _value;
         /// <summary>
-        /// The value of the enumeration member.
+        /// The value of the enumeration member, as referenced by the code (e.g. <see cref="ConsoleColor.Red"/>).
         /// </summary>
         public object Value
         {
