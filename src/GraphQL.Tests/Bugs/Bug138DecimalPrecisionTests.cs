@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -38,6 +39,7 @@ namespace GraphQL.Tests.Bugs
                 resolve: context =>
                 {
                     var val = context.GetArgument<decimal>("request");
+                    val.ShouldBe(24.15m);
                     return val;
                 });
         }

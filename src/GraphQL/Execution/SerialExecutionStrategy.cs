@@ -67,7 +67,6 @@ namespace GraphQL.Execution
                     }
                 }
             }
-
         }
     }
 }
