@@ -2,6 +2,8 @@
 
 ## New Features
 
+* Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
+
 ## Breaking Changes
 
 * `NameConverter` and `SchemaFilter` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
