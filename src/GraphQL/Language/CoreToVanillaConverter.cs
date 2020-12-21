@@ -391,6 +391,6 @@ namespace GraphQL.Language
             Mid = mid;
         }
 
-        internal bool Equals(ref DecimalData other) => Flags == other.Flags && Hi == other.Hi && Lo == other.Lo && Mid == other.Mid;
+        internal bool Equals(in DecimalData other) => Flags == other.Flags && Hi == other.Hi && Lo == other.Lo && Mid == other.Mid;
     }
 }
