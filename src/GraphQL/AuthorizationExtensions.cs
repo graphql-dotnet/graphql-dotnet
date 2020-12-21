@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Builders;
 using GraphQL.Types;
@@ -55,6 +56,9 @@ namespace GraphQL
         public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : IProvideMetadata
         {
+            if (policy == null)
+                throw new ArgumentNullException(nameof(policy));
+
             var list = GetPolicies(provider) ?? new List<string>();
 
             if (!list.Contains(policy))
