@@ -90,7 +90,7 @@ namespace GraphQL.Execution
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
- 
+
             if (itemType is NonNullGraphType nonNullGraphType)
                 itemType = nonNullGraphType.ResolvedType;
 
