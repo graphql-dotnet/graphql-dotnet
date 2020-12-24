@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Types;
@@ -58,6 +59,20 @@ namespace GraphQL.DataLoader.Tests.Types
                         orders.GetAllOrdersAsync);
 
                     return loader.LoadAsync();
+                });
+
+            Field<NonNullGraphType<ListGraphType<UserType>>, IEnumerable<IDataLoaderResult<User>>>()
+                .Name("SpecifiedUsers")
+                .Description("Get Users by ID")
+                .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
+                .Resolve(ctx =>
+                {
+                    var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUserById",
+                        users.GetUsersByIdAsync);
+
+                    var ids = ctx.GetArgument<IEnumerable<int>>("ids");
+                    var ret = ids.Select(id => loader.LoadAsync(id));
+                    return ret;
                 });
         }
     }

@@ -11,6 +11,8 @@ namespace GraphQL.Execution
         public IGraphType GraphType { get; }
         public Field Field { get; }
         public FieldType FieldDefinition { get; }
+        //todo: make public
+        internal IGraphType ResolvedType { get; }
         public int? IndexInParentNode { get; protected set; }
 
         public string Name => Field?.Alias ?? Field?.Name;
@@ -35,12 +37,24 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
+        //todo: add parameter to constructor for resolvedType
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
             GraphType = graphType;
             Field = field;
             FieldDefinition = fieldDefinition;
+            if (indexInParentNode.HasValue)
+            {
+                var t = fieldDefinition.ResolvedType;
+                if (t is NonNullGraphType nonNullGraphType)
+                    t = nonNullGraphType.ResolvedType;
+                ResolvedType = ((ListGraphType)t).ResolvedType;
+            }
+            else
+            {
+                ResolvedType = fieldDefinition?.ResolvedType;
+            }
             IndexInParentNode = indexInParentNode;
         }
 
