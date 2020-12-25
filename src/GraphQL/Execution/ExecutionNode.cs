@@ -1,23 +1,57 @@
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Represents a node to be executed.
+    /// </summary>
     public abstract class ExecutionNode
     {
+        /// <summary>
+        /// Returns the parent node, or null if this is the root node.
+        /// </summary>
         public ExecutionNode Parent { get; }
+
+        /// <summary>
+        /// Returns the underlying graph type of this node (does not represent a <see cref="NonNullGraphType"/> or <see cref="ListGraphType"/> instance).
+        /// </summary>
         public IGraphType GraphType { get; }
+
+        /// <summary>
+        /// Returns the AST field of this node.
+        /// </summary>
         public Field Field { get; }
+
+        /// <summary>
+        /// Returns the graph's field type of this node.
+        /// </summary>
         public FieldType FieldDefinition { get; }
+
+        /// <summary>
+        /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, null.
+        /// </summary>
         public int? IndexInParentNode { get; protected set; }
 
+        /// <summary>
+        /// Returns the AST field alias, if specified, or AST field name otherwise.
+        /// </summary>
         public string Name => Field?.Alias ?? Field?.Name;
 
+        /// <summary>
+        /// Returns true if the result has been set. Also returns true when the result is temporarily set to an <see cref="IDataLoaderResult"/>
+        /// pending execution at a later time.
+        /// </summary>
         public bool IsResultSet { get; private set; }
 
         private object _result;
+        /// <summary>
+        /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
+        /// result that has not yet finished executing.
+        /// </summary>
         public object Result
         {
             get => _result;
@@ -29,12 +63,18 @@ namespace GraphQL.Execution
         }
 
         private object _source;
+        /// <summary>
+        /// Returns the parent node's result. If set, the set value will override the parent node's result.
+        /// </summary>
         public object Source
         {
             get => _source ?? Parent?.Result;
             set => _source = value;
         }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
+        /// </summary>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
@@ -44,8 +84,14 @@ namespace GraphQL.Execution
             IndexInParentNode = indexInParentNode;
         }
 
+        /// <summary>
+        /// Returns an object that represents the result of this node.
+        /// </summary>
         public abstract object ToValue();
 
+        /// <summary>
+        /// Returns the parent graph type of this node.
+        /// </summary>
         public IObjectGraphType GetParentType(ISchema schema)
         {
             IGraphType parentType = Parent?.GraphType;
@@ -132,20 +178,40 @@ namespace GraphQL.Execution
         }
     }
 
+    /// <summary>
+    /// Represents an execution node with child nodes.
+    /// </summary>
     public interface IParentExecutionNode
     {
+        /// <summary>
+        /// Returns a list of child execution nodes.
+        /// </summary>
         IEnumerable<ExecutionNode> GetChildNodes();
     }
 
+    /// <summary>
+    /// Represents an object execution node, which will contain child execution nodes.
+    /// </summary>
     public class ObjectExecutionNode : ExecutionNode, IParentExecutionNode
     {
+        /// <summary>
+        /// Returns a dictionary of child execution nodes, with keys set to the names of the child fields that the child nodes represent.
+        /// </summary>
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
+        /// <summary>
+        /// Initializes an instances of <see cref="ObjectExecutionNode"/> with the specified values.
+        /// </summary>
         public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
 
+        /// <summary>
+        /// For execution nodes that represent a field that is an <see cref="IAbstractGraphType"/>, returns the
+        /// proper <see cref="IObjectGraphType"/> based on the set <see cref="ExecutionNode.Result"/>.
+        /// Otherwise returns the value of <see cref="ExecutionNode.GraphType"/>.
+        /// </summary>
         public IObjectGraphType GetObjectGraphType(ISchema schema)
         {
             var objectGraphType = GraphType as IObjectGraphType;
@@ -156,6 +222,10 @@ namespace GraphQL.Execution
             return objectGraphType;
         }
 
+        /// <summary>
+        /// Returns a representation of the result of this execution node and its children
+        /// within a <see cref="Dictionary{TKey, TValue}"/>.
+        /// </summary>
         public override object ToValue()
         {
             if (SubFields == null)
@@ -184,6 +254,9 @@ namespace GraphQL.Execution
         }
     }
 
+    /// <summary>
+    /// Represents a root execution node.
+    /// </summary>
     public class RootExecutionNode : ObjectExecutionNode
     {
         public RootExecutionNode(IObjectGraphType graphType)
@@ -193,16 +266,28 @@ namespace GraphQL.Execution
         }
     }
 
+    /// <summary>
+    /// Represents an execution node of a <see cref="ListGraphType"/>.
+    /// </summary>
     public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     {
+        /// <summary>
+        /// Returns a list of child execution nodes.
+        /// </summary>
         public List<ExecutionNode> Items { get; set; }
 
+        /// <summary>
+        /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
+        /// </summary>
         public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
 
+        /// <summary>
+        /// Returns a <see cref="List{T}"/> containing the results of the child execution nodes.
+        /// </summary>
         public override object ToValue()
         {
             if (Items == null)
@@ -237,31 +322,51 @@ namespace GraphQL.Execution
         }
     }
 
+    /// <summary>
+    /// Represents a execution node of a <see cref="ScalarGraphType"/>.
+    /// </summary>
     public class ValueExecutionNode : ExecutionNode
     {
+        /// <summary>
+        /// Initializes an instance of <see cref="ValueExecutionNode"/> with the specified values.
+        /// </summary>
         public ValueExecutionNode(ExecutionNode parent, ScalarGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
 
         }
 
+        /// <summary>
+        /// Returns <see cref="ExecutionNode.Result"/>, which has already been serialized by <see cref="ScalarGraphType.Serialize(object)"/>
+        /// within <see cref="ExecutionStrategy.CompleteNode(ExecutionContext, ExecutionNode)"/> or
+        /// <see cref="ExecutionStrategy.SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)"/>.
+        /// </summary>
         public override object ToValue()
         {
-            // result has already been serialized within ExecuteNodeAsync / SetArrayItemNodes
             return Result;
         }
 
+        /// <inheritdoc cref="ExecutionNode.GraphType"/>
         public new ScalarGraphType GraphType => (ScalarGraphType)base.GraphType;
     }
 
+    /// <summary>
+    /// Represents an execution node which always returns null.
+    /// </summary>
     public class NullExecutionNode : ExecutionNode
     {
+        /// <summary>
+        /// Initializes an instance of <see cref="NullExecutionNode"/> with the specified values.
+        /// </summary>
         public NullExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
             Result = null;
         }
 
+        /// <summary>
+        /// Returns null.
+        /// </summary>
         public override object ToValue() => null;
     }
 }

@@ -11,8 +11,17 @@ using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// The base class for the included serial and parallel execution strategies.
+    /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
+        /// <summary>
+        /// Executes a GraphQL request and returns the result. The default implementation builds the root node
+        /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>.
+        /// Once complete, the values are collected into an object that is ready to be serialized and returned
+        /// within an <see cref="ExecutionResult"/>.
+        /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
@@ -30,8 +39,15 @@ namespace GraphQL.Execution
             }.With(context);
         }
 
+        /// <summary>
+        /// Executes an execution node and all of its child nodes. This is typically only executed upon
+        /// the root execution node.
+        /// </summary>
         protected abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode);
 
+        /// <summary>
+        /// Builds the root execution node.
+        /// </summary>
         public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
@@ -50,12 +66,19 @@ namespace GraphQL.Execution
             return root;
         }
 
+        /// <summary>
+        /// Creates execution nodes for child fields of an object execution node. Only run if
+        /// the object execution node result is not null.
+        /// </summary>
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
             var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
             SetSubFieldNodes(context, parent, fields);
         }
 
+        /// <summary>
+        /// Creates specified child execution nodes of an object execution node.
+        /// </summary>
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
@@ -86,6 +109,10 @@ namespace GraphQL.Execution
             parent.SubFields = subFields;
         }
 
+        /// <summary>
+        /// Creates execution nodes for array elements of an array execution node. Only run if
+        /// the array execution node result is not null.
+        /// </summary>
         public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
@@ -144,6 +171,9 @@ namespace GraphQL.Execution
             parent.Items = arrayItems;
         }
 
+        /// <summary>
+        /// Builds an execution node with the specified parameters.
+        /// </summary>
         public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
@@ -160,7 +190,8 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Execute a single node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
+        /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
+        /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
         protected virtual async Task ExecuteNodeAsync(ExecutionContext context, ExecutionNode node)
         {
@@ -205,7 +236,8 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Completes a pending data loader node. If the node does not return a IDataLoaderResult, it will build child nodes, but does not execute them.
+        /// Completes a pending data loader node.  If the node does not return an <see cref="IDataLoaderResult"/>,
+        /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)
         {
@@ -239,7 +271,9 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Builds child nodes, but does not execute them.
+        /// Validates a node result. Builds child nodes via <see cref="SetSubFieldNodes(ExecutionContext, ObjectExecutionNode)">SetSubFieldNodes</see>
+        /// and <see cref="SetArrayItemNodes(ExecutionContext, ArrayExecutionNode)">SetArrayItemNodes</see>, but does not execute them. For value
+        /// execution nodes, it will run <see cref="ScalarGraphType.Serialize(object)"/> to serialize the result.
         /// </summary>
         protected virtual void CompleteNode(ExecutionContext context, ExecutionNode node)
         {
@@ -292,9 +326,9 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Processes unhandled field resolver exceptions
+        /// Processes unhandled field resolver exceptions.
         /// </summary>
-        /// <returns>A value that indicates when the exception should be rethrown</returns>
+        /// <returns>A value that indicates when the exception should be rethrown.</returns>
         protected bool ProcessNodeUnhandledException(ExecutionContext context, ExecutionNode node, Exception ex)
         {
             if (context.ThrowOnUnhandledException)
@@ -316,6 +350,12 @@ namespace GraphQL.Execution
             return false;
         }
 
+        /// <summary>
+        /// Validates the <see cref="ExecutionNode.Result"/> to ensure that it is valid for the node.
+        /// Errors typically occur when a null value is returned for a non-null graph type. Also validates the
+        /// object type when <see cref="IObjectGraphType.IsTypeOf"/> is assigned, or when the graph type
+        /// is an <see cref="IAbstractGraphType"/>.
+        /// </summary>
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
         {
             var result = node.Result;
@@ -363,6 +403,11 @@ namespace GraphQL.Execution
             }
         }
 
+        /// <summary>
+        /// If there are any <see cref="IDocumentExecutionListener"/>s specified within the <see cref="ExecutionContext"/>,
+        /// runs the <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext)">BeforeExecutionStepAwaitedAsync</see>
+        /// method on each of the registered document execution listeners.
+        /// </summary>
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
             if (context.Listeners != null)
