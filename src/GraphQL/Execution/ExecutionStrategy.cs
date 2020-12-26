@@ -236,7 +236,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Completes a pending data loader node.  If the node does not return an <see cref="IDataLoaderResult"/>,
+        /// Completes a pending data loader node. If the node does not return an <see cref="IDataLoaderResult"/>,
         /// it will pass execution to <see cref="CompleteNode(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
         protected virtual async Task CompleteDataLoaderNodeAsync(ExecutionContext context, ExecutionNode node)

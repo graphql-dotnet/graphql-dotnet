@@ -200,7 +200,7 @@ namespace GraphQL.Execution
         public IDictionary<string, ExecutionNode> SubFields { get; set; }
 
         /// <summary>
-        /// Initializes an instances of <see cref="ObjectExecutionNode"/> with the specified values.
+        /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
         /// </summary>
         public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
