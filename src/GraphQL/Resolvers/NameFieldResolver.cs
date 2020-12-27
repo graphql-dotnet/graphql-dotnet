@@ -5,10 +5,12 @@ using System.Linq.Expressions;
 namespace GraphQL.Resolvers
 {
     /// <summary>
+    /// <para>
     /// Attempts to return a value for a field from the graph's source object, matching the name of
     /// the field to a property or a method with the same name on the source object.
-    /// <br/><br/>
-    /// Call <see cref="NameFieldResolver.Instance"/> to retrieve an instance of this class.
+    /// </para><para>
+    /// Call <see cref="Instance"/> to retrieve an instance of this class.
+    /// </para>
     /// </summary>
     public class NameFieldResolver : IFieldResolver
     {
@@ -22,6 +24,7 @@ namespace GraphQL.Resolvers
         /// </summary>
         public static NameFieldResolver Instance { get; } = new NameFieldResolver();
 
+        /// <inheritdoc/>
         public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
 
         private static object Resolve(object source, string name)
@@ -37,18 +40,22 @@ namespace GraphQL.Resolvers
         }
 
         /// <summary>
+        /// <para>
         /// Dynamically creates the necessary delegate in runtime to get the property/method value of the specified type.
-        ///
+        /// </para><para>
         /// Example:
+        /// </para><code>
         /// public class Person
         /// {
         ///     public int Age { get; set; }
         /// }
-        ///
-        /// So resulting Func will be generated as {x => Convert(Convert(x, Person).Age, Object)}
-        /// 1. First, the input parameter 'x' is converted from the object to a specific type.
-        /// 2. The required property or method is extracted from casted value.
+        /// </code>
+        /// <para>
+        /// So resulting Func will be generated as <c>{x => Convert(Convert(x, Person).Age, Object)}</c><br/>
+        /// 1. First, the input parameter 'x' is converted from the object to a specific type.<br/>
+        /// 2. The required property or method is extracted from casted value.<br/>
         /// 3. Then result is converted again to the object and returned from the method.
+        /// </para>
         /// </summary>
         /// <param name="target"> The type from which you want to get the value. </param>
         /// <param name="name"> Property/method name. </param>
@@ -82,7 +89,7 @@ namespace GraphQL.Resolvers
                 }
                 catch (InvalidOperationException)
                 {
-                    throw new InvalidOperationException($"Expected to find property or method {name} on {target.Name} but it does not exist.");
+                    throw new InvalidOperationException($"Expected to find property or method '{name}' on type '{target.Name}' but it does not exist.");
                 }
             }
         }

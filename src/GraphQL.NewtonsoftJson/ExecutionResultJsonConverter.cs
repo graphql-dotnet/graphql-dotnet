@@ -109,6 +109,6 @@ namespace GraphQL.NewtonsoftJson
 
         public override bool CanRead => false;
 
-        public override bool CanConvert(Type objectType) => objectType == typeof(ExecutionResult);
+        public override bool CanConvert(Type objectType) => typeof(ExecutionResult).IsAssignableFrom(objectType);
     }
 }

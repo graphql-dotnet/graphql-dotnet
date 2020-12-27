@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="IResolveFieldContext"/> instances.
+    /// </summary>
     public static class ResolveFieldContextExtensions
     {
         /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
