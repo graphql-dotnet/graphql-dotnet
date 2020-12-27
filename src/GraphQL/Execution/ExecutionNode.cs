@@ -17,7 +17,8 @@ namespace GraphQL.Execution
         public ExecutionNode Parent { get; }
 
         /// <summary>
-        /// Returns the underlying graph type of this node (does not represent a <see cref="NonNullGraphType"/> or <see cref="ListGraphType"/> instance).
+        /// Returns the underlying graph type of this node; does not represent a <see cref="NonNullGraphType"/>, and
+        /// for child nodes of an array execution node, does not represent a <see cref="ListGraphType"/> instance.
         /// </summary>
         public IGraphType GraphType { get; }
 
