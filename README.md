@@ -4,6 +4,7 @@
 
 [![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
 [![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
+[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/workflows/CodeQL/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A.github%2Fworkflows%2Fcodeql-analysis.yml)
 
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
