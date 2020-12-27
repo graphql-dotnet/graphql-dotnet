@@ -2,9 +2,9 @@
 
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
-[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/workflows/CodeQL/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A.github%2Fworkflows%2Fcodeql-analysis.yml)
+[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Build+artifacts%22%22)
+[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Publish+code%22%22)
+[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/workflows/CodeQL%20analysis/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22CodeQL+analysis%22%22)
 
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
