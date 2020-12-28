@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Setup .NET Core 3.1 LTS SDK
+      - name: Setup .NET Core 3.1 SDK
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
