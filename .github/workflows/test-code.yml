@@ -18,16 +18,22 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet: ['3.1.x', '5.0.x']
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Setup .NET Core ${{ matrix.dotnet }}
+      - name: Setup .NET Core 3.1 LTS SDK
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          dotnet-version: '3.1.x'
+          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Setup .NET Core 5.0 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
