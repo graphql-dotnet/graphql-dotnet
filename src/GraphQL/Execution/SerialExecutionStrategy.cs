@@ -5,8 +5,13 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
+    /// <inheritdoc cref="SerialExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class SerialExecutionStrategy : ExecutionStrategy
     {
+        /// <summary>
+        /// Executes document nodes serially. Nodes that return a <see cref="IDataLoaderResult"/> will
+        /// execute once all other pending nodes have been completed.
+        /// </summary>
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
             // Use a stack to track all nodes in the tree that need to be executed
