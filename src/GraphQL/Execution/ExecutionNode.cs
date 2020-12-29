@@ -78,6 +78,8 @@ namespace GraphQL.Execution
         /// </summary>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
+            if (graphType is NonNullGraphType)
+                throw new System.ArgumentOutOfRangeException(nameof(graphType), $"For non-nullable graph types, graphType must represent the unwrapped graph type");
             Parent = parent;
             GraphType = graphType;
             Field = field;
