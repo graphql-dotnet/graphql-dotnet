@@ -37,7 +37,11 @@ namespace GraphQL.Execution
         /// </summary>
         public int? IndexInParentNode { get; protected set; }
 
-        //todo: make public
+        /// <summary>
+        /// Returns the underlying graph type of this node, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// For child nodes of an array execution node, this property unwraps the <see cref="ListGraphType"/> instance and returns
+        /// the underlying graph type, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// </summary>
         internal IGraphType ResolvedType
         {
             get
