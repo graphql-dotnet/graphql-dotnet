@@ -48,10 +48,7 @@ namespace GraphQL.Execution
             {
                 if (IndexInParentNode.HasValue)
                 {
-                    var t = FieldDefinition.ResolvedType;
-                    if (t is NonNullGraphType nonNullGraphType)
-                        t = nonNullGraphType.ResolvedType;
-                    return ((ListGraphType)t).ResolvedType;
+                    return ((ListGraphType)Parent.GraphType).ResolvedType;
                 }
                 else
                 {
