@@ -60,8 +60,8 @@ namespace GraphQL.Types
 
         public static string FullName(this IType type) => type switch
         {
-            NonNullType nonnull => "{0}!".ToFormat(FullName(nonnull.Type)),
-            ListType list => "[{0}]".ToFormat(FullName(list.Type)),
+            NonNullType nonnull => $"{FullName(nonnull.Type)}!",
+            ListType list => $"[{FullName(list.Type)}]",
             _ => ((NamedType)type).Name
         };
     }

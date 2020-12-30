@@ -148,7 +148,7 @@ namespace GraphQL.Tests.Types
             typeNames.Apply(typeName =>
             {
                 var type = schema.FindType(typeName);
-                type.ShouldNotBeNull("Did not find {0} in type lookup.".ToFormat(typeName));
+                type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
             });
         }
 
@@ -157,7 +157,7 @@ namespace GraphQL.Tests.Types
             typeNames.Apply(typeName =>
             {
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
-                type.ShouldBe(null, "Found {0} in type lookup.".ToFormat(typeName));
+                type.ShouldBe(null, $"Found {typeName} in type lookup.");
             });
         }
     }

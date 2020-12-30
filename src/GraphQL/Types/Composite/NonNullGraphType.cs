@@ -44,7 +44,7 @@ namespace GraphQL.Types
             ResolvedType = innerType;
             var name = innerType.CollectTypes(context);
             context.AddType(name, innerType, context);
-            return "{0}!".ToFormat(name);
+            return $"{name}!";
         }
 
         /// <inheritdoc />

@@ -36,7 +36,11 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc />
-        public override string ToString() => "ObjectValue{{objectFields={0}}}".ToFormat(string.Join(", ", ObjectFields.Select(x => x.ToString())));
+        public override string ToString()
+        {
+            string fields = string.Join(", ", ObjectFields.Select(x => x.ToString()));
+            return $"ObjectValue{{objectFields={fields}}}";
+        }
 
         public override bool IsEqualTo(INode obj)
         {
