@@ -79,6 +79,7 @@ namespace GraphQL.Types
             return Name;
         }
 
+        /// <inheritdoc />
         public override string ToString() =>
             string.IsNullOrWhiteSpace(Name)
                 ? GetType().Name

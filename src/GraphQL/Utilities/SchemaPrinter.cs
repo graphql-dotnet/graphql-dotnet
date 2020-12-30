@@ -306,8 +306,8 @@ namespace GraphQL.Utilities
         {
             return type switch
             {
-                NonNullGraphType nullable => "{0}!".ToFormat(ResolveName(nullable.ResolvedType)),
-                ListGraphType list => "[{0}]".ToFormat(ResolveName(list.ResolvedType)),
+                NonNullGraphType nullable => $"{ResolveName(nullable.ResolvedType)}!",
+                ListGraphType list => $"[{ResolveName(list.ResolvedType)}]",
                 _ => type?.Name
             };
         }

@@ -18,10 +18,8 @@ namespace GraphQL.Language.AST
 
         public override IEnumerable<INode> Children => Directives;
 
-        public override string ToString()
-        {
-            return "FragmentSpread{{name='{0}', directives={1}}}".ToFormat(Name, Directives);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"FragmentSpread{{name='{Name}', directives={Directives}}}";
 
         protected bool Equals(FragmentSpread other)
         {

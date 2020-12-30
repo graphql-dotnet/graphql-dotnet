@@ -70,8 +70,8 @@ namespace GraphQL.Utilities
         /// </summary>
         public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5)
         {
-            var itemsArray = items.Take(maxLength).ToArray();
-            var index = 0;
+            string[] itemsArray = items.Take(maxLength).ToArray();
+            int index = 0;
             return itemsArray
                 .Select(x => $"\"{x}\"")
                 .Aggregate((list, quoted) =>
