@@ -26,10 +26,8 @@ namespace GraphQL.Language.AST
             get { yield return Value; }
         }
 
-        public override string ToString()
-        {
-            return "ObjectField{{name='{0}', value={1}}}".ToFormat(Name, Value);
-        }
+        /// <inheritdoc />
+        public override string ToString() => "ObjectField{{name='{0}', value={1}}}".ToFormat(Name, Value);
 
         protected bool Equals(ObjectField other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 

@@ -1092,6 +1092,7 @@ namespace GraphQL.Language.AST
         public void Add(GraphQL.Language.AST.Argument arg) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Argument> GetEnumerator() { }
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
+        public override string ToString() { }
         public GraphQL.Language.AST.IValue ValueFor(string name) { }
     }
     public class BigIntValue : GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger>
@@ -1157,6 +1158,7 @@ namespace GraphQL.Language.AST
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Directive> GetEnumerator() { }
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public bool Remove(GraphQL.Language.AST.Directive item) { }
+        public override string ToString() { }
     }
     public class Document : GraphQL.Language.AST.AbstractNode
     {
@@ -1478,6 +1480,7 @@ namespace GraphQL.Language.AST
         public VariableDefinitions() { }
         public void Add(GraphQL.Language.AST.VariableDefinition variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.VariableDefinition> GetEnumerator() { }
+        public override string ToString() { }
     }
     public class VariableReference : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
@@ -1493,6 +1496,7 @@ namespace GraphQL.Language.AST
         public Variables() { }
         public void Add(GraphQL.Language.AST.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Variable> GetEnumerator() { }
+        public override string ToString() { }
         public object ValueFor(string name) { }
     }
 }

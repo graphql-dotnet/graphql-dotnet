@@ -24,10 +24,8 @@ namespace GraphQL.Language.AST
             get { yield return Value; }
         }
 
-        public override string ToString()
-        {
-            return $"Argument{{name={Name},value={Value}}}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Argument{{name={Name},value={Value}}}";
 
         protected bool Equals(Argument other)
         {

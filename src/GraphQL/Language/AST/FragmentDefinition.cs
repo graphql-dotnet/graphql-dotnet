@@ -38,11 +38,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "FragmentDefinition{{name='{0}', typeCondition={1}, directives={2}, selectionSet={3}}}"
-                .ToFormat(Name, Type, Directives, SelectionSet);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"FragmentDefinition{{name='{Name}', typeCondition={Type}, directives={Directives}, selectionSet={SelectionSet}}}";
 
         protected bool Equals(FragmentDefinition other)
         {

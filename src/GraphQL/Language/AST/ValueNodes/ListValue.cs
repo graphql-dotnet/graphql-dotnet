@@ -17,10 +17,8 @@ namespace GraphQL.Language.AST
 
         public override IEnumerable<INode> Children => Values;
 
-        public override string ToString()
-        {
-            return "ListValue{{values={0}}}".ToFormat(string.Join(", ", Values.Select(x => x.ToString())));
-        }
+        /// <inheritdoc />
+        public override string ToString() => "ListValue{{values={0}}}".ToFormat(string.Join(", ", Values.Select(x => x.ToString())));
 
         public override bool IsEqualTo(INode obj)
         {

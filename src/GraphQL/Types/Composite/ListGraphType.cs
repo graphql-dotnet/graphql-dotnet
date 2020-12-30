@@ -36,6 +36,7 @@ namespace GraphQL.Types
             return "[{0}]".ToFormat(name);
         }
 
+        /// <inheritdoc />
         public override string ToString() => $"[{ResolvedType}]";
     }
 }

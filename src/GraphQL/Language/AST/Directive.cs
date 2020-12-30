@@ -21,10 +21,8 @@ namespace GraphQL.Language.AST
             get { yield return Arguments; }
         }
 
-        public override string ToString()
-        {
-            return $"Directive{{name='{Name}',arguments={Arguments}}}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Directive{{name='{Name}',arguments={Arguments}}}";
 
         protected bool Equals(Directive other)
         {
