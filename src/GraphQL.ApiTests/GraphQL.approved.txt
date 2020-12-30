@@ -1,5 +1,15 @@
 namespace GraphQL
 {
+    public static class AuthorizationExtensions
+    {
+        public const string POLICY_KEY = "Authorization__Policies";
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
+        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static System.Collections.Generic.List<string> GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
+    }
     public static class BoolBox
     {
         public static readonly object False;
