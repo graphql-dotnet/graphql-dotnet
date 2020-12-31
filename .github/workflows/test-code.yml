@@ -52,7 +52,7 @@ jobs:
 
   buildcheck:
     needs:
-      - format
+      - test
     runs-on: ubuntu-latest
     if: always()
     steps:
