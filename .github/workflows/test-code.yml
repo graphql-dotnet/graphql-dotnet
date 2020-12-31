@@ -35,7 +35,7 @@ jobs:
         working-directory: src
         run: |
           dotnet tool install -g dotnet-format
-          dotnet format --check || echo "Run 'dotnet format' to fix formatting issues" || exit 1
+          dotnet format --check || echo "Run 'dotnet format' to fix formatting issues" && exit 1
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
