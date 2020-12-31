@@ -94,8 +94,8 @@ namespace GraphQL.Tests.Validation
             fieldB
           }
         ";
-          // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-          duplicateFrag(_, "fragA", 5, 11, 8, 11);
+                // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
+                duplicateFrag(_, "fragA", 5, 11, 8, 11);
             });
         }
 
@@ -112,8 +112,8 @@ namespace GraphQL.Tests.Validation
             fieldB
           }
         ";
-          // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-          duplicateFrag(_, "fragA", 2, 11, 5, 11);
+                // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
+                duplicateFrag(_, "fragA", 2, 11, 5, 11);
             });
         }
 

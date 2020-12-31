@@ -133,7 +133,7 @@ namespace GraphQL.Utilities
 
             // Return trivial case - difference in string lengths exceeds threshold
             if (Math.Abs(length1 - length2) > threshold)
-            { return int.MaxValue; }
+                return int.MaxValue;
 
             // Ensure arrays [i] / length1 use shorter length
             if (length1 > length2)
@@ -151,7 +151,7 @@ namespace GraphQL.Utilities
             int[] dSwap;
 
             for (int i = 0; i <= maxi; i++)
-            { dCurrent[i] = i; }
+                dCurrent[i] = i;
 
             int jm1 = 0, im1 = 0, im2 = -1;
 
@@ -186,17 +186,17 @@ namespace GraphQL.Utilities
 
                     dCurrent[i] = min;
                     if (min < minDistance)
-                    { minDistance = min; }
+                        minDistance = min;
                     im1++;
                     im2++;
                 }
                 jm1++;
                 if (minDistance > threshold)
-                { return int.MaxValue; }
+                    return int.MaxValue;
             }
 
             int result = dCurrent[maxi];
-            return (result > threshold) ? int.MaxValue : result;
+            return result > threshold ? int.MaxValue : result;
         }
     }
 }
