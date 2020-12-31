@@ -49,11 +49,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "Field{{name='{0}', alias='{1}', arguments={2}, directives={3}, selectionSet={4}}}"
-                .ToFormat(Name, Alias, Arguments, Directives, SelectionSet);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Field{{name='{Name}', alias='{Alias}', arguments={Arguments}, directives={Directives}, selectionSet={SelectionSet}}}";
 
         protected bool Equals(Field other)
         {

@@ -10,12 +10,11 @@ namespace GraphQL.Language.AST
         }
 
         public string Name => NameNode.Name;
+
         public NameNode NameNode { get; }
 
-        public override string ToString()
-        {
-            return "NamedType{{name={0}}}".ToFormat(Name);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"NamedType{{name={Name}}}";
 
         protected bool Equals(NamedType other)
         {

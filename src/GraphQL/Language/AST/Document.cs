@@ -40,10 +40,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "Document{{definitions={0}}}".ToFormat(_definitions);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Document{{definitions={_definitions}}}";
 
         public override bool IsEqualTo(INode node)
         {

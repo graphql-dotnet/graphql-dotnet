@@ -294,11 +294,10 @@ namespace GraphQL.Types
 
                         if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
                         {
-                            throw new InvalidOperationException((
-                                "Interface type {0} does not provide a \"resolveType\" function " +
-                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
-                                "There is no way to resolve this possible type during execution.")
-                                .ToFormat(interfaceInstance.Name, obj.Name));
+                            throw new InvalidOperationException(
+                               $"Interface type \"{interfaceInstance.Name}\" does not provide a \"resolveType\" function " +
+                               $"and possible Type \"{obj.Name}\" does not provide a \"isTypeOf\" function. " +
+                                "There is no way to resolve this possible type during execution.");
                         }
                     }
                 }
@@ -308,7 +307,7 @@ namespace GraphQL.Types
             {
                 if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
-                    throw new InvalidOperationException("Must provide types for Union {0}.".ToFormat(union));
+                    throw new InvalidOperationException($"Must provide types for Union '{union}'.");
                 }
 
                 foreach (var unionedType in union.PossibleTypes)
@@ -320,11 +319,10 @@ namespace GraphQL.Types
 
                     if (union.ResolveType == null && unionedType.IsTypeOf == null)
                     {
-                        throw new InvalidOperationException((
-                            "Union type {0} does not provide a \"resolveType\" function " +
-                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
-                            "There is no way to resolve this possible type during execution.")
-                            .ToFormat(union.Name, unionedType.Name));
+                        throw new InvalidOperationException(
+                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
+                           $"and possible Type \"{unionedType.Name}\" does not provide a \"isTypeOf\" function. " +
+                            "There is no way to resolve this possible type during execution.");
                     }
                 }
 
@@ -336,11 +334,10 @@ namespace GraphQL.Types
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
-                        throw new InvalidOperationException((
-                            "Union type {0} does not provide a \"resolveType\" function " +
-                            "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
-                            "There is no way to resolve this possible type during execution.")
-                            .ToFormat(union.Name, objType.Name));
+                        throw new InvalidOperationException(
+                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
+                           $"and possible Type \"{objType.Name}\" does not provide a \"isTypeOf\" function. " +
+                            "There is no way to resolve this possible type during execution.");
                     }
 
                     union.AddPossibleType(objType);
@@ -491,11 +488,10 @@ Make sure that your ServiceProvider is configured correctly.");
 
                         if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                         {
-                            throw new InvalidOperationException((
-                                    "Interface type {0} does not provide a \"resolveType\" function " +
-                                    "and possible Type \"{1}\" does not provide a \"isTypeOf\" function.  " +
-                                    "There is no way to resolve this possible type during execution.")
-                                .ToFormat(interfaceType.Name, objectType.Name));
+                            throw new InvalidOperationException(
+                                   $"Interface type \"{interfaceType.Name}\" does not provide a \"resolveType\" function " +
+                                   $"and possible Type \"{objectType.Name}\" does not provide a \"isTypeOf\" function.  " +
+                                    "There is no way to resolve this possible type during execution.");
                         }
 
                         interfaceType.AddPossibleType(objectType);
@@ -515,11 +511,10 @@ Make sure that your ServiceProvider is configured correctly.");
 
                         if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                         {
-                            throw new InvalidOperationException((
-                                "Union type {0} does not provide a \"resolveType\" function " +
-                                "and possible Type \"{1}\" does not provide a \"isTypeOf\" function. " +
-                                "There is no way to resolve this possible type during execution.")
-                                .ToFormat(union.Name, unionType.Name));
+                            throw new InvalidOperationException(
+                               $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
+                               $"and possible Type \"{union.Name}\" does not provide a \"isTypeOf\" function. " +
+                                "There is no way to resolve this possible type during execution.");
                         }
 
                         return unionType;

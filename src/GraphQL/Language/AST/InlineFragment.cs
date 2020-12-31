@@ -34,11 +34,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "InlineFragment{{typeCondition={0}, directives={1}, selections={2}}}"
-                .ToFormat(Type, Directives, SelectionSet);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"InlineFragment{{typeCondition={Type}, directives={Directives}, selections={SelectionSet}}}";
 
         public override bool IsEqualTo(INode obj)
         {

@@ -18,10 +18,8 @@ namespace GraphQL.Language.AST
 
         public int Column { get; }
 
-        public override string ToString()
-        {
-            return $"line={Line}, column={Column}, start={Start}, end={End}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"line={Line}, column={Column}, start={Start}, end={End}";
 
         protected bool Equals(SourceLocation other)
         {

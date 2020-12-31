@@ -16,10 +16,8 @@ namespace GraphQL.Language.AST
             get { yield return Type; }
         }
 
-        public override string ToString()
-        {
-            return "NonNullType{{type={0}}}".ToFormat(Type);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"NonNullType{{type={Type}}}";
 
         public override bool IsEqualTo(INode node)
         {

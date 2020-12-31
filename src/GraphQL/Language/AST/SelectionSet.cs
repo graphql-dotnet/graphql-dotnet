@@ -42,9 +42,10 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            var sel = string.Join(", ", SelectionsList.Select(s => s.ToString()));
+            string sel = string.Join(", ", SelectionsList.Select(s => s.ToString()));
             return $"SelectionSet{{selections={sel}}}";
         }
     }
