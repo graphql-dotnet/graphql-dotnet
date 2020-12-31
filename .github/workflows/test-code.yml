@@ -14,6 +14,15 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check formatting
+        working-directory: src
+        run: |
+          dotnet tool install -g dotnet-format
+          dotnet format ./Source/EasyNetQ.sln --check
+
   test:
     strategy:
       matrix:
@@ -45,14 +54,13 @@ jobs:
         run: dotnet test --no-restore
 
   buildcheck:
-    needs:
-      - test
+    needs: [format, test]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Pass build check
-        if: ${{ needs.test.result == 'success' }}
+        if: ${{ needs.format.result == 'success' && needs.test.result == 'success' }}
         run: exit 0
       - name: Fail build check
-        if: ${{ needs.test.result != 'success' }}
+        if: ${{ needs.format.result != 'success' || needs.test.result != 'success' }}
         run: exit 1
