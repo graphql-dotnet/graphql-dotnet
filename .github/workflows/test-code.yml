@@ -14,15 +14,6 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check formatting
-        working-directory: src
-        run: |
-          dotnet tool install -g dotnet-format
-          dotnet format ./Source/EasyNetQ.sln --check
-
   test:
     strategy:
       matrix:
@@ -39,6 +30,12 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Check formatting
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        working-directory: src
+        run: |
+          dotnet tool install -g dotnet-format
+          dotnet format --check
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
