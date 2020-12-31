@@ -99,9 +99,11 @@ namespace GraphQL.Types
 
         private static bool IsNullableProperty(PropertyInfo propertyInfo)
         {
-            if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute))) return false;
+            if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute)))
+                return false;
 
-            if (!propertyInfo.PropertyType.IsValueType) return true;
+            if (!propertyInfo.PropertyType.IsValueType)
+                return true;
 
             return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
@@ -119,11 +121,14 @@ namespace GraphQL.Types
 
         internal static bool IsEnabledForRegister(Type propertyType, bool firstCall)
         {
-            if (propertyType == typeof(string)) return true;
+            if (propertyType == typeof(string))
+                return true;
 
-            if (propertyType.IsValueType) return true; // TODO: requires discussion: Nullable<T>, enums, any struct
+            if (propertyType.IsValueType)
+                return true; // TODO: requires discussion: Nullable<T>, enums, any struct
 
-            if (GraphTypeTypeRegistry.Contains(propertyType)) return true;
+            if (GraphTypeTypeRegistry.Contains(propertyType))
+                return true;
 
             if (firstCall)
             {

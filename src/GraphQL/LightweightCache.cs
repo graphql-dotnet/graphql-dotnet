@@ -218,7 +218,8 @@ namespace GraphQL
         {
             var returnValue = false;
 
-            Each(delegate (TValue value) { returnValue |= predicate(value); });
+            Each(delegate (TValue value)
+            { returnValue |= predicate(value); });
 
             return returnValue;
         }

@@ -1,10 +1,10 @@
+using System;
 using BenchmarkDotNet.Attributes;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Tests.Introspection;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace GraphQL.Benchmarks
 {

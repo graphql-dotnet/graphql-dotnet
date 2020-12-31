@@ -52,15 +52,22 @@ namespace GraphQL.Validation.Rules
             {
                 switch (op.OperationType)
                 {
-                    case OperationType.Query: return DirectiveLocation.Query;
-                    case OperationType.Mutation: return DirectiveLocation.Mutation;
-                    case OperationType.Subscription: return DirectiveLocation.Subscription;
+                    case OperationType.Query:
+                        return DirectiveLocation.Query;
+                    case OperationType.Mutation:
+                        return DirectiveLocation.Mutation;
+                    case OperationType.Subscription:
+                        return DirectiveLocation.Subscription;
                 }
             }
-            if (appliedTo is Field) return DirectiveLocation.Field;
-            if (appliedTo is FragmentSpread) return DirectiveLocation.FragmentSpread;
-            if (appliedTo is InlineFragment) return DirectiveLocation.InlineFragment;
-            if (appliedTo is FragmentDefinition) return DirectiveLocation.FragmentDefinition;
+            if (appliedTo is Field)
+                return DirectiveLocation.Field;
+            if (appliedTo is FragmentSpread)
+                return DirectiveLocation.FragmentSpread;
+            if (appliedTo is InlineFragment)
+                return DirectiveLocation.InlineFragment;
+            if (appliedTo is FragmentDefinition)
+                return DirectiveLocation.FragmentDefinition;
 
             throw new InvalidOperationException($"Unable to determine directive location for \"{context.Print(appliedTo)}\".");
         }

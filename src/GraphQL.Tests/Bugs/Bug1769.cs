@@ -15,7 +15,8 @@ namespace GraphQL.Tests.Bugs
         private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0) error.AddLocation(line, column);
+            if (line != 0)
+                error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;

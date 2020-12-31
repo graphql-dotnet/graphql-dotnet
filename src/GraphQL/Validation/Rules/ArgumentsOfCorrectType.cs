@@ -22,7 +22,8 @@ namespace GraphQL.Validation.Rules
                 _.Match<Argument>(argAst =>
                 {
                     var argDef = context.TypeInfo.GetArgument();
-                    if (argDef == null) return;
+                    if (argDef == null)
+                        return;
 
                     var type = argDef.ResolvedType;
                     var errors = type.IsValidLiteralValue(argAst.Value ?? argDef.GetDefaultValueAST(context.Schema), context.Schema).ToList();
