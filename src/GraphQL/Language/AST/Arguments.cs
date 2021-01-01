@@ -47,5 +47,8 @@ namespace GraphQL.Language.AST
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public override string ToString() => _arguments?.Count > 0 ? $"Arguments{{{string.Join(", ", _arguments)}}}" : "Arguments(Empty)";
     }
 }

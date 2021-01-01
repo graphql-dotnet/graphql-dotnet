@@ -17,7 +17,8 @@ namespace GraphQL.Tests.Types
 
     public class ComplexGraphTypeTests
     {
-        internal class ComplexType<T> : ComplexGraphType<T> {
+        internal class ComplexType<T> : ComplexGraphType<T>
+        {
             public ComplexType()
             {
                 Name = typeof(T).GetFriendlyName().Replace("<", "Of").Replace(">", "");
@@ -441,5 +442,5 @@ namespace GraphQL.Tests.Types
         }
     }
 
-    #pragma warning restore 618
+#pragma warning restore 618
 }

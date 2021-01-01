@@ -75,12 +75,12 @@ query {
         public List<int> IntsList { get; set; }
 
         public List<int> IntsList2 { get; set; }
-        
+
         public int ValueProp { get; set; }
 
         public int ReadOnlyProp { get; }
 
-        public int PrivateSetProp { get; private set; } 
+        public int PrivateSetProp { get; private set; }
     }
 
     public class ArrayInputType : InputObjectGraphType<ArrayInput>

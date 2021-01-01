@@ -153,7 +153,7 @@ directive @skip(
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var expected = new Dictionary<string, string>
             {
@@ -183,7 +183,7 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
@@ -218,7 +218,7 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
@@ -725,7 +725,7 @@ scalar Uri"
         public void prints_enum_default_args()
         {
             var root = new ObjectGraphType { Name = "Query" };
-            
+
             var f = new FieldType
             {
                 Name = "bestColor",

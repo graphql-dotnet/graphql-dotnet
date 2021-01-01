@@ -37,14 +37,16 @@ namespace GraphQL.Types
 
         public bool HasField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return false;
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
 
             return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return null;
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
 
             // DO NOT USE LINQ ON HOT PATH
             foreach (var x in _fields)
@@ -330,10 +332,12 @@ namespace GraphQL.Types
             Type type = null)
         {
             string name;
-            try {
+            try
+            {
                 name = expression.NameOf();
             }
-            catch {
+            catch
+            {
                 throw new ArgumentException(
                     $"Cannot infer a Field name from the expression: '{expression.Body.ToString()}' " +
                     $"on parent GraphQL type: '{Name ?? GetType().Name}'.");

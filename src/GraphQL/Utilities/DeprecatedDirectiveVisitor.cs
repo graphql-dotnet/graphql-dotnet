@@ -9,14 +9,16 @@ namespace GraphQL.Utilities
         public override void VisitFieldDefinition(FieldType field)
         {
             // if a value has already been set, prefer that
-            if (!string.IsNullOrWhiteSpace(field.DeprecationReason)) return;
+            if (!string.IsNullOrWhiteSpace(field.DeprecationReason))
+                return;
             field.DeprecationReason = GetArgument<string>("reason") ?? DeprecatedDefaultValue;
         }
 
         public override void VisitEnumValue(EnumValueDefinition value)
         {
             // if a value has already been set, prefer that
-            if (!string.IsNullOrWhiteSpace(value.DeprecationReason)) return;
+            if (!string.IsNullOrWhiteSpace(value.DeprecationReason))
+                return;
             value.DeprecationReason = GetArgument<string>("reason") ?? DeprecatedDefaultValue;
         }
     }

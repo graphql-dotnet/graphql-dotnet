@@ -17,7 +17,8 @@ namespace GraphQL.Tests.Bugs
                 error = new ValidationError(null, number, message);
             else
                 error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0) error.AddLocation(line, column);
+            if (line != 0)
+                error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;

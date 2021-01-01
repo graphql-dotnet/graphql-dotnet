@@ -1,4 +1,4 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -23,7 +23,7 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-       }
+        }
 
         [Fact]
         public void one_named_operation()
