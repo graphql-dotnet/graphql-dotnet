@@ -88,7 +88,7 @@ namespace GraphQL.NewtonsoftJson
                 {
                     writer.WritePropertyName("extensions");
                     serializer.Serialize(writer, info.Extensions);
-                } 
+                }
 
                 writer.WriteEndObject();
             }

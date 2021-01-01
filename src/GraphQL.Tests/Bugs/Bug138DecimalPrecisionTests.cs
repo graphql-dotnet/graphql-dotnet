@@ -39,7 +39,7 @@ namespace GraphQL.Tests.Bugs
         {
             Field<DecimalGraphType>(
                 "set",
-                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request"}),
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request" }),
                 resolve: context =>
                 {
                     var val = context.GetArgument<decimal>("request");

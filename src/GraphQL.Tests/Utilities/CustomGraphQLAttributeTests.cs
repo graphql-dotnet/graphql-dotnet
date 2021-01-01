@@ -132,7 +132,7 @@ namespace GraphQL.Tests.Utilities
         public abstract string Id { get; }
     }
 
-    [GraphQLMetadata(Name="ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
+    [GraphQLMetadata(Name = "ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
     public class ResolvingClassForABlog : UniqueElement
     {
         public ResolvingClassForABlog()

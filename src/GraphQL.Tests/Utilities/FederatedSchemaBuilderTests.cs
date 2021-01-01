@@ -170,7 +170,7 @@ type User @key(fields: ""id"") {
             var possibleTypes = (List<object>)entityType["possibleTypes"];
             var possibleType = (Dictionary<string, object>)possibleTypes[0];
             var name = (string)possibleType["name"];
-            
+
             Assert.Equal("User", name);
         }
 
@@ -199,10 +199,12 @@ type User @key(fields: ""id"") {
             };
             var listener = new DataLoaderDocumentListener(accessor);
 
-            Builder.Types.For("User").ResolveReferenceAsync(ctx => {
+            Builder.Types.For("User").ResolveReferenceAsync(ctx =>
+            {
                 var id = ctx.Arguments["id"].ToString();
                 // return Task.FromResult(users.FirstOrDefault(user => user.Id == id));
-                var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids => {
+                var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids =>
+                {
                     var results = users.Where(user => ids.Contains(user.Id));
                     return Task.FromResult((IDictionary<string, User>)results.ToDictionary(c => c.Id));
                 });

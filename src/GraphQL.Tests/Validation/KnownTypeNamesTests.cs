@@ -27,7 +27,8 @@ namespace GraphQL.Tests.Validation
         [Fact]
         public void unknown_nonnull_type_name_is_invalid()
         {
-            ShouldFailRule(_ =>{
+            ShouldFailRule(_ =>
+            {
                 _.Query = @"
                     query Foo($var: Abcd!) {
                         user(id: 4) {
@@ -64,7 +65,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(KnownTypeNamesError.UnknownTypeMessage("JumbledUpLetters", null), 2, 35);
                 _.Error(KnownTypeNamesError.UnknownTypeMessage("Badger", null), 5, 37);
-                _.Error(KnownTypeNamesError.UnknownTypeMessage("Peettt", new[] {"Pet"}), 8, 41);
+                _.Error(KnownTypeNamesError.UnknownTypeMessage("Peettt", new[] { "Pet" }), 8, 41);
             });
         }
     }

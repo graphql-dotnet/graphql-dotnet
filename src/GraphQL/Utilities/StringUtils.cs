@@ -24,8 +24,10 @@ namespace GraphQL.Utilities
         {
             switch (str.Length)
             {
-                case 0: return str;
-                case 1: return str.ToUpperInvariant();
+                case 0:
+                    return str;
+                case 1:
+                    return str.ToUpperInvariant();
                 default:
                     str = str.ToLowerInvariant();
                     return char.ToUpperInvariant(str[0]) + str.Substring(1);
@@ -70,8 +72,8 @@ namespace GraphQL.Utilities
         /// </summary>
         public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5)
         {
-            var itemsArray = items.Take(maxLength).ToArray();
-            var index = 0;
+            string[] itemsArray = items.Take(maxLength).ToArray();
+            int index = 0;
             return itemsArray
                 .Select(x => $"\"{x}\"")
                 .Aggregate((list, quoted) =>
@@ -130,7 +132,8 @@ namespace GraphQL.Utilities
             int length2 = target.Length;
 
             // Return trivial case - difference in string lengths exceeds threshold
-            if (Math.Abs(length1 - length2) > threshold) { return int.MaxValue; }
+            if (Math.Abs(length1 - length2) > threshold)
+                return int.MaxValue;
 
             // Ensure arrays [i] / length1 use shorter length
             if (length1 > length2)
@@ -147,7 +150,8 @@ namespace GraphQL.Utilities
             int[] dMinus2 = new int[maxi + 1];
             int[] dSwap;
 
-            for (int i = 0; i <= maxi; i++) { dCurrent[i] = i; }
+            for (int i = 0; i <= maxi; i++)
+                dCurrent[i] = i;
 
             int jm1 = 0, im1 = 0, im2 = -1;
 
@@ -181,16 +185,18 @@ namespace GraphQL.Utilities
                         min = Math.Min(min, dMinus2[im2] + cost);
 
                     dCurrent[i] = min;
-                    if (min < minDistance) { minDistance = min; }
+                    if (min < minDistance)
+                        minDistance = min;
                     im1++;
                     im2++;
                 }
                 jm1++;
-                if (minDistance > threshold) { return int.MaxValue; }
+                if (minDistance > threshold)
+                    return int.MaxValue;
             }
 
             int result = dCurrent[maxi];
-            return (result > threshold) ? int.MaxValue : result;
+            return result > threshold ? int.MaxValue : result;
         }
     }
 }

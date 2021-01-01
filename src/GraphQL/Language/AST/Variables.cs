@@ -7,28 +7,38 @@ namespace GraphQL.Language.AST
 {
     public class Variables : IEnumerable<Variable>
     {
-        private readonly List<Variable> _variables = new List<Variable>();
+        private List<Variable> _variables;
 
         public void Add(Variable variable)
         {
-            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+            if (variable == null)
+                throw new ArgumentNullException(nameof(variable));
+
+            if (_variables == null)
+                _variables = new List<Variable>();
+
+            _variables.Add(variable);
         }
 
         public object ValueFor(string name)
         {
-            var variable = _variables.FirstOrDefault(v => v.Name == name);
+            var variable = _variables?.FirstOrDefault(v => v.Name == name);
             return variable?.Value;
         }
 
+        /// <inheritdoc />
         public IEnumerator<Variable> GetEnumerator()
         {
+            if (_variables == null)
+                return Enumerable.Empty<Variable>().GetEnumerator();
+
             return _variables.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
     }
 
     public class VariableDefinitions : IEnumerable<VariableDefinition>
@@ -46,6 +56,7 @@ namespace GraphQL.Language.AST
             _variables.Add(variable);
         }
 
+        /// <inheritdoc />
         public IEnumerator<VariableDefinition> GetEnumerator()
         {
             if (_variables == null)
@@ -55,5 +66,8 @@ namespace GraphQL.Language.AST
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public override string ToString() => _variables?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", _variables)}}}" : "VariableDefinitions(Empty)";
     }
 }

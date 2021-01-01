@@ -42,9 +42,9 @@ namespace GraphQL.Tests
             var writtenResult = Writer.WriteToStringAsync(runResult).Result;
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).Result;
 
-//#if DEBUG
-//            Console.WriteLine(writtenResult);
-//#endif
+            //#if DEBUG
+            //            Console.WriteLine(writtenResult);
+            //#endif
 
             string additionalInfo = null;
 
@@ -84,9 +84,9 @@ namespace GraphQL.Tests
             var writtenResult = Writer.WriteToStringAsync(runResult).GetAwaiter().GetResult();
             var expectedResult = Writer.WriteToStringAsync(expectedExecutionResult).GetAwaiter().GetResult();
 
-//#if DEBUG
-//            Console.WriteLine(writtenResult);
-//#endif
+            //#if DEBUG
+            //            Console.WriteLine(writtenResult);
+            //#endif
 
             string additionalInfo = null;
 

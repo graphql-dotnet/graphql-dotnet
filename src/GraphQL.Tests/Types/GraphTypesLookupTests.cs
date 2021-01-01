@@ -20,7 +20,8 @@ namespace GraphQL.Tests.Types
             var modified = false;
             foreach (var t in _lookup.All())
             {
-                if (modified) continue;
+                if (modified)
+                    continue;
                 _inIteration.Set();
                 _lookupModified.WaitOne();
                 modified = true;

@@ -172,7 +172,7 @@ namespace GraphQL.Tests.Utilities
             var type = schema.FindType("PetKind") as EnumerationGraphType;
             type.ShouldNotBeNull();
 
-            type.Values.Select(x => x.Value.ToString()).ShouldBe(new [] {"CAT", "DOG"});
+            type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace GraphQL.Tests.Utilities
             schema.Initialize();
 
             var searchResult = schema.FindType("SearchResult") as UnionGraphType;
-            searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] {"Human", "Droid"});
+            searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] { "Human", "Droid" });
         }
 
         [Fact]

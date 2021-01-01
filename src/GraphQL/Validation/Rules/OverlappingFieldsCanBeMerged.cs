@@ -814,7 +814,7 @@ namespace GraphQL.Validation.Rules
             {
                 _data.TryGetValue(a, out var first);
 
-                if(first == null || !first.ContainsKey(b))
+                if (first == null || !first.ContainsKey(b))
                 {
                     return false;
                 }

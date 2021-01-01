@@ -201,9 +201,9 @@ namespace GraphQL
         /// <param name="predicate">The search predicate.</param>
         public bool Exists(Predicate<TValue> predicate)
         {
-            var returnValue = false;
+            bool returnValue = false;
 
-            Each(delegate (TValue value) { returnValue |= predicate(value); });
+            Each(value => returnValue |= predicate(value));
 
             return returnValue;
         }
