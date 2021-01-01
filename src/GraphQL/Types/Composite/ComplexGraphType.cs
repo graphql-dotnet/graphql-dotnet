@@ -282,7 +282,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a builder for a new field.
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
         /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
@@ -296,13 +296,13 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a builder for a new field.
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
         /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
         public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
 
         /// <summary>
-        /// Returns a builder for a new field that is linked to a property of the source object.
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="name">The name of this field.</param>
@@ -345,7 +345,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a builder for a new field that is linked to a property of the source object.
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
         /// The default name of this field is inferred by the property represented within the expression.
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>

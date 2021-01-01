@@ -7,7 +7,7 @@ using GraphQL.Utilities;
 namespace GraphQL.Builders
 {
     /// <summary>
-    /// Static methods to create connection builders.
+    /// Static methods to create connection field builders.
     /// </summary>
     public static class ConnectionBuilder
     {
@@ -181,7 +181,7 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets the default page size
+        /// Sets the default page size.
         /// </summary>
         public ConnectionBuilder<TSourceType> PageSize(int pageSize)
         {
