@@ -66,8 +66,14 @@ namespace GraphQL.Types
         private readonly object _lock = new object();
         private bool _sealed;
 
+        /// <summary>
+        /// Initializes a new instance with the <see cref="CamelCaseNameConverter"/>.
+        /// </summary>
         public GraphTypesLookup() : this(CamelCaseNameConverter.Instance) { }
 
+        /// <summary>
+        /// Initalizes a new instance with the specified <see cref="INameConverter"/>.
+        /// </summary>
         public GraphTypesLookup(INameConverter nameConverter)
         {
             if (nameConverter == null)
@@ -104,6 +110,14 @@ namespace GraphQL.Types
 
         private IGraphType BuildNamedType(Type type, Func<Type, IGraphType> resolver) => type.BuildNamedType(t => this[t] ?? resolver(t));
 
+        /// <summary>
+        /// Initializes a new instance for the specified graph types and directives, and with the specified type resolver and name converter.
+        /// </summary>
+        /// <param name="types">A list of graph type instances to register in the lookup table.</param>
+        /// <param name="directives">A list of directives to reigster.</param>
+        /// <param name="resolveType">A delegate which returns an instance of a graph type from its .Net type.</param>
+        /// <param name="nameConverter">A name converter to use for the specified graph types.</param>
+        /// <param name="seal">Prevents additional types from being added to the lookup table.</param>
         public static GraphTypesLookup Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
@@ -159,6 +173,9 @@ namespace GraphQL.Types
             return lookup;
         }
 
+        /// <summary>
+        /// Gets or sets the name converter used when adding types to the lookup table.
+        /// </summary>
         public INameConverter NameConverter { get; set; }
 
         internal void Clear(bool internalCall)
@@ -177,6 +194,9 @@ namespace GraphQL.Types
         /// </summary>
         public void Clear() => Clear(false);
 
+        /// <summary>
+        /// Returns a list of all of the discovered types from the lookup table.
+        /// </summary>
         public IEnumerable<IGraphType> All()
         {
             lock (_lock)
@@ -185,6 +205,9 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Returns a graph type instance from the lookup table by its GraphQL type name.
+        /// </summary>
         public IGraphType this[string typeName]
         {
             get
@@ -214,10 +237,9 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Gets GraphType from lookup by its .NET type.
+        /// Returns a graph type instance from the lookup table by its .Net type.
         /// </summary>
-        /// <param name="type"> .NET type of GraphType. </param>
-        /// <returns> Found GraphType if any. </returns>
+        /// <param name="type">The .Net type of the graph type.</param>
         public IGraphType this[Type type]
         {
             get
@@ -230,10 +252,11 @@ namespace GraphQL.Types
             }
         }
 
+        // TODO: remove new() constraint
         /// <summary>
-        /// Adds specified GraphType to lookup.
+        /// Adds the specified graph type to the lookup table.
         /// </summary>
-        /// <typeparam name="TType"> GraphType to add. </typeparam>
+        /// <typeparam name="TType">The graph type to add.</typeparam>
         public void AddType<TType>()
             where TType : IGraphType, new()
         {
@@ -244,6 +267,10 @@ namespace GraphQL.Types
             Debug.Assert(_context.InFlightRegisteredTypes.Count == 0);
         }
 
+        // TODO: make private
+        /// <summary>
+        /// Adds the specified graph type to the lookup table using a specified <see cref="TypeCollectionContext"/>.
+        /// </summary>
         public void AddType<TType>(TypeCollectionContext context)
             where TType : IGraphType
         {
@@ -254,6 +281,10 @@ namespace GraphQL.Types
             AddType(instance, context);
         }
 
+        // TODO: make private
+        /// <summary>
+        /// Adds the specified graph type instance to the lookup table using a specified <see cref="TypeCollectionContext"/>.
+        /// </summary>
         public void AddType(IGraphType type, TypeCollectionContext context)
         {
             CheckSealed();
@@ -452,6 +483,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
+        // TODO: make private
         public void ApplyTypeReferences()
         {
             CheckSealed();
@@ -462,6 +494,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
+        // TODO: make private
         public void ApplyTypeReference(IGraphType type)
         {
             CheckSealed();
@@ -590,10 +623,19 @@ the name '{typeName}' is already registered to '{existingGraphType.GetType().Ful
             }
         }
 
+        /// <summary>
+        /// Returns the <see cref="FieldType"/> instance for the <c>__schema</c> meta-field.
+        /// </summary>
         public FieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
 
+        /// <summary>
+        /// Returns the <see cref="FieldType"/> instance for the <c>__type</c> meta-field.
+        /// </summary>
         public FieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
 
+        /// <summary>
+        /// Returns the <see cref="FieldType"/> instance for the <c>__typename</c> meta-field.
+        /// </summary>
         public FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
     }
 }

@@ -11,30 +11,50 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents a complex (object) graph type.
+    /// </summary>
     public interface IComplexGraphType : IGraphType
     {
+        /// <summary>
+        /// Returns a list of the fields configured for the graph.
+        /// </summary>
         IEnumerable<FieldType> Fields { get; }
 
+        /// <summary>
+        /// Adds a field to the graph.
+        /// </summary>
         FieldType AddField(FieldType fieldType);
 
+        /// <summary>
+        /// Returns true when a field matching the specified name is configured for the graph.
+        /// </summary>
         bool HasField(string name);
 
+        /// <summary>
+        /// Returns the <see cref="FieldType"/> for the field matching the specified name that
+        /// is configured for the graph, or null if none is found.
+        /// </summary>
         FieldType GetField(string name);
     }
 
+    /// <inheritdoc cref="IComplexGraphType"/>
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
         private readonly List<FieldType> _fields = new List<FieldType>();
 
+        /// <inheritdoc/>
         protected ComplexGraphType()
         {
             Description ??= typeof(TSourceType).Description();
             DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FieldType> Fields => _fields;
 
+        /// <inheritdoc/>
         public bool HasField(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -43,6 +63,7 @@ namespace GraphQL.Types
             return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
+        /// <inheritdoc/>
         public FieldType GetField(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -56,6 +77,7 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc/>
         public virtual FieldType AddField(FieldType fieldType)
         {
             if (fieldType == null)

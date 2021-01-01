@@ -17,6 +17,7 @@ namespace GraphQL.Types
 
         public Func<object, bool> IsTypeOf { get; set; }
 
+        /// <inheritdoc/>
         public ObjectGraphType()
         {
             if (typeof(TSourceType) != typeof(object))
