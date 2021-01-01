@@ -847,7 +847,6 @@ namespace GraphQL.Instrumentation
         public System.DateTime StartTime { get; }
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Validation { get; }
         public int Version { get; }
-        public static long ConvertTime(double ms) { }
         public class ExecutionTrace
         {
             public ExecutionTrace() { }
