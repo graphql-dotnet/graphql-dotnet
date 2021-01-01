@@ -7,7 +7,7 @@ using GraphQL.Utilities;
 namespace GraphQL.Builders
 {
     /// <summary>
-    /// Static methods to create connection builders.
+    /// Static methods to create connection field builders.
     /// </summary>
     public static class ConnectionBuilder
     {
