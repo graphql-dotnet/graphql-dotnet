@@ -213,8 +213,6 @@ namespace GraphQL
         public LightweightCache(System.Func<TKey, TValue> onMissing) { }
         public LightweightCache(System.Collections.Generic.IDictionary<TKey, TValue> dictionary, System.Func<TKey, TValue> onMissing) { }
         public int Count { get; }
-        public TValue First { get; }
-        public System.Func<TValue, TKey> GetKey { get; set; }
         public TValue this[TKey key] { get; set; }
         public System.Collections.Generic.IEnumerable<TKey> Keys { get; }
         public System.Func<TKey, TValue> OnMissing { set; }
