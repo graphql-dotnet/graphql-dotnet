@@ -66,12 +66,12 @@ namespace GraphQL.Instrumentation
         public class OperationTrace
         {
             /// <summary>
-            /// Sets or returns the start offset of the operation, in nanoseconds.
+            /// Gets or sets the start offset of the operation, in nanoseconds.
             /// </summary>
             public long StartOffset { get; set; }
 
             /// <summary>
-            /// Sets or returns the duration of the operation, in nanoseconds.
+            /// Gets or sets the duration of the operation, in nanoseconds.
             /// </summary>
             public long Duration { get; set; }
         }
@@ -93,22 +93,22 @@ namespace GraphQL.Instrumentation
         public class ResolverTrace : OperationTrace
         {
             /// <summary>
-            /// Sets or returns the path of the field.
+            /// Gets or sets the path of the field.
             /// </summary>
             public List<object> Path { get; set; } = new List<object>();
 
             /// <summary>
-            /// Sets or returns the parent graph type name.
+            /// Gets or sets the parent graph type name.
             /// </summary>
             public string ParentType { get; set; }
 
             /// <summary>
-            /// Sets or returns the field name.
+            /// Gets or sets the field name.
             /// </summary>
             public string FieldName { get; set; }
 
             /// <summary>
-            /// Sets or returns the returned graph type name.
+            /// Gets or sets the returned graph type name.
             /// </summary>
             public string ReturnType { get; set; }
         }
