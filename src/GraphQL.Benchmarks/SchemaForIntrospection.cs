@@ -1,6 +1,6 @@
-using GraphQL.Types;
 using System;
 using System.Numerics;
+using GraphQL.Types;
 
 namespace GraphQL.Benchmarks
 {

@@ -40,7 +40,7 @@ namespace GraphQL.Utilities
             return GetExtensionAstTypes(type).Count > 0;
         }
 
-        public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode 
+        public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode
         {
             var types = GetExtensionAstTypes(type);
             types.Add(astType);

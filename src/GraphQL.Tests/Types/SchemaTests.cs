@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
             schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new SchemaWithDuplicates();
             schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -313,11 +313,11 @@ namespace GraphQL.Tests.Types
     {
         public DSchemaType()
         {
-            Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
+            Field<StringGraphType>("id", resolve: ctx => new { id = "id" });
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()}),
-                resolve: ctx => new {id = "id"});
+                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> { Name = "input2", ResolvedType = new DInputType2() }),
+                resolve: ctx => new { id = "id" });
             Field<ListGraphType<DListType>>("alist");
         }
     }

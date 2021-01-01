@@ -1,4 +1,4 @@
-﻿using GraphQL.Language.AST;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {

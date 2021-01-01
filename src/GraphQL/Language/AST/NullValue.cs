@@ -9,8 +9,10 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return true;
-            if (ReferenceEquals(this, obj)) return true;
+            if (obj is null)
+                return true;
+            if (ReferenceEquals(this, obj))
+                return true;
             return obj.GetType() == GetType();
         }
     }

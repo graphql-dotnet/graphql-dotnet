@@ -26,7 +26,7 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() =>
             {
                 var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Local);
-                Should.Throw<FormatException>(()=> _type.Serialize(date));
+                Should.Throw<FormatException>(() => _type.Serialize(date));
             });
         }
 
@@ -36,7 +36,7 @@ namespace GraphQL.Tests.Types
             CultureTestHelper.UseCultures(() =>
             {
                 var date = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Utc);
-                Should.Throw<FormatException>(()=> _type.Serialize(date));
+                Should.Throw<FormatException>(() => _type.Serialize(date));
             });
         }
 
@@ -47,7 +47,7 @@ namespace GraphQL.Tests.Types
             {
                 var expected = DateTime.UtcNow;
                 var input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
-                Should.Throw<FormatException>(()=> _type.ParseValue(input));
+                Should.Throw<FormatException>(() => _type.ParseValue(input));
             });
         }
 
@@ -56,7 +56,7 @@ namespace GraphQL.Tests.Types
         {
             CultureTestHelper.UseCultures(() =>
             {
-                ((DateTime) _type.ParseValue("2015-11-21")).Kind.ShouldBe(
+                ((DateTime)_type.ParseValue("2015-11-21")).Kind.ShouldBe(
                     DateTimeKind.Utc);
             });
         }

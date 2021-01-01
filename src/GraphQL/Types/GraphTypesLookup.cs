@@ -84,7 +84,7 @@ namespace GraphQL.Types
                    }
                    ctx.AddType(trimmed, type, null);
                });
-            
+
             // Add introspection types. Note that introspection types rely on the
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
             NameConverter = CamelCaseNameConverter.Instance;
@@ -314,7 +314,8 @@ namespace GraphQL.Types
                 foreach (var unionedType in union.PossibleTypes)
                 {
                     // skip references
-                    if (unionedType is GraphQLTypeReference) continue;
+                    if (unionedType is GraphQLTypeReference)
+                        continue;
 
                     AddTypeIfNotRegistered(unionedType, context);
 

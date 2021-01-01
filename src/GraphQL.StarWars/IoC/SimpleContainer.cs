@@ -10,7 +10,7 @@ namespace GraphQL.StarWars.IoC
         T Get<T>();
         void Register<TService>() where TService : class;
         void Register<TService>(Func<TService> instanceCreator) where TService : class;
-        void Register<TService, TImpl>() where TService: class where TImpl : class, TService;
+        void Register<TService, TImpl>() where TService : class where TImpl : class, TService;
         void Singleton<TService>(TService instance) where TService : class;
         void Singleton<TService>(Func<TService> instanceCreator) where TService : class;
     }

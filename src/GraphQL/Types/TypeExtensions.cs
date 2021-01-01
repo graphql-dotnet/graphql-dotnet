@@ -7,7 +7,8 @@ namespace GraphQL.Types
     {
         public static IGraphType GraphTypeFromType(this IType type, ISchema schema)
         {
-            if (type == null) return null;
+            if (type == null)
+                return null;
 
             if (type is NonNullType nonnull)
             {

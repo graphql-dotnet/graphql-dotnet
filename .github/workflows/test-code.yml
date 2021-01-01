@@ -30,6 +30,12 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Check formatting
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+        working-directory: src
+        run: |
+          dotnet tool install -g dotnet-format
+          dotnet format --check -v diag || (echo "Run 'dotnet format' to fix formatting issues" && exit 1)
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
