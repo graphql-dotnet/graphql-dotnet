@@ -20,7 +20,7 @@ namespace GraphQL.Types
             }
         }
 
-        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
