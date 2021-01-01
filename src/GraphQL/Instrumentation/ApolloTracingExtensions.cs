@@ -21,17 +21,8 @@ namespace GraphQL.Instrumentation
         public static void EnrichWithApolloTracing(this ExecutionResult result, DateTime start)
         {
             var perf = result?.Perf;
-            if (perf == null)
-            {
-                return;
-            }
-
-            var trace = CreateTrace(perf, start);
-            if (result.Extensions == null)
-            {
-                result.Extensions = new Dictionary<string, object>();
-            }
-            result.Extensions["tracing"] = trace;
+            if (perf != null)
+                (result.Extensions ??= new Dictionary<string, object>())["tracing"] = CreateTrace(perf, start);
         }
 
         /// <summary>
