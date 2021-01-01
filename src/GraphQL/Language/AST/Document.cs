@@ -41,7 +41,7 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"Document{{definitions={_definitions}}}";
+        public override string ToString() => $"Document{{definitions={string.Join(", ", _definitions)}}}";
 
         public override bool IsEqualTo(INode node)
         {
