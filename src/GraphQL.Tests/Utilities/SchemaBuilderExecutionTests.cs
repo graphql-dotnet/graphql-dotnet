@@ -694,6 +694,8 @@ namespace GraphQL.Tests.Utilities
     public class Blog
     {
         public string Title { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Post Post(string id, long unused)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
@@ -703,6 +705,7 @@ namespace GraphQL.Tests.Utilities
     [GraphQLMetadata("Query")]
     public class BlogQueryType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Blog Blog(string id)
         {
             return new Blog
@@ -771,8 +774,10 @@ namespace GraphQL.Tests.Utilities
     {
         public bool Source(object source) => source != null;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string Resolve(IResolveFieldContext context) => "Resolved";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
         public string UserContext(MyUserContext context) => context.Name;
