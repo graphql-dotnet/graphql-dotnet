@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
-using GraphQL.Utilities;
 
 namespace GraphQL.Builders
 {

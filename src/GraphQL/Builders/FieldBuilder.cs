@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Builders
 {
