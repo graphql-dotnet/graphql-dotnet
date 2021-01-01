@@ -4,12 +4,19 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents an object graph type.
+    /// </summary>
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
         Func<object, bool> IsTypeOf { get; set; }
         void AddResolvedInterface(IInterfaceGraphType graphType);
     }
 
+    /// <summary>
+    /// Represents an object graph type.
+    /// </summary>
+    /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .Net type of the source property within field resolvers for this graph.</typeparam>
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();
@@ -87,6 +94,9 @@ namespace GraphQL.Types
         }
     }
 
+    /// <summary>
+    /// Represents and object graph type.
+    /// </summary>
     public class ObjectGraphType : ObjectGraphType<object>
     {
     }
