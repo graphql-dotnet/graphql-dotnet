@@ -11,7 +11,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
+        /// <param name="start">The date and time that the GraphQL document began execution.</param>
         /// <param name="durationMs">The number of milliseconds that it took to execute the GraphQL document.</param>
         public ApolloTrace(DateTime start, double durationMs)
         {
@@ -26,12 +26,12 @@ namespace GraphQL.Instrumentation
         public int Version => 1;
 
         /// <summary>
-        /// Returns the UTC date and time when the document began execution.
+        /// Returns the date and time when the document began execution. Should be serialized as a RFC 3339 string.
         /// </summary>
         public DateTime StartTime { get; }
 
         /// <summary>
-        /// Returns the UTC date and time when the document completed execution.
+        /// Returns the date and time when the document completed execution. Should be serialized as a RFC 3339 string.
         /// </summary>
         public DateTime EndTime { get; }
 
