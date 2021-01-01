@@ -95,7 +95,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Determines if the name of the specified graph type is equal to the name of this graph typ 740107wee.
         /// </summary>
-        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);  
+        protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
         /// <summary>
         /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
