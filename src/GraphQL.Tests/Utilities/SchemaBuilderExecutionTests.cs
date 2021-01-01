@@ -394,7 +394,7 @@ namespace GraphQL.Tests.Utilities
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ source }";
-                _.Root = new { Hello =  "World" };
+                _.Root = new { Hello = "World" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""source"": true }");
@@ -651,7 +651,7 @@ namespace GraphQL.Tests.Utilities
                 type Cat {
                     name: String!
                 }
-            ", _=>
+            ", _ =>
             {
                 _.Types.For("Dog").IsTypeOf<Dog>();
                 _.Types.For("Cat").IsTypeOf<Cat>();
@@ -805,11 +805,11 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    internal class MyUserContext: Dictionary<string, object>
+    internal class MyUserContext : Dictionary<string, object>
     {
         public string Name { get; set; }
     }
-    internal class ChildMyUserContext: MyUserContext
+    internal class ChildMyUserContext : MyUserContext
     {
     }
 }

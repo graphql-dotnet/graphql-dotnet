@@ -163,10 +163,10 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected \"{ofType.Name}!\", found null."};
+                        return new[] { $"Expected \"{ofType.Name}!\", found null." };
                     }
 
-                    return new[] { "Expected non-null value, found null"};
+                    return new[] { "Expected non-null value, found null" };
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);

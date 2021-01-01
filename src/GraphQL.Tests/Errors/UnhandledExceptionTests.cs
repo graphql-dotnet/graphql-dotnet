@@ -45,7 +45,7 @@ namespace GraphQL.Tests.Errors
             var expectedError = new ExecutionError("Test error message");
             expectedError.AddLocation(1, 3);
             expectedError.Path = new[] { "hello2" };
-            
+
             AssertQuery(options =>
             {
                 options.Schema = Builder.Build(def);

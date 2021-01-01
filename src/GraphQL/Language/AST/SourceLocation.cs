@@ -18,10 +18,8 @@ namespace GraphQL.Language.AST
 
         public int Column { get; }
 
-        public override string ToString()
-        {
-            return $"line={Line}, column={Column}, start={Start}, end={End}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"line={Line}, column={Column}, start={Start}, end={End}";
 
         protected bool Equals(SourceLocation other)
         {
@@ -30,9 +28,12 @@ namespace GraphQL.Language.AST
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((SourceLocation)obj);
         }
 
@@ -40,7 +41,7 @@ namespace GraphQL.Language.AST
         {
             unchecked
             {
-                return (Line*397) ^ Column;
+                return (Line * 397) ^ Column;
             }
         }
     }

@@ -60,13 +60,13 @@ namespace GraphQL.Utilities.Federation
                 schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
-            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new {});
+            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new { });
 
             var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
             query.FieldAsync(
                 "_entities",
                 new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations"}),
+                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
                 resolve: async context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);
@@ -79,7 +79,7 @@ namespace GraphQL.Utilities.Federation
                     {
                         var typeName = rep["__typename"].ToString();
                         var type = context.Schema.FindType(typeName);
-                        if(type != null)
+                        if (type != null)
                         {
                             // execute resolver
                             var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
@@ -181,10 +181,12 @@ namespace GraphQL.Utilities.Federation
             }
 
             var directive = type.GetExtensionDirectives<ASTNode>().Directive("key");
-            if (directive != null) return true;
+            if (directive != null)
+                return true;
 
             var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null) return false;
+            if (ast == null)
+                return false;
 
             var keyDir = ast.Directives.Directive("key");
             return keyDir != null;

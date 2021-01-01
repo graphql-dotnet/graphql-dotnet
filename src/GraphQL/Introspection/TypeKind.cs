@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
         [Description("Indicates this type is a scalar.")]
         SCALAR = 0,
         [Description("Indicates this type is an object. `fields` and `possibleTypes` are valid fields.")]
-        OBJECT  = 1,
+        OBJECT = 1,
         [Description("Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.")]
         INTERFACE = 2,
         [Description("Indicates this type is a union. `possibleTypes` is a valid field.")]

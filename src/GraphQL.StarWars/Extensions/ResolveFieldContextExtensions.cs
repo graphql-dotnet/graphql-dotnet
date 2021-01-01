@@ -1,9 +1,9 @@
-using GraphQL.Builders;
-using GraphQL.StarWars.Types;
-using GraphQL.Types.Relay.DataObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Builders;
+using GraphQL.StarWars.Types;
+using GraphQL.Types.Relay.DataObjects;
 
 namespace GraphQL.StarWars.Extensions
 {

@@ -17,16 +17,16 @@ namespace GraphQL.Types
 
         public Func<object, bool> IsTypeOf
         {
-             get => throw Invalid();
-             set => throw Invalid();
+            get => throw Invalid();
+            set => throw Invalid();
         }
 
         public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
         public IEnumerable<Type> Interfaces
         {
-             get => throw Invalid();
-             set => throw Invalid();
+            get => throw Invalid();
+            set => throw Invalid();
         }
 
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces

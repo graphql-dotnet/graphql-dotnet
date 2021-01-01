@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Execution
     {
         public Root(int number, DateTime dateTime)
         {
-            NumberHolder = new NumberHolder {TheNumber = number};
+            NumberHolder = new NumberHolder { TheNumber = number };
             DateTimeHolder = new DateTimeHolder { TheDateTime = dateTime };
         }
 

@@ -119,7 +119,7 @@ namespace GraphQL.Validation
             }
 
             var fragments = new List<FragmentDefinition>();
-            var nodesToVisit = new Stack<SelectionSet>(new[] {operation.SelectionSet});
+            var nodesToVisit = new Stack<SelectionSet>(new[] { operation.SelectionSet });
             var collectedNames = new Dictionary<string, bool>();
 
             while (nodesToVisit.Count > 0)
