@@ -26,27 +26,27 @@ namespace GraphQL.Instrumentation
         public void MarkEnd(double end) => End = end;
 
         /// <summary>
-        /// Sets or returns the category name.
+        /// Gets or sets the category name.
         /// </summary>
         public string Category { get; set; }
 
         /// <summary>
-        /// Sets or returns the subject name.
+        /// Gets or sets the subject name.
         /// </summary>
         public string Subject { get; set; }
 
         /// <summary>
-        /// Sets or returns a dictionary of additional metadata.
+        /// Gets or sets a dictionary of additional metadata.
         /// </summary>
         public Dictionary<string, object> Metadata { get; set; }
 
         /// <summary>
-        /// Sets or returns the start time, represented as an offset in milliseconds from starting the GraphQL operation's execution.
+        /// Gets or sets the start time, represented as an offset in milliseconds from starting the GraphQL operation's execution.
         /// </summary>
         public double Start { get; set; }
 
         /// <summary>
-        /// Sets or returns the completion time, represented as an offset in milliseconds from starting the GraphQL operation's execution.
+        /// Gets or sets the completion time, represented as an offset in milliseconds from starting the GraphQL operation's execution.
         /// </summary>
         public double End { get; set; }
 
