@@ -181,7 +181,7 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets the default page size
+        /// Sets the default page size.
         /// </summary>
         public ConnectionBuilder<TSourceType> PageSize(int pageSize)
         {
