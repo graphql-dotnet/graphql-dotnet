@@ -281,6 +281,12 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Returns a builder for a new field.
+        /// </summary>
+        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
+        /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
+        /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
         {
             var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
@@ -289,8 +295,20 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <summary>
+        /// Returns a builder for a new field.
+        /// </summary>
+        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
         public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
 
+        /// <summary>
+        /// Returns a builder for a new field that is linked to a property of the source object.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
@@ -326,6 +344,14 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <summary>
+        /// Returns a builder for a new field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
@@ -345,6 +371,7 @@ namespace GraphQL.Types
             return Field(name, expression, nullable, type);
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
@@ -353,6 +380,7 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
@@ -362,6 +390,7 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
