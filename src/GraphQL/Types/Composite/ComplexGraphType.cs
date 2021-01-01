@@ -127,6 +127,16 @@ namespace GraphQL.Types
             return fieldType;
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <param name="type">The .Net type of the graph type of this field.</param>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType Field(
             Type type,
             string name,
@@ -148,6 +158,16 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .Net type of the graph type of this field.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType Field<TGraphType>(
             string name,
             string description = null,
@@ -169,6 +189,16 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .Net type of the graph type of this field.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType FieldDelegate<TGraphType>(
             string name,
             string description = null,
@@ -190,6 +220,16 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <param name="type">The .Net type of the graph type of this field.</param>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync(
             Type type,
             string name,
@@ -211,6 +251,16 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .Net type of the graph type of this field.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType>(
             string name,
             string description = null,
@@ -232,6 +282,17 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a field with the specified properties to the graph.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .Net type of the graph type of this field.</typeparam>
+        /// <typeparam name="TReturnType">The type of the return value of the field resolver delegate.</typeparam>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="description">The description of the field.</param>
+        /// <param name="arguments">A list of arguments for the field.</param>
+        /// <param name="resolve">A field resolver delegate.</param>
+        /// <param name="deprecationReason">The deprecation reason for the field.</param>
+        /// <returns>The new <see cref="FieldType"/> instance.</returns>
         public FieldType FieldAsync<TGraphType, TReturnType>(
             string name,
             string description = null,
