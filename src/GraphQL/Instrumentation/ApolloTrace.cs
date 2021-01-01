@@ -7,8 +7,8 @@ namespace GraphQL.Instrumentation
     {
         public ApolloTrace(DateTime start, double durationMs)
         {
-            StartTime = start;
-            EndTime = start.AddMilliseconds(durationMs);
+            StartTime = start.ToUniversalTime();
+            EndTime = StartTime.AddMilliseconds(durationMs);
             Duration = ConvertTime(durationMs);
         }
 
@@ -26,7 +26,7 @@ namespace GraphQL.Instrumentation
 
         public ExecutionTrace Execution { get; } = new ExecutionTrace();
 
-        public static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
+        internal static long ConvertTime(double ms) => (long)(ms * 1000 * 1000);
 
         public class OperationTrace
         {
@@ -42,7 +42,7 @@ namespace GraphQL.Instrumentation
 
         public class ResolverTrace : OperationTrace
         {
-            public List<object> Path { get; set; } = new List<object>();
+            public List<object> Path { get; set; }
 
             public string ParentType { get; set; }
 
