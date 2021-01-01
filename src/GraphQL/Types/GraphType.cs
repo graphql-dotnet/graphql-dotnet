@@ -56,9 +56,6 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Type name that must conform to the specification: https://graphql.github.io/graphql-spec/June2018/#sec-Names
-        /// </summary>
         public string Name
         {
             get => _name;
