@@ -42,10 +42,7 @@ namespace GraphQL.Tests.Utilities
                     method: String!
                     property: Int!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -68,10 +65,7 @@ namespace GraphQL.Tests.Utilities
                     method: String!
                     property: Int!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -98,10 +92,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                     test: Test!
                 }
-                ", builder =>
-                {
-                    builder.Types.Include<Query>();
-                });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -128,10 +119,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                     test: Test!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -412,10 +400,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
-            {
-                _.Query = "{ resolve }";
-            });
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = "{ resolve }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);

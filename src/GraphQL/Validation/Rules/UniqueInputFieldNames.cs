@@ -29,10 +29,7 @@ namespace GraphQL.Validation.Rules
                         knownNameStack.Push(knownNames);
                         knownNames = new Dictionary<string, IValue>();
                     },
-                    leave: objVal =>
-                    {
-                        knownNames = knownNameStack.Pop();
-                    });
+                    leave: objVal => knownNames = knownNameStack.Pop());
 
                 _.Match<ObjectField>(
                     leave: objField =>
