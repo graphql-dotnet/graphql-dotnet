@@ -77,8 +77,7 @@ namespace GraphQL.Execution
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
         /// </summary>
         /// <param name="parent">The parent node, or null if this is the root node</param>
-        /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
-        /// Array nodes will be a <see cref="ListGraphType"/> instance.</param>
+        /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>. Array nodes will be a <see cref="ListGraphType"/> instance.</param>
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
