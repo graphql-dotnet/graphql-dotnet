@@ -46,7 +46,8 @@ namespace GraphQL.DataLoader.Tests.Types
                         //without dataloader, this would be:
                         //var batchResults = await orders.GetItemsByOrderIdAsync(orderResults.Select(o => o.OrderId));
                         //var allResults = orderResults.Select(o => batchResults[o.OrderId]);
-                        return itemsLoader.LoadAsync(orderResults.Select(o => o.OrderId)).Then(allResults => allResults.SelectMany(x => x)); //flatten and return the results
+                        return itemsLoader.LoadAsync(orderResults.Select(o => o.OrderId))
+                            .Then(allResults => allResults.SelectMany(x => x)); //flatten and return the results
 
                     });
 
