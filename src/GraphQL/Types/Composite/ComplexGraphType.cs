@@ -27,6 +27,7 @@ namespace GraphQL.Types
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
         private readonly List<FieldType> _fields = new List<FieldType>();
 
+        /// <inheritdoc/>
         protected ComplexGraphType()
         {
             Description ??= typeof(TSourceType).Description();

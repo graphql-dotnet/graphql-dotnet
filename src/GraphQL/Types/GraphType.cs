@@ -9,6 +9,9 @@ namespace GraphQL.Types
     {
         private string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the graph type.
+        /// </summary>
         protected GraphType()
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
