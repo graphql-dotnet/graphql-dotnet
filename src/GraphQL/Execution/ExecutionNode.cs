@@ -77,18 +77,13 @@ namespace GraphQL.Execution
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
         /// </summary>
         /// <param name="parent">The parent node, or null if this is the root node</param>
-        /// <param name="graphType">The underlying graph type of this node; not a <see cref="NonNullGraphType"/>, and
-        /// for child nodes of an array execution node, not a <see cref="ListGraphType"/> instance. Typically
-        /// this should equal <see cref="FieldDefinition">fieldDefinition</see>.<see cref="FieldType.ResolvedType">ResolvedType</see>.<see cref="GraphQLExtensions.GetNamedType(IGraphType)">GetNamedType()</see></param>
+        /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
+        /// Array nodes will be a <see cref="ListGraphType"/> instance.</param>
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
-            if (graphType is NonNullGraphType)
-                throw new System.ArgumentOutOfRangeException(nameof(graphType), "For non-nullable graph types, graphType must represent the unwrapped graph type");
-            if (IndexInParentNode.HasValue && graphType is ListGraphType)
-                throw new System.ArgumentOutOfRangeException(nameof(graphType), "For children nodes of a list graph type, graphType must represent the unwrapped graph type");
             Parent = parent;
             GraphType = graphType;
             Field = field;
