@@ -25,7 +25,7 @@ namespace GraphQL.DataLoader
                 if (_loadingTask != null)
                     return _loadingTask;
 
-                lock (this) //external code cannot access "this"
+                lock (this) //external code cannot access "this"; lgtm [cs/lock-this]
                 {
                     //this lock depends on external code, as it should to prevent double execution
                     //it also depends on the locks in DataLoader to succeed, which is guaranteed to succeed, as if they

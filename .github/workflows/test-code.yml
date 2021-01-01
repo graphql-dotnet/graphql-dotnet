@@ -34,8 +34,8 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: |
-          dotnet tool install -g dotnet-format
-          dotnet format --check -v diag || (echo "Run 'dotnet format' to fix formatting issues" && exit 1)
+          dotnet tool install -g dotnet-format --version 5.0.142902 --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+          dotnet format --check -v diag --fix-style warn --fix-analyzers warn || (echo "Run 'dotnet format' to fix formatting issues" && exit 1)
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
