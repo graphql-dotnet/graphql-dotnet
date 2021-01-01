@@ -875,12 +875,6 @@ namespace GraphQL.Instrumentation
         public static GraphQL.Instrumentation.ApolloTrace CreateTrace(GraphQL.Instrumentation.PerfRecord[] perf, System.DateTime start) { }
         public static void EnrichWithApolloTracing(this GraphQL.ExecutionResult result, System.DateTime start) { }
     }
-    public class Field
-    {
-        public Field() { }
-        public string Name { get; set; }
-        public string ReturnType { get; set; }
-    }
     public class FieldMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
     {
         public FieldMiddlewareBuilder() { }
@@ -896,14 +890,6 @@ namespace GraphQL.Instrumentation
             where T : GraphQL.Instrumentation.IFieldMiddleware { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
-    public class FieldStat
-    {
-        public FieldStat() { }
-        public double Latency { get; set; }
-        public string Name { get; set; }
-        public string ReturnType { get; set; }
-        public void AddLatency(double duration) { }
-    }
     public interface IFieldMiddleware
     {
         System.Threading.Tasks.Task<object> Resolve(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next);
@@ -943,35 +929,6 @@ namespace GraphQL.Instrumentation
         public string Subject { get; set; }
         public void MarkEnd(double end) { }
         public T MetaField<T>(string key) { }
-    }
-    public class StatsPerSignature
-    {
-        public StatsPerSignature() { }
-        public GraphQL.Instrumentation.TypeStat[] PerType { get; set; }
-    }
-    public class StatsReport
-    {
-        public StatsReport() { }
-        public double Duration { get; set; }
-        public System.DateTime End { get; set; }
-        public System.Collections.Generic.Dictionary<string, GraphQL.Instrumentation.StatsPerSignature> PerSignature { get; set; }
-        public System.DateTime Start { get; set; }
-        public GraphQL.Instrumentation.Type[] Types { get; set; }
-        public static GraphQL.Instrumentation.StatsReport From(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Operation operation, GraphQL.Instrumentation.PerfRecord[] records, System.DateTime start) { }
-        public static GraphQL.Instrumentation.Type[] TypesFromSchema(GraphQL.Types.ISchema schema) { }
-    }
-    public class Type
-    {
-        public Type() { }
-        public GraphQL.Instrumentation.Field[] Fields { get; set; }
-        public string Name { get; set; }
-    }
-    public class TypeStat
-    {
-        public TypeStat() { }
-        public GraphQL.Instrumentation.FieldStat[] Fields { get; set; }
-        public GraphQL.Instrumentation.FieldStat this[string fieldName] { get; }
-        public string Name { get; set; }
     }
     public readonly struct ValueStopwatch
     {
