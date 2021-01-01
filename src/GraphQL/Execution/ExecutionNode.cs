@@ -38,6 +38,26 @@ namespace GraphQL.Execution
         public int? IndexInParentNode { get; protected set; }
 
         /// <summary>
+        /// Returns the underlying graph type of this node, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// For child nodes of an array execution node, this property unwraps the <see cref="ListGraphType"/> instance and returns
+        /// the underlying graph type, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// </summary>
+        internal IGraphType ResolvedType
+        {
+            get
+            {
+                if (IndexInParentNode.HasValue)
+                {
+                    return ((ListGraphType)Parent.GraphType).ResolvedType;
+                }
+                else
+                {
+                    return FieldDefinition?.ResolvedType;
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
         /// </summary>
         public string Name => Field?.Alias ?? Field?.Name;
