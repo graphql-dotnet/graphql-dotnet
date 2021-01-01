@@ -882,8 +882,8 @@ namespace GraphQL.Tests.Validation
             string argName,
             string typeName,
             string value,
-            int? line = null,
-            int? column = null,
+            int line,
+            int column,
             IEnumerable<string> errors = null)
         {
             if (errors == null)
