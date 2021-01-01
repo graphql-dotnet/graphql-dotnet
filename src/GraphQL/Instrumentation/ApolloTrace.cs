@@ -11,7 +11,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
+        /// <param name="start">The date and time that the GraphQL document began execution. If not UTC, this value will be converted to UTC.</param>
         /// <param name="durationMs">The number of milliseconds that it took to execute the GraphQL document.</param>
         public ApolloTrace(DateTime start, double durationMs)
         {
