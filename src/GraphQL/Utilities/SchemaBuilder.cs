@@ -228,7 +228,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
             else
             {
-                type = _types[astType.Name.Value] as ObjectGraphType;
+                type = _types[astType.Name.Value] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{astType.Name.Value} should be ObjectGraphType");
             }
 
             if (!isExtensionType)
