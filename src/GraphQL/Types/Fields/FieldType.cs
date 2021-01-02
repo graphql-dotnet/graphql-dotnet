@@ -6,6 +6,9 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents a field of a graph type.
+    /// </summary>
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
     public class FieldType : MetadataProvider, IFieldType, IProvideResolvedType
     {
@@ -13,6 +16,7 @@ namespace GraphQL.Types
         private IValue _defaultValueAST;
 
         private string _name;
+        /// <inheritdoc/>
         public string Name
         {
             get => _name;
@@ -23,10 +27,15 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public string DeprecationReason { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default value of the field. Only applies to fields of input object graph types.
+        /// </summary>
         public object DefaultValue
         {
             get => _defaultValue;
@@ -40,12 +49,22 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Gets or sets the graph type of this field.
+        /// </summary>
         public Type Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets the graph type of this field.
+        /// </summary>
         public IGraphType ResolvedType { get; set; }
 
+        /// <inheritdoc/>
         public QueryArguments Arguments { get; set; }
 
+        /// <summary>
+        /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
+        /// </summary>
         public IFieldResolver Resolver { get; set; }
 
         internal IValue GetDefaultValueAST(ISchema schema)
