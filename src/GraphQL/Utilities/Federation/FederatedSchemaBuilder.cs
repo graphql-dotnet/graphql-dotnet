@@ -39,7 +39,7 @@ namespace GraphQL.Utilities.Federation
         public override ISchema Build(string typeDefinitions)
         {
             var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
-            schema.RegisterType(BuildEntityGraphType(schema));
+            schema.RegisterType(BuildEntityGraphType());
             AddRootEntityFields(schema);
             return schema;
         }
@@ -142,7 +142,7 @@ namespace GraphQL.Utilities.Federation
             return true;
         }
 
-        private UnionGraphType BuildEntityGraphType(ISchema schema)
+        private UnionGraphType BuildEntityGraphType()
         {
             var union = new UnionGraphType
             {

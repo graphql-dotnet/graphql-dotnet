@@ -36,7 +36,7 @@ namespace GraphQL.Validation.Rules
                             var fieldName = node.Name;
 
                             // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = GetSuggestedTypeNames(context.Schema, type, fieldName).ToList();
+                            var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Count > 0
@@ -57,10 +57,7 @@ namespace GraphQL.Validation.Rules
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> GetSuggestedTypeNames(
-          ISchema schema,
-          IGraphType type,
-          string fieldName)
+        private IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
         {
             if (type is IAbstractGraphType absType)
             {
