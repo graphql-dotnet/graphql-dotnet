@@ -1978,7 +1978,6 @@ namespace GraphQL.Types
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
         object DefaultValue { get; }
-        System.Type Type { get; }
     }
     public interface IImplementInterfaces
     {
@@ -2006,6 +2005,7 @@ namespace GraphQL.Types
     public interface IProvideResolvedType
     {
         GraphQL.Types.IGraphType ResolvedType { get; }
+        System.Type Type { get; }
     }
     public interface ISchema : GraphQL.Types.IProvideMetadata
     {
