@@ -27,15 +27,6 @@ namespace GraphQL.Types
 
         public IGraphType ResolvedType { get; set; }
 
-        public override string CollectTypes(TypeCollectionContext context)
-        {
-            var innerType = context.ResolveType(Type);
-            ResolvedType = innerType;
-            var name = innerType.CollectTypes(context);
-            context.AddType(name, innerType, context);
-            return "[{0}]".ToFormat(name);
-        }
-
         public override string ToString() => $"[{ResolvedType}]";
     }
 }

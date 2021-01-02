@@ -20,7 +20,7 @@ namespace GraphQL.Harness.Tests
         public override void Assert(Scenario scenario, HttpContext context, ScenarioAssertionException ex)
         {
             var expectedResult = CreateQueryResult(_result);
-            var actualResultJson = ex.ReadBody(context);
+            string actualResultJson = ex.ReadBody(context);
 
             if (_ignoreExtensions)
             {
@@ -34,11 +34,11 @@ namespace GraphQL.Harness.Tests
                 actualResultJson = _writer.WriteToStringAsync(actualResult).GetAwaiter().GetResult();
             }
 
-            var expectedResultJson = _writer.WriteToStringAsync(expectedResult).GetAwaiter().GetResult();
+            string expectedResultJson = _writer.WriteToStringAsync(expectedResult).GetAwaiter().GetResult();
 
             if (!actualResultJson.Equals(expectedResultJson))
             {
-                ex.Add($"Expected '{expectedResult}' but got '{actualResultJson}'");
+                ex.Add($"Expected '{expectedResultJson}' but got '{actualResultJson}'");
             }
         }
     }

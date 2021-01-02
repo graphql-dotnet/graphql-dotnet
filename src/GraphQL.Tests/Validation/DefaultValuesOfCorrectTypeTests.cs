@@ -63,9 +63,9 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new []{"Expected type \"Int\", found \"one\"."}), 3, 35);
-                _.Error(BadValueForDefaultArgMessage("b", "String", "4", new []{"Expected type \"String\", found 4."}), 4, 38);
-                _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new []{"Expected \"ComplexInput\", found not an object."}), 5, 44);
+                _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new[] { "Expected type \"Int\", found \"one\"." }), 3, 35);
+                _.Error(BadValueForDefaultArgMessage("b", "String", "4", new[] { "Expected type \"String\", found 4." }), 4, 38);
+                _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new[] { "Expected \"ComplexInput\", found not an object." }), 5, 44);
             });
         }
 
@@ -79,7 +79,7 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new []{"In field \"requiredField\": Expected \"Boolean!\", found null."}), 2, 67);
+                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new[] { "In field \"requiredField\": Expected \"Boolean!\", found null." }), 2, 67);
             });
         }
 

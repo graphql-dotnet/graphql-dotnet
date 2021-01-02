@@ -4,11 +4,18 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
+    /// <inheritdoc cref="ParallelExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
+        /// <summary>
+        /// Executes document nodes in parallel. Field resolvers must be designed for multi-threaded use.
+        /// Nodes that return a <see cref="IDataLoaderResult"/> will execute once all other pending nodes
+        /// have been completed.
+        /// </summary>
         protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
             => ExecuteNodeTreeAsync(context, rootNode);
 
+        /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
         protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
             var pendingNodes = new Queue<ExecutionNode>();
@@ -56,7 +63,9 @@ namespace GraphQL.Execution
 
                     }
 
+#pragma warning disable CS0612 // Type or member is obsolete
                     await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                         .ConfigureAwait(false);
 
                     // Await tasks for this execution step

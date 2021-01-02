@@ -285,7 +285,7 @@ namespace GraphQL.Tests.StarWars
             }
             ";
 
-            var inputs = new Inputs(new Dictionary<string, object> {{"id", "1"}});
+            var inputs = new Inputs(new Dictionary<string, object> { { "id", "1" } });
 
             AssertQuerySuccess(query, expected, inputs);
         }

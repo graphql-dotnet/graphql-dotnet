@@ -13,7 +13,8 @@ namespace GraphQL.Tests.Types
     {
         [Description("The best colors ever!")]
         [Obsolete("Just some reason")]
-        private enum Colors {
+        private enum Colors
+        {
             Red = 1,
             Blue,
             Green,

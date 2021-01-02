@@ -135,12 +135,14 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IGraphType> AllTypes =>
             _lookup?
                 .Value
                 .All()
                 .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
+        /// <inheritdoc/>
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
         /// <inheritdoc/>

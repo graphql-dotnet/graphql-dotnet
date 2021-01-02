@@ -5,8 +5,13 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
+    /// <inheritdoc cref="SerialExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class SerialExecutionStrategy : ExecutionStrategy
     {
+        /// <summary>
+        /// Executes document nodes serially. Nodes that return a <see cref="IDataLoaderResult"/> will
+        /// execute once all other pending nodes have been completed.
+        /// </summary>
         protected override async Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode)
         {
             // Use a stack to track all nodes in the tree that need to be executed
@@ -22,7 +27,9 @@ namespace GraphQL.Execution
                     var node = nodes.Pop();
                     var task = ExecuteNodeAsync(context, node);
 
+#pragma warning disable CS0612 // Type or member is obsolete
                     await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                         .ConfigureAwait(false);
 
                     await task.ConfigureAwait(false);
@@ -47,7 +54,9 @@ namespace GraphQL.Execution
                     var node = dataLoaderNodes.Dequeue();
                     var task = CompleteDataLoaderNodeAsync(context, node);
 
+#pragma warning disable CS0612 // Type or member is obsolete
                     await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                         .ConfigureAwait(false);
 
                     await task.ConfigureAwait(false);
@@ -67,7 +76,6 @@ namespace GraphQL.Execution
                     }
                 }
             }
-
         }
     }
 }
