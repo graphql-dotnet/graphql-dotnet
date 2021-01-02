@@ -38,7 +38,9 @@ namespace GraphQL.Types
         FieldType GetField(string name);
     }
 
-    /// <inheritdoc cref="IComplexGraphType"/>
+    /// <summary>
+    /// Represents a default base class for all complex (that is, having their own properties) input and output graph types.
+    /// </summary>
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
