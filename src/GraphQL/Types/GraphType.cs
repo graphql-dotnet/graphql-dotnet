@@ -4,10 +4,16 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents a graph type.
+    /// </summary>
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the graph type.
+        /// </summary>
         protected GraphType()
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
@@ -19,7 +25,7 @@ namespace GraphQL.Types
             }
         }
 
-        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
@@ -55,23 +61,31 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Type name that must conform to the specification: https://graphql.github.io/graphql-spec/June2018/#sec-Names
-        /// </summary>
+        /// <inheritdoc/>
         public string Name
         {
             get => _name;
             set => SetName(value, validate: true);
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public string DeprecationReason { get; set; }
 
+        /// <inheritdoc />
         public override string ToString() => Name;
 
+        /// <summary>
+        /// Determines if the name of the specified graph type is equal to the name of this graph type.
+        /// </summary>
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
+        /// <summary>
+        /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
+        /// is equal to the name of this graph type.
+        /// </summary>
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -84,6 +98,7 @@ namespace GraphQL.Types
             return Equals((IGraphType)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
     }
 }

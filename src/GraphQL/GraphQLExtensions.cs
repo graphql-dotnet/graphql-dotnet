@@ -298,6 +298,7 @@ namespace GraphQL
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]
         public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema) // TODO: remove unused schema parameter in v4.0.0
         {
             if (maybeSubType.Equals(superType))
