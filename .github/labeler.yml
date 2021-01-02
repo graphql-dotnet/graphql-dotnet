@@ -1,0 +1,15 @@
+"test":
+  - any: ['src/GraphQL.ApiTests/**/*', 'src/GraphQL.DataLoader.Tests/**/*', 'src/GraphQL.Dummy/**/*', 'src/GraphQL.Harness.Tests/**/*', 'src/GraphQL.Tests/**/*', '!src/GraphQL.ApiTests/**/*.txt']
+
+"CI":
+  - .github/workflows/**/*
+
+"code style":
+  - .editorconfig
+
+"documentation":
+  - README.md
+  - docs2/**/*
+
+"performance":
+  - src/GraphQL.Benchmarks/**/*

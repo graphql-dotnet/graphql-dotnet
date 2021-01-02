@@ -10,11 +10,7 @@ namespace GraphQL.Utilities
 
         public static void ValidateName(string name, string type = "field")
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name can not be null or empty.");
-            }
+            ValidateNameNotNull(name, type);
 
             if (name.Length > 1 && name.StartsWith(RESERVED_PREFIX, StringComparison.InvariantCulture))
             {
@@ -25,6 +21,15 @@ namespace GraphQL.Utilities
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     $"A {type} name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {name} does not.");
+            }
+        }
+
+        internal static void ValidateNameNotNull(string name, string type = "field")
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentOutOfRangeException(nameof(name),
+                    $"A {type} name can not be null or empty.");
             }
         }
     }

@@ -40,16 +40,17 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "Document{{definitions={0}}}".ToFormat(_definitions);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Document{{definitions={string.Join(", ", _definitions)}}}";
 
         public override bool IsEqualTo(INode node)
         {
-            if (node is null) return false;
-            if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != GetType()) return false;
+            if (node is null)
+                return false;
+            if (ReferenceEquals(this, node))
+                return true;
+            if (node.GetType() != GetType())
+                return false;
 
             return true;
         }

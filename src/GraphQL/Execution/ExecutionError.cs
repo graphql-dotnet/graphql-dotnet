@@ -34,7 +34,7 @@ namespace GraphQL
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionError"/> class with a specified error message. Sets the
-        /// <see cref="Code"/> and <see cref="Codes"/> properties based on the inner exception(s). Loads any exception data
+        /// <see cref="Code"/> property based on the inner exception. Loads any exception data
         /// from the inner exception into this instance.
         /// </summary>
         public ExecutionError(string message, Exception exception)
@@ -96,23 +96,44 @@ namespace GraphQL
         }
     }
 
+    /// <summary>
+    /// Represents a location within a document where a parsing or execution error occurred.
+    /// </summary>
     public struct ErrorLocation : IEquatable<ErrorLocation>
     {
+        /// <summary>
+        /// The line number of the document where the error occurred, where 1 is the first line.
+        /// </summary>
         public int Line { get; set; }
 
+        /// <summary>
+        /// The column number of the document where the error occurred, where 1 is the first column.
+        /// </summary>
         public int Column { get; set; }
 
+        /// <inheritdoc/>
         public bool Equals(ErrorLocation other) => Line == other.Line && Column == other.Column;
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is Location loc && Equals(loc);
 
+        /// <inheritdoc/>
         public override int GetHashCode() => (Line, Column).GetHashCode();
 
+        /// <summary>
+        /// Indicates whether two <see cref="ErrorLocation"/> instances are the same.
+        /// </summary>
         public static bool operator ==(ErrorLocation left, ErrorLocation right) => left.Equals(right);
 
+        /// <summary>
+        /// Indicates whether two <see cref="ErrorLocation"/> instances are not the same.
+        /// </summary>
         public static bool operator !=(ErrorLocation left, ErrorLocation right) => !(left == right);
     }
 
+    /// <summary>
+    /// Provides extension methods for <see cref="ExecutionError"/> instances.
+    /// </summary>
     public static class ExecutionErrorExtensions
     {
         /// <summary>

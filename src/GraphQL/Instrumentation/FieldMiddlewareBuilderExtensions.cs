@@ -1,5 +1,5 @@
-using GraphQL.Types;
 using System;
+using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
 {
@@ -23,6 +23,7 @@ namespace GraphQL.Instrumentation
         /// <br/><br/>
         /// This is a compatibility shim when compiling delegates without schema specified.
         /// </summary>
+        /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <param name="middleware">Middleware delegate.</param>
         /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
         public static IFieldMiddlewareBuilder Use(this IFieldMiddlewareBuilder builder, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)

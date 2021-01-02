@@ -43,12 +43,13 @@ namespace GraphQL
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
 
+        /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
         /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
-        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(Action{ExecutionOptions})">ExecuteAsync</see>.
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
         /// </summary>
         public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
 

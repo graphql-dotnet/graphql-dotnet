@@ -15,6 +15,7 @@ namespace GraphQL.Instrumentation
         private Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleMiddleware;
         private IList<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _middlewares;
 
+        /// <inheritdoc/>
         public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
             middleware = middleware ?? throw new ArgumentNullException(nameof(middleware));
@@ -61,6 +62,7 @@ namespace GraphQL.Instrumentation
 
         private bool Empty => _singleMiddleware == null;
 
+        /// <inheritdoc/>
         public void ApplyTo(ISchema schema)
         {
             // allocation free optimization if no middlewares are defined

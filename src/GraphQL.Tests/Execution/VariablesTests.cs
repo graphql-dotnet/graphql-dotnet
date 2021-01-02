@@ -98,7 +98,7 @@ namespace GraphQL.Tests.Execution
             Field<StringGraphType>(
                 "fieldWithObjectInput",
                 arguments: new QueryArguments(
-                    new QueryArgument<TestInputObject> { Name = "input"}
+                    new QueryArgument<TestInputObject> { Name = "input" }
                 ),
                 resolve: context =>
                 {
@@ -144,7 +144,7 @@ namespace GraphQL.Tests.Execution
             Field<StringGraphType>(
                 "fieldWithDefaultArgumentValue",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "input", DefaultValue = "Hello World"}
+                    new QueryArgument<StringGraphType> { Name = "input", DefaultValue = "Hello World" }
                 ),
                 resolve: context =>
                 {
@@ -643,7 +643,7 @@ namespace GraphQL.Tests.Execution
                 Code = "ARGUMENTS_OF_CORRECT_TYPE",
             };
             error.AddLocation(3, 45);
-            
+
             var expected = new ExecutionResult
             {
                 Errors = new ExecutionErrors { error },

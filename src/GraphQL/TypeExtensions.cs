@@ -20,9 +20,7 @@ namespace GraphQL
         /// <returns><c>null</c> if the cast failed, otherwise item as T</returns>
         public static T As<T>(this object item)
             where T : class
-        {
-            return item as T;
-        }
+            => item as T;
 
         /// <summary>
         /// Determines whether this instance is a concrete type.
@@ -33,7 +31,8 @@ namespace GraphQL
         /// </returns>
         public static bool IsConcrete(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+                return false;
 
             return !type.IsAbstract && !type.IsInterface;
         }
@@ -46,9 +45,7 @@ namespace GraphQL
         ///   <c>true</c> if the specified type is a subclass of Nullable&lt;T&gt;; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsNullable(this Type type)
-        {
-            return type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
-        }
+            => type == typeof(string) || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
 
         public static bool IsPrimitive(this Type type)
         {
@@ -66,9 +63,7 @@ namespace GraphQL
         ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsGraphType(this Type type)
-        {
-            return type.GetInterfaces().Contains(typeof(IGraphType));
-        }
+            => type.GetInterfaces().Contains(typeof(IGraphType));
 
         /// <summary>
         /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
@@ -107,7 +102,6 @@ namespace GraphQL
         /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
-        /// <example><see>IList<string></see> -> <see>ListGraphType<StringGraphType></see></example>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false)
         {
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
@@ -198,7 +192,8 @@ namespace GraphQL
 
         public static Type GetEnumerableElementType(this Type type)
         {
-            if (_untypedContainers.Contains(type)) return typeof(object);
+            if (_untypedContainers.Contains(type))
+                return typeof(object);
 
             if (type.IsConstructedGenericType)
             {

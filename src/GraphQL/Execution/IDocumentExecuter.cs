@@ -31,6 +31,7 @@ namespace GraphQL
         /// <summary>
         /// Executes a GraphQL request and returns the result
         /// </summary>
+        /// <param name="executer">An instance of <see cref="IDocumentExecuter"/> to use to execute the query</param>
         /// <param name="configure">A delegate which configures the execution options</param>
         public static Task<ExecutionResult> ExecuteAsync(this IDocumentExecuter executer, Action<ExecutionOptions> configure)
         {

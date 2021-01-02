@@ -171,7 +171,7 @@ namespace GraphQL.Utilities
                     var ops = Join(p.ArgArray(x => x.Operations), "\n\n");
                     var frags = Join(p.ArgArray(x => x.Fragments), "\n\n");
 
-                    var result = Join(new[] {ops, frags}, "\n\n") + "\n";
+                    var result = Join(new[] { ops, frags }, "\n\n") + "\n";
                     return result;
                 });
             });
@@ -195,7 +195,7 @@ namespace GraphQL.Utilities
                            && string.IsNullOrWhiteSpace(directives)
                            && string.IsNullOrWhiteSpace(variables)
                         ? selectionSet
-                        : Join(new[] {op, Join(new[] {name, variables}, ""), directives, selectionSet}, " ");
+                        : Join(new[] { op, Join(new[] { name, variables }, ""), directives, selectionSet }, " ");
                 });
             });
 
@@ -263,7 +263,7 @@ namespace GraphQL.Utilities
                     var directives = Join(n.ArgArray(x => x.Directives), " ");
                     var selectionSet = n.Arg(x => x.SelectionSet);
 
-                    var result = Join(new []
+                    var result = Join(new[]
                     {
                         Wrap("", alias, ": ") + name + Wrap("(", args, ")"),
                         directives,
@@ -356,7 +356,7 @@ namespace GraphQL.Utilities
             Config<ObjectValue>(c =>
             {
                 c.Field(x => x.ObjectFields);
-                c.Print(p => $"{{{Join(p.ArgArray(x=>x.ObjectFields), ", ")}}}");
+                c.Print(p => $"{{{Join(p.ArgArray(x => x.ObjectFields), ", ")}}}");
             });
 
             Config<ObjectField>(c =>

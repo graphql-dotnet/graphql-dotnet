@@ -10,12 +10,11 @@ namespace GraphQL.Language.AST
         }
 
         public string Name => NameNode.Name;
+
         public NameNode NameNode { get; }
 
-        public override string ToString()
-        {
-            return "NamedType{{name={0}}}".ToFormat(Name);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"NamedType{{name={Name}}}";
 
         protected bool Equals(NamedType other)
         {
@@ -24,9 +23,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
 
             return Equals((NamedType)obj);
         }

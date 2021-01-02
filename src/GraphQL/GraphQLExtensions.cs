@@ -113,12 +113,13 @@ namespace GraphQL
 
                 if (found == null)
                 {
-                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Type '{type.Name}' has no field '{field.Name}'.") : false;
+                    return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. It has no field '{field.Name}'.") : false;
                 }
 
-                if (found.Type != field.Type)
+                if (found.ResolvedType != null && field.ResolvedType != null)
                 {
-                    return throwError ? throw new ArgumentException($"Type '{type.Name}' ({type.GetType().GetFriendlyName()}) does not implement '{iface.Name}' interface. Field '{type.Name}.{field.Name}' must be of type '{field.Type.GetFriendlyName()}', but in fact it is of type '{found.Type.GetFriendlyName()}'.") : false;
+                    if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType, null))
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. Field '{field.Name}' must be of type '{field.ResolvedType}' or covariant from it, but in fact it is of type '{found.ResolvedType}'.") : false;
                 }
             }
 
@@ -162,10 +163,10 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected \"{ofType.Name}!\", found null."};
+                        return new[] { $"Expected \"{ofType.Name}!\", found null." };
                     }
 
-                    return new[] { "Expected non-null value, found null"};
+                    return new[] { "Expected non-null value, found null" };
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -277,6 +278,14 @@ namespace GraphQL
                 : null;
         }
 
+        /// <summary>
+        /// Adds a key-value metadata pair to the specified provider.
+        /// </summary>
+        /// <typeparam name="TMetadataProvider"> The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining. </typeparam>
+        /// <param name="provider"> Metadata provider which must implement <see cref="IProvideMetadata"/> interface. </param>
+        /// <param name="key"> String key. </param>
+        /// <param name="value"> Arbitrary value. </param>
+        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : IProvideMetadata
         {
@@ -288,7 +297,8 @@ namespace GraphQL
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
-        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema) // TODO: remove unused schema parameter in v4.0.0
         {
             if (maybeSubType.Equals(superType))
             {
@@ -300,14 +310,14 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup1.ResolvedType, null);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType, superType, schema);
+                return IsSubtypeOf(sub.ResolvedType, superType, null);
             }
 
             // If superType type is a list, maybeSubType type must also be a list.
@@ -315,7 +325,7 @@ namespace GraphQL
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, schema);
+                    return IsSubtypeOf(sub.ResolvedType, sup.ResolvedType, null);
                 }
 
                 return false;
@@ -328,8 +338,7 @@ namespace GraphQL
 
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
-            if (superType is IAbstractGraphType type &&
-                maybeSubType is IObjectGraphType)
+            if (superType is IAbstractGraphType type && maybeSubType is IObjectGraphType)
             {
                 return type.IsPossibleType(maybeSubType);
             }

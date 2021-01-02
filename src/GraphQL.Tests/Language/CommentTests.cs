@@ -25,7 +25,7 @@ query _ {
         name
     }
 }";
-            
+
             var document = CoreToVanillaConverter.Convert(query, _parser.Parse(new Source(query)));
             document.Operations.First().Comment.ShouldBeNull();
         }

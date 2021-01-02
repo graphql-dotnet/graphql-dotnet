@@ -37,14 +37,16 @@ namespace GraphQL.Types
 
         public bool HasField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return false;
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
 
             return _fields.Any(x => string.Equals(x.Name, name, StringComparison.Ordinal));
         }
 
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return null;
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
 
             // DO NOT USE LINQ ON HOT PATH
             foreach (var x in _fields)
@@ -75,7 +77,8 @@ namespace GraphQL.Types
                 }
             }
 
-            NameValidator.ValidateName(fieldType.Name);
+            //check if fieldType.Name has never been set
+            NameValidator.ValidateNameNotNull(fieldType.Name);
 
             if (HasField(fieldType.Name))
             {
@@ -278,6 +281,12 @@ namespace GraphQL.Types
             });
         }
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
+        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
+        /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
+        /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
         {
             var builder = FieldBuilder.Create<TSourceType, TReturnType>(typeof(TGraphType))
@@ -286,8 +295,20 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
+        /// <typeparam name="TGraphType">The graph type of the field.</typeparam>
         public virtual FieldBuilder<TSourceType, object> Field<TGraphType>() => Field<TGraphType, object>();
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
+        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
            string name,
            Expression<Func<TSourceType, TProperty>> expression,
@@ -323,16 +344,26 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
+        /// <param name="type">The graph type of the field; inferred via <see cref="GraphTypeTypeRegistry"/> if null.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
             Type type = null)
         {
             string name;
-            try {
+            try
+            {
                 name = expression.NameOf();
             }
-            catch {
+            catch
+            {
                 throw new ArgumentException(
                     $"Cannot infer a Field name from the expression: '{expression.Body.ToString()}' " +
                     $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
@@ -340,6 +371,7 @@ namespace GraphQL.Types
             return Field(name, expression, nullable, type);
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
@@ -348,6 +380,7 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
@@ -357,6 +390,7 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>

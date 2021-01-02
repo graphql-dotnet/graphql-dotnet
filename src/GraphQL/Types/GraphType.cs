@@ -20,7 +20,7 @@ namespace GraphQL.Types
             }
         }
 
-        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
@@ -79,6 +79,7 @@ namespace GraphQL.Types
             return Name;
         }
 
+        /// <inheritdoc />
         public override string ToString() =>
             string.IsNullOrWhiteSpace(Name)
                 ? GetType().Name
@@ -88,9 +89,12 @@ namespace GraphQL.Types
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
 
             return Equals((IGraphType)obj);
         }
@@ -99,7 +103,7 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// This sucks, find a better way
+    /// TODO: This sucks, find a better way
     /// </summary>
     public class TypeCollectionContext
     {

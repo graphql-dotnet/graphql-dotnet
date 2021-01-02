@@ -6,10 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="29.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
-    <PackageReference Include="Moq" Version="4.14.5" />
-    <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0" />
+    <PackageReference Include="Bogus" Version="32.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.10" />
+    <PackageReference Include="Moq" Version="4.15.2" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>

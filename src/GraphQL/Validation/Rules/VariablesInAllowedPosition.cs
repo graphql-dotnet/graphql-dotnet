@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
-using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using GraphQL.Execution;
 using GraphQL.SystemTextJson;
 using GraphQL.Utilities;
@@ -68,7 +67,7 @@ namespace GraphQL.Tests.Utilities
         public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 
         protected string ReadSchema(string fileName)
-            => File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Files", fileName));
+            => File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "Files", fileName));
     }
 
     public class ExecuteConfig

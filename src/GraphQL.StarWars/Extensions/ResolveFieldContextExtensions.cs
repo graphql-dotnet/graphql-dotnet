@@ -1,9 +1,9 @@
-using GraphQL.Builders;
-using GraphQL.StarWars.Types;
-using GraphQL.Types.Relay.DataObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Builders;
+using GraphQL.StarWars.Types;
+using GraphQL.Types.Relay.DataObjects;
 
 namespace GraphQL.StarWars.Extensions
 {
@@ -46,7 +46,7 @@ namespace GraphQL.StarWars.Extensions
                 }
             }
 
-            list = data.GetCharactersAsync(idList).Result as List<U>;
+            list = data.GetCharactersAsync(idList).Result as List<U> ?? throw new InvalidOperationException($"GetCharactersAsync method should return list of '{typeof(U).Name}' items.");
             cursor = list.Count > 0 ? list.Last().Cursor : null;
             endCursor = ids.Count > 0 ? Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(ids.Last())) : null;
 
@@ -57,7 +57,7 @@ namespace GraphQL.StarWars.Extensions
                 PageInfo = new PageInfo
                 {
                     EndCursor = endCursor,
-                    HasNextPage = endCursor == null ? false : !cursor.Equals(endCursor)
+                    HasNextPage = endCursor == null ? false : cursor != endCursor,
                 }
             };
         }

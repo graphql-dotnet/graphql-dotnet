@@ -25,11 +25,19 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
 
+        /// <summary>
+        /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// </summary>
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
@@ -37,6 +45,7 @@ namespace GraphQL
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
         }
 
+        /// <inheritdoc/>
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
@@ -107,20 +116,70 @@ namespace GraphQL
                         _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
                 }
 
-                context = BuildExecutionContext(
-                    options.Schema,
-                    options.Root,
-                    document,
-                    operation,
-                    options.Inputs,
-                    options.UserContext,
-                    options.CancellationToken,
-                    metrics,
-                    options.Listeners,
-                    options.ThrowOnUnhandledException,
-                    options.UnhandledExceptionDelegate,
-                    options.MaxParallelExecutionCount,
-                    options.RequestServices);
+                try
+                {
+                    context = BuildExecutionContext(
+                        options.Schema,
+                        options.Root,
+                        document,
+                        operation,
+                        options.Inputs ?? Inputs.Empty,
+                        options.UserContext,
+                        options.CancellationToken,
+                        metrics,
+                        options.Listeners,
+                        options.ThrowOnUnhandledException,
+                        options.UnhandledExceptionDelegate,
+                        options.MaxParallelExecutionCount,
+                        options.RequestServices);
+                }
+                catch (InvalidVariableError)
+                {
+                    // error parsing variables
+                    // attempt to run AfterValidationAsync with null for the 'ExecutionContext.Variables' property
+
+                    context = BuildExecutionContext(
+                        options.Schema,
+                        options.Root,
+                        document,
+                        operation,
+                        null,
+                        options.UserContext,
+                        options.CancellationToken,
+                        metrics,
+                        options.Listeners,
+                        options.ThrowOnUnhandledException,
+                        options.UnhandledExceptionDelegate,
+                        options.MaxParallelExecutionCount,
+                        options.RequestServices);
+
+                    try
+                    {
+                        foreach (var listener in options.Listeners)
+                        {
+                            await listener.AfterValidationAsync(context, validationResult)
+                                .ConfigureAwait(false);
+                        }
+
+                        // if there was a validation error, return that, and ignore the variable parsing error
+                        if (!validationResult.IsValid)
+                        {
+                            return new ExecutionResult
+                            {
+                                Errors = validationResult.Errors,
+                                Perf = metrics.Finish()
+                            };
+                        }
+                    }
+                    catch
+                    {
+                        // if there was an error within AfterValidationAsync (such as a NullReferenceException
+                        // due to ExecutionContext.Variables being null), skip this step and throw the variable parsing error
+                    }
+
+                    // if there was no validation errors returned, throw the variable parsing error
+                    throw;
+                }
 
                 foreach (var listener in options.Listeners)
                 {
@@ -185,6 +244,10 @@ namespace GraphQL
                     result.Errors = context.Errors;
                 }
             }
+            catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (ExecutionError ex)
             {
                 result = new ExecutionResult
@@ -248,7 +311,7 @@ namespace GraphQL
                 UserContext = userContext,
 
                 Operation = operation,
-                Variables = GetVariableValues(document, schema, operation?.Variables, inputs),
+                Variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs),
                 Fragments = document.Fragments,
                 CancellationToken = cancellationToken,
 
@@ -263,6 +326,12 @@ namespace GraphQL
             return context;
         }
 
+        /// <summary>
+        /// Returns the selected <see cref="Operation"/> given a specified <see cref="Document"/> and operation name.
+        /// <br/><br/>
+        /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
+        /// Returns the first operation from the document if no operation name was specified.
+        /// </summary>
         protected virtual Operation GetOperation(string operationName, Document document)
         {
             return !string.IsNullOrWhiteSpace(operationName)
@@ -270,6 +339,14 @@ namespace GraphQL
                 : document.Operations.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
+        /// <br/><br/>
+        /// Typically the strategy is selected based on the type of operation.
+        /// <br/><br/>
+        /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
+        /// <see cref="SerialExecutionStrategy"/> and subscription operations return a <see cref="SubscriptionExecutionStrategy"/>.
+        /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
             // TODO: Should we use cached instances of the default execution strategies?

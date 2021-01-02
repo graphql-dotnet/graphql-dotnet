@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="IResolveFieldContext"/> instances.
+    /// </summary>
     public static class ResolveFieldContextExtensions
     {
         /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
@@ -52,7 +54,7 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType);
+            result = arg.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
@@ -85,7 +87,7 @@ namespace GraphQL
         }
 
         /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveEventStreamContext.Source"/> property cannot be cast to the specified type</exception>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
             if (context is IResolveEventStreamContext<T> typedContext)

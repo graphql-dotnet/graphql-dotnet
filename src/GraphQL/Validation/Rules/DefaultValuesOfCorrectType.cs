@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
@@ -22,14 +21,8 @@ namespace GraphQL.Validation.Rules
             {
                 _.Match<VariableDefinition>(varDefAst =>
                 {
-                    var name = varDefAst.Name;
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
-
-                    if (inputType is NonNullGraphType nonNullType && defaultValue != null)
-                    {
-                        context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, nonNullType));
-                    }
 
                     if (inputType != null && defaultValue != null)
                     {

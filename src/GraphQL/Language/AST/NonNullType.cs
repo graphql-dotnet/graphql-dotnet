@@ -16,16 +16,17 @@ namespace GraphQL.Language.AST
             get { yield return Type; }
         }
 
-        public override string ToString()
-        {
-            return "NonNullType{{type={0}}}".ToFormat(Type);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"NonNullType{{type={Type}}}";
 
         public override bool IsEqualTo(INode node)
         {
-            if (node is null) return false;
-            if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != GetType()) return false;
+            if (node is null)
+                return false;
+            if (ReferenceEquals(this, node))
+                return true;
+            if (node.GetType() != GetType())
+                return false;
 
             return true;
         }

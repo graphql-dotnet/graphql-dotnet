@@ -30,10 +30,10 @@ namespace GraphQL.Utilities
         public static object GetRequiredService(this IServiceProvider provider, Type serviceType)
         {
             if (provider == null)
-                throw new ArgumentNullException(nameof (provider));
+                throw new ArgumentNullException(nameof(provider));
 
             if (serviceType == null)
-                throw new ArgumentNullException(nameof (serviceType));
+                throw new ArgumentNullException(nameof(serviceType));
 
             object service = provider.GetService(serviceType);
             if (service != null)

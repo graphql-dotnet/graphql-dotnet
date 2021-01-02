@@ -41,18 +41,12 @@ namespace GraphQL.Tests.Validation
         }
 
         [Fact]
-        public void no_required_variables_with_default_values()
+        public void allows_required_variables_with_default_values()
         {
-            ShouldFailRule(_ =>
-            {
-                _.Query = @"
-                    query UnreachableDefaultValues($a: Int! = 3, $b: String! = ""default"") {
-                      dog { name }
-                    }";
-
-                _.Error(BadValueForNonNullArgMessage("a", "Int!", "Int"), 2, 63);
-                _.Error(BadValueForNonNullArgMessage("b", "String!", "String"), 2, 80);
-            });
+            ShouldPassRule(@"
+                query UnreachableDefaultValues($a: Int! = 3, $b: String! = ""default"") {
+                    dog { name }
+                }");
         }
 
         [Fact]
@@ -69,9 +63,9 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new []{"Expected type \"Int\", found \"one\"."}), 3, 35);
-                _.Error(BadValueForDefaultArgMessage("b", "String", "4", new []{"Expected type \"String\", found 4."}), 4, 38);
-                _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new []{"Expected \"ComplexInput\", found not an object."}), 5, 44);
+                _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", new[] { "Expected type \"Int\", found \"one\"." }), 3, 35);
+                _.Error(BadValueForDefaultArgMessage("b", "String", "4", new[] { "Expected type \"String\", found 4." }), 4, 38);
+                _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", new[] { "Expected \"ComplexInput\", found not an object." }), 5, 44);
             });
         }
 
@@ -85,7 +79,7 @@ namespace GraphQL.Tests.Validation
                       dog { name }
                     }";
 
-                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new []{"In field \"requiredField\": Expected \"Boolean!\", found null."}), 2, 67);
+                _.Error(BadValueForDefaultArgMessage("a", "ComplexInput", "{intField: 3}", new[] { "In field \"requiredField\": Expected \"Boolean!\", found null." }), 2, 67);
             });
         }
 
@@ -104,8 +98,5 @@ namespace GraphQL.Tests.Validation
 
         private static string BadValueForDefaultArgMessage(string varName, string type, string value, string[] verboseErrors)
             => DefaultValuesOfCorrectTypeError.BadValueForDefaultArgMessage(varName, type, value, verboseErrors);
-
-        private static string BadValueForNonNullArgMessage(string varName, string type, string guessType)
-            => DefaultValuesOfCorrectTypeError.BadValueForNonNullArgMessage(varName, type, guessType);
     }
 }
