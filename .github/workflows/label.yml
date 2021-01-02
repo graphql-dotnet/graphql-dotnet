@@ -8,7 +8,6 @@
 name: Labeler
 on: [pull_request]
 
-
 jobs:
   label:
     continue-on-error: true
