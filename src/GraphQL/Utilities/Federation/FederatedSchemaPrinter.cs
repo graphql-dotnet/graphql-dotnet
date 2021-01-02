@@ -36,14 +36,16 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintFederatedDirectives(IGraphType type)
         {
-            if (type.IsInputObjectType()) return "";
+            if (type.IsInputObjectType())
+                return "";
             return PrintFederatedDirectivesFromAst(type);
         }
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
             var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
-            if (astDirectives == null) return "";
+            if (astDirectives == null)
+                return "";
 
             var dirs = string.Join(
                 " ",

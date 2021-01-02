@@ -38,10 +38,11 @@ namespace GraphQL.Validation
                     for (int i = 0; i < list.Count; ++i)
                         Visit((INode)list[i]);
                 }
-                else foreach (var child in children)
-                {
-                    Visit(child);
-                }
+                else
+                    foreach (var child in children)
+                    {
+                        Visit(child);
+                    }
             }
 
             for (int i = _visitors.Count - 1; i >= 0; i--)

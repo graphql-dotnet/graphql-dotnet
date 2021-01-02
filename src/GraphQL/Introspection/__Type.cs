@@ -102,7 +102,8 @@ namespace GraphQL.Introspection
             });
             Field<__Type>("ofType", resolve: context =>
             {
-                if (context.Source == null) return null;
+                if (context.Source == null)
+                    return null;
 
                 if (context.Source is NonNullGraphType type)
                 {

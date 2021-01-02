@@ -1,7 +1,8 @@
-﻿namespace GraphQL.Types.Relay
+namespace GraphQL.Types.Relay
 {
     public class PageInfoType : ObjectGraphType<object>
     {
+        /// <inheritdoc/>
         public PageInfoType()
         {
             Name = "PageInfo";

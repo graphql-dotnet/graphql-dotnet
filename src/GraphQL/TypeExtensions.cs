@@ -31,7 +31,8 @@ namespace GraphQL
         /// </returns>
         public static bool IsConcrete(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+                return false;
 
             return !type.IsAbstract && !type.IsInterface;
         }
@@ -191,7 +192,8 @@ namespace GraphQL
 
         public static Type GetEnumerableElementType(this Type type)
         {
-            if (_untypedContainers.Contains(type)) return typeof(object);
+            if (_untypedContainers.Contains(type))
+                return typeof(object);
 
             if (type.IsConstructedGenericType)
             {

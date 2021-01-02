@@ -89,7 +89,7 @@ namespace GraphQL.Utilities
 
         public bool IsSpecDirective(string directiveName)
         {
-            var names = new []
+            var names = new[]
             {
                 "skip",
                 "include",
@@ -100,7 +100,8 @@ namespace GraphQL.Utilities
 
         public string PrintSchemaDefinition(ISchema schema)
         {
-            if (IsSchemaOfCommonNames(Schema)) return null;
+            if (IsSchemaOfCommonNames(Schema))
+                return null;
 
             var operationTypes = new List<string>();
 
@@ -274,8 +275,9 @@ namespace GraphQL.Utilities
 
         private string FormatDirectiveArguments(QueryArguments arguments)
         {
-            if (arguments == null || arguments.Count == 0) return null;
-            return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
+            if (arguments == null || arguments.Count == 0)
+                return null;
+            return string.Join(Environment.NewLine, arguments.Select(arg => $"  {PrintInputValue(arg)}"));
         }
 
         private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
@@ -306,15 +308,16 @@ namespace GraphQL.Utilities
         {
             return type switch
             {
-                NonNullGraphType nullable => "{0}!".ToFormat(ResolveName(nullable.ResolvedType)),
-                ListGraphType list => "[{0}]".ToFormat(ResolveName(list.ResolvedType)),
+                NonNullGraphType nullable => $"{ResolveName(nullable.ResolvedType)}!",
+                ListGraphType list => $"[{ResolveName(list.ResolvedType)}]",
                 _ => type?.Name
             };
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
         {
-            if (string.IsNullOrWhiteSpace(description)) return "";
+            if (string.IsNullOrWhiteSpace(description))
+                return "";
 
             indentation ??= "";
 

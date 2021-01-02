@@ -42,10 +42,7 @@ namespace GraphQL.Tests.Utilities
                     method: String!
                     property: Int!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -68,10 +65,7 @@ namespace GraphQL.Tests.Utilities
                     method: String!
                     property: Int!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -98,10 +92,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                     test: Test!
                 }
-                ", builder =>
-                {
-                    builder.Types.Include<Query>();
-                });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -128,10 +119,7 @@ namespace GraphQL.Tests.Utilities
                 type Query {
                     test: Test!
                 }
-                ", builder =>
-            {
-                builder.Types.Include<Query>();
-            });
+                ", builder => builder.Types.Include<Query>());
 
             var executor = new DocumentExecuter();
             var result = await executor.ExecuteAsync(options =>
@@ -394,7 +382,7 @@ namespace GraphQL.Tests.Utilities
             var result = await schema.ExecuteAsync(Writer, _ =>
             {
                 _.Query = "{ source }";
-                _.Root = new { Hello =  "World" };
+                _.Root = new { Hello = "World" };
             });
 
             var expectedResult = CreateQueryResult(@"{ ""source"": true }");
@@ -412,10 +400,7 @@ namespace GraphQL.Tests.Utilities
                 }
             ", _ => _.Types.Include<ParametersType>());
 
-            var result = await schema.ExecuteAsync(Writer, _ =>
-            {
-                _.Query = "{ resolve }";
-            });
+            var result = await schema.ExecuteAsync(Writer, _ => _.Query = "{ resolve }");
 
             var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
             var serializedExpectedResult = await Writer.WriteToStringAsync(expectedResult);
@@ -651,7 +636,7 @@ namespace GraphQL.Tests.Utilities
                 type Cat {
                     name: String!
                 }
-            ", _=>
+            ", _ =>
             {
                 _.Types.For("Dog").IsTypeOf<Dog>();
                 _.Types.For("Cat").IsTypeOf<Cat>();
@@ -709,6 +694,8 @@ namespace GraphQL.Tests.Utilities
     public class Blog
     {
         public string Title { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Post Post(string id, long unused)
         {
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
@@ -718,6 +705,7 @@ namespace GraphQL.Tests.Utilities
     [GraphQLMetadata("Query")]
     public class BlogQueryType
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public Blog Blog(string id)
         {
             return new Blog
@@ -786,8 +774,10 @@ namespace GraphQL.Tests.Utilities
     {
         public bool Source(object source) => source != null;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string Resolve(IResolveFieldContext context) => "Resolved";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public string ResolveWithParam(IResolveFieldContext context, string id) => $"Resolved {id}";
 
         public string UserContext(MyUserContext context) => context.Name;
@@ -805,11 +795,11 @@ namespace GraphQL.Tests.Utilities
         }
     }
 
-    internal class MyUserContext: Dictionary<string, object>
+    internal class MyUserContext : Dictionary<string, object>
     {
         public string Name { get; set; }
     }
-    internal class ChildMyUserContext: MyUserContext
+    internal class ChildMyUserContext : MyUserContext
     {
     }
 }

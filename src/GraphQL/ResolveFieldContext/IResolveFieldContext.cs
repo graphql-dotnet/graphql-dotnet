@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Conversion;
@@ -6,7 +7,6 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using System;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL

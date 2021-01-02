@@ -147,8 +147,8 @@ namespace GraphQL.Types
         ISchemaFilter Filter { get; }
 
         /// <summary>
-        /// Provides the ability to order the schema elements upon introspection. By default only fields are ordered by
-        /// their names within enclosing type.
+        /// Provides the ability to order the schema elements upon introspection.
+        /// By default all elements are returned as is, no sorting is applied.
         /// </summary>
         ISchemaComparer Comparer { get; set; }
 
