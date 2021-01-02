@@ -15,4 +15,5 @@
 * `IGraphType.CollectTypes` has been removed.
 * `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
 * `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * By default fields returned by introspection query are no longer sorted by their names.
