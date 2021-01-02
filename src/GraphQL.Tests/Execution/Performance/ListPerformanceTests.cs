@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using GraphQL.Conversion;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
