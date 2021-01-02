@@ -236,7 +236,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <typeparam name="TType"> GraphType to add. </typeparam>
         public void AddType<TType>()
-            where TType : IGraphType, new()
+            where TType : IGraphType
         {
             CheckSealed();
 
@@ -451,7 +451,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        public void ApplyTypeReferences()
+        private void ApplyTypeReferences()
         {
             CheckSealed();
 
@@ -461,7 +461,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        public void ApplyTypeReference(IGraphType type)
+        private void ApplyTypeReference(IGraphType type)
         {
             CheckSealed();
 

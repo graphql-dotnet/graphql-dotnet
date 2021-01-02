@@ -13,3 +13,4 @@
 * `LightweightCache.First` has been removed.
 * `IGraphType.CollectTypes` has been removed.
 * `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
+* `GraphTypesLookup.ApplyTypeReferences` is now private.
