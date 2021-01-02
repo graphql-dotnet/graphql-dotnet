@@ -70,8 +70,10 @@ namespace GraphQL.Types
 
         public GraphTypesLookup(INameConverter nameConverter)
         {
+#pragma warning disable IDE0016 // Use 'throw' expression; if this rule is applied here, then the null check is moved to the very end of the method - this is not what we want
             if (nameConverter == null)
                 throw new ArgumentNullException(nameof(nameConverter));
+#pragma warning restore IDE0016
 
             _context = new TypeCollectionContext(
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),

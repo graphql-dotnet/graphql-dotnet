@@ -26,6 +26,7 @@ namespace GraphQL.Tests.Execution
         }
 
         public NumberHolder NumberHolder { get; private set; }
+
         public DateTimeHolder DateTimeHolder { get; private set; }
 
         public NumberHolder ImmediatelyChangeTheNumber(int number)
@@ -68,6 +69,7 @@ namespace GraphQL.Tests.Execution
             throw new InvalidOperationException("Cannot change the datetime");
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
         {
             await Task.Delay(100).ConfigureAwait(false);

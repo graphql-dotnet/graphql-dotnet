@@ -122,6 +122,7 @@ namespace GraphQL.Instrumentation
             return report;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]
         public static Type[] TypesFromSchema(ISchema schema)
         {
             return null;

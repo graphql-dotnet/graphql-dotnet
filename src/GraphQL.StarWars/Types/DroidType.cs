@@ -15,13 +15,7 @@ namespace GraphQL.StarWars.Types
 
             Field<ListGraphType<CharacterInterface>>(
                 "friends",
-                resolve: context =>
-                {
-                    // simulate loading
-                    // await Task.Delay(1000);
-                    return data.GetFriends(context.Source);
-                }
-            );
+                resolve: context => data.GetFriends(context.Source));
 
             Connection<CharacterInterface>()
                 .Name("friendsConnection")

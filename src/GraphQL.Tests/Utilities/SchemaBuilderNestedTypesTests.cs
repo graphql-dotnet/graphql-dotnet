@@ -91,7 +91,10 @@ namespace GraphQL.Tests.Utilities
         public class DroidType
         {
             public string Id(Droid droid) => droid.Id;
+
             public string Name(Droid droid) => droid.Name;
+
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
             public Character Friend(MyUserContext context)
             {
                 return new Character { Name = "C3-PO" };
