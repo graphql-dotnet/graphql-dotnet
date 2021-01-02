@@ -14,7 +14,7 @@ namespace GraphQL.Types.Relay.DataObjects
         /// <summary>
         /// The total number of records available.
         /// </summary>
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; set; }
 
         /// <summary>
         /// Additional pagination information for this result data set.

@@ -2312,7 +2312,7 @@ namespace GraphQL.Types.Relay.DataObjects
         public System.Collections.Generic.List<TEdge> Edges { get; set; }
         public System.Collections.Generic.List<TNode> Items { get; }
         public GraphQL.Types.Relay.DataObjects.PageInfo PageInfo { get; set; }
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; set; }
     }
     public class Edge<TNode>
     {
