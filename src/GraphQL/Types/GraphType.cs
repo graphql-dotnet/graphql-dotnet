@@ -93,7 +93,7 @@ namespace GraphQL.Types
                 : Name;
 
         /// <summary>
-        /// Determines if the name of the specified graph type is equal to the name of this graph typ 740107wee.
+        /// Determines if the name of the specified graph type is equal to the name of this graph type.
         /// </summary>
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
@@ -118,16 +118,16 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// Provides a mechanism to resolve graph type instances from their .Net types,
+    /// Provides a mechanism to resolve graph type instances from their .NET types,
     /// and also to register new graph type instances with their name in the graph type lookup table.
     /// (See <see cref="GraphTypesLookup"/>.)
     /// </summary>
     public class TypeCollectionContext
     {
         /// <summary>
-        /// Initializes a new instance with the specified parameters
+        /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="resolver">A delegate which returns an instance of a graph type from its .Net type.</param>
+        /// <param name="resolver">A delegate which returns an instance of a graph type from its .NET type.</param>
         /// <param name="addType">A delegate which adds a graph type instance to the list of named graph types for the schema.</param>
         public TypeCollectionContext(
             Func<Type, IGraphType> resolver,
@@ -138,7 +138,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a delegate which returns an instance of a graph type from its .Net type.
+        /// Returns a delegate which returns an instance of a graph type from its .NET type.
         /// </summary>
         public Func<Type, IGraphType> ResolveType { get; }
         /// <summary>

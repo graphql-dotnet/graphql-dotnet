@@ -5,7 +5,7 @@ using System.Linq;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Represents an object graph type.
+    /// Represents an interface for all object (that is, having their own properties) output graph types.
     /// </summary>
     public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     {
@@ -14,9 +14,9 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// Represents an object graph type.
+    /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
-    /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .Net type of the source property within field resolvers for this graph.</typeparam>
+    /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .NET type of the source property within field resolvers for this graph.</typeparam>
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         private readonly List<Type> _interfaces = new List<Type>();
@@ -95,7 +95,7 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// Represents and object graph type.
+    /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
     public class ObjectGraphType : ObjectGraphType<object>
     {

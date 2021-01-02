@@ -1,7 +1,7 @@
 namespace GraphQL.Types
 {
     /// <summary>
-    /// A type that has a name within the GraphQL schema
+    /// A type that has a name within the GraphQL schema.
     /// </summary>
     public interface INamedType
     {
@@ -13,12 +13,12 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// Represents a graph type with the GraphQL schema.
+    /// Represents a graph type within the GraphQL schema.
     /// </summary>
     public interface IGraphType : IProvideMetadata, INamedType
     {
         /// <summary>
-        /// Gets or sets the description of the graph.
+        /// Gets or sets the description of the graph type.
         /// </summary>
         string Description { get; set; }
 

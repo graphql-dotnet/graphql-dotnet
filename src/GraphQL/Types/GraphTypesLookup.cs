@@ -114,8 +114,8 @@ namespace GraphQL.Types
         /// Initializes a new instance for the specified graph types and directives, and with the specified type resolver and name converter.
         /// </summary>
         /// <param name="types">A list of graph type instances to register in the lookup table.</param>
-        /// <param name="directives">A list of directives to reigster.</param>
-        /// <param name="resolveType">A delegate which returns an instance of a graph type from its .Net type.</param>
+        /// <param name="directives">A list of directives to register.</param>
+        /// <param name="resolveType">A delegate which returns an instance of a graph type from its .NET type.</param>
         /// <param name="nameConverter">A name converter to use for the specified graph types.</param>
         /// <param name="seal">Prevents additional types from being added to the lookup table.</param>
         public static GraphTypesLookup Create(
@@ -237,9 +237,9 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns a graph type instance from the lookup table by its .Net type.
+        /// Returns a graph type instance from the lookup table by its .NET type.
         /// </summary>
-        /// <param name="type">The .Net type of the graph type.</param>
+        /// <param name="type">The .NET type of the graph type.</param>
         public IGraphType this[Type type]
         {
             get

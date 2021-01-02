@@ -1,7 +1,7 @@
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Represents the field of a graph type.
+    /// Represents a field of a graph type.
     /// </summary>
     public interface IFieldType : IHaveDefaultValue, IProvideMetadata
     {
@@ -16,7 +16,7 @@ namespace GraphQL.Types
         string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the deprecation reason of the field.
+        /// Gets or sets the deprecation reason of the field. Only applicable to fields of output graph types.
         /// </summary>
         string DeprecationReason { get; set; }
 
