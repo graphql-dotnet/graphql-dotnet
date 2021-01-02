@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -107,7 +108,16 @@ namespace GraphQL
                 ctorArguments[i] = arg;
             }
 
-            object obj = targetCtor.Invoke(ctorArguments);
+            object obj;
+            try
+            {
+                obj = targetCtor.Invoke(ctorArguments);
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                return null; // never executed, necessary only for intellisense
+            }
 
             foreach (var item in source)
             {

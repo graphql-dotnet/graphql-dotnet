@@ -72,7 +72,7 @@ namespace GraphQL.Tests.Execution
             fragment.Type = new GraphQL.Language.AST.NamedType(
                 new NameNode("Person"));
 
-            var fragments = new Fragments {fragment};
+            var fragments = new Fragments { fragment };
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());

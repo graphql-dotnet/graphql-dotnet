@@ -7,22 +7,32 @@ using GraphQL.Validation;
 
 namespace GraphQL.Execution
 {
+    /// <inheritdoc cref="IErrorInfoProvider"/>
     public class ErrorInfoProvider : IErrorInfoProvider
     {
         private static readonly ConcurrentDictionary<Type, string> _exceptionErrorCodes = new ConcurrentDictionary<Type, string>();
 
         private readonly ErrorInfoProviderOptions _options;
 
+        /// <summary>
+        /// Initializes an <see cref="ErrorInfoProvider"/> with a default set of <see cref="ErrorInfoProviderOptions"/>.
+        /// </summary>
         public ErrorInfoProvider()
             : this(new ErrorInfoProviderOptions())
         {
         }
 
+        /// <summary>
+        /// Initializes an <see cref="ErrorInfoProvider"/> with a specified set of <see cref="ErrorInfoProviderOptions"/>.
+        /// </summary>
         public ErrorInfoProvider(ErrorInfoProviderOptions options)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
+        /// <summary>
+        /// Initializes an <see cref="ErrorInfoProvider"/> with a set of <see cref="ErrorInfoProviderOptions"/> filled out by the specified delegate.
+        /// </summary>
         public ErrorInfoProvider(Action<ErrorInfoProviderOptions> optionsBuilder)
         {
             if (optionsBuilder == null)
@@ -31,6 +41,7 @@ namespace GraphQL.Execution
             optionsBuilder(_options);
         }
 
+        /// <inheritdoc/>
         public virtual ErrorInfo GetInfo(ExecutionError executionError)
         {
             if (executionError == null)
@@ -68,6 +79,13 @@ namespace GraphQL.Execution
             };
         }
 
+        /// <summary>
+        /// <para>Returns a list of error codes derived from a specified <see cref="ExecutionError"/> instance.</para>
+        /// <para>
+        /// By default, this returns the <see cref="ExecutionError.Code"/> value if set, along with
+        /// codes generated from the type of the <see cref="Exception.InnerException"/> and all their inner exceptions.
+        /// </para>
+        /// </summary>
         protected virtual IEnumerable<string> GetCodesForError(ExecutionError executionError)
         {
             // Code could be set explicitly, and not through the constructor with the exception

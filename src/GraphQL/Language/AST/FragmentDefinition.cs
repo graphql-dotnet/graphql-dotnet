@@ -38,11 +38,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "FragmentDefinition{{name='{0}', typeCondition={1}, directives={2}, selectionSet={3}}}"
-                .ToFormat(Name, Type, Directives, SelectionSet);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"FragmentDefinition{{name='{Name}', typeCondition={Type}, directives={Directives}, selectionSet={SelectionSet}}}";
 
         protected bool Equals(FragmentDefinition other)
         {
@@ -51,9 +48,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((FragmentDefinition)obj);
         }
     }

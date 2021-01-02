@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Types.Relay.DataObjects
+namespace GraphQL.Types.Relay.DataObjects
 {
     public class PageInfo
     {

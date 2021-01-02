@@ -2,8 +2,12 @@
 
 [![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
-[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions)
+[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Build%20artifacts/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Build+artifacts%22%22)
+[![Build status](https://github.com/graphql-dotnet/graphql-dotnet/workflows/Publish%20code/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22Publish+code%22%22)
+[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/workflows/CodeQL%20analysis/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions?query=workflow%3A%22%22CodeQL+analysis%22%22)
+
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/alerts/)
+[![Language grade: C#](https://img.shields.io/lgtm/grade/csharp/g/graphql-dotnet/graphql-dotnet.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/graphql-dotnet/graphql-dotnet/context:csharp)
 
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
@@ -266,27 +270,13 @@ var json = await schema.ExecuteAsync(_ =>
   - [x] directives
 
 
-### Publishing NuGet packages
+## Publishing NuGet packages
 
 The package publishing process is automated with [GitHub Actions](https://github.com/features/actions).
 
 After your PR is merged into `master` or `develop`, preview packages are published to [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 
 Stable versions of packages are published to NuGet when a [release](https://github.com/graphql-dotnet/graphql-dotnet/releases) is created.
-
-### Running on OSX with mono
-
-To run this project on OSX with mono you will need to add some configuration.
-Make sure mono is installed and add the following to your bash configuration:
-
-```bash
-export FrameworkPathOverride=/Library/Frameworks/Mono.framework/Versions/4.6.2/lib/mono/4.5/
-```
-
-See the following for more details:
-
-* [Building VS 2017 MSBuild csproj Projects with Mono on Linux](https://stackoverflow.com/questions/42747722/building-vs-2017-msbuild-csproj-projects-with-mono-on-linux)
-* [using .NET Framework as targets framework, the osx/unix build fails](https://github.com/dotnet/netcorecli-fsc/wiki/.NET-Core-SDK-rc4#using-net-framework-as-targets-framework-the-osxunix-build-fails)
 
 ## Contributors
 

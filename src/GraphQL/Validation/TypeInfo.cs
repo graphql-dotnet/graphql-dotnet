@@ -23,7 +23,7 @@ namespace GraphQL.Validation
 
         public INode[] GetAncestors()
         {
-            return _ancestorStack.Select(x => x).Skip(1).Reverse().ToArray();
+            return _ancestorStack.Skip(1).Reverse().ToArray();
         }
 
         public IGraphType GetLastType()

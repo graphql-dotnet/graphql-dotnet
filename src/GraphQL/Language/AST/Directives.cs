@@ -58,5 +58,8 @@ namespace GraphQL.Language.AST
         public void CopyTo(Directive[] array, int arrayIndex) => _directives.CopyTo(array, arrayIndex);
 
         public bool Remove(Directive item) => _directives.Remove(item) && _unique.Remove(item.Name);
+
+        /// <inheritdoc />
+        public override string ToString() => _directives?.Count > 0 ? $"Directives{{{string.Join(", ", _directives)}}}" : "Directives(Empty)";
     }
 }

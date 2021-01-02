@@ -22,7 +22,6 @@ namespace GraphQL.Validation.Rules
             {
                 _.Match<VariableDefinition>(varDefAst =>
                 {
-                    var name = varDefAst.Name;
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
 

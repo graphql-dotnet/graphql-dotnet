@@ -94,6 +94,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{4B4D88E2-B20E-45E0-94E5-D9DD19BDDC29}"
 	ProjectSection(SolutionItems) = preProject
 		..\.github\workflows\build-artifacts-code.yml = ..\.github\workflows\build-artifacts-code.yml
+		..\.github\workflows\codeql-analysis.yml = ..\.github\workflows\codeql-analysis.yml
 		..\.github\workflows\label.yml = ..\.github\workflows\label.yml
 		..\.github\workflows\publish-code.yml = ..\.github\workflows\publish-code.yml
 		..\.github\workflows\publish-documentation.yml = ..\.github\workflows\publish-documentation.yml
@@ -109,7 +110,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		..\.github\ISSUE_TEMPLATE\question.md = ..\.github\ISSUE_TEMPLATE\question.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{3C62C155-7603-4926-A4A5-C91AED6C4EA7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{74E5F778-9FF7-42EE-A4D8-74509F79931F}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\migrations\migration2.md = ..\docs2\site\docs\migrations\migration2.md
 		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
@@ -184,7 +185,7 @@ Global
 		{FCE8E24C-29AA-4AED-93BA-08551D38823A} = {7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}
 		{4B4D88E2-B20E-45E0-94E5-D9DD19BDDC29} = {2A7FA3F9-B04C-463E-80EF-144433458FAD}
 		{FF7D1FB7-2288-4D87-989F-1E9D7BFB0AAF} = {2A7FA3F9-B04C-463E-80EF-144433458FAD}
-		{3C62C155-7603-4926-A4A5-C91AED6C4EA7} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
+		{74E5F778-9FF7-42EE-A4D8-74509F79931F} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

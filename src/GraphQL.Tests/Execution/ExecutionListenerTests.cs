@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void BeforeExecutionAwaited_Called_Correctly()
         {
-            var schema = new Schema {Query = new AsyncGraphType()};
+            var schema = new Schema { Query = new AsyncGraphType() };
 
             var userContext = new TestContext();
 

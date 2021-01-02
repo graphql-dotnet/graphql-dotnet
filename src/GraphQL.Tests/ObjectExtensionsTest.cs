@@ -75,7 +75,7 @@ namespace GraphQL.Tests
         public void convert_double_array_to_array()
         {
             // Arrange
-            var doubles = new [] { 1.00, 2.01, 3.14 };
+            var doubles = new[] { 1.00, 2.01, 3.14 };
 
             // Act
             var actual = doubles.GetPropertyValue(typeof(double[]));

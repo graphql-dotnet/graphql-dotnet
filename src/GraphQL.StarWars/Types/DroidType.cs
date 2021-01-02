@@ -15,7 +15,8 @@ namespace GraphQL.StarWars.Types
 
             Field<ListGraphType<CharacterInterface>>(
                 "friends",
-                resolve: context => {
+                resolve: context =>
+                {
                     // simulate loading
                     // await Task.Delay(1000);
                     return data.GetFriends(context.Source);
@@ -27,7 +28,7 @@ namespace GraphQL.StarWars.Types
                 .Description("A list of a character's friends.")
                 .Bidirectional()
                 .Resolve(context => context.GetPagedResults<Droid, StarWarsCharacter>(data, context.Source.Friends));
-                
+
             Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
             Field(d => d.PrimaryFunction, nullable: true).Description("The primary function of the droid.");
 
