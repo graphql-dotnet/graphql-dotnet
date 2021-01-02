@@ -9,6 +9,7 @@ using AstField = GraphQL.Language.AST.Field;
 
 namespace GraphQL.Instrumentation
 {
+    [Obsolete]
     public class FieldStat
     {
         public string Name { get; set; }
@@ -23,6 +24,7 @@ namespace GraphQL.Instrumentation
         }
     }
 
+    [Obsolete]
     public class TypeStat
     {
         private readonly LightweightCache<string, FieldStat> _fields =
@@ -44,23 +46,27 @@ namespace GraphQL.Instrumentation
         public FieldStat this[string fieldName] => _fields[fieldName];
     }
 
+    [Obsolete]
     public class StatsPerSignature
     {
         public TypeStat[] PerType { get; set; }
     }
 
+    [Obsolete]
     public class Field
     {
         public string Name { get; set; }
         public string ReturnType { get; set; }
     }
 
+    [Obsolete]
     public class Type
     {
         public string Name { get; set; }
         public Field[] Fields { get; set; }
     }
 
+    [Obsolete]
     public class StatsReport
     {
         public StatsReport()

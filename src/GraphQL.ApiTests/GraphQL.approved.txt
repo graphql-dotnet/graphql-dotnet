@@ -205,7 +205,9 @@ namespace GraphQL
         public LightweightCache(System.Func<TKey, TValue> onMissing) { }
         public LightweightCache(System.Collections.Generic.IDictionary<TKey, TValue> dictionary, System.Func<TKey, TValue> onMissing) { }
         public int Count { get; }
+        [System.Obsolete]
         public TValue First { get; }
+        [System.Obsolete]
         public System.Func<TValue, TKey> GetKey { get; set; }
         public TValue this[TKey key] { get; set; }
         public System.Collections.Generic.IEnumerable<TKey> Keys { get; }
@@ -867,6 +869,7 @@ namespace GraphQL.Instrumentation
         public static GraphQL.Instrumentation.ApolloTrace CreateTrace(GraphQL.Instrumentation.PerfRecord[] perf, System.DateTime start) { }
         public static void EnrichWithApolloTracing(this GraphQL.ExecutionResult result, System.DateTime start) { }
     }
+    [System.Obsolete]
     public class Field
     {
         public Field() { }
@@ -888,6 +891,7 @@ namespace GraphQL.Instrumentation
             where T : GraphQL.Instrumentation.IFieldMiddleware { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
+    [System.Obsolete]
     public class FieldStat
     {
         public FieldStat() { }
@@ -936,11 +940,13 @@ namespace GraphQL.Instrumentation
         public void MarkEnd(double end) { }
         public T MetaField<T>(string key) { }
     }
+    [System.Obsolete]
     public class StatsPerSignature
     {
         public StatsPerSignature() { }
         public GraphQL.Instrumentation.TypeStat[] PerType { get; set; }
     }
+    [System.Obsolete]
     public class StatsReport
     {
         public StatsReport() { }
@@ -952,12 +958,14 @@ namespace GraphQL.Instrumentation
         public static GraphQL.Instrumentation.StatsReport From(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Operation operation, GraphQL.Instrumentation.PerfRecord[] records, System.DateTime start) { }
         public static GraphQL.Instrumentation.Type[] TypesFromSchema(GraphQL.Types.ISchema schema) { }
     }
+    [System.Obsolete]
     public class Type
     {
         public Type() { }
         public GraphQL.Instrumentation.Field[] Fields { get; set; }
         public string Name { get; set; }
     }
+    [System.Obsolete]
     public class TypeStat
     {
         public TypeStat() { }

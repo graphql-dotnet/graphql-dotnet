@@ -67,6 +67,7 @@ namespace GraphQL
             set => _onMissing = value;
         }
 
+        [Obsolete]
         public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
 
         /// <summary>
@@ -74,6 +75,7 @@ namespace GraphQL
         /// </summary>
         public int Count => _values.Count;
 
+        [Obsolete]
         public TValue First
         {
             get
