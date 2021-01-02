@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using GraphQL.Conversion;
 using GraphQL.Tests.StarWars;
 using Shouldly;
 using Xunit;

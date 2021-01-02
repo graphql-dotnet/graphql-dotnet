@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,7 @@ namespace GraphQL.Tests.Execution
 
         public class TestExecutionListener : DocumentExecutionListenerBase
         {
+            [Obsolete]
             public override Task BeforeExecutionAwaitedAsync(IExecutionContext context)
             {
                 var testContext = context.UserContext as TestContext;

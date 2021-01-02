@@ -375,11 +375,11 @@ mutation {
         }
 
         /// <summary>
-        /// Exercises <see cref="Execution.ExecutionNode.ResolvedType"/> for children of children, verifying that
+        /// Exercises Execution.ExecutionNode.ResolvedType for children of children, verifying that
         /// <see cref="Execution.ExecutionNode.GraphType"/> is returning proper values. Without a dataloader,
         /// <see cref="Execution.ExecutionStrategy.SetArrayItemNodes(Execution.ExecutionContext, Execution.ArrayExecutionNode)"/>
         /// skips execution of <see cref="Execution.ExecutionStrategy.ValidateNodeResult(Execution.ExecutionContext, Execution.ExecutionNode)"/>
-        /// because it is not relevant, and that method is the only one that calls <see cref="Execution.ExecutionNode.ResolvedType"/>.
+        /// because it is not relevant, and that method is the only one that calls Execution.ExecutionNode.ResolvedType.
         /// </summary>
         [Fact]
         public void ExerciseListsOfLists()

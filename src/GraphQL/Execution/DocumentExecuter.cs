@@ -222,7 +222,9 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
+#pragma warning disable CS0612 // Type or member is obsolete
                             await listener.BeforeExecutionAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                                 .ConfigureAwait(false);
                         }
 
