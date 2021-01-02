@@ -11,3 +11,4 @@
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 * `LightweightCache.First` has been removed.
+* `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
