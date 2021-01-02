@@ -876,14 +876,15 @@ namespace GraphQL.Tests.Validation
 
     public static class ValidationExtensions
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "'rule' parameter works as 'this' anchor")]
         public static void badValue(
             this ArgumentsOfCorrectType rule,
-            ValidationTestConfig _,
+            ValidationTestConfig config,
             string argName,
             string typeName,
             string value,
-            int? line = null,
-            int? column = null,
+            int line,
+            int column,
             IEnumerable<string> errors = null)
         {
             if (errors == null)
@@ -891,7 +892,7 @@ namespace GraphQL.Tests.Validation
                 errors = new[] { $"Expected type \"{typeName}\", found {value}." };
             }
 
-            _.Error(
+            config.Error(
                 ArgumentsOfCorrectTypeError.BadValueMessage(argName, value, errors),
                 line,
                 column);

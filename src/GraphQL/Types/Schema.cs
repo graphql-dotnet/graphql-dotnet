@@ -59,8 +59,10 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
+        /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
+        /// <inheritdoc/>
         public bool Initialized => _lookup?.IsValueCreated == true;
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
@@ -70,6 +72,7 @@ namespace GraphQL.Types
                 throw new InvalidOperationException("Schema is already initialized and sealed for modifications. You should call RegisterXXX methods only when Schema.Initialized = false.");
         }
 
+        /// <inheritdoc/>
         public void Initialize()
         {
             CheckDisposed();
@@ -77,12 +80,16 @@ namespace GraphQL.Types
             FindType("____");
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Query { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Mutation { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Subscription { get; set; }
 
         /// <summary>
@@ -106,8 +113,10 @@ namespace GraphQL.Types
         /// </returns>
         object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
+        /// <inheritdoc/>
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
+        /// <inheritdoc/>
         public IEnumerable<DirectiveGraphType> Directives
         {
             get => _directives;
@@ -123,20 +132,26 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IGraphType> AllTypes =>
             _lookup?
                 .Value
                 .All()
                 .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
 
+        /// <inheritdoc/>
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
+        /// <inheritdoc/>
         public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
 
+        /// <inheritdoc/>
         public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
 
+        /// <inheritdoc/>
         public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
 
+        /// <inheritdoc/>
         public void RegisterType(IGraphType type)
         {
             CheckDisposed();
@@ -145,6 +160,7 @@ namespace GraphQL.Types
             _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
+        /// <inheritdoc/>
         public void RegisterTypes(params IGraphType[] types)
         {
             CheckDisposed();
@@ -154,6 +170,7 @@ namespace GraphQL.Types
                 RegisterType(type);
         }
 
+        /// <inheritdoc/>
         public void RegisterTypes(params Type[] types)
         {
             CheckDisposed();
@@ -170,6 +187,7 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public void RegisterType<T>() where T : IGraphType
         {
             CheckDisposed();
@@ -178,6 +196,7 @@ namespace GraphQL.Types
             RegisterType(typeof(T));
         }
 
+        /// <inheritdoc/>
         public void RegisterDirective(DirectiveGraphType directive)
         {
             CheckDisposed();
@@ -195,6 +214,7 @@ namespace GraphQL.Types
                 RegisterDirective(directive);
         }
 
+        /// <inheritdoc/>
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
             CheckDisposed();
@@ -204,11 +224,13 @@ namespace GraphQL.Types
                 RegisterDirective(directive);
         }
 
+        /// <inheritdoc/>
         public DirectiveGraphType FindDirective(string name)
         {
             return _directives.FirstOrDefault(x => x.Name == name);
         }
 
+        /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
             CheckDisposed();
@@ -216,11 +238,13 @@ namespace GraphQL.Types
             _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
         }
 
+        /// <inheritdoc/>
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
             return _converters.FirstOrDefault(x => x.Matches(value, type));
         }
 
+        /// <inheritdoc/>
         public IGraphType FindType(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -231,6 +255,7 @@ namespace GraphQL.Types
             return _lookup?.Value[name];
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);

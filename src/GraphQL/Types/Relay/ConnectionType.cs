@@ -25,7 +25,7 @@ namespace GraphQL.Types.Relay
 
             Field<ListGraphType<TEdgeType>>()
                 .Name("edges")
-                .Description("Information to aid in pagination.");
+                .Description("A list of all of the edges returned in the connection.");
 
             Field<ListGraphType<TNodeType>>()
                 .Name("items")

@@ -5,10 +5,16 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// Represents a graph type.
+    /// </summary>
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the graph type.
+        /// </summary>
         protected GraphType()
         {
             if (!IsTypeModifier) // specification requires name must be null for these types
@@ -20,7 +26,7 @@ namespace GraphQL.Types
             }
         }
 
-        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType;
+        private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
@@ -56,19 +62,20 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Type name that must conform to the specification: https://graphql.github.io/graphql-spec/June2018/#sec-Names
-        /// </summary>
+        /// <inheritdoc/>
         public string Name
         {
             get => _name;
             set => SetName(value, validate: true);
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public string DeprecationReason { get; set; }
 
+        /// <inheritdoc/>
         public virtual string CollectTypes(TypeCollectionContext context)
         {
             if (string.IsNullOrWhiteSpace(Name))
@@ -85,8 +92,15 @@ namespace GraphQL.Types
                 ? GetType().Name
                 : Name;
 
+        /// <summary>
+        /// Determines if the name of the specified graph type is equal to the name of this graph type.
+        /// </summary>
         protected bool Equals(IGraphType other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 
+        /// <summary>
+        /// Determines if the graph type is equal to the specified object, or if the name of the specified graph type
+        /// is equal to the name of this graph type.
+        /// </summary>
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -99,14 +113,22 @@ namespace GraphQL.Types
             return Equals((IGraphType)obj);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() => Name?.GetHashCode() ?? 0;
     }
 
     /// <summary>
-    /// TODO: This sucks, find a better way
+    /// Provides a mechanism to resolve graph type instances from their .NET types,
+    /// and also to register new graph type instances with their name in the graph type lookup table.
+    /// (See <see cref="GraphTypesLookup"/>.)
     /// </summary>
     public class TypeCollectionContext
     {
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="resolver">A delegate which returns an instance of a graph type from its .NET type.</param>
+        /// <param name="addType">A delegate which adds a graph type instance to the list of named graph types for the schema.</param>
         public TypeCollectionContext(
             Func<Type, IGraphType> resolver,
             Action<string, IGraphType, TypeCollectionContext> addType)
@@ -115,8 +137,14 @@ namespace GraphQL.Types
             AddType = addType;
         }
 
-        public Func<Type, IGraphType> ResolveType { get; private set; }
-        public Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
+        /// <summary>
+        /// Returns a delegate which returns an instance of a graph type from its .NET type.
+        /// </summary>
+        public Func<Type, IGraphType> ResolveType { get; }
+        /// <summary>
+        /// Returns a delegate which adds a graph type instance to the list of named graph types for the schema.
+        /// </summary>
+        public Action<string, IGraphType, TypeCollectionContext> AddType { get; }
         internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
     }
 }
