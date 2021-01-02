@@ -1915,11 +1915,9 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        public void AddType(GraphQL.Types.IGraphType type, GraphQL.Types.TypeCollectionContext context) { }
+        public void AddType(GraphQL.Types.IGraphType type) { }
         public void AddType<TType>()
             where TType : GraphQL.Types.IGraphType, new () { }
-        public void AddType<TType>(GraphQL.Types.TypeCollectionContext context)
-            where TType : GraphQL.Types.IGraphType { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> All() { }
         public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
         public void ApplyTypeReferences() { }
@@ -2212,12 +2210,6 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-    }
-    public class TypeCollectionContext
-    {
-        public TypeCollectionContext(System.Func<System.Type, GraphQL.Types.IGraphType> resolver, System.Action<string, GraphQL.Types.IGraphType, GraphQL.Types.TypeCollectionContext> addType) { }
-        public System.Action<string, GraphQL.Types.IGraphType, GraphQL.Types.TypeCollectionContext> AddType { get; }
-        public System.Func<System.Type, GraphQL.Types.IGraphType> ResolveType { get; }
     }
     public static class TypeExtensions
     {

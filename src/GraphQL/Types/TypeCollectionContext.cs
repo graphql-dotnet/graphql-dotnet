@@ -6,7 +6,7 @@ namespace GraphQL.Types
     /// <summary>
     /// TODO: This sucks, find a better way
     /// </summary>
-    public class TypeCollectionContext
+    internal sealed class TypeCollectionContext
     {
         public TypeCollectionContext(Func<Type, IGraphType> resolver, Action<string, IGraphType, TypeCollectionContext> addType)
         {
