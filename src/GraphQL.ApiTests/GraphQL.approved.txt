@@ -607,7 +607,9 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
         public virtual System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult) { }
         public virtual System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context) { }
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
+        [System.Obsolete]
         public virtual System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context) { }
     }
     public struct ErrorInfo
@@ -695,6 +697,7 @@ namespace GraphQL.Execution
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode);
+        [System.Obsolete]
         protected virtual System.Threading.Tasks.Task OnBeforeExecutionStepAwaitedAsync(GraphQL.Execution.ExecutionContext context) { }
         protected bool ProcessNodeUnhandledException(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
         protected void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
@@ -719,7 +722,9 @@ namespace GraphQL.Execution
         System.Threading.Tasks.Task AfterExecutionAsync(GraphQL.Execution.IExecutionContext context);
         System.Threading.Tasks.Task AfterValidationAsync(GraphQL.Execution.IExecutionContext context, GraphQL.Validation.IValidationResult validationResult);
         System.Threading.Tasks.Task BeforeExecutionAsync(GraphQL.Execution.IExecutionContext context);
+        [System.Obsolete]
         System.Threading.Tasks.Task BeforeExecutionAwaitedAsync(GraphQL.Execution.IExecutionContext context);
+        [System.Obsolete]
         System.Threading.Tasks.Task BeforeExecutionStepAwaitedAsync(GraphQL.Execution.IExecutionContext context);
     }
     public interface IErrorInfoProvider

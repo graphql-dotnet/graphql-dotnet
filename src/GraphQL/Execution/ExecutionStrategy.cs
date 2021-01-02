@@ -410,6 +410,7 @@ namespace GraphQL.Execution
         /// runs the <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext)">BeforeExecutionStepAwaitedAsync</see>
         /// method on each of the registered document execution listeners.
         /// </summary>
+        [Obsolete]
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
             if (context.Listeners != null)
