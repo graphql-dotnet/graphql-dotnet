@@ -9,7 +9,7 @@ namespace GraphQL.Types
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
     [DebuggerDisplay("ref {TypeName,nq}")]
-    public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
+    internal sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         /// <summary>
         /// Initializes a new instance for the specified GraphQL type name.

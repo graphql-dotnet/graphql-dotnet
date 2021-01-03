@@ -46,7 +46,11 @@ namespace GraphQL.Introspection
                 resolve: async context =>
                 {
                     var arguments = context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
-                    return await arguments.WhereAsync(x => context.Schema.Filter.AllowArgument(context.Source, x)).ConfigureAwait(false);
+                    var args = await arguments.WhereAsync(x => context.Schema.Filter.AllowArgument(context.Source, x)).ConfigureAwait(false);
+                    var comparer = context.Schema.Comparer.ArgumentComparer(context.Source);
+                    if (comparer != null)
+                        args = args.OrderBy(a => a, comparer);
+                    return args; 
                 });
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());

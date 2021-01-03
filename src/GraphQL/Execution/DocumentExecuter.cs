@@ -46,7 +46,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
@@ -58,9 +58,6 @@ namespace GraphQL
                 throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
             var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
-
-            options.Schema.NameConverter = options.NameConverter;
-            options.Schema.Filter = options.SchemaFilter;
 
             ExecutionResult result = null;
             ExecutionContext context = null;

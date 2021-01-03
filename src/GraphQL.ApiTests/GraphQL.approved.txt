@@ -1,5 +1,15 @@
 namespace GraphQL
 {
+    public static class AuthorizationExtensions
+    {
+        public const string POLICY_KEY = "Authorization__Policies";
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWith<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
+        public static TMetadataProvider AuthorizeWith<TMetadataProvider>(this TMetadataProvider provider, string policy)
+            where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWith<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static System.Collections.Generic.List<string> GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
+        public static bool RequiresAuthorization(this GraphQL.Types.IProvideMetadata provider) { }
+    }
     public static class BoolBox
     {
         public static readonly object False;
@@ -16,7 +26,7 @@ namespace GraphQL
     {
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
-        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQL.Language.AST.Operation GetOperation(string operationName, GraphQL.Language.AST.Document document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
@@ -79,13 +89,11 @@ namespace GraphQL
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
-        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public string OperationName { get; set; }
         public string Query { get; set; }
         public System.IServiceProvider RequestServices { get; set; }
         public object Root { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
-        public GraphQL.Introspection.ISchemaFilter SchemaFilter { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
@@ -205,10 +213,6 @@ namespace GraphQL
         public LightweightCache(System.Func<TKey, TValue> onMissing) { }
         public LightweightCache(System.Collections.Generic.IDictionary<TKey, TValue> dictionary, System.Func<TKey, TValue> onMissing) { }
         public int Count { get; }
-        [System.Obsolete]
-        public TValue First { get; }
-        [System.Obsolete]
-        public System.Func<TValue, TKey> GetKey { get; set; }
         public TValue this[TKey key] { get; set; }
         public System.Collections.Generic.IEnumerable<TKey> Keys { get; }
         public System.Func<TKey, TValue> OnMissing { set; }
@@ -504,14 +508,14 @@ namespace GraphQL.DataLoader
     }
     public static class DataLoaderContextExtensions
     {
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
-        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, T> GetOrAddBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, T defaultValue = default, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>>> fetchFunc, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
+        public static GraphQL.DataLoader.IDataLoader<TKey, System.Collections.Generic.IEnumerable<T>> GetOrAddCollectionBatchLoader<TKey, T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Collections.Generic.IEnumerable<TKey>, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<T>>> fetchFunc, System.Func<T, TKey> keySelector, System.Collections.Generic.IEqualityComparer<TKey> keyComparer = null, int maxBatchSize = 2147483647) { }
         public static GraphQL.DataLoader.IDataLoader<T> GetOrAddLoader<T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Threading.Tasks.Task<T>> fetchFunc) { }
         public static GraphQL.DataLoader.IDataLoader<T> GetOrAddLoader<T>(this GraphQL.DataLoader.DataLoaderContext context, string loaderKey, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> fetchFunc) { }
         public static System.Func<System.Threading.CancellationToken, TResult> WrapNonCancellableFunc<TResult>(System.Func<TResult> func) { }
@@ -670,7 +674,6 @@ namespace GraphQL.Execution
         public static object GetVariableValue(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinition variable, object input) { }
         public static GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions variableDefinitions, GraphQL.Inputs inputs) { }
         public static bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Directives directives) { }
-        public static System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFieldsFor(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType fieldType, GraphQL.Language.AST.Field field) { }
     }
     public abstract class ExecutionNode
     {
@@ -842,7 +845,6 @@ namespace GraphQL.Instrumentation
         public System.DateTime StartTime { get; }
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Validation { get; }
         public int Version { get; }
-        public static long ConvertTime(double ms) { }
         public class ExecutionTrace
         {
             public ExecutionTrace() { }
@@ -868,13 +870,6 @@ namespace GraphQL.Instrumentation
         public static GraphQL.Instrumentation.ApolloTrace CreateTrace(GraphQL.Instrumentation.PerfRecord[] perf, System.DateTime start) { }
         public static void EnrichWithApolloTracing(this GraphQL.ExecutionResult result, System.DateTime start) { }
     }
-    [System.Obsolete]
-    public class Field
-    {
-        public Field() { }
-        public string Name { get; set; }
-        public string ReturnType { get; set; }
-    }
     public class FieldMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
     {
         public FieldMiddlewareBuilder() { }
@@ -890,15 +885,6 @@ namespace GraphQL.Instrumentation
             where T : GraphQL.Instrumentation.IFieldMiddleware { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
-    [System.Obsolete]
-    public class FieldStat
-    {
-        public FieldStat() { }
-        public double Latency { get; set; }
-        public string Name { get; set; }
-        public string ReturnType { get; set; }
-        public void AddLatency(double duration) { }
-    }
     public interface IFieldMiddleware
     {
         System.Threading.Tasks.Task<object> Resolve(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next);
@@ -939,39 +925,6 @@ namespace GraphQL.Instrumentation
         public void MarkEnd(double end) { }
         public T MetaField<T>(string key) { }
     }
-    [System.Obsolete]
-    public class StatsPerSignature
-    {
-        public StatsPerSignature() { }
-        public GraphQL.Instrumentation.TypeStat[] PerType { get; set; }
-    }
-    [System.Obsolete]
-    public class StatsReport
-    {
-        public StatsReport() { }
-        public double Duration { get; set; }
-        public System.DateTime End { get; set; }
-        public System.Collections.Generic.Dictionary<string, GraphQL.Instrumentation.StatsPerSignature> PerSignature { get; set; }
-        public System.DateTime Start { get; set; }
-        public GraphQL.Instrumentation.Type[] Types { get; set; }
-        public static GraphQL.Instrumentation.StatsReport From(GraphQL.Types.ISchema schema, GraphQL.Language.AST.Operation operation, GraphQL.Instrumentation.PerfRecord[] records, System.DateTime start) { }
-        public static GraphQL.Instrumentation.Type[] TypesFromSchema(GraphQL.Types.ISchema schema) { }
-    }
-    [System.Obsolete]
-    public class Type
-    {
-        public Type() { }
-        public GraphQL.Instrumentation.Field[] Fields { get; set; }
-        public string Name { get; set; }
-    }
-    [System.Obsolete]
-    public class TypeStat
-    {
-        public TypeStat() { }
-        public GraphQL.Instrumentation.FieldStat[] Fields { get; set; }
-        public GraphQL.Instrumentation.FieldStat this[string fieldName] { get; }
-        public string Name { get; set; }
-    }
     public readonly struct ValueStopwatch
     {
         public System.TimeSpan Elapsed { get; }
@@ -981,6 +934,24 @@ namespace GraphQL.Instrumentation
 }
 namespace GraphQL.Introspection
 {
+    public class AlphabeticalSchemaComparer : GraphQL.Introspection.ISchemaComparer
+    {
+        public AlphabeticalSchemaComparer() { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
+    }
+    public class DefaultSchemaComparer : GraphQL.Introspection.ISchemaComparer
+    {
+        public DefaultSchemaComparer() { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
+    }
     public class DefaultSchemaFilter : GraphQL.Introspection.ISchemaFilter
     {
         public DefaultSchemaFilter() { }
@@ -989,6 +960,14 @@ namespace GraphQL.Introspection
         public virtual System.Threading.Tasks.Task<bool> AllowEnumValue(GraphQL.Types.EnumerationGraphType parent, GraphQL.Types.EnumValueDefinition enumValue) { }
         public virtual System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field) { }
         public virtual System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type) { }
+    }
+    public interface ISchemaComparer
+    {
+        System.Collections.Generic.IComparer<GraphQL.Types.DirectiveGraphType> DirectiveComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
+        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field);
+        System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
+        System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent);
     }
     public interface ISchemaFilter
     {
@@ -1875,24 +1854,12 @@ namespace GraphQL.Types
     {
         public GraphQLDeprecatedDirective() { }
     }
-    public class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideMetadata
-    {
-        public GraphQLTypeReference(string typeName) { }
-        public System.Collections.Generic.IEnumerable<System.Type> Interfaces { get; set; }
-        public System.Func<object, bool> IsTypeOf { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType> ResolvedInterfaces { get; set; }
-        public string TypeName { get; }
-        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
-        public override bool Equals(object obj) { }
-        public override int GetHashCode() { }
-    }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
         public string DeprecationReason { get; set; }
         public string Description { get; set; }
         public string Name { get; set; }
-        public virtual string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
@@ -1908,14 +1875,10 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        public void AddType(GraphQL.Types.IGraphType type, GraphQL.Types.TypeCollectionContext context) { }
+        public void AddType(GraphQL.Types.IGraphType type) { }
         public void AddType<TType>()
-            where TType : GraphQL.Types.IGraphType, new () { }
-        public void AddType<TType>(GraphQL.Types.TypeCollectionContext context)
             where TType : GraphQL.Types.IGraphType { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> All() { }
-        public void ApplyTypeReference(GraphQL.Types.IGraphType type) { }
-        public void ApplyTypeReferences() { }
         public void Clear() { }
         public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter, bool seal = false) { }
     }
@@ -1954,12 +1917,10 @@ namespace GraphQL.Types
     {
         string DeprecationReason { get; set; }
         string Description { get; set; }
-        string CollectTypes(GraphQL.Types.TypeCollectionContext context);
     }
     public interface IHaveDefaultValue : GraphQL.Types.IProvideResolvedType
     {
         object DefaultValue { get; }
-        System.Type Type { get; }
     }
     public interface IImplementInterfaces
     {
@@ -1987,17 +1948,19 @@ namespace GraphQL.Types
     public interface IProvideResolvedType
     {
         GraphQL.Types.IGraphType ResolvedType { get; }
+        System.Type Type { get; }
     }
     public interface ISchema : GraphQL.Types.IProvideMetadata
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
         System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
-        GraphQL.Introspection.ISchemaFilter Filter { get; set; }
+        GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
-        GraphQL.Conversion.INameConverter NameConverter { get; set; }
+        GraphQL.Conversion.INameConverter NameConverter { get; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType Subscription { get; set; }
@@ -2058,7 +2021,6 @@ namespace GraphQL.Types
         protected ListGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
-        public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
     public class ListGraphType<T> : GraphQL.Types.ListGraphType
@@ -2078,7 +2040,6 @@ namespace GraphQL.Types
         protected NonNullGraphType(System.Type type) { }
         public GraphQL.Types.IGraphType ResolvedType { get; set; }
         public System.Type Type { get; }
-        public override string CollectTypes(GraphQL.Types.TypeCollectionContext context) { }
         public override string ToString() { }
     }
     public class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
@@ -2150,6 +2111,7 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
@@ -2208,12 +2170,6 @@ namespace GraphQL.Types
         public override object ParseLiteral(GraphQL.Language.AST.IValue value) { }
         public override object ParseValue(object value) { }
         public override object Serialize(object value) { }
-    }
-    public class TypeCollectionContext
-    {
-        public TypeCollectionContext(System.Func<System.Type, GraphQL.Types.IGraphType> resolver, System.Action<string, GraphQL.Types.IGraphType, GraphQL.Types.TypeCollectionContext> addType) { }
-        public System.Action<string, GraphQL.Types.IGraphType, GraphQL.Types.TypeCollectionContext> AddType { get; }
-        public System.Func<System.Type, GraphQL.Types.IGraphType> ResolveType { get; }
     }
     public static class TypeExtensions
     {
@@ -2293,7 +2249,7 @@ namespace GraphQL.Types.Relay.DataObjects
         public System.Collections.Generic.List<TEdge> Edges { get; set; }
         public System.Collections.Generic.List<TNode> Items { get; }
         public GraphQL.Types.Relay.DataObjects.PageInfo PageInfo { get; set; }
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; set; }
     }
     public class Edge<TNode>
     {
@@ -2528,11 +2484,6 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool OldImplementsSyntax { get; set; }
-    }
-    public static class ServiceProviderExtensions
-    {
-        public static object GetRequiredService(this System.IServiceProvider provider, System.Type serviceType) { }
-        public static T GetRequiredService<T>(this System.IServiceProvider provider) { }
     }
     public static class StringUtils
     {

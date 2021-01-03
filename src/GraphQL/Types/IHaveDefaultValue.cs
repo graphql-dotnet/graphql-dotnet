@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -11,10 +9,5 @@ namespace GraphQL.Types
         /// Returns the default value of this argument or field.
         /// </summary>
         object DefaultValue { get; }
-
-        /// <summary>
-        /// Returns the graph type of this argument or field.
-        /// </summary>
-        Type Type { get; }
     }
 }

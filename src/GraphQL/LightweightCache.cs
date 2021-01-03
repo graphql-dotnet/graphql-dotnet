@@ -67,27 +67,10 @@ namespace GraphQL
             set => _onMissing = value;
         }
 
-        [Obsolete]
-        public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
-
         /// <summary>
         /// Gets the count.
         /// </summary>
         public int Count => _values.Count;
-
-        [Obsolete]
-        public TValue First
-        {
-            get
-            {
-                foreach (var pair in _values)
-                {
-                    return pair.Value;
-                }
-
-                return default;
-            }
-        }
 
         /// <summary>
         /// Gets or sets the <typeparamref name="TValue"/> with the specified key.

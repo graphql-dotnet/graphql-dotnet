@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -59,9 +57,6 @@ namespace GraphQL
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
-        /// <summary>Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/></summary>
-        public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
-
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
         public bool EnableMetrics { get; set; } = true;
 
@@ -77,9 +72,6 @@ namespace GraphQL
 
         /// <summary>If set, limits the maximum number of nodes executed in parallel</summary>
         public int? MaxParallelExecutionCount { get; set; }
-
-        /// <summary>Provides the ability to filter the schema upon introspection to hide types; by default no types are hidden.</summary>
-        public ISchemaFilter SchemaFilter { get; set; } = new DefaultSchemaFilter();
 
         /// <summary>
         /// The service provider for the executing request. Typically this is set to a scoped service provider

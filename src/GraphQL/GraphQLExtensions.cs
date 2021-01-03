@@ -16,6 +16,7 @@ namespace GraphQL
     {
         private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
+        //TODO: probably completely remove
         public static string TrimGraphQLTypes(this string name)
         {
             return _trimPattern.Replace(name, string.Empty).Trim();

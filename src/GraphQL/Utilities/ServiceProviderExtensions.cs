@@ -2,7 +2,7 @@ using System;
 
 namespace GraphQL.Utilities
 {
-    public static class ServiceProviderExtensions
+    internal static class ServiceProviderExtensions
     {
         /// <summary>
         /// Get service of type <typeparamref name="T"/> from the <see cref="IServiceProvider"/>.
