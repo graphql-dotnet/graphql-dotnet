@@ -73,14 +73,30 @@ namespace GraphQL.Types
 
     /// <summary>
     /// Directives are used by the GraphQL runtime as a way of modifying execution
-    /// behavior.Type system creators will usually not create these directly.
+    /// behavior. Type system creators will usually not create these directly.
     /// </summary>
     public class DirectiveGraphType : INamedType
     {
+        /// <summary>
+        /// Returns a static instance of the predefined 'include' directive.
+        /// </summary>
         public static readonly IncludeDirective Include = new IncludeDirective();
+
+        /// <summary>
+        /// Returns a static instance of the predefined 'skip' directive.
+        /// </summary>
         public static readonly SkipDirective Skip = new SkipDirective();
+
+        /// <summary>
+        /// Returns a static instance of the predefined 'deprecated' directive.
+        /// </summary>
         public static readonly GraphQLDeprecatedDirective Deprecated = new GraphQLDeprecatedDirective();
 
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="name">The type name within the GraphQL schema.</param>
+        /// <param name="locations">A list of locations where the directive can be applied.</param>
         public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
         {
             Name = name;
@@ -90,12 +106,22 @@ namespace GraphQL.Types
                 throw new ArgumentException("Directive must have locations", nameof(locations));
         }
 
+        /// <inheritdoc/>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description of the directive.
+        /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Gets or sets a list of arguments for the directive.
+        /// </summary>
         public QueryArguments Arguments { get; set; }
 
+        /// <summary>
+        /// Returns a list of locations where the directive can be applied.
+        /// </summary>
         public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
     }
 
@@ -104,6 +130,9 @@ namespace GraphQL.Types
     /// </summary>
     public class IncludeDirective : DirectiveGraphType
     {
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
         public IncludeDirective()
             : base("include", new[]
             {
@@ -126,6 +155,9 @@ namespace GraphQL.Types
     /// </summary>
     public class SkipDirective : DirectiveGraphType
     {
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
         public SkipDirective()
             : base("skip", new[]
             {
@@ -148,6 +180,9 @@ namespace GraphQL.Types
     /// </summary>
     public class GraphQLDeprecatedDirective : DirectiveGraphType
     {
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
         public GraphQLDeprecatedDirective()
             : base("deprecated", new[]
             {

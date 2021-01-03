@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GraphQL.Types
 {
@@ -22,6 +21,7 @@ namespace GraphQL.Types
         private readonly List<Type> _interfaces = new List<Type>();
         private readonly List<IInterfaceGraphType> _resolvedInterfaces = new List<IInterfaceGraphType>();
 
+        /// <inheritdoc/>
         public Func<object, bool> IsTypeOf { get; set; }
 
         /// <inheritdoc/>
@@ -31,6 +31,7 @@ namespace GraphQL.Types
                 IsTypeOf = instance => instance is TSourceType;
         }
 
+        /// <inheritdoc/>
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
             if (!_resolvedInterfaces.Contains(graphType))
@@ -40,6 +41,7 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
         {
             get => _resolvedInterfaces;
@@ -55,6 +57,7 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<Type> Interfaces
         {
             get => _interfaces;
@@ -70,6 +73,9 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Adds a GraphQL interface graph type to the list of compatible GraphQL interfaces for this graph type.
+        /// </summary>
         public void Interface<TInterface>()
             where TInterface : IInterfaceGraphType
         {
@@ -77,6 +83,7 @@ namespace GraphQL.Types
                 _interfaces.Add(typeof(TInterface));
         }
 
+        /// <inheritdoc cref="Interface{TInterface}"/>
         public void Interface(Type type)
         {
             if (type == null)
@@ -84,7 +91,7 @@ namespace GraphQL.Types
                 throw new ArgumentNullException(nameof(type));
             }
 
-            if (!type.GetInterfaces().Contains(typeof(IInterfaceGraphType)))
+            if (!typeof(IInterfaceGraphType).IsAssignableFrom(type))
             {
                 throw new ArgumentException($"Interface must implement {nameof(IInterfaceGraphType)}", nameof(type));
             }
