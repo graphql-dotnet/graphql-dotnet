@@ -43,13 +43,15 @@ namespace GraphQL.Introspection
                         var includeDeprecated = context.GetArgument<bool>("includeDeprecated");
                         var type = context.Source as IComplexGraphType;
                         var fields = !includeDeprecated
-                            ? type?.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
-                            : type?.Fields;
+                            ? type.Fields.Where(f => string.IsNullOrWhiteSpace(f.DeprecationReason))
+                            : type.Fields;
 
                         fields ??= Enumerable.Empty<FieldType>();
-                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(context.Source as IGraphType, f)).ConfigureAwait(false);
-
-                        return fields.OrderBy(f => f.Name);
+                        fields = await fields.WhereAsync(f => context.Schema.Filter.AllowField(type, f)).ConfigureAwait(false);
+                        var comparer = context.Schema.Comparer.FieldComparer(type);
+                        if (comparer != null)
+                            fields = fields.OrderBy(f => f, comparer);
+                        return fields;
                     }
                     return null;
                 });
@@ -83,7 +85,11 @@ namespace GraphQL.Introspection
                             ? type.Values.Where(e => string.IsNullOrWhiteSpace(e.DeprecationReason)).ToList()
                             : type.Values.ToList();
 
-                        return await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v)).ConfigureAwait(false);
+                        var enumValues = await values.WhereAsync(v => context.Schema.Filter.AllowEnumValue(type, v)).ConfigureAwait(false);
+                        var comparer = context.Schema.Comparer.EnumValueComparer(type);
+                        if (comparer != null)
+                            enumValues = enumValues.OrderBy(v => v, comparer);
+                        return enumValues;
                     }
 
                     return null;

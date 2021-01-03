@@ -63,7 +63,9 @@ namespace GraphQL.Execution
 
                     }
 
+#pragma warning disable CS0612 // Type or member is obsolete
                     await OnBeforeExecutionStepAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                         .ConfigureAwait(false);
 
                     // Await tasks for this execution step

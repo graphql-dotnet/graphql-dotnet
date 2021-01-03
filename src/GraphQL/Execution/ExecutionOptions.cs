@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Introspection;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;

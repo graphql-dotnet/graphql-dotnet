@@ -97,5 +97,16 @@ namespace GraphQL.Tests.Introspection
   }
 ";
 
+        public static readonly string GetFieldNamesOfTypesQuery = @"
+query {
+  __schema {
+    types {
+      name
+      fields {
+        name
+      }
+    }
+  }
+}";
     }
 }

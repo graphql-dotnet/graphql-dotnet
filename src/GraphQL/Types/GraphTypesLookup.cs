@@ -98,7 +98,7 @@ namespace GraphQL.Types
             NameConverter = CamelCaseNameConverter.Instance;
 
             foreach (var introspectionType in _introspectionTypes.Values)
-                AddType(introspectionType, _context);
+                AddType(introspectionType);
 
             // set the name converter properly
             NameConverter = nameConverter;
@@ -220,10 +220,9 @@ namespace GraphQL.Types
                 }
 
                 IGraphType type;
-                var name = typeName.TrimGraphQLTypes();
                 lock (_lock)
                 {
-                    _types.TryGetValue(name, out type);
+                    _types.TryGetValue(typeName, out type);
                 }
                 return type;
             }
@@ -254,40 +253,31 @@ namespace GraphQL.Types
             }
         }
 
-        // TODO: remove new() constraint
         /// <summary>
-        /// Adds the specified graph type to the lookup table.
+        /// Adds the specified GraphType to lookup. The instance of this type will be resolved by resolveType parameter specified in
+        /// <see cref="Create(IEnumerable{IGraphType}, IEnumerable{DirectiveGraphType}, Func{Type, IGraphType}, INameConverter, bool)"/>
+        /// method when creating this lookup.
         /// </summary>
         /// <typeparam name="TType">The graph type to add.</typeparam>
         public void AddType<TType>()
-            where TType : IGraphType, new()
-        {
-            CheckSealed();
-
-            AddType<TType>(_context);
-
-            Debug.Assert(_context.InFlightRegisteredTypes.Count == 0);
-        }
-
-        // TODO: make private
-        /// <summary>
-        /// Adds the specified graph type to the lookup table using a specified <see cref="TypeCollectionContext"/>.
-        /// </summary>
-        public void AddType<TType>(TypeCollectionContext context)
             where TType : IGraphType
         {
             CheckSealed();
 
             var type = typeof(TType).GetNamedType();
-            var instance = context.ResolveType(type);
-            AddType(instance, context);
+            var instance = _context.ResolveType(type);
+            AddType(instance);
+
+            Debug.Assert(_context.InFlightRegisteredTypes.Count == 0);
         }
 
-        // TODO: make private
         /// <summary>
-        /// Adds the specified graph type instance to the lookup table using a specified <see cref="TypeCollectionContext"/>.
+        /// Adds the specified GraphType to lookup.
         /// </summary>
-        public void AddType(IGraphType type, TypeCollectionContext context)
+        /// <param name="type"> GraphType to add. </param>
+        public void AddType(IGraphType type) => AddType(type, _context);
+
+        private void AddType(IGraphType type, TypeCollectionContext context)
         {
             CheckSealed();
 
@@ -301,7 +291,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
             }
 
-            var name = type.CollectTypes(context).TrimGraphQLTypes();
+            string name = context.CollectTypes(type);
             lock (_lock)
             {
                 SetGraphType(name, type);
@@ -485,8 +475,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        // TODO: make private
-        public void ApplyTypeReferences()
+        private void ApplyTypeReferences()
         {
             CheckSealed();
 
@@ -496,8 +485,7 @@ Make sure that your ServiceProvider is configured correctly.");
             }
         }
 
-        // TODO: make private
-        public void ApplyTypeReference(IGraphType type)
+        private void ApplyTypeReference(IGraphType type)
         {
             CheckSealed();
 
