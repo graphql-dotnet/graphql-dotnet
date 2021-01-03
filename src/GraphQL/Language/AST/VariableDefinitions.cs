@@ -5,10 +5,16 @@ using System.Linq;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Represents a list of variable definition nodes within a document.
+    /// </summary>
     public class VariableDefinitions : IEnumerable<VariableDefinition>
     {
         private List<VariableDefinition> _variables;
 
+        /// <summary>
+        /// Adds a variable definition node to the list.
+        /// </summary>
         public void Add(VariableDefinition variable)
         {
             if (variable == null)
@@ -20,7 +26,7 @@ namespace GraphQL.Language.AST
             _variables.Add(variable);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IEnumerator<VariableDefinition> GetEnumerator()
         {
             if (_variables == null)
@@ -31,7 +37,7 @@ namespace GraphQL.Language.AST
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string ToString() => _variables?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", _variables)}}}" : "VariableDefinitions(Empty)";
     }
 }
