@@ -131,7 +131,7 @@ namespace GraphQL.Types
     public class IncludeDirective : DirectiveGraphType
     {
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the 'include' directive.
         /// </summary>
         public IncludeDirective()
             : base("include", new[]
@@ -156,7 +156,7 @@ namespace GraphQL.Types
     public class SkipDirective : DirectiveGraphType
     {
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the 'skip' directive.
         /// </summary>
         public SkipDirective()
             : base("skip", new[]
@@ -181,7 +181,7 @@ namespace GraphQL.Types
     public class GraphQLDeprecatedDirective : DirectiveGraphType
     {
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the 'deprecated' directive.
         /// </summary>
         public GraphQLDeprecatedDirective()
             : base("deprecated", new[]

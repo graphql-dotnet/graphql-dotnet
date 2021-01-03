@@ -9,12 +9,12 @@ namespace GraphQL.Types
     public interface IImplementInterfaces
     {
         /// <summary>
-        /// Gets or sets a list of .NET types of supported GraphQL interface types
+        /// Gets or sets a list of .NET types of supported GraphQL interface types.
         /// </summary>
         IEnumerable<Type> Interfaces { get; set; }
 
         /// <summary>
-        /// Gets or sets a list of instances of supported GraphQL interface types
+        /// Gets or sets a list of instances of supported GraphQL interface types.
         /// </summary>
         IEnumerable<IInterfaceGraphType> ResolvedInterfaces { get; set; }
     }
