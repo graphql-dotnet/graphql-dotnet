@@ -409,7 +409,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// TODO
+        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
         /// </summary>
         public static Dictionary<string, Field> CollectFields(
             ExecutionContext context,
