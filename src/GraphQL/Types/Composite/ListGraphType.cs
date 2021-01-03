@@ -14,7 +14,8 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// Represents a list of objects.
+    /// Represents a list of objects. A GraphQL schema may describe that a field represents a list of another type.
+    /// The List type is provided for this reason, and wraps another type.
     /// </summary>
     public class ListGraphType : GraphType, IProvideResolvedType
     {
