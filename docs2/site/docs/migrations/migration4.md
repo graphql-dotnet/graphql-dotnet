@@ -16,4 +16,23 @@
 * `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
 * `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
-* By default fields returned by introspection query are no longer sorted by their names.
+* By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
+
+```c#
+    /// <summary>
+    /// Default schema comparer for GraphQL.NET v3.x.x.
+    /// By default only fields are ordered by their names within enclosing type.
+    /// </summary>
+    public sealed class LegacyV3SchemaComparer : DefaultSchemaComparer
+    {
+        private static readonly FieldByNameComparer _instance = new FieldByNameComparer();
+
+        private sealed class FieldByNameComparer : IComparer<IFieldType>
+        {
+            public int Compare(IFieldType x, IFieldType y) => x.Name.CompareTo(y.Name);
+        }
+
+        /// <inheritdoc/>
+        public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
+    }
+```

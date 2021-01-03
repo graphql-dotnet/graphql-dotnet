@@ -64,23 +64,6 @@ namespace GraphQL.Introspection
     }
 
     /// <summary>
-    /// Default schema comparer for GraphQL.NET v3.x.x.
-    /// By default only fields are ordered by their names within enclosing type.
-    /// </summary>
-    public sealed class LegacyV3SchemaComparer : DefaultSchemaComparer
-    {
-        private static readonly FieldByNameComparer _instance = new FieldByNameComparer();
-
-        private sealed class FieldByNameComparer : IComparer<IFieldType>
-        {
-            public int Compare(IFieldType x, IFieldType y) => x.Name.CompareTo(y.Name);
-        }
-
-        /// <inheritdoc/>
-        public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
-    }
-
-    /// <summary>
     /// All elements are sorted in alphabetical order of their names.
     /// </summary>
     public class AlphabeticallySchemaComparer : ISchemaComparer

@@ -1033,11 +1033,6 @@ namespace GraphQL.Introspection
         System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field);
         System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type);
     }
-    public sealed class LegacyV3SchemaComparer : GraphQL.Introspection.DefaultSchemaComparer
-    {
-        public LegacyV3SchemaComparer() { }
-        public override System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
-    }
     public class SchemaMetaFieldType : GraphQL.Types.FieldType
     {
         public SchemaMetaFieldType() { }
