@@ -674,7 +674,6 @@ namespace GraphQL.Execution
         public static object GetVariableValue(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinition variable, object input) { }
         public static GraphQL.Language.AST.Variables GetVariableValues(GraphQL.Language.AST.Document document, GraphQL.Types.ISchema schema, GraphQL.Language.AST.VariableDefinitions variableDefinitions, GraphQL.Inputs inputs) { }
         public static bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQL.Language.AST.Directives directives) { }
-        public static System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFieldsFor(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType fieldType, GraphQL.Language.AST.Field field) { }
     }
     public abstract class ExecutionNode
     {

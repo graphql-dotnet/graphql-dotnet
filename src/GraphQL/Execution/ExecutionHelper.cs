@@ -453,15 +453,5 @@ namespace GraphQL.Execution
 
             return false;
         }
-
-        public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
-        {
-            var selections = field?.SelectionSet?.Selections;
-            if (selections == null || selections.Count == 0)
-            {
-                return null;
-            }
-            return CollectFields(context, fieldType, field.SelectionSet);
-        }
     }
 }
