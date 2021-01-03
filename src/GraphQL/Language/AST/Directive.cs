@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Represents a directive node within a document.
+    /// </summary>
     public class Directive : AbstractNode
     {
         public Directive(NameNode node)
