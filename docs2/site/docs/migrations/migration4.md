@@ -39,3 +39,6 @@
         public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
     }
 ```
+
+* Subscriptions classes (`SubscriptionExecutionStrategy`, `SubscriptionDocumentExecuter`, `SubscriptionExecutionResult`) has been moved into `GraphQL.Subscriptions` project.
+* `ISubscriptionExecuter` has been removed.
