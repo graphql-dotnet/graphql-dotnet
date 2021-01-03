@@ -1398,17 +1398,20 @@ namespace GraphQL.Language.AST
         public ShortValue(short value) { }
         protected override bool Equals(GraphQL.Language.AST.ValueNode<short> other) { }
     }
-    public class SourceLocation
+    public readonly struct SourceLocation : System.IEquatable<GraphQL.Language.AST.SourceLocation>
     {
+        public static readonly GraphQL.Language.AST.SourceLocation Empty;
         public SourceLocation(int line, int column, int start = -1, int end = -1) { }
         public int Column { get; }
         public int End { get; }
         public int Line { get; }
         public int Start { get; }
-        protected bool Equals(GraphQL.Language.AST.SourceLocation other) { }
+        public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
+        public static bool operator !=(GraphQL.Language.AST.SourceLocation first, GraphQL.Language.AST.SourceLocation second) { }
+        public static bool operator ==(GraphQL.Language.AST.SourceLocation first, GraphQL.Language.AST.SourceLocation second) { }
     }
     public class StringValue : GraphQL.Language.AST.ValueNode<string>
     {

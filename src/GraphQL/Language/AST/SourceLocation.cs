@@ -1,7 +1,11 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
-    public class SourceLocation
+    public readonly struct SourceLocation : IEquatable<SourceLocation>
     {
+        public static readonly SourceLocation Empty = new SourceLocation(-1, -1, -1, -1);
+
         public SourceLocation(int line, int column, int start = -1, int end = -1)
         {
             Line = line;
@@ -21,28 +25,14 @@ namespace GraphQL.Language.AST
         /// <inheritdoc />
         public override string ToString() => $"line={Line}, column={Column}, start={Start}, end={End}";
 
-        protected bool Equals(SourceLocation other)
-        {
-            return Line == other.Line && Column == other.Column;
-        }
+        public bool Equals(SourceLocation other) => Line == other.Line && Column == other.Column; // TODO: where are start and end?
 
-        public override bool Equals(object obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((SourceLocation)obj);
-        }
+        public static bool operator ==(SourceLocation first, SourceLocation second) => first.Equals(second);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Line * 397) ^ Column;
-            }
-        }
+        public static bool operator !=(SourceLocation first, SourceLocation second) => !first.Equals(second);
+
+        public override bool Equals(object obj) => obj is SourceLocation loc && Equals(loc);
+
+        public override int GetHashCode() => (Line, Column).GetHashCode();
     }
 }
