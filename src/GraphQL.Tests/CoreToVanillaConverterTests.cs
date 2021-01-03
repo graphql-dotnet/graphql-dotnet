@@ -1,7 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using GraphQL.Language;
-using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Shouldly;
@@ -40,8 +38,6 @@ namespace GraphQL.Tests.Bugs
                 Schema = Schema,
             });
             valid.ShouldNotBeNull();
-            var test = new DocumentWriter().WriteToStringAsync(valid);
-            Console.WriteLine("RESULT: " + test);
             valid.Data.ShouldNotBeNull();
             valid.Errors.ShouldBeNull();
         }
