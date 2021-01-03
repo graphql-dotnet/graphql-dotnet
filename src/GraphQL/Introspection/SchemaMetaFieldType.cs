@@ -1,3 +1,4 @@
+using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -31,7 +32,14 @@ namespace GraphQL.Introspection
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
                 "types",
                 "A list of all types supported by this server.",
-                resolve: async context => await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false));
+                resolve: async context =>
+                {
+                    var types = await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
+                    if (context.Schema.Comparer.TypeComparer != null)
+                        types = types.OrderBy(t => t, context.Schema.Comparer.TypeComparer);
+                    return types;
+                });
+
 
             Field<NonNullGraphType<__Type>>(
                 "queryType",
@@ -65,7 +73,13 @@ namespace GraphQL.Introspection
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
                 "directives",
                 "A list of all directives supported by this server.",
-                resolve: async context => await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false));
+                resolve: async context =>
+                {
+                    var directives = await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false);
+                    if (context.Schema.Comparer.DirectiveComparer != null)
+                        directives = directives.OrderBy(d => d, context.Schema.Comparer.DirectiveComparer);
+                    return directives;
+                });
         }
     }
 }

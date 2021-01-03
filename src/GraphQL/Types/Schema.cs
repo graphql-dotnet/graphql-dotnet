@@ -117,6 +117,9 @@ namespace GraphQL.Types
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
         /// <inheritdoc/>
+        public ISchemaComparer Comparer { get; set; } = new DefaultSchemaComparer();
+
+        /// <inheritdoc/>
         public IEnumerable<DirectiveGraphType> Directives
         {
             get => _directives;
