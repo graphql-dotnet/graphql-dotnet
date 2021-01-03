@@ -75,8 +75,7 @@ namespace GraphQL.Types
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets the default value of the argument. Only applicable when the type is not a
-        /// non-null graph type.
+        /// Gets or sets the default value of the argument.
         /// </summary>
         public object DefaultValue
         {
