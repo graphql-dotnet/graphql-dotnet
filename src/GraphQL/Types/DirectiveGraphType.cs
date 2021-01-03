@@ -95,7 +95,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="name">The type name within the GraphQL schema.</param>
+        /// <param name="name">The directive name within the GraphQL schema.</param>
         /// <param name="locations">A list of locations where the directive can be applied.</param>
         public DirectiveGraphType(string name, IEnumerable<DirectiveLocation> locations)
         {
