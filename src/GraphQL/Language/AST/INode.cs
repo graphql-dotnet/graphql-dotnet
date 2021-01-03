@@ -8,7 +8,7 @@ namespace GraphQL.Language.AST
     public interface INode
     {
         /// <summary>
-        /// Returns a list of children nodes.
+        /// Returns a list of children nodes. If the node doesn't have children, returns <see langword="null"/>.
         /// </summary>
         IEnumerable<INode> Children { get; }
 
