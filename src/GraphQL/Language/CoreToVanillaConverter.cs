@@ -125,7 +125,6 @@ namespace GraphQL.Language
                 foreach (var s in source.Selections)
                 {
                     set.Add(Selection(s));
-
                 }
             }
 
