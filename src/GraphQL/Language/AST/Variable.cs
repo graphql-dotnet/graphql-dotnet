@@ -39,11 +39,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "VariableDefinition{{name={0},type={1},defaultValue={2}}}"
-                .ToFormat(Name, Type, DefaultValue);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"VariableDefinition{{name={Name},type={Type},defaultValue={DefaultValue}}}";
 
         protected bool Equals(VariableDefinition other)
         {
@@ -52,9 +49,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((VariableDefinition)obj);
         }
     }
@@ -71,10 +71,8 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public NameNode NameNode { get; }
 
-        public override string ToString()
-        {
-            return "VariableReference{{name={0}}}".ToFormat(Name);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"VariableReference{{name={Name}}}";
 
         protected bool Equals(VariableReference other)
         {
@@ -83,9 +81,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((VariableReference)obj);
         }
     }

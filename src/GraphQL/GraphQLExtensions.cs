@@ -163,10 +163,10 @@ namespace GraphQL
                 {
                     if (ofType != null)
                     {
-                        return new[] { $"Expected \"{ofType.Name}!\", found null."};
+                        return new[] { $"Expected \"{ofType.Name}!\", found null." };
                     }
 
-                    return new[] { "Expected non-null value, found null"};
+                    return new[] { "Expected non-null value, found null" };
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -278,6 +278,14 @@ namespace GraphQL
                 : null;
         }
 
+        /// <summary>
+        /// Adds a key-value metadata pair to the specified provider.
+        /// </summary>
+        /// <typeparam name="TMetadataProvider"> The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining. </typeparam>
+        /// <param name="provider"> Metadata provider which must implement <see cref="IProvideMetadata"/> interface. </param>
+        /// <param name="key"> String key. </param>
+        /// <param name="value"> Arbitrary value. </param>
+        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : IProvideMetadata
         {
@@ -289,6 +297,7 @@ namespace GraphQL
         /// Provided a type and a super type, return true if the first type is either
         /// equal or a subset of the second super type (covariant).
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Will be removed in v4")]
         public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, ISchema schema) // TODO: remove unused schema parameter in v4.0.0
         {
             if (maybeSubType.Equals(superType))

@@ -35,16 +35,21 @@ namespace GraphQL.Language.AST
             return ObjectFields.FirstOrDefault(x => x.Name == name);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            return "ObjectValue{{objectFields={0}}}".ToFormat(string.Join(", ", ObjectFields.Select(x => x.ToString())));
+            string fields = string.Join(", ", ObjectFields.Select(x => x.ToString()));
+            return $"ObjectValue{{objectFields={fields}}}";
         }
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
 
             return true;
         }

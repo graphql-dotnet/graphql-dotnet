@@ -21,10 +21,8 @@ namespace GraphQL.Language.AST
             get { yield return Arguments; }
         }
 
-        public override string ToString()
-        {
-            return $"Directive{{name='{Name}',arguments={Arguments}}}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Directive{{name='{Name}',arguments={Arguments}}}";
 
         protected bool Equals(Directive other)
         {
@@ -36,9 +34,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((Directive)obj);
         }
     }

@@ -42,6 +42,7 @@ namespace GraphQL.Tests.Subscription
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Conventions")]
     public class Subscription
     {
         [GraphQLMetadata(Name = "messageAdded", Type = ResolverType.Subscriber)]

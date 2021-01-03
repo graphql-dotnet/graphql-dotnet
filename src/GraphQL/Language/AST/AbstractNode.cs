@@ -5,6 +5,7 @@ namespace GraphQL.Language.AST
     public abstract class AbstractNode : INode
     {
         public string Comment => CommentNode?.Value;
+
         public CommentNode CommentNode { get; set; }
 
         public virtual IEnumerable<INode> Children => null;

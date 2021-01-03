@@ -1,9 +1,5 @@
 "test":
-  - src/GraphQL.ApiTests/**/*
-  - src/GraphQL.DataLoader.Tests/**/*
-  - src/GraphQL.Dummy/**/*
-  - src/GraphQL.Harness.Tests/**/*
-  - src/GraphQL.Tests/**/*
+  - any: ['src/GraphQL.ApiTests/**/*', 'src/GraphQL.DataLoader.Tests/**/*', 'src/GraphQL.Dummy/**/*', 'src/GraphQL.Harness.Tests/**/*', 'src/GraphQL.Tests/**/*', '!src/GraphQL.ApiTests/**/*.txt']
 
 "CI":
   - .github/workflows/**/*

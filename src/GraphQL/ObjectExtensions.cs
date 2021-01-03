@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -96,7 +97,7 @@ namespace GraphQL
                 }
             }
 
-            if (targetCtor == null)
+            if (targetCtor == null || ctorParameters == null)
                 throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
 
             object[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
@@ -107,7 +108,16 @@ namespace GraphQL
                 ctorArguments[i] = arg;
             }
 
-            object obj = targetCtor.Invoke(ctorArguments);
+            object obj;
+            try
+            {
+                obj = targetCtor.Invoke(ctorArguments);
+            }
+            catch (TargetInvocationException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                return null; // never executed, necessary only for intellisense
+            }
 
             foreach (var item in source)
             {

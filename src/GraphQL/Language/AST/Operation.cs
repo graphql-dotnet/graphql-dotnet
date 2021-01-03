@@ -47,11 +47,8 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public override string ToString()
-        {
-            return "OperationDefinition{{name='{0}', operation={1}, variableDefinitions={2}, directives={3}, selectionSet={4}}}"
-                .ToFormat(Name, OperationType, Variables, Directives, SelectionSet);
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"OperationDefinition{{name='{Name}', operation={OperationType}, variableDefinitions={Variables}, directives={Directives}, selectionSet={SelectionSet}}}";
 
         protected bool Equals(Operation other)
         {
@@ -60,9 +57,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode node)
         {
-            if (node is null) return false;
-            if (ReferenceEquals(this, node)) return true;
-            if (node.GetType() != GetType()) return false;
+            if (node is null)
+                return false;
+            if (ReferenceEquals(this, node))
+                return true;
+            if (node.GetType() != GetType())
+                return false;
             return Equals((Operation)node);
         }
     }

@@ -24,10 +24,8 @@ namespace GraphQL.Language.AST
             get { yield return Value; }
         }
 
-        public override string ToString()
-        {
-            return $"Argument{{name={Name},value={Value}}}";
-        }
+        /// <inheritdoc />
+        public override string ToString() => $"Argument{{name={Name},value={Value}}}";
 
         protected bool Equals(Argument other)
         {
@@ -36,9 +34,12 @@ namespace GraphQL.Language.AST
 
         public override bool IsEqualTo(INode obj)
         {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj is null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((Argument)obj);
         }
     }

@@ -3,13 +3,16 @@ using System.Diagnostics;
 
 namespace GraphQL.Instrumentation
 {
-    /// <summary> This is already familiar <see cref="Stopwatch"/> but readonly struct. Doesn't allocate memory on the managed heap. </summary>
+    /// <summary>
+    /// This is already familiar <see cref="Stopwatch"/> but as a readonly struct. Doesn't allocate memory on the managed heap.
+    /// </summary>
     public readonly struct ValueStopwatch
     {
         private static readonly double _timestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
         private readonly long _startTimestamp;
 
+        /// <inheritdoc cref="Stopwatch.IsRunning"/>
         public bool IsActive => _startTimestamp != 0;
 
         private ValueStopwatch(long startTimestamp)
@@ -17,8 +20,10 @@ namespace GraphQL.Instrumentation
             _startTimestamp = startTimestamp;
         }
 
+        /// <inheritdoc cref="Stopwatch.StartNew"/>
         public static ValueStopwatch StartNew() => new ValueStopwatch(Stopwatch.GetTimestamp());
 
+        /// <inheritdoc cref="Stopwatch.Elapsed"/>
         public TimeSpan Elapsed
         {
             get

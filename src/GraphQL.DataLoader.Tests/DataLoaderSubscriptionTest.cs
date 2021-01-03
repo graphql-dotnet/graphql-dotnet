@@ -12,7 +12,7 @@ using Xunit;
 
 namespace GraphQL.DataLoader.Tests
 {
-    public class DataLoaderSubscriptionTest: QueryTestBase
+    public class DataLoaderSubscriptionTest : QueryTestBase
     {
         protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(string query)
         {

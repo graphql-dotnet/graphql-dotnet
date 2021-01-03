@@ -21,7 +21,8 @@ namespace GraphQL.Tests.Bugs
         [Theory]
         [InlineData("null")]
         [InlineData("1")]
-        public void TestVariableObject_InvalidType(string param) {
+        public void TestVariableObject_InvalidType(string param)
+        {
             var error1 = new ValidationError(null, VariablesAreInputTypesError.NUMBER,
                 VariablesAreInputTypesError.UndefinedVarMessage("arg", "abcdefg"))
             {
