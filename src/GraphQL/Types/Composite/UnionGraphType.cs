@@ -74,7 +74,7 @@ namespace GraphQL.Types
 
             if (!typeof(IObjectGraphType).IsAssignableFrom(type))
             {
-                throw new ArgumentException($"Added union type must implement {nameof(IObjectGraphType)}", nameof(type));
+                throw new ArgumentException($"Added union type '{type.Name}' must implement {nameof(IObjectGraphType)}", nameof(type));
             }
 
             EnsureTypes();
