@@ -28,7 +28,11 @@ namespace GraphQL
         }
 
         private IDictionary<string, Field> GetSubFields()
-            => ExecutionHelper.SubFieldsFor(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field);
+        {
+            return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
+                ? ExecutionHelper.CollectFields(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
+                : null;
+        }
 
         private IDictionary<string, object> GetArguments()
             => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
