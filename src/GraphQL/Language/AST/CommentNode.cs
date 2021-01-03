@@ -21,7 +21,7 @@ namespace GraphQL.Language.AST
         public string Value { get; }
 
         /// <summary>
-        /// Compares this instance to another <see cref="CommentNode"/> by name.
+        /// Compares this instance to another <see cref="CommentNode"/> by comment value.
         /// </summary>
         protected bool Equals(CommentNode other) => string.Equals(Value, other.Value, StringComparison.InvariantCulture);
 
