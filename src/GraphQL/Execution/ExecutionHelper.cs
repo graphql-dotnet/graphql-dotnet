@@ -497,18 +497,5 @@ namespace GraphQL.Execution
 
             return false;
         }
-
-        /// <summary>
-        /// Returns a list of subfields (child nodes) for a result node based on the selection set from the document.
-        /// </summary>
-        public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
-        {
-            var selections = field?.SelectionSet?.Selections;
-            if (selections == null || selections.Count == 0)
-            {
-                return null;
-            }
-            return CollectFields(context, fieldType, field.SelectionSet);
-        }
     }
 }

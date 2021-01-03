@@ -14,6 +14,7 @@
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
 * `LightweightCache.First` has been removed.
 * `IGraphType.CollectTypes` has been removed.
+* `ExecutionHelper.SubFieldsFor` has been removed.
 * `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
 * `GraphQLTypeReference` is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
