@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace GraphQL.Types
 {
     [DebuggerDisplay("ref {TypeName,nq}")]
-    public class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
+    internal sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     {
         public GraphQLTypeReference(string typeName)
         {
