@@ -1059,12 +1059,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
         public abstract bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
-    public class Alias
-    {
-        public Alias(GraphQL.Language.AST.NameNode alias, GraphQL.Language.AST.NameNode name) { }
-        public GraphQL.Language.AST.NameNode Al { get; }
-        public GraphQL.Language.AST.NameNode Name { get; }
-    }
     public class Argument : GraphQL.Language.AST.AbstractNode
     {
         public Argument() { }
