@@ -4,8 +4,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__Directive</c> introspection type represents a directive that a server supports.
+    /// </summary>
     public class __Directive : ObjectGraphType<DirectiveGraphType>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__Directive</c> introspection type.
+        /// </summary>
         public __Directive()
         {
             Name = nameof(__Directive);
@@ -44,8 +50,14 @@ namespace GraphQL.Introspection
         }
     }
 
+    /// <summary>
+    /// An enumeration representing a location that a directive may be placed.
+    /// </summary>
     public class __DirectiveLocation : EnumerationGraphType<DirectiveLocation>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="__DirectiveLocation"/> graph type.
+        /// </summary>
         public __DirectiveLocation()
         {
             SetName(nameof(__DirectiveLocation), validate: false);
