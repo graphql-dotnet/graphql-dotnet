@@ -461,7 +461,10 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// TODO
+        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
+        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
+        /// <br/><br/>
+        /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
         /// </summary>
         public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
         {
