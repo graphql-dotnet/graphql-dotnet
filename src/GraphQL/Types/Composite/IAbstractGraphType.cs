@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// An interface for such graph types that do not represent concrete graph types, that is, for interfaces and unions. 
+    /// </summary>
     public interface IAbstractGraphType : IGraphType
     {
         Func<object, IObjectGraphType> ResolveType { get; set; }

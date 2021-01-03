@@ -1,5 +1,8 @@
 namespace GraphQL.Types.Relay
 {
+    /// <summary>
+    /// A graph type that represents pagination information relating to the result data set.
+    /// </summary>
     public class PageInfoType : ObjectGraphType<object>
     {
         /// <inheritdoc/>

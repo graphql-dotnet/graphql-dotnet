@@ -24,7 +24,7 @@ namespace GraphQL.Introspection
                 "describing additional information to the executor.";
 
             Field(f => f.Name);
-            Field(f => f.Description, nullable: true);
+            Field(f => f.Description, nullable: true).Description(null);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
