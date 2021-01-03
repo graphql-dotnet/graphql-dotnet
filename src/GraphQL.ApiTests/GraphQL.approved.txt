@@ -1871,17 +1871,6 @@ namespace GraphQL.Types
     {
         public GraphQLDeprecatedDirective() { }
     }
-    public class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideMetadata
-    {
-        public GraphQLTypeReference(string typeName) { }
-        public System.Collections.Generic.IEnumerable<System.Type> Interfaces { get; set; }
-        public System.Func<object, bool> IsTypeOf { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType> ResolvedInterfaces { get; set; }
-        public string TypeName { get; }
-        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
-        public override bool Equals(object obj) { }
-        public override int GetHashCode() { }
-    }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         protected GraphType() { }
