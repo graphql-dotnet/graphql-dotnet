@@ -124,7 +124,7 @@ namespace GraphQL.Tests.Introspection
 
         [Theory]
         [ClassData(typeof(DocumentWritersTestData))]
-        public async Task validate_that_alphabetically_schema_comparer_gives_ordered_fields_and_types(IDocumentWriter documentWriter)
+        public async Task validate_that_alphabetical_schema_comparer_gives_ordered_fields_and_types(IDocumentWriter documentWriter)
         {
             var documentExecuter = new DocumentExecuter();
             var executionResult = await documentExecuter.ExecuteAsync(_ =>
@@ -132,7 +132,7 @@ namespace GraphQL.Tests.Introspection
                 _.Schema = new Schema
                 {
                     Query = TestQueryType(),
-                    Comparer = new AlphabeticallySchemaComparer()
+                    Comparer = new AlphabeticalSchemaComparer()
                 };
                 _.Query = SchemaIntrospection.GetFieldNamesOfTypesQuery;
             });

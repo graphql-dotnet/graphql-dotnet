@@ -66,7 +66,7 @@ namespace GraphQL.Introspection
     /// <summary>
     /// All elements are sorted in alphabetical order of their names.
     /// </summary>
-    public class AlphabeticallySchemaComparer : ISchemaComparer
+    public class AlphabeticalSchemaComparer : ISchemaComparer
     {
         private static readonly TypeByNameComparer _instance1 = new TypeByNameComparer();
         private static readonly DirectiveByNameComparer _instance2 = new DirectiveByNameComparer();
