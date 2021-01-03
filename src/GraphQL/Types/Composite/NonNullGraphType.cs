@@ -15,6 +15,7 @@ namespace GraphQL.Types
 
     /// <summary>
     /// Represents a graph type that, for output graphs, is never null, or for input graphs, is not optional.
+    /// In other words the NonNull type wraps another type, and denotes that the resulting value will never be null.
     /// </summary>
     public class NonNullGraphType : GraphType, IProvideResolvedType
     {
@@ -44,12 +45,12 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns the .NET type of the inner graph type.
+        /// Returns the .NET type of the inner (wrapped) graph type.
         /// </summary>
         public Type Type { get; private set; }
 
         /// <summary>
-        /// Gets or sets the implmentation of the inner graph type.
+        /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
         public IGraphType ResolvedType { get; set; }
 

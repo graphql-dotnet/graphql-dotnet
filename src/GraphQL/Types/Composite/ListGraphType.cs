@@ -33,12 +33,12 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Returns the .NET type of the inner graph type.
+        /// Returns the .NET type of the inner (wrapped) graph type.
         /// </summary>
         public Type Type { get; private set; }
 
         /// <summary>
-        /// Gets or sets the inner graph type.
+        /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
         public IGraphType ResolvedType { get; set; }
 

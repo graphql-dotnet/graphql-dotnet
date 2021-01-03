@@ -74,7 +74,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Adds a GraphQL interface graph type to the list of compatible GraphQL interfaces for this graph type.
+        /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.
         /// </summary>
         public void Interface<TInterface>()
             where TInterface : IInterfaceGraphType
@@ -93,7 +93,7 @@ namespace GraphQL.Types
 
             if (!typeof(IInterfaceGraphType).IsAssignableFrom(type))
             {
-                throw new ArgumentException($"Interface must implement {nameof(IInterfaceGraphType)}", nameof(type));
+                throw new ArgumentException($"Interface '{type.Name}' must implement {nameof(IInterfaceGraphType)}", nameof(type));
             }
 
             if (!_interfaces.Contains(type))
