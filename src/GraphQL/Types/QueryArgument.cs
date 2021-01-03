@@ -13,7 +13,7 @@ namespace GraphQL.Types
         where TType : IGraphType
     {
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the argument.
         /// </summary>
         public QueryArgument()
             : base(typeof(TType))
