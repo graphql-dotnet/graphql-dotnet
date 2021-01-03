@@ -4,46 +4,43 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
+    /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, and directives.
+    /// Can be used to hide information, such as graph types, from clients that have an inadequate permission level.
     /// </summary>
     public interface ISchemaFilter
     {
         /// <summary>
-        /// Returns a value indicating whether to hide the specified type.
+        /// Returns a boolean indicating whether the specified graph type should be returned within the introspection query.
         /// </summary>
-        /// <param name="type"> GraphQL type to consider. </param>
+        /// <param name="type">The graph type to consider.</param>
         Task<bool> AllowType(IGraphType type);
-
         /// <summary>
-        /// Returns a value indicating whether to hide the specified field.
+        /// Returns a boolean indicating whether the specified field should be returned within the introspection query.
         /// </summary>
-        /// <param name="parent"> Parent type to which the field belongs. </param>
-        /// <param name="field"> Field to consider. </param>
+        /// <param name="parent">The parent type to which the field belongs.</param>
+        /// <param name="field">The field to consider.</param>
         Task<bool> AllowField(IGraphType parent, IFieldType field);
-
         /// <summary>
-        /// Returns a value indicating whether to hide the specified field argument.
+        /// Returns a boolean indicating whether the specified argument should be returned within the introspection query.
         /// </summary>
-        /// <param name="field"> The field to which the argument belongs. </param>
-        /// <param name="argument"> Argument to consider. </param>
+        /// <param name="field">The field to which the argument belongs.</param>
+        /// <param name="argument">The argument to consider.</param>
         Task<bool> AllowArgument(IFieldType field, QueryArgument argument);
-
         /// <summary>
-        /// Returns a value indicating whether to hide the specified enum value.
+        /// Returns a boolean indicating whether the specified enumeration value should be returned within the introspection query.
         /// </summary>
-        /// <param name="parent"> The enumeration to which the enum value belongs.  </param>
-        /// <param name="enumValue"> Enum value to consider. </param>
+        /// <param name="parent">The enumeration to which the enumeration value belongs.</param>
+        /// <param name="enumValue">The enumeration value to consider.</param>
         Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue);
-
         /// <summary>
-        /// Returns a value indicating whether to hide the specified directive.
+        /// Returns a boolean indicating whether the specified directive should be returned within the introspection query.
         /// </summary>
-        /// <param name="directive"> GraphQL directive to consider. </param>
+        /// <param name="directive">The directive to consider.</param>
         Task<bool> AllowDirective(DirectiveGraphType directive);
     }
 
     /// <summary>
-    /// Default schema filter. By default nothing is hidden.
+    /// The default schema filter. By default nothing is hidden.
     /// </summary>
     public class DefaultSchemaFilter : ISchemaFilter
     {

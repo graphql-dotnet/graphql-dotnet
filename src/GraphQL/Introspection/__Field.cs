@@ -3,8 +3,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__Field</c> introspection type represents each field in an Object or Interface type.
+    /// </summary>
     public class __Field : ObjectGraphType<IFieldType>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__Field</c> introspection type.
+        /// </summary>
         public __Field()
         {
             Name = nameof(__Field);
