@@ -4,12 +4,12 @@ test:
 CI:
   - .github/workflows/**/*
 
-"code style":
+code style:
   - .editorconfig
 
-"documentation":
+documentation:
   - README.md
   - docs2/**/*
 
-"performance":
+performance:
   - src/GraphQL.Benchmarks/**/*
