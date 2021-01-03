@@ -10,7 +10,7 @@ namespace GraphQL.Reflection
     public interface IAccessor
     {
         /// <summary>
-        /// Returns the name of the member that this points to.
+        /// Returns the name of the member that this accessor points to.
         /// </summary>
         string FieldName { get; }
 
@@ -25,7 +25,7 @@ namespace GraphQL.Reflection
         Type DeclaringType { get; }
 
         /// <summary>
-        /// For methods, returns a list of parameters defined for the method.
+        /// For methods, returns a list of parameters defined for the method, otherwise null.
         /// </summary>
         ParameterInfo[] Parameters { get; }
 
@@ -44,7 +44,7 @@ namespace GraphQL.Reflection
         object GetValue(object target, object[] arguments);
 
         /// <summary>
-        /// Returns a list of attributes of a specified type defined on the member.
+        /// Returns a list of attributes of the specified type defined on the member.
         /// </summary>
         /// <typeparam name="T">The type of the attribute.</typeparam>
         IEnumerable<T> GetAttributes<T>() where T : Attribute;

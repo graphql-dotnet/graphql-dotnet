@@ -5,8 +5,8 @@ using GraphQL.Language.AST;
 namespace GraphQL
 {
     /// <summary>
-    /// Represents a dictionary of variable inputs to a document. Typically this
-    /// contains the deserialized variables property from the GraphQL request. During document execution,
+    /// Represents a readonly dictionary of variable inputs to a document. Typically this
+    /// contains the deserialized 'variables' property from the GraphQL request. During document execution,
     /// these inputs will be validated and coerced into a <see cref="Variables"/> dictionary.
     /// </summary>
     public class Inputs : ReadOnlyDictionary<string, object>
