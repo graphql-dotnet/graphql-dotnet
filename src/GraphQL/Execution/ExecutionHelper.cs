@@ -281,7 +281,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Coerces variable values to a compatible .NET type for the variable's graph type.
+        /// Coerces a variable value to a compatible .NET type for the variable's graph type.
         /// </summary>
         public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
         {
