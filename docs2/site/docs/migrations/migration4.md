@@ -15,3 +15,4 @@
 * `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
 * `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
+* `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
