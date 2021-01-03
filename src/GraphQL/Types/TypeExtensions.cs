@@ -56,20 +56,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the name of an AST type after unwrapping any <see cref="NonNullType"/> or <see cref="ListType"/> layers.
         /// </summary>
-        public static string Name(this IType type)
+        public static string Name(this IType type) => type switch
         {
-            if (type is NonNullType nonnull)
-            {
-                return Name(nonnull.Type);
-            }
-
-            if (type is ListType list)
-            {
-                return Name(list.Type);
-            }
-
-            return ((NamedType)type).Name;
-        }
+            NonNullType nonnull => Name(nonnull.Type),
+            ListType list => Name(list.Type),
+            _ => ((NamedType)type).Name,
+        };
 
         /// <summary>
         /// Returns the formatted GraphQL type name of the AST type, using brackets and exclamation points as necessary to
