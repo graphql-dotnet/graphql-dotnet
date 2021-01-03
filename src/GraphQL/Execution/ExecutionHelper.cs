@@ -409,6 +409,11 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
+        /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
+        /// otherwise the field name). This ensures all fields with the same response key included via referenced
+        /// fragments are executed at the same time.
+        /// <br/><br/>
         /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
         /// </summary>
         public static Dictionary<string, Field> CollectFields(
