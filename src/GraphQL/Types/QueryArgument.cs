@@ -33,7 +33,7 @@ namespace GraphQL.Types
         private IValue _defaultValueAST;
 
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the argument.
         /// </summary>
         /// <param name="type">The graph type of the argument.</param>
         public QueryArgument(IGraphType type)
@@ -42,7 +42,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Initializes a new instance
+        /// Initializes a new instance of the argument.
         /// </summary>
         /// <param name="type">The graph type of the argument.</param>
         public QueryArgument(Type type)

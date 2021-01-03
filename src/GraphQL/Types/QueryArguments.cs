@@ -77,7 +77,7 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Finds an argument by name from the list.
+        /// Finds an argument by its name from the list.
         /// </summary>
         public QueryArgument Find(string name)
         {
