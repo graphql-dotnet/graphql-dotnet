@@ -40,5 +40,5 @@
     }
 ```
 
-* Subscriptions classes (`SubscriptionExecutionStrategy`, `SubscriptionDocumentExecuter`) has been moved into `GraphQL.SystemReactive` project.
+* Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
 * `ISubscriptionExecuter` has been removed.
