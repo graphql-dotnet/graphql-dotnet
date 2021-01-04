@@ -10,15 +10,15 @@ namespace GraphQL.Tests.Execution
     {
         public RepeatedSubfieldsTests()
         {
-            FirstInnerField = new Field(default, new NameNode("first"));
+            FirstInnerField = new Field(default, "first");
             FirstFieldSelection = new SelectionSet();
             FirstFieldSelection.Add(FirstInnerField);
-            SecondInnerField = new Field(default, new NameNode("second"));
+            SecondInnerField = new Field(default, "second");
             SecondFieldSelection = new SelectionSet();
             SecondFieldSelection.Add(SecondInnerField);
-            FirstTestField = new Field(default, new NameNode("test"));
-            SecondTestField = new Field(default, new NameNode("test"));
-            AliasedTestField = new Field(new NameNode("alias"), new NameNode("test"));
+            FirstTestField = new Field(default, "test");
+            SecondTestField = new Field(default, "test");
+            AliasedTestField = new Field("alias", "test");
 
             FirstTestField.SelectionSet = FirstFieldSelection;
             SecondTestField.SelectionSet = SecondFieldSelection;
@@ -65,12 +65,11 @@ namespace GraphQL.Tests.Execution
         [Fact]
         public void MergeFieldAndFragment()
         {
-            var fragment = new FragmentDefinition(new NameNode("fragment"));
+            var fragment = new FragmentDefinition("fragment");
             var fragmentSelection = new SelectionSet();
             fragmentSelection.Add(FirstTestField);
             fragment.SelectionSet = fragmentSelection;
-            fragment.Type = new GraphQL.Language.AST.NamedType(
-                new NameNode("Person"));
+            fragment.Type = new GraphQL.Language.AST.NamedType("Person");
 
             var fragments = new Fragments { fragment };
 
@@ -83,7 +82,7 @@ namespace GraphQL.Tests.Execution
                 Schema = schema
             };
 
-            var fragSpread = new FragmentSpread(new NameNode("fragment"));
+            var fragSpread = new FragmentSpread("fragment");
             var outerSelection = new SelectionSet();
             outerSelection.Add(fragSpread);
             outerSelection.Add(SecondTestField);

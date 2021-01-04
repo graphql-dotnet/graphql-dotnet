@@ -10,15 +10,6 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance for the specified field name and value.
         /// </summary>
-        public ObjectField(NameNode name, IValue value)
-            : this(name.Name, value)
-        {
-            NameNode = name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance for the specified field name and value.
-        /// </summary>
         public ObjectField(string name, IValue value)
         {
             Name = name;
@@ -29,11 +20,6 @@ namespace GraphQL.Language.AST
         /// Returns the name of the field.
         /// </summary>
         public string Name { get; }
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of the field, if initialized with the <see cref="ObjectField.ObjectField(NameNode, IValue)"/> constructor.
-        /// </summary>
-        public NameNode NameNode { get; }
 
         /// <summary>
         /// Returns the value node containing the value of the field.
