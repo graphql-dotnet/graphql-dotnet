@@ -1638,6 +1638,12 @@ namespace GraphQL.Subscription
         public ResolveEventStreamContext() { }
         public ResolveEventStreamContext(GraphQL.Subscription.IResolveEventStreamContext context) { }
     }
+    public class SubscriptionExecutionResult : GraphQL.ExecutionResult
+    {
+        public SubscriptionExecutionResult() { }
+        public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
+        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>> Streams { get; set; }
+    }
 }
 namespace GraphQL.Types
 {

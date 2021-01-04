@@ -40,5 +40,5 @@
     }
 ```
 
-* Subscriptions classes (`SubscriptionExecutionStrategy`, `SubscriptionDocumentExecuter`, `SubscriptionExecutionResult`) has been moved into `GraphQL.Subscriptions` project.
+* Subscriptions classes (`SubscriptionExecutionStrategy`, `SubscriptionDocumentExecuter`) has been moved into `GraphQL.SystemReactive` project.
 * `ISubscriptionExecuter` has been removed.

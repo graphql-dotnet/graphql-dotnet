@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
+using GraphQL.Subscription;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shouldly;

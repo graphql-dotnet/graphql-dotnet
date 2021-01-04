@@ -15,10 +15,4 @@ namespace GraphQL
         public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
         protected override GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
-    public class SubscriptionExecutionResult : GraphQL.ExecutionResult
-    {
-        public SubscriptionExecutionResult() { }
-        public SubscriptionExecutionResult(GraphQL.ExecutionResult result) { }
-        public System.Collections.Generic.IDictionary<string, System.IObservable<GraphQL.ExecutionResult>> Streams { get; set; }
-    }
 }
