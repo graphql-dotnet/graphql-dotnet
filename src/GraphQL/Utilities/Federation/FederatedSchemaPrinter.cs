@@ -54,11 +54,7 @@ namespace GraphQL.Utilities.Federation
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive)
-        {
-            var ast = CoreToVanillaConverter.Instance.Directive(directive);
-            return AstPrinter.Print(ast);
-        }
+        public string PrintAstDirective(GraphQLDirective directive) => AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
 
         public override string PrintObject(IObjectGraphType type)
         {

@@ -18,6 +18,7 @@
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `ErrorLocation` struct became `readonly`.
 * `SourceLocation` class became `readonly struct`.
+* `CoreToVanillaConverter` class became `static`.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` are private.

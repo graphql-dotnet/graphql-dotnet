@@ -10,18 +10,16 @@ using OperationTypeParser = GraphQLParser.AST.OperationType;
 
 namespace GraphQL.Language
 {
-    public class CoreToVanillaConverter
+    public static class CoreToVanillaConverter
     {
-        public static readonly CoreToVanillaConverter Instance = new CoreToVanillaConverter();
-
         public static Document Convert(GraphQLDocument source)
         {
             var target = new Document();
-            Instance.AddDefinitions(source, target);
+            AddDefinitions(source, target);
             return target;
         }
 
-        public void AddDefinitions(GraphQLDocument source, Document target)
+        public static void AddDefinitions(GraphQLDocument source, Document target)
         {
             foreach (var def in source.Definitions)
             {
@@ -37,7 +35,7 @@ namespace GraphQL.Language
             }
         }
 
-        public Operation Operation(GraphQLOperationDefinition source)
+        public static Operation Operation(GraphQLOperationDefinition source)
         {
             var name = source.Name != null ? Name(source.Name) : null;
             return new Operation(name)
@@ -51,7 +49,7 @@ namespace GraphQL.Language
             };
         }
 
-        public FragmentDefinition Fragment(GraphQLFragmentDefinition source)
+        public static FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
             return new FragmentDefinition(Name(source.Name))
             {
@@ -63,7 +61,7 @@ namespace GraphQL.Language
             };
         }
 
-        public FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
+        public static FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
         {
             var name = source.Name != null ? Name(source.Name) : null;
             return new FragmentSpread(name)
@@ -74,7 +72,7 @@ namespace GraphQL.Language
             };
         }
 
-        public InlineFragment InlineFragment(GraphQLInlineFragment source)
+        public static InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
             return new InlineFragment
             {
@@ -86,7 +84,7 @@ namespace GraphQL.Language
             };
         }
 
-        public VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
+        public static VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
             VariableDefinitions defs = null;
 
@@ -101,7 +99,7 @@ namespace GraphQL.Language
             return defs;
         }
 
-        public VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
+        public static VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
             var def = new VariableDefinition(Name(source.Variable.Name))
             {
@@ -120,7 +118,7 @@ namespace GraphQL.Language
             return def;
         }
 
-        public SelectionSet SelectionSet(GraphQLSelectionSet source)
+        public static SelectionSet SelectionSet(GraphQLSelectionSet source)
         {
             var set = new SelectionSet();
 
@@ -136,7 +134,7 @@ namespace GraphQL.Language
             return set;
         }
 
-        public ISelection Selection(ASTNode source) => source.Kind switch
+        public static ISelection Selection(ASTNode source) => source.Kind switch
         {
             ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
             ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
@@ -144,7 +142,7 @@ namespace GraphQL.Language
             _ => throw new InvalidOperationException($"Unmapped selection {source.Kind}")
         };
 
-        public Field Field(GraphQLFieldSelection source)
+        public static Field Field(GraphQLFieldSelection source)
         {
             var alias = source.Alias != null ? Name(source.Alias) : null;
             return new Field(alias, Name(source.Name))
@@ -157,7 +155,7 @@ namespace GraphQL.Language
             };
         }
 
-        public Directives Directives(IEnumerable<GraphQLDirective> source)
+        public static Directives Directives(IEnumerable<GraphQLDirective> source)
         {
             Directives target = null;
 
@@ -172,7 +170,7 @@ namespace GraphQL.Language
             return target;
         }
 
-        public Directive Directive(GraphQLDirective d)
+        public static Directive Directive(GraphQLDirective d)
         {
             return new Directive(Name(d.Name))
             {
@@ -181,7 +179,7 @@ namespace GraphQL.Language
             };
         }
 
-        public Arguments Arguments(IEnumerable<GraphQLArgument> source)
+        public static Arguments Arguments(IEnumerable<GraphQLArgument> source)
         {
             Arguments target = null;
 
@@ -202,7 +200,7 @@ namespace GraphQL.Language
             return target;
         }
 
-        public IValue Value(GraphQLValue source)
+        public static IValue Value(GraphQLValue source)
         {
             switch (source.Kind)
             {
@@ -310,17 +308,17 @@ namespace GraphQL.Language
             throw new InvalidOperationException($"Unmapped value type {source.Kind}");
         }
 
-        public ObjectField ObjectField(GraphQLObjectField source)
+        public static ObjectField ObjectField(GraphQLObjectField source)
         {
             return new ObjectField(Name(source.Name), Value(source.Value)) { SourceLocation = Convert(source.Location) };
         }
 
-        public NamedType NamedType(GraphQLNamedType source)
+        public static NamedType NamedType(GraphQLNamedType source)
         {
             return new NamedType(Name(source.Name)) { SourceLocation = Convert(source.Location) };
         }
 
-        public IType Type(GraphQLType type)
+        public static IType Type(GraphQLType type)
         {
             switch (type.Kind)
             {
@@ -346,12 +344,12 @@ namespace GraphQL.Language
             throw new InvalidOperationException($"Unmapped type {type.Kind}");
         }
 
-        public NameNode Name(GraphQLName name)
+        public static NameNode Name(GraphQLName name)
         {
             return new NameNode(name.Value) { SourceLocation = Convert(name.Location) };
         }
 
-        private CommentNode Comment(GraphQLComment comment)
+        private static CommentNode Comment(GraphQLComment comment)
         {
             return comment == null
                 ? null
