@@ -60,6 +60,6 @@ namespace GraphQL.Language.AST
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() => unchecked((Line * 397) ^ Column);
+        public override int GetHashCode() => (Line, Column).GetHashCode();
     }
 }
