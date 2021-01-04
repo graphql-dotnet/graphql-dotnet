@@ -35,8 +35,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; }
-
-        /// <inheritdoc/>
-        bool INode.IsEqualTo(INode node) => throw new NotImplementedException();
     }
 }

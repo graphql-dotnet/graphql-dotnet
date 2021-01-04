@@ -1057,7 +1057,6 @@ namespace GraphQL.Language.AST
         public string Comment { get; }
         public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
-        public abstract bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
     public class Argument : GraphQL.Language.AST.AbstractNode
     {
@@ -1067,8 +1066,6 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.IValue Value { get; set; }
-        protected bool Equals(GraphQL.Language.AST.Argument other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Arguments : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Argument>, System.Collections.IEnumerable
@@ -1077,46 +1074,37 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public void Add(GraphQL.Language.AST.Argument arg) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Argument> GetEnumerator() { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
         public GraphQL.Language.AST.IValue ValueFor(string name) { }
     }
     public class BigIntValue : GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger>
     {
         public BigIntValue(System.Numerics.BigInteger value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger> other) { }
     }
     public class BooleanValue : GraphQL.Language.AST.ValueNode<bool>
     {
         public BooleanValue(bool value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<bool> other) { }
     }
     public class ByteValue : GraphQL.Language.AST.ValueNode<byte>
     {
         public ByteValue(byte value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<byte> other) { }
     }
     public class CommentNode : GraphQL.Language.AST.AbstractNode
     {
         public CommentNode(string value) { }
         public string Value { get; }
-        protected bool Equals(GraphQL.Language.AST.CommentNode other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
     }
     public class DateTimeOffsetValue : GraphQL.Language.AST.ValueNode<System.DateTimeOffset>
     {
         public DateTimeOffsetValue(System.DateTimeOffset value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.DateTimeOffset> other) { }
     }
     public class DateTimeValue : GraphQL.Language.AST.ValueNode<System.DateTime>
     {
         public DateTimeValue(System.DateTime value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.DateTime> other) { }
     }
     public class DecimalValue : GraphQL.Language.AST.ValueNode<decimal>
     {
         public DecimalValue(decimal value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<decimal> other) { }
     }
     public class Directive : GraphQL.Language.AST.AbstractNode
     {
@@ -1125,8 +1113,6 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; set; }
-        protected bool Equals(GraphQL.Language.AST.Directive other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Directives : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.ICollection<GraphQL.Language.AST.Directive>, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Directive>, System.Collections.IEnumerable
@@ -1142,7 +1128,6 @@ namespace GraphQL.Language.AST
         public void CopyTo(GraphQL.Language.AST.Directive[] array, int arrayIndex) { }
         public GraphQL.Language.AST.Directive Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Directive> GetEnumerator() { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public bool Remove(GraphQL.Language.AST.Directive item) { }
         public override string ToString() { }
     }
@@ -1154,7 +1139,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.Operations Operations { get; }
         public string OriginalQuery { get; set; }
         public void AddDefinition(GraphQL.Language.AST.IDefinition definition) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
         public override string ToString() { }
     }
     public class EnumValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
@@ -1163,8 +1147,6 @@ namespace GraphQL.Language.AST
         public EnumValue(string name) { }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        protected bool Equals(GraphQL.Language.AST.EnumValue other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Field : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
@@ -1179,9 +1161,6 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
-        protected bool Equals(GraphQL.Language.AST.Field other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
-        public GraphQL.Language.AST.Field MergeSelectionSet(GraphQL.Language.AST.Field other) { }
         public override string ToString() { }
     }
     public class Fields : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Field>, System.Collections.IEnumerable
@@ -1194,7 +1173,6 @@ namespace GraphQL.Language.AST
     public class FloatValue : GraphQL.Language.AST.ValueNode<double>
     {
         public FloatValue(double value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<double> other) { }
     }
     public class FragmentDefinition : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
@@ -1205,8 +1183,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.NamedType Type { get; set; }
-        protected bool Equals(GraphQL.Language.AST.FragmentDefinition other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
@@ -1216,8 +1192,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        protected bool Equals(GraphQL.Language.AST.FragmentSpread other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Fragments : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition>, System.Collections.IEnumerable
@@ -1230,7 +1204,6 @@ namespace GraphQL.Language.AST
     public class GuidValue : GraphQL.Language.AST.ValueNode<System.Guid>
     {
         public GuidValue(System.Guid value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.Guid> other) { }
     }
     public interface IDefinition : GraphQL.Language.AST.INode { }
     public interface IFragment : GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection { }
@@ -1242,7 +1215,6 @@ namespace GraphQL.Language.AST
     {
         System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         GraphQL.Language.AST.SourceLocation SourceLocation { get; }
-        bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
     public interface ISelection : GraphQL.Language.AST.INode { }
     public interface IType : GraphQL.Language.AST.INode { }
@@ -1261,20 +1233,17 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.Directives Directives { get; set; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.NamedType Type { get; set; }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class IntValue : GraphQL.Language.AST.ValueNode<int>
     {
         public IntValue(int value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<int> other) { }
     }
     public class ListType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
     {
         public ListType(GraphQL.Language.AST.IType type) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IType Type { get; }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
         public override string ToString() { }
     }
     public class ListValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
@@ -1283,13 +1252,11 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public object Value { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.IValue> Values { get; }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class LongValue : GraphQL.Language.AST.ValueNode<long>
     {
         public LongValue(long value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<long> other) { }
     }
     public readonly struct NameNode : GraphQL.Language.AST.INode
     {
@@ -1303,8 +1270,6 @@ namespace GraphQL.Language.AST
         public NamedType(GraphQL.Language.AST.NameNode node) { }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        protected bool Equals(GraphQL.Language.AST.NamedType other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class NonNullType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
@@ -1312,13 +1277,11 @@ namespace GraphQL.Language.AST
         public NonNullType(GraphQL.Language.AST.IType type) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IType Type { get; }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
         public override string ToString() { }
     }
     public class NullValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
         public NullValue() { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class ObjectField : GraphQL.Language.AST.AbstractNode
@@ -1329,8 +1292,6 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.IValue Value { get; }
-        protected bool Equals(GraphQL.Language.AST.ObjectField other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class ObjectValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
@@ -1341,7 +1302,6 @@ namespace GraphQL.Language.AST
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.ObjectField> ObjectFields { get; }
         public object Value { get; }
         public GraphQL.Language.AST.ObjectField Field(string name) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
@@ -1354,8 +1314,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.OperationType OperationType { get; set; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.VariableDefinitions Variables { get; set; }
-        protected bool Equals(GraphQL.Language.AST.Operation other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
         public override string ToString() { }
     }
     public enum OperationType
@@ -1375,7 +1333,6 @@ namespace GraphQL.Language.AST
     public class SByteValue : GraphQL.Language.AST.ValueNode<sbyte>
     {
         public SByteValue(sbyte value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<sbyte> other) { }
     }
     public class SelectionSet : GraphQL.Language.AST.AbstractNode
     {
@@ -1383,7 +1340,6 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public System.Collections.Generic.IList<GraphQL.Language.AST.ISelection> Selections { get; }
         public void Add(GraphQL.Language.AST.ISelection selection) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public GraphQL.Language.AST.SelectionSet Merge(GraphQL.Language.AST.SelectionSet otherSelection) { }
         public void Prepend(GraphQL.Language.AST.ISelection selection) { }
         public override string ToString() { }
@@ -1391,7 +1347,6 @@ namespace GraphQL.Language.AST
     public class ShortValue : GraphQL.Language.AST.ValueNode<short>
     {
         public ShortValue(short value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<short> other) { }
     }
     public class SourceLocation
     {
@@ -1408,39 +1363,31 @@ namespace GraphQL.Language.AST
     public class StringValue : GraphQL.Language.AST.ValueNode<string>
     {
         public StringValue(string value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<string> other) { }
     }
     public class TimeSpanValue : GraphQL.Language.AST.ValueNode<System.TimeSpan>
     {
         public TimeSpanValue(System.TimeSpan value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.TimeSpan> other) { }
     }
     public class UIntValue : GraphQL.Language.AST.ValueNode<uint>
     {
         public UIntValue(uint value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<uint> other) { }
     }
     public class ULongValue : GraphQL.Language.AST.ValueNode<ulong>
     {
         public ULongValue(ulong value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<ulong> other) { }
     }
     public class UShortValue : GraphQL.Language.AST.ValueNode<ushort>
     {
         public UShortValue(ushort value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<ushort> other) { }
     }
     public class UriValue : GraphQL.Language.AST.ValueNode<System.Uri>
     {
         public UriValue(System.Uri value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<System.Uri> other) { }
     }
     public abstract class ValueNode<T> : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue, GraphQL.Language.AST.IValue<T>
     {
         protected ValueNode() { }
         public T Value { get; set; }
-        protected abstract bool Equals(GraphQL.Language.AST.ValueNode<T> node);
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Variable
@@ -1458,8 +1405,6 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; set; }
         public GraphQL.Language.AST.IType Type { get; set; }
-        protected bool Equals(GraphQL.Language.AST.VariableDefinition other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class VariableDefinitions : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.VariableDefinition>, System.Collections.IEnumerable
@@ -1474,8 +1419,6 @@ namespace GraphQL.Language.AST
         public VariableReference(GraphQL.Language.AST.NameNode name) { }
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
-        protected bool Equals(GraphQL.Language.AST.VariableReference other) { }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
         public override string ToString() { }
     }
     public class Variables : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Variable>, System.Collections.IEnumerable
@@ -2549,7 +2492,6 @@ namespace GraphQL.Utilities.Federation
     public class AnyValue : GraphQL.Language.AST.ValueNode<object>
     {
         public AnyValue(object value) { }
-        protected override bool Equals(GraphQL.Language.AST.ValueNode<object> node) { }
     }
     public class AnyValueConverter : GraphQL.Types.IAstFromValueConverter
     {

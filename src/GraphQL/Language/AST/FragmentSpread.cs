@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -36,25 +35,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"FragmentSpread{{name='{Name}', directives={Directives}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by name.
-        /// </summary>
-        protected bool Equals(FragmentSpread other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((FragmentSpread)obj);
-        }
     }
 }

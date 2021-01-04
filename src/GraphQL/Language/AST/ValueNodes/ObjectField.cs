@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -49,23 +48,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"ObjectField{{name='{Name}', value={Value}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by name.
-        /// </summary>
-        protected bool Equals(ObjectField other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-
-            return Equals((ObjectField)obj);
-        }
     }
 }
