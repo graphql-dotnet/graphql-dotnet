@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.DataLoader;
@@ -187,6 +188,9 @@ namespace GraphQL.Execution
                 node = node.Parent;
                 ++count;
             }
+
+            if (count == 0)
+                return Array.Empty<object>();
 
             var pathList = new object[count];
             var index = count;

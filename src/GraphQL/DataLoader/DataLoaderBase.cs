@@ -19,7 +19,15 @@ namespace GraphQL.DataLoader
         private DataLoaderList _list;
         private readonly Dictionary<TKey, DataLoaderPair<TKey, T>> _cachedList;
         private readonly object _sync = new object();
+
+        /// <summary>
+        /// Returns the maximum number of keys passed to the fetch function at a time.
+        /// </summary>
         protected internal readonly int MaxBatchSize;
+
+        /// <summary>
+        /// Returns the equality comparer to be used, or null for the default equality comparer.
+        /// </summary>
         protected internal readonly IEqualityComparer<TKey> EqualityComparer;
 
         /// <summary>

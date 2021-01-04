@@ -11,8 +11,19 @@ namespace GraphQL.DataLoader
     /// </summary>
     public static class DataLoaderContextExtensions
     {
+        /// <summary>
+        /// Returns a delegate which calls the delegate passed to this method, stripping off the <see cref="CancellationToken"/> in the process.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the return value of the delegate.</typeparam>
+        /// <param name="func">The delegate to call.</param>
         public static Func<CancellationToken, TResult> WrapNonCancellableFunc<TResult>(Func<TResult> func) => cancellationToken => func();
 
+        /// <summary>
+        /// Returns a delegate which calls the delegate passed to this method, stripping off the <see cref="CancellationToken"/> in the process.
+        /// </summary>
+        /// <typeparam name="T">The type of the argument of the delegate.</typeparam>
+        /// <typeparam name="TResult">The type of the return value of the delegate.</typeparam>
+        /// <param name="func">The delegate to call.</param>
         public static Func<T, CancellationToken, TResult> WrapNonCancellableFunc<T, TResult>(Func<T, TResult> func) => (arg, cancellationToken) => func(arg);
 
         /// <summary>
