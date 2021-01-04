@@ -84,31 +84,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc />
         public override string ToString() => $"Field{{name='{Name}', alias='{Alias}', arguments={Arguments}, directives={Directives}, selectionSet={SelectionSet}}}";
-
-        /// <summary>
-        /// Determines if this instance is equal to another instance by comparing the <see cref="Name"/> and <see cref="Alias"/> properties.
-        /// </summary>
-        private bool Equals(Field other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && string.Equals(Alias, other.Alias, StringComparison.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Returns a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
-        /// </summary>
-        public Field MergeSelectionSet(Field other)
-        {
-            if (Equals(other)) //TODO: is this check necessary?
-            {
-                return new Field(AliasNode, NameNode)
-                {
-                    Arguments = Arguments,
-                    SelectionSet = SelectionSet.Merge(other.SelectionSet),
-                    Directives = Directives,
-                    SourceLocation = SourceLocation,
-                };
-            }
-            return this;
-        }
     }
 }

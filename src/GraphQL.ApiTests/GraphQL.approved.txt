@@ -1161,7 +1161,6 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
-        public GraphQL.Language.AST.Field MergeSelectionSet(GraphQL.Language.AST.Field other) { }
         public override string ToString() { }
     }
     public class Fields : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Field>, System.Collections.IEnumerable
