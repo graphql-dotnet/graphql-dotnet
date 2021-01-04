@@ -59,6 +59,7 @@ namespace GraphQL.DataLoader
             _defaultValue = defaultValue;
         }
 
+        /// <inheritdoc/>
         protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list, CancellationToken cancellationToken)
         {
             var keys = list.Select(x => x.Key);
