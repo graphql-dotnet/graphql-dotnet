@@ -186,7 +186,7 @@ namespace GraphQL.Language
                 {
                     var arg = new Argument(a.Name?.Value)
                     {
-                        SourceLocation = Convert(a.Name.Location),
+                        SourceLocation = Convert(a.Name?.Location ?? a.Location),
                         CommentNode = Comment(a.Comment),
                         Value = Value(a.Value)
                     };
