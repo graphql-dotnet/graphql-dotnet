@@ -12,22 +12,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"{GetType().Name}{{value={Value}}}";
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((T)obj);
-        }
-
-        /// <summary>
-        /// Compares the value of this instance to another instance.
-        /// </summary>
-        protected abstract bool Equals(ValueNode<T> node);
     }
 }

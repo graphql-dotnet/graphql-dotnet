@@ -36,18 +36,5 @@ namespace GraphQL.Language.AST
             string values = string.Join(", ", Values.Select(x => x.ToString()));
             return $"ListValue{{values={values}}}";
         }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-
-            return true;
-        }
     }
 }

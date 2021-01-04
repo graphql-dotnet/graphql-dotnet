@@ -61,18 +61,5 @@ namespace GraphQL.Language.AST
             string fields = string.Join(", ", ObjectFields.Select(x => x.ToString()));
             return $"ObjectValue{{objectFields={fields}}}";
         }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-
-            return true;
-        }
     }
 }

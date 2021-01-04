@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -19,11 +17,5 @@ namespace GraphQL.Language.AST
         /// Returns the contained name.
         /// </summary>
         public string Name { get; }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
