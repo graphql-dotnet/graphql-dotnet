@@ -8,23 +8,18 @@ namespace GraphQL.Language.AST
     public class Operation : AbstractNode, IDefinition, IHaveSelectionSet
     {
         /// <summary>
-        /// Initializes a new operation node with the specified <see cref="NameNode"/> containing the name of the operation, if any.
+        /// Initializes a new operation node with the specified name of the operation, if any.
         /// </summary>
-        public Operation(NameNode name)
+        public Operation(string name)
         {
-            NameNode = name;
+            Name = name;
             OperationType = OperationType.Query;
         }
 
         /// <summary>
         /// Returns the name of the operation, if any.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of the operation, if any.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets or sets the type of this operation.

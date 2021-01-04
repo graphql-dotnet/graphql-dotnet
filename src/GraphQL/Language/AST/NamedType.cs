@@ -6,22 +6,17 @@ namespace GraphQL.Language.AST
     public class NamedType : AbstractNode, IType
     {
         /// <summary>
-        /// Initializes a new named type node containing the specified <see cref="NameNode"/>.
+        /// Initializes a new named type node containing the specified name.
         /// </summary>
-        public NamedType(NameNode node)
+        public NamedType(string name)
         {
-            NameNode = node;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of the named type node.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of the type.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <inheritdoc/>
         public override string ToString() => $"NamedType{{name={Name}}}";

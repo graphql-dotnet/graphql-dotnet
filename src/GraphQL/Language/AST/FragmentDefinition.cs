@@ -8,22 +8,17 @@ namespace GraphQL.Language.AST
     public class FragmentDefinition : AbstractNode, IDefinition, IHaveSelectionSet
     {
         /// <summary>
-        /// Initializes a new fragment definition node with the specified <see cref="NameNode"/> containing the name of this fragment definition.
+        /// Initializes a new fragment definition node with the specified name of this fragment definition.
         /// </summary>
-        public FragmentDefinition(NameNode node)
+        public FragmentDefinition(string name)
         {
-            NameNode = node;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of this fragment definition.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of this fragment definition.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets or sets the type node representing the graph type of this fragment definition.

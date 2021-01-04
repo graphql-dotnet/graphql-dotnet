@@ -2,15 +2,13 @@ namespace GraphQL.Language.AST
 {
     public class VariableReference : AbstractNode, IValue
     {
-        public VariableReference(NameNode name)
+        public VariableReference(string name)
         {
-            Name = name.Name;
-            NameNode = name;
+            Name = name;
         }
 
         object IValue.Value => Name;
         public string Name { get; }
-        public NameNode NameNode { get; }
 
         /// <inheritdoc />
         public override string ToString() => $"VariableReference{{name={Name}}}";

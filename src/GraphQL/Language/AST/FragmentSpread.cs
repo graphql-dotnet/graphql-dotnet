@@ -8,22 +8,17 @@ namespace GraphQL.Language.AST
     public class FragmentSpread : AbstractNode, IFragment
     {
         /// <summary>
-        /// Initializes a new instance with the specified <see cref="NameNode"/> containing the name of this fragment spread node.
+        /// Initializes a new instance with the specified name of this fragment spread node.
         /// </summary>
-        public FragmentSpread(NameNode node)
+        public FragmentSpread(string name)
         {
-            NameNode = node;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of this fragment spread.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of this fragment spread.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets or sets a list of directive nodes that apply to this fragment spread node.

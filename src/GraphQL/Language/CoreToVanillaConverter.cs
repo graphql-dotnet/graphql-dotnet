@@ -37,7 +37,7 @@ namespace GraphQL.Language
 
         public static Operation Operation(GraphQLOperationDefinition source)
         {
-            return new Operation(Name(source.Name))
+            return new Operation(source.Name?.Value)
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -50,7 +50,7 @@ namespace GraphQL.Language
 
         public static FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
-            return new FragmentDefinition(Name(source.Name))
+            return new FragmentDefinition(source.Name?.Value)
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -62,7 +62,7 @@ namespace GraphQL.Language
 
         public static FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
         {
-            return new FragmentSpread(Name(source.Name))
+            return new FragmentSpread(source.Name?.Value)
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -99,7 +99,7 @@ namespace GraphQL.Language
 
         public static VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
-            var def = new VariableDefinition(Name(source.Variable.Name))
+            var def = new VariableDefinition(source.Variable.Name?.Value)
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -142,7 +142,7 @@ namespace GraphQL.Language
 
         public static Field Field(GraphQLFieldSelection source)
         {
-            return new Field(Name(source.Alias), Name(source.Name))
+            return new Field(source.Alias?.Value, source.Name?.Value)
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -169,7 +169,7 @@ namespace GraphQL.Language
 
         public static Directive Directive(GraphQLDirective d)
         {
-            return new Directive(Name(d.Name))
+            return new Directive(d.Name?.Value)
             {
                 SourceLocation = Convert(d.Location),
                 Arguments = Arguments(d.Arguments)
@@ -184,7 +184,7 @@ namespace GraphQL.Language
             {
                 foreach (var a in source)
                 {
-                    var arg = new Argument(Name(a.Name))
+                    var arg = new Argument(a.Name?.Value)
                     {
                         SourceLocation = Convert(a.Name.Location),
                         CommentNode = Comment(a.Comment),
@@ -281,7 +281,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.Variable:
                 {
                     var vari = (GraphQLVariable)source;
-                    return new VariableReference(Name(vari.Name)) { SourceLocation = Convert(vari.Location) };
+                    return new VariableReference(vari.Name?.Value) { SourceLocation = Convert(vari.Location) };
                 }
                 case ASTNodeKind.ObjectValue:
                 {
@@ -307,12 +307,12 @@ namespace GraphQL.Language
 
         public static ObjectField ObjectField(GraphQLObjectField source)
         {
-            return new ObjectField(Name(source.Name), Value(source.Value)) { SourceLocation = Convert(source.Location) };
+            return new ObjectField(source.Name?.Value, Value(source.Value)) { SourceLocation = Convert(source.Location) };
         }
 
         public static NamedType NamedType(GraphQLNamedType source)
         {
-            return new NamedType(Name(source.Name)) { SourceLocation = Convert(source.Location) };
+            return new NamedType(source.Name?.Value) { SourceLocation = Convert(source.Location) };
         }
 
         public static IType Type(GraphQLType type)
@@ -322,7 +322,7 @@ namespace GraphQL.Language
                 case ASTNodeKind.NamedType:
                 {
                     var name = (GraphQLNamedType)type;
-                    return new NamedType(Name(name.Name)) { SourceLocation = Convert(name.Location) };
+                    return new NamedType(name.Name?.Value) { SourceLocation = Convert(name.Location) };
                 }
 
                 case ASTNodeKind.NonNullType:
@@ -339,12 +339,6 @@ namespace GraphQL.Language
             }
 
             throw new InvalidOperationException($"Unmapped type {type.Kind}");
-        }
-
-        public static NameNode Name(GraphQLName name)
-        {
-            if (name == null) return default;
-            return new NameNode(name.Value, Convert(name.Location));
         }
 
         private static CommentNode Comment(GraphQLComment comment)

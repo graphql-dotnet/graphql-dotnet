@@ -113,7 +113,7 @@ namespace GraphQL.Utilities.Federation
         {
             if (FindSelectionToAmend(field.SelectionSet, document, out var setToAlter))
             {
-                setToAlter.Prepend(new Field(default, new NameNode("__typename")));
+                setToAlter.Prepend(new Field(default, "__typename"));
             }
         }
 

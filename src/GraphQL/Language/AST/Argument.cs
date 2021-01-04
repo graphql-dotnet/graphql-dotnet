@@ -8,29 +8,17 @@ namespace GraphQL.Language.AST
     public class Argument : AbstractNode
     {
         /// <summary>
-        /// Initializes a new instance of an argument node.
-        /// </summary>
-        public Argument()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of an argument node with the specified properties.
         /// </summary>
-        public Argument(NameNode name)
+        public Argument(string name)
         {
-            NameNode = name;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of this argument.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns a <see cref="NameNode"/> containing the name of this argument.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Returns the value node for this argument.

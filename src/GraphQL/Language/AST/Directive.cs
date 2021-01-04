@@ -10,20 +10,15 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance of a directive node with the specified parameters.
         /// </summary>
-        public Directive(NameNode node)
+        public Directive(string name)
         {
-            NameNode = node;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of this directive.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> which contains the name of this directive.
-        /// </summary>
-        public NameNode NameNode { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Returns the node containing a list of argument nodes for this directive.

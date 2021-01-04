@@ -15,22 +15,17 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
-        /// Initializes a new variable definition node with the specified <see cref="NameNode"/> containing the name of the variable.
+        /// Initializes a new variable definition node with the specified name of the variable.
         /// </summary>
-        public VariableDefinition(NameNode node)
+        public VariableDefinition(string name)
         {
-            NameNode = node;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of the variable.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Gets or sets the <see cref="NameNode"/> containing the name of the variable.
-        /// </summary>
-        public NameNode NameNode { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Returns the type node representing the graph type of the variable.

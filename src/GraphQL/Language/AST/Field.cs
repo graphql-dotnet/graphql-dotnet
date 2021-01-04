@@ -8,41 +8,23 @@ namespace GraphQL.Language.AST
     public class Field : AbstractNode, ISelection, IHaveSelectionSet
     {
         /// <summary>
-        /// Initializes a new instance of a field selection node.
-        /// </summary>
-        public Field()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of a field selection node with the specified parameters.
         /// </summary>
-        public Field(NameNode alias, NameNode name)
+        public Field(string alias, string name)
         {
-            Alias = alias.Name;
-            AliasNode = alias;
-            NameNode = name;
+            Alias = alias;
+            Name = name;
         }
 
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name => NameNode.Name;
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the name of this field.
-        /// </summary>
-        public NameNode NameNode { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Returns the alias for this field, if any.
         /// </summary>
-        public string Alias { get; set; }
-
-        /// <summary>
-        /// Returns the <see cref="NameNode"/> containing the alias of this field, if any.
-        /// </summary>
-        public NameNode AliasNode { get; }
+        public string Alias { get; }
 
         /// <summary>
         /// Gets or sets a list of directive nodes for this field selection node.
