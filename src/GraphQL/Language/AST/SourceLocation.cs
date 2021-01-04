@@ -30,5 +30,8 @@ namespace GraphQL.Language.AST
         /// Indicates whether the structure has been initialized with a valid values.
         /// </summary>
         public bool IsSet => _start >= 0 && _end >= _start;
+
+        /// <inheritdoc/>
+        public override string ToString() => $"start={Start}, end={End}";
     }
 }

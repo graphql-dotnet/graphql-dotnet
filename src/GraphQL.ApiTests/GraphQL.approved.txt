@@ -1398,6 +1398,7 @@ namespace GraphQL.Language.AST
         public int End { get; }
         public bool IsSet { get; }
         public int Start { get; }
+        public override string ToString() { }
     }
     public class StringValue : GraphQL.Language.AST.ValueNode<string>
     {
