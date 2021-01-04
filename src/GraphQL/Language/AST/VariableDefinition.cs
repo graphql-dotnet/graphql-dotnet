@@ -40,6 +40,7 @@ namespace GraphQL.Language.AST
 
         /// <summary>
         /// Returns a value node representing the default value of the variable.
+        /// Returns <see langword="null"/> if the variable has no default value. 
         /// </summary>
         public IValue DefaultValue { get; set; }
 

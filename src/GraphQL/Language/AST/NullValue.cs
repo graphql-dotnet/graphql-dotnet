@@ -1,7 +1,7 @@
 namespace GraphQL.Language.AST
 {
     /// <summary>
-    /// Represents the value null within a document.
+    /// Represents the 'null' value within a document.
     /// </summary>
     public class NullValue : AbstractNode, IValue
     {

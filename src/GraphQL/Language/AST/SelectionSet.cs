@@ -43,7 +43,7 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
-        /// Adds a node to the list.
+        /// Adds a node to the end of the list.
         /// </summary>
         public void Add(ISelection selection)
         {

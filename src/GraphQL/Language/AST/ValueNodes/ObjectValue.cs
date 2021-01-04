@@ -21,7 +21,8 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
-        /// Returns a <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see> containing the values of the field nodes that this object value node contains.
+        /// Returns a <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see>
+        /// containing the values of the field nodes that this object value node contains.
         /// </summary>
         public object Value
         {

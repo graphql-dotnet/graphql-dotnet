@@ -11,7 +11,6 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new fragment definition node with the specified <see cref="NameNode"/> containing the name of this fragment definition.
         /// </summary>
-        /// <param name="node"></param>
         public FragmentDefinition(NameNode node)
         {
             NameNode = node;

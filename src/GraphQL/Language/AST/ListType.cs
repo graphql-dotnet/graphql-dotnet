@@ -10,7 +10,6 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a list type node that wraps the specified type node.
         /// </summary>
-        /// <param name="type"></param>
         public ListType(IType type)
         {
             Type = type;

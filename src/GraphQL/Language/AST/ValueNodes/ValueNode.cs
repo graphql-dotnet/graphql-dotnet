@@ -1,7 +1,7 @@
 namespace GraphQL.Language.AST
 {
     /// <summary>
-    /// Represents a value node which contains an literal value within a document.
+    /// Represents a value node which contains a literal value within a document.
     /// </summary>
     public abstract class ValueNode<T> : AbstractNode, IValue<T>
     {

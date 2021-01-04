@@ -9,10 +9,12 @@ namespace GraphQL.Language.AST
         /// A query operation.
         /// </summary>
         Query,
+
         /// <summary>
         /// A mutation operation.
         /// </summary>
         Mutation,
+
         /// <summary>
         /// A subscription operation.
         /// </summary>

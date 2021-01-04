@@ -40,7 +40,7 @@ namespace GraphQL.Language.AST
         public override string ToString() => $"EnumValue{{name={Name}}}";
 
         /// <summary>
-        /// Compares this instances to another instance by comparing the string representation of the enumeration value.
+        /// Compares this instance to another instance by comparing the string representation of the enumeration value.
         /// </summary>
         protected bool Equals(EnumValue other) => string.Equals(Name, other.Name, StringComparison.InvariantCulture);
 

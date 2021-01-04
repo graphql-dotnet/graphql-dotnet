@@ -10,7 +10,6 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new named type node containing the specified <see cref="NameNode"/>.
         /// </summary>
-        /// <param name="node"></param>
         public NamedType(NameNode node)
         {
             NameNode = node;

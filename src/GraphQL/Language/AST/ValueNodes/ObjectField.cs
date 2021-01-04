@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GraphQL.Language.AST
 {
     /// <summary>
-    /// Represents the child field node of a object value node within a document.
+    /// Represents the child field node of an object value node within a document.
     /// </summary>
     public class ObjectField : AbstractNode
     {
