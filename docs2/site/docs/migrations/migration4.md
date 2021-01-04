@@ -20,7 +20,7 @@
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
-* `NameNode` has been changed to a struct.
+* `NameNode` has been changed to a readonly struct.
 
 ```c#
     /// <summary>
