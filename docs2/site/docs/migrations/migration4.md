@@ -15,9 +15,9 @@
 * `LightweightCache.First` method has been removed.
 * `IGraphType.CollectTypes` method has been removed.
 * `ExecutionHelper.SubFieldsFor` method has been removed.
-* `SourceLocation`, `NodeExtensions`, `AstNodeExtensions` classes have been removed.
+* `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `ErrorLocation` struct became `readonly`.
-* `GraphQL.Language.AST.INode.SourceLocation` property now has `GraphQLParser.AST.GraphQLLocation` type.
+* `SourceLocation` class became `readonly struct`.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
