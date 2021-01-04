@@ -1428,7 +1428,9 @@ namespace GraphQL.Language
     {
         public static void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         public static GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
+        public static GraphQL.Language.AST.CommentNode Comment(GraphQLParser.AST.GraphQLComment comment) { }
         public static GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
+        public static GraphQL.Language.AST.SourceLocation Convert(GraphQLParser.AST.GraphQLLocation location) { }
         public static GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
         public static GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
         public static GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }

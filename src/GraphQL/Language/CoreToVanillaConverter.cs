@@ -414,7 +414,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a comment node.
         /// </summary>
-        private static CommentNode Comment(GraphQLComment comment)
+        public static CommentNode Comment(GraphQLComment comment)
         {
             return comment == null
                 ? null
@@ -432,7 +432,10 @@ namespace GraphQL.Language
             _ => throw new InvalidOperationException($"Unmapped operation type {type}")
         };
 
-        private static SourceLocation Convert(GraphQLLocation location) => new SourceLocation(location.Start, location.End);
+        /// <summary>
+        /// Converts a location reference within a document.
+        /// </summary>
+        public static SourceLocation Convert(GraphQLLocation location) => new SourceLocation(location.Start, location.End);
     }
 
     // * DESCRIPTION TAKEN FROM MS REFERENCE SOURCE *
