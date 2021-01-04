@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -84,25 +83,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc />
         public override string ToString() => $"Field{{name='{Name}', alias='{Alias}', arguments={Arguments}, directives={Directives}, selectionSet={SelectionSet}}}";
-
-        /// <summary>
-        /// Determines if this instance is equal to another instance by comparing the <see cref="Name"/> and <see cref="Alias"/> properties.
-        /// </summary>
-        protected bool Equals(Field other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && string.Equals(Alias, other.Alias, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((Field)obj);
-        }
     }
 }

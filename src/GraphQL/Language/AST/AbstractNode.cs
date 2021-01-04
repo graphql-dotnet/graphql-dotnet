@@ -22,8 +22,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; set; }
-
-        /// <inheritdoc/>
-        public abstract bool IsEqualTo(INode node);
     }
 }
