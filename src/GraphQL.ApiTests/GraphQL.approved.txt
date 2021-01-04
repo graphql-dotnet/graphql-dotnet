@@ -1080,6 +1080,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
         public abstract bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
+    [System.Obsolete]
     public class Alias
     {
         public Alias(GraphQL.Language.AST.NameNode alias, GraphQL.Language.AST.NameNode name) { }
