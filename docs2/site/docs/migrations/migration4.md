@@ -40,3 +40,6 @@
         public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
     }
 ```
+
+* Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
+* `ISubscriptionExecuter` has been removed.

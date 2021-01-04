@@ -807,12 +807,6 @@ namespace GraphQL.Execution
         public SerialExecutionStrategy() { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
-    public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
-    {
-        public SubscriptionExecutionStrategy() { }
-        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
-        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-    }
     [System.Serializable]
     public class SyntaxError : GraphQL.Execution.DocumentError
     {
@@ -1577,10 +1571,6 @@ namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext { }
     public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>, GraphQL.Subscription.IResolveEventStreamContext { }
-    public interface ISubscriptionExecuter
-    {
-        System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
-    }
     public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }
