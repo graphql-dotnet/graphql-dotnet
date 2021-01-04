@@ -141,18 +141,11 @@ namespace GraphQL
         /// </summary>
         public static void AddLocation(this ExecutionError error, AbstractNode abstractNode, Document document)
         {
-            if (abstractNode == null)
+            if (abstractNode == null || document == null)
                 return;
 
-            if (document != null)
-            {
-                var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
-                error.AddLocation(location.Line, location.Column);
-            }
-            else if (abstractNode.SourceLocation.Line > 0 && abstractNode.SourceLocation.Column > 0)
-            {
-                error.AddLocation(abstractNode.SourceLocation.Line, abstractNode.SourceLocation.Column);
-            }
+            var location = new Location(new Source(document.OriginalQuery), abstractNode.SourceLocation.Start);
+            error.AddLocation(location.Line, location.Column);
         }
     }
 }
