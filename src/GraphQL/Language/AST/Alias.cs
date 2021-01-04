@@ -1,5 +1,8 @@
+using System;
+
 namespace GraphQL.Language.AST
 {
+    [Obsolete]
     public class Alias
     {
         public NameNode Al { get; }

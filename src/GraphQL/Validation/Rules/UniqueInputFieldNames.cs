@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -29,10 +28,7 @@ namespace GraphQL.Validation.Rules
                         knownNameStack.Push(knownNames);
                         knownNames = new Dictionary<string, IValue>();
                     },
-                    leave: objVal =>
-                    {
-                        knownNames = knownNameStack.Pop();
-                    });
+                    leave: objVal => knownNames = knownNameStack.Pop());
 
                 _.Match<ObjectField>(
                     leave: objField =>

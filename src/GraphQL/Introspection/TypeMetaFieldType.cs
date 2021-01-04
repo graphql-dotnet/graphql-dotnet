@@ -3,8 +3,15 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__type</c> meta-field is available on the root of a query operation and
+    /// returns a <c>__Type</c> graph type for a specified graph type name.
+    /// </summary>
     public class TypeMetaFieldType : FieldType
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__type</c> meta-field.
+        /// </summary>
         public TypeMetaFieldType()
         {
             SetName("__type", validate: false);

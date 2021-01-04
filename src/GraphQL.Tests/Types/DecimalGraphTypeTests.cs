@@ -19,7 +19,7 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void coerces_integer_to_decimal()
         {
-            _type.ParseValue(0).ShouldBe((decimal) 0);
+            _type.ParseValue(0).ShouldBe((decimal)0);
         }
 
         [Fact]

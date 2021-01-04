@@ -32,7 +32,8 @@ namespace GraphQL.Validation.Complexity
 
         public void Validate(Document document, ComplexityConfiguration complexityParameters)
         {
-            if (complexityParameters == null) return;
+            if (complexityParameters == null)
+                return;
             var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f, complexityParameters.MaxRecursionCount);
 
             Analyzed(document, complexityParameters, complexityResult);
@@ -61,7 +62,8 @@ namespace GraphQL.Validation.Complexity
         /// </summary>
         internal ComplexityResult Analyze(Document doc, double avgImpact, int maxRecursionCount)
         {
-            if (avgImpact <= 1) throw new ArgumentOutOfRangeException(nameof(avgImpact));
+            if (avgImpact <= 1)
+                throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
             var context = new AnalysisContext { MaxRecursionCount = maxRecursionCount };
 
@@ -105,7 +107,8 @@ namespace GraphQL.Validation.Complexity
         {
             context.AssertRecursion();
 
-            if (node is FragmentDefinition) return;
+            if (node is FragmentDefinition)
+                return;
 
             if (node.Children != null &&
                 node.Children.Any(n => n is Field || n is FragmentSpread || (n is SelectionSet set && set.Children.Any()) || n is Operation))
@@ -135,15 +138,19 @@ namespace GraphQL.Validation.Complexity
         private static double? GetImpactFromArgs(INode node)
         {
             double? newImpact = null;
-            if (!(node.Children.FirstOrDefault(n => n is Arguments) is Arguments args)) return null;
+            if (!(node.Children.FirstOrDefault(n => n is Arguments) is Arguments args))
+                return null;
 
-            if (args.ValueFor("id") != null) newImpact = 1;
+            if (args.ValueFor("id") != null)
+                newImpact = 1;
             else
             {
-                if (args.ValueFor("first") is IntValue firstValue) newImpact = firstValue.Value;
+                if (args.ValueFor("first") is IntValue firstValue)
+                    newImpact = firstValue.Value;
                 else
                 {
-                    if (args.ValueFor("last") is IntValue lastValue) newImpact = lastValue.Value;
+                    if (args.ValueFor("last") is IntValue lastValue)
+                        newImpact = lastValue.Value;
                 }
             }
             return newImpact;

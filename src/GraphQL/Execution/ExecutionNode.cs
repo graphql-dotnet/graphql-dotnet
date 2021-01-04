@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.DataLoader;
@@ -17,8 +18,8 @@ namespace GraphQL.Execution
         public ExecutionNode Parent { get; }
 
         /// <summary>
-        /// Returns the underlying graph type of this node; does not represent a <see cref="NonNullGraphType"/>, and
-        /// for child nodes of an array execution node, does not represent a <see cref="ListGraphType"/> instance.
+        /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
+        /// Array nodes will be a <see cref="ListGraphType"/> instance.
         /// </summary>
         public IGraphType GraphType { get; }
 
@@ -36,6 +37,26 @@ namespace GraphQL.Execution
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, null.
         /// </summary>
         public int? IndexInParentNode { get; protected set; }
+
+        /// <summary>
+        /// Returns the underlying graph type of this node, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// For child nodes of an array execution node, this property unwraps the <see cref="ListGraphType"/> instance and returns
+        /// the underlying graph type, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
+        /// </summary>
+        internal IGraphType ResolvedType
+        {
+            get
+            {
+                if (IndexInParentNode.HasValue)
+                {
+                    return ((ListGraphType)Parent.GraphType).ResolvedType;
+                }
+                else
+                {
+                    return FieldDefinition?.ResolvedType;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
@@ -76,6 +97,11 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
         /// </summary>
+        /// <param name="parent">The parent node, or null if this is the root node</param>
+        /// <param name="graphType">The graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>. Array nodes will be a <see cref="ListGraphType"/> instance.</param>
+        /// <param name="field">The AST field of this node</param>
+        /// <param name="fieldDefinition">The graph's field type of this node</param>
+        /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
             Parent = parent;
@@ -162,6 +188,9 @@ namespace GraphQL.Execution
                 node = node.Parent;
                 ++count;
             }
+
+            if (count == 0)
+                return Array.Empty<object>();
 
             var pathList = new object[count];
             var index = count;
