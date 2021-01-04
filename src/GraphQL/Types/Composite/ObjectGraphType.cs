@@ -34,10 +34,13 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
+            if (graphType == null)
+                throw new ArgumentNullException(nameof(graphType));
+
             if (!_resolvedInterfaces.Contains(graphType))
             {
-                graphType.IsValidInterfaceFor(this, throwError: true);
-                _resolvedInterfaces.Add(graphType ?? throw new ArgumentNullException(nameof(graphType)));
+                _ = graphType.IsValidInterfaceFor(this, throwError: true);
+                _resolvedInterfaces.Add(graphType);
             }
         }
 

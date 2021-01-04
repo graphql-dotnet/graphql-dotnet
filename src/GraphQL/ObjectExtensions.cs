@@ -97,7 +97,7 @@ namespace GraphQL
                 }
             }
 
-            if (targetCtor == null || ctorParameters == null)
+            if (targetCtor == null || ctorParameters == null || matchedKeys == null)
                 throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
 
             object[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
