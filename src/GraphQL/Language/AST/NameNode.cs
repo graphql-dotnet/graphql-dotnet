@@ -23,7 +23,7 @@ namespace GraphQL.Language.AST
         public NameNode(string name)
         {
             Name = name;
-            SourceLocation = null;
+            SourceLocation = default;
         }
 
         /// <summary>

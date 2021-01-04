@@ -37,7 +37,7 @@ namespace GraphQL.Language
 
         public static Operation Operation(GraphQLOperationDefinition source)
         {
-            return new Operation(Name(source.name))
+            return new Operation(Name(source.Name))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
