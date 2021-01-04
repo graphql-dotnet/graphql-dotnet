@@ -20,8 +20,8 @@ namespace GraphQL.Language.AST
 
         /// <summary>
         /// The index for the start of the node in the source (i.e. it's inclusive).
-        ///
-        /// For example,
+        /// <br/>
+        /// For example:
         /// <code>
         /// { field { subfield } }
         /// <br/>
@@ -32,8 +32,8 @@ namespace GraphQL.Language.AST
 
         /// <summary>
         /// The index for the character immediately after the node in the source (i.e. it's exclusive).
-        ///
-        /// For example,
+        /// <br/>
+        /// For example:
         /// <code>
         /// { field { subfield } }
         /// <br/>
