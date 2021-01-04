@@ -1,9 +1,18 @@
 namespace GraphQL.Validation.Complexity
 {
+    /// <summary>
+    /// Configuration parameters for a complexity analyzer.
+    /// </summary>
     public class ComplexityConfiguration
     {
+        /// <summary>
+        /// Gets or sets the allowed maximum depth of the query.
+        /// </summary>
         public int? MaxDepth { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maximum calculated document complexity factor.
+        /// </summary>
         public int? MaxComplexity { get; set; }
 
         /// <summary>
