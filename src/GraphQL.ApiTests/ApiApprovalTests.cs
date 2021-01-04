@@ -11,6 +11,7 @@ namespace GraphQL.ApiTests
     {
         [Theory]
         [InlineData(typeof(IGraphType))]
+        [InlineData(typeof(SubscriptionDocumentExecuter))]
         [InlineData(typeof(SystemTextJson.DocumentWriter))]
         [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
         public void PublicApi(Type type)
