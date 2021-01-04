@@ -164,12 +164,6 @@ namespace GraphQL.Execution
             string message,
             Field field,
             IEnumerable<object> path,
-            Exception ex = null)
-        {
-            var error = new ExecutionError(message, ex);
-            error.AddLocation(field, context.Document);
-            error.Path = path;
-            return error;
-        }
+            Exception ex = null) => new ExecutionError(message, ex) { Path = path }.AddLocation(field, context.Document);
     }
 }

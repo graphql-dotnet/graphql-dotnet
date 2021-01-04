@@ -29,6 +29,7 @@ namespace GraphQL.Language.AST
 
             if (_fields.TryGetValue(name, out Field original))
             {
+                // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                 _fields[name] = new Field(original.AliasNode, original.NameNode)
                 {
                     Arguments = original.Arguments,

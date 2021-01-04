@@ -19,8 +19,6 @@ namespace GraphQL.Execution
         {
             IObjectGraphType type;
 
-            ExecutionError error;
-
             switch (operation.OperationType)
             {
                 case OperationType.Query:
@@ -30,21 +28,13 @@ namespace GraphQL.Execution
                 case OperationType.Mutation:
                     type = schema.Mutation;
                     if (type == null)
-                    {
-                        error = new InvalidOperationError("Schema is not configured for mutations");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
+                        throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(operation, document);
                     break;
 
                 case OperationType.Subscription:
                     type = schema.Subscription;
                     if (type == null)
-                    {
-                        error = new InvalidOperationError("Schema is not configured for subscriptions");
-                        error.AddLocation(operation, document);
-                        throw error;
-                    }
+                        throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(operation, document);
                     break;
 
                 default:
