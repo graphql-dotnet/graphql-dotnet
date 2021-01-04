@@ -7,6 +7,9 @@ namespace GraphQL.Language.AST
     /// </summary>
     public readonly struct SourceLocation : IEquatable<SourceLocation>
     {
+        /// <summary>
+        /// Returns an 'empty' location. The meaning is equivalent to the lack of information about the location.
+        /// </summary>
         public static readonly SourceLocation Empty = new SourceLocation(-1, -1, -1, -1);
 
         /// <summary>
@@ -48,10 +51,17 @@ namespace GraphQL.Language.AST
         /// </summary>
         public bool Equals(SourceLocation other) => Line == other.Line && Column == other.Column; // TODO: where are start and end?
 
+        /// <summary>
+        /// Compares two location instances to equality.
+        /// </summary>
         public static bool operator ==(SourceLocation first, SourceLocation second) => first.Equals(second);
 
+        /// <summary>
+        /// Compares two location instances to inequality.
+        /// </summary>
         public static bool operator !=(SourceLocation first, SourceLocation second) => !first.Equals(second);
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is SourceLocation loc && Equals(loc);
 
         /// <inheritdoc/>
