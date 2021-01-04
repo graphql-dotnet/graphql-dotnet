@@ -361,7 +361,8 @@ namespace GraphQL.Language
         public static T WithLocation<T>(this T node, ASTNode astNode)
             where T : AbstractNode
         {
-            return node.WithLocation(0, 0, astNode?.Location.Start ?? -1, astNode?.Location.End ?? -1);
+            node.SourceLocation = new SourceLocation(0, 0, astNode?.Location.Start ?? -1, astNode?.Location.End ?? -1);
+            return node;
         }
     }
 
