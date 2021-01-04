@@ -16,9 +16,18 @@ namespace GraphQL.Utilities
         /// to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
         /// <br/>
         /// Setting this delegate allows you to use names not conforming to the specification, for example
-        /// 'enum-member'. Only use it when absolutely necessary.
+        /// 'enum-member'. Only change it when absolutely necessary.
         /// </summary>
         public static Action<string, string> Validation = ValidateDefault;
+
+        /// <summary>
+        /// Gets or sets current validation delegate during schema initialization. By default this delegate
+        /// validates all names according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
+        /// <br/>
+        /// Setting this delegate allows you to use names not conforming to the specification, for example
+        /// 'enum-member'. Only change it when absolutely necessary.
+        /// </summary>
+        public static Action<string, string> ValidationOnSchemaInitialize = ValidateDefault;
 
         /// <summary>
         /// Validates a specified name.
@@ -26,6 +35,13 @@ namespace GraphQL.Utilities
         /// <param name="name">GraphQL name.</param>
         /// <param name="type">Type of element: field, type, argument, enum.</param>
         public static void ValidateName(string name, string type = "field") => Validation(name, type);
+
+        /// <summary>
+        /// Validates a specified name during schema initialization.
+        /// </summary>
+        /// <param name="name">GraphQL name.</param>
+        /// <param name="type">Type of element: field, type, argument, enum.</param>
+        public static void ValidateNameOnSchemaInitialize(string name, string type = "field") => ValidationOnSchemaInitialize(name, type);
 
         /// <summary>
         /// Validates a specified name according to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
