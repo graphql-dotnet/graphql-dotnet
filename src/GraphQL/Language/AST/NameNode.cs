@@ -31,7 +31,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public string Name { get; }
 
-        IEnumerable<INode> INode.Children => throw new NotImplementedException();
+        IEnumerable<INode> INode.Children => null;
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; }
