@@ -46,7 +46,7 @@ namespace GraphQL.Language
 
         public Operation Operation(GraphQLOperationDefinition source)
         {
-            var name = source.Name != null ? Name(source.Name) : null;
+            var name = Name(source.Name);
             var op = new Operation(name).WithLocation(source);
             op.CommentNode = Comment(source.Comment);
             op.OperationType = ToOperationType(source.Operation);
@@ -68,7 +68,7 @@ namespace GraphQL.Language
 
         public FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
         {
-            var name = source.Name != null ? Name(source.Name) : null;
+            var name = Name(source.Name);
             var spread = new FragmentSpread(name).WithLocation(source);
             spread.CommentNode = Comment(source.Comment);
             spread.Directives = Directives(source.Directives);
@@ -142,7 +142,7 @@ namespace GraphQL.Language
 
         public Field Field(GraphQLFieldSelection source)
         {
-            var alias = source.Alias != null ? Name(source.Alias) : null;
+            var alias = Name(source.Alias);
             var field = new Field(alias, Name(source.Name)).WithLocation(source);
             field.CommentNode = Comment(source.Comment);
             field.Arguments = Arguments(source.Arguments);
@@ -337,7 +337,9 @@ namespace GraphQL.Language
 
         public NameNode Name(GraphQLName name)
         {
-            return new NameNode(name.Value).WithLocation(name);
+            if (name == null) return default;
+            var location = new SourceLocation(0, 0, name.Location.Start, name.Location.End);
+            return new NameNode(name.Value, location);
         }
 
         private CommentNode Comment(GraphQLComment comment)

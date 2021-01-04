@@ -1291,11 +1291,12 @@ namespace GraphQL.Language.AST
         public LongValue(long value) { }
         protected override bool Equals(GraphQL.Language.AST.ValueNode<long> other) { }
     }
-    public class NameNode : GraphQL.Language.AST.AbstractNode
+    public readonly struct NameNode : GraphQL.Language.AST.INode
     {
         public NameNode(string name) { }
+        public NameNode(string name, GraphQL.Language.AST.SourceLocation location) { }
         public string Name { get; }
-        public override bool IsEqualTo(GraphQL.Language.AST.INode node) { }
+        public GraphQL.Language.AST.SourceLocation SourceLocation { get; }
     }
     public class NamedType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
     {

@@ -10,14 +10,14 @@ namespace GraphQL.Tests.Execution
     {
         public RepeatedSubfieldsTests()
         {
-            FirstInnerField = new Field(null, new NameNode("first"));
+            FirstInnerField = new Field(default, new NameNode("first"));
             FirstFieldSelection = new SelectionSet();
             FirstFieldSelection.Add(FirstInnerField);
-            SecondInnerField = new Field(null, new NameNode("second"));
+            SecondInnerField = new Field(default, new NameNode("second"));
             SecondFieldSelection = new SelectionSet();
             SecondFieldSelection.Add(SecondInnerField);
-            FirstTestField = new Field(null, new NameNode("test"));
-            SecondTestField = new Field(null, new NameNode("test"));
+            FirstTestField = new Field(default, new NameNode("test"));
+            SecondTestField = new Field(default, new NameNode("test"));
             AliasedTestField = new Field(new NameNode("alias"), new NameNode("test"));
 
             FirstTestField.SelectionSet = FirstFieldSelection;

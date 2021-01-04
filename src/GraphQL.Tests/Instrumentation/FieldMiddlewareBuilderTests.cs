@@ -21,7 +21,7 @@ namespace GraphQL.Tests.Instrumentation
             _context = new ResolveFieldContext
             {
                 FieldName = "Name",
-                FieldAst = new Field(null, new NameNode("Name")),
+                FieldAst = new Field(default, new NameNode("Name")),
                 Source = new Person { Name = "Quinn" },
                 Errors = new ExecutionErrors(),
                 Schema = new Schema(),
