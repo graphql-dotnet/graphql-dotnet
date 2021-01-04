@@ -6,6 +6,9 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation.Complexity
 {
+    /// <summary>
+    /// The default complexity analyzer.
+    /// </summary>
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
         private sealed class FragmentComplexity
@@ -30,6 +33,7 @@ namespace GraphQL.Validation.Complexity
             }
         }
 
+        /// <inheritdoc/>
         public void Validate(Document document, ComplexityConfiguration complexityParameters)
         {
             if (complexityParameters == null)
@@ -47,6 +51,10 @@ namespace GraphQL.Validation.Complexity
                     $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
         }
 
+        /// <summary>
+        /// Executes after the complexity analysis has completed, before comparing results to the complexity configuration parameters.
+        /// This method is made to be able to access the calculated <see cref="ComplexityResult"/> and handle it, for example, for logging.
+        /// </summary>
         protected virtual void Analyzed(Document document, ComplexityConfiguration complexityParameters, ComplexityResult complexityResult)
         {
 #if DEBUG
