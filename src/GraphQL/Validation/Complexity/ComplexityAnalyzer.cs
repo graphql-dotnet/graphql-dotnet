@@ -7,7 +7,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Validation.Complexity
 {
     /// <summary>
-    /// The default complexity analyzer
+    /// The default complexity analyzer.
     /// </summary>
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
@@ -53,6 +53,7 @@ namespace GraphQL.Validation.Complexity
 
         /// <summary>
         /// Executes after the complexity analysis has completed, before comparing results to the complexity configuration parameters.
+        /// This method is made to be able to access the calculated <see cref="ComplexityResult"/> and handle it, for example, for logging.
         /// </summary>
         protected virtual void Analyzed(Document document, ComplexityConfiguration complexityParameters, ComplexityResult complexityResult)
         {

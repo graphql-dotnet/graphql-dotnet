@@ -14,7 +14,7 @@ namespace GraphQL.Validation.Complexity
         public Dictionary<INode, double> ComplexityMap { get; } = new Dictionary<INode, double>();
 
         /// <summary>
-        /// Returns the calculated document complexity factor.
+        /// Returns the total calculated document complexity factor over all executed nodes.
         /// </summary>
         public double Complexity { get; set; }
 
