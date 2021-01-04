@@ -29,7 +29,14 @@ namespace GraphQL.Language.AST
 
             if (_fields.TryGetValue(name, out Field original))
             {
-                _fields[name] = original.MergeSelectionSet(field);
+                // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                _fields[name] = new Field(original.AliasNode, original.NameNode)
+                {
+                    Arguments = original.Arguments,
+                    SelectionSet = original.SelectionSet.Merge(field.SelectionSet),
+                    Directives = original.Directives,
+                    SourceLocation = original.SourceLocation,
+                };
             }
             else
             {

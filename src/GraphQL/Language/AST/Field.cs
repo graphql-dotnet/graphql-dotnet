@@ -104,23 +104,5 @@ namespace GraphQL.Language.AST
                 return false;
             return Equals((Field)obj);
         }
-
-        /// <summary>
-        /// Returns a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
-        /// </summary>
-        public Field MergeSelectionSet(Field other)
-        {
-            if (Equals(other))
-            {
-                return new Field(AliasNode, NameNode)
-                {
-                    Arguments = Arguments,
-                    SelectionSet = SelectionSet.Merge(other.SelectionSet),
-                    Directives = Directives,
-                    SourceLocation = SourceLocation,
-                };
-            }
-            return this;
-        }
     }
 }

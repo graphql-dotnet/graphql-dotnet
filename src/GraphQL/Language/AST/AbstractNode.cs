@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
@@ -21,7 +22,7 @@ namespace GraphQL.Language.AST
         public virtual IEnumerable<INode> Children => null;
 
         /// <inheritdoc/>
-        public SourceLocation SourceLocation { get; set; }
+        public GraphQLLocation SourceLocation { get; set; }
 
         /// <inheritdoc/>
         public abstract bool IsEqualTo(INode node);

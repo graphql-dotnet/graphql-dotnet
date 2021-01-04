@@ -44,10 +44,11 @@ namespace GraphQL
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
         public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
     }
-    public struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
+    public readonly struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
-        public int Column { get; set; }
-        public int Line { get; set; }
+        public ErrorLocation(int line, int column) { }
+        public int Column { get; }
+        public int Line { get; }
         public bool Equals(GraphQL.ErrorLocation other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
@@ -67,7 +68,8 @@ namespace GraphQL
     }
     public static class ExecutionErrorExtensions
     {
-        public static void AddLocation(this GraphQL.ExecutionError error, GraphQL.Language.AST.AbstractNode abstractNode, GraphQL.Language.AST.Document document) { }
+        public static TError AddLocation<TError>(this TError error, GraphQL.Language.AST.AbstractNode abstractNode, GraphQL.Language.AST.Document document)
+            where TError : GraphQL.ExecutionError { }
     }
     public class ExecutionErrors : System.Collections.Generic.IEnumerable<GraphQL.ExecutionError>, System.Collections.IEnumerable
     {
@@ -1056,7 +1058,7 @@ namespace GraphQL.Language.AST
         public virtual System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public string Comment { get; }
         public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
-        public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
+        public GraphQLParser.AST.GraphQLLocation SourceLocation { get; set; }
         public abstract bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
     public class Argument : GraphQL.Language.AST.AbstractNode
@@ -1181,7 +1183,6 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         protected bool Equals(GraphQL.Language.AST.Field other) { }
         public override bool IsEqualTo(GraphQL.Language.AST.INode obj) { }
-        public GraphQL.Language.AST.Field MergeSelectionSet(GraphQL.Language.AST.Field other) { }
         public override string ToString() { }
     }
     public class Fields : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Field>, System.Collections.IEnumerable
@@ -1241,7 +1242,7 @@ namespace GraphQL.Language.AST
     public interface INode
     {
         System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
-        GraphQL.Language.AST.SourceLocation SourceLocation { get; }
+        GraphQLParser.AST.GraphQLLocation SourceLocation { get; }
         bool IsEqualTo(GraphQL.Language.AST.INode node);
     }
     public interface ISelection : GraphQL.Language.AST.INode { }
@@ -1392,21 +1393,6 @@ namespace GraphQL.Language.AST
         public ShortValue(short value) { }
         protected override bool Equals(GraphQL.Language.AST.ValueNode<short> other) { }
     }
-    public readonly struct SourceLocation : System.IEquatable<GraphQL.Language.AST.SourceLocation>
-    {
-        public static readonly GraphQL.Language.AST.SourceLocation Empty;
-        public SourceLocation(int line, int column, int start = -1, int end = -1) { }
-        public int Column { get; }
-        public int End { get; }
-        public int Line { get; }
-        public int Start { get; }
-        public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
-        public override bool Equals(object obj) { }
-        public override int GetHashCode() { }
-        public override string ToString() { }
-        public static bool operator !=(GraphQL.Language.AST.SourceLocation first, GraphQL.Language.AST.SourceLocation second) { }
-        public static bool operator ==(GraphQL.Language.AST.SourceLocation first, GraphQL.Language.AST.SourceLocation second) { }
-    }
     public class StringValue : GraphQL.Language.AST.ValueNode<string>
     {
         public StringValue(string value) { }
@@ -1491,13 +1477,10 @@ namespace GraphQL.Language.AST
 }
 namespace GraphQL.Language
 {
-    public static class AstNodeExtensions
-    {
-        public static T WithLocation<T>(this T node, GraphQLParser.AST.ASTNode astNode)
-            where T : GraphQL.Language.AST.AbstractNode { }
-    }
     public class CoreToVanillaConverter
     {
+        public static readonly GraphQL.Language.CoreToVanillaConverter Instance;
+        public CoreToVanillaConverter() { }
         public void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         public GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
         public GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
@@ -1516,7 +1499,7 @@ namespace GraphQL.Language
         public GraphQL.Language.AST.IValue Value(GraphQLParser.AST.GraphQLValue source) { }
         public GraphQL.Language.AST.VariableDefinition VariableDefinition(GraphQLParser.AST.GraphQLVariableDefinition source) { }
         public GraphQL.Language.AST.VariableDefinitions VariableDefinitions(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLVariableDefinition> source) { }
-        public static GraphQL.Language.AST.Document Convert(string body, GraphQLParser.AST.GraphQLDocument source) { }
+        public static GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
         public static GraphQL.Language.AST.OperationType ToOperationType(GraphQLParser.AST.OperationType type) { }
     }
 }

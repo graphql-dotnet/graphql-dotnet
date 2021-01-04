@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GraphQLParser.AST;
 
 namespace GraphQL.Language.AST
 {
@@ -15,7 +16,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the node's location within the source document.
         /// </summary>
-        SourceLocation SourceLocation { get; }
+        GraphQLLocation SourceLocation { get; }
 
         /// <summary>
         /// Determines if the node is equal to another node.

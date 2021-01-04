@@ -42,11 +42,8 @@ namespace GraphQL.Validation
             nodes?.Apply(n =>
             {
                 _nodes.Add(n);
-                if (n.SourceLocation != SourceLocation.Empty)
-                {
-                    var location = new Location(new Source(originalQuery), n.SourceLocation.Start);
-                    AddLocation(location.Line, location.Column);
-                }
+                var location = new Location(originalQuery, n.SourceLocation.Start);
+                AddLocation(location.Line, location.Column);
             });
         }
 

@@ -26,12 +26,9 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private readonly CoreToVanillaConverter _converter;
-
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)
         {
-            _converter = new CoreToVanillaConverter("");
         }
 
         public string PrintFederatedDirectives(IGraphType type)
@@ -59,7 +56,7 @@ namespace GraphQL.Utilities.Federation
 
         public string PrintAstDirective(GraphQLDirective directive)
         {
-            var ast = _converter.Directive(directive);
+            var ast = CoreToVanillaConverter.Instance.Directive(directive);
             return AstPrinter.Print(ast);
         }
 
