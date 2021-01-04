@@ -44,10 +44,11 @@ namespace GraphQL
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
         public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
     }
-    public struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
+    public readonly struct ErrorLocation : System.IEquatable<GraphQL.ErrorLocation>
     {
-        public int Column { get; set; }
-        public int Line { get; set; }
+        public ErrorLocation(int line, int column) { }
+        public int Column { get; }
+        public int Line { get; }
         public bool Equals(GraphQL.ErrorLocation other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
@@ -67,7 +68,8 @@ namespace GraphQL
     }
     public static class ExecutionErrorExtensions
     {
-        public static void AddLocation(this GraphQL.ExecutionError error, GraphQL.Language.AST.AbstractNode abstractNode, GraphQL.Language.AST.Document document) { }
+        public static TError AddLocation<TError>(this TError error, GraphQL.Language.AST.AbstractNode abstractNode, GraphQL.Language.AST.Document document)
+            where TError : GraphQL.ExecutionError { }
     }
     public class ExecutionErrors : System.Collections.Generic.IEnumerable<GraphQL.ExecutionError>, System.Collections.IEnumerable
     {
@@ -807,12 +809,6 @@ namespace GraphQL.Execution
         public SerialExecutionStrategy() { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
-    public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
-    {
-        public SubscriptionExecutionStrategy() { }
-        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
-        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
-    }
     [System.Serializable]
     public class SyntaxError : GraphQL.Execution.DocumentError
     {
@@ -1348,14 +1344,12 @@ namespace GraphQL.Language.AST
     {
         public ShortValue(short value) { }
     }
-    public class SourceLocation
+    public readonly struct SourceLocation : System.IEquatable<GraphQL.Language.AST.SourceLocation>
     {
-        public SourceLocation(int line, int column, int start = -1, int end = -1) { }
-        public int Column { get; }
+        public SourceLocation(int start, int end) { }
         public int End { get; }
-        public int Line { get; }
         public int Start { get; }
-        protected bool Equals(GraphQL.Language.AST.SourceLocation other) { }
+        public bool Equals(GraphQL.Language.AST.SourceLocation other) { }
         public override bool Equals(object obj) { }
         public override int GetHashCode() { }
         public override string ToString() { }
@@ -1432,38 +1426,28 @@ namespace GraphQL.Language.AST
 }
 namespace GraphQL.Language
 {
-    public static class AstNodeExtensions
+    public static class CoreToVanillaConverter
     {
-        public static T WithLocation<T>(this T node, GraphQLParser.AST.ASTNode astNode)
-            where T : GraphQL.Language.AST.AbstractNode { }
-    }
-    public class CoreToVanillaConverter
-    {
-        public void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
-        public GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
-        public GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
-        public GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
-        public GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
-        public GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
-        public GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
-        public GraphQL.Language.AST.InlineFragment InlineFragment(GraphQLParser.AST.GraphQLInlineFragment source) { }
-        public GraphQL.Language.AST.NameNode Name(GraphQLParser.AST.GraphQLName name) { }
-        public GraphQL.Language.AST.NamedType NamedType(GraphQLParser.AST.GraphQLNamedType source) { }
-        public GraphQL.Language.AST.ObjectField ObjectField(GraphQLParser.AST.GraphQLObjectField source) { }
-        public GraphQL.Language.AST.Operation Operation(GraphQLParser.AST.GraphQLOperationDefinition source) { }
-        public GraphQL.Language.AST.ISelection Selection(GraphQLParser.AST.ASTNode source) { }
-        public GraphQL.Language.AST.SelectionSet SelectionSet(GraphQLParser.AST.GraphQLSelectionSet source) { }
-        public GraphQL.Language.AST.IType Type(GraphQLParser.AST.GraphQLType type) { }
-        public GraphQL.Language.AST.IValue Value(GraphQLParser.AST.GraphQLValue source) { }
-        public GraphQL.Language.AST.VariableDefinition VariableDefinition(GraphQLParser.AST.GraphQLVariableDefinition source) { }
-        public GraphQL.Language.AST.VariableDefinitions VariableDefinitions(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLVariableDefinition> source) { }
-        public static GraphQL.Language.AST.Document Convert(string body, GraphQLParser.AST.GraphQLDocument source) { }
+        public static void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
+        public static GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
+        public static GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
+        public static GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
+        public static GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
+        public static GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
+        public static GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
+        public static GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
+        public static GraphQL.Language.AST.InlineFragment InlineFragment(GraphQLParser.AST.GraphQLInlineFragment source) { }
+        public static GraphQL.Language.AST.NameNode Name(GraphQLParser.AST.GraphQLName name) { }
+        public static GraphQL.Language.AST.NamedType NamedType(GraphQLParser.AST.GraphQLNamedType source) { }
+        public static GraphQL.Language.AST.ObjectField ObjectField(GraphQLParser.AST.GraphQLObjectField source) { }
+        public static GraphQL.Language.AST.Operation Operation(GraphQLParser.AST.GraphQLOperationDefinition source) { }
+        public static GraphQL.Language.AST.ISelection Selection(GraphQLParser.AST.ASTNode source) { }
+        public static GraphQL.Language.AST.SelectionSet SelectionSet(GraphQLParser.AST.GraphQLSelectionSet source) { }
         public static GraphQL.Language.AST.OperationType ToOperationType(GraphQLParser.AST.OperationType type) { }
-    }
-    public static class NodeExtensions
-    {
-        public static T WithLocation<T>(this T node, int line, int column, int start = -1, int end = -1)
-            where T : GraphQL.Language.AST.AbstractNode { }
+        public static GraphQL.Language.AST.IType Type(GraphQLParser.AST.GraphQLType type) { }
+        public static GraphQL.Language.AST.IValue Value(GraphQLParser.AST.GraphQLValue source) { }
+        public static GraphQL.Language.AST.VariableDefinition VariableDefinition(GraphQLParser.AST.GraphQLVariableDefinition source) { }
+        public static GraphQL.Language.AST.VariableDefinitions VariableDefinitions(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLVariableDefinition> source) { }
     }
 }
 namespace GraphQL.Reflection
@@ -1579,10 +1563,6 @@ namespace GraphQL.Subscription
 {
     public interface IResolveEventStreamContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext { }
     public interface IResolveEventStreamContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>, GraphQL.Subscription.IResolveEventStreamContext { }
-    public interface ISubscriptionExecuter
-    {
-        System.Threading.Tasks.Task<GraphQL.Subscription.SubscriptionExecutionResult> SubscribeAsync(GraphQL.ExecutionOptions config);
-    }
     public class ResolveEventStreamContext : GraphQL.Subscription.ResolveEventStreamContext<object>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.Subscription.IResolveEventStreamContext
     {
         public ResolveEventStreamContext() { }

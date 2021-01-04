@@ -34,8 +34,12 @@ namespace GraphQL.Execution
 
             return new ExecutionResult
             {
-                Data = data
-            }.With(context);
+                Data = data,
+                Query = context.Document.OriginalQuery,
+                Document = context.Document,
+                Operation = context.Operation,
+                Extensions = context.Extensions
+            };
         }
 
         /// <summary>

@@ -26,12 +26,9 @@ namespace GraphQL.Utilities.Federation
             "_Any"
         };
 
-        private readonly CoreToVanillaConverter _converter;
-
         public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
             : base(schema, options)
         {
-            _converter = new CoreToVanillaConverter("");
         }
 
         public string PrintFederatedDirectives(IGraphType type)
@@ -57,11 +54,7 @@ namespace GraphQL.Utilities.Federation
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive)
-        {
-            var ast = _converter.Directive(directive);
-            return AstPrinter.Print(ast);
-        }
+        public string PrintAstDirective(GraphQLDirective directive) => AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
 
         public override string PrintObject(IObjectGraphType type)
         {

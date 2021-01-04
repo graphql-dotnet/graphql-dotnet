@@ -1,0 +1,18 @@
+namespace GraphQL.Execution
+{
+    public class SubscriptionExecutionStrategy : GraphQL.Execution.ParallelExecutionStrategy
+    {
+        public SubscriptionExecutionStrategy() { }
+        public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
+        protected virtual System.Threading.Tasks.Task<System.IObservable<GraphQL.ExecutionResult>> ResolveEventStreamAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+    }
+}
+namespace GraphQL
+{
+    public class SubscriptionDocumentExecuter : GraphQL.DocumentExecuter
+    {
+        public SubscriptionDocumentExecuter() { }
+        public SubscriptionDocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        protected override GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
+    }
+}

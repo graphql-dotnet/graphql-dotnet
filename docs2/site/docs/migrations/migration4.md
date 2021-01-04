@@ -12,11 +12,17 @@
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into your project if you require these classes.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
 * `ApolloTracing.ConvertTime` is now private and `ResolverTrace.Path` does not initialize an empty list when created.
-* `LightweightCache.First` has been removed.
-* `IGraphType.CollectTypes` has been removed.
-* `ExecutionHelper.SubFieldsFor` has been removed.
-* `TypeCollectionContext` is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
-* `GraphQLTypeReference` is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
+* `LightweightCache.First` method has been removed.
+* `IGraphType.CollectTypes` method has been removed.
+* `ExecutionHelper.SubFieldsFor` method has been removed.
+* `NodeExtensions`, `AstNodeExtensions` classes have been removed.
+* `ErrorLocation` struct became `readonly`.
+* `SourceLocation` class became `readonly struct`.
+* `CoreToVanillaConverter` class became `static`.
+* `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
+* `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
+* `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
+* `GraphQLTypeReference` class is now internal, also `GraphTypesLookup.ApplyTypeReferences` is now private.
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
@@ -41,3 +47,6 @@
         public override IComparer<IFieldType> FieldComparer(IGraphType parent) => _instance;
     }
 ```
+
+* Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
+* `ISubscriptionExecuter` has been removed.
