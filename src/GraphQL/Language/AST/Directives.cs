@@ -64,9 +64,6 @@ namespace GraphQL.Language.AST
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj) => ReferenceEquals(this, obj);
-
-        /// <inheritdoc/>
         public void Clear()
         {
             _directives.Clear();

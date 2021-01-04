@@ -88,21 +88,9 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Determines if this instance is equal to another instance by comparing the <see cref="Name"/> and <see cref="Alias"/> properties.
         /// </summary>
-        protected bool Equals(Field other)
+        private bool Equals(Field other)
         {
             return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && string.Equals(Alias, other.Alias, StringComparison.InvariantCulture);
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null)
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-            if (obj.GetType() != GetType())
-                return false;
-            return Equals((Field)obj);
         }
 
         /// <summary>
@@ -110,7 +98,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public Field MergeSelectionSet(Field other)
         {
-            if (Equals(other))
+            if (Equals(other)) //TODO: is this check necessary?
             {
                 return new Field(AliasNode, NameNode)
                 {

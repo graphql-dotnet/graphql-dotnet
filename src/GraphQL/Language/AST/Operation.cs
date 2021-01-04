@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -72,25 +71,5 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => $"OperationDefinition{{name='{Name}', operation={OperationType}, variableDefinitions={Variables}, directives={Directives}, selectionSet={SelectionSet}}}";
-
-        /// <summary>
-        /// Compares this instance to another instance by name.
-        /// </summary>
-        protected bool Equals(Operation other)
-        {
-            return string.Equals(Name, other.Name, StringComparison.InvariantCulture) && OperationType == other.OperationType;
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEqualTo(INode node)
-        {
-            if (node is null)
-                return false;
-            if (ReferenceEquals(this, node))
-                return true;
-            if (node.GetType() != GetType())
-                return false;
-            return Equals((Operation)node);
-        }
     }
 }

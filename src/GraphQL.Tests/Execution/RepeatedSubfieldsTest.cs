@@ -43,8 +43,8 @@ namespace GraphQL.Tests.Execution
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -57,9 +57,9 @@ namespace GraphQL.Tests.Execution
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
             fields["alias"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["alias"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["alias"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -94,8 +94,8 @@ namespace GraphQL.Tests.Execution
                 outerSelection);
 
             fields.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
     }
 }
