@@ -9,6 +9,9 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for objects and a method for converting a dictionary into a strongly typed object.
+    /// </summary>
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
@@ -273,6 +276,7 @@ namespace GraphQL
         /// <param name="obj">The object to be read.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>System.Object.</returns>
+        [Obsolete]
         public static object GetPropertyValue(this object obj, string propertyName)
         {
             var val = obj.GetType()
@@ -289,9 +293,11 @@ namespace GraphQL
         /// <param name="name">The name of the desired interface. This is case sensitive.</param>
         /// <returns>The interface, or <c>null</c> if no matches were found.</returns>
         /// <remarks>If more than one interface matches, the returned interface is non-deterministic.</remarks>
+        [Obsolete]
         public static Type GetInterface(this Type type, string name)
             => type.GetInterfaces().FirstOrDefault(x => x.Name == name);
 
+        [Obsolete]
         public static T GetPropertyValue<T>(this object value)
             => (T)GetPropertyValue(value, typeof(T));
 

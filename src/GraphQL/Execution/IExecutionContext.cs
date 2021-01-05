@@ -7,6 +7,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Provides information regarding the currently executing document.
+    /// </summary>
     public interface IExecutionContext : IProvideUserContext
     {
         /// <summary>
