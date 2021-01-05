@@ -1426,7 +1426,7 @@ namespace GraphQL.Language
 {
     public class CoreToVanillaConverter
     {
-        public static GraphQL.Language.CoreToVanillaConverter Instance;
+        public static readonly GraphQL.Language.CoreToVanillaConverter Instance;
         protected CoreToVanillaConverter() { }
         protected virtual void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
         protected virtual GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }

@@ -26,7 +26,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Returns a static instance of this class.
         /// </summary>
-        public static CoreToVanillaConverter Instance = new CoreToVanillaConverter();
+        public static readonly CoreToVanillaConverter Instance = new CoreToVanillaConverter();
 
         /// <summary>
         /// Converts an GraphQLParser AST representation of a document into a GraphQL.NET AST
