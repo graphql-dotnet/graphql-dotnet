@@ -31,15 +31,20 @@ namespace GraphQL.Execution
     /// <inheritdoc cref="IDocumentExecutionListener"/>
     public abstract class DocumentExecutionListenerBase : IDocumentExecutionListener
     {
+        /// <inheritdoc/>
         public virtual Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult) => Task.CompletedTask;
 
+        /// <inheritdoc/>
         public virtual Task BeforeExecutionAsync(IExecutionContext context) => Task.CompletedTask;
 
+        /// <inheritdoc/>
         [Obsolete]
         public virtual Task BeforeExecutionAwaitedAsync(IExecutionContext context) => Task.CompletedTask;
 
+        /// <inheritdoc/>
         public virtual Task AfterExecutionAsync(IExecutionContext context) => Task.CompletedTask;
 
+        /// <inheritdoc/>
         [Obsolete]
         public virtual Task BeforeExecutionStepAwaitedAsync(IExecutionContext context) => Task.CompletedTask;
     }

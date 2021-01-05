@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension functions for document writers.
+    /// </summary>
     public static class DocumentWriterExtensions
     {
         private static readonly Encoding _utf8Encoding = new UTF8Encoding(false);
