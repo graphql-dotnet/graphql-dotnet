@@ -723,7 +723,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private class FieldDefPair
+        private sealed class FieldDefPair
         {
             public IGraphType ParentType { get; set; }
             public ISelection Field { get; set; }
