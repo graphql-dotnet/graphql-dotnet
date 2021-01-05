@@ -2516,7 +2516,7 @@ namespace GraphQL.Validation
     {
         public BasicVisitor(params GraphQL.Validation.INodeVisitor[] visitors) { }
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
-        public void Visit(GraphQL.Language.AST.INode node) { }
+        public void Visit(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class DocumentValidator : GraphQL.Validation.IDocumentValidator
     {
@@ -2528,7 +2528,7 @@ namespace GraphQL.Validation
     {
         public EnterLeaveListener() { }
         public EnterLeaveListener(System.Action<GraphQL.Validation.EnterLeaveListener> configure) { }
-        public void Match<TNode>(System.Action<TNode> enter = null, System.Action<TNode> leave = null)
+        public void Match<TNode>(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null)
             where TNode : GraphQL.Language.AST.INode { }
     }
     public interface IDocumentValidator
@@ -2537,8 +2537,8 @@ namespace GraphQL.Validation
     }
     public interface INodeVisitor
     {
-        void Enter(GraphQL.Language.AST.INode node);
-        void Leave(GraphQL.Language.AST.INode node);
+        void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
+        void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
     }
     public interface IValidationResult
     {
@@ -2552,7 +2552,7 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQL.Language.AST.INode
     {
-        public MatchingNodeVisitor(System.Action<TNode> enter = null, System.Action<TNode> leave = null) { }
+        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
     }
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
@@ -2563,7 +2563,7 @@ namespace GraphQL.Validation
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
-        public void Enter(GraphQL.Language.AST.INode node) { }
+        public void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQL.Language.AST.INode[] GetAncestors() { }
         public GraphQL.Types.QueryArgument GetArgument() { }
         public GraphQL.Types.DirectiveGraphType GetDirective() { }
@@ -2571,7 +2571,7 @@ namespace GraphQL.Validation
         public GraphQL.Types.IGraphType GetInputType() { }
         public GraphQL.Types.IGraphType GetLastType() { }
         public GraphQL.Types.IGraphType GetParentType() { }
-        public void Leave(GraphQL.Language.AST.INode node) { }
+        public void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {
