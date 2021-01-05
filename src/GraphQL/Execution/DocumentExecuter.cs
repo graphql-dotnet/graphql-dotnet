@@ -345,7 +345,7 @@ namespace GraphQL
         /// <br/><br/>
         /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
         /// <see cref="SerialExecutionStrategy"/>. Subscription operations return a special strategy defined in some separate project,
-        /// for example it can be SubscriptionExecutionStrategy from GraphQL.Subscriptions.
+        /// for example it can be SubscriptionExecutionStrategy from GraphQL.SystemReactive.
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
@@ -354,7 +354,7 @@ namespace GraphQL
             {
                 OperationType.Query => new ParallelExecutionStrategy(),
                 OperationType.Mutation => new SerialExecutionStrategy(),
-                OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.Subscriptions package to execute subscriptions."),
+                OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
                 _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
             };
         }
