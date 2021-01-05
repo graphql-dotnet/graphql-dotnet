@@ -801,7 +801,7 @@ namespace GraphQL.Validation.Rules
             public List<string> Names { get; set; }
         }
 
-        private class PairSet
+        private sealed class PairSet
         {
             private readonly ObjMap<ObjMap<bool>> _data;
 
