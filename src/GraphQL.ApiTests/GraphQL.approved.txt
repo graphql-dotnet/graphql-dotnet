@@ -40,7 +40,6 @@ namespace GraphQL
     }
     public static class EnumerableExtensions
     {
-        public static void Apply(this System.Collections.IDictionary items, System.Action<object, object> action) { }
         public static void Apply<T>(this System.Collections.Generic.IEnumerable<T> items, System.Action<T> action) { }
         public static void Apply<T>(this System.Collections.Generic.List<T> items, System.Action<T> action) { }
     }
@@ -235,10 +234,7 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static System.Type GetInterface(this System.Type type, string name) { }
-        public static object GetPropertyValue(this object obj, string propertyName) { }
         public static object GetPropertyValue(this object propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType = null) { }
-        public static T GetPropertyValue<T>(this object value) { }
         public static bool IsDefinedEnumValue(System.Type type, object value) { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object> source, System.Type type, GraphQL.Types.IGraphType mappedType = null) { }
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object> source)

@@ -30,6 +30,8 @@
 * `NameNode` has been changed to a readonly struct.
 * `DebugNodeVisitor` class has been removed.
 * Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
+* `EnumerableExtensions.Apply` for dictionaries has been removed.
+* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 
 ```c#
     /// <summary>
