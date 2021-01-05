@@ -50,8 +50,8 @@ namespace GraphQL.Validation
         /// Configures an event listener for the specified node type.
         /// </summary>
         /// <typeparam name="TNode">The type of the AST node to listen for.</typeparam>
-        /// <param name="enter">A delegate to execute when the specified node type is entered.</param>
-        /// <param name="leave">A delegate to execute when the specified node type is left.</param>
+        /// <param name="enter">A delegate to execute when the node of specified type is entered.</param>
+        /// <param name="leave">A delegate to execute when the node of specified type is left.</param>
         public void Match<TNode>(
             Action<TNode> enter = null,
             Action<TNode> leave = null)

@@ -8,12 +8,12 @@ namespace GraphQL.Validation
     public interface INodeVisitor
     {
         /// <summary>
-        /// Raised when the node walker is entering a node.
+        /// Called when the node walker is entering a node.
         /// </summary>
         void Enter(INode node);
 
         /// <summary>
-        /// Raised when the node walker is leaving a node.
+        /// Called when the node walker is leaving a node.
         /// </summary>
         void Leave(INode node);
     }

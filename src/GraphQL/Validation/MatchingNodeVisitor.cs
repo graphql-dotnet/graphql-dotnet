@@ -4,7 +4,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// A node listener which runs configured delegates only when the node enetered/left matches the specified node type.
+    /// A node listener which runs configured delegates only when the node entered/left matches the specified node type.
     /// </summary>
     /// <typeparam name="TNode">A specified AST node type.</typeparam>
     public class MatchingNodeVisitor<TNode> : INodeVisitor

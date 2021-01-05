@@ -85,7 +85,7 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// For a specified operation with a document, returns a list of variable references
-        /// along with what input type each were referenced for.
+        /// along with what input type each was referenced for.
         /// </summary>
         public IEnumerable<VariableUsage> GetRecursiveVariables(Operation operation)
         {
