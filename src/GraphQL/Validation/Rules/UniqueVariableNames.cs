@@ -23,11 +23,9 @@ namespace GraphQL.Validation.Rules
         {
             Dictionary<string, VariableDefinition> knownVariables = null;
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Operation>((__, context) => knownVariables = new Dictionary<string, VariableDefinition>());
-
-                _.Match<VariableDefinition>((variableDefinition, context) =>
+            return new NodeVisitors(
+                new MatchingNodeVisitor<Operation>((__, context) => knownVariables = new Dictionary<string, VariableDefinition>()),
+                new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
                 {
                     var variableName = variableDefinition.Name;
 
@@ -39,8 +37,8 @@ namespace GraphQL.Validation.Rules
                     {
                         knownVariables[variableName] = variableDefinition;
                     }
-                });
-            }).ToTask();
+                })
+            ).ToTask();
         }
     }
 }

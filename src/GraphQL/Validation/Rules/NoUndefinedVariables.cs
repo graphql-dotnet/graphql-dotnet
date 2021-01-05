@@ -24,11 +24,10 @@ namespace GraphQL.Validation.Rules
         {
             var variableNameDefined = new Dictionary<string, bool>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>((varDef, context) => variableNameDefined[varDef.Name] = true);
+            return new NodeVisitors(
+                new MatchingNodeVisitor<VariableDefinition>((varDef, context) => variableNameDefined[varDef.Name] = true),
 
-                _.Match<Operation>(
+                new MatchingNodeVisitor<Operation>(
                     enter: (op, context) => variableNameDefined = new Dictionary<string, bool>(),
                     leave: (op, context) =>
                     {
@@ -40,8 +39,8 @@ namespace GraphQL.Validation.Rules
                                 context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
                             }
                         }
-                    });
-            }).ToTask();
+                    })
+            ).ToTask();
         }
     }
 }

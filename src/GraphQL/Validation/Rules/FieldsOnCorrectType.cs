@@ -63,7 +63,7 @@ namespace GraphQL.Validation.Rules
             if (type is IAbstractGraphType absType)
             {
                 var suggestedObjectTypes = new List<string>();
-                var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
+                var interfaceUsageCount = new Dictionary<string, int>();
 
                 absType.PossibleTypes.Apply(possibleType =>
                 {
@@ -80,7 +80,7 @@ namespace GraphQL.Validation.Rules
                         if (possibleInterface.HasField(fieldName))
                         {
                             // This interface type defines this field.
-                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
+                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
                         }
                     });
                 });

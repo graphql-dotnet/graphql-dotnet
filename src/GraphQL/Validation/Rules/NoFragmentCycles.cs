@@ -24,32 +24,32 @@ namespace GraphQL.Validation.Rules
         {
             // Tracks already visited fragments to maintain O(N) and to ensure that cycles
             // are not redundantly reported.
-            var visitedFrags = new LightweightCache<string, bool>(key => false);
+            var visitedFrags = new HashSet<string>();
 
             // Array of AST nodes used to produce meaningful errors
             var spreadPath = new Stack<FragmentSpread>();
 
             // Position in the spread path
-            var spreadPathIndexByName = new LightweightCache<string, int>(key => -1);
+            var spreadPathIndexByName = new Dictionary<string, int>();
 
             return new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+            {
+                if (!visitedFrags.Contains(node.Name))
                 {
-                    if (!visitedFrags[node.Name])
-                    {
-                        detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
-                    }
-                }).ToTask();
+                    detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
+                }
+            }).ToTask();
         }
 
         private static void detectCycleRecursive(
             FragmentDefinition fragment,
             Stack<FragmentSpread> spreadPath,
-            LightweightCache<string, bool> visitedFrags,
-            LightweightCache<string, int> spreadPathIndexByName,
+            HashSet<string> visitedFrags,
+            Dictionary<string, int> spreadPathIndexByName,
             ValidationContext context)
         {
             var fragmentName = fragment.Name;
-            visitedFrags[fragmentName] = true;
+            visitedFrags.Add(fragmentName);
 
             var spreadNodes = context.GetFragmentSpreads(fragment.SelectionSet);
             if (spreadNodes.Count == 0)
@@ -62,13 +62,11 @@ namespace GraphQL.Validation.Rules
             foreach (var spreadNode in spreadNodes)
             {
                 var spreadName = spreadNode.Name;
-                var cycleIndex = spreadPathIndexByName[spreadName];
-
-                if (cycleIndex == -1)
+                if (!spreadPathIndexByName.TryGetValue(spreadName, out var cycleIndex))
                 {
                     spreadPath.Push(spreadNode);
 
-                    if (!visitedFrags[spreadName])
+                    if (!visitedFrags.Contains(spreadName))
                     {
                         var spreadFragment = context.GetFragment(spreadName);
                         if (spreadFragment != null)
@@ -93,7 +91,7 @@ namespace GraphQL.Validation.Rules
                 }
             }
 
-            spreadPathIndexByName[fragmentName] = -1;
+            spreadPathIndexByName.Remove(fragmentName);
         }
     }
 }

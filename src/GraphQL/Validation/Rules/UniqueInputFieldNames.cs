@@ -25,17 +25,16 @@ namespace GraphQL.Validation.Rules
             var knownNameStack = new Stack<Dictionary<string, IValue>>();
             var knownNames = new Dictionary<string, IValue>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<ObjectValue>(
+            return new NodeVisitors(
+                new MatchingNodeVisitor<ObjectValue>(
                     enter: (objVal, context) =>
                     {
                         knownNameStack.Push(knownNames);
                         knownNames = new Dictionary<string, IValue>();
                     },
-                    leave: (objVal, context) => knownNames = knownNameStack.Pop());
+                    leave: (objVal, context) => knownNames = knownNameStack.Pop()),
 
-                _.Match<ObjectField>(
+                new MatchingNodeVisitor<ObjectField>(
                     leave: (objField, context) =>
                     {
                         if (knownNames.ContainsKey(objField.Name))
@@ -46,8 +45,8 @@ namespace GraphQL.Validation.Rules
                         {
                             knownNames[objField.Name] = objField.Value;
                         }
-                    });
-            }).ToTask();
+                    })
+            ).ToTask();
         }
     }
 }

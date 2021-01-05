@@ -26,28 +26,27 @@ namespace GraphQL.Validation.Rules
         {
             var variableDefs = new List<VariableDefinition>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>((def, context) => variableDefs.Add(def));
+            return new NodeVisitors(
+                new MatchingNodeVisitor<VariableDefinition>((def, context) => variableDefs.Add(def)),
 
-                _.Match<Operation>(
-                enter: (op, context) => variableDefs = new List<VariableDefinition>(),
-                leave: (op, context) =>
-                {
-                    var usages = context.GetRecursiveVariables(op)
-                        .Select(usage => usage.Node.Name)
-                        .ToList();
-
-                    foreach (var variableDef in variableDefs)
+                new MatchingNodeVisitor<Operation>(
+                    enter: (op, context) => variableDefs = new List<VariableDefinition>(),
+                    leave: (op, context) =>
                     {
-                        var variableName = variableDef.Name;
-                        if (!usages.Contains(variableName))
+                        var usages = context.GetRecursiveVariables(op)
+                            .Select(usage => usage.Node.Name)
+                            .ToList();
+
+                        foreach (var variableDef in variableDefs)
                         {
-                            context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
+                            var variableName = variableDef.Name;
+                            if (!usages.Contains(variableName))
+                            {
+                                context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
+                            }
                         }
-                    }
-                });
-            }).ToTask();
+                    })
+            ).ToTask();
         }
     }
 }

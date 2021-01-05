@@ -23,13 +23,12 @@ namespace GraphQL.Validation.Rules
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>(
+            return new NodeVisitors(
+                new MatchingNodeVisitor<VariableDefinition>(
                     (varDefAst, context) => varDefMap[varDefAst.Name] = varDefAst
-                );
+                ),
 
-                _.Match<Operation>(
+                new MatchingNodeVisitor<Operation>(
                     enter: (op, context) => varDefMap = new Dictionary<string, VariableDefinition>(),
                     leave: (op, context) =>
                     {
@@ -52,8 +51,8 @@ namespace GraphQL.Validation.Rules
                             }
                         }
                     }
-                );
-            }).ToTask();
+                )
+            ).ToTask();
         }
 
         /// <summary>

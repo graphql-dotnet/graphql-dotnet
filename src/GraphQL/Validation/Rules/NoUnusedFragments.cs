@@ -26,11 +26,10 @@ namespace GraphQL.Validation.Rules
             var operationDefs = new List<Operation>();
             var fragmentDefs = new List<FragmentDefinition>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Operation>((node, context) => operationDefs.Add(node));
-                _.Match<FragmentDefinition>((node, context) => fragmentDefs.Add(node));
-                _.Match<Document>(leave: (document, context) =>
+            return new NodeVisitors(
+                new MatchingNodeVisitor<Operation>((node, context) => operationDefs.Add(node)),
+                new MatchingNodeVisitor<FragmentDefinition>((node, context) => fragmentDefs.Add(node)),
+                new MatchingNodeVisitor<Document>(leave: (document, context) =>
                 {
                     var fragmentNamesUsed = operationDefs
                         .SelectMany(context.GetRecursivelyReferencedFragments)
@@ -46,8 +45,8 @@ namespace GraphQL.Validation.Rules
                             context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
                         }
                     }
-                });
-            }).ToTask();
+                })
+            ).ToTask();
         }
     }
 }

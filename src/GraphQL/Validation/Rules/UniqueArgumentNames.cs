@@ -24,12 +24,10 @@ namespace GraphQL.Validation.Rules
         {
             var knownArgs = new Dictionary<string, Argument>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Field>((__, context) => knownArgs = new Dictionary<string, Argument>());
-                _.Match<Directive>((__, context) => knownArgs = new Dictionary<string, Argument>());
-
-                _.Match<Argument>((argument, context) =>
+            return new NodeVisitors(
+                new MatchingNodeVisitor<Field>((__, context) => knownArgs = new Dictionary<string, Argument>()),
+                new MatchingNodeVisitor<Directive>((__, context) => knownArgs = new Dictionary<string, Argument>()),
+                new MatchingNodeVisitor<Argument>((argument, context) =>
                 {
                     var argName = argument.Name;
                     if (knownArgs.ContainsKey(argName))
@@ -40,8 +38,8 @@ namespace GraphQL.Validation.Rules
                     {
                         knownArgs[argName] = argument;
                     }
-                });
-            }).ToTask();
+                })
+            ).ToTask();
         }
     }
 }

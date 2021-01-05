@@ -2554,6 +2554,10 @@ namespace GraphQL.Validation
     {
         public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
     }
+    public sealed class NodeVisitors : GraphQL.Validation.INodeVisitor
+    {
+        public NodeVisitors(params GraphQL.Validation.INodeVisitor[] nodeVisitors) { }
+    }
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
         public static readonly GraphQL.Validation.SuccessfullyValidatedResult Instance;
