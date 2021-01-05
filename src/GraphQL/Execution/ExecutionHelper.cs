@@ -323,7 +323,7 @@ namespace GraphQL.Execution
                     return null;
                 }
 
-                var complexType = type as IComplexGraphType;
+                var complexType = (IComplexGraphType)type; // both IObjectGraphType and IInputObjectGraphType inherit from IComplexGraphType
                 var obj = new Dictionary<string, object>();
 
                 foreach (var field in complexType.Fields)
