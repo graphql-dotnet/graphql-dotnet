@@ -17,11 +17,11 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ => _.Match<Field>(f => Field(context.TypeInfo.GetLastType(), f, context)))
+            return new MatchingNodeVisitor<Field>(f => Field(context.TypeInfo.GetLastType(), f, context))
                 .ToTask();
         }
 
-        private void Field(IGraphType type, Field field, ValidationContext context)
+        private static void Field(IGraphType type, Field field, ValidationContext context)
         {
             if (type == null)
             {

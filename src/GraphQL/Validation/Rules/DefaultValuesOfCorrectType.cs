@@ -17,9 +17,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>(varDefAst =>
+            return new MatchingNodeVisitor<VariableDefinition>(varDefAst =>
                 {
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
@@ -32,8 +30,7 @@ namespace GraphQL.Validation.Rules
                             context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
                         }
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }

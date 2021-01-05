@@ -16,9 +16,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<FragmentSpread>(node =>
+            return new MatchingNodeVisitor<FragmentSpread>(node =>
                 {
                     var fragmentName = node.Name;
                     var fragment = context.GetFragment(fragmentName);
@@ -26,8 +24,7 @@ namespace GraphQL.Validation.Rules
                     {
                         context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }

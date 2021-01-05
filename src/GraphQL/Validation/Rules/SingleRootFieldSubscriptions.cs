@@ -14,9 +14,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(config =>
-            {
-                config.Match<Operation>(operation =>
+            return new MatchingNodeVisitor<Operation>(operation =>
                 {
                     if (!IsSubscription(operation))
                     {
@@ -53,8 +51,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, fragment));
                     }
 
-                });
-            }).ToTask();
+                }).ToTask();
         }
 
         private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;

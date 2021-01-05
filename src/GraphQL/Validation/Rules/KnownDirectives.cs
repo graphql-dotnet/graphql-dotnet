@@ -19,9 +19,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Directive>(node =>
+            return new MatchingNodeVisitor<Directive>(node =>
                 {
                     var directiveDef = context.Schema.FindDirective(node.Name);
                     if (directiveDef == null)
@@ -35,11 +33,10 @@ namespace GraphQL.Validation.Rules
                     {
                         context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
 
-        private DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
+        private static DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
         {
             var appliedTo = ancestors[ancestors.Length - 1];
 

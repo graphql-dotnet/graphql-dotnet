@@ -17,9 +17,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Argument>(node =>
+            return new MatchingNodeVisitor<Argument>(node =>
                 {
                     var ancestors = context.TypeInfo.GetAncestors();
                     var argumentOf = ancestors[ancestors.Length - 2];
@@ -48,8 +46,7 @@ namespace GraphQL.Validation.Rules
                             }
                         }
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }
