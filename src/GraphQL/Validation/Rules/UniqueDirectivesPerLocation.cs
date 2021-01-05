@@ -20,21 +20,20 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueDirectivesPerLocationError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new EnterLeaveListener(_ =>
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Operation>((f, context) => CheckDirectives(context, f.Directives));
+            _.Match<Operation>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<Field>((f, context) => CheckDirectives(context, f.Directives));
+            _.Match<Field>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentDefinition>((f, context) => CheckDirectives(context, f.Directives));
+            _.Match<FragmentDefinition>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentSpread>((f, context) => CheckDirectives(context, f.Directives));
+            _.Match<FragmentSpread>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<InlineFragment>((f, context) => CheckDirectives(context, f.Directives));
-            }).ToTask();
-        }
+            _.Match<InlineFragment>((f, context) => CheckDirectives(context, f.Directives));
+        }).ToTask();
 
         private static void CheckDirectives(ValidationContext context, Directives directives)
         {

@@ -22,24 +22,23 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownDirectivesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Directive>((node, context) =>
-                {
-                    var directiveDef = context.Schema.FindDirective(node.Name);
-                    if (directiveDef == null)
-                    {
-                        context.ReportError(new KnownDirectivesError(context, node));
-                        return;
-                    }
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-                    var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
-                    if (!directiveDef.Locations.Any(x => x == candidateLocation))
-                    {
-                        context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
-                    }
-                }).ToTask();
-        }
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Directive>((node, context) =>
+        {
+            var directiveDef = context.Schema.FindDirective(node.Name);
+            if (directiveDef == null)
+            {
+                context.ReportError(new KnownDirectivesError(context, node));
+                return;
+            }
+
+            var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
+            if (!directiveDef.Locations.Any(x => x == candidateLocation))
+            {
+                context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
+            }
+        }).ToTask();
 
         private static DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
         {

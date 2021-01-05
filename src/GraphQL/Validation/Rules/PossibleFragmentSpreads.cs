@@ -21,34 +21,33 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="PossibleFragmentSpreadsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new EnterLeaveListener(_ =>
         {
-            return new EnterLeaveListener(_ =>
+            _.Match<InlineFragment>((node, context) =>
             {
-                _.Match<InlineFragment>((node, context) =>
+                var fragType = context.TypeInfo.GetLastType();
+                var parentType = context.TypeInfo.GetParentType().GetNamedType();
+
+                if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                 {
-                    var fragType = context.TypeInfo.GetLastType();
-                    var parentType = context.TypeInfo.GetParentType().GetNamedType();
+                    context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
+                }
+            });
 
-                    if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
-                    {
-                        context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
-                    }
-                });
+            _.Match<FragmentSpread>((node, context) =>
+            {
+                string fragName = node.Name;
+                var fragType = getFragmentType(context, fragName);
+                var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
-                _.Match<FragmentSpread>((node, context) =>
+                if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
                 {
-                    string fragName = node.Name;
-                    var fragType = getFragmentType(context, fragName);
-                    var parentType = context.TypeInfo.GetParentType().GetNamedType();
-
-                    if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
-                    {
-                        context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
-                    }
-                });
-            }).ToTask();
-        }
+                    context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
+                }
+            });
+        }).ToTask();
 
         private static IGraphType getFragmentType(ValidationContext context, string name)
         {

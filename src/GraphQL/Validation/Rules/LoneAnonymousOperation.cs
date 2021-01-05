@@ -19,18 +19,15 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="LoneAnonymousOperationError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var operationCount = context.Document.Operations.Count;
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new MatchingNodeVisitor<Operation>((op, context) =>
-                {
-                    if (string.IsNullOrWhiteSpace(op.Name)
-                        && operationCount > 1)
-                    {
-                        context.ReportError(new LoneAnonymousOperationError(context, op));
-                    }
-                }).ToTask();
-        }
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
+        {
+            if (string.IsNullOrWhiteSpace(op.Name)
+                && context.Document.Operations.Count > 1)
+            {
+                context.ReportError(new LoneAnonymousOperationError(context, op));
+            }
+        }).ToTask();
     }
 }

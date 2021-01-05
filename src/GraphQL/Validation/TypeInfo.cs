@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -34,7 +33,14 @@ namespace GraphQL.Validation
         /// <returns></returns>
         public INode[] GetAncestors()
         {
-            return _ancestorStack.Skip(1).Reverse().ToArray();
+            var ancestorArray = _ancestorStack.ToArray();
+            var c = ancestorArray.Length;
+            var ret = new INode[c - 1];
+            for (int i = c-- - 1; i > 0; --i) {
+                ret[c - i] = ancestorArray[i];
+            }
+            return ret;
+            // aka: return _ancestorStack.Skip(1).Reverse().ToArray();
         }
 
         /// <summary>
