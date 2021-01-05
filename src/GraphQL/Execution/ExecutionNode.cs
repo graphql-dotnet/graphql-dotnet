@@ -292,7 +292,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes a new instance for the specified root graph type.
         /// </summary>
-        /// <param name="graphType"></param>
         public RootExecutionNode(IObjectGraphType graphType)
             : base(null, graphType, null, null, null)
         {

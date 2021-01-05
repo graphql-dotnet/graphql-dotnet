@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace GraphQL
 {
     /// <summary>
-    /// Provides extension functions for document writers.
+    /// Provides extension methods for document writers.
     /// </summary>
     public static class DocumentWriterExtensions
     {
