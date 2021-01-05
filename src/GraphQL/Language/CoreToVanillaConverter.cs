@@ -51,8 +51,7 @@ namespace GraphQL.Language
         /// </summary>
         public static Operation Operation(GraphQLOperationDefinition source)
         {
-            var name = source.Name != null ? Name(source.Name) : null;
-            return new Operation(name)
+            return new Operation(Name(source.Name))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -83,8 +82,7 @@ namespace GraphQL.Language
         /// </summary>
         public static FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
         {
-            var name = source.Name != null ? Name(source.Name) : null;
-            return new FragmentSpread(name)
+            return new FragmentSpread(Name(source.Name))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -182,8 +180,7 @@ namespace GraphQL.Language
         /// </summary>
         public static Field Field(GraphQLFieldSelection source)
         {
-            var alias = source.Alias != null ? Name(source.Alias) : null;
-            return new Field(alias, Name(source.Name))
+            return new Field(Name(source.Alias), Name(source.Name))
             {
                 SourceLocation = Convert(source.Location),
                 CommentNode = Comment(source.Comment),
@@ -408,7 +405,8 @@ namespace GraphQL.Language
         /// </summary>
         public static NameNode Name(GraphQLName name)
         {
-            return new NameNode(name.Value) { SourceLocation = Convert(name.Location) };
+            if (name == null) return default;
+            return new NameNode(name.Value, Convert(name.Location));
         }
 
         /// <summary>

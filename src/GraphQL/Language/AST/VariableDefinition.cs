@@ -25,7 +25,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the variable.
         /// </summary>
-        public string Name => NameNode?.Name;
+        public string Name => NameNode.Name;
 
         /// <summary>
         /// Gets or sets the <see cref="NameNode"/> containing the name of the variable.
