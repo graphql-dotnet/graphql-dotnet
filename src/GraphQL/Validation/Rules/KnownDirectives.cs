@@ -8,15 +8,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Known directives
+    /// Known directives:
     ///
     /// A GraphQL document is only valid if all `@directives` are known by the
     /// schema and legally positioned.
     /// </summary>
     public class KnownDirectives : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly KnownDirectives Instance = new KnownDirectives();
 
+        /// <inheritdoc/>
+        /// <exception cref="KnownDirectivesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

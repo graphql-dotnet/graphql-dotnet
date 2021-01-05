@@ -8,8 +8,20 @@ using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Overlapping fields are mergable:
+    ///
+    /// If multiple field selections with the same response names are encountered during execution,
+    /// the field and arguments to execute and the resulting value should be unambiguous. Therefore
+    /// any two field selections which might both be encountered for the same object are only valid
+    /// if they are equivalent.
+    /// <br/><br/>
+    /// Due to the complexity of the implementation, this validation rule is not part of the default set of validation rules.
+    /// </summary>
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
+        /// <inheritdoc/>
+        /// <exception cref="OverlappingFieldsCanBeMergedError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var comparedFragmentPairs = new PairSet();

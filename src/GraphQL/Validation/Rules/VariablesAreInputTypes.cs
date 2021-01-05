@@ -6,15 +6,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Variables are input types
+    /// Variables are input types:
     ///
     /// A GraphQL operation is only valid if all the variables it defines are of
     /// input types (scalar, enum, or input object).
     /// </summary>
     public class VariablesAreInputTypes : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
 
+        /// <inheritdoc/>
+        /// <exception cref="VariablesAreInputTypesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

@@ -6,11 +6,15 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.KnownArgumentNames"/>
     [Serializable]
     public class KnownArgumentNamesError : ValidationError
     {
         internal const string NUMBER = "5.4.1";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public KnownArgumentNamesError(ValidationContext context, Argument node, FieldType fieldDef, IGraphType parentType)
             : base(context.OriginalQuery, NUMBER,
                 UnknownArgMessage(
@@ -22,6 +26,9 @@ namespace GraphQL.Validation.Errors
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public KnownArgumentNamesError(ValidationContext context, Argument node, DirectiveGraphType directive)
             : base(context.OriginalQuery, NUMBER,
                 UnknownDirectiveArgMessage(

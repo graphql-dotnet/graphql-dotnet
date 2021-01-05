@@ -4,20 +4,31 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
+    /// <summary>
+    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(INode)"/> and <see cref="INodeVisitor.Leave(INode)"/> events for each node.
+    /// </summary>
     public class BasicVisitor
     {
         private readonly IList<INodeVisitor> _visitors;
 
+        /// <summary>
+        /// Returns a new instance configured for the specified list of <see cref="INodeVisitor"/>.
+        /// </summary>
         public BasicVisitor(params INodeVisitor[] visitors)
         {
             _visitors = visitors;
         }
 
+        /// <inheritdoc cref="BasicVisitor.BasicVisitor(INodeVisitor[])"/>
         public BasicVisitor(IList<INodeVisitor> visitors)
         {
             _visitors = visitors;
         }
 
+        /// <summary>
+        /// Walks the specified <see cref="INode"/>, executing <see cref="INodeVisitor.Enter(INode)"/> and
+        /// <see cref="INodeVisitor.Leave(INode)"/> events for each node.
+        /// </summary>
         public void Visit(INode node)
         {
             if (node == null)
