@@ -24,7 +24,6 @@ namespace GraphQL.Validation
         /// <summary>
         /// Allows validation rules store their specific data during validation.
         /// </summary>
-
         private readonly ConcurrentDictionary<object, object> _validationRuleLocalContext = new ConcurrentDictionary<object, object>();
 
         /// <summary>
@@ -54,7 +53,8 @@ namespace GraphQL.Validation
         /// <typeparam name="TValidationRule">The type of validation rule.</typeparam>
         /// <typeparam name="TResult">Type of data.</typeparam>
         /// <returns>Previously stored data if any, otherwise throws <see cref="InvalidOperationException"/>.</returns>
-        internal TResult Get<TValidationRule, TResult>() => (TResult)_validationRuleLocalContext[typeof(TValidationRule)] ?? throw new InvalidOperationException("No data");
+        internal TResult Get<TValidationRule, TResult>()
+            => (TResult)_validationRuleLocalContext[typeof(TValidationRule)] ?? throw new InvalidOperationException("No data");
 
         /// <summary>
         /// Sets some data specific to validation rule into validation context.

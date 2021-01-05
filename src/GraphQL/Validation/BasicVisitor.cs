@@ -5,7 +5,7 @@ using GraphQL.Language.AST;
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(INode)"/> and <see cref="INodeVisitor.Leave(INode)"/> methods for each node.
+    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(INode, ValidationContext)"/> and <see cref="INodeVisitor.Leave(INode, ValidationContext)"/> methods for each node.
     /// </summary>
     public class BasicVisitor
     {
@@ -26,8 +26,8 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Walks the specified <see cref="INode"/>, executing <see cref="INodeVisitor.Enter(INode)"/> and
-        /// <see cref="INodeVisitor.Leave(INode)"/> methods for each node.
+        /// Walks the specified <see cref="INode"/>, executing <see cref="INodeVisitor.Enter(INode, ValidationContext)"/> and
+        /// <see cref="INodeVisitor.Leave(INode, ValidationContext)"/> methods for each node.
         /// </summary>
         public void Visit(INode node, ValidationContext context)
         {
