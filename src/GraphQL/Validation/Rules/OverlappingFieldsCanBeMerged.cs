@@ -848,7 +848,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private class ObjMap<T> : Dictionary<string, T>
+        private sealed class ObjMap<T> : Dictionary<string, T>
         {
         }
     }
