@@ -2674,6 +2674,7 @@ namespace GraphQL.Validation
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
         public void Visit(GraphQL.Language.AST.INode node) { }
     }
+    [System.Obsolete]
     public class DebugNodeVisitor : GraphQL.Validation.INodeVisitor
     {
         public DebugNodeVisitor() { }
@@ -2998,6 +2999,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.LoneAnonymousOperation Instance;
         public LoneAnonymousOperation() { }
+        [System.Obsolete]
         public System.Func<string> AnonOperationNotAloneMessage { get; }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -3027,6 +3029,7 @@ namespace GraphQL.Validation.Rules
     }
     public class OverlappingFieldsCanBeMerged : GraphQL.Validation.IValidationRule
     {
+        public static readonly GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged Instance;
         public OverlappingFieldsCanBeMerged() { }
         public void CollectFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, GraphQL.Types.IGraphType parentType, GraphQL.Language.AST.SelectionSet selectionSet, System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.FieldDefPair>> nodeAndDefs, System.Collections.Generic.Dictionary<string, bool> fragments) { }
         public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField GetReferencedFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, System.Collections.Generic.Dictionary<GraphQL.Language.AST.SelectionSet, GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField> cachedFieldsAndFragmentNames, GraphQL.Language.AST.FragmentDefinition fragment) { }

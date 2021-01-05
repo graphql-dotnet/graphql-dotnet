@@ -7,7 +7,7 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// No unused variables
+    /// No unused variables:
     ///
     /// A GraphQL operation is only valid if all variables defined by that operation
     /// are used in that operation or a fragment transitively included by that
@@ -15,8 +15,13 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoUnusedVariables : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
 
+        /// <inheritdoc/>
+        /// <exception cref="NoUnusedVariablesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var variableDefs = new List<VariableDefinition>();

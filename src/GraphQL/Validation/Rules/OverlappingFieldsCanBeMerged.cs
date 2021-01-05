@@ -8,8 +8,25 @@ using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
+    /// <summary>
+    /// Overlapping fields are mergable:
+    ///
+    /// If multiple field selections with the same response names are encountered during execution,
+    /// the field and arguments to execute and the resulting value should be unambiguous. Therefore
+    /// any two field selections which might both be encountered for the same object are only valid
+    /// if they are equivalent.
+    /// <br/><br/>
+    /// Due to the complexity of the implementation, this validation rule is not part of the default set of validation rules.
+    /// </summary>
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
+        public static readonly OverlappingFieldsCanBeMerged Instance = new OverlappingFieldsCanBeMerged();
+
+        /// <inheritdoc/>
+        /// <exception cref="OverlappingFieldsCanBeMergedError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var comparedFragmentPairs = new PairSet();
@@ -586,7 +603,7 @@ namespace GraphQL.Validation.Rules
 
             if (type1.IsLeafType() || type2.IsLeafType())
             {
-                return type1 != type2;
+                return !type1.Equals(type2);
             }
 
             return false;
@@ -776,22 +793,56 @@ namespace GraphQL.Validation.Rules
             return null;
         }
 
+        /// <summary>
+        /// Describes a conflict between two fields in a document.
+        /// </summary>
         public class Conflict
         {
+            /// <summary>
+            /// Returns the reason for the conflict.
+            /// </summary>
             public ConflictReason Reason { get; set; }
+
+            /// <summary>
+            /// Returns a list of fields that are in conflict.
+            /// </summary>
             public List<ISelection> FieldsLeft { get; set; }
+
+            /// <summary>
+            /// Returns a list of fields that are in conflict.
+            /// </summary>
             public List<ISelection> FieldsRight { get; set; }
         }
 
+        /// <summary>
+        /// Describes the reason for a conflict.
+        /// </summary>
         public class ConflictReason
         {
+            /// <summary>
+            /// The name of the field in conflict.
+            /// </summary>
             public string Name { get; set; }
+
+            /// <summary>
+            /// Returns a message descriptor describing the conflict.
+            /// </summary>
             public Message Message { get; set; }
         }
 
+        /// <summary>
+        /// A message descriptor describing a conflict.
+        /// </summary>
         public class Message
         {
+            /// <summary>
+            /// Returns the conflict message.
+            /// </summary>
             public string Msg { get; set; }
+
+            /// <summary>
+            /// Returns a list of conflict reasons that triggered this conflict.
+            /// </summary>
             public List<ConflictReason> Msgs { get; set; }
         }
 
