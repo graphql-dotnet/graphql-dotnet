@@ -18,7 +18,7 @@
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
 * `ErrorLocation` struct became `readonly`.
 * `SourceLocation` class became `readonly struct`.
-* `CoreToVanillaConverter` class became `static`.
+* `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
 * `TypeCollectionContext` class is now internal, also all methods with this parameter in `GraphTypesLookup` are private.
@@ -52,4 +52,6 @@
 * `NameNode` has been changed to a readonly struct.
 * `DebugNodeVisitor` class has been removed.
 * Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
+* `EnumerableExtensions.Apply` for dictionaries has been removed.
+* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * `INodeVisitor.Enter` and `INodeVisitor.Leave` methods now accept additional `ValidationContext` argument.
