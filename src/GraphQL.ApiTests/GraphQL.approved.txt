@@ -2994,6 +2994,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.LoneAnonymousOperation Instance;
         public LoneAnonymousOperation() { }
+        [System.Obsolete]
         public System.Func<string> AnonOperationNotAloneMessage { get; }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
