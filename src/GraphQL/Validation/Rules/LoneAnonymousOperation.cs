@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
         {
             var operationCount = context.Document.Operations.Count;
 
-            return new MatchingNodeVisitor<Operation>(op =>
+            return new MatchingNodeVisitor<Operation>((op, context) =>
                 {
                     if (string.IsNullOrWhiteSpace(op.Name)
                         && operationCount > 1)

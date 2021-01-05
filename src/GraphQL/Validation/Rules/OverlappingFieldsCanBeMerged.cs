@@ -34,7 +34,7 @@ namespace GraphQL.Validation.Rules
 
             return new EnterLeaveListener(config =>
             {
-                config.Match<SelectionSet>(selectionSet =>
+                config.Match<SelectionSet>((selectionSet, context) =>
                 {
                     List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                          context,

@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="SingleRootFieldSubscriptionsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<Operation>(operation =>
+            return new MatchingNodeVisitor<Operation>((operation, context) =>
                 {
                     if (!IsSubscription(operation))
                     {

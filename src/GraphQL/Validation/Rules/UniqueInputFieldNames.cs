@@ -28,15 +28,15 @@ namespace GraphQL.Validation.Rules
             return new EnterLeaveListener(_ =>
             {
                 _.Match<ObjectValue>(
-                    enter: objVal =>
+                    enter: (objVal, context) =>
                     {
                         knownNameStack.Push(knownNames);
                         knownNames = new Dictionary<string, IValue>();
                     },
-                    leave: objVal => knownNames = knownNameStack.Pop());
+                    leave: (objVal, context) => knownNames = knownNameStack.Pop());
 
                 _.Match<ObjectField>(
-                    leave: objField =>
+                    leave: (objField, context) =>
                     {
                         if (knownNames.ContainsKey(objField.Name))
                         {

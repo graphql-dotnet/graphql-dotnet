@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Rules
         {
             return new EnterLeaveListener(_ =>
             {
-                _.Match<Field>(leave: node =>
+                _.Match<Field>(leave: (node, context) =>
                 {
                     var fieldDef = context.TypeInfo.GetFieldDef();
 
@@ -44,7 +44,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
 
-                _.Match<Directive>(leave: node =>
+                _.Match<Directive>(leave: (node, context) =>
                 {
                     var directive = context.TypeInfo.GetDirective();
 

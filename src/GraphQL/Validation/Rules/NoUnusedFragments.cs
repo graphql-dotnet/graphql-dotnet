@@ -28,9 +28,9 @@ namespace GraphQL.Validation.Rules
 
             return new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(node => operationDefs.Add(node));
-                _.Match<FragmentDefinition>(node => fragmentDefs.Add(node));
-                _.Match<Document>(leave: document =>
+                _.Match<Operation>((node, context) => operationDefs.Add(node));
+                _.Match<FragmentDefinition>((node, context) => fragmentDefs.Add(node));
+                _.Match<Document>(leave: (document, context) =>
                 {
                     var fragmentNamesUsed = operationDefs
                         .SelectMany(context.GetRecursivelyReferencedFragments)

@@ -10,13 +10,13 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : INodeVisitor
         where TNode : INode
     {
-        private readonly Action<TNode> _enter;
-        private readonly Action<TNode> _leave;
+        private readonly Action<TNode, ValidationContext> _enter;
+        private readonly Action<TNode, ValidationContext> _leave;
 
         /// <summary>
         /// Returns a new instance configured with the specified enter/leave delegates.
         /// </summary>
-        public MatchingNodeVisitor(Action<TNode> enter = null, Action<TNode> leave = null)
+        public MatchingNodeVisitor(Action<TNode, ValidationContext> enter = null, Action<TNode, ValidationContext> leave = null)
         {
             if (enter == null && leave == null)
             {
@@ -27,19 +27,19 @@ namespace GraphQL.Validation
             _leave = leave;
         }
 
-        void INodeVisitor.Enter(INode node)
+        void INodeVisitor.Enter(INode node, ValidationContext context)
         {
             if (_enter != null && node is TNode n)
             {
-                _enter(n);
+                _enter(n, context);
             }
         }
 
-        void INodeVisitor.Leave(INode node)
+        void INodeVisitor.Leave(INode node, ValidationContext context)
         {
             if (_leave != null && node is TNode n)
             {
-                _leave(n);
+                _leave(n, context);
             }
         }
     }

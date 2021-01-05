@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownFragmentNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<FragmentSpread>(node =>
+            return new MatchingNodeVisitor<FragmentSpread>((node, context) =>
                 {
                     var fragmentName = node.Name;
                     var fragment = context.GetFragment(fragmentName);

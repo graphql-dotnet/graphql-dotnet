@@ -93,7 +93,7 @@ namespace GraphQL.Validation
 
             var basic = new BasicVisitor(visitors);
 
-            basic.Visit(document);
+            basic.Visit(document, context);
 
             if (context.HasErrors)
                 return new ValidationResult(context.Errors);

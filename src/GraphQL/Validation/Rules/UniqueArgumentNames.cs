@@ -26,10 +26,10 @@ namespace GraphQL.Validation.Rules
 
             return new EnterLeaveListener(_ =>
             {
-                _.Match<Field>(__ => knownArgs = new Dictionary<string, Argument>());
-                _.Match<Directive>(__ => knownArgs = new Dictionary<string, Argument>());
+                _.Match<Field>((__, context) => knownArgs = new Dictionary<string, Argument>());
+                _.Match<Directive>((__, context) => knownArgs = new Dictionary<string, Argument>());
 
-                _.Match<Argument>(argument =>
+                _.Match<Argument>((argument, context) =>
                 {
                     var argName = argument.Name;
                     if (knownArgs.ContainsKey(argName))

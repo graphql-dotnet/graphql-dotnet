@@ -26,12 +26,12 @@ namespace GraphQL.Validation.Rules
             return new EnterLeaveListener(_ =>
             {
                 _.Match<VariableDefinition>(
-                    varDefAst => varDefMap[varDefAst.Name] = varDefAst
+                    (varDefAst, context) => varDefMap[varDefAst.Name] = varDefAst
                 );
 
                 _.Match<Operation>(
-                    enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
-                    leave: op =>
+                    enter: (op, context) => varDefMap = new Dictionary<string, VariableDefinition>(),
+                    leave: (op, context) =>
                     {
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {

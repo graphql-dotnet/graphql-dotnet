@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
         {
             var frequency = new HashSet<string>();
 
-            return new MatchingNodeVisitor<Operation>(op =>
+            return new MatchingNodeVisitor<Operation>((op, context) =>
                     {
                         if (context.Document.Operations.Count < 2)
                         {

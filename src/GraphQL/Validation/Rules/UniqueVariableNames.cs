@@ -25,9 +25,9 @@ namespace GraphQL.Validation.Rules
 
             return new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(__ => knownVariables = new Dictionary<string, VariableDefinition>());
+                _.Match<Operation>((__, context) => knownVariables = new Dictionary<string, VariableDefinition>());
 
-                _.Match<VariableDefinition>(variableDefinition =>
+                _.Match<VariableDefinition>((variableDefinition, context) =>
                 {
                     var variableName = variableDefinition.Name;
 

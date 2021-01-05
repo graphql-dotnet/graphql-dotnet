@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="ScalarLeafsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<Field>(f => Field(context.TypeInfo.GetLastType(), f, context))
+            return new MatchingNodeVisitor<Field>((f, context) => Field(context.TypeInfo.GetLastType(), f, context))
                 .ToTask();
         }
 

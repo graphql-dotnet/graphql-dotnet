@@ -29,20 +29,20 @@ namespace GraphQL.Validation
             configure(this);
         }
 
-        void INodeVisitor.Enter(INode node)
+        void INodeVisitor.Enter(INode node, ValidationContext context)
         {
             foreach (var listener in _listeners)
             {
-                listener.Enter(node);
+                listener.Enter(node, context);
             }
         }
 
-        void INodeVisitor.Leave(INode node)
+        void INodeVisitor.Leave(INode node, ValidationContext context)
         {
             // Shouldn't this be done in reverse?
             foreach (var listener in _listeners)
             {
-                listener.Leave(node);
+                listener.Leave(node, context);
             }
         }
 
@@ -53,8 +53,8 @@ namespace GraphQL.Validation
         /// <param name="enter">A delegate to execute when the node of specified type is entered.</param>
         /// <param name="leave">A delegate to execute when the node of specified type is left.</param>
         public void Match<TNode>(
-            Action<TNode> enter = null,
-            Action<TNode> leave = null)
+            Action<TNode, ValidationContext> enter = null,
+            Action<TNode, ValidationContext> leave = null)
             where TNode : INode
         {
             var listener = new MatchingNodeVisitor<TNode>(enter, leave);

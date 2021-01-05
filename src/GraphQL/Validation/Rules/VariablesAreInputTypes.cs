@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="VariablesAreInputTypesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<VariableDefinition>(varDef =>
+            return new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
                 {
                     var type = GetNamedGraphTypeFromType(varDef.Type, context.Schema);
 

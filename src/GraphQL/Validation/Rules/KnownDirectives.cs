@@ -24,7 +24,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownDirectivesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<Directive>(node =>
+            return new MatchingNodeVisitor<Directive>((node, context) =>
                 {
                     var directiveDef = context.Schema.FindDirective(node.Name);
                     if (directiveDef == null)

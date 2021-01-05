@@ -24,15 +24,15 @@ namespace GraphQL.Validation.Rules
         {
             return new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(f => CheckDirectives(context, f.Directives));
+                _.Match<Operation>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<Field>(f => CheckDirectives(context, f.Directives));
+                _.Match<Field>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentDefinition>(f => CheckDirectives(context, f.Directives));
+                _.Match<FragmentDefinition>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentSpread>(f => CheckDirectives(context, f.Directives));
+                _.Match<FragmentSpread>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<InlineFragment>(f => CheckDirectives(context, f.Directives));
+                _.Match<InlineFragment>((f, context) => CheckDirectives(context, f.Directives));
             }).ToTask();
         }
 

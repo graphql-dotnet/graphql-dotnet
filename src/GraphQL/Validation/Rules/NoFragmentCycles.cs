@@ -32,7 +32,7 @@ namespace GraphQL.Validation.Rules
             // Position in the spread path
             var spreadPathIndexByName = new LightweightCache<string, int>(key => -1);
 
-            return new MatchingNodeVisitor<FragmentDefinition>(node =>
+            return new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
                 {
                     if (!visitedFrags[node.Name])
                     {

@@ -28,11 +28,11 @@ namespace GraphQL.Validation.Rules
 
             return new EnterLeaveListener(_ =>
             {
-                _.Match<VariableDefinition>(def => variableDefs.Add(def));
+                _.Match<VariableDefinition>((def, context) => variableDefs.Add(def));
 
                 _.Match<Operation>(
-                enter: op => variableDefs = new List<VariableDefinition>(),
-                leave: op =>
+                enter: (op, context) => variableDefs = new List<VariableDefinition>(),
+                leave: (op, context) =>
                 {
                     var usages = context.GetRecursiveVariables(op)
                         .Select(usage => usage.Node.Name)

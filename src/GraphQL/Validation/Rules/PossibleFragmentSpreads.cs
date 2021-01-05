@@ -25,7 +25,7 @@ namespace GraphQL.Validation.Rules
         {
             return new EnterLeaveListener(_ =>
             {
-                _.Match<InlineFragment>(node =>
+                _.Match<InlineFragment>((node, context) =>
                 {
                     var fragType = context.TypeInfo.GetLastType();
                     var parentType = context.TypeInfo.GetParentType().GetNamedType();
@@ -36,7 +36,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
 
-                _.Match<FragmentSpread>(node =>
+                _.Match<FragmentSpread>((node, context) =>
                 {
                     string fragName = node.Name;
                     var fragType = getFragmentType(context, fragName);

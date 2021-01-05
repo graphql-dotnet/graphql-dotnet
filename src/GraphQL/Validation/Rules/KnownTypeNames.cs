@@ -23,7 +23,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="KnownTypeNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new MatchingNodeVisitor<NamedType>(leave: node =>
+            return new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
                 {
                     var type = context.Schema.FindType(node.Name);
                     if (type == null)
