@@ -14,17 +14,14 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly UniqueVariableNames Instance = new UniqueVariableNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            Dictionary<string, VariableDefinition> knownVariables = null;
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(__ => knownVariables = new Dictionary<string, VariableDefinition>());
+                _.Match<Operation>((__, context) => context.Set<UniqueVariableNames>(new Dictionary<string, VariableDefinition>()));
 
-                _.Match<VariableDefinition>(variableDefinition =>
+                _.Match<VariableDefinition>((variableDefinition, context) =>
                 {
-                    var variableName = variableDefinition.Name;
+                    string variableName = variableDefinition.Name;
+                    var knownVariables = context.Get<UniqueVariableNames, Dictionary<string, VariableDefinition>>();
 
                     if (knownVariables.ContainsKey(variableName))
                     {
@@ -36,6 +33,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

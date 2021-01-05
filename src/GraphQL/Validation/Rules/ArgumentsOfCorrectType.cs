@@ -15,9 +15,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Argument>(argAst =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Argument>((argAst, context) =>
                 {
                     var argDef = context.TypeInfo.GetArgument();
                     if (argDef == null)
@@ -30,6 +28,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ArgumentsOfCorrectTypeError(context, argAst, errors));
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

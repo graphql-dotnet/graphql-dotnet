@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
@@ -46,7 +47,8 @@ namespace GraphQL.Validation
             ProvidedNonNullArguments.Instance,
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
-            UniqueInputFieldNames.Instance
+            UniqueInputFieldNames.Instance,
+            OverlappingFieldsCanBeMerged.Instance
         }.AsReadOnly();
 
         public async Task<IValidationResult> ValidateAsync(
@@ -72,19 +74,28 @@ namespace GraphQL.Validation
                 Inputs = inputs
             };
 
+            List<INodeVisitor> visitors;
+
             if (rules == null)
             {
-                rules = CoreRules;
+                // Optimizations for standard rules:
+                //   1. Known size of allocated list.
+                //   2. No LINQ related allocations.
+                //   3. No async/await related allocations since all standard rules return cached tasks from ValidateAsync.
+                var coreRules = (ReadOnlyCollection<IValidationRule>)CoreRules;
+                visitors = new List<INodeVisitor>(coreRules.Count + 1) { context.TypeInfo };
+                for (int i = 0; i < coreRules.Count; ++i)
+                    visitors.Add(coreRules[i].ValidateAsync(context).Result);
             }
-
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
-            var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
-
-            visitors.Insert(0, context.TypeInfo);
+            else
+            {
+                visitors = (await Task.WhenAll(rules.Select(x => x.ValidateAsync(context)))).ToList();
+                visitors.Insert(0, context.TypeInfo);
+            }
 
             var basic = new BasicVisitor(visitors);
 
-            basic.Visit(document);
+            basic.Visit(document, context);
 
             if (context.HasErrors)
                 return new ValidationResult(context.Errors);

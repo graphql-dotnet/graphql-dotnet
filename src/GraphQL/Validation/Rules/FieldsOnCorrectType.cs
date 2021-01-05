@@ -19,9 +19,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Field>(node =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Field>((node, context) =>
                 {
                     var type = context.TypeInfo.GetParentType().GetNamedType();
 
@@ -46,7 +44,8 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces

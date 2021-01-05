@@ -15,21 +15,20 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly UniqueDirectivesPerLocation Instance = new UniqueDirectivesPerLocation();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(f => CheckDirectives(context, f.Directives));
+                _.Match<Operation>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<Field>(f => CheckDirectives(context, f.Directives));
+                _.Match<Field>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentDefinition>(f => CheckDirectives(context, f.Directives));
+                _.Match<FragmentDefinition>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<FragmentSpread>(f => CheckDirectives(context, f.Directives));
+                _.Match<FragmentSpread>((f, context) => CheckDirectives(context, f.Directives));
 
-                _.Match<InlineFragment>(f => CheckDirectives(context, f.Directives));
+                _.Match<InlineFragment>((f, context) => CheckDirectives(context, f.Directives));
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static void CheckDirectives(ValidationContext context, Directives directives)
         {

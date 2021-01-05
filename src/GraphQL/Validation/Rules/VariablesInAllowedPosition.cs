@@ -14,20 +14,15 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var varDefMap = new Dictionary<string, VariableDefinition>();
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<VariableDefinition>(
-                    varDefAst => varDefMap[varDefAst.Name] = varDefAst
-                );
+                _.Match<VariableDefinition>((varDefAst, context) => context.Get<VariablesInAllowedPosition, Dictionary<string, VariableDefinition>>()[varDefAst.Name] = varDefAst);
 
                 _.Match<Operation>(
-                    enter: op => varDefMap = new Dictionary<string, VariableDefinition>(),
-                    leave: op =>
+                    enter: (op, context) => context.Set<VariablesInAllowedPosition>(new Dictionary<string, VariableDefinition>()),
+                    leave: (op, context) =>
                     {
+                        var varDefMap = context.Get<VariablesInAllowedPosition, Dictionary<string, VariableDefinition>>();
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;
@@ -49,7 +44,8 @@ namespace GraphQL.Validation.Rules
                     }
                 );
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         /// <summary>
         /// if a variable definition has a default value, it is effectively non-null.

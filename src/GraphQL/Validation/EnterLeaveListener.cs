@@ -6,7 +6,7 @@ namespace GraphQL.Validation
 {
     public class EnterLeaveListener : INodeVisitor
     {
-        private readonly List<INodeVisitor> _listeners =
+        private readonly List<INodeVisitor> _visitors =
             new List<INodeVisitor>();
 
         public EnterLeaveListener()
@@ -19,30 +19,30 @@ namespace GraphQL.Validation
             configure(this);
         }
 
-        void INodeVisitor.Enter(INode node)
+        void INodeVisitor.Enter(INode node, ValidationContext context)
         {
-            foreach (var listener in _listeners)
+            foreach (var visitor in _visitors)
             {
-                listener.Enter(node);
+                visitor.Enter(node, context);
             }
         }
 
-        void INodeVisitor.Leave(INode node)
+        void INodeVisitor.Leave(INode node, ValidationContext context)
         {
             // Shouldn't this be done in reverse?
-            foreach (var listener in _listeners)
+            foreach (var visitor in _visitors)
             {
-                listener.Leave(node);
+                visitor.Leave(node, context);
             }
         }
 
         public void Match<TNode>(
-            Action<TNode> enter = null,
-            Action<TNode> leave = null)
+            Action<TNode, ValidationContext> enter = null,
+            Action<TNode, ValidationContext> leave = null)
             where TNode : INode
         {
             var listener = new MatchingNodeVisitor<TNode>(enter, leave);
-            _listeners.Add(listener);
+            _visitors.Add(listener);
         }
     }
 }

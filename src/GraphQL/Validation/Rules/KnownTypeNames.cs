@@ -16,9 +16,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly KnownTypeNames Instance = new KnownTypeNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<NamedType>(leave: node =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
                 {
                     var type = context.Schema.FindType(node.Name);
                     if (type == null)
@@ -28,6 +26,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

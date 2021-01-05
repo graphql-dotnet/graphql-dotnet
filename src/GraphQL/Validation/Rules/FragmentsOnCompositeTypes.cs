@@ -15,11 +15,9 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<InlineFragment>(node =>
+                _.Match<InlineFragment>((node, context) =>
                 {
                     var type = context.TypeInfo.GetLastType();
                     if (node.Type != null && type != null && !type.IsCompositeType())
@@ -28,7 +26,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
 
-                _.Match<FragmentDefinition>(node =>
+                _.Match<FragmentDefinition>((node, context) =>
                 {
                     var type = context.TypeInfo.GetLastType();
                     if (type != null && !type.IsCompositeType())
@@ -37,6 +35,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

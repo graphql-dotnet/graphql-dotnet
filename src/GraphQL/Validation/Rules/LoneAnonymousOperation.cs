@@ -14,18 +14,19 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var operationCount = context.Document.Operations.Count;
-
-            return new MatchingNodeVisitor<Operation>(op =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
+            {
+                _.Match<Document>((_, context) => context.Set<LoneAnonymousOperation>(context.Document.Operations.Count));
+                _.Match<Operation>((op, context) =>
                 {
-                    if (string.IsNullOrWhiteSpace(op.Name)
-                        && operationCount > 1)
+                    int operationCount = context.Get<LoneAnonymousOperation, int>();
+                    if (string.IsNullOrWhiteSpace(op.Name) && operationCount > 1)
                     {
                         context.ReportError(new LoneAnonymousOperationError(context, op));
                     }
-                }).ToTask();
-        }
+                });
+            }).ToTask();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

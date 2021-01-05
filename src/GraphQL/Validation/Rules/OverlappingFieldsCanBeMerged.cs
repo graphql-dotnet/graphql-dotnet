@@ -10,19 +10,25 @@ namespace GraphQL.Validation.Rules
 {
     public class OverlappingFieldsCanBeMerged : IValidationRule
     {
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        private sealed class OverlappingFieldsCanBeMergedData
         {
-            var comparedFragmentPairs = new PairSet();
-            var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
+            public PairSet ComparedFragmentPairs { get; set; } = new PairSet();
 
-            return new EnterLeaveListener(config =>
+            public Dictionary<SelectionSet, CachedField> CachedFieldsAndFragmentNames { get; set; } = new Dictionary<SelectionSet, CachedField>();
+        }
+
+        public static readonly OverlappingFieldsCanBeMerged Instance = new OverlappingFieldsCanBeMerged();
+
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(config =>
             {
-                config.Match<SelectionSet>(selectionSet =>
+                config.Match<Document>((_, context) => context.Set<OverlappingFieldsCanBeMerged>(new OverlappingFieldsCanBeMergedData()));
+                config.Match<SelectionSet>((selectionSet, context) =>
                 {
+                    var data = context.Get<OverlappingFieldsCanBeMerged, OverlappingFieldsCanBeMergedData>();
                     List<Conflict> conflicts = FindConflictsWithinSelectionSet(
                          context,
-                         cachedFieldsAndFragmentNames,
-                         comparedFragmentPairs,
+                         data.CachedFieldsAndFragmentNames,
+                         data.ComparedFragmentPairs,
                          context.TypeInfo.GetParentType(),
                          selectionSet);
 
@@ -32,7 +38,8 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static List<Conflict> FindConflictsWithinSelectionSet(
             ValidationContext context,
@@ -150,7 +157,6 @@ namespace GraphQL.Validation.Rules
             FieldDefPair fieldDefPair1,
             FieldDefPair fieldDefPair2)
         {
-
             var parentType1 = fieldDefPair1.ParentType;
             var node1 = fieldDefPair1.Field;
             var def1 = fieldDefPair1.FieldDef;
@@ -586,7 +592,7 @@ namespace GraphQL.Validation.Rules
 
             if (type1.IsLeafType() || type2.IsLeafType())
             {
-                return type1 != type2;
+                return !type1.Equals(type2);
             }
 
             return false;

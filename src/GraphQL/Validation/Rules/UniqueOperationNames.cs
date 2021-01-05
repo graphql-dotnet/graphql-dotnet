@@ -14,26 +14,26 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var frequency = new HashSet<string>();
-
-            return new MatchingNodeVisitor<Operation>(op =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
+            {
+                _.Match<Document>((_, context) =>
+                {
+                    if (context.Document.Operations.Count >= 2)
+                        context.Set<UniqueOperationNames>(new HashSet<string>());
+                });
+                _.Match<Operation>((op, context) =>
+                {
+                    if (context.Document.Operations.Count >= 2 && !string.IsNullOrWhiteSpace(op.Name))
                     {
-                        if (context.Document.Operations.Count < 2)
-                        {
-                            return;
-                        }
-                        if (string.IsNullOrWhiteSpace(op.Name))
-                        {
-                            return;
-                        }
-
+                        var frequency = context.Get<UniqueOperationNames, HashSet<string>>();
                         if (!frequency.Add(op.Name))
                         {
                             context.ReportError(new UniqueOperationNamesError(context, op));
                         }
-                }).ToTask();
-        }
+                    }
+                });
+            }).ToTask();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

@@ -15,11 +15,9 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Field>(leave: node =>
+                _.Match<Field>(leave: (node, context) =>
                 {
                     var fieldDef = context.TypeInfo.GetFieldDef();
 
@@ -39,7 +37,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
 
-                _.Match<Directive>(leave: node =>
+                _.Match<Directive>(leave: (node, context) =>
                 {
                     var directive = context.TypeInfo.GetDirective();
 
@@ -60,6 +58,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

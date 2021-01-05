@@ -15,17 +15,14 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var knownArgs = new Dictionary<string, Argument>();
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Field>(__ => knownArgs = new Dictionary<string, Argument>());
-                _.Match<Directive>(__ => knownArgs = new Dictionary<string, Argument>());
+                _.Match<Field>((__, context) => context.Set<UniqueArgumentNames>(new Dictionary<string, Argument>()));
+                _.Match<Directive>((__, context) => context.Set<UniqueArgumentNames>(new Dictionary<string, Argument>()));
 
-                _.Match<Argument>(argument =>
+                _.Match<Argument>((argument, context) =>
                 {
+                    var knownArgs = context.Get<UniqueArgumentNames, Dictionary<string, Argument>>();
                     var argName = argument.Name;
                     if (knownArgs.ContainsKey(argName))
                     {
@@ -37,6 +34,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

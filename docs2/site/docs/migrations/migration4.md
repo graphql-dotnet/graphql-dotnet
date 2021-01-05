@@ -26,10 +26,6 @@
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
-* `INode.IsEqualTo` and related methods have been removed.
-* `NameNode` has been changed to a readonly struct.
-* `DebugNodeVisitor` class has been removed.
-* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
 
 ```c#
     /// <summary>
@@ -52,3 +48,8 @@
 
 * Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
 * `ISubscriptionExecuter` has been removed.
+* `INode.IsEqualTo` and related methods have been removed.
+* `NameNode` has been changed to a readonly struct.
+* `DebugNodeVisitor` class has been removed.
+* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
+* `INodeVisitor.Enter` and `INodeVisitor.Leave` methods now accept additional `ValidationContext` argument.

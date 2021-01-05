@@ -15,21 +15,19 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var variableNameDefined = new Dictionary<string, bool>();
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<VariableDefinition>(varDef => variableNameDefined[varDef.Name] = true);
+                _.Match<VariableDefinition>((varDef, context) => context.Get<NoUndefinedVariables, Dictionary<string, bool>>()[varDef.Name] = true);
 
                 _.Match<Operation>(
-                    enter: op => variableNameDefined = new Dictionary<string, bool>(),
-                    leave: op =>
+                    enter: (op, context) => context.Set<NoUndefinedVariables>(new Dictionary<string, bool>()),
+                    leave: (op, context) =>
                     {
+                        var variableNameDefined = context.Get<NoUndefinedVariables, Dictionary<string, bool>>();
+
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {
-                            var varName = usage.Node.Name;
+                            string varName = usage.Node.Name;
                             if (!variableNameDefined.TryGetValue(varName, out bool found))
                             {
                                 context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
@@ -37,6 +35,7 @@ namespace GraphQL.Validation.Rules
                         }
                     });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

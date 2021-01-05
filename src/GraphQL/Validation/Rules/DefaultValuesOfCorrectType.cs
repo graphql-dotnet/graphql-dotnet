@@ -15,9 +15,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<VariableDefinition>(varDefAst =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<VariableDefinition>((varDefAst, context) =>
                 {
                     var defaultValue = varDefAst.DefaultValue;
                     var inputType = context.TypeInfo.GetInputType();
@@ -31,6 +29,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

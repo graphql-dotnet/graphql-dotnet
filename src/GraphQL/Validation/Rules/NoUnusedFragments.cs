@@ -14,35 +14,41 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoUnusedFragments : IValidationRule
     {
+        private sealed class NoUnusedFragmentsData
+        {
+            public List<Operation> OperationDefs = new List<Operation>();
+
+            public List<FragmentDefinition> FragmentDefs = new List<FragmentDefinition>();
+        }
+
         public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var operationDefs = new List<Operation>();
-            var fragmentDefs = new List<FragmentDefinition>();
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Operation>(node => operationDefs.Add(node));
-                _.Match<FragmentDefinition>(node => fragmentDefs.Add(node));
-                _.Match<Document>(leave: document =>
-                {
-                    var fragmentNamesUsed = operationDefs
-                        .SelectMany(context.GetRecursivelyReferencedFragments)
-                        .Select(fragment => fragment.Name)
-                        .ToList();
-
-                    foreach (var fragmentDef in fragmentDefs)
+                _.Match<Operation>((node, context) => context.Get<NoUnusedFragments, NoUnusedFragmentsData>().OperationDefs.Add(node));
+                _.Match<FragmentDefinition>((node, context) => context.Get<NoUnusedFragments, NoUnusedFragmentsData>().FragmentDefs.Add(node));
+                _.Match<Document>(
+                    enter: (_, context) => context.Set<NoUnusedFragments>(new NoUnusedFragmentsData()),
+                    leave: (document, context) =>
                     {
-                        var fragName = fragmentDef.Name;
+                        var data = context.Get<NoUnusedFragments, NoUnusedFragmentsData>();
+                        var fragmentNamesUsed = data.OperationDefs
+                                .SelectMany(context.GetRecursivelyReferencedFragments)
+                                .Select(fragment => fragment.Name)
+                                .ToList();
 
-                        if (!fragmentNamesUsed.Contains(fragName))
+                        foreach (var fragmentDef in data.FragmentDefs)
                         {
-                            context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
+                            var fragName = fragmentDef.Name;
+
+                            if (!fragmentNamesUsed.Contains(fragName))
+                            {
+                                context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
+                            }
                         }
-                    }
-                });
+                    });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

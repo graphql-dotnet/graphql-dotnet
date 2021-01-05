@@ -14,12 +14,12 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly UniqueFragmentNames Instance = new UniqueFragmentNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var knownFragments = new Dictionary<string, FragmentDefinition>();
-
-            return new MatchingNodeVisitor<FragmentDefinition>(fragmentDefinition =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
+            {
+                _.Match<Document>((_, context) => context.Set<UniqueFragmentNames>(new Dictionary<string, FragmentDefinition>()));
+                _.Match<FragmentDefinition>((fragmentDefinition, context) =>
                 {
+                    var knownFragments = context.Get<UniqueFragmentNames, Dictionary<string, FragmentDefinition>>();
                     var fragmentName = fragmentDefinition.Name;
                     if (knownFragments.ContainsKey(fragmentName))
                     {
@@ -29,7 +29,9 @@ namespace GraphQL.Validation.Rules
                     {
                         knownFragments[fragmentName] = fragmentDefinition;
                     }
-                }).ToTask();
-        }
+                });
+            }).ToTask();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

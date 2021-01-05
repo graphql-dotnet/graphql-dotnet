@@ -16,11 +16,9 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<InlineFragment>(node =>
+                _.Match<InlineFragment>((node, context) =>
                 {
                     var fragType = context.TypeInfo.GetLastType();
                     var parentType = context.TypeInfo.GetParentType().GetNamedType();
@@ -31,7 +29,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
 
-                _.Match<FragmentSpread>(node =>
+                _.Match<FragmentSpread>((node, context) =>
                 {
                     string fragName = node.Name;
                     var fragType = getFragmentType(context, fragName);
@@ -43,7 +41,8 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static IGraphType getFragmentType(ValidationContext context, string name)
         {

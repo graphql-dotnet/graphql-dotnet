@@ -15,9 +15,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Argument>(node =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Argument>((node, context) =>
                 {
                     var ancestors = context.TypeInfo.GetAncestors();
                     var argumentOf = ancestors[ancestors.Length - 2];
@@ -47,6 +45,7 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

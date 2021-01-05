@@ -13,28 +13,34 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class NoFragmentCycles : IValidationRule
     {
-        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
-
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        private sealed class NoFragmentCyclesData
         {
-            // Tracks already visited fragments to maintain O(N) and to ensure that cycles
-            // are not redundantly reported.
-            var visitedFrags = new LightweightCache<string, bool>(key => false);
+            // Tracks already visited fragments to maintain O(N) and to ensure that cycles are not redundantly reported.
+            public LightweightCache<string, bool> VisitedFrags { get; set; } = new LightweightCache<string, bool>(key => false);
 
             // Array of AST nodes used to produce meaningful errors
-            var spreadPath = new Stack<FragmentSpread>();
+            public Stack<FragmentSpread> SpreadPath = new Stack<FragmentSpread>();
 
             // Position in the spread path
-            var spreadPathIndexByName = new LightweightCache<string, int>(key => -1);
-
-            return new MatchingNodeVisitor<FragmentDefinition>(node =>
-                {
-                    if (!visitedFrags[node.Name])
-                    {
-                        detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
-                    }
-                }).ToTask();
+            public LightweightCache<string, int> SpreadPathIndexByName = new LightweightCache<string, int>(key => -1);
         }
+
+        public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
+
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
+            {
+                _.Match<Document>((_, context) => context.Set<NoFragmentCycles>(new NoFragmentCyclesData()));
+                _.Match<FragmentDefinition>((node, context) =>
+                {
+                    var data = context.Get<NoFragmentCycles, NoFragmentCyclesData>();
+                    if (!data.VisitedFrags[node.Name])
+                    {
+                        detectCycleRecursive(node, data.SpreadPath, data.VisitedFrags, data.SpreadPathIndexByName, context);
+                    }
+                });
+            }).ToTask();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static void detectCycleRecursive(
             FragmentDefinition fragment,

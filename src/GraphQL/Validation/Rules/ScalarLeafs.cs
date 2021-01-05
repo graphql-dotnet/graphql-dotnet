@@ -15,11 +15,9 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly ScalarLeafs Instance = new ScalarLeafs();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Field>(f => Field(context.TypeInfo.GetLastType(), f, context))
-                .ToTask();
-        }
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Field>((f, context) => Field(context.TypeInfo.GetLastType(), f, context)).ToTask();
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static void Field(IGraphType type, Field field, ValidationContext context)
         {

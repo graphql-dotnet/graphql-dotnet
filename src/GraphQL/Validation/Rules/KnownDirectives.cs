@@ -17,9 +17,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly KnownDirectives Instance = new KnownDirectives();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Directive>(node =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Directive>((node, context) =>
                 {
                     var directiveDef = context.Schema.FindDirective(node.Name);
                     if (directiveDef == null)
@@ -34,7 +32,8 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
         {

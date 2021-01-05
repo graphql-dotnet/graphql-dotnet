@@ -56,7 +56,7 @@ namespace GraphQL.Validation
             return _argument;
         }
 
-        public void Enter(INode node)
+        public void Enter(INode node, ValidationContext context)
         {
             _ancestorStack.Push(node);
 
@@ -160,7 +160,7 @@ namespace GraphQL.Validation
             }
         }
 
-        public void Leave(INode node)
+        public void Leave(INode node, ValidationContext context)
         {
             _ancestorStack.Pop();
 

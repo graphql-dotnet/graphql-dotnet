@@ -18,7 +18,7 @@ namespace GraphQL.Validation
             _visitors = visitors;
         }
 
-        public void Visit(INode node)
+        public void Visit(INode node, ValidationContext context)
         {
             if (node == null)
             {
@@ -27,7 +27,7 @@ namespace GraphQL.Validation
 
             for (int i = 0; i < _visitors.Count; i++)
             {
-                _visitors[i].Enter(node);
+                _visitors[i].Enter(node, context);
             }
 
             var children = node.Children;
@@ -36,18 +36,18 @@ namespace GraphQL.Validation
                 if (children is IList list)
                 {
                     for (int i = 0; i < list.Count; ++i)
-                        Visit((INode)list[i]);
+                        Visit((INode)list[i], context);
                 }
                 else
                     foreach (var child in children)
                     {
-                        Visit(child);
+                        Visit(child, context);
                     }
             }
 
             for (int i = _visitors.Count - 1; i >= 0; i--)
             {
-                _visitors[i].Leave(node);
+                _visitors[i].Leave(node, context);
             }
         }
     }

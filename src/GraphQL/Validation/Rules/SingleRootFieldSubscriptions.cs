@@ -12,9 +12,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<Operation>(operation =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Operation>((operation, context) =>
                 {
                     if (!IsSubscription(operation))
                     {
@@ -52,7 +50,8 @@ namespace GraphQL.Validation.Rules
                     }
 
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
 

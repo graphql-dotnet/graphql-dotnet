@@ -14,9 +14,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly KnownFragmentNames Instance = new KnownFragmentNames();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new MatchingNodeVisitor<FragmentSpread>(node =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<FragmentSpread>((node, context) =>
                 {
                     var fragmentName = node.Name;
                     var fragment = context.GetFragment(fragmentName);
@@ -25,6 +23,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new KnownFragmentNamesError(context, node, fragmentName));
                     }
                 }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

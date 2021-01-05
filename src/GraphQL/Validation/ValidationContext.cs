@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
@@ -17,6 +18,12 @@ namespace GraphQL.Validation
         private readonly Dictionary<Operation, IEnumerable<VariableUsage>> _variables =
             new Dictionary<Operation, IEnumerable<VariableUsage>>();
 
+        /// <summary>
+        /// Allows validation rules store their specific data during validation.
+        /// </summary>
+
+        private readonly ConcurrentDictionary<object, object> _validationRuleLocalContext = new ConcurrentDictionary<object, object>();
+
         public string OriginalQuery { get; set; }
 
         public string OperationName { get; set; }
@@ -28,6 +35,23 @@ namespace GraphQL.Validation
         public TypeInfo TypeInfo { get; set; }
 
         public IDictionary<string, object> UserContext { get; set; }
+
+        /// <summary>
+        /// Gets some data specific to validation rule from validation context.
+        /// </summary>
+        /// <typeparam name="TValidationRule">The type of validation rule.</typeparam>
+        /// <typeparam name="TResult">Type of data.</typeparam>
+        /// <returns>Previously stored data if any, otherwise throws <see cref="InvalidOperationException"/>.</returns>
+        internal TResult Get<TValidationRule, TResult>() => (TResult)_validationRuleLocalContext[typeof(TValidationRule)] ?? throw new InvalidOperationException("No data");
+
+        /// <summary>
+        /// Sets some data specific to validation rule into validation context.
+        /// </summary>
+        /// <typeparam name="TValidationRule">The type of validation rule.</typeparam>
+        /// <param name="data">Arbitrary object used by the specified rule during validation.</param>
+        internal void Set<TValidationRule>(object data)
+            where TValidationRule : IValidationRule
+            => _validationRuleLocalContext[typeof(TValidationRule)] = data;
 
         public IEnumerable<ValidationError> Errors => (IEnumerable<ValidationError>)_errors ?? Array.Empty<ValidationError>();
 
@@ -50,12 +74,12 @@ namespace GraphQL.Validation
             var listener = new EnterLeaveListener(_ =>
             {
                 _.Match<VariableReference>(
-                    varRef => usages.Add(new VariableUsage(varRef, info.GetInputType()))
+                    (varRef, context) => usages.Add(new VariableUsage(varRef, info.GetInputType()))
                 );
             });
 
             var visitor = new BasicVisitor(info, listener);
-            visitor.Visit(node);
+            visitor.Visit(node, this);
 
             return usages;
         }

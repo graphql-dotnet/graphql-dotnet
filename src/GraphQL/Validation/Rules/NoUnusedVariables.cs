@@ -17,25 +17,23 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly NoUnusedVariables Instance = new NoUnusedVariables();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var variableDefs = new List<VariableDefinition>();
-
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<VariableDefinition>(def => variableDefs.Add(def));
+                _.Match<VariableDefinition>((def, context) => context.Get<NoUnusedVariables, List<VariableDefinition>>().Add(def));
 
                 _.Match<Operation>(
-                enter: op => variableDefs = new List<VariableDefinition>(),
-                leave: op =>
+                enter: (op, context) => context.Set<NoUnusedVariables>(new List<VariableDefinition>()),
+                leave: (op, context) =>
                 {
+                    var variableDefs = context.Get<NoUnusedVariables, List<VariableDefinition>>();
+
                     var usages = context.GetRecursiveVariables(op)
                         .Select(usage => usage.Node.Name)
                         .ToList();
 
                     foreach (var variableDef in variableDefs)
                     {
-                        var variableName = variableDef.Name;
+                        string variableName = variableDef.Name;
                         if (!usages.Contains(variableName))
                         {
                             context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
@@ -43,6 +41,7 @@ namespace GraphQL.Validation.Rules
                     }
                 });
             }).ToTask();
-        }
+
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }
