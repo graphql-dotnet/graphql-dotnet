@@ -31,7 +31,7 @@ namespace GraphQL.Validation.Rules
             }).ToTask();
         }
 
-        private void CheckDirectives(ValidationContext context, Directives directives)
+        private static void CheckDirectives(ValidationContext context, Directives directives)
         {
             if (directives == null || directives.Count == 0)
                 return;

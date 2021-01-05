@@ -81,9 +81,6 @@ namespace GraphQL.Validation
             var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
 
             visitors.Insert(0, context.TypeInfo);
-            // #if DEBUG
-            //             visitors.Insert(1, new DebugNodeVisitor());
-            // #endif
 
             var basic = new BasicVisitor(visitors);
 

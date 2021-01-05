@@ -17,9 +17,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableDefinition>(varDef =>
+            return new MatchingNodeVisitor<VariableDefinition>(varDef =>
                 {
                     var type = GetNamedGraphTypeFromType(varDef.Type, context.Schema);
 
@@ -27,8 +25,7 @@ namespace GraphQL.Validation.Rules
                     {
                         context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
 
         private static IGraphType GetNamedGraphTypeFromType(IType type, ISchema schema) => type switch
