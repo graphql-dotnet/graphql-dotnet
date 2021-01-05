@@ -19,14 +19,10 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
             {
-                _.Match<Document>((_, context) =>
-                {
-                    if (context.Document.Operations.Count >= 2)
-                        context.Set<UniqueOperationNames>(new HashSet<string>());
-                });
+                _.Match<Document>((_, context) => context.Set<UniqueOperationNames>(new HashSet<string>()));
                 _.Match<Operation>((op, context) =>
                 {
-                    if (context.Document.Operations.Count >= 2 && !string.IsNullOrWhiteSpace(op.Name))
+                    if (!string.IsNullOrWhiteSpace(op.Name))
                     {
                         var frequency = context.Get<UniqueOperationNames, HashSet<string>>();
                         if (!frequency.Add(op.Name))
@@ -35,7 +31,9 @@ namespace GraphQL.Validation.Rules
                         }
                     }
                 });
-            }).ToTask();
+            },
+            shouldRun: context => context.Document.Operations.Count >= 2
+            ).ToTask();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>

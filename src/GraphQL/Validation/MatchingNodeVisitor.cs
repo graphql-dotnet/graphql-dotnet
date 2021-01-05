@@ -12,11 +12,12 @@ namespace GraphQL.Validation
     {
         private readonly Action<TNode, ValidationContext> _enter;
         private readonly Action<TNode, ValidationContext> _leave;
+        private readonly Func<ValidationContext, bool> _shouldRun;
 
         /// <summary>
         /// Returns a new instance configured with the specified enter/leave delegates.
         /// </summary>
-        public MatchingNodeVisitor(Action<TNode, ValidationContext> enter = null, Action<TNode, ValidationContext> leave = null)
+        public MatchingNodeVisitor(Action<TNode, ValidationContext> enter = null, Action<TNode, ValidationContext> leave = null, Func<ValidationContext, bool> shouldRun = null)
         {
             if (enter == null && leave == null)
             {
@@ -25,7 +26,11 @@ namespace GraphQL.Validation
 
             _enter = enter;
             _leave = leave;
+            _shouldRun = shouldRun;
         }
+
+        /// <inheritdoc/>
+        public bool ShouldRunOn(ValidationContext context) => _shouldRun?.Invoke(context) ?? true;
 
         void INodeVisitor.Enter(INode node, ValidationContext context)
         {

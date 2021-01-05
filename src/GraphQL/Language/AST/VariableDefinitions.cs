@@ -20,20 +20,11 @@ namespace GraphQL.Language.AST
             if (variable == null)
                 throw new ArgumentNullException(nameof(variable));
 
-            if (_variables == null)
-                _variables = new List<VariableDefinition>();
-
-            _variables.Add(variable);
+            (_variables ??= new List<VariableDefinition>()).Add(variable);
         }
 
         /// <inheritdoc/>
-        public IEnumerator<VariableDefinition> GetEnumerator()
-        {
-            if (_variables == null)
-                return Enumerable.Empty<VariableDefinition>().GetEnumerator();
-
-            return _variables.GetEnumerator();
-        }
+        public IEnumerator<VariableDefinition> GetEnumerator() => _variables?.GetEnumerator() ?? Enumerable.Empty<VariableDefinition>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

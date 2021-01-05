@@ -19,7 +19,7 @@ namespace GraphQL.Validation
             _visitors = visitors;
         }
 
-        /// <inheritdoc cref="BasicVisitor.BasicVisitor(INodeVisitor[])"/>
+        /// <inheritdoc cref="BasicVisitor(INodeVisitor[])"/>
         public BasicVisitor(IList<INodeVisitor> visitors)
         {
             _visitors = visitors;
@@ -38,7 +38,8 @@ namespace GraphQL.Validation
 
             for (int i = 0; i < _visitors.Count; i++)
             {
-                _visitors[i].Enter(node, context);
+                if (_visitors[i].ShouldRunOn(context))
+                    _visitors[i].Enter(node, context);
             }
 
             var children = node.Children;
@@ -58,7 +59,8 @@ namespace GraphQL.Validation
 
             for (int i = _visitors.Count - 1; i >= 0; i--)
             {
-                _visitors[i].Leave(node, context);
+                if (_visitors[i].ShouldRunOn(context))
+                    _visitors[i].Leave(node, context);
             }
         }
     }

@@ -1189,6 +1189,7 @@ namespace GraphQL.Language.AST
     public class Fragments : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition>, System.Collections.IEnumerable
     {
         public Fragments() { }
+        public int Count { get; }
         public void Add(GraphQL.Language.AST.FragmentDefinition fragment) { }
         public GraphQL.Language.AST.FragmentDefinition FindDefinition(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.FragmentDefinition> GetEnumerator() { }
@@ -2526,10 +2527,10 @@ namespace GraphQL.Validation
     }
     public class EnterLeaveListener : GraphQL.Validation.INodeVisitor
     {
-        public EnterLeaveListener() { }
-        public EnterLeaveListener(System.Action<GraphQL.Validation.EnterLeaveListener> configure) { }
+        public EnterLeaveListener(System.Action<GraphQL.Validation.EnterLeaveListener> configure, System.Func<GraphQL.Validation.ValidationContext, bool> shouldRun = null) { }
         public void Match<TNode>(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null)
             where TNode : GraphQL.Language.AST.INode { }
+        public bool ShouldRunOn(GraphQL.Validation.ValidationContext context) { }
     }
     public interface IDocumentValidator
     {
@@ -2539,6 +2540,7 @@ namespace GraphQL.Validation
     {
         void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
         void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
+        bool ShouldRunOn(GraphQL.Validation.ValidationContext context);
     }
     public interface IValidationResult
     {
@@ -2552,7 +2554,8 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQL.Language.AST.INode
     {
-        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
+        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null, System.Func<GraphQL.Validation.ValidationContext, bool> shouldRun = null) { }
+        public bool ShouldRunOn(GraphQL.Validation.ValidationContext context) { }
     }
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
@@ -2572,6 +2575,7 @@ namespace GraphQL.Validation
         public GraphQL.Types.IGraphType GetLastType() { }
         public GraphQL.Types.IGraphType GetParentType() { }
         public void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
+        public bool ShouldRunOn(GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {

@@ -82,10 +82,10 @@ namespace GraphQL.Validation
         /// Returns the last query argument matched, or null if none.
         /// </summary>
         /// <returns></returns>
-        public QueryArgument GetArgument()
-        {
-            return _argument;
-        }
+        public QueryArgument GetArgument() => _argument;
+
+        /// <inheritdoc/>
+        public bool ShouldRunOn(ValidationContext context) => true;
 
         /// <inheritdoc/>
         public void Enter(INode node, ValidationContext context)

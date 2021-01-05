@@ -17,18 +17,16 @@ namespace GraphQL.Validation.Rules
         /// </summary>
         public static readonly LoneAnonymousOperation Instance = new LoneAnonymousOperation();
 
-        private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Operation>(
+            enter: (op, context) =>
             {
-                _.Match<Document>((_, context) => context.Set<LoneAnonymousOperation>(context.Document.Operations.Count));
-                _.Match<Operation>((op, context) =>
+                if (string.IsNullOrWhiteSpace(op.Name))
                 {
-                    int operationCount = context.Get<LoneAnonymousOperation, int>();
-                    if (string.IsNullOrWhiteSpace(op.Name) && operationCount > 1)
-                    {
-                        context.ReportError(new LoneAnonymousOperationError(context, op));
-                    }
-                });
-            }).ToTask();
+                    context.ReportError(new LoneAnonymousOperationError(context, op));
+                }
+            },
+            shouldRun: context => context.Document.Operations.Count > 1
+            ).ToTask();
 
         /// <inheritdoc/>
         /// <exception cref="LoneAnonymousOperationError"/>

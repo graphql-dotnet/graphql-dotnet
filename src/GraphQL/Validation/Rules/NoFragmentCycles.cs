@@ -41,7 +41,9 @@ namespace GraphQL.Validation.Rules
                         detectCycleRecursive(node, data.SpreadPath, data.VisitedFrags, data.SpreadPathIndexByName, context);
                     }
                 });
-            }).ToTask();
+            },
+            shouldRun: context => context.Document.Fragments.Count > 0
+            ).ToTask();
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>

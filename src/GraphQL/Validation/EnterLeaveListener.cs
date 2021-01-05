@@ -10,30 +10,27 @@ namespace GraphQL.Validation
     /// </summary>
     public class EnterLeaveListener : INodeVisitor
     {
-        private readonly List<INodeVisitor> _visitors =
-            new List<INodeVisitor>();
-
-        /// <summary>
-        /// Initializes a new instance with no configured listeners.
-        /// </summary>
-        public EnterLeaveListener()
-        {
-
-        }
+        private readonly List<INodeVisitor> _visitors = new List<INodeVisitor>();
+        private readonly Func<ValidationContext, bool> _shouldRun;
 
         /// <summary>
         /// Initializes a new instance and runs the supplied configuration delegate.
         /// </summary>
-        public EnterLeaveListener(Action<EnterLeaveListener> configure)
+        public EnterLeaveListener(Action<EnterLeaveListener> configure, Func<ValidationContext, bool> shouldRun = null)
         {
             configure(this);
+            _shouldRun = shouldRun;
         }
+
+        /// <inheritdoc/>
+        public bool ShouldRunOn(ValidationContext context) => _shouldRun?.Invoke(context) ?? true;
 
         void INodeVisitor.Enter(INode node, ValidationContext context)
         {
             foreach (var visitor in _visitors)
             {
-                visitor.Enter(node, context);
+                if (visitor.ShouldRunOn(context))
+                    visitor.Enter(node, context);
             }
         }
 
@@ -42,7 +39,8 @@ namespace GraphQL.Validation
             // Shouldn't this be done in reverse?
             foreach (var visitor in _visitors)
             {
-                visitor.Leave(node, context);
+                if (visitor.ShouldRunOn(context))
+                    visitor.Leave(node, context);
             }
         }
 
@@ -57,8 +55,7 @@ namespace GraphQL.Validation
             Action<TNode, ValidationContext> leave = null)
             where TNode : INode
         {
-            var listener = new MatchingNodeVisitor<TNode>(enter, leave);
-            _visitors.Add(listener);
+            _visitors.Add(new MatchingNodeVisitor<TNode>(enter, leave));
         }
     }
 }

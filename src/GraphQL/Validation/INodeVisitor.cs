@@ -8,6 +8,13 @@ namespace GraphQL.Validation
     public interface INodeVisitor
     {
         /// <summary>
+        /// Indicates the applicability of this visitor to the given <see cref="ValidationContext"/>.
+        /// <br/>
+        /// Some visitors process only documents with certain nodes and it makes no sense to run them on other documents.
+        /// </summary>
+        bool ShouldRunOn(ValidationContext context);
+
+        /// <summary>
         /// Called when the node walker is entering a node.
         /// </summary>
         void Enter(INode node, ValidationContext context);

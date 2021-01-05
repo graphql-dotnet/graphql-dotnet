@@ -55,3 +55,4 @@
 * `EnumerableExtensions.Apply` for dictionaries has been removed.
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * `INodeVisitor.Enter` and `INodeVisitor.Leave` methods now accept additional `ValidationContext` argument.
+* `INodeVisitor.ShouldRunOn` method has been added.

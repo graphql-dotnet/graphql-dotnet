@@ -33,7 +33,8 @@ namespace GraphQL.Validation.Rules
                         knownFragments[fragmentName] = fragmentDefinition;
                     }
                 });
-            }).ToTask();
+            },
+            shouldRun: context => context.Document.Fragments.Count >= 2).ToTask();
 
         /// <inheritdoc/>
         /// <exception cref="UniqueFragmentNamesError"/>

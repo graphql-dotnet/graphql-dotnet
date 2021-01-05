@@ -96,12 +96,7 @@ namespace GraphQL.Validation
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
-            var listener = new EnterLeaveListener(_ =>
-            {
-                _.Match<VariableReference>(
-                    (varRef, context) => usages.Add(new VariableUsage(varRef, info.GetInputType()))
-                );
-            });
+            var listener = new MatchingNodeVisitor<VariableReference>((varRef, context) => usages.Add(new VariableUsage(varRef, info.GetInputType())));
 
             var visitor = new BasicVisitor(info, listener);
             visitor.Visit(node, this);

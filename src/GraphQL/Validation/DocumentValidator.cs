@@ -94,7 +94,11 @@ namespace GraphQL.Validation
                 var coreRules = (ReadOnlyCollection<IValidationRule>)CoreRules;
                 visitors = new List<INodeVisitor>(coreRules.Count + 1) { context.TypeInfo };
                 for (int i = 0; i < coreRules.Count; ++i)
-                    visitors.Add(coreRules[i].ValidateAsync(context).Result);
+                {
+                    var visitor = coreRules[i].ValidateAsync(context).Result;
+                    if (visitor.ShouldRunOn(context))
+                        visitors.Add(visitor);
+                }
             }
             else
             {
@@ -106,10 +110,7 @@ namespace GraphQL.Validation
 
             basic.Visit(document, context);
 
-            if (context.HasErrors)
-                return new ValidationResult(context.Errors);
-
-            return SuccessfullyValidatedResult.Instance;
+            return context.HasErrors ? new ValidationResult(context.Errors) : (IValidationResult)SuccessfullyValidatedResult.Instance;
         }
     }
 }
