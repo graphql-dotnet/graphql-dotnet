@@ -1,3 +1,4 @@
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -79,8 +80,8 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
-                _.Error(Rule.AnonOperationNotAloneMessage(), 6, 17);
+                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 6, 17);
             });
         }
 
@@ -100,7 +101,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
             });
         }
 
@@ -120,7 +121,7 @@ namespace GraphQL.Tests.Validation
             ShouldFailRule(_ =>
             {
                 _.Query = query;
-                _.Error(Rule.AnonOperationNotAloneMessage(), 2, 17);
+                _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
             });
         }
     }
