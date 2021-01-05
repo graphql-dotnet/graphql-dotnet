@@ -6,13 +6,16 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Provided required arguments
+    /// Provided required arguments:
     ///
     /// A field or directive is only valid if all required (non-null) field arguments
     /// have been provided.
     /// </summary>
     public class ProvidedNonNullArguments : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -59,6 +62,8 @@ namespace GraphQL.Validation.Rules
                 });
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="ProvidedNonNullArgumentsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

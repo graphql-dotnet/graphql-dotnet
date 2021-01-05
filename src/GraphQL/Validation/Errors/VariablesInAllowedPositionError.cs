@@ -5,11 +5,15 @@ using GraphQLParser;
 
 namespace GraphQL.Validation.Errors
 {
+    /// <inheritdoc cref="Rules.VariablesInAllowedPosition"/>
     [Serializable]
     public class VariablesInAllowedPositionError : ValidationError
     {
         internal const string NUMBER = "5.8.5";
 
+        /// <summary>
+        /// Initializes a new instance with the specified properties.
+        /// </summary>
         public VariablesInAllowedPositionError(ValidationContext context, VariableDefinition varDef, IGraphType varType, VariableUsage usage)
             : base(context.OriginalQuery, NUMBER, BadVarPosMessage(usage.Node.Name, context.Print(varType), context.Print(usage.Type)))
         {

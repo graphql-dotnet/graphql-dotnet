@@ -8,10 +8,13 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Variables passed to field arguments conform to type
+    /// Variables passed to field arguments conform to type.
     /// </summary>
     public class VariablesInAllowedPosition : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -45,6 +48,8 @@ namespace GraphQL.Validation.Rules
                 );
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="VariablesInAllowedPositionError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         /// <summary>

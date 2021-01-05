@@ -10,13 +10,16 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Fields on correct type
+    /// Fields on correct type:
     ///
     /// A GraphQL document is only valid if all fields selected are defined by the
-    /// parent type, or are an allowed meta field such as __typename
+    /// parent type, or are an allowed meta field such as __typename.
     /// </summary>
     public class FieldsOnCorrectType : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
 
         private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Field>((node, context) =>
@@ -45,6 +48,8 @@ namespace GraphQL.Validation.Rules
                     }
                 }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="FieldsOnCorrectTypeError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         /// <summary>

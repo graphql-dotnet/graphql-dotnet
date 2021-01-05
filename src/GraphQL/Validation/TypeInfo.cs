@@ -5,6 +5,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Validation
 {
+    /// <summary>
+    /// Provides information pertaining to the current state of the AST tree while being walked.
+    /// </summary>
     public class TypeInfo : INodeVisitor
     {
         private readonly ISchema _schema;
@@ -16,46 +19,75 @@ namespace GraphQL.Validation
         private DirectiveGraphType _directive;
         private QueryArgument _argument;
 
+        /// <summary>
+        /// Initializes a new instance for the specified schema.
+        /// </summary>
+        /// <param name="schema"></param>
         public TypeInfo(ISchema schema)
         {
             _schema = schema;
         }
 
+        /// <summary>
+        /// Returns a list of ancestors of the current node.
+        /// </summary>
+        /// <returns></returns>
         public INode[] GetAncestors()
         {
             return _ancestorStack.Skip(1).Reverse().ToArray();
         }
 
+        /// <summary>
+        /// Returns the last graph type matched, or null if none.
+        /// </summary>
         public IGraphType GetLastType()
         {
             return _typeStack.Count > 0 ? _typeStack.Peek() : null;
         }
 
+        /// <summary>
+        /// Returns the last input graph type matched, or null if none.
+        /// </summary>
         public IGraphType GetInputType()
         {
             return _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
         }
 
+        /// <summary>
+        /// Returns the parent graph type of the current node, or null if none.
+        /// </summary>
         public IGraphType GetParentType()
         {
             return _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
         }
 
+        /// <summary>
+        /// Returns the last field type matched, or null if none.
+        /// </summary>
         public FieldType GetFieldDef()
         {
             return _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
         }
 
+        /// <summary>
+        /// Returns the last directive specified, or null if none.
+        /// </summary>
+        /// <returns></returns>
         public DirectiveGraphType GetDirective()
         {
             return _directive;
         }
 
+        /// <summary>
+        /// Returns the last query argument matched, or null if none.
+        /// </summary>
+        /// <returns></returns>
         public QueryArgument GetArgument()
         {
             return _argument;
         }
 
+        /// <inheritdoc/>
         public void Enter(INode node, ValidationContext context)
         {
             _ancestorStack.Push(node);
@@ -160,6 +192,7 @@ namespace GraphQL.Validation
             }
         }
 
+        /// <inheritdoc/>
         public void Leave(INode node, ValidationContext context)
         {
             _ancestorStack.Pop();

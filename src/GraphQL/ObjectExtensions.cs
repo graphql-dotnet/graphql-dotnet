@@ -9,6 +9,9 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for objects and a method for converting a dictionary into a strongly typed object.
+    /// </summary>
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();

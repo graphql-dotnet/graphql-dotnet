@@ -3,12 +3,19 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Validation
 {
+    /// <summary>
+    /// A node listener which runs configured delegates only when the node entered/left matches the specified node type.
+    /// </summary>
+    /// <typeparam name="TNode">A specified AST node type.</typeparam>
     public class MatchingNodeVisitor<TNode> : INodeVisitor
         where TNode : INode
     {
         private readonly Action<TNode, ValidationContext> _enter;
         private readonly Action<TNode, ValidationContext> _leave;
 
+        /// <summary>
+        /// Returns a new instance configured with the specified enter/leave delegates.
+        /// </summary>
         public MatchingNodeVisitor(Action<TNode, ValidationContext> enter = null, Action<TNode, ValidationContext> leave = null)
         {
             if (enter == null && leave == null)

@@ -6,13 +6,16 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Unique argument names
+    /// Unique argument names:
     ///
     /// A GraphQL field or directive is only valid if all supplied arguments at a given field
     /// are uniquely named.
     /// </summary>
     public class UniqueArgumentNames : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly UniqueArgumentNames Instance = new UniqueArgumentNames();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -35,6 +38,8 @@ namespace GraphQL.Validation.Rules
                 });
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="UniqueArgumentNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

@@ -10,6 +10,9 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class SingleRootFieldSubscriptions : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
         private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Operation>((operation, context) =>
@@ -51,6 +54,8 @@ namespace GraphQL.Validation.Rules
 
                 }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="SingleRootFieldSubscriptionsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;

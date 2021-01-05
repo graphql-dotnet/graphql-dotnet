@@ -7,7 +7,7 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// No fragment cycles
+    /// No fragment cycles:
     ///
     /// A GraphQL document is only valid if it does not contain fragment cycles.
     /// </summary>
@@ -25,6 +25,9 @@ namespace GraphQL.Validation.Rules
             public LightweightCache<string, int> SpreadPathIndexByName = new LightweightCache<string, int>(key => -1);
         }
 
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -40,6 +43,8 @@ namespace GraphQL.Validation.Rules
                 });
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="NoFragmentCyclesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
 
         private static void detectCycleRecursive(

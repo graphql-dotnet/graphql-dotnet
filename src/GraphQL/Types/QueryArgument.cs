@@ -64,8 +64,11 @@ namespace GraphQL.Types
             get => _name;
             set
             {
-                NameValidator.ValidateNameNotNull(value, "argument");
-                _name = value;
+                if (_name != value)
+                {
+                    NameValidator.ValidateName(value, "argument");
+                    _name = value;
+                }
             }
         }
 

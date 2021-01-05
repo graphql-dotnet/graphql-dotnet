@@ -8,8 +8,12 @@ using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
 {
+    /// <summary>
+    /// Validates a document against a set of validation rules and returns a list of the errors found.
+    /// </summary>
     public interface IDocumentValidator
     {
+        /// <inheritdoc cref="IDocumentValidator"/>
         Task<IValidationResult> ValidateAsync(
             string originalQuery,
             ISchema schema,
@@ -19,8 +23,12 @@ namespace GraphQL.Validation
             Inputs inputs = null);
     }
 
+    /// <inheritdoc/>
     public class DocumentValidator : IDocumentValidator
     {
+        /// <summary>
+        /// Returns the default set of validation rules: all except <see cref="OverlappingFieldsCanBeMerged"/>.
+        /// </summary>
         public static readonly IEnumerable<IValidationRule> CoreRules = new List<IValidationRule>
         {
             UniqueOperationNames.Instance,
@@ -48,9 +56,10 @@ namespace GraphQL.Validation
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
             UniqueInputFieldNames.Instance,
-            OverlappingFieldsCanBeMerged.Instance
+            //OverlappingFieldsCanBeMerged.Instance uncomment later
         }.AsReadOnly();
 
+        /// <inheritdoc/>
         public async Task<IValidationResult> ValidateAsync(
             string originalQuery,
             ISchema schema,

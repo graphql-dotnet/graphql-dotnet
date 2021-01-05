@@ -6,7 +6,7 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Unique input field names
+    /// Unique input field names:
     ///
     /// A GraphQL input object value is only valid if all supplied fields are
     /// uniquely named.
@@ -20,6 +20,9 @@ namespace GraphQL.Validation.Rules
             public Dictionary<string, IValue> KnownNames { get; set; } = new Dictionary<string, IValue>();
         }
 
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly UniqueInputFieldNames Instance = new UniqueInputFieldNames();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -53,6 +56,8 @@ namespace GraphQL.Validation.Rules
                     });
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="UniqueInputFieldNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

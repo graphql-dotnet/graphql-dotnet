@@ -6,12 +6,15 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Unique operation names
+    /// Unique operation names:
     ///
     /// A GraphQL document is only valid if all defined operations have unique names.
     /// </summary>
     public class UniqueOperationNames : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly UniqueOperationNames Instance = new UniqueOperationNames();
 
         private static readonly Task<INodeVisitor> _task = new EnterLeaveListener(_ =>
@@ -34,6 +37,8 @@ namespace GraphQL.Validation.Rules
                 });
             }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="UniqueOperationNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

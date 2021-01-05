@@ -6,13 +6,16 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Variable default values of correct type
+    /// Variable default values of correct type:
     ///
     /// A GraphQL document is only valid if all variable default values are of the
     /// type expected by their definition.
     /// </summary>
     public class DefaultValuesOfCorrectType : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly DefaultValuesOfCorrectType Instance = new DefaultValuesOfCorrectType();
 
         private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<VariableDefinition>((varDefAst, context) =>
@@ -30,6 +33,8 @@ namespace GraphQL.Validation.Rules
                     }
                 }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="DefaultValuesOfCorrectTypeError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }

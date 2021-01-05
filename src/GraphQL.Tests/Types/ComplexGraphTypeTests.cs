@@ -348,14 +348,23 @@ namespace GraphQL.Tests.Types
         [InlineData("id$")]
         public void does_not_throw_with_filtering_nameconverter(string fieldName)
         {
-            var type = new ObjectGraphType();
-            type.Field<StringGraphType>(fieldName);
-            var schema = new Schema
+            NameValidator.Validation = (n, t) => { }; // disable "before" checks
+
+            try
             {
-                Query = type,
-                NameConverter = new TestNameConverter(fieldName, "pass")
-            };
-            schema.Initialize();
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>(fieldName);
+                var schema = new Schema
+                {
+                    Query = type,
+                    NameConverter = new TestNameConverter(fieldName, "pass")
+                };
+                schema.Initialize();
+            }
+            finally
+            {
+                NameValidator.Validation = NameValidator.ValidateDefault; // restore defaults
+            }
         }
 
         [Fact]

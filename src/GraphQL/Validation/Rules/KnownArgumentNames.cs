@@ -6,13 +6,16 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Known argument names
+    /// Known argument names:
     ///
     /// A GraphQL field is only valid if all supplied arguments are defined by
     /// that field.
     /// </summary>
     public class KnownArgumentNames : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
 
         private static readonly Task<INodeVisitor> _task = new MatchingNodeVisitor<Argument>((node, context) =>
@@ -46,6 +49,8 @@ namespace GraphQL.Validation.Rules
                     }
                 }).ToTask();
 
+        /// <inheritdoc/>
+        /// <exception cref="KnownArgumentNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _task;
     }
 }
