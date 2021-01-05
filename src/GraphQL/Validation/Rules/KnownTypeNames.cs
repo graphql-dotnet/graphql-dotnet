@@ -18,9 +18,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<NamedType>(leave: node =>
+            return new MatchingNodeVisitor<NamedType>(leave: node =>
                 {
                     var type = context.Schema.FindType(node.Name);
                     if (type == null)
@@ -29,8 +27,7 @@ namespace GraphQL.Validation.Rules
                         var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
                         context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }

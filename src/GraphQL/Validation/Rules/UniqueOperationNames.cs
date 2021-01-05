@@ -18,10 +18,7 @@ namespace GraphQL.Validation.Rules
         {
             var frequency = new HashSet<string>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Operation>(
-                    enter: op =>
+            return new MatchingNodeVisitor<Operation>(op =>
                     {
                         if (context.Document.Operations.Count < 2)
                         {
@@ -36,8 +33,7 @@ namespace GraphQL.Validation.Rules
                         {
                             context.ReportError(new UniqueOperationNamesError(context, op));
                         }
-                    });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }

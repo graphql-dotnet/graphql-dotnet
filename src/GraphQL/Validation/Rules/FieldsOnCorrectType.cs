@@ -21,9 +21,7 @@ namespace GraphQL.Validation.Rules
 
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<Field>(node =>
+            return new MatchingNodeVisitor<Field>(node =>
                 {
                     var type = context.TypeInfo.GetParentType().GetNamedType();
 
@@ -47,8 +45,7 @@ namespace GraphQL.Validation.Rules
                             context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
                         }
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
 
         /// <summary>
@@ -57,7 +54,7 @@ namespace GraphQL.Validation.Rules
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
+        private static IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
         {
             if (type is IAbstractGraphType absType)
             {
@@ -95,9 +92,7 @@ namespace GraphQL.Validation.Rules
         /// For the field name provided, determine if there are any similar field names
         /// that may be the result of a typo.
         /// </summary>
-        private IEnumerable<string> GetSuggestedFieldNames(
-          IGraphType type,
-          string fieldName)
+        private static IEnumerable<string> GetSuggestedFieldNames(IGraphType type, string fieldName)
         {
             if (type is IComplexGraphType complexType)
             {

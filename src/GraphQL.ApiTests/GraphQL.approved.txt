@@ -2533,12 +2533,6 @@ namespace GraphQL.Validation
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
         public void Visit(GraphQL.Language.AST.INode node) { }
     }
-    public class DebugNodeVisitor : GraphQL.Validation.INodeVisitor
-    {
-        public DebugNodeVisitor() { }
-        public void Enter(GraphQL.Language.AST.INode node) { }
-        public void Leave(GraphQL.Language.AST.INode node) { }
-    }
     public class DocumentValidator : GraphQL.Validation.IDocumentValidator
     {
         public static readonly System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> CoreRules;
@@ -2857,7 +2851,6 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.LoneAnonymousOperation Instance;
         public LoneAnonymousOperation() { }
-        public System.Func<string> AnonOperationNotAloneMessage { get; }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class NoFragmentCycles : GraphQL.Validation.IValidationRule
@@ -2887,16 +2880,7 @@ namespace GraphQL.Validation.Rules
     public class OverlappingFieldsCanBeMerged : GraphQL.Validation.IValidationRule
     {
         public OverlappingFieldsCanBeMerged() { }
-        public void CollectFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, GraphQL.Types.IGraphType parentType, GraphQL.Language.AST.SelectionSet selectionSet, System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.FieldDefPair>> nodeAndDefs, System.Collections.Generic.Dictionary<string, bool> fragments) { }
-        public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField GetReferencedFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, System.Collections.Generic.Dictionary<GraphQL.Language.AST.SelectionSet, GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField> cachedFieldsAndFragmentNames, GraphQL.Language.AST.FragmentDefinition fragment) { }
-        public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Conflict SubfieldConflicts(System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Conflict> conflicts, string responseName, GraphQL.Language.AST.ISelection node1, GraphQL.Language.AST.ISelection node2) { }
         public System.Threading.Tasks.Task<GraphQL.Validation.INodeVisitor> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
-        public class CachedField
-        {
-            public CachedField() { }
-            public System.Collections.Generic.List<string> Names { get; set; }
-            public System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.FieldDefPair>> NodeAndDef { get; set; }
-        }
         public class Conflict
         {
             public Conflict() { }
@@ -2910,28 +2894,11 @@ namespace GraphQL.Validation.Rules
             public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.Message Message { get; set; }
             public string Name { get; set; }
         }
-        public class FieldDefPair
-        {
-            public FieldDefPair() { }
-            public GraphQL.Language.AST.ISelection Field { get; set; }
-            public GraphQL.Types.FieldType FieldDef { get; set; }
-            public GraphQL.Types.IGraphType ParentType { get; set; }
-        }
         public class Message
         {
             public Message() { }
             public string Msg { get; set; }
             public System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.ConflictReason> Msgs { get; set; }
-        }
-        public class ObjMap<T> : System.Collections.Generic.Dictionary<string, T>
-        {
-            public ObjMap() { }
-        }
-        public class PairSet
-        {
-            public PairSet() { }
-            public void Add(string a, string b, bool areMutuallyExclusive) { }
-            public bool Has(string a, string b, bool areMutuallyExclusive) { }
         }
     }
     public class PossibleFragmentSpreads : GraphQL.Validation.IValidationRule

@@ -18,9 +18,7 @@ namespace GraphQL.Validation.Rules
         {
             var knownFragments = new Dictionary<string, FragmentDefinition>();
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<FragmentDefinition>(fragmentDefinition =>
+            return new MatchingNodeVisitor<FragmentDefinition>(fragmentDefinition =>
                 {
                     var fragmentName = fragmentDefinition.Name;
                     if (knownFragments.ContainsKey(fragmentName))
@@ -31,8 +29,7 @@ namespace GraphQL.Validation.Rules
                     {
                         knownFragments[fragmentName] = fragmentDefinition;
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
     }
 }

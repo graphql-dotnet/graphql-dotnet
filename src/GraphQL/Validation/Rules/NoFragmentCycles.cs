@@ -27,19 +27,16 @@ namespace GraphQL.Validation.Rules
             // Position in the spread path
             var spreadPathIndexByName = new LightweightCache<string, int>(key => -1);
 
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<FragmentDefinition>(node =>
+            return new MatchingNodeVisitor<FragmentDefinition>(node =>
                 {
                     if (!visitedFrags[node.Name])
                     {
                         detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
                     }
-                });
-            }).ToTask();
+                }).ToTask();
         }
 
-        private void detectCycleRecursive(
+        private static void detectCycleRecursive(
             FragmentDefinition fragment,
             Stack<FragmentSpread> spreadPath,
             LightweightCache<string, bool> visitedFrags,

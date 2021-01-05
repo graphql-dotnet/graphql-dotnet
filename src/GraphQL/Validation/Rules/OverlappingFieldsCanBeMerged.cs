@@ -34,7 +34,7 @@ namespace GraphQL.Validation.Rules
             }).ToTask();
         }
 
-        private List<Conflict> FindConflictsWithinSelectionSet(
+        private static List<Conflict> FindConflictsWithinSelectionSet(
             ValidationContext context,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
@@ -96,7 +96,7 @@ namespace GraphQL.Validation.Rules
             return conflicts;
         }
 
-        private void CollectConflictsWithin(
+        private static void CollectConflictsWithin(
             ValidationContext context,
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
@@ -141,7 +141,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private Conflict FindConflict(
+        private static Conflict FindConflict(
             ValidationContext context,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
@@ -259,7 +259,7 @@ namespace GraphQL.Validation.Rules
             return null;
         }
 
-        private List<Conflict> FindConflictsBetweenSubSelectionSets(
+        private static List<Conflict> FindConflictsBetweenSubSelectionSets(
             ValidationContext context,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
@@ -360,7 +360,7 @@ namespace GraphQL.Validation.Rules
             return conflicts;
         }
 
-        private void CollectConflictsBetweenFragments(
+        private static void CollectConflictsBetweenFragments(
             ValidationContext context,
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
@@ -449,7 +449,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private void CollectConflictsBetweenFieldsAndFragment(
+        private static void CollectConflictsBetweenFieldsAndFragment(
             ValidationContext context,
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
@@ -517,7 +517,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private void CollectConflictsBetween(
+        private static void CollectConflictsBetween(
             ValidationContext context,
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
@@ -562,7 +562,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private bool DoTypesConflict(IGraphType type1, IGraphType type2)
+        private static bool DoTypesConflict(IGraphType type1, IGraphType type2)
         {
             if (type1 is ListGraphType type1List)
             {
@@ -592,7 +592,7 @@ namespace GraphQL.Validation.Rules
             return false;
         }
 
-        private bool SameArguments(Arguments arguments1, Arguments arguments2)
+        private static bool SameArguments(Arguments arguments1, Arguments arguments2)
         {
             if (arguments1.Count() != arguments2.Count())
             {
@@ -611,13 +611,13 @@ namespace GraphQL.Validation.Rules
             });
         }
 
-        private bool SameValue(Argument arg1, Argument arg2)
+        private static bool SameValue(Argument arg1, Argument arg2)
         {
             return arg1.Value == null && arg2.Value == null ||
                 AstPrinter.Print(arg1.Value) == AstPrinter.Print(arg2.Value);
         }
 
-        private CachedField GetFieldsAndFragmentNames(
+        private static CachedField GetFieldsAndFragmentNames(
             ValidationContext context,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             IGraphType parentType,
@@ -645,7 +645,7 @@ namespace GraphQL.Validation.Rules
 
         // Given a reference to a fragment, return the represented collection of fields
         // as well as a list of nested fragment names referenced via fragment spreads.
-        public CachedField GetReferencedFieldsAndFragmentNames(
+        private static CachedField GetReferencedFieldsAndFragmentNames(
             ValidationContext context,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             FragmentDefinition fragment)
@@ -665,7 +665,7 @@ namespace GraphQL.Validation.Rules
         }
 
 
-        public void CollectFieldsAndFragmentNames(
+        private static void CollectFieldsAndFragmentNames(
             ValidationContext context,
             IGraphType parentType,
             SelectionSet selectionSet,
@@ -723,26 +723,26 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        public class FieldDefPair
+        private sealed class FieldDefPair
         {
             public IGraphType ParentType { get; set; }
             public ISelection Field { get; set; }
             public FieldType FieldDef { get; set; }
         }
 
-        private bool isInterfaceType(IGraphType parentType)
+        private static bool isInterfaceType(IGraphType parentType)
         {
             return parentType is IInterfaceGraphType;
         }
 
-        private bool isObjectType(IGraphType parentType)
+        private static bool isObjectType(IGraphType parentType)
         {
             return parentType is IObjectGraphType;
         }
 
         // Given a series of Conflicts which occurred between two sub-fields,
         // generate a single Conflict.
-        public Conflict SubfieldConflicts(
+        private static Conflict SubfieldConflicts(
             List<Conflict> conflicts,
             string responseName,
             ISelection node1,
@@ -795,13 +795,13 @@ namespace GraphQL.Validation.Rules
             public List<ConflictReason> Msgs { get; set; }
         }
 
-        public class CachedField
+        private sealed class CachedField
         {
             public Dictionary<string, List<FieldDefPair>> NodeAndDef { get; set; }
             public List<string> Names { get; set; }
         }
 
-        public class PairSet
+        private sealed class PairSet
         {
             private readonly ObjMap<ObjMap<bool>> _data;
 
@@ -848,7 +848,7 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        public class ObjMap<T> : Dictionary<string, T>
+        private sealed class ObjMap<T> : Dictionary<string, T>
         {
         }
     }

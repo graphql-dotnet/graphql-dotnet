@@ -9,7 +9,7 @@ namespace GraphQL.Validation
 {
     public class ValidationContext : IProvideUserContext
     {
-        private readonly List<ValidationError> _errors = new List<ValidationError>();
+        private List<ValidationError> _errors;
 
         private readonly Dictionary<Operation, IEnumerable<FragmentDefinition>> _fragments
             = new Dictionary<Operation, IEnumerable<FragmentDefinition>>();
@@ -29,15 +29,17 @@ namespace GraphQL.Validation
 
         public IDictionary<string, object> UserContext { get; set; }
 
-        public IEnumerable<ValidationError> Errors => _errors;
+        public IEnumerable<ValidationError> Errors => (IEnumerable<ValidationError>)_errors ?? Array.Empty<ValidationError>();
 
-        public bool HasErrors => _errors.Count > 0;
+        public bool HasErrors => _errors?.Count > 0;
 
         public Inputs Inputs { get; set; }
 
         public void ReportError(ValidationError error)
         {
-            _errors.Add(error ?? throw new ArgumentNullException(nameof(error), "Must provide a validation error."));
+            if (error == null)
+                throw new ArgumentNullException(nameof(error), "Must provide a validation error.");
+            (_errors ??= new List<ValidationError>()).Add(error);
         }
 
         public List<VariableUsage> GetVariables(IHaveSelectionSet node)
