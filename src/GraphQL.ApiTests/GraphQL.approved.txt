@@ -3024,6 +3024,7 @@ namespace GraphQL.Validation.Rules
     }
     public class OverlappingFieldsCanBeMerged : GraphQL.Validation.IValidationRule
     {
+        public static readonly GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged Instance;
         public OverlappingFieldsCanBeMerged() { }
         public void CollectFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, GraphQL.Types.IGraphType parentType, GraphQL.Language.AST.SelectionSet selectionSet, System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.FieldDefPair>> nodeAndDefs, System.Collections.Generic.Dictionary<string, bool> fragments) { }
         public GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField GetReferencedFieldsAndFragmentNames(GraphQL.Validation.ValidationContext context, System.Collections.Generic.Dictionary<GraphQL.Language.AST.SelectionSet, GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.CachedField> cachedFieldsAndFragmentNames, GraphQL.Language.AST.FragmentDefinition fragment) { }
