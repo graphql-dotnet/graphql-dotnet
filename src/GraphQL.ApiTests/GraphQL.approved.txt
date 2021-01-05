@@ -1426,28 +1426,7 @@ namespace GraphQL.Language
 {
     public static class CoreToVanillaConverter
     {
-        public static void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
-        public static GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
-        public static GraphQL.Language.AST.CommentNode Comment(GraphQLParser.AST.GraphQLComment comment) { }
         public static GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
-        public static GraphQL.Language.AST.SourceLocation Convert(GraphQLParser.AST.GraphQLLocation location) { }
-        public static GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
-        public static GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
-        public static GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
-        public static GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
-        public static GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
-        public static GraphQL.Language.AST.InlineFragment InlineFragment(GraphQLParser.AST.GraphQLInlineFragment source) { }
-        public static GraphQL.Language.AST.NameNode Name(GraphQLParser.AST.GraphQLName name) { }
-        public static GraphQL.Language.AST.NamedType NamedType(GraphQLParser.AST.GraphQLNamedType source) { }
-        public static GraphQL.Language.AST.ObjectField ObjectField(GraphQLParser.AST.GraphQLObjectField source) { }
-        public static GraphQL.Language.AST.Operation Operation(GraphQLParser.AST.GraphQLOperationDefinition source) { }
-        public static GraphQL.Language.AST.ISelection Selection(GraphQLParser.AST.ASTNode source) { }
-        public static GraphQL.Language.AST.SelectionSet SelectionSet(GraphQLParser.AST.GraphQLSelectionSet source) { }
-        public static GraphQL.Language.AST.OperationType ToOperationType(GraphQLParser.AST.OperationType type) { }
-        public static GraphQL.Language.AST.IType Type(GraphQLParser.AST.GraphQLType type) { }
-        public static GraphQL.Language.AST.IValue Value(GraphQLParser.AST.GraphQLValue source) { }
-        public static GraphQL.Language.AST.VariableDefinition VariableDefinition(GraphQLParser.AST.GraphQLVariableDefinition source) { }
-        public static GraphQL.Language.AST.VariableDefinitions VariableDefinitions(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLVariableDefinition> source) { }
     }
 }
 namespace GraphQL.Reflection
