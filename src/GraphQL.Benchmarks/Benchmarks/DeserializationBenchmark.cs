@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
-using GraphQL.Tests.Introspection;
 
 namespace GraphQL.Benchmarks
 {
@@ -36,6 +35,7 @@ namespace GraphQL.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
+            var loadedFromFile = IntrospectionResult.Data;
         }
 
         public IEnumerable<string> Codes => new[] { "Empty", "Short", "Introspection" };
