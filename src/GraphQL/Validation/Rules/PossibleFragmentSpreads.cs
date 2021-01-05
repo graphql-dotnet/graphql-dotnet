@@ -6,7 +6,7 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Possible fragment spread
+    /// Possible fragment spread:
     ///
     /// A fragment spread is only valid if the type condition could ever possibly
     /// be true: if there is a non-empty intersection of the possible parent types,
@@ -14,8 +14,13 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class PossibleFragmentSpreads : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly PossibleFragmentSpreads Instance = new PossibleFragmentSpreads();
 
+        /// <inheritdoc/>
+        /// <exception cref="PossibleFragmentSpreadsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

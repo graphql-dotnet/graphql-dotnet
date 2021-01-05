@@ -6,15 +6,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Argument values of correct type
+    /// Argument values of correct type:
     ///
     /// A GraphQL document is only valid if all field argument literal values are
     /// of the type expected by their position.
     /// </summary>
     public class ArgumentsOfCorrectType : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly ArgumentsOfCorrectType Instance = new ArgumentsOfCorrectType();
 
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentsOfCorrectTypeError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new MatchingNodeVisitor<Argument>(argAst =>

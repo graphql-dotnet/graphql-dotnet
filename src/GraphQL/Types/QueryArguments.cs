@@ -5,6 +5,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    // TODO: better to rename QueryArguments and QueryArgument to something like GraphQLArguments and GraphQLArgument.
     /// <summary>
     /// Represents a list of arguments to a field or directive.
     /// </summary>
@@ -40,7 +41,7 @@ namespace GraphQL.Types
             get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
             set
             {
-                if (value != null && string.IsNullOrEmpty(value.Name))
+                if (value != null)
                 {
                     NameValidator.ValidateName(value.Name, "argument");
                 }
@@ -67,8 +68,7 @@ namespace GraphQL.Types
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            if (string.IsNullOrEmpty(argument.Name))
-                NameValidator.ValidateName(argument.Name, "argument");
+            NameValidator.ValidateName(argument.Name, "argument");
 
             if (ArgumentsList == null)
                 ArgumentsList = new List<QueryArgument>();

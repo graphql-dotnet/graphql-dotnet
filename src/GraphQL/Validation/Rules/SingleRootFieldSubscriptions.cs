@@ -10,8 +10,13 @@ namespace GraphQL.Validation.Rules
     /// </summary>
     public class SingleRootFieldSubscriptions : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
 
+        /// <inheritdoc/>
+        /// <exception cref="SingleRootFieldSubscriptionsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new MatchingNodeVisitor<Operation>(operation =>

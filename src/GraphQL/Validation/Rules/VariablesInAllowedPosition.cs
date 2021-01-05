@@ -8,12 +8,17 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Variables passed to field arguments conform to type
+    /// Variables passed to field arguments conform to type.
     /// </summary>
     public class VariablesInAllowedPosition : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly VariablesInAllowedPosition Instance = new VariablesInAllowedPosition();
 
+        /// <inheritdoc/>
+        /// <exception cref="VariablesInAllowedPositionError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var varDefMap = new Dictionary<string, VariableDefinition>();

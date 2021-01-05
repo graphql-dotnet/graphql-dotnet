@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for working with <see cref="IEnumerable{T}"/> lists.
+    /// </summary>
     public static class EnumerableExtensions
     {
         /// <summary>

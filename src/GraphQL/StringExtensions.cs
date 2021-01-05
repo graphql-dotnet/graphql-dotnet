@@ -1,5 +1,8 @@
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for strings.
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>

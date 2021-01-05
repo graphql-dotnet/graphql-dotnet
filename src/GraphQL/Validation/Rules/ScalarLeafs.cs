@@ -6,15 +6,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Scalar leafs
+    /// Scalar leafs:
     ///
     /// A GraphQL document is valid only if all leaf fields (fields without
     /// sub selections) are of scalar or enum types.
     /// </summary>
     public class ScalarLeafs : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly ScalarLeafs Instance = new ScalarLeafs();
 
+        /// <inheritdoc/>
+        /// <exception cref="ScalarLeafsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new MatchingNodeVisitor<Field>(f => Field(context.TypeInfo.GetLastType(), f, context))

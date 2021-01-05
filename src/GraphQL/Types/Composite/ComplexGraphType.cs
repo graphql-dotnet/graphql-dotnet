@@ -85,6 +85,8 @@ namespace GraphQL.Types
             if (fieldType == null)
                 throw new ArgumentNullException(nameof(fieldType));
 
+            NameValidator.ValidateNameNotNull(fieldType.Name);
+
             if (!(fieldType.ResolvedType.GetNamedType() is GraphQLTypeReference))
             {
                 if (this is IInputObjectGraphType)
@@ -100,9 +102,6 @@ namespace GraphQL.Types
                             $"Output type '{Name ?? GetType().GetFriendlyName()}' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType. Field '{fieldType.Name}' has an input type.");
                 }
             }
-
-            //check if fieldType.Name has never been set
-            NameValidator.ValidateNameNotNull(fieldType.Name);
 
             if (HasField(fieldType.Name))
             {

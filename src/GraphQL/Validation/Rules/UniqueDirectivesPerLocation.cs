@@ -6,15 +6,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Unique directive names per location
+    /// Unique directive names per location:
     ///
     /// A GraphQL document is only valid if all directives at a given location
     /// are uniquely named.
     /// </summary>
     public class UniqueDirectivesPerLocation : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly UniqueDirectivesPerLocation Instance = new UniqueDirectivesPerLocation();
 
+        /// <inheritdoc/>
+        /// <exception cref="UniqueDirectivesPerLocationError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>

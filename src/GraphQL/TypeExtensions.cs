@@ -10,6 +10,9 @@ using GraphQL.Utilities;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for types.
+    /// </summary>
     public static class TypeExtensions
     {
         /// <summary>
