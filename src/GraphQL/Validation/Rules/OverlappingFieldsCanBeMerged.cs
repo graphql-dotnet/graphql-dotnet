@@ -603,7 +603,7 @@ namespace GraphQL.Validation.Rules
 
             if (type1.IsLeafType() || type2.IsLeafType())
             {
-                return type1 != type2;
+                return !type1.Equals(type2);
             }
 
             return false;
