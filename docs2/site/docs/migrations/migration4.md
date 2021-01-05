@@ -28,6 +28,8 @@
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
 * `INode.IsEqualTo` and related methods have been removed.
 * `NameNode` has been changed to a readonly struct.
+* `DebugNodeVisitor` class has been removed.
+* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
 
 ```c#
     /// <summary>
