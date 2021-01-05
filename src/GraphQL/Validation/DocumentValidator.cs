@@ -102,7 +102,7 @@ namespace GraphQL.Validation
             }
             else
             {
-                visitors = (await Task.WhenAll(rules.Select(x => x.ValidateAsync(context)))).ToList();
+                visitors = (await Task.WhenAll(rules.Select(x => x.ValidateAsync(context)))).Where(v => v.ShouldRunOn(context)).ToList();
                 visitors.Insert(0, context.TypeInfo);
             }
 
