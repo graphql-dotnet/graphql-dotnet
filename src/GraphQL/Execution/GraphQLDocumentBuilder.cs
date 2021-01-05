@@ -38,7 +38,7 @@ namespace GraphQL.Execution
                 throw new SyntaxError(ex);
             }
 
-            var document = CoreToVanillaConverter.Convert(result);
+            var document = CoreToVanillaConverter.Instance.Convert(result);
             document.OriginalQuery = body;
             return document;
         }

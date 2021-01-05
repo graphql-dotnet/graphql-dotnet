@@ -1424,9 +1424,32 @@ namespace GraphQL.Language.AST
 }
 namespace GraphQL.Language
 {
-    public static class CoreToVanillaConverter
+    public class CoreToVanillaConverter
     {
-        public static GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
+        public static GraphQL.Language.CoreToVanillaConverter Instance;
+        protected CoreToVanillaConverter() { }
+        protected virtual void AddDefinitions(GraphQLParser.AST.GraphQLDocument source, GraphQL.Language.AST.Document target) { }
+        protected virtual GraphQL.Language.AST.Arguments Arguments(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLArgument> source) { }
+        protected virtual GraphQL.Language.AST.CommentNode Comment(GraphQLParser.AST.GraphQLComment comment) { }
+        public virtual GraphQL.Language.AST.Document Convert(GraphQLParser.AST.GraphQLDocument source) { }
+        protected virtual GraphQL.Language.AST.SourceLocation Convert(GraphQLParser.AST.GraphQLLocation location) { }
+        protected virtual GraphQL.Language.AST.Directive Directive(GraphQLParser.AST.GraphQLDirective d) { }
+        protected virtual GraphQL.Language.AST.Directives Directives(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLDirective> source) { }
+        protected virtual GraphQL.Language.AST.Field Field(GraphQLParser.AST.GraphQLFieldSelection source) { }
+        protected virtual GraphQL.Language.AST.FragmentDefinition Fragment(GraphQLParser.AST.GraphQLFragmentDefinition source) { }
+        protected virtual GraphQL.Language.AST.FragmentSpread FragmentSpread(GraphQLParser.AST.GraphQLFragmentSpread source) { }
+        protected virtual GraphQL.Language.AST.InlineFragment InlineFragment(GraphQLParser.AST.GraphQLInlineFragment source) { }
+        protected virtual GraphQL.Language.AST.NameNode Name(GraphQLParser.AST.GraphQLName name) { }
+        protected virtual GraphQL.Language.AST.NamedType NamedType(GraphQLParser.AST.GraphQLNamedType source) { }
+        protected virtual GraphQL.Language.AST.ObjectField ObjectField(GraphQLParser.AST.GraphQLObjectField source) { }
+        protected virtual GraphQL.Language.AST.Operation Operation(GraphQLParser.AST.GraphQLOperationDefinition source) { }
+        protected virtual GraphQL.Language.AST.ISelection Selection(GraphQLParser.AST.ASTNode source) { }
+        protected virtual GraphQL.Language.AST.SelectionSet SelectionSet(GraphQLParser.AST.GraphQLSelectionSet source) { }
+        protected virtual GraphQL.Language.AST.OperationType ToOperationType(GraphQLParser.AST.OperationType type) { }
+        protected virtual GraphQL.Language.AST.IType Type(GraphQLParser.AST.GraphQLType type) { }
+        protected virtual GraphQL.Language.AST.IValue Value(GraphQLParser.AST.GraphQLValue source) { }
+        protected virtual GraphQL.Language.AST.VariableDefinition VariableDefinition(GraphQLParser.AST.GraphQLVariableDefinition source) { }
+        protected virtual GraphQL.Language.AST.VariableDefinitions VariableDefinitions(System.Collections.Generic.IEnumerable<GraphQLParser.AST.GraphQLVariableDefinition> source) { }
     }
 }
 namespace GraphQL.Reflection

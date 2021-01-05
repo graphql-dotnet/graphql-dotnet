@@ -14,13 +14,25 @@ namespace GraphQL.Language
     /// Converts an GraphQLParser AST representation of a document into a GraphQL.NET AST
     /// representation of a document.
     /// </summary>
-    public static class CoreToVanillaConverter
+    public class CoreToVanillaConverter
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="CoreToVanillaConverter"/>.
+        /// </summary>
+        protected CoreToVanillaConverter()
+        {
+        }
+
+        /// <summary>
+        /// Returns a static instance of this class.
+        /// </summary>
+        public static CoreToVanillaConverter Instance = new CoreToVanillaConverter();
+
         /// <summary>
         /// Converts an GraphQLParser AST representation of a document into a GraphQL.NET AST
         /// representation of a document and returns it.
         /// </summary>
-        public static Document Convert(GraphQLDocument source)
+        public virtual Document Convert(GraphQLDocument source)
         {
             var target = new Document();
             AddDefinitions(source, target);
@@ -30,7 +42,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Enumerates the operations and fragments in the source document and adds them to the target document.
         /// </summary>
-        private static void AddDefinitions(GraphQLDocument source, Document target)
+        protected virtual void AddDefinitions(GraphQLDocument source, Document target)
         {
             foreach (var def in source.Definitions)
             {
@@ -49,7 +61,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts an operation node and its children.
         /// </summary>
-        private static Operation Operation(GraphQLOperationDefinition source)
+        protected virtual Operation Operation(GraphQLOperationDefinition source)
         {
             var name = source.Name != null ? Name(source.Name) : null;
             return new Operation(name)
@@ -66,7 +78,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a fragment definition node and its children.
         /// </summary>
-        private static FragmentDefinition Fragment(GraphQLFragmentDefinition source)
+        protected virtual FragmentDefinition Fragment(GraphQLFragmentDefinition source)
         {
             return new FragmentDefinition(Name(source.Name))
             {
@@ -81,7 +93,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a fragment spread node and its children.
         /// </summary>
-        private static FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
+        protected virtual FragmentSpread FragmentSpread(GraphQLFragmentSpread source)
         {
             var name = source.Name != null ? Name(source.Name) : null;
             return new FragmentSpread(name)
@@ -95,7 +107,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts an inline fragment node and its children.
         /// </summary>
-        private static InlineFragment InlineFragment(GraphQLInlineFragment source)
+        protected virtual InlineFragment InlineFragment(GraphQLInlineFragment source)
         {
             return new InlineFragment
             {
@@ -110,7 +122,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of variable definition nodes and their children.
         /// </summary>
-        private static VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
+        protected virtual VariableDefinitions VariableDefinitions(IEnumerable<GraphQLVariableDefinition> source)
         {
             VariableDefinitions defs = null;
 
@@ -128,7 +140,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a variable definition node and its children.
         /// </summary>
-        private static VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
+        protected virtual VariableDefinition VariableDefinition(GraphQLVariableDefinition source)
         {
             var def = new VariableDefinition(Name(source.Variable.Name))
             {
@@ -150,7 +162,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a selection set node and its children.
         /// </summary>
-        private static SelectionSet SelectionSet(GraphQLSelectionSet source)
+        protected virtual SelectionSet SelectionSet(GraphQLSelectionSet source)
         {
             var set = new SelectionSet();
 
@@ -169,7 +181,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a selection node and its children.
         /// </summary>
-        private static ISelection Selection(ASTNode source) => source.Kind switch
+        protected virtual ISelection Selection(ASTNode source) => source.Kind switch
         {
             ASTNodeKind.Field => Field((GraphQLFieldSelection)source),
             ASTNodeKind.FragmentSpread => FragmentSpread((GraphQLFragmentSpread)source),
@@ -180,7 +192,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a field node and its children.
         /// </summary>
-        private static Field Field(GraphQLFieldSelection source)
+        protected virtual Field Field(GraphQLFieldSelection source)
         {
             var alias = source.Alias != null ? Name(source.Alias) : null;
             return new Field(alias, Name(source.Name))
@@ -196,7 +208,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of directive nodes and their children.
         /// </summary>
-        private static Directives Directives(IEnumerable<GraphQLDirective> source)
+        protected virtual Directives Directives(IEnumerable<GraphQLDirective> source)
         {
             Directives target = null;
 
@@ -214,7 +226,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a directive node and its children.
         /// </summary>
-        internal static Directive Directive(GraphQLDirective d)
+        protected internal virtual Directive Directive(GraphQLDirective d)
         {
             return new Directive(Name(d.Name))
             {
@@ -226,7 +238,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of argument nodes and their children.
         /// </summary>
-        private static Arguments Arguments(IEnumerable<GraphQLArgument> source)
+        protected virtual Arguments Arguments(IEnumerable<GraphQLArgument> source)
         {
             Arguments target = null;
 
@@ -250,7 +262,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a value node and its children.
         /// </summary>
-        internal static IValue Value(GraphQLValue source)
+        protected internal virtual IValue Value(GraphQLValue source)
         {
             switch (source.Kind)
             {
@@ -361,7 +373,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts and object field node and its children.
         /// </summary>
-        private static ObjectField ObjectField(GraphQLObjectField source)
+        protected virtual ObjectField ObjectField(GraphQLObjectField source)
         {
             return new ObjectField(Name(source.Name), Value(source.Value)) { SourceLocation = Convert(source.Location) };
         }
@@ -369,7 +381,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a named type node and its children.
         /// </summary>
-        private static NamedType NamedType(GraphQLNamedType source)
+        protected virtual NamedType NamedType(GraphQLNamedType source)
         {
             return new NamedType(Name(source.Name)) { SourceLocation = Convert(source.Location) };
         }
@@ -377,7 +389,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a type node and its children.
         /// </summary>
-        private static IType Type(GraphQLType type)
+        protected virtual IType Type(GraphQLType type)
         {
             switch (type.Kind)
             {
@@ -406,7 +418,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a name node.
         /// </summary>
-        private static NameNode Name(GraphQLName name)
+        protected virtual NameNode Name(GraphQLName name)
         {
             return new NameNode(name.Value) { SourceLocation = Convert(name.Location) };
         }
@@ -414,7 +426,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a comment node.
         /// </summary>
-        private static CommentNode Comment(GraphQLComment comment)
+        protected virtual CommentNode Comment(GraphQLComment comment)
         {
             return comment == null
                 ? null
@@ -424,7 +436,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts an operation type enumeration value.
         /// </summary>
-        private static OperationType ToOperationType(OperationTypeParser type) => type switch
+        protected virtual OperationType ToOperationType(OperationTypeParser type) => type switch
         {
             OperationTypeParser.Query => OperationType.Query,
             OperationTypeParser.Mutation => OperationType.Mutation,
@@ -435,7 +447,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a location reference within a document.
         /// </summary>
-        private static SourceLocation Convert(GraphQLLocation location) => new SourceLocation(location.Start, location.End);
+        protected virtual SourceLocation Convert(GraphQLLocation location) => new SourceLocation(location.Start, location.End);
     }
 
     // * DESCRIPTION TAKEN FROM MS REFERENCE SOURCE *
