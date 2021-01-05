@@ -795,7 +795,7 @@ namespace GraphQL.Validation.Rules
             public List<ConflictReason> Msgs { get; set; }
         }
 
-        private class CachedField
+        private sealed class CachedField
         {
             public Dictionary<string, List<FieldDefPair>> NodeAndDef { get; set; }
             public List<string> Names { get; set; }
