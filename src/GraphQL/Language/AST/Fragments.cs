@@ -20,6 +20,11 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
+        /// Returns the number of fragment defintion nodes in the list.
+        /// </summary>
+        public int Count => _fragments.Count;
+
+        /// <summary>
         /// Searches the list by name and returns the first matching fragment definition, or <see langword="null"/> if none is found.
         /// </summary>
         public FragmentDefinition FindDefinition(string name)

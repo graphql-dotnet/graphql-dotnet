@@ -20,7 +20,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 0 ? _nodeVisitor : NullNodeVisitor.TaskInstance;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
         {
