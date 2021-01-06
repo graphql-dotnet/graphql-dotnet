@@ -49,7 +49,7 @@ namespace GraphQL
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
         /// <summary>
-        /// Indicates if the type is an input graph type.
+        /// Indicates if the type is an input graph type (scalar or input object).
         /// </summary>
         public static bool IsInputType(this Type type)
         {
@@ -60,7 +60,7 @@ namespace GraphQL
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
         /// <summary>
-        /// Indicates if the graph type is an input graph type.
+        /// Indicates if the graph type is an input graph type (scalar or input object).
         /// </summary>
         public static bool IsInputType(this IGraphType type)
         {
@@ -161,10 +161,10 @@ namespace GraphQL
 
         /// <summary>
         /// Returns a new instance of the specified graph type, using the specified resolver to
-        /// instantiate the new instance. Defaults to <see cref="Activator.CreateInstance(Type)"/>
+        /// instantiate a new instance. Defaults to <see cref="Activator.CreateInstance(Type)"/>
         /// if no <paramref name="resolve"/> parameter is specified. List and non-null graph
-        /// types are instiated and their <see cref="IProvideResolvedType.ResolvedType"/> property
-        /// is set to a new instance of the base type.
+        /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/> property
+        /// property is set to a new instance of the base (wrapped) type.
         /// </summary>
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
         {
@@ -189,11 +189,11 @@ namespace GraphQL
 
             return resolve(type) ??
                    throw new InvalidOperationException(
-                       $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
+                       $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
         }
 
         /// <summary>
-        /// Validates that a specified AST value is valid for the specified scalar or input graph type.
+        /// Validates that the specified AST value is valid for the specified scalar or input graph type.
         /// Graph types that are lists or non-null types are handled appropriately by this method.
         /// Returns a list of strings representing the errors encountered while validating the value.
         /// </summary>
