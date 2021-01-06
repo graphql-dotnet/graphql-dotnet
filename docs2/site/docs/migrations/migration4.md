@@ -32,6 +32,7 @@
 * Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
 * `EnumerableExtensions.Apply` for dictionaries has been removed.
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
+* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 
 ```c#
     /// <summary>
