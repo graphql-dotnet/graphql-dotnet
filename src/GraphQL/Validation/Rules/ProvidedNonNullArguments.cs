@@ -22,9 +22,8 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="ProvidedNonNullArgumentsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new EnterLeaveListener(_ =>
-        {
-            _.Match<Field>(leave: (node, context) =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Field>(leave: (node, context) =>
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
 
@@ -42,9 +41,9 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                     }
                 }
-            });
+            }),
 
-            _.Match<Directive>(leave: (node, context) =>
+            new MatchingNodeVisitor<Directive>(leave: (node, context) =>
             {
                 var directive = context.TypeInfo.GetDirective();
 
@@ -63,7 +62,7 @@ namespace GraphQL.Validation.Rules
                         context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                     }
                 }
-            });
-        }).ToTask();
+            })
+        ).ToTask();
     }
 }

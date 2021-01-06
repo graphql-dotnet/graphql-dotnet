@@ -20,26 +20,18 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
         {
-            // Tracks already visited fragments to maintain O(N) and to ensure that cycles
-            // are not redundantly reported.
-            var visitedFrags = new HashSet<string>();
-
-            // Array of AST nodes used to produce meaningful errors
-            var spreadPath = new Stack<FragmentSpread>();
-
-            // Position in the spread path
-            var spreadPathIndexByName = new Dictionary<string, int>();
-
-            return new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<string>();
+            var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<FragmentSpread>();
+            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<string, int>();
+            if (!visitedFrags.Contains(node.Name))
             {
-                if (!visitedFrags.Contains(node.Name))
-                {
-                    detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
-                }
-            }).ToTask();
-        }
+                detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
+            }
+        }).ToTask();
 
         private static void detectCycleRecursive(
             FragmentDefinition fragment,

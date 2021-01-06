@@ -22,31 +22,36 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedVariablesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var variableDefs = new List<VariableDefinition>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new NodeVisitors(
-                new MatchingNodeVisitor<VariableDefinition>((def, context) => variableDefs.Add(def)),
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<VariableDefinition>((def, context) =>
+            {
+                var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new List<VariableDefinition>();
+                varDefs.Add(def);
+            }),
 
-                new MatchingNodeVisitor<Operation>(
-                    enter: (op, context) => variableDefs = new List<VariableDefinition>(),
-                    leave: (op, context) =>
+            new MatchingNodeVisitor<Operation>(
+                enter: (op, context) => context.TypeInfo.NoUnusedVariables_VariableDefs = null,
+                leave: (op, context) =>
+                {
+                    var variableDefs = context.TypeInfo.NoUnusedVariables_VariableDefs;
+                    if (variableDefs == null)
+                        return;
+
+                    var usages = context.GetRecursiveVariables(op)
+                        .Select(usage => usage.Node.Name)
+                        .ToList();
+
+                    foreach (var variableDef in variableDefs)
                     {
-                        var usages = context.GetRecursiveVariables(op)
-                            .Select(usage => usage.Node.Name)
-                            .ToList();
-
-                        foreach (var variableDef in variableDefs)
+                        var variableName = variableDef.Name;
+                        if (!usages.Contains(variableName))
                         {
-                            var variableName = variableDef.Name;
-                            if (!usages.Contains(variableName))
-                            {
-                                context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
-                            }
+                            context.ReportError(new NoUnusedVariablesError(context, variableDef, op));
                         }
-                    })
-            ).ToTask();
-        }
+                    }
+                })
+        ).ToTask();
     }
 }

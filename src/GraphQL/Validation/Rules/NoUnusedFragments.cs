@@ -21,32 +21,41 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedFragmentsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var operationDefs = new List<Operation>();
-            var fragmentDefs = new List<FragmentDefinition>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new NodeVisitors(
-                new MatchingNodeVisitor<Operation>((node, context) => operationDefs.Add(node)),
-                new MatchingNodeVisitor<FragmentDefinition>((node, context) => fragmentDefs.Add(node)),
-                new MatchingNodeVisitor<Document>(leave: (document, context) =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Operation>((node, context) =>
+            {
+                (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node);
+                context.TypeInfo.NoUnusedFragments_FragmentDefs = null;
+            }),
+            new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+            {
+                var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>();
+                fragmentDefs.Add(node);
+            }),
+            new MatchingNodeVisitor<Document>(leave: (document, context) =>
+            {
+                var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
+                if (fragmentDefs == null)
+                    return;
+                var operationDefs = context.TypeInfo.NoUnusedFragments_OperationDefs;
+
+                var fragmentNamesUsed = operationDefs
+                    .SelectMany(context.GetRecursivelyReferencedFragments)
+                    .Select(fragment => fragment.Name)
+                    .ToList();
+
+                foreach (var fragmentDef in fragmentDefs)
                 {
-                    var fragmentNamesUsed = operationDefs
-                        .SelectMany(context.GetRecursivelyReferencedFragments)
-                        .Select(fragment => fragment.Name)
-                        .ToList();
+                    var fragName = fragmentDef.Name;
 
-                    foreach (var fragmentDef in fragmentDefs)
+                    if (!fragmentNamesUsed.Contains(fragName))
                     {
-                        var fragName = fragmentDef.Name;
-
-                        if (!fragmentNamesUsed.Contains(fragName))
-                        {
-                            context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
-                        }
+                        context.ReportError(new NoUnusedFragmentsError(context, fragmentDef));
                     }
-                })
-            ).ToTask();
-        }
+                }
+            })
+        ).ToTask();
     }
 }

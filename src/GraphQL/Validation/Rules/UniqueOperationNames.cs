@@ -19,26 +19,22 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => context.Document.Operations.Count < 2 ? _nullNodeVisitor : _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
         {
-            if (context.Document.Operations.Count < 2)
-                return _nullNodeVisitor;
+            if (string.IsNullOrWhiteSpace(op.Name))
+            {
+                return;
+            }
 
-            var frequency = new HashSet<string>();
+            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<string>();
 
-            return new MatchingNodeVisitor<Operation>((op, context) =>
-                {
-                    if (string.IsNullOrWhiteSpace(op.Name))
-                    {
-                        return;
-                    }
-
-                    if (!frequency.Add(op.Name))
-                    {
-                        context.ReportError(new UniqueOperationNamesError(context, op));
-                    }
-                }).ToTask();
-        }
+            if (!frequency.Add(op.Name))
+            {
+                context.ReportError(new UniqueOperationNamesError(context, op));
+            }
+        }).ToTask();
 
         private static readonly Task<INodeVisitor> _nullNodeVisitor = Task.FromResult((INodeVisitor)NullNodeVisitor.Instance);
 

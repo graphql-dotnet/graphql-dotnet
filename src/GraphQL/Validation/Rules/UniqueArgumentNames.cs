@@ -20,26 +20,24 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var knownArgs = new Dictionary<string, Argument>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new NodeVisitors(
-                new MatchingNodeVisitor<Field>((__, context) => knownArgs = new Dictionary<string, Argument>()),
-                new MatchingNodeVisitor<Directive>((__, context) => knownArgs = new Dictionary<string, Argument>()),
-                new MatchingNodeVisitor<Argument>((argument, context) =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs = null),
+            new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs = null),
+            new MatchingNodeVisitor<Argument>((argument, context) =>
+            {
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
+                var argName = argument.Name;
+                if (knownArgs.ContainsKey(argName))
                 {
-                    var argName = argument.Name;
-                    if (knownArgs.ContainsKey(argName))
-                    {
-                        context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));
-                    }
-                    else
-                    {
-                        knownArgs[argName] = argument;
-                    }
-                })
-            ).ToTask();
-        }
+                    context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));
+                }
+                else
+                {
+                    knownArgs[argName] = argument;
+                }
+            })
+        ).ToTask();
     }
 }

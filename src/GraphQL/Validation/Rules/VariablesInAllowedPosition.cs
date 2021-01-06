@@ -25,13 +25,20 @@ namespace GraphQL.Validation.Rules
 
             return new NodeVisitors(
                 new MatchingNodeVisitor<VariableDefinition>(
-                    (varDefAst, context) => varDefMap[varDefAst.Name] = varDefAst
+                    (varDefAst, context) => {
+                        var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
+                        varDefMap[varDefAst.Name] = varDefAst;
+                    }
                 ),
 
                 new MatchingNodeVisitor<Operation>(
-                    enter: (op, context) => varDefMap = new Dictionary<string, VariableDefinition>(),
+                    enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap = null,
                     leave: (op, context) =>
                     {
+                        var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap;
+                        if (varDefMap == null)
+                            return;
+
                         foreach (var usage in context.GetRecursiveVariables(op))
                         {
                             var varName = usage.Node.Name;

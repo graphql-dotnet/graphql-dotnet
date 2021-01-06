@@ -20,27 +20,29 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUndefinedVariablesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            var variableNameDefined = new Dictionary<string, bool>();
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new NodeVisitors(
-                new MatchingNodeVisitor<VariableDefinition>((varDef, context) => variableNameDefined[varDef.Name] = true),
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
+            {
+                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<string>();
+                varNameDef.Add(varDef.Name);
+            }),
 
-                new MatchingNodeVisitor<Operation>(
-                    enter: (op, context) => variableNameDefined = new Dictionary<string, bool>(),
-                    leave: (op, context) =>
+            new MatchingNodeVisitor<Operation>(
+                enter: (op, context) => context.TypeInfo.NoUndefinedVariables_VariableNameDefined = null,
+                leave: (op, context) =>
+                {
+                    var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined;
+                    foreach (var usage in context.GetRecursiveVariables(op))
                     {
-                        foreach (var usage in context.GetRecursiveVariables(op))
+                        var varName = usage.Node.Name;
+                        if (varNameDef == null || !varNameDef.Contains(varName))
                         {
-                            var varName = usage.Node.Name;
-                            if (!variableNameDefined.TryGetValue(varName, out bool found))
-                            {
-                                context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
-                            }
+                            context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
                         }
-                    })
-            ).ToTask();
-        }
+                    }
+                })
+        ).ToTask();
     }
 }

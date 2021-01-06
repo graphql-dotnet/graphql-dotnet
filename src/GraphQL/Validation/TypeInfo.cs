@@ -280,5 +280,39 @@ namespace GraphQL.Validation
 
             return null;
         }
+
+        /// <summary>
+        /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
+        /// are not redundantly reported.
+        /// </summary>
+        internal HashSet<string> NoFragmentCycles_VisitedFrags;
+        /// <summary>
+        /// Array of AST nodes used to produce meaningful errors
+        /// </summary>
+        internal Stack<FragmentSpread> NoFragmentCycles_SpreadPath;
+        /// <summary>
+        /// Position in the spread path
+        /// </summary>
+        internal Dictionary<string, int> NoFragmentCycles_SpreadPathIndexByName;
+
+        internal HashSet<string> NoUndefinedVariables_VariableNameDefined;
+
+        internal List<Operation> NoUnusedFragments_OperationDefs;
+        internal List<FragmentDefinition> NoUnusedFragments_FragmentDefs;
+
+        internal List<VariableDefinition> NoUnusedVariables_VariableDefs;
+
+        internal Dictionary<string, Argument> UniqueArgumentNames_KnownArgs;
+
+        internal Dictionary<string, FragmentDefinition> UniqueFragmentNames_KnownFragments;
+
+        internal Stack<Dictionary<string, IValue>> UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<string, IValue> UniqueInputFieldNames_KnownNames;
+
+        internal HashSet<string> UniqueOperationNames_Frequency;
+
+        internal Dictionary<string, VariableDefinition> UniqueVariableNames_KnownVariables;
+
+        internal Dictionary<string, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
     }
 }
