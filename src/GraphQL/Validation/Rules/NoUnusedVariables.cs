@@ -36,7 +36,7 @@ namespace GraphQL.Validation.Rules
                 leave: (op, context) =>
                 {
                     var variableDefs = context.TypeInfo.NoUnusedVariables_VariableDefs;
-                    if (variableDefs == null)
+                    if (variableDefs == null || variableDefs.Count == 0)
                         return;
 
                     var usages = context.GetRecursiveVariables(op)
