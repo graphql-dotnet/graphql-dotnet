@@ -35,8 +35,8 @@ namespace GraphQL.Validation
         {
             var ancestorArray = _ancestorStack.ToArray();
             var c = ancestorArray.Length;
-            var ret = new INode[c - 1];
-            for (int i = c-- - 1; i > 0; --i) {
+            var ret = new INode[--c];
+            for (int i = c; i > 0; --i) {
                 ret[c - i] = ancestorArray[i];
             }
             return ret;
