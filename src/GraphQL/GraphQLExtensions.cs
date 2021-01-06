@@ -163,7 +163,7 @@ namespace GraphQL
         /// Returns a new instance of the specified graph type, using the specified resolver to
         /// instantiate a new instance. Defaults to <see cref="Activator.CreateInstance(Type)"/>
         /// if no <paramref name="resolve"/> parameter is specified. List and non-null graph
-        /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/> property
+        /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
         /// property is set to a new instance of the base (wrapped) type.
         /// </summary>
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
