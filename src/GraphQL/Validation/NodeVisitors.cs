@@ -5,7 +5,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Represents a set of <see cref="INodeVisitor"/> instances that each runs upon entering or leaving a node.
-    /// Be aware that all <see cref="INodeVisitor"/> instances are called in the order suplied; not in reverse order upon leaving a node.
+    /// Be aware that all <see cref="INodeVisitor"/> instances are called in the order supplied; not in reverse order upon leaving a node.
     /// </summary>
     public sealed class NodeVisitors : INodeVisitor
     {
