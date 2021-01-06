@@ -153,7 +153,9 @@ namespace GraphQL
                        $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
         }
 
-        public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
+        private static readonly string[] _foundNull = new[] { "Expected non-null value, found null" };
+
+        public static string[] IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             // see also ExecutionHelper.AssertValidVariableValue
             if (type is NonNullGraphType nonNull)
@@ -167,7 +169,7 @@ namespace GraphQL
                         return new[] { $"Expected \"{ofType.Name}!\", found null." };
                     }
 
-                    return new[] { "Expected non-null value, found null" };
+                    return _foundNull;
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -200,7 +202,7 @@ namespace GraphQL
                             IsValidLiteralValue(ofType, value, schema)
                                 .Select((err, index) => $"In element #{index + 1}: {err}")
                         )
-                        .ToList();
+                        .ToArray();
                 }
 
                 return IsValidLiteralValue(ofType, valueAst, schema);
@@ -237,7 +239,7 @@ namespace GraphQL
                     errors.AddRange(result.Select(err => $"In field \"{field.Name}\": {err}"));
                 }
 
-                return errors;
+                return errors.ToArray();
             }
 
             var scalar = (ScalarGraphType)type;
