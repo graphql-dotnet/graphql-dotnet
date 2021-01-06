@@ -5,28 +5,17 @@ namespace GraphQL.Tests
 {
     public class GraphQLExtensionsTester
     {
-        [Fact]
-        public void trims_nonnull_bang()
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("Human", "Human")]
+        [InlineData("Human!", "Human")]
+        [InlineData("[Human]", "Human")]
+        [InlineData("[Human]!", "Human")]
+        [InlineData("[[Human!]!]!", "Human")]
+        [InlineData("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]Human!!!!!!!!!!!!!]!!!!!!]]]]]]]!", "Human")]
+        public void nothing_to_trim(string sourceName, string expectedName)
         {
-            var nonNullName = "Human!";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
-        }
-
-        [Fact]
-        public void trims_array()
-        {
-            var nonNullName = "[Human]";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
-        }
-
-        [Fact]
-        public void trims_combo()
-        {
-            var nonNullName = "[Human]!";
-
-            nonNullName.TrimGraphQLTypes().ShouldBe("Human");
+            sourceName.TrimGraphQLTypes().ShouldBe(expectedName);
         }
     }
 }
