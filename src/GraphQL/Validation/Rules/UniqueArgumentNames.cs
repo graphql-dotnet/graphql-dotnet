@@ -23,8 +23,8 @@ namespace GraphQL.Validation.Rules
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs = null),
-            new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs = null),
+            new MatchingNodeVisitor<Field>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
+            new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<Argument>((argument, context) =>
             {
                 var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();

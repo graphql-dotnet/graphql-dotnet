@@ -30,7 +30,7 @@ namespace GraphQL.Validation.Rules
             }),
 
             new MatchingNodeVisitor<Operation>(
-                enter: (op, context) => context.TypeInfo.NoUndefinedVariables_VariableNameDefined = null,
+                enter: (op, context) => context.TypeInfo.NoUndefinedVariables_VariableNameDefined?.Clear(),
                 leave: (op, context) =>
                 {
                     var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined;

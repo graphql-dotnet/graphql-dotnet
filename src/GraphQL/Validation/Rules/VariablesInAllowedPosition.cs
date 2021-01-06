@@ -32,7 +32,7 @@ namespace GraphQL.Validation.Rules
                 ),
 
                 new MatchingNodeVisitor<Operation>(
-                    enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap = null,
+                    enter: (op, context) => context.TypeInfo.VariablesInAllowedPosition_VarDefMap?.Clear(),
                     leave: (op, context) =>
                     {
                         var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap;

@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
                         var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames);
-                        context.TypeInfo.UniqueInputFieldNames_KnownNames = new Dictionary<string, IValue>();
+                        context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                     },
                     leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack.Pop()),
 

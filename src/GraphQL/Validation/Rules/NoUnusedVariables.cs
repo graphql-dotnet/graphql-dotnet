@@ -32,7 +32,7 @@ namespace GraphQL.Validation.Rules
             }),
 
             new MatchingNodeVisitor<Operation>(
-                enter: (op, context) => context.TypeInfo.NoUnusedVariables_VariableDefs = null,
+                enter: (op, context) => context.TypeInfo.NoUnusedVariables_VariableDefs?.Clear(),
                 leave: (op, context) =>
                 {
                     var variableDefs = context.TypeInfo.NoUnusedVariables_VariableDefs;
