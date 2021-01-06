@@ -20,7 +20,7 @@ namespace GraphQL.Language.AST
         }
 
         /// <summary>
-        /// Returns the number of fragment defintion nodes in the list.
+        /// Returns the number of fragment definition nodes in the list.
         /// </summary>
         public int Count => _fragments.Count;
 
