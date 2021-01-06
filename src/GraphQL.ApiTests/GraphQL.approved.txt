@@ -1189,6 +1189,7 @@ namespace GraphQL.Language.AST
     public class Fragments : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition>, System.Collections.IEnumerable
     {
         public Fragments() { }
+        public int Count { get; }
         public void Add(GraphQL.Language.AST.FragmentDefinition fragment) { }
         public GraphQL.Language.AST.FragmentDefinition FindDefinition(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.FragmentDefinition> GetEnumerator() { }
