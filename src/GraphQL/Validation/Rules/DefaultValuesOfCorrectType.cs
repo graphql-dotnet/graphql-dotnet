@@ -29,8 +29,8 @@ namespace GraphQL.Validation.Rules
 
                     if (inputType != null && defaultValue != null)
                     {
-                        var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema).ToList();
-                        if (errors.Count > 0)
+                        var errors = inputType.IsValidLiteralValue(defaultValue, context.Schema);
+                        if (errors.Length > 0)
                         {
                             context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
                         }
