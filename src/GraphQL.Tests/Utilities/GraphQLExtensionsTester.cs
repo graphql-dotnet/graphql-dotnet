@@ -13,7 +13,7 @@ namespace GraphQL.Tests
         [InlineData("[Human]!", "Human")]
         [InlineData("[[Human!]!]!", "Human")]
         [InlineData("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]Human!!!!!!!!!!!!!]!!!!!!]]]]]]]!", "Human")]
-        public void nothing_to_trim(string sourceName, string expectedName)
+        public void TrimGraphQLTypes_Should_Return_Expected_Results(string sourceName, string expectedName)
         {
             sourceName.TrimGraphQLTypes().ShouldBe(expectedName);
         }
