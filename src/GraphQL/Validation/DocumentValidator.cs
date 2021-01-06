@@ -86,7 +86,7 @@ namespace GraphQL.Validation
                 rules = CoreRules;
             }
 
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
+            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
             var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
 
             visitors.Insert(0, context.TypeInfo);

@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueOperationNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => context.Document.Operations.Count < 2 ? NullNodeVisitor.TaskInstance : _nodeVisitor;
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => context.Document.Operations.Count < 2 ? null : _nodeVisitor;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
         {
