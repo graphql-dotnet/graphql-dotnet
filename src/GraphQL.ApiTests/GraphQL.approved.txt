@@ -2524,13 +2524,6 @@ namespace GraphQL.Validation
         public DocumentValidator() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(string originalQuery, GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null) { }
     }
-    public class EnterLeaveListener : GraphQL.Validation.INodeVisitor
-    {
-        public EnterLeaveListener() { }
-        public EnterLeaveListener(System.Action<GraphQL.Validation.EnterLeaveListener> configure) { }
-        public void Match<TNode>(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null)
-            where TNode : GraphQL.Language.AST.INode { }
-    }
     public interface IDocumentValidator
     {
         System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(string originalQuery, GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null);

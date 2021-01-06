@@ -23,9 +23,8 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="PossibleFragmentSpreadsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new EnterLeaveListener(_ =>
-        {
-            _.Match<InlineFragment>((node, context) =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<InlineFragment>((node, context) =>
             {
                 var fragType = context.TypeInfo.GetLastType();
                 var parentType = context.TypeInfo.GetParentType().GetNamedType();
@@ -34,9 +33,9 @@ namespace GraphQL.Validation.Rules
                 {
                     context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
                 }
-            });
+            }),
 
-            _.Match<FragmentSpread>((node, context) =>
+            new MatchingNodeVisitor<FragmentSpread>((node, context) =>
             {
                 string fragName = node.Name;
                 var fragType = getFragmentType(context, fragName);
@@ -46,8 +45,8 @@ namespace GraphQL.Validation.Rules
                 {
                     context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
                 }
-            });
-        }).ToTask();
+            })
+        ).ToTask();
 
         private static IGraphType getFragmentType(ValidationContext context, string name)
         {

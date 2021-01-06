@@ -22,25 +22,24 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="FragmentsOnCompositeTypesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new EnterLeaveListener(_ =>
-        {
-            _.Match<InlineFragment>((node, context) =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<InlineFragment>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
                 if (node.Type != null && type != null && !type.IsCompositeType())
                 {
                     context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                 }
-            });
+            }),
 
-            _.Match<FragmentDefinition>((node, context) =>
+            new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
                 if (type != null && !type.IsCompositeType())
                 {
                     context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                 }
-            });
-        }).ToTask();
+            })
+        ).ToTask();
     }
 }
