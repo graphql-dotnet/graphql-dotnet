@@ -193,6 +193,11 @@ namespace GraphQL
         private static bool IsAnIEnumerable(Type type) =>
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
+        /// <summary>
+        /// Returns the base type for an enumeration type.
+        /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
+        /// as a list type.
+        /// </summary>
         public static Type GetEnumerableElementType(this Type type)
         {
             if (_untypedContainers.Contains(type))
@@ -243,8 +248,16 @@ namespace GraphQL
             return baseType == null ? false : ImplementsGenericType(baseType, genericType);
         }
 
+        /// <summary>
+        /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
+        /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
+        /// </summary>
         public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
 
+        /// <summary>
+        /// Looks for a <see cref="ObsoleteAttribute"/> on the specified member and returns
+        /// the <see cref="ObsoleteAttribute.Message">message</see>, if any.
+        /// </summary>
         public static string ObsoleteMessage(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), false).FirstOrDefault() as ObsoleteAttribute)?.Message;
     }
 }
