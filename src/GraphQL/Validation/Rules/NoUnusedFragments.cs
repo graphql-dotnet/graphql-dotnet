@@ -37,7 +37,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Document>(leave: (document, context) =>
             {
                 var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
-                if (fragmentDefs == null)
+                if (fragmentDefs == null || fragmentDefs.Count == 0)
                     return;
                 var operationDefs = context.TypeInfo.NoUnusedFragments_OperationDefs;
 
