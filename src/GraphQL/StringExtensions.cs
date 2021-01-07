@@ -33,8 +33,7 @@ namespace GraphQL
 
             return s.Length <= 256
                 ? FastChangeFirstLetter(newFirstLetter, s)
-                :
-                newFirstLetter + s.Substring(1);
+                : newFirstLetter + s.Substring(1);
         }
 
         /// <summary>
@@ -55,8 +54,7 @@ namespace GraphQL
 
             return s.Length <= 256
                ? FastChangeFirstLetter(newFirstLetter, s)
-               :
-               newFirstLetter + s.Substring(1);
+               : newFirstLetter + s.Substring(1);
         }
 
         private static string FastChangeFirstLetter(char newFirstLetter, string s)
