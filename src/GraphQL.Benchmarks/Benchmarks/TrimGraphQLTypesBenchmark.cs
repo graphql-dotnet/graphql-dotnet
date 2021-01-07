@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    public class TrimGraphQLTypes
+    public class TrimGraphQLTypesBenchmark
     {
         private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 

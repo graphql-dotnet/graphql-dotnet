@@ -4,7 +4,7 @@ using BenchmarkDotNet.Attributes;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    public class ToCamelCase
+    public class ToCamelCaseBenchmark
     {
         public static string ToCamelCaseOld1(string s)
         {
@@ -17,7 +17,7 @@ namespace GraphQL.Benchmarks
             if (newFirstLetter == s[0])
                 return s;
 
-            return newFirstLetter + s.Substring(1);
+            return newFirstLetter + s[1..];
         }
 
         [Benchmark(Baseline = true)]
