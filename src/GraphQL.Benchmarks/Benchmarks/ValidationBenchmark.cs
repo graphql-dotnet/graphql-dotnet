@@ -1,19 +1,24 @@
 using System;
 using BenchmarkDotNet.Attributes;
+using GraphQL.Execution;
+using GraphQL.Language.AST;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
     //[RPlotExporter, CsvMeasurementsExporter]
-    public class ExecutionBenchmark : IBenchmark
+    public class ValidationBenchmark : IBenchmark
     {
         private IServiceProvider _provider;
         private ISchema _schema;
-        private DocumentExecuter _executer;
+        private DocumentValidator _validator;
+
+        private Document _introspectionDocument, _heroDocument;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -33,29 +38,25 @@ namespace GraphQL.Benchmarks
             _provider = services.BuildServiceProvider();
             _schema = _provider.GetRequiredService<ISchema>();
             _schema.Initialize();
-            _executer = new DocumentExecuter();
+            _validator = new DocumentValidator();
+
+            _introspectionDocument = new GraphQLDocumentBuilder().Build(SchemaIntrospection.IntrospectionQuery);
+            _heroDocument = new GraphQLDocumentBuilder().Build("{ hero { id name } }");
         }
 
         [Benchmark]
         public void Introspection()
         {
-            var result = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
+            _ = Validate(_introspectionDocument);
         }
 
         [Benchmark]
         public void Hero()
         {
-            var result = ExecuteQuery(_schema, "{ hero { id name } }");
+            _ = Validate(_heroDocument);
         }
 
-        private ExecutionResult ExecuteQuery(ISchema schema, string query)
-        {
-            return _executer.ExecuteAsync(_ =>
-            {
-                _.Schema = schema;
-                _.Query = query;
-            }).GetAwaiter().GetResult();
-        }
+        private IValidationResult Validate(Document document) => _validator.ValidateAsync(null, _schema, document).GetAwaiter().GetResult();
 
         void IBenchmark.Run() => Introspection();
     }

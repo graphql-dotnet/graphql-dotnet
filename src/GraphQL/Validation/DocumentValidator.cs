@@ -81,7 +81,7 @@ namespace GraphQL.Validation
 
             var context = new ValidationContext
             {
-                OriginalQuery = originalQuery,
+                OriginalQuery = originalQuery ?? document.OriginalQuery,
                 Schema = schema,
                 Document = document,
                 TypeInfo = new TypeInfo(schema),
