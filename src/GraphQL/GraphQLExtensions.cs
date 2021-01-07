@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -17,16 +16,13 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
+        private static readonly char[] _bangs = new char[] { '!', '[', ']' };
 
         /// <summary>
         /// Removes brackets and exclamation points from a GraphQL type name -- for example,
         /// converts <c>[Int!]</c> to <c>Int</c>
         /// </summary>
-        public static string TrimGraphQLTypes(this string name)
-        {
-            return _trimPattern.Replace(name, string.Empty).Trim();
-        }
+        public static string TrimGraphQLTypes(this string name) => name.Trim().Trim(_bangs);
 
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
