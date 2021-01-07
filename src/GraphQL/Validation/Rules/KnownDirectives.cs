@@ -33,7 +33,7 @@ namespace GraphQL.Validation.Rules
                         return;
                     }
 
-                    var candidateLocation = getDirectiveLocationForAstPath(context.TypeInfo.GetAncestors(), context);
+                    var candidateLocation = getDirectiveLocationForAstPath(context);
                     if (!directiveDef.Locations.Any(x => x == candidateLocation))
                     {
                         context.ReportError(new KnownDirectivesError(context, node, candidateLocation));
@@ -41,13 +41,13 @@ namespace GraphQL.Validation.Rules
                 }).ToTask();
         }
 
-        private static DirectiveLocation getDirectiveLocationForAstPath(INode[] ancestors, ValidationContext context)
+        private static DirectiveLocation getDirectiveLocationForAstPath(ValidationContext context)
         {
-            var appliedTo = ancestors[ancestors.Length - 1];
+            var appliedTo = context.TypeInfo.GetAncestor(1);
 
             if (appliedTo is Directives || appliedTo is Arguments)
             {
-                appliedTo = ancestors[ancestors.Length - 2];
+                appliedTo = context.TypeInfo.GetAncestor(2);
             }
 
             if (appliedTo is Operation op)

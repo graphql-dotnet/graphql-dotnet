@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -29,12 +28,28 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Returns a list of ancestors of the current node.
+        /// Returns an ancestor of the current node.
         /// </summary>
-        /// <returns></returns>
-        public INode[] GetAncestors()
+        /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
+        public INode GetAncestor(int index)
         {
-            return _ancestorStack.Skip(1).Reverse().ToArray();
+            var e = _ancestorStack.GetEnumerator();
+
+            try
+            {
+                int i = index;
+                do
+                {
+                    _ = e.MoveNext();
+                }
+                while (i-- > 0);
+
+                return e.Current; // throws if index is out of range
+            }
+            finally
+            {
+                e.Dispose();
+            }
         }
 
         /// <summary>

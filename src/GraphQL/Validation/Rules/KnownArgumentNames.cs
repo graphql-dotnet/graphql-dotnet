@@ -24,8 +24,8 @@ namespace GraphQL.Validation.Rules
         {
             return new MatchingNodeVisitor<Argument>(node =>
                 {
-                    var ancestors = context.TypeInfo.GetAncestors();
-                    var argumentOf = ancestors[ancestors.Length - 2];
+                    var argumentOf = context.TypeInfo.GetAncestor(2);
+
                     if (argumentOf is Field)
                     {
                         var fieldDef = context.TypeInfo.GetFieldDef();
