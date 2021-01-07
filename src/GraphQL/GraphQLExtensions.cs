@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -14,33 +13,9 @@ namespace GraphQL
 {
     public static class GraphQLExtensions
     {
-        private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
-
         private static readonly char[] _bangs = new char[] { '!', '[', ']' };
 
-        public static string TrimGraphQLTypes(this string name)
-        {
-            name = name.Trim();
-
-            if (name.Length <= 256)
-            {
-                Span<char> buffer = stackalloc char[name.Length];
-
-                int index = 0;
-                for (int i=0; i<name.Length; ++i)
-                {
-                    char c = name[i];
-                    if (!_bangs.Contains(c))
-                        buffer[index++] = c;
-                }
-
-                return index == name.Length ? name : buffer.Slice(0, index).ToString();
-            }
-            else
-            {
-                return _trimPattern.Replace(name, string.Empty);
-            }
-        }
+        public static string TrimGraphQLTypes(this string name) => name.Trim().Trim(_bangs);
 
         public static bool IsCompositeType(this IGraphType type)
         {

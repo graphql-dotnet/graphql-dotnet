@@ -10,10 +10,15 @@ namespace GraphQL.Benchmarks
         private static readonly Regex _trimPattern = new Regex("[\\[!\\]]", RegexOptions.Compiled);
 
         [Benchmark(Baseline = true)]
-        public string TrimGraphQLTypesOld() => _trimPattern.Replace(Name, string.Empty).Trim();
+        public string Old() => _trimPattern.Replace(Name, string.Empty).Trim();
 
         [Benchmark]
-        public string TrimGraphQLTypesNew() => Name.TrimGraphQLTypes();
+        public string New() => Name.TrimGraphQLTypes();
+
+        private static readonly char[] _chars = new[] { '[', ']', '!' };
+
+        [Benchmark]
+        public string Alt() => Name.Trim().Trim(_chars);
 
         [ParamsSource(nameof(Names))]
         public string Name { get; set; }
