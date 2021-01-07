@@ -121,6 +121,7 @@ namespace GraphQL.Tests.Utilities
             return PostData.Posts.FirstOrDefault(x => x.Id == id);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
         public ResolvingClassForABlog Blog(string id)
         {
             return new ResolvingClassForABlog();
@@ -132,7 +133,7 @@ namespace GraphQL.Tests.Utilities
         public abstract string Id { get; }
     }
 
-    [GraphQLMetadata(Name="ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
+    [GraphQLMetadata(Name = "ABlog", IsTypeOf = typeof(ResolvingClassForABlog))]
     public class ResolvingClassForABlog : UniqueElement
     {
         public ResolvingClassForABlog()

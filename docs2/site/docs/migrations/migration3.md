@@ -15,7 +15,7 @@ These .Net types now are automatically mapped to corresponding built-in custom s
 * BigInt
 
 There is also support for converting base-64 encoded strings to byte arrays. See
-the [FAQ](known-issues#can-custom-scalars-serialize-non-null-data-to-a-null-value-and-vice-versa)
+the [FAQ](../guides/known-issues#can-custom-scalars-serialize-non-null-data-to-a-null-value-and-vice-versa)
 and the `ValueConverter` class for more details.
 
 See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-types) for more details.
@@ -46,6 +46,23 @@ See [Schema Types](https://graphql-dotnet.github.io/docs/getting-started/schema-
 This project now requires the .NET Standard 2.0 and breaks compatibility with applications based on
 .NET Framework 4.6 and earlier. See https://docs.microsoft.com/en-us/dotnet/standard/net-standard for a list of
 frameworks that support .Net Standard 2.0.
+
+### Naming
+
+By default, the `GraphType.Name` property now is initialized in constructor and is the same as the name of the .NET type
+unless the name of .NET type ends in _GraphType_. In this case, the _GraphType_ suffix is truncated and `GraphType.Name`
+is set to this value.
+
+Examples:
+
+| .NET GraphType Name | Default Name |
+|---------------------|--------------|
+| MoneyType           | MoneyType    |
+| MoneyGraphType      | Money        |
+
+You can always set your own type name either in the constructor or externally. The result of this change is that it is no
+longer possible to have Graph Types with unspecified (`null`) or invalid names. This allows to avoid a number of errors
+and incomprehensible behavior at runtime.
 
 ### Dependency Injection
 
@@ -351,7 +368,7 @@ public class OrderType : ObjectGraphType<Order>
 
 If you need to process the data loader result before it is returned, additional refactoring will need to be done.
 The data loader also now supports chained data loaders, and asynchronous code prior to queuing the data loader. See
-[Data loader documentation](https://graphql-dotnet.github.io/docs/getting-started/dataloader) for more details.
+[Data loader documentation](https://graphql-dotnet.github.io/docs/guides/dataloader) for more details.
 
 ### DateGraphType parsing changes
 
@@ -455,3 +472,8 @@ public class MyConverter : INameConverter
 The three introspection field definitions for `__schema`, `__type`, and `__typename` have moved from static properties on the `SchemaIntrospection` class
 to properties of the `ISchema` interface, typically provided by the `Schema` class. Custom implementations of `ISchema` must implement three new properties:
 `SchemaMetaFieldType`, `TypeMetaFieldType`, and `TypeNameMetaFieldType`. These can be provided by the `GraphTypesLookup` class.
+
+### `ISchema` now implements `IProvideMetadata` (only for GraphQL.NET >= v3.2.0)
+
+Formally it is a breaking change but practically clients shouldn't run into problems, as hardly anyone creates their own `ISchema` implementations preferring
+to inherit from `Schema` class. 

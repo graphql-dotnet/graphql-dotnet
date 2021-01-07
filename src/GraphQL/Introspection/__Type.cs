@@ -4,8 +4,15 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// <c>__Type</c> is at the core of the type introspection system.
+    /// It represents scalars, interfaces, object types, unions, enums in the system.
+    /// </summary>
     public class __Type : ObjectGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__Type</c> introspection type.
+        /// </summary>
         public __Type()
         {
             Name = nameof(__Type);
@@ -96,7 +103,8 @@ namespace GraphQL.Introspection
             });
             Field<__Type>("ofType", resolve: context =>
             {
-                if (context.Source == null) return null;
+                if (context.Source == null)
+                    return null;
 
                 if (context.Source is NonNullGraphType type)
                 {

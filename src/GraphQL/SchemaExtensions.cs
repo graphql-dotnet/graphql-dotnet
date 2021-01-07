@@ -4,6 +4,9 @@ using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for schemas.
+    /// </summary>
     public static class SchemaExtensions
     {
         /// <summary>

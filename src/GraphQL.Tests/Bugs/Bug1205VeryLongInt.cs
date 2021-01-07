@@ -18,11 +18,12 @@ namespace GraphQL.Tests.Bugs
             var error = new ExecutionError("Error trying to resolve field 'int'.", new OverflowException());
             error.AddLocation(1, 3);
             error.Path = new object[] { "int" };
-            var expected = new ExecutionResult {
+            var expected = new ExecutionResult
+            {
                 Errors = new ExecutionErrors { error },
                 Data = new { @int = (object)null }
             };
-            
+
             AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 

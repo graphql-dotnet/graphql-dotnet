@@ -7,8 +7,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// Provides helper methods for document execution.
+    /// </summary>
     public static class ExecutionHelper
     {
+        /// <summary>
+        /// Returns the root graph type for the execution -- for a specified schema and operation type.
+        /// </summary>
         public static IObjectGraphType GetOperationRootType(Document document, ISchema schema, Operation operation)
         {
             IObjectGraphType type;
@@ -48,6 +54,10 @@ namespace GraphQL.Execution
             return type;
         }
 
+        /// <summary>
+        /// Returns a <see cref="FieldType"/> for the specified AST <see cref="Field"/> within a specified parent
+        /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
+        /// </summary>
         public static FieldType GetFieldDefinition(ISchema schema, IObjectGraphType parentType, Field field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
@@ -65,12 +75,15 @@ namespace GraphQL.Execution
 
             if (parentType == null)
             {
-                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch {field.Name}. Are you missing a root type?");
+                throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
             }
 
             return parentType.GetField(field.Name);
         }
 
+        /// <summary>
+        /// Returns all of the variable values defined for the document from the attached <see cref="Inputs"/> object.
+        /// </summary>
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
             var variables = new Variables();
@@ -95,6 +108,9 @@ namespace GraphQL.Execution
             return variables;
         }
 
+        /// <summary>
+        /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// </summary>
         public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
         {
             var type = variable.Type.GraphTypeFromType(schema);
@@ -117,6 +133,9 @@ namespace GraphQL.Execution
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
         }
 
+        /// <summary>
+        /// Ensures that the specified variable value is valid for the variable's graph type.
+        /// </summary>
         public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
         {
             // see also GraphQLExtensions.IsValidLiteralValue
@@ -232,6 +251,10 @@ namespace GraphQL.Execution
             throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
 
+        /// <summary>
+        /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
+        /// or variables as specified by the document.
+        /// </summary>
         public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
@@ -257,6 +280,9 @@ namespace GraphQL.Execution
             return values;
         }
 
+        /// <summary>
+        /// Coerces a variable value to a compatible .NET type for the variable's graph type.
+        /// </summary>
         public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
         {
             if (type is NonNullGraphType nonNull)
@@ -297,7 +323,7 @@ namespace GraphQL.Execution
                     return null;
                 }
 
-                var complexType = type as IComplexGraphType;
+                var complexType = (IComplexGraphType)type; // both IObjectGraphType and IInputObjectGraphType inherit from IComplexGraphType
                 var obj = new Dictionary<string, object>();
 
                 foreach (var field in complexType.Fields)
@@ -382,6 +408,14 @@ namespace GraphQL.Execution
             return fields;
         }
 
+        /// <summary>
+        /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
+        /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
+        /// otherwise the field name). This ensures all fields with the same response key included via referenced
+        /// fragments are executed at the same time.
+        /// <br/><br/>
+        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
+        /// </summary>
         public static Dictionary<string, Field> CollectFields(
             ExecutionContext context,
             IGraphType specificType,
@@ -390,10 +424,14 @@ namespace GraphQL.Execution
             return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
-        // Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
-        // directives are provided on the same field or fragment, it must be queried only if the @skip condition
-        // is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
-        // if either the @skip condition is true or the @include condition is false.
+        /// <summary>
+        /// Examines @skip and @include directives for a node and returns a value indicating if the node should be included or not.
+        /// <br/><br/>
+        /// Note: Neither @skip nor @include has precedence over the other. In the case that both the @skip and @include
+        /// directives are provided on the same field or fragment, it must be queried only if the @skip condition
+        /// is false and the @include condition is true. Stated conversely, the field or fragment must not be queried
+        /// if either the @skip condition is true or the @include condition is false.
+        /// </summary>
         public static bool ShouldIncludeNode(ExecutionContext context, Directives directives)
         {
             if (directives != null)
@@ -427,6 +465,12 @@ namespace GraphQL.Execution
             return true;
         }
 
+        /// <summary>
+        /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
+        /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
+        /// <br/><br/>
+        /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
+        /// </summary>
         public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
         {
             if (string.IsNullOrWhiteSpace(fragmentName))
@@ -454,6 +498,9 @@ namespace GraphQL.Execution
             return false;
         }
 
+        /// <summary>
+        /// Returns a list of subfields (child nodes) for a result node based on the selection set from the document.
+        /// </summary>
         public static IDictionary<string, Field> SubFieldsFor(ExecutionContext context, IGraphType fieldType, Field field)
         {
             var selections = field?.SelectionSet?.Selections;

@@ -13,8 +13,11 @@ namespace GraphQL.Tests.Bugs
         {
             var query = @"
 mutation {
-  create(input: {id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
+  create(input: {float1: 1.3, floatFromInt: 1, id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
   {
+    float1
+    floatFromInt
+
     id1
     id2
 
@@ -42,6 +45,9 @@ mutation {
   }
   create_with_defaults(input: { })
   {
+    float1
+    floatFromInt
+
     id1
     id2
 
@@ -72,6 +78,8 @@ mutation {
             var expected = @"{
   ""data"": {
     ""create"": {
+      ""float1"": 1.2999999523162842,
+      ""floatFromInt"": 1,
       ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
       ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
       ""uint"": 3147483647,
@@ -111,6 +119,8 @@ mutation {
       ]
     },
     ""create_with_defaults"": {
+      ""float1"": 1.2999999523162842,
+      ""floatFromInt"": 1,
       ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
       ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
       ""uint"": 3147483647,
@@ -190,6 +200,10 @@ mutation {
 
     public class ScalarsModel
     {
+        public float Float1 { get; set; }
+
+        public float FloatFromInt { get; set; }
+
         public Guid Id1 { get; set; }
 
         public Guid Id2 { get; set; }
@@ -223,6 +237,8 @@ mutation {
         {
             Name = "ScalarsInput";
 
+            Field("float1", o => o.Float1, type: typeof(FloatGraphType));
+            Field("floatFromInt", o => o.FloatFromInt, type: typeof(FloatGraphType));
             Field("id1", o => o.Id1, type: typeof(IdGraphType));
             Field("id2", o => o.Id2, type: typeof(GuidGraphType));
             Field("uint", o => o.uInt, type: typeof(UIntGraphType));
@@ -250,6 +266,8 @@ mutation {
         {
             Name = "ScalarsInputWithDefaults";
 
+            Field("float1", o => o.Float1, type: typeof(NonNullGraphType<FloatGraphType>)).DefaultValue(1.3f);
+            Field("floatFromInt", o => o.FloatFromInt, type: typeof(NonNullGraphType<FloatGraphType>)).DefaultValue(1);
             Field("id1", o => o.Id1, type: typeof(NonNullGraphType<IdGraphType>)).DefaultValue(new Guid("8dfab389-a6f7-431d-ab4e-aa693cc53edf"));
             Field("id2", o => o.Id2, type: typeof(NonNullGraphType<GuidGraphType>)).DefaultValue(new Guid("8dfab389-a6f7-431d-ab4e-aa693cc53ede"));
             Field("uint", o => o.uInt, type: typeof(NonNullGraphType<UIntGraphType>)).DefaultValue((uint)3147483647);
@@ -277,6 +295,8 @@ mutation {
         {
             Name = "ScalarsType";
 
+            Field("float1", o => o.Float1, type: typeof(FloatGraphType));
+            Field("floatFromInt", o => o.FloatFromInt, type: typeof(FloatGraphType));
             Field("id1", o => o.Id1, type: typeof(IdGraphType));
             Field("id2", o => o.Id2, type: typeof(GuidGraphType));
             Field("uint", o => o.uInt, type: typeof(UIntGraphType));

@@ -15,6 +15,7 @@ namespace GraphQL.Utilities
     {
         protected readonly IDictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
         private readonly List<IVisitorSelector> _visitorSelectors = new List<IVisitorSelector>();
+        private GraphQLSchemaDefinition _schemaDef;
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
@@ -91,16 +92,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var directives = new List<DirectiveGraphType>();
 
-            GraphQLSchemaDefinition schemaDef = null;
-
             foreach (var def in document.Definitions)
             {
                 switch (def.Kind)
                 {
                     case ASTNodeKind.SchemaDefinition:
                     {
-                        schemaDef = def as GraphQLSchemaDefinition;
-                        schema.SetAstType(schemaDef);
+                        _schemaDef = def.As<GraphQLSchemaDefinition>();
+                        schema.SetAstType(_schemaDef);
 
                         VisitNode(schema, v => v.VisitSchema(schema));
                         break;
@@ -108,60 +107,60 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     case ASTNodeKind.ObjectTypeDefinition:
                     {
-                        var type = ToObjectGraphType(def as GraphQLObjectTypeDefinition);
+                        var type = ToObjectGraphType(def.As<GraphQLObjectTypeDefinition>());
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.TypeExtensionDefinition:
                     {
-                        var type = ToObjectGraphType((def as GraphQLTypeExtensionDefinition).Definition, true);
+                        var type = ToObjectGraphType(def.As<GraphQLTypeExtensionDefinition>().Definition, true);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.InterfaceTypeDefinition:
                     {
-                        var type = ToInterfaceType(def as GraphQLInterfaceTypeDefinition);
+                        var type = ToInterfaceType(def.As<GraphQLInterfaceTypeDefinition>());
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.EnumTypeDefinition:
                     {
-                        var type = ToEnumerationType(def as GraphQLEnumTypeDefinition);
+                        var type = ToEnumerationType(def.As<GraphQLEnumTypeDefinition>());
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.UnionTypeDefinition:
                     {
-                        var type = ToUnionType(def as GraphQLUnionTypeDefinition);
+                        var type = ToUnionType(def.As<GraphQLUnionTypeDefinition>());
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.InputObjectTypeDefinition:
                     {
-                        var type = ToInputObjectType(def as GraphQLInputObjectTypeDefinition);
+                        var type = ToInputObjectType(def.As<GraphQLInputObjectTypeDefinition>());
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.DirectiveDefinition:
                     {
-                        var directive = ToDirective(def as GraphQLDirectiveDefinition);
+                        var directive = ToDirective(def.As<GraphQLDirectiveDefinition>());
                         directives.Add(directive);
                         break;
                     }
                 }
             }
 
-            if (schemaDef != null)
+            if (_schemaDef != null)
             {
-                schema.Description = schemaDef.Comment?.Text;
+                schema.Description = _schemaDef.Comment?.Text;
 
-                foreach (var operationTypeDef in schemaDef.OperationTypes)
+                foreach (var operationTypeDef in _schemaDef.OperationTypes)
                 {
                     var typeName = operationTypeDef.Type.Name.Value;
                     var type = GetType(typeName) as IObjectGraphType;
@@ -209,6 +208,15 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        private bool IsSubscriptionType(ObjectGraphType type)
+        {
+            var operationDefinition = _schemaDef?.OperationTypes?.FirstOrDefault(o => o.Operation == OperationType.Subscription);
+            if (operationDefinition == null)
+                return type.Name == "Subscription";
+
+            return type.Name == operationDefinition.Type.Name.Value;
+        }
+
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var typeConfig = Types.For(astType.Name.Value);
@@ -220,7 +228,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
             else
             {
-                type = _types[astType.Name.Value] as ObjectGraphType;
+                type = _types[astType.Name.Value] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{astType.Name.Value} should be ObjectGraphType");
             }
 
             if (!isExtensionType)
@@ -232,7 +240,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             CopyMetadata(type, typeConfig);
 
             Func<string, GraphQLFieldDefinition, FieldType> constructFieldType;
-            if (type.Name == "Subscription")
+            if (IsSubscriptionType(type))
             {
                 constructFieldType = ToSubscriptionFieldType;
             }
@@ -527,6 +535,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
     internal static class SchemaExtensions
     {
+        public static TNode As<TNode>(ASTNode node) where TNode : ASTNode
+        {
+            return node as TNode ?? throw new InvalidOperationException($"Node should be of type '{typeof(TNode).Name}' but it is of type '{node?.GetType().Name}'.");
+        }
+
         public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
         {
             return directives?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));

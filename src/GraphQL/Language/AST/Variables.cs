@@ -5,55 +5,49 @@ using System.Linq;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Contains a list of variables (name &amp; value tuples) that have been gathered from the document and attached <see cref="Inputs"/>.
+    /// </summary>
     public class Variables : IEnumerable<Variable>
     {
-        private readonly List<Variable> _variables = new List<Variable>();
+        private List<Variable> _variables;
 
+        /// <summary>
+        /// Adds a variable to the list.
+        /// </summary>
         public void Add(Variable variable)
-        {
-            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
-        }
-
-        public object ValueFor(string name)
-        {
-            var variable = _variables.FirstOrDefault(v => v.Name == name);
-            return variable?.Value;
-        }
-
-        public IEnumerator<Variable> GetEnumerator()
-        {
-            return _variables.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    public class VariableDefinitions : IEnumerable<VariableDefinition>
-    {
-        private List<VariableDefinition> _variables;
-
-        public void Add(VariableDefinition variable)
         {
             if (variable == null)
                 throw new ArgumentNullException(nameof(variable));
 
             if (_variables == null)
-                _variables = new List<VariableDefinition>();
+                _variables = new List<Variable>();
 
             _variables.Add(variable);
         }
 
-        public IEnumerator<VariableDefinition> GetEnumerator()
+        /// <summary>
+        /// Returns the first variable with a matching name, or <see langword="null"/> if none are found.
+        /// </summary>
+        public object ValueFor(string name)
+        {
+            var variable = _variables?.FirstOrDefault(v => v.Name == name);
+            return variable?.Value;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerator<Variable> GetEnumerator()
         {
             if (_variables == null)
-                return Enumerable.Empty<VariableDefinition>().GetEnumerator();
+                return Enumerable.Empty<Variable>().GetEnumerator();
 
             return _variables.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc/>
+        public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
     }
+
 }

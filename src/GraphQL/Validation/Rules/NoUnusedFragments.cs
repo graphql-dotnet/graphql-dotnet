@@ -7,15 +7,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// No unused fragments
+    /// No unused fragments:
     ///
     /// A GraphQL document is only valid if all fragment definitions are spread
     /// within operations, or spread within other fragments spread within operations.
     /// </summary>
     public class NoUnusedFragments : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly NoUnusedFragments Instance = new NoUnusedFragments();
 
+        /// <inheritdoc/>
+        /// <exception cref="NoUnusedFragmentsError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             var operationDefs = new List<Operation>();

@@ -11,7 +11,7 @@ namespace GraphQL.DataLoader
     /// <typeparam name="TKey">The type of the key</typeparam>
     /// <typeparam name="T">The type of the value</typeparam>
     /// <remarks>This class is thread safe.</remarks>
-    public abstract partial class DataLoaderBase<TKey, T>: IDataLoader, IDataLoader<TKey, T>
+    public abstract partial class DataLoaderBase<TKey, T> : IDataLoader, IDataLoader<TKey, T>
     {
         //this class supports adding more items after DispatchAsync has been called,
         //  and calling DispatchAsync will then load those items
@@ -19,7 +19,15 @@ namespace GraphQL.DataLoader
         private DataLoaderList _list;
         private readonly Dictionary<TKey, DataLoaderPair<TKey, T>> _cachedList;
         private readonly object _sync = new object();
+
+        /// <summary>
+        /// Returns the maximum number of keys passed to the fetch function at a time.
+        /// </summary>
         protected internal readonly int MaxBatchSize;
+
+        /// <summary>
+        /// Returns the equality comparer to be used, or null for the default equality comparer.
+        /// </summary>
         protected internal readonly IEqualityComparer<TKey> EqualityComparer;
 
         /// <summary>

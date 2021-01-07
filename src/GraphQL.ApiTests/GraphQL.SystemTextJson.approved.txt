@@ -15,6 +15,7 @@ namespace GraphQL.SystemTextJson
     public class ExecutionResultJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionResult>
     {
         public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public override bool CanConvert(System.Type typeToConvert) { }
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }

@@ -25,11 +25,19 @@ namespace GraphQL
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
 
+        /// <summary>
+        /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// </summary>
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
@@ -37,6 +45,7 @@ namespace GraphQL
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
         }
 
+        /// <inheritdoc/>
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
@@ -216,7 +225,9 @@ namespace GraphQL
                     if (context.Listeners != null)
                         foreach (var listener in context.Listeners)
                         {
+#pragma warning disable CS0612 // Type or member is obsolete
                             await listener.BeforeExecutionAwaitedAsync(context)
+#pragma warning restore CS0612 // Type or member is obsolete
                                 .ConfigureAwait(false);
                         }
 
@@ -317,6 +328,12 @@ namespace GraphQL
             return context;
         }
 
+        /// <summary>
+        /// Returns the selected <see cref="Operation"/> given a specified <see cref="Document"/> and operation name.
+        /// <br/><br/>
+        /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
+        /// Returns the first operation from the document if no operation name was specified.
+        /// </summary>
         protected virtual Operation GetOperation(string operationName, Document document)
         {
             return !string.IsNullOrWhiteSpace(operationName)
@@ -324,6 +341,14 @@ namespace GraphQL
                 : document.Operations.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
+        /// <br/><br/>
+        /// Typically the strategy is selected based on the type of operation.
+        /// <br/><br/>
+        /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
+        /// <see cref="SerialExecutionStrategy"/> and subscription operations return a <see cref="SubscriptionExecutionStrategy"/>.
+        /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         {
             // TODO: Should we use cached instances of the default execution strategies?

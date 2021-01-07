@@ -4,14 +4,21 @@ using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
+    /// <summary>
+    /// The Date scalar graph type represents a year, month and day in accordance with the ISO-8601 standard.
+    /// </summary>
     public class DateGraphType : ScalarGraphType
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateGraphType"/> class.
+        /// </summary>
         public DateGraphType()
         {
             Description = "The `Date` scalar type represents a year, month and day in accordance with the " +
                 "[ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.";
         }
 
+        /// <inheritdoc/>
         public override object Serialize(object value)
         {
             var date = ParseValue(value);
@@ -24,6 +31,23 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc/>
+        public override object ParseLiteral(IValue value)
+        {
+            if (value is DateTimeValue timeValue)
+            {
+                return timeValue.Value;
+            }
+
+            if (value is StringValue stringValue)
+            {
+                return ParseValue(stringValue.Value);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
         public override object ParseValue(object value)
         {
             if (value is DateTime dateTime)
@@ -45,21 +69,6 @@ namespace GraphQL.Types
             }
 
             throw new FormatException($"Could not parse date. Expected either a string or a DateTime without time component. Value: {value}");
-        }
-
-        public override object ParseLiteral(IValue value)
-        {
-            if (value is DateTimeValue timeValue)
-            {
-                return timeValue.Value;
-            }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
         }
     }
 }

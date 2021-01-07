@@ -138,7 +138,7 @@ namespace GraphQL.Tests.Bugs
 
         private static string DeriveGraphQlName(string name)
         {
-            return $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
+            return $"{char.ToUpperInvariant(name[0])}{name[1..]}";
         }
 
         private static string DeriveEnumValueName(string name)
