@@ -77,7 +77,7 @@ namespace GraphQL.Validation
             );
 
             var visitor = new BasicVisitor(info, listener);
-            visitor.Visit(node, null);
+            visitor.Visit(node, this);
 
             return usages;
         }
