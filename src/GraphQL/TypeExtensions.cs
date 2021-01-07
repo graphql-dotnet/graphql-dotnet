@@ -196,7 +196,7 @@ namespace GraphQL
         /// <summary>
         /// Returns the type of element for a one-dimensional container type.
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
-        /// as a list type.
+        /// as a one-dimensional container type.
         /// </summary>
         public static Type GetEnumerableElementType(this Type type)
         {
