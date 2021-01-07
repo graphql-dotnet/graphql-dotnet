@@ -17,6 +17,7 @@ namespace GraphQL.Validation
         private readonly Stack<INode> _ancestorStack = new Stack<INode>();
         private DirectiveGraphType _directive;
         private QueryArgument _argument;
+
         /// <summary>
         /// Initializes a new instance for the specified schema.
         /// </summary>
