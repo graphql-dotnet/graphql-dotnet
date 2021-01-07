@@ -27,17 +27,15 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Operation>((node, context) =>
             {
                 (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node);
-                context.TypeInfo.NoUnusedFragments_FragmentDefs?.Clear();
             }),
             new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
             {
-                var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>();
-                fragmentDefs.Add(node);
+                (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>()).Add(node);
             }),
             new MatchingNodeVisitor<Document>(leave: (document, context) =>
             {
                 var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
-                if (fragmentDefs == null || fragmentDefs.Count == 0)
+                if (fragmentDefs == null)
                     return;
                 var operationDefs = context.TypeInfo.NoUnusedFragments_OperationDefs;
 
