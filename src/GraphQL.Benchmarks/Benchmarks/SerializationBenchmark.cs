@@ -11,8 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter, CsvMeasurementsExporter]
-    public class SerializationBenchmark
+    //[RPlotExporter, CsvMeasurementsExporter]
+    public class SerializationBenchmark : IBenchmark
     {
         private IServiceProvider _provider;
         private ISchema _schema;
@@ -47,6 +47,7 @@ namespace GraphQL.Benchmarks
 
             _provider = services.BuildServiceProvider();
             _schema = _provider.GetRequiredService<ISchema>();
+            _schema.Initialize();
             _executer = new DocumentExecuter();
 
             _stjWriter = new SystemTextJson.DocumentWriter();
@@ -115,5 +116,11 @@ namespace GraphQL.Benchmarks
 
         [Benchmark]
         public Task SystemTextJsonIndented() => _stjWriterIndented.WriteAsync(_stream, Result);
+
+        void IBenchmark.Run()
+        {
+            Code = "Introspection";
+            SystemTextJson().GetAwaiter().GetResult();
+        }
     }
 }
