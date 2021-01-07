@@ -1,4 +1,5 @@
 using System;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Shouldly;
 using Xunit;
@@ -162,6 +163,31 @@ mutation {
 }";
             AssertQuery(query, expected, null, null);
         }
+
+        [Fact]
+        public void Should_Accept_Long_As_Long_In_Literal()
+        {
+            var query = @"mutation { long(number: 100) }";
+            var expected = @"{ ""long"": 100 }";
+            AssertQuerySuccess(query, expected, null, null);
+        }
+
+        [Fact]
+        public void Should_Not_Accept_String_As_Long_In_Literal()
+        {
+            var query = @"mutation { long(number: ""100"") }";
+            string expected = null;
+            AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
+        }
+
+        // TODO: rework to throw exception
+        [Fact]
+        public void Should_Accept_String_As_Long_In_Variable()
+        {
+            var query = @"mutation AAA($val : Long!) { long(number: $val) }";
+            var expected = @"{ ""long"": 100 }";
+            AssertQuerySuccess(query, expected, @"{ ""val"": ""100"" }".ToInputs(), null);
+        }
     }
 
     public class SchemaForScalars : Schema
@@ -315,6 +341,16 @@ mutation {
                 {
                     var arg = ctx.GetArgument<ScalarsModel>("input");
                     arg.decZero.ShouldBe(12.10m);
+                    return arg;
+                });
+
+            Field<LongGraphType>(
+                "long",
+                arguments: new QueryArguments(new QueryArgument<LongGraphType> { Name = "number" }),
+                resolve: ctx =>
+                {
+                    var arg = ctx.GetArgument<long>("number");
+                    arg.ShouldBe(100L);
                     return arg;
                 });
         }
