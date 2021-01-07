@@ -335,7 +335,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Examines a simple lambda expression and returns the deprecation reason of the member it
+        /// Examines a simple lambda expression and returns the default value of the member it
         /// references as listed by a <see cref="DefaultValueAttribute"/>.
         /// Unable to parse any expressions that are more complex than a simple member access.
         /// Returns <see langword="null"/> if the expression is not a simple member access.
