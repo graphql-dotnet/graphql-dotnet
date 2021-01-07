@@ -5,8 +5,8 @@ using BenchmarkDotNet.Attributes;
 namespace GraphQL.Benchmarks
 {
     [MemoryDiagnoser]
-    [RPlotExporter, CsvMeasurementsExporter]
-    public class DeserializationBenchmark
+    //[RPlotExporter, CsvMeasurementsExporter]
+    public class DeserializationBenchmark : IBenchmark
     {
         private const string SHORT_JSON = @"{
   ""key0"": null,
@@ -56,5 +56,11 @@ namespace GraphQL.Benchmarks
 
         [Benchmark]
         public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
+
+        void IBenchmark.Run()
+        {
+            Code = "Introspection";
+            _ = SystemTextJson();
+        }
     }
 }
