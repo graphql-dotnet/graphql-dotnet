@@ -30,5 +30,18 @@ namespace GraphQL.Tests
         {
             sourceName.ToCamelCase().ShouldBe(expectedName);
         }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("\tAA", "\tAA")] // ???
+        [InlineData("a", "A")]
+        [InlineData("Aa", "Aa")]
+        [InlineData("9a", "9a")]
+        [InlineData("aBC", "ABC")]
+        public void ToPascalCase_Should_Return_Expected_Results(string sourceName, string expectedName)
+        {
+            sourceName.ToPascalCase().ShouldBe(expectedName);
+        }
     }
 }
