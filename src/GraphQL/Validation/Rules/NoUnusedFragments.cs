@@ -24,14 +24,8 @@ namespace GraphQL.Validation.Rules
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => context.Document.Fragments.Count > 0 ? _nodeVisitor : null;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Operation>((node, context) =>
-            {
-                (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node);
-            }),
-            new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
-            {
-                (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>()).Add(node);
-            }),
+            new MatchingNodeVisitor<Operation>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new List<Operation>(1)).Add(node)),
+            new MatchingNodeVisitor<FragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new List<FragmentDefinition>()).Add(node)),
             new MatchingNodeVisitor<Document>(leave: (document, context) =>
             {
                 var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;
