@@ -6,6 +6,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Provides information pertaining to the current state of the AST tree while being walked.
+    /// Thus, validation rules checking is designed for sequential execution.
     /// </summary>
     public class TypeInfo : INodeVisitor
     {
