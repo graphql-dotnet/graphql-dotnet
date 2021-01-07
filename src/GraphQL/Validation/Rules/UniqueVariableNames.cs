@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
         public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables = null),
+            new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
             new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
             {
                 var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<string, VariableDefinition>();
