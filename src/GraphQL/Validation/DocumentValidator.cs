@@ -75,8 +75,7 @@ namespace GraphQL.Validation
             {
                 rules = CoreRules;
             }
-
-            if (!rules.Any())
+            else if (!rules.Any())
                 return SuccessfullyValidatedResult.Instance;
 
             var context = new ValidationContext
