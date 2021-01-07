@@ -251,6 +251,7 @@ namespace GraphQL
         /// <summary>
         /// Looks for a <see cref="DescriptionAttribute"/> on the specified member and returns
         /// the <see cref="DescriptionAttribute.Description">description</see>, if any.
+        /// Otherwise returns xml documentation on the specified member, if any.
         /// </summary>
         public static string Description(this MemberInfo memberInfo) => (memberInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute)?.Description ?? memberInfo.GetXmlDocumentation();
 
