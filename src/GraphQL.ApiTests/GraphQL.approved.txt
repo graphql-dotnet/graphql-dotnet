@@ -2564,7 +2564,7 @@ namespace GraphQL.Validation
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
         public void Enter(GraphQL.Language.AST.INode node) { }
-        public GraphQL.Language.AST.INode[] GetAncestors() { }
+        public GraphQL.Language.AST.INode GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument GetArgument() { }
         public GraphQL.Types.DirectiveGraphType GetDirective() { }
         public GraphQL.Types.FieldType GetFieldDef() { }
