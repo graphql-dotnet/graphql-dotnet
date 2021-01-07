@@ -17,5 +17,18 @@ namespace GraphQL.Tests
         {
             sourceName.TrimGraphQLTypes().ShouldBe(expectedName);
         }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData(" ", "")]
+        [InlineData("\tAA", "\tAA")] // ???
+        [InlineData("a", "a")]
+        [InlineData("Aa", "aa")]
+        [InlineData("9a", "9a")]
+        [InlineData("aBC", "aBC")]
+        public void ToCamelCase_Should_Return_Expected_Results(string sourceName, string expectedName)
+        {
+            sourceName.ToCamelCase().ShouldBe(expectedName);
+        }
     }
 }
