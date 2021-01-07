@@ -6,7 +6,7 @@ namespace GraphQL.Benchmarks
     [MemoryDiagnoser]
     public class ToCamelCaseBenchmark
     {
-        public static string ToCamelCaseOld1(string s)
+        private static string ToCamelCaseOld(string s)
         {
             if (string.IsNullOrWhiteSpace(s))
             {
@@ -21,7 +21,7 @@ namespace GraphQL.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public string ToCamelCaseOld() => ToCamelCaseOld1(Name);
+        public string ToCamelCaseOld() => ToCamelCaseOld(Name);
 
         [Benchmark]
         public string ToCamelCaseNew() => StringExtensions.ToCamelCase(Name);
