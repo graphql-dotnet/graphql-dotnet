@@ -11,12 +11,22 @@ using GraphQL.Utilities;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for working with graph types.
+    /// </summary>
     public static class GraphQLExtensions
     {
         private static readonly char[] _bangs = new char[] { '!', '[', ']' };
 
+        /// <summary>
+        /// Removes brackets and exclamation points from a GraphQL type name -- for example,
+        /// converts <c>[Int!]</c> to <c>Int</c>
+        /// </summary>
         public static string TrimGraphQLTypes(this string name) => name.Trim().Trim(_bangs);
 
+        /// <summary>
+        /// Indicates if the graph type is a union, interface or object graph type.
+        /// </summary>
         public static bool IsCompositeType(this IGraphType type)
         {
             return type is IObjectGraphType ||
@@ -24,6 +34,9 @@ namespace GraphQL
                    type is UnionGraphType;
         }
 
+        /// <summary>
+        /// Indicates if the graph type is a scalar graph type.
+        /// </summary>
         public static bool IsLeafType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
@@ -31,6 +44,9 @@ namespace GraphQL
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        /// <summary>
+        /// Indicates if the type is an input graph type (scalar or input object).
+        /// </summary>
         public static bool IsInputType(this Type type)
         {
             var namedType = type.GetNamedType();
@@ -39,6 +55,9 @@ namespace GraphQL
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        /// <summary>
+        /// Indicates if the graph type is an input graph type (scalar or input object).
+        /// </summary>
         public static bool IsInputType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
@@ -47,6 +66,9 @@ namespace GraphQL
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        /// <summary>
+        /// Indicates if the type is an output graph type (scalar, object, interface or union).
+        /// </summary>
         public static bool IsOutputType(this Type type)
         {
             var namedType = type.GetNamedType();
@@ -57,6 +79,9 @@ namespace GraphQL
         }
 
         // https://graphql.github.io/graphql-spec/June2018/#sec-Input-and-Output-Types
+        /// <summary>
+        /// Indicates if the graph type is an output graph type (scalar, object, interface or union).
+        /// </summary>
         public static bool IsOutputType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
@@ -66,12 +91,18 @@ namespace GraphQL
                    namedType is UnionGraphType;
         }
 
+        /// <summary>
+        /// Indicates if the graph type is an input object graph type.
+        /// </summary>
         public static bool IsInputObjectType(this IGraphType type)
         {
             var namedType = type.GetNamedType();
             return namedType is IInputObjectGraphType;
         }
 
+        /// <summary>
+        /// Unwraps any list/non-null graph type wrappers from a graph type and returns the base graph type.
+        /// </summary>
         public static IGraphType GetNamedType(this IGraphType type)
         {
             return type switch
@@ -82,6 +113,9 @@ namespace GraphQL
             };
         }
 
+        /// <summary>
+        /// Unwraps any list/non-null graph type wrappers from a graph type and returns the base graph type.
+        /// </summary>
         public static Type GetNamedType(this Type type)
         {
             if (!type.IsGenericType)
@@ -97,10 +131,9 @@ namespace GraphQL
         /// An Interface defines a list of fields; Object types that implement that interface are guaranteed to implement those fields.
         /// Whenever the type system claims it will return an interface, it will return a valid implementing type.
         /// </summary>
-        /// <param name="iface"></param>
-        /// <param name="type"></param>
+        /// <param name="iface">The interface graph type.</param>
+        /// <param name="type">The object graph type to verify it against.</param>
         /// <param name="throwError"> Set to <c>true</c> to generate an error if the type does not match the interface. </param>
-        /// <returns></returns>
         public static bool IsValidInterfaceFor(this IInterfaceGraphType iface, IObjectGraphType type, bool throwError = true)
         {
             foreach (var field in iface.Fields)
@@ -122,6 +155,13 @@ namespace GraphQL
             return true;
         }
 
+        /// <summary>
+        /// Returns a new instance of the specified graph type, using the specified resolver to
+        /// instantiate a new instance. Defaults to <see cref="Activator.CreateInstance(Type)"/>
+        /// if no <paramref name="resolve"/> parameter is specified. List and non-null graph
+        /// types are instantiated and their <see cref="IProvideResolvedType.ResolvedType"/>
+        /// property is set to a new instance of the base (wrapped) type.
+        /// </summary>
         public static IGraphType BuildNamedType(this Type type, Func<Type, IGraphType> resolve = null)
         {
             resolve ??= t => (IGraphType)Activator.CreateInstance(t);
@@ -145,9 +185,14 @@ namespace GraphQL
 
             return resolve(type) ??
                    throw new InvalidOperationException(
-                       $"Expected non-null value, {nameof(resolve)} delegate return null for \"${type}\"");
+                       $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
         }
 
+        /// <summary>
+        /// Validates that the specified AST value is valid for the specified scalar or input graph type.
+        /// Graph types that are lists or non-null types are handled appropriately by this method.
+        /// Returns a list of strings representing the errors encountered while validating the value.
+        /// </summary>
         public static IEnumerable<string> IsValidLiteralValue(this IGraphType type, IValue valueAst, ISchema schema)
         {
             // see also ExecutionHelper.AssertValidVariableValue
@@ -247,12 +292,24 @@ namespace GraphQL
             return Array.Empty<string>();
         }
 
+        /// <summary>
+        /// Examines a simple lambda expression and returns the name of the member it references.
+        /// For instance, returns <c>Widget</c> given an expression of <c>x => x.Widget</c>.
+        /// Unable to parse any expressions that are more complex than a simple member access.
+        /// Throws an <see cref="InvalidCastException"/> if the expression is not a simple member access.
+        /// </summary>
         public static string NameOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             var member = (MemberExpression)expression.Body;
             return member.Member.Name;
         }
 
+        /// <summary>
+        /// Examines a simple lambda expression and returns the description of the member it
+        /// references as listed by a <see cref="DescriptionAttribute"/>.
+        /// Unable to parse any expressions that are more complex than a simple member access.
+        /// Returns <see langword="null"/> if the expression is not a simple member access.
+        /// </summary>
         public static string DescriptionOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
@@ -260,6 +317,12 @@ namespace GraphQL
                 : null;
         }
 
+        /// <summary>
+        /// Examines a simple lambda expression and returns the deprecation reason of the member it
+        /// references as listed by a <see cref="ObsoleteAttribute"/>.
+        /// Unable to parse any expressions that are more complex than a simple member access.
+        /// Returns <see langword="null"/> if the expression is not a simple member access.
+        /// </summary>
         public static string DeprecationReasonOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
@@ -267,6 +330,12 @@ namespace GraphQL
                 : null;
         }
 
+        /// <summary>
+        /// Examines a simple lambda expression and returns the default value of the member it
+        /// references as listed by a <see cref="DefaultValueAttribute"/>.
+        /// Unable to parse any expressions that are more complex than a simple member access.
+        /// Returns <see langword="null"/> if the expression is not a simple member access.
+        /// </summary>
         public static object DefaultValueOf<TSourceType, TProperty>(this Expression<Func<TSourceType, TProperty>> expression)
         {
             return expression.Body is MemberExpression expr
@@ -380,6 +449,10 @@ namespace GraphQL
 
         private static readonly NullValue _null = new NullValue();
 
+        /// <summary>
+        /// Attempts to serialize a value into an AST representation for a specified graph type.
+        /// May throw exceptions during the serialization process.
+        /// </summary>
         public static IValue AstFromValue(this object value, ISchema schema, IGraphType type)
         {
             if (type is NonNullGraphType nonnull)
