@@ -194,7 +194,7 @@ namespace GraphQL
             type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type) && !type.IsArray;
 
         /// <summary>
-        /// Returns the base type for an enumeration type.
+        /// Returns the type of element for a one-dimensional container type.
         /// Throws <see cref="ArgumentOutOfRangeException"/> if the type cannot be identified
         /// as a list type.
         /// </summary>
