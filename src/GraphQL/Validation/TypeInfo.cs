@@ -35,21 +35,14 @@ namespace GraphQL.Validation
         {
             var e = _ancestorStack.GetEnumerator();
 
-            try
+            int i = index;
+            do
             {
-                int i = index;
-                do
-                {
-                    _ = e.MoveNext();
-                }
-                while (i-- > 0);
+                _ = e.MoveNext();
+            }
+            while (i-- > 0);
 
-                return e.Current; // throws if index is out of range
-            }
-            finally
-            {
-                e.Dispose();
-            }
+            return e.Current; // throws if index is out of range
         }
 
         /// <summary>
