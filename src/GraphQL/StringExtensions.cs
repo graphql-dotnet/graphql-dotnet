@@ -12,7 +12,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="format">The format string in String.Format style.</param>
         /// <param name="args">The arguments.</param>
-        public static string ToFormat(this string format, params object[] args)
+        internal static string ToFormat(this string format, params object[] args)
             => string.Format(format, args);
 
         /// <summary>

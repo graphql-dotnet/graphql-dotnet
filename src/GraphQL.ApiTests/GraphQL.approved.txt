@@ -321,7 +321,6 @@ namespace GraphQL
     {
         public static string ToCamelCase(this string s) { }
         public static string ToConstantCase(this string s) { }
-        public static string ToFormat(this string format, params object[] args) { }
         public static string ToPascalCase(this string s) { }
         public static string TrimGraphQLTypes(this string name) { }
     }
