@@ -22,22 +22,22 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="UniqueInputFieldNamesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
-            var knownNameStack = new Stack<Dictionary<string, IValue>>();
-            var knownNames = new Dictionary<string, IValue>();
-
-            return new EnterLeaveListener(_ =>
-            {
-                _.Match<ObjectValue>(
-                    enter: objVal =>
+            return new NodeVisitors(
+                new MatchingNodeVisitor<ObjectValue>(
+                    enter: (objVal, context) =>
                     {
-                        knownNameStack.Push(knownNames);
-                        knownNames = new Dictionary<string, IValue>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
+
+                        knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames);
+                        context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                     },
-                    leave: objVal => knownNames = knownNameStack.Pop());
+                    leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack.Pop()),
 
-                _.Match<ObjectField>(
-                    leave: objField =>
+                new MatchingNodeVisitor<ObjectField>(
+                    leave: (objField, context) =>
                     {
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
+
                         if (knownNames.ContainsKey(objField.Name))
                         {
                             context.ReportError(new UniqueInputFieldNamesError(context, knownNames[objField.Name], objField));
@@ -46,8 +46,8 @@ namespace GraphQL.Validation.Rules
                         {
                             knownNames[objField.Name] = objField.Value;
                         }
-                    });
-            }).ToTask();
+                    })
+            ).ToTask();
         }
     }
 }

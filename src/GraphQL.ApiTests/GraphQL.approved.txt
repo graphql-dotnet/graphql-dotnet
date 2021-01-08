@@ -1189,6 +1189,7 @@ namespace GraphQL.Language.AST
     public class Fragments : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition>, System.Collections.IEnumerable
     {
         public Fragments() { }
+        public int Count { get; }
         public void Add(GraphQL.Language.AST.FragmentDefinition fragment) { }
         public GraphQL.Language.AST.FragmentDefinition FindDefinition(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.FragmentDefinition> GetEnumerator() { }
@@ -2516,7 +2517,7 @@ namespace GraphQL.Validation
     {
         public BasicVisitor(params GraphQL.Validation.INodeVisitor[] visitors) { }
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
-        public void Visit(GraphQL.Language.AST.INode node) { }
+        public void Visit(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class DocumentValidator : GraphQL.Validation.IDocumentValidator
     {
@@ -2524,21 +2525,14 @@ namespace GraphQL.Validation
         public DocumentValidator() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(string originalQuery, GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null) { }
     }
-    public class EnterLeaveListener : GraphQL.Validation.INodeVisitor
-    {
-        public EnterLeaveListener() { }
-        public EnterLeaveListener(System.Action<GraphQL.Validation.EnterLeaveListener> configure) { }
-        public void Match<TNode>(System.Action<TNode> enter = null, System.Action<TNode> leave = null)
-            where TNode : GraphQL.Language.AST.INode { }
-    }
     public interface IDocumentValidator
     {
         System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(string originalQuery, GraphQL.Types.ISchema schema, GraphQL.Language.AST.Document document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> rules = null, System.Collections.Generic.IDictionary<string, object> userContext = null, GraphQL.Inputs inputs = null);
     }
     public interface INodeVisitor
     {
-        void Enter(GraphQL.Language.AST.INode node);
-        void Leave(GraphQL.Language.AST.INode node);
+        void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
+        void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context);
     }
     public interface IValidationResult
     {
@@ -2552,7 +2546,11 @@ namespace GraphQL.Validation
     public class MatchingNodeVisitor<TNode> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQL.Language.AST.INode
     {
-        public MatchingNodeVisitor(System.Action<TNode> enter = null, System.Action<TNode> leave = null) { }
+        public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
+    }
+    public sealed class NodeVisitors : GraphQL.Validation.INodeVisitor
+    {
+        public NodeVisitors(params GraphQL.Validation.INodeVisitor[] nodeVisitors) { }
     }
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
@@ -2563,7 +2561,7 @@ namespace GraphQL.Validation
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
-        public void Enter(GraphQL.Language.AST.INode node) { }
+        public void Enter(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQL.Language.AST.INode GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument GetArgument() { }
         public GraphQL.Types.DirectiveGraphType GetDirective() { }
@@ -2571,7 +2569,7 @@ namespace GraphQL.Validation
         public GraphQL.Types.IGraphType GetInputType() { }
         public GraphQL.Types.IGraphType GetLastType() { }
         public GraphQL.Types.IGraphType GetParentType() { }
-        public void Leave(GraphQL.Language.AST.INode node) { }
+        public void Leave(GraphQL.Language.AST.INode node, GraphQL.Validation.ValidationContext context) { }
     }
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {

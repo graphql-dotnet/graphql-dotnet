@@ -54,4 +54,5 @@
 * `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
 * `ISubscriptionExecuter` has been removed.
+* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`

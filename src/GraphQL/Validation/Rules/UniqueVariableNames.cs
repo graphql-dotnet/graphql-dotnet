@@ -19,28 +19,25 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueVariableNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            Dictionary<string, VariableDefinition> knownVariables = null;
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
 
-            return new EnterLeaveListener(_ =>
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
+            new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
             {
-                _.Match<Operation>(__ => knownVariables = new Dictionary<string, VariableDefinition>());
+                var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<string, VariableDefinition>();
 
-                _.Match<VariableDefinition>(variableDefinition =>
+                var variableName = variableDefinition.Name;
+
+                if (knownVariables.ContainsKey(variableName))
                 {
-                    var variableName = variableDefinition.Name;
-
-                    if (knownVariables.ContainsKey(variableName))
-                    {
-                        context.ReportError(new UniqueVariableNamesError(context, knownVariables[variableName], variableDefinition));
-                    }
-                    else
-                    {
-                        knownVariables[variableName] = variableDefinition;
-                    }
-                });
-            }).ToTask();
-        }
+                    context.ReportError(new UniqueVariableNamesError(context, knownVariables[variableName], variableDefinition));
+                }
+                else
+                {
+                    knownVariables[variableName] = variableDefinition;
+                }
+            })
+        ).ToTask();
     }
 }

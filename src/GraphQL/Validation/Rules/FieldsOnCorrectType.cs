@@ -24,34 +24,33 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="FieldsOnCorrectTypeError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Field>((node, context) =>
         {
-            return new MatchingNodeVisitor<Field>(node =>
+            var type = context.TypeInfo.GetParentType().GetNamedType();
+
+            if (type != null)
+            {
+                var fieldDef = context.TypeInfo.GetFieldDef();
+                if (fieldDef == null)
                 {
-                    var type = context.TypeInfo.GetParentType().GetNamedType();
+                    // This field doesn't exist, lets look for suggestions.
+                    var fieldName = node.Name;
 
-                    if (type != null)
-                    {
-                        var fieldDef = context.TypeInfo.GetFieldDef();
-                        if (fieldDef == null)
-                        {
-                            // This field doesn't exist, lets look for suggestions.
-                            var fieldName = node.Name;
+                    // First determine if there are any suggested types to condition on.
+                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
 
-                            // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
+                    // If there are no suggested types, then perhaps this was a typo?
+                    var suggestedFieldNames = suggestedTypeNames.Count > 0
+                        ? Array.Empty<string>()
+                        : GetSuggestedFieldNames(type, fieldName);
 
-                            // If there are no suggested types, then perhaps this was a typo?
-                            var suggestedFieldNames = suggestedTypeNames.Count > 0
-                                ? Array.Empty<string>()
-                                : GetSuggestedFieldNames(type, fieldName);
-
-                            // Report an error, including helpful suggestions.
-                            context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
-                        }
-                    }
-                }).ToTask();
-        }
+                    // Report an error, including helpful suggestions.
+                    context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));
+                }
+            }
+        }).ToTask();
 
         /// <summary>
         /// Go through all of the implementations of type, as well as the interfaces
@@ -64,7 +63,7 @@ namespace GraphQL.Validation.Rules
             if (type is IAbstractGraphType absType)
             {
                 var suggestedObjectTypes = new List<string>();
-                var interfaceUsageCount = new LightweightCache<string, int>(key => 0);
+                var interfaceUsageCount = new Dictionary<string, int>();
 
                 absType.PossibleTypes.Apply(possibleType =>
                 {
@@ -81,7 +80,7 @@ namespace GraphQL.Validation.Rules
                         if (possibleInterface.HasField(fieldName))
                         {
                             // This interface type defines this field.
-                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount[possibleInterface.Name] + 1;
+                            interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
                         }
                     });
                 });
