@@ -68,46 +68,35 @@ namespace GraphQL
         /// <summary>
         /// Returns a constant case version of this string. For example, converts 'StringError' into 'STRING_ERROR'.
         /// </summary>
-        public static string ToConstantCase(this string s)
+        public static string ToConstantCase(this string value)
         {
             //aka: return Regex.Replace(s, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4").ToUpperInvariant();
             int i;
-            int count = s.Length;
-            for (i = 0; i < count - 2; ++i)
+            int strLength = value.Length;
+            // iterate through each character in the string, stopping a character short of the end
+            for (i = 0; i < strLength - 1; ++i)
             {
-                var c = s[i];
-                if (char.IsLower(c) || char.IsDigit(c))
+                var curChar = value[i];
+                var nextChar = value[i + 1];
+                // look for the pattern [a-z0-9][A-Z]
+                if ((char.IsLower(curChar) || char.IsDigit(curChar)) && char.IsUpper(nextChar))
                 {
-                    if (char.IsUpper(s[i + 1]))
-                    {
-                        s = s.Substring(0, ++i) + '_' + s.Substring(i);
-                        ++count;
-                        continue;
-                    }
+                    // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
+                    value = value.Substring(0, ++i) + '_' + value.Substring(i);
+                    ++strLength;
+                    // skip the following match check since we already found a match here
+                    continue;
                 }
-                if (char.IsUpper(c) && char.IsUpper(s[i + 1]))
+                // if there's enough characters left, look for the pattern [A-Z][A-Z][a-z]
+                if (i < strLength - 2 && char.IsUpper(curChar) && char.IsUpper(nextChar) && char.IsLower(value[i + 2]))
                 {
-                    if (char.IsLower(s[i + 2]))
-                    {
-                        s = s.Substring(0, ++i) + '_' + s.Substring(i);
-                        ++count;
-                        continue;
-                    }
+                    // add an underscore between the two characters, increment i to skip the underscore, and increase strLength because the string is longer now
+                    value = value.Substring(0, ++i) + '_' + value.Substring(i);
+                    ++strLength;
                 }
             }
-            if (i < count - 1)
-            {
-                var c = s[i];
-                if (char.IsLower(c) || char.IsDigit(c))
-                {
-                    if (char.IsUpper(s[i + 1]))
-                    {
-                        s = s.Substring(0, ++i) + '_' + s.Substring(i);
-                    }
-                }
-            }
-
-            return s.ToUpperInvariant();
+            // convert the resulting string to uppercase
+            return value.ToUpperInvariant();
         }
 
         private static readonly char[] _bangs = new char[] { '!', '[', ']' };
