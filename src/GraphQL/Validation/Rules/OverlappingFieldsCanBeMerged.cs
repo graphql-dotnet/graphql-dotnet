@@ -32,22 +32,19 @@ namespace GraphQL.Validation.Rules
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 
-            return new EnterLeaveListener(config =>
+            return new MatchingNodeVisitor<SelectionSet>((selectionSet, context) =>
             {
-                config.Match<SelectionSet>(selectionSet =>
-                {
-                    List<Conflict> conflicts = FindConflictsWithinSelectionSet(
-                         context,
-                         cachedFieldsAndFragmentNames,
-                         comparedFragmentPairs,
-                         context.TypeInfo.GetParentType(),
-                         selectionSet);
+                List<Conflict> conflicts = FindConflictsWithinSelectionSet(
+                        context,
+                        cachedFieldsAndFragmentNames,
+                        comparedFragmentPairs,
+                        context.TypeInfo.GetParentType(),
+                        selectionSet);
 
-                    foreach (var conflict in conflicts)
-                    {
-                        context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
-                    }
-                });
+                foreach (var conflict in conflicts)
+                {
+                    context.ReportError(new OverlappingFieldsCanBeMergedError(context, conflict));
+                }
             }).ToTask();
         }
 

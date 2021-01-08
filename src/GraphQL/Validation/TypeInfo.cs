@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -7,6 +6,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Provides information pertaining to the current state of the AST tree while being walked.
+    /// Thus, validation rules checking is designed for sequential execution.
     /// </summary>
     public class TypeInfo : INodeVisitor
     {
@@ -34,7 +34,14 @@ namespace GraphQL.Validation
         /// <returns></returns>
         public INode[] GetAncestors()
         {
-            return _ancestorStack.Skip(1).Reverse().ToArray();
+            var ancestorArray = _ancestorStack.ToArray();
+            var c = ancestorArray.Length;
+            var ret = new INode[--c];
+            for (int i = c; i > 0; --i) {
+                ret[c - i] = ancestorArray[i];
+            }
+            return ret;
+            // aka: return _ancestorStack.Skip(1).Reverse().ToArray();
         }
 
         /// <summary>
@@ -88,7 +95,7 @@ namespace GraphQL.Validation
         }
 
         /// <inheritdoc/>
-        public void Enter(INode node)
+        public void Enter(INode node, ValidationContext context)
         {
             _ancestorStack.Push(node);
 
@@ -193,7 +200,7 @@ namespace GraphQL.Validation
         }
 
         /// <inheritdoc/>
-        public void Leave(INode node)
+        public void Leave(INode node, ValidationContext context)
         {
             _ancestorStack.Pop();
 
@@ -274,5 +281,39 @@ namespace GraphQL.Validation
 
             return null;
         }
+
+        /// <summary>
+        /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
+        /// are not redundantly reported.
+        /// </summary>
+        internal HashSet<string> NoFragmentCycles_VisitedFrags;
+        /// <summary>
+        /// Array of AST nodes used to produce meaningful errors
+        /// </summary>
+        internal Stack<FragmentSpread> NoFragmentCycles_SpreadPath;
+        /// <summary>
+        /// Position in the spread path
+        /// </summary>
+        internal Dictionary<string, int> NoFragmentCycles_SpreadPathIndexByName;
+
+        internal HashSet<string> NoUndefinedVariables_VariableNameDefined;
+
+        internal List<Operation> NoUnusedFragments_OperationDefs;
+        internal List<FragmentDefinition> NoUnusedFragments_FragmentDefs;
+
+        internal List<VariableDefinition> NoUnusedVariables_VariableDefs;
+
+        internal Dictionary<string, Argument> UniqueArgumentNames_KnownArgs;
+
+        internal Dictionary<string, FragmentDefinition> UniqueFragmentNames_KnownFragments;
+
+        internal Stack<Dictionary<string, IValue>> UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<string, IValue> UniqueInputFieldNames_KnownNames;
+
+        internal HashSet<string> UniqueOperationNames_Frequency;
+
+        internal Dictionary<string, VariableDefinition> UniqueVariableNames_KnownVariables;
+
+        internal Dictionary<string, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
     }
 }

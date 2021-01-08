@@ -71,6 +71,13 @@ namespace GraphQL.Validation
                 schema.Initialize();
             }
 
+            if (rules == null)
+            {
+                rules = CoreRules;
+            }
+            else if (!rules.Any())
+                return SuccessfullyValidatedResult.Instance;
+
             var context = new ValidationContext
             {
                 OriginalQuery = originalQuery ?? document.OriginalQuery,
@@ -81,19 +88,14 @@ namespace GraphQL.Validation
                 Inputs = inputs
             };
 
-            if (rules == null)
-            {
-                rules = CoreRules;
-            }
-
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context));
+            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
             var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
 
             visitors.Insert(0, context.TypeInfo);
 
             var basic = new BasicVisitor(visitors);
 
-            basic.Visit(document);
+            basic.Visit(document, context);
 
             if (context.HasErrors)
                 return new ValidationResult(context.Errors);

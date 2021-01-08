@@ -20,51 +20,49 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ProvidedNonNullArgumentsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Field>(leave: (node, context) =>
             {
-                _.Match<Field>(leave: node =>
+                var fieldDef = context.TypeInfo.GetFieldDef();
+
+                if (fieldDef == null || fieldDef.Arguments == null)
                 {
-                    var fieldDef = context.TypeInfo.GetFieldDef();
+                    return;
+                }
 
-                    if (fieldDef == null || fieldDef.Arguments == null)
-                    {
-                        return;
-                    }
-
-                    foreach (var arg in fieldDef.Arguments)
-                    {
-                        if (arg.DefaultValue == null &&
-                            arg.ResolvedType is NonNullGraphType &&
-                            node.Arguments?.ValueFor(arg.Name) == null)
-                        {
-                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
-                        }
-                    }
-                });
-
-                _.Match<Directive>(leave: node =>
+                foreach (var arg in fieldDef.Arguments)
                 {
-                    var directive = context.TypeInfo.GetDirective();
-
-                    if (directive?.Arguments?.ArgumentsList == null)
+                    if (arg.DefaultValue == null &&
+                        arg.ResolvedType is NonNullGraphType &&
+                        node.Arguments?.ValueFor(arg.Name) == null)
                     {
-                        return;
+                        context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                     }
+                }
+            }),
 
-                    foreach (var arg in directive.Arguments.ArgumentsList)
+            new MatchingNodeVisitor<Directive>(leave: (node, context) =>
+            {
+                var directive = context.TypeInfo.GetDirective();
+
+                if (directive?.Arguments?.ArgumentsList == null)
+                {
+                    return;
+                }
+
+                foreach (var arg in directive.Arguments.ArgumentsList)
+                {
+                    var argAst = node.Arguments?.ValueFor(arg.Name);
+                    var type = arg.ResolvedType;
+
+                    if (argAst == null && type is NonNullGraphType)
                     {
-                        var argAst = node.Arguments?.ValueFor(arg.Name);
-                        var type = arg.ResolvedType;
-
-                        if (argAst == null && type is NonNullGraphType)
-                        {
-                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
-                        }
+                        context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                     }
-                });
-            }).ToTask();
-        }
+                }
+            })
+        ).ToTask();
     }
 }
