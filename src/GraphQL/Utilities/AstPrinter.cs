@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using GraphQL.Language.AST;
 
 namespace GraphQL.Utilities
@@ -447,7 +446,7 @@ namespace GraphQL.Utilities
 
         private string Indent(string str)
         {
-            return Regex.Replace(str, "\n", "\n  ");
+            return str.Replace("\n", "\n  ");
         }
 
         public object Visit(INode node)

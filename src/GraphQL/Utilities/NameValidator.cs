@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 
 namespace GraphQL.Utilities
 {
@@ -8,9 +7,6 @@ namespace GraphQL.Utilities
     /// </summary>
     public static class NameValidator
     {
-        private const string RESERVED_PREFIX = "__";
-        private const string NAME_RX = @"^[_A-Za-z][_0-9A-Za-z]*$";
-
         /// <summary>
         /// Gets or sets current validation delegate. By default this delegate validates all names according
         /// to the GraphQL <see href="http://spec.graphql.org/June2018/#sec-Names">specification</see>.
@@ -52,15 +48,27 @@ namespace GraphQL.Utilities
         {
             ValidateNameNotNull(name, type);
 
-            if (name.Length > 1 && name.StartsWith(RESERVED_PREFIX, StringComparison.InvariantCulture))
+            if (name.Length > 1 && name[0] == '_' && name[1] == '_')
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name: {name} must not begin with \"__\", which is reserved by GraphQL introspection.");
+                    $"A {type} name: '{name}' must not begin with \"__\", which is reserved by GraphQL introspection.");
             }
-            if (!Regex.IsMatch(name, NAME_RX))
+
+            var c = name[0];
+            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && c != '_')
+                ThrowMatchError();
+
+            for (int i = 1; i < name.Length; ++i)
+            {
+                c = name[i];
+                if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '_')
+                    ThrowMatchError();
+            }
+
+            void ThrowMatchError()
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
-                    $"A {type} name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {name} does not.");
+                    $"A {type} name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but '{name}' does not.");
             }
         }
 
