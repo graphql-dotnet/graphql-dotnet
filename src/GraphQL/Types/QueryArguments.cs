@@ -65,9 +65,12 @@ namespace GraphQL.Types
         /// </summary>
         public void Add(QueryArgument argument)
         {
+            if (argument == null)
+                throw new ArgumentNullException(nameof(argument));
+
             NameValidator.ValidateName(argument.Name, "argument");
 
-            (ArgumentsList ??= new List<QueryArgument>()).Add(argument ?? throw new ArgumentNullException(nameof(argument)));
+            (ArgumentsList ??= new List<QueryArgument>()).Add(argument);
         }
 
         /// <summary>
