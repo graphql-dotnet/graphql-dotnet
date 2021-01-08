@@ -24,7 +24,6 @@
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
-* Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
 
 ```c#
     /// <summary>
@@ -57,3 +56,4 @@
 * `ISubscriptionExecuter` has been removed.
 * `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
+* Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
