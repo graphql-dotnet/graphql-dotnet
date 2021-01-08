@@ -326,7 +326,7 @@ namespace GraphQL.Tests.Types
         {
             var exception = test_field_name(fieldName);
 
-            exception.Message.ShouldStartWith($"A field name: {fieldName} must not begin with \"__\", which is reserved by GraphQL introspection.");
+            exception.Message.ShouldStartWith($"A field name: '{fieldName}' must not begin with \"__\", which is reserved by GraphQL introspection.");
         }
 
         [Theory]
@@ -337,7 +337,7 @@ namespace GraphQL.Tests.Types
         {
             var exception = test_field_name(fieldName);
 
-            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {fieldName} does not.");
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but '{fieldName}' does not.");
         }
 
         [Theory]
@@ -382,7 +382,7 @@ namespace GraphQL.Tests.Types
                 schema.Initialize();
             });
 
-            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but hello$ does not.");
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but 'hello$' does not.");
         }
 
         private class TestNameConverter : INameConverter

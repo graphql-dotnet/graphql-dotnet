@@ -145,7 +145,6 @@ namespace GraphQL
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string[] IsValidLiteralValue(this GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue valueAst, GraphQL.Types.ISchema schema) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        public static string TrimGraphQLTypes(this string name) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
@@ -321,6 +320,7 @@ namespace GraphQL
     public static class StringExtensions
     {
         public static string ToCamelCase(this string s) { }
+        public static string ToConstantCase(this string s) { }
         public static string ToFormat(this string format, params object[] args) { }
         public static string ToPascalCase(this string s) { }
     }
@@ -2425,17 +2425,9 @@ namespace GraphQL.Utilities
     }
     public static class StringUtils
     {
-        public static string Capitalize(string str) { }
-        public static string ChangeCase(string str, string sep, System.Func<string, string> composer) { }
-        public static string ChangeCase(string str, string sep, System.Func<string, int, string> composer) { }
         public static int DamerauLevenshteinDistance(string source, string target, int threshold) { }
         public static string QuotedOrList(System.Collections.Generic.IEnumerable<string> items, int maxLength = 5) { }
         public static string[] SuggestionList(string input, System.Collections.Generic.IEnumerable<string> options) { }
-        public static void Swap<T>(ref T arg1, ref T arg2) { }
-        public static string ToCamelCase(string str) { }
-        public static string ToConstantCase(string str) { }
-        public static string ToPascalCase(string str) { }
-        public static System.Collections.Generic.IEnumerable<string> ToWords(string str) { }
     }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {
