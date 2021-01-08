@@ -320,7 +320,7 @@ namespace GraphQL
     public static class StringExtensions
     {
         public static string ToCamelCase(this string s) { }
-        public static string ToConstantCase(this string s) { }
+        public static string ToConstantCase(this string value) { }
         public static string ToPascalCase(this string s) { }
         public static string TrimGraphQLTypes(this string name) { }
     }
