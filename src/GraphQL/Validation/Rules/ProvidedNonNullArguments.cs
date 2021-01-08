@@ -27,18 +27,16 @@ namespace GraphQL.Validation.Rules
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
 
-                if (fieldDef == null || fieldDef.Arguments == null)
+                if (fieldDef?.Arguments?.Count > 0)
                 {
-                    return;
-                }
-
-                foreach (var arg in fieldDef.Arguments)
-                {
-                    if (arg.DefaultValue == null &&
-                        arg.ResolvedType is NonNullGraphType &&
-                        node.Arguments?.ValueFor(arg.Name) == null)
+                    foreach (var arg in fieldDef.Arguments.ArgumentsList)
                     {
-                        context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        if (arg.DefaultValue == null &&
+                            arg.ResolvedType is NonNullGraphType &&
+                            node.Arguments?.ValueFor(arg.Name) == null)
+                        {
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        }
                     }
                 }
             }),

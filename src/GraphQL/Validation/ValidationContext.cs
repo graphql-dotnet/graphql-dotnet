@@ -14,11 +14,11 @@ namespace GraphQL.Validation
     {
         private List<ValidationError> _errors;
 
-        private readonly Dictionary<Operation, IEnumerable<FragmentDefinition>> _fragments
-            = new Dictionary<Operation, IEnumerable<FragmentDefinition>>();
+        private readonly Dictionary<Operation, List<FragmentDefinition>> _fragments
+            = new Dictionary<Operation, List<FragmentDefinition>>();
 
-        private readonly Dictionary<Operation, IEnumerable<VariableUsage>> _variables =
-            new Dictionary<Operation, IEnumerable<VariableUsage>>();
+        private readonly Dictionary<Operation, List<VariableUsage>> _variables =
+            new Dictionary<Operation, List<VariableUsage>>();
 
         /// <summary>
         /// Returns the original GraphQL query string.
@@ -72,12 +72,10 @@ namespace GraphQL.Validation
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
-            var listener = new MatchingNodeVisitor<VariableReference>(
-                (varRef, __) => usages.Add(new VariableUsage(varRef, info.GetInputType()))
-            );
+            //TODO: Allocation of Action<VariableReference, ValidationContext>
+            var listener = new MatchingNodeVisitor<VariableReference>((varRef, __) => usages.Add(new VariableUsage(varRef, info.GetInputType())));
 
-            var visitor = new BasicVisitor(info, listener);
-            visitor.Visit(node, this);
+            new BasicVisitor(info, listener).Visit(node, this);
 
             return usages;
         }
@@ -86,7 +84,7 @@ namespace GraphQL.Validation
         /// For a specified operation with a document, returns a list of variable references
         /// along with what input type each was referenced for.
         /// </summary>
-        public IEnumerable<VariableUsage> GetRecursiveVariables(Operation operation)
+        public List<VariableUsage> GetRecursiveVariables(Operation operation)
         {
             if (_variables.TryGetValue(operation, out var results))
             {
@@ -148,7 +146,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// For a specified operation within a document, returns a list of all fragment definitions in use.
         /// </summary>
-        public IEnumerable<FragmentDefinition> GetRecursivelyReferencedFragments(Operation operation)
+        public List<FragmentDefinition> GetRecursivelyReferencedFragments(Operation operation)
         {
             if (_fragments.TryGetValue(operation, out var results))
             {
@@ -165,7 +163,7 @@ namespace GraphQL.Validation
 
                 foreach (var spread in GetFragmentSpreads(node))
                 {
-                    var fragName = spread.Name;
+                    string fragName = spread.Name;
                     if (!collectedNames.ContainsKey(fragName))
                     {
                         collectedNames[fragName] = true;

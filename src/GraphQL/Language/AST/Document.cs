@@ -28,6 +28,13 @@ namespace GraphQL.Language.AST
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _definitions;
 
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            foreach (var definition in _definitions)
+                action(definition, state);
+        }
+
         /// <summary>
         /// Returns a list of operation nodes for this document.
         /// </summary>

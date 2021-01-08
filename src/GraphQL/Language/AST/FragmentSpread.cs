@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -32,6 +33,9 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => Directives;
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Directives, state);
 
         /// <inheritdoc/>
         public override string ToString() => $"FragmentSpread{{name='{Name}', directives={Directives}}}";

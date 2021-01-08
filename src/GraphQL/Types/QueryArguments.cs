@@ -70,10 +70,7 @@ namespace GraphQL.Types
 
             NameValidator.ValidateName(argument.Name, "argument");
 
-            if (ArgumentsList == null)
-                ArgumentsList = new List<QueryArgument>();
-
-            ArgumentsList.Add(argument);
+            (ArgumentsList ??= new List<QueryArgument>()).Add(argument);
         }
 
         /// <summary>
@@ -81,13 +78,15 @@ namespace GraphQL.Types
         /// </summary>
         public QueryArgument Find(string name)
         {
-            if (ArgumentsList == null)
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var arg in ArgumentsList)
-                if (arg.Name == name)
-                    return arg;
+            if (ArgumentsList != null)
+            {
+                foreach (var arg in ArgumentsList)
+                {
+                    if (arg.Name == name)
+                        return arg;
+                }
+            }
 
             return null;
         }

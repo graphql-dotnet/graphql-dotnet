@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -32,10 +33,7 @@ namespace GraphQL.Language.AST
 
                 if (Directives != null)
                 {
-                    foreach (var directive in Directives)
-                    {
-                        yield return directive;
-                    }
+                    yield return Directives;
                 }
 
                 if (SelectionSet != null)
@@ -43,6 +41,14 @@ namespace GraphQL.Language.AST
                     yield return SelectionSet;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            action(Type, state);
+            action(Directives, state);
+            action(SelectionSet, state);
         }
 
         /// <inheritdoc/>

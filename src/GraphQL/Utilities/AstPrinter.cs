@@ -490,8 +490,10 @@ namespace GraphQL.Utilities
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var c in _configs)
+            {
                 if (c.Matches(node))
                     return c;
+            }
 
             return null;
         }

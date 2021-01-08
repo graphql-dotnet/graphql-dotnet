@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -25,6 +26,9 @@ namespace GraphQL.Language.AST
         {
             get { yield return Type; }
         }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Type, state);
 
         /// <inheritdoc/>
         public override string ToString() => $"NonNullType{{type={Type}}}";

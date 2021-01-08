@@ -16,8 +16,6 @@
 * `IGraphType.CollectTypes` method has been removed.
 * `ExecutionHelper.SubFieldsFor` method has been removed.
 * `NodeExtensions`, `AstNodeExtensions` classes have been removed.
-* `ErrorLocation` struct became `readonly`.
-* `SourceLocation` class became `readonly struct`.
 * `CoreToVanillaConverter` class became `static` and most of its members have been removed.
 * `GraphQL.Language.AST.Field.MergeSelectionSet` method has been removed.
 * `CoreToVanillaConverter.Convert` method now requires only one `GraphQLDocument` argument.
@@ -47,7 +45,9 @@
 ```
 
 * `INode.IsEqualTo` and related methods have been removed.
-* `NameNode` has been changed to a readonly struct.
+* `void Visit<TState>(System.Action<INode, TState> action, TState state)` method has been added.
+* `SourceLocation`, `NameNode` and `BasicVisitor` have been changed to a `readonly struct`.
+* `ErrorLocation` struct became `readonly`.
 * `DebugNodeVisitor` class has been removed.
 * Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
 * `EnumerableExtensions.Apply` for dictionaries has been removed.

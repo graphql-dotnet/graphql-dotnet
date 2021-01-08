@@ -1049,6 +1049,7 @@ namespace GraphQL.Language.AST
         public string Comment { get; }
         public GraphQL.Language.AST.CommentNode CommentNode { get; set; }
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; set; }
+        public virtual void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Argument : GraphQL.Language.AST.AbstractNode
     {
@@ -1059,6 +1060,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.IValue Value { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Arguments : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Argument>, System.Collections.IEnumerable
     {
@@ -1068,6 +1070,7 @@ namespace GraphQL.Language.AST
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Argument> GetEnumerator() { }
         public override string ToString() { }
         public GraphQL.Language.AST.IValue ValueFor(string name) { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class BigIntValue : GraphQL.Language.AST.ValueNode<System.Numerics.BigInteger>
     {
@@ -1106,6 +1109,7 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Directives : GraphQL.Language.AST.AbstractNode, System.Collections.Generic.ICollection<GraphQL.Language.AST.Directive>, System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Directive>, System.Collections.IEnumerable
     {
@@ -1122,6 +1126,7 @@ namespace GraphQL.Language.AST
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Directive> GetEnumerator() { }
         public bool Remove(GraphQL.Language.AST.Directive item) { }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Document : GraphQL.Language.AST.AbstractNode
     {
@@ -1132,6 +1137,7 @@ namespace GraphQL.Language.AST
         public string OriginalQuery { get; set; }
         public void AddDefinition(GraphQL.Language.AST.IDefinition definition) { }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class EnumValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
@@ -1154,6 +1160,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Fields : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Field>, System.Collections.IEnumerable
     {
@@ -1176,6 +1183,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.NamedType Type { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class FragmentSpread : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IFragment, GraphQL.Language.AST.INode, GraphQL.Language.AST.ISelection
     {
@@ -1185,6 +1193,7 @@ namespace GraphQL.Language.AST
         public string Name { get; }
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Fragments : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition>, System.Collections.IEnumerable
     {
@@ -1208,6 +1217,7 @@ namespace GraphQL.Language.AST
     {
         System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         GraphQL.Language.AST.SourceLocation SourceLocation { get; }
+        void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state);
     }
     public interface ISelection : GraphQL.Language.AST.INode { }
     public interface IType : GraphQL.Language.AST.INode { }
@@ -1227,6 +1237,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.NamedType Type { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class IntValue : GraphQL.Language.AST.ValueNode<int>
     {
@@ -1238,14 +1249,17 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IType Type { get; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class ListValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
         public ListValue(System.Collections.Generic.IEnumerable<GraphQL.Language.AST.IValue> values) { }
+        public ListValue(System.Collections.Generic.List<GraphQL.Language.AST.IValue> values) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public object Value { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.IValue> Values { get; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class LongValue : GraphQL.Language.AST.ValueNode<long>
     {
@@ -1257,6 +1271,7 @@ namespace GraphQL.Language.AST
         public NameNode(string name, GraphQL.Language.AST.SourceLocation location) { }
         public string Name { get; }
         public GraphQL.Language.AST.SourceLocation SourceLocation { get; }
+        public void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class NamedType : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IType
     {
@@ -1271,6 +1286,7 @@ namespace GraphQL.Language.AST
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public GraphQL.Language.AST.IType Type { get; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class NullValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
@@ -1286,16 +1302,19 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; }
         public GraphQL.Language.AST.IValue Value { get; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class ObjectValue : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.INode, GraphQL.Language.AST.IValue
     {
         public ObjectValue(System.Collections.Generic.IEnumerable<GraphQL.Language.AST.ObjectField> fields) { }
+        public ObjectValue(System.Collections.Generic.List<GraphQL.Language.AST.ObjectField> fields) { }
         public override System.Collections.Generic.IEnumerable<GraphQL.Language.AST.INode> Children { get; }
         public System.Collections.Generic.IEnumerable<string> FieldNames { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.ObjectField> ObjectFields { get; }
         public object Value { get; }
         public GraphQL.Language.AST.ObjectField Field(string name) { }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class Operation : GraphQL.Language.AST.AbstractNode, GraphQL.Language.AST.IDefinition, GraphQL.Language.AST.IHaveSelectionSet, GraphQL.Language.AST.INode
     {
@@ -1308,6 +1327,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SelectionSet SelectionSet { get; set; }
         public GraphQL.Language.AST.VariableDefinitions Variables { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public enum OperationType
     {
@@ -1336,6 +1356,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.SelectionSet Merge(GraphQL.Language.AST.SelectionSet otherSelection) { }
         public void Prepend(GraphQL.Language.AST.ISelection selection) { }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class ShortValue : GraphQL.Language.AST.ValueNode<short>
     {
@@ -1397,6 +1418,7 @@ namespace GraphQL.Language.AST
         public GraphQL.Language.AST.NameNode NameNode { get; set; }
         public GraphQL.Language.AST.IType Type { get; set; }
         public override string ToString() { }
+        public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
     public class VariableDefinitions : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.VariableDefinition>, System.Collections.IEnumerable
     {
@@ -2513,7 +2535,7 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Validation
 {
-    public class BasicVisitor
+    public readonly struct BasicVisitor
     {
         public BasicVisitor(params GraphQL.Validation.INodeVisitor[] visitors) { }
         public BasicVisitor(System.Collections.Generic.IList<GraphQL.Validation.INodeVisitor> visitors) { }
@@ -2585,8 +2607,8 @@ namespace GraphQL.Validation
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.FragmentDefinition GetFragment(string name) { }
         public System.Collections.Generic.List<GraphQL.Language.AST.FragmentSpread> GetFragmentSpreads(GraphQL.Language.AST.SelectionSet node) { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQL.Language.AST.Operation operation) { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
+        public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetRecursiveVariables(GraphQL.Language.AST.Operation operation) { }
+        public System.Collections.Generic.List<GraphQL.Language.AST.FragmentDefinition> GetRecursivelyReferencedFragments(GraphQL.Language.AST.Operation operation) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage> GetVariables(GraphQL.Language.AST.IHaveSelectionSet node) { }
         public string Print(GraphQL.Language.AST.INode node) { }
         public string Print(GraphQL.Types.IGraphType type) { }

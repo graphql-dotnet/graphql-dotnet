@@ -68,13 +68,15 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public FieldType GetField(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _fields)
-                if (string.Equals(x.Name, name, StringComparison.Ordinal))
-                    return x;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                foreach (var x in _fields)
+                {
+                    if (string.Equals(x.Name, name, StringComparison.Ordinal))
+                        return x;
+                }
+            }
 
             return null;
         }

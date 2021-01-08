@@ -156,8 +156,10 @@ namespace GraphQL.Types
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in _values)
+            {
                 if (def.Name.Equals(name, comparison))
                     return def;
+            }
 
             return null;
         }
@@ -174,8 +176,10 @@ namespace GraphQL.Types
 
             // DO NOT USE LINQ ON HOT PATH
             foreach (var def in _values)
+            {
                 if (def.UnderlyingValue.Equals(value))
                     return def;
+            }
 
             return null;
         }
