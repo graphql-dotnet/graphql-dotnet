@@ -15,34 +15,28 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Adds a variable to the list.
         /// </summary>
-        public void Add(Variable variable)
-        {
-            if (variable == null)
-                throw new ArgumentNullException(nameof(variable));
-
-            if (_variables == null)
-                _variables = new List<Variable>();
-
-            _variables.Add(variable);
-        }
+        public void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <summary>
         /// Returns the first variable with a matching name, or <see langword="null"/> if none are found.
         /// </summary>
         public object ValueFor(string name)
         {
-            var variable = _variables?.FirstOrDefault(v => v.Name == name);
-            return variable?.Value;
+            // DO NOT USE LINQ ON HOT PATH
+            if (_variables != null)
+            {
+                foreach (var v in _variables)
+                {
+                    if (v.Name == name)
+                        return v.Value;
+                }
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
-        public IEnumerator<Variable> GetEnumerator()
-        {
-            if (_variables == null)
-                return Enumerable.Empty<Variable>().GetEnumerator();
-
-            return _variables.GetEnumerator();
-        }
+        public IEnumerator<Variable> GetEnumerator() => (_variables ?? Enumerable.Empty<Variable>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

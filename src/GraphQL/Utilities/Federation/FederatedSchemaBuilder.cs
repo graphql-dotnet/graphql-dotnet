@@ -119,7 +119,7 @@ namespace GraphQL.Utilities.Federation
 
         private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet setToAlter)
         {
-            foreach (var selection in selectionSet.Selections)
+            foreach (var selection in selectionSet.SelectionsList)
             {
                 if (selection is Field childField && childField.Name == "__typename")
                 {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -79,6 +80,14 @@ namespace GraphQL.Language.AST
                     yield return SelectionSet;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            action(Arguments, state);
+            action(Directives, state);
+            action(SelectionSet, state);
         }
 
         /// <inheritdoc />

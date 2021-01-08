@@ -93,14 +93,11 @@ namespace GraphQL.Validation
 
             visitors.Insert(0, context.TypeInfo);
 
-            var basic = new BasicVisitor(visitors);
+            new BasicVisitor(visitors).Visit(document, context);
 
-            basic.Visit(document, context);
-
-            if (context.HasErrors)
-                return new ValidationResult(context.Errors);
-
-            return SuccessfullyValidatedResult.Instance;
+            return context.HasErrors
+                ? new ValidationResult(context.Errors)
+                : (IValidationResult)SuccessfullyValidatedResult.Instance;
         }
     }
 }

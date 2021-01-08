@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -55,6 +56,13 @@ namespace GraphQL.Language.AST
                     yield return DefaultValue;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            action(Type, state);
+            action(DefaultValue, state);
         }
 
         /// <inheritdoc/>

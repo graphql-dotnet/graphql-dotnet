@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
@@ -35,6 +36,9 @@ namespace GraphQL.Language.AST
         {
             get { yield return Arguments; }
         }
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state) => action(Arguments, state);
 
         /// <inheritdoc />
         public override string ToString() => $"Directive{{name='{Name}',arguments={Arguments}}}";

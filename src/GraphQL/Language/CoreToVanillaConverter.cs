@@ -336,13 +336,13 @@ namespace GraphQL.Language
                 case ASTNodeKind.ObjectValue:
                 {
                     var obj = (GraphQLObjectValue)source;
-                    var fields = obj.Fields?.Select(ObjectField);
+                    var fields = obj.Fields?.Select(ObjectField) ?? Enumerable.Empty<ObjectField>();
                     return new ObjectValue(fields) { SourceLocation = Convert(obj.Location) };
                 }
                 case ASTNodeKind.ListValue:
                 {
                     var list = (GraphQLListValue)source;
-                    var values = list.Values?.Select(Value);
+                    var values = list.Values?.Select(Value) ?? Enumerable.Empty<IValue>();
                     return new ListValue(values) { SourceLocation = Convert(list.Location) };
                 }
                 case ASTNodeKind.NullValue:

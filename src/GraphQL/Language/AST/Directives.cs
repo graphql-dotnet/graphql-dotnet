@@ -15,18 +15,22 @@ namespace GraphQL.Language.AST
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _directives;
 
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            if (_directives != null)
+            {
+                foreach (var directive in _directives)
+                    action(directive, state);
+            }
+        }
+
         /// <summary>
         /// Adds a directive node to the list.
         /// </summary>
         public void Add(Directive directive)
         {
-            if (directive == null)
-                throw new ArgumentNullException(nameof(directive));
-
-            if (_directives == null)
-                _directives = new List<Directive>();
-
-            _directives.Add(directive);
+            (_directives ??= new List<Directive>()).Add(directive ?? throw new ArgumentNullException(nameof(directive)));
 
             if (!_unique.ContainsKey(directive.Name))
             {
@@ -53,13 +57,7 @@ namespace GraphQL.Language.AST
         public bool IsReadOnly => false;
 
         /// <inheritdoc/>
-        public IEnumerator<Directive> GetEnumerator()
-        {
-            if (_directives == null)
-                return System.Linq.Enumerable.Empty<Directive>().GetEnumerator();
-
-            return _directives.GetEnumerator();
-        }
+        public IEnumerator<Directive> GetEnumerator() => (_directives ?? System.Linq.Enumerable.Empty<Directive>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
