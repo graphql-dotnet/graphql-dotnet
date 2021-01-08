@@ -39,13 +39,13 @@ namespace GraphQL.Benchmarks
         [Benchmark]
         public void Introspection()
         {
-            var result = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
+            var result = ExecuteQuery(_schema, Queries.Introspection);
         }
 
         [Benchmark]
         public void Hero()
         {
-            var result = ExecuteQuery(_schema, "{ hero { id name } }");
+            var result = ExecuteQuery(_schema, Queries.Hero);
         }
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query)

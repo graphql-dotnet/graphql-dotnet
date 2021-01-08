@@ -56,8 +56,8 @@ namespace GraphQL.Benchmarks
             _nsjWriter = new NewtonsoftJson.DocumentWriter();
             _nsjWriterIndented = new NewtonsoftJson.DocumentWriter(indent: true);
 
-            _introspectionResult = ExecuteQuery(_schema, SchemaIntrospection.IntrospectionQuery);
-            _smallResult = ExecuteQuery(_schema, "{ hero { id name } }");
+            _introspectionResult = ExecuteQuery(_schema, Queries.Introspection);
+            _smallResult = ExecuteQuery(_schema, Queries.Hero);
             _middleResult = ExecuteQuery(_schema, @"{
   hero
   {

@@ -29,19 +29,21 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Returns a list of ancestors of the current node.
+        /// Returns an ancestor of the current node.
         /// </summary>
-        /// <returns></returns>
-        public INode[] GetAncestors()
+        /// <param name="index">Index of the ancestor; 0 for the node itself, 1 for the direct ancestor and so on.</param>
+        public INode GetAncestor(int index)
         {
-            var ancestorArray = _ancestorStack.ToArray();
-            var c = ancestorArray.Length;
-            var ret = new INode[--c];
-            for (int i = c; i > 0; --i) {
-                ret[c - i] = ancestorArray[i];
+            var e = _ancestorStack.GetEnumerator();
+
+            int i = index;
+            do
+            {
+                _ = e.MoveNext();
             }
-            return ret;
-            // aka: return _ancestorStack.Skip(1).Reverse().ToArray();
+            while (i-- > 0);
+
+            return e.Current; // throws if index is out of range
         }
 
         /// <summary>

@@ -26,13 +26,6 @@
 * `IHaveDefaultValue.Type` has been moved to `IProvideResolvedType.Type`
 * `Connection<TNode, TEdge>.TotalCount` has been changed from an `int` to an `int?`. This allows for returning `null` indicating that the total count is unknown.
 * By default fields returned by introspection query are no longer sorted by their names. `LegacyV3SchemaComparer` can be used to switch to the old behavior.
-* `INode.IsEqualTo` and related methods have been removed.
-* `NameNode` has been changed to a readonly struct.
-* `DebugNodeVisitor` class has been removed.
-* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
-* `EnumerableExtensions.Apply` for dictionaries has been removed.
-* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
-* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 
 ```c#
     /// <summary>
@@ -53,5 +46,13 @@
     }
 ```
 
+* `INode.IsEqualTo` and related methods have been removed.
+* `NameNode` has been changed to a readonly struct.
+* `DebugNodeVisitor` class has been removed.
+* Most methods and classes within `OverlappingFieldsCanBeMerged` are now private.
+* `EnumerableExtensions.Apply` for dictionaries has been removed.
+* `ObjectExtensions.GetInterface` has been removed along with two overloads of `GetPropertyValue`.
 * Subscriptions implementation (`SubscriptionExecutionStrategy`) has been moved into `GraphQL.SystemReactive` project and default document executer throws `NotSupportedException`.
 * `ISubscriptionExecuter` has been removed.
+* `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
+* `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`

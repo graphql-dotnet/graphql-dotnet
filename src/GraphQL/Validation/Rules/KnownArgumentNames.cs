@@ -24,8 +24,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Argument>((node, context) =>
         {
-            var ancestors = context.TypeInfo.GetAncestors();
-            var argumentOf = ancestors[ancestors.Length - 2];
+            var argumentOf = context.TypeInfo.GetAncestor(2);
             if (argumentOf is Field)
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();

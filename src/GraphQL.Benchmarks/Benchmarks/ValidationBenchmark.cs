@@ -18,7 +18,7 @@ namespace GraphQL.Benchmarks
         private ISchema _schema;
         private DocumentValidator _validator;
 
-        private Document _introspectionDocument, _heroDocument;
+        private Document _introspectionDocument, _fragmentsDocument, _heroDocument;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -40,14 +40,21 @@ namespace GraphQL.Benchmarks
             _schema.Initialize();
             _validator = new DocumentValidator();
 
-            _introspectionDocument = new GraphQLDocumentBuilder().Build(SchemaIntrospection.IntrospectionQuery);
-            _heroDocument = new GraphQLDocumentBuilder().Build("{ hero { id name } }");
+            _introspectionDocument = new GraphQLDocumentBuilder().Build(Queries.Introspection);
+            _fragmentsDocument = new GraphQLDocumentBuilder().Build(Queries.Fragments);
+            _heroDocument = new GraphQLDocumentBuilder().Build(Queries.Hero);
         }
 
         [Benchmark]
         public void Introspection()
         {
             _ = Validate(_introspectionDocument);
+        }
+
+        [Benchmark]
+        public void Fragments()
+        {
+            _ = Validate(_fragmentsDocument);
         }
 
         [Benchmark]

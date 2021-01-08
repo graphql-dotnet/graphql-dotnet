@@ -1,8 +1,8 @@
 namespace GraphQL.Benchmarks
 {
-    public static class SchemaIntrospection
+    public static class Queries
     {
-        public static readonly string IntrospectionQuery = @"
+        public static readonly string Introspection = @"
   query IntrospectionQuery {
     __schema {
       description
@@ -95,6 +95,57 @@ namespace GraphQL.Benchmarks
       }
     }
   }
+";
+
+        public static readonly string Hero = "{ hero { id name } }";
+
+        public static readonly string Fragments = @"
+query deep {
+  human(id: ""abcd"") {
+    friends {
+      ... on Droid
+        {
+            primaryFunction
+        friends
+            {
+                ... on Droid {
+                    ...DroidData
+                    __typename
+                }
+                ... on Human {
+                    ...HumanData
+                    __typename
+                }
+            }
+        }
+      ... on Human
+        {
+            homePlanet
+        friends
+            {
+                ... on Droid {
+                    ...DroidData
+                    __typename
+                }
+                ... on Human {
+                    ...HumanData
+                    __typename
+               }
+            }
+        }
+    }
+  }
+}
+
+fragment DroidData on Droid {
+  primaryFunction
+  name
+}
+
+fragment HumanData on Human {
+  appearsIn
+  homePlanet
+}
 ";
     }
 }
