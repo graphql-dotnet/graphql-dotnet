@@ -2562,6 +2562,11 @@ namespace GraphQL.Validation
     {
         public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext> leave = null) { }
     }
+    public class MatchingNodeVisitor<TNode, TState> : GraphQL.Validation.INodeVisitor
+        where TNode : GraphQL.Language.AST.INode
+    {
+        public MatchingNodeVisitor(TState state, System.Action<TNode, GraphQL.Validation.ValidationContext, TState> enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext, TState> leave = null) { }
+    }
     public sealed class NodeVisitors : GraphQL.Validation.INodeVisitor
     {
         public NodeVisitors(params GraphQL.Validation.INodeVisitor[] nodeVisitors) { }

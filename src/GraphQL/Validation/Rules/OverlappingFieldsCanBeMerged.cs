@@ -29,6 +29,7 @@ namespace GraphQL.Validation.Rules
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
+            //TODO: make static instance when enabling this rule
             var comparedFragmentPairs = new PairSet();
             var cachedFieldsAndFragmentNames = new Dictionary<SelectionSet, CachedField>();
 

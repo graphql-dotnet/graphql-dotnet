@@ -20,9 +20,9 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueInputFieldNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new NodeVisitors(
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
                 new MatchingNodeVisitor<ObjectValue>(
                     enter: (objVal, context) =>
                     {
@@ -48,6 +48,5 @@ namespace GraphQL.Validation.Rules
                         }
                     })
             ).ToTask();
-        }
     }
 }

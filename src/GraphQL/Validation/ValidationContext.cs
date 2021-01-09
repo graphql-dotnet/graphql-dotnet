@@ -72,8 +72,7 @@ namespace GraphQL.Validation
             var usages = new List<VariableUsage>();
             var info = new TypeInfo(Schema);
 
-            //TODO: Allocation of Action<VariableReference, ValidationContext>
-            var listener = new MatchingNodeVisitor<VariableReference>((varRef, __) => usages.Add(new VariableUsage(varRef, info.GetInputType())));
+            var listener = new MatchingNodeVisitor<VariableReference, (List<VariableUsage> usages, TypeInfo info)>((usages, info), (varRef, __, state) => state.usages.Add(new VariableUsage(varRef, state.info.GetInputType())));
 
             new BasicVisitor(info, listener).Visit(node, this);
 
@@ -118,7 +117,8 @@ namespace GraphQL.Validation
         {
             var spreads = new List<FragmentSpread>();
 
-            var setsToVisit = new Stack<SelectionSet>(new[] { node });
+            var setsToVisit = new Stack<SelectionSet>();
+            setsToVisit.Push(node);
 
             while (setsToVisit.Count > 0)
             {
@@ -154,7 +154,8 @@ namespace GraphQL.Validation
             }
 
             var fragments = new List<FragmentDefinition>();
-            var nodesToVisit = new Stack<SelectionSet>(new[] { operation.SelectionSet });
+            var nodesToVisit = new Stack<SelectionSet>();
+            nodesToVisit.Push(operation.SelectionSet);
             var collectedNames = new Dictionary<string, bool>();
 
             while (nodesToVisit.Count > 0)
