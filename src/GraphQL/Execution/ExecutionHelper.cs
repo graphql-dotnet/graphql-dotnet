@@ -132,9 +132,9 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null/* && variable.DefaultValue != null*/)
+            if (input == null)
             {
-                return null /*variable.DefaultValue.Value*/;
+                return null;
             }
 
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
