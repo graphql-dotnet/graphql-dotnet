@@ -46,6 +46,21 @@ namespace GraphQL.Tests.Bugs
 
         [Fact]
         public void Object_Variable_Null() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", @"{ ""testObject"": null }", "{\"input\":{\"value\":null}}".ToInputs());
+
+        [Fact]
+        public void HasArgument_NoDefault_None() => AssertQuerySuccess("{ hasArgumentNoDefault }", @"{ ""hasArgumentNoDefault"": false }");
+
+        [Fact]
+        public void HasArgument_NoDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": false }");
+
+        [Fact]
+        public void HasArgument_NoDefault_Set() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: true) }", @"{ ""hasArgumentNoDefault"": true }");
+
+        [Fact]
+        public void HasArgument_NoDefault_DefaultVariable() => AssertQuerySuccess("query($input: Boolean = true) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }");
+
+        [Fact]
+        public void HasArgument_NoDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }", "{\"input\":true}".ToInputs());
     }
 
     public class Bug2159Schema : Schema
@@ -70,6 +85,16 @@ namespace GraphQL.Tests.Bugs
                 resolve: ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value,
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(Bug2159ObjectGraphType)) { Name = "arg", DefaultValue = new Bug2159Object { Value = "defaultValue" } }));
+            Field<BooleanGraphType>(
+                "hasArgumentNoDefault",
+                resolve: ctx => ctx.HasArgument("arg"),
+                arguments: new QueryArguments(
+                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg" }));
+            Field<BooleanGraphType>(
+                "hasArgumentWithDefault",
+                resolve: ctx => ctx.HasArgument("arg"),
+                arguments: new QueryArguments(
+                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }));
         }
     }
 
