@@ -55,7 +55,7 @@ namespace GraphQL.Validation
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
             UniqueInputFieldNames.Instance
-        }.AsReadOnly();
+        };
 
         /// <inheritdoc/>
         public async Task<IValidationResult> ValidateAsync(
@@ -71,12 +71,15 @@ namespace GraphQL.Validation
                 schema.Initialize();
             }
 
-            if (rules == null)
+            bool useOnlyStandardRules = rules == null;
+            if (useOnlyStandardRules)
             {
                 rules = CoreRules;
             }
             else if (!rules.Any())
+            {
                 return SuccessfullyValidatedResult.Instance;
+            }
 
             var context = new ValidationContext
             {
@@ -88,8 +91,24 @@ namespace GraphQL.Validation
                 Inputs = inputs
             };
 
-            var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
-            var visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+            List<INodeVisitor> visitors;
+
+            if (useOnlyStandardRules)
+            {
+                // No async/ await related allocations since all standard rules return completed tasks from ValidateAsync.
+                visitors = new List<INodeVisitor>();
+                foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                {
+                    var visitor = rule.ValidateAsync(context)?.Result;
+                    if (visitor != null)
+                        visitors.Add(visitor);
+                }
+            }
+            else
+            {
+                var awaitedVisitors = rules.Select(x => x.ValidateAsync(context)).Where(x => x != null);
+                visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+            }   
 
             visitors.Insert(0, context.TypeInfo);
 
