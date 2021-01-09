@@ -95,7 +95,7 @@ namespace GraphQL.Validation
 
             if (useOnlyStandardRules)
             {
-                // No async/ await related allocations since all standard rules return completed tasks from ValidateAsync.
+                // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
                 visitors = new List<INodeVisitor>();
                 foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
                 {
