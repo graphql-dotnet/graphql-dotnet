@@ -1516,7 +1516,7 @@ namespace GraphQL.Language.AST
         public void Add(GraphQL.Language.AST.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Variable> GetEnumerator() { }
         public override string ToString() { }
-        public object ValueFor(string name, object defaultValue) { }
+        public object ValueFor(string name, object defaultValue = null) { }
     }
 }
 namespace GraphQL.Language
