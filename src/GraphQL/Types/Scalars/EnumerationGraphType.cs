@@ -115,7 +115,7 @@ namespace GraphQL.Types
                 deprecation: e.member.ObsoleteMessage()
             ));
 
-            Name = StringUtils.ToPascalCase(type.Name);
+            Name = type.Name.ToPascalCase();
             Description ??= typeof(TEnum).Description();
             DeprecationReason ??= typeof(TEnum).ObsoleteMessage();
 
@@ -128,7 +128,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Changes the case of the specified enum name. By default changes it to constant case (uppercase, using underscores to separate words).
         /// </summary>
-        protected virtual string ChangeEnumCase(string val) => StringUtils.ToConstantCase(val);
+        protected virtual string ChangeEnumCase(string val) => val.ToConstantCase();
     }
 
     /// <summary>

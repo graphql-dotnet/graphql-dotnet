@@ -16,14 +16,6 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLExtensions
     {
-        private static readonly char[] _bangs = new char[] { '!', '[', ']' };
-
-        /// <summary>
-        /// Removes brackets and exclamation points from a GraphQL type name -- for example,
-        /// converts <c>[Int!]</c> to <c>Int</c>
-        /// </summary>
-        public static string TrimGraphQLTypes(this string name) => name.Trim().Trim(_bangs);
-
         /// <summary>
         /// Indicates if the graph type is a union, interface or object graph type.
         /// </summary>
