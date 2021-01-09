@@ -16,10 +16,6 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void Direct_Literal_Null() => AssertQuerySuccess("{ testValue(arg: null) }", @"{ ""testValue"": null }");
 
-        // If a variable is provided for an input object field, the runtime value of that variable must be used.
-        // If the runtime value is null and the field type is non‐null, a field error must be thrown. If no runtime
-        // value is provided, the variable definition’s default value should be used. If the variable definition
-        // does not provide a default value, the input object field definition’s default value should be used.
         [Fact]
         public void Direct_Variable_FieldDefault() => AssertQuerySuccess("query($input: String) { testValue(arg: $input) }", @"{ ""testValue"": ""defaultValue"" }");
 
@@ -42,10 +38,6 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void Object_Literal_Null() => AssertQuerySuccess("{ testObject(arg: {value:null}) }", @"{ ""testObject"": null }");
 
-        // If a variable is provided for an input object field, the runtime value of that variable must be used.
-        // If the runtime value is null and the field type is non‐null, a field error must be thrown. If no runtime
-        // value is provided, the variable definition’s default value should be used. If the variable definition
-        // does not provide a default value, the input object field definition’s default value should be used.
         [Fact]
         public void Object_Variable_Default() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", @"{ ""testObject"": ""defaultFieldValue"" }", "{\"input\":{}}".ToInputs());
 
