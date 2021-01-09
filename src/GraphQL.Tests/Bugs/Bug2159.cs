@@ -1,8 +1,5 @@
-using System;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
-using GraphQL.Validation;
-using GraphQL.Validation.Errors;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -10,25 +7,6 @@ namespace GraphQL.Tests.Bugs
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/2159
     public class Bug2159 : QueryTestBase<Bug2159Schema>
     {
-        private void AssertQueryWithError(string query, string result, string message, int line, int column, string path, Exception exception = null, string code = null, string inputs = null, string number = null)
-            => AssertQueryWithError(query, result, message, line, column, new object[] { path }, exception, code, inputs, number);
-
-        private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, string number = null)
-        {
-            ExecutionError error;
-            if (number != null)
-                error = new ValidationError(null, number, message);
-            else
-                error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0)
-                error.AddLocation(line, column);
-            error.Path = path;
-            if (code != null)
-                error.Code = code;
-            var expected = CreateQueryResult(result, new ExecutionErrors { error });
-            AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
-        }
-
         [Fact]
         public void Direct_Literal_Default() => AssertQuerySuccess("{ testValue }", @"{ ""testValue"": ""defaultValue"" }");
 
