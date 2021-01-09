@@ -97,9 +97,16 @@ namespace GraphQL.Execution
                         Name = v.Name
                     };
 
-                    object variableValue = null;
-                    inputs?.TryGetValue(v.Name, out variableValue);
-                    variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    if (inputs.TryGetValue(v.Name, out var variableValue))
+                    {
+                        variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    }
+                    else
+                    {
+                        var value = GetVariableValue(document, schema, v, v.DefaultValue?.Value);
+                        if (value != null)
+                            variable.Value = value;
+                    }
 
                     variables.Add(variable);
                 }
@@ -125,9 +132,9 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null && variable.DefaultValue != null)
+            if (input == null/* && variable.DefaultValue != null*/)
             {
-                return variable.DefaultValue.Value;
+                return null /*variable.DefaultValue.Value*/;
             }
 
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
@@ -269,7 +276,7 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
 
-                var coercedValue = CoerceValue(schema, type, value, variables) ?? arg.DefaultValue;
+                var coercedValue = CoerceValue(schema, type, value, variables, arg.DefaultValue);
 
                 if (coercedValue != null)
                 {
@@ -283,21 +290,29 @@ namespace GraphQL.Execution
         /// <summary>
         /// Coerces a variable value to a compatible .NET type for the variable's graph type.
         /// </summary>
-        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
+        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
         {
             if (type is NonNullGraphType nonNull)
             {
-                return CoerceValue(schema, nonNull.ResolvedType, input, variables);
+                return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
-            if (input == null || input is NullValue)
+            if (input == null)
+            {
+                return fieldDefault;
+            }
+
+            if (input is NullValue)
             {
                 return null;
             }
 
             if (input is VariableReference variable)
             {
-                return variables?.ValueFor(variable.Name);
+                if (variables == null)
+                    return fieldDefault;
+
+                return variables.ValueFor(variable.Name, fieldDefault);
             }
 
             if (type is ListGraphType listType)
@@ -331,7 +346,7 @@ namespace GraphQL.Execution
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
                     }
                     else if (field.DefaultValue != null)
                     {

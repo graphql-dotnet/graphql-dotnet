@@ -29,10 +29,12 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first variable with a matching name, or <see langword="null"/> if none are found.
         /// </summary>
-        public object ValueFor(string name)
+        public object ValueFor(string name, object defaultValue)
         {
             var variable = _variables?.FirstOrDefault(v => v.Name == name);
-            return variable?.Value;
+            if (variable != null && variable.ValueSpecified)
+                return variable.Value;
+            return defaultValue;
         }
 
         /// <inheritdoc/>
