@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace GraphQL.Types
 {
     /// <summary>
@@ -5,6 +7,10 @@ namespace GraphQL.Types
     /// </summary>
     public interface IInputObjectGraphType : IComplexGraphType
     {
+        /// <summary>
+        /// Converts a supplied dictionary of keys and values to an object.
+        /// </summary>
+        object ParseDictionary(IDictionary<string, object> value);
     }
 
     /// <inheritdoc/>
@@ -15,6 +21,19 @@ namespace GraphQL.Types
     /// <inheritdoc cref="IInputObjectGraphType"/>
     public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
+        /// <inheritdoc/>
+        public virtual object ParseDictionary(IDictionary<string, object> value)
+        {
+            if (value == null)
+                return null;
+
+            // for InputObjectGraphType just return the dictionary
+            if (typeof(TSourceType) == typeof(object))
+                return value;
+
+            // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
+            return value.ToObject(typeof(TSourceType), this);
+        }
     }
 }
 

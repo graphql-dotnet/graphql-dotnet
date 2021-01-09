@@ -105,9 +105,17 @@ namespace GraphQL.Execution
         {
             var type = variable.Type.GraphTypeFromType(schema);
 
+            if (type == null)
+                throw new InvalidVariableError(variable.Name, $"Variable has unknown type '{variable.Type.Name()}'");
+
+            if (input == null && variable.DefaultValue != null)
+            {
+                return variable.DefaultValue.Value;
+            }
+
             try
             {
-                AssertValidVariableValue(schema, type, input, variable.Name, variable.DefaultValue != null);
+                return ParseValue(type, variable.Name, input);
             }
             catch (InvalidVariableError error)
             {
@@ -115,14 +123,227 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null && variable.DefaultValue != null)
+            static object ParseValue(IGraphType type, string variableName, object value)
             {
-                return variable.DefaultValue.Value;
+                if (type is IInputObjectGraphType inputObjectGraphType)
+                {
+                    return ParseValueObject(inputObjectGraphType, variableName, value);
+                }
+                else if (type is NonNullGraphType nonNullGraphType)
+                {
+                    return ParseValueNonNull(nonNullGraphType, variableName, value);
+                }
+                else if (type is ListGraphType listGraphType)
+                {
+                    return ParseValueList(listGraphType, variableName, value);
+                }
+                else if (type is ScalarGraphType scalarGraphType)
+                {
+                    return ParseValueScalar(scalarGraphType, variableName, value);
+                }
+                else
+                {
+                    throw new InvalidOperationException("The graph type is not an input graph type.");
+                }
             }
 
-            return CoerceValue(schema, type, input.AstFromValue(schema, type));
+            static object ParseValueScalar(ScalarGraphType scalarGraphType, string variableName, object value)
+            {
+                if (value == null)
+                    return null;
+
+                object ret;
+
+                try
+                {
+                    ret = scalarGraphType.ParseValue(value);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidVariableError(variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
+                }
+
+                if (ret == null)
+                    throw new InvalidVariableError(variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
+
+                return ret;
+            }
+
+            static object ParseValueNonNull(NonNullGraphType nonNullGraphType, string variableName, object value)
+            {
+                if (value == null)
+                    ThrowNullError(variableName);
+
+                return ParseValue(nonNullGraphType.ResolvedType, variableName, value);
+            }
+
+            static void ThrowNullError(string variableName)
+                => throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
+
+            static object ParseValueList(ListGraphType listGraphType, string variableName, object value)
+            {
+                if (value == null)
+                    return null;
+
+                if (value is IEnumerable values && !(value is string))
+                {
+                    var valueOutputs = new List<object>(values is ICollection collection ? collection.Count : 0);
+                    int index = 0;
+                    foreach (var val in values)
+                    {
+                        valueOutputs.Add(ParseValue(listGraphType.ResolvedType, variableName + "[" + index++ + "]", val));
+                    }
+                    return valueOutputs;
+                }
+                else
+                {
+                    // RULE: If the value passed as an input to a list type is not a list and not the null value,
+                    // then the result of input coercion is a list of size one, where the single item value is the
+                    // result of input coercion for the list’s item type on the provided value (note this may apply
+                    // recursively for nested lists).
+                    var result = ParseValue(listGraphType.ResolvedType, variableName, value);
+                    return new List<object>(1) { result };
+                }
+            }
+
+            static object ParseValueObject(IInputObjectGraphType graphType, string variableName, object value)
+            {
+                if (value == null)
+                    return null;
+
+                if (!(value is IDictionary<string, object> dic))
+                {
+                    // RULE: The value for an input object should be an input object literal
+                    // or an unordered map supplied by a variable, otherwise a query error
+                    // must be thrown.
+
+                    throw new InvalidVariableError(variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?");
+                }
+
+                var newDictionary = new Dictionary<string, object>(dic.Count);
+                foreach (var field in graphType.Fields)
+                {
+                    var childFieldVariableName = variableName + (variableName.EndsWith("]") ? null : ".") + field.Name;
+
+                    if (dic.TryGetValue(field.Name, out var fieldValue))
+                    {
+                        // RULE: If the value null was provided for an input object field, and
+                        // the field’s type is not a non‐null type, an entry in the coerced
+                        // unordered map is given the value null. In other words, there is a
+                        // semantic difference between the explicitly provided value null
+                        // versus having not provided a value.
+
+                        // Note: we always call ParseValue even for null values, and if it
+                        // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
+                        newDictionary[field.Name] = ParseValue(field.ResolvedType, childFieldVariableName, fieldValue);
+                    }
+                    else if (field.ResolvedType is NonNullGraphType nonNullGraphType)
+                    {
+                        if (field.DefaultValue != null)
+                        {
+                            // RULE: If no value is provided for a defined input object field and that
+                            // field definition provides a default value, the default value should be used.
+                            newDictionary[field.Name] = field.DefaultValue;
+                        }
+                        else
+                        {
+                            // RULE: If no default value is provided and the input object field’s type is non‐null,
+                            // an error should be thrown.
+                            ThrowNullError(childFieldVariableName);
+                        }
+                    }
+
+                    // RULE: Otherwise, if the field is not required, then no
+                    // entry is added to the coerced unordered map.
+
+                    // so do not do this:    else { newDictionary[field.Name] = null; }
+                }
+
+                // RULE: The value for an input object should be an input object literal
+                // or an unordered map supplied by a variable, otherwise a query error
+                // must be thrown. In either case, the input object literal or unordered
+                // map must not contain any entries with names not defined by a field
+                // of this input object type, ***otherwise an error must be thrown.***
+                var unknownFields = dic.Keys
+                    .Except(graphType.Fields.Select(f => f.Name))
+                    .ToList();
+
+                if (unknownFields.Count > 0)
+                {
+                    throw new InvalidVariableError(variableName,
+                        $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'.");
+                }
+
+                return graphType.ParseDictionary(newDictionary);
+            }
         }
 
+        /*
+        object ParseLiteral(IGraphType graphType, IValue value)
+        {
+            if (value == null || value is NullValue)
+                return null;
+
+            if (!(value is ObjectValue objectValue))
+            {
+                // RULE: The value for an input object should be an input object literal
+                // or an unordered map supplied by a variable, otherwise a query error
+                // must be thrown.
+
+                throw new ArgumentNullException(nameof(value), "Supplied value is not an object node");
+            }
+
+            var objectFieldsList = objectValue.ObjectFieldsList;
+            var newDictionary = new Dictionary<string, object>(objectFieldsList.Count);
+            foreach (var field in Fields)
+            {
+                var objectField = objectFieldsList.Find(o => o.Name == field.Name);
+                if (objectField != null)
+                {
+                    // RULE: If the value null was provided for an input object field, and
+                    // the field’s type is not a non‐null type, an entry in the coerced
+                    // unordered map is given the value null. In other words, there is a
+                    // semantic difference between the explicitly provided value null
+                    // versus having not provided a value.
+
+                    // Note: we always call ParseValue even for null values, and if it
+                    // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
+                    newDictionary[field.Name] = ((IInputType)field.ResolvedType).ParseLiteral(objectField.Value);
+                }
+                else if (field.ResolvedType is NonNullGraphType nonNullGraphType)
+                {
+                    // RULE: If no value is provided for a defined input object field and that
+                    // field definition provides a default value, the default value should be used.
+                    if (field.DefaultValue != null)
+                        newDictionary[field.Name] = field.DefaultValue;
+
+                    // RULE: If no default value is provided and the input object field’s type is non‐null,
+                    // an error should be thrown.
+                    newDictionary[field.Name] = nonNullGraphType.ParseLiteral(null); //throws error (unless overridden)
+                }
+
+                // RULE: Otherwise, if the field is not required, then no
+                // entry is added to the coerced unordered map.
+
+                // so do not do this:    else { newDictionary[field.Name] = null; }
+            }
+
+            // RULE: The value for an input object should be an input object literal
+            // or an unordered map supplied by a variable, otherwise a query error
+            // must be thrown. In either case, the input object literal or unordered
+            // map must not contain any entries with names not defined by a field
+            // of this input object type, ***otherwise an error must be thrown.***
+            foreach (var objectField in objectFieldsList)
+            {
+                if (!Fields.Any(x => x.Name == objectField.Name))
+                    throw new ArgumentException("An value within the list of object values cannot be matched to a field.", nameof(value));
+            }
+
+            return ParseDictionary(newDictionary);
+        }
+        */
+
+        /*
         /// <summary>
         /// Ensures that the specified variable value is valid for the variable's graph type.
         /// </summary>
@@ -240,6 +461,7 @@ namespace GraphQL.Execution
 
             throw new InvalidVariableError(variableName ?? "input", "Invalid input");
         }
+        */
 
         /// <summary>
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
@@ -306,22 +528,21 @@ namespace GraphQL.Execution
                 }
             }
 
-            if (type is IObjectGraphType || type is IInputObjectGraphType)
+            if (type is IInputObjectGraphType inputObjectGraphType)
             {
                 if (!(input is ObjectValue objectValue))
                 {
                     return null;
                 }
 
-                var complexType = (IComplexGraphType)type; // both IObjectGraphType and IInputObjectGraphType inherit from IComplexGraphType
                 var obj = new Dictionary<string, object>();
 
-                foreach (var field in complexType.Fields)
+                foreach (var field in inputObjectGraphType.Fields)
                 {
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables)/* ?? field.DefaultValue*/;
                     }
                     else if (field.DefaultValue != null)
                     {
@@ -329,7 +550,7 @@ namespace GraphQL.Execution
                     }
                 }
 
-                return obj;
+                return inputObjectGraphType.ParseDictionary(obj);
             }
 
             if (type is ScalarGraphType scalarType)

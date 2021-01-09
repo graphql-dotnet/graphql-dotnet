@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -53,6 +54,20 @@ namespace GraphQL.Types
         /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
         public IGraphType ResolvedType { get; set; }
+
+        /*
+        /// <inheritdoc/>
+        public virtual object ParseLiteral(IValue value)
+        {
+            if (value == null || value is NullValue)
+                throw new ArgumentNullException(nameof(value), "Null value supplied for non-null graph type");
+
+            if (!(ResolvedType is IInputType resolvedInputType))
+                throw new InvalidOperationException("The underlying graph type is not an input graph type.");
+
+            return resolvedInputType.ParseLiteral(value);
+        }
+        */
 
         /// <inheritdoc/>
         public override string ToString() => $"{ResolvedType}!";
