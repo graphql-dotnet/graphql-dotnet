@@ -276,12 +276,7 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
 
-                var coercedValue = CoerceValue(schema, type, value, variables, arg.DefaultValue);
-
-                if (coercedValue != null)
-                {
-                    values[arg.Name] = coercedValue;
-                }
+                values[arg.Name] = CoerceValue(schema, type, value, variables, arg.DefaultValue);
             }
 
             return values;
