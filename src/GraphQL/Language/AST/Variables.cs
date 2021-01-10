@@ -32,9 +32,9 @@ namespace GraphQL.Language.AST
         public object ValueFor(string name, object defaultValue = null)
         {
             var variable = _variables?.FirstOrDefault(v => v.Name == name);
-            if (variable != null && variable.ValueSpecified)
-                return variable.Value;
-            return defaultValue;
+            return variable != null && variable.ValueSpecified
+                ? variable.Value
+                : defaultValue;
         }
 
         /// <inheritdoc/>
