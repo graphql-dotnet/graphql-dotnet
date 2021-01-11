@@ -123,29 +123,29 @@ namespace GraphQL.Tests.Bugs
         {
             Field<StringGraphType>(
                 "testValue",
-                resolve: ctx => ctx.GetArgument<string>("arg"),
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(StringGraphType)) { Name = "arg", DefaultValue = "defaultValue" }));
+                    new QueryArgument(typeof(StringGraphType)) { Name = "arg", DefaultValue = "defaultValue" }),
+                resolve: ctx => ctx.GetArgument<string>("arg"));
             Field<StringGraphType>(
                 "testObject",
-                resolve: ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value,
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(Bug2159ObjectGraphType)) { Name = "arg", DefaultValue = new Bug2159Object { Value = "defaultValue" } }));
+                    new QueryArgument(typeof(Bug2159ObjectGraphType)) { Name = "arg", DefaultValue = new Bug2159Object { Value = "defaultValue" } }),
+                resolve: ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value);
             Field<BooleanGraphType>(
                 "hasArgumentNoDefault",
-                resolve: ctx => ctx.HasArgument("arg"),
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg" }));
+                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg" }),
+                resolve: ctx => ctx.HasArgument("arg"));
             Field<BooleanGraphType>(
                 "hasArgumentWithDefault",
-                resolve: ctx => ctx.HasArgument("arg"),
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }));
+                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }),
+                resolve: ctx => ctx.HasArgument("arg"));
             Field<StringGraphType>(
                 "testReqObjField",
-                resolve: ctx => "OK",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(Bug2159ReqObjGraphType)) { Name = "arg" }));
+                    new QueryArgument(typeof(Bug2159ReqObjGraphType)) { Name = "arg" }),
+                resolve: ctx => "OK");
         }
     }
 

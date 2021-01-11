@@ -93,8 +93,12 @@ namespace GraphQL.Tests.Bugs
         [Fact]
         public void Input_Enum_OverrideDefault() => AssertQuerySuccess("{ inputWithDefault(arg: SLEEPY) }", @"{ ""inputWithDefault"": ""Sleepy"" }");
 
+        // For non-nullable struct types, GetArgument coerces null to default(T), which is Grumpy
         [Fact]
         public void Input_Enum_NullDefault() => AssertQuerySuccess("{ inputWithDefault(arg: null) }", @"{ ""inputWithDefault"": ""Grumpy"" }");
+
+        [Fact]
+        public void Input_Enum_NullDefault_Nullable() => AssertQuerySuccess("{ inputWithDefaultNullable(arg: null) }", @"{ ""inputWithDefaultNullable"": null }");
 
         [Fact]
         public void Input_Enum_MissingRequired() => AssertQueryWithError(@"{ inputRequired }", null, "Argument \u0022arg\u0022 of type \u0022Bug1699Enum!\u0022 is required for field \u0022inputRequired\u0022 but not provided.", 1, 3, (object[])null, code: "PROVIDED_NON_NULL_ARGUMENTS", number: ProvidedNonNullArgumentsError.NUMBER);
@@ -163,6 +167,10 @@ namespace GraphQL.Tests.Bugs
                 "inputWithDefault",
                 arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
                 resolve: ctx => ctx.GetArgument<Bug1699Enum>("arg").ToString());
+            Field<StringGraphType>(
+                "inputWithDefaultNullable",
+                arguments: new QueryArguments(new QueryArgument<EnumerationGraphType<Bug1699Enum>> { Name = "arg", DefaultValue = Bug1699Enum.Happy }),
+                resolve: ctx => ctx.GetArgument<Bug1699Enum?>("arg")?.ToString());
             Field<StringGraphType>(
                 "inputRequired",
                 arguments: new QueryArguments(new QueryArgument<NonNullGraphType<EnumerationGraphType<Bug1699Enum>>> { Name = "arg" }),
