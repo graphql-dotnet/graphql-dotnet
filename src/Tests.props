@@ -3,7 +3,7 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);1591;IDE1006</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="Shouldly" Version="4.0.3" />
