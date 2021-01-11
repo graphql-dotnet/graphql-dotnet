@@ -117,6 +117,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
         public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
         {
