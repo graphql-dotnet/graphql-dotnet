@@ -101,6 +101,12 @@ namespace GraphQL.Tests.Bugs
         //todo: fix HasArgument so it returns false only when no value was supplied
         [Fact(Skip = "HasArgument currently returns false if GetArgument returns null")]
         public void HasArgument_WithDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":null}".ToInputs());
+
+        [Fact]
+        public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1);
+
+        [Fact]
+        public void CheckRequiredObjectFieldAreRequired_Literal() => AssertQueryWithErrors("{ testReqObjField(arg: { value2: null }) }", "null", expectedErrorCount: 1);
     }
 
     public class Bug2159Schema : Schema
@@ -135,12 +141,18 @@ namespace GraphQL.Tests.Bugs
                 resolve: ctx => ctx.HasArgument("arg"),
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }));
+            Field<StringGraphType>(
+                "testReqObjField",
+                resolve: ctx => "OK",
+                arguments: new QueryArguments(
+                    new QueryArgument(typeof(Bug2159ReqObjGraphType)) { Name = "arg" }));
         }
     }
 
     public class Bug2159Object
     {
         public string Value { get; set; }
+        public string Value2 { get; set; }
     }
 
     public class Bug2159ObjectGraphType : InputObjectGraphType<Bug2159Object>
@@ -148,6 +160,15 @@ namespace GraphQL.Tests.Bugs
         public Bug2159ObjectGraphType()
         {
             Field(x => x.Value, true).DefaultValue("defaultFieldValue");
+        }
+    }
+
+    public class Bug2159ReqObjGraphType: InputObjectGraphType<Bug2159Object>
+    {
+        public Bug2159ReqObjGraphType()
+        {
+            Field(x => x.Value);
+            Field(x => x.Value2, true);
         }
     }
 }

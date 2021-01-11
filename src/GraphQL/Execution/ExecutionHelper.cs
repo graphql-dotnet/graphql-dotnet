@@ -289,6 +289,7 @@ namespace GraphQL.Execution
         {
             if (type is NonNullGraphType nonNull)
             {
+                // validation rules and/or AssertValidVariableValue have verified that this is not null
                 return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
@@ -338,15 +339,35 @@ namespace GraphQL.Execution
 
                 foreach (var field in complexType.Fields)
                 {
+                    // https://spec.graphql.org/June2018/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
+                        // Rules covered:
+
+                        // If no default value is provided and the input object field’s type is non‐null, an error should be
+                        // thrown.
+
+                        // If a literal value is provided for an input object field, an entry in the coerced unordered map is
+                        // given the result of coercing that value according to the input coercion rules for the type of that field.
+
+                        // If a variable is provided for an input object field, the runtime value of that variable must be used.
+                        // If the runtime value is null and the field type is non‐null, a field error must be thrown.
+                        // If no runtime value is provided, the variable definition’s default value should be used.
+                        // If the variable definition does not provide a default value, the input object field definition’s
+                        // default value should be used.
+
+                        // so: do not pass the field's default value to this method, since the field was specified
                         obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
                     }
                     else if (field.DefaultValue != null)
                     {
+                        // If no value is provided for a defined input object field and that field definition provides a default value,
+                        // the default value should be used. 
                         obj[field.Name] = field.DefaultValue;
                     }
+                    // Covered by validation rules and/or AssertValidVariableValue:
+                    // Otherwise, if the field is not required, then no entry is added to the coerced unordered map.
                 }
 
                 return obj;
