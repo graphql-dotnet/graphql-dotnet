@@ -72,7 +72,7 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Returns all of the variable values defined for the document from the attached <see cref="Inputs"/> object.
+        /// Returns all of the variable values defined for the operation from the attached <see cref="Inputs"/> object.
         /// </summary>
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
@@ -80,50 +80,70 @@ namespace GraphQL.Execution
 
             if (variableDefinitions != null)
             {
-                foreach (var v in variableDefinitions)
+                foreach (var variableDef in variableDefinitions)
                 {
+                    // find the IGraphType instance for the variable type
+                    var graphType = variableDef.Type.GraphTypeFromType(schema);
+
+                    if (graphType == null)
+                    {
+                        var error = new InvalidVariableError(variableDef.Name, $"Variable has unknown type '{variableDef.Type.Name()}'");
+                        error.AddLocation(variableDef, document);
+                        throw error;
+                    }
+
+                    // create a new variable object
                     var variable = new Variable
                     {
-                        Name = v.Name
+                        Name = variableDef.Name
                     };
 
-                    if (inputs.TryGetValue(v.Name, out var variableValue))
+                    // attempt to retrieve the variable value from the inputs
+                    if (inputs.TryGetValue(variableDef.Name, out var variableValue))
                     {
-                        variable.Value = GetVariableValue(document, schema, v, variableValue);
+                        // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
+                        variable.Value = GetVariableValue(document, graphType, variableDef, variableValue);
                     }
-                    else
+                    else if (variableDef.DefaultValue != null)
                     {
-                        var value = GetVariableValue(document, schema, v, v.DefaultValue?.Value);
-                        if (value != null)
-                            variable.Value = value;
-                    }
+                        // if the variable was not specified in the inputs, and a default literal value was specified, use the specified default variable value
 
+                        // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
+                        variable.Value = CoerceValue(schema, graphType, variableDef.DefaultValue, variables, null).Value;
+                    }
+                    else if (graphType is NonNullGraphType)
+                    {
+                        ThrowNullError(variable.Name);
+                    } 
+
+                    // if the variable was not specified and no default was specified, do not add the variable to the Variables object
+
+                    // add the variable to the list of parsed variables defined for the operation
                     variables.Add(variable);
                 }
             }
 
+            // return the list of parsed variables defined for the operation
             return variables;
         }
 
+        private static void ThrowNullError(string variableName)
+            => throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
+
         /// <summary>
         /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// <br/><br/>
+        /// Validates and parses the supplied input object according to the variable's type, and converts the object
+        /// with <see cref="ScalarGraphType.ParseValue(object)"/> and
+        /// <see cref="IInputObjectGraphType.ParseDictionary(IDictionary{string, object})"/> as applicable.
+        /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
+        public static object GetVariableValue(Document document, IGraphType graphType, VariableDefinition variable, object input)
         {
-            var type = variable.Type.GraphTypeFromType(schema);
-
-            if (type == null)
-                throw new InvalidVariableError(variable.Name, $"Variable has unknown type '{variable.Type.Name()}'");
-
-            if (input == null && variable.DefaultValue != null)
-            {
-                return variable.DefaultValue.Value;
-            }
-
             try
             {
-                return ParseValue(type, variable.Name, input);
+                return ParseValue(graphType, variable.Name, input);
             }
             catch (InvalidVariableError error)
             {
@@ -131,6 +151,7 @@ namespace GraphQL.Execution
                 throw;
             }
 
+            // Coerces a value depending on the graph type.
             static object ParseValue(IGraphType type, string variableName, object value)
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
@@ -139,7 +160,10 @@ namespace GraphQL.Execution
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
-                    return ParseValueNonNull(nonNullGraphType, variableName, value);
+                    if (value == null)
+                        ThrowNullError(variableName);
+
+                    return ParseValue(nonNullGraphType.ResolvedType, variableName, value);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
@@ -155,6 +179,7 @@ namespace GraphQL.Execution
                 }
             }
 
+            // Coerces a scalar value
             static object ParseValueScalar(ScalarGraphType scalarGraphType, string variableName, object value)
             {
                 if (value == null)
@@ -177,28 +202,21 @@ namespace GraphQL.Execution
                 return ret;
             }
 
-            static object ParseValueNonNull(NonNullGraphType nonNullGraphType, string variableName, object value)
-            {
-                if (value == null)
-                    ThrowNullError(variableName);
-
-                return ParseValue(nonNullGraphType.ResolvedType, variableName, value);
-            }
-
-            static void ThrowNullError(string variableName)
-                => throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
-
             static object ParseValueList(ListGraphType listGraphType, string variableName, object value)
             {
                 if (value == null)
                     return null;
 
+                // note: a list can have a single child element which will automatically be intrepreted as a list of 1 elements. (see below rule)
+                // so, to prevent a string as being intrepreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
                 if (value is IEnumerable values && !(value is string))
                 {
+                    // create a list containing the parsed elements in the input list
                     var valueOutputs = new List<object>(values is ICollection collection ? collection.Count : 0);
                     int index = 0;
                     foreach (var val in values)
                     {
+                        // parse/validate values as required by graph type
                         valueOutputs.Add(ParseValue(listGraphType.ResolvedType, variableName + "[" + index++ + "]", val));
                     }
                     return valueOutputs;
@@ -231,7 +249,7 @@ namespace GraphQL.Execution
                 var newDictionary = new Dictionary<string, object>(dic.Count);
                 foreach (var field in graphType.Fields)
                 {
-                    var childFieldVariableName = variableName + (variableName.EndsWith("]") ? null : ".") + field.Name;
+                    var childFieldVariableName = variableName + "." + field.Name;
 
                     if (dic.TryGetValue(field.Name, out var fieldValue))
                     {
@@ -245,20 +263,17 @@ namespace GraphQL.Execution
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
                         newDictionary[field.Name] = ParseValue(field.ResolvedType, childFieldVariableName, fieldValue);
                     }
+                    else if (field.DefaultValue != null)
+                    {
+                        // RULE: If no value is provided for a defined input object field and that
+                        // field definition provides a default value, the default value should be used.
+                        newDictionary[field.Name] = field.DefaultValue;
+                    }
                     else if (field.ResolvedType is NonNullGraphType nonNullGraphType)
                     {
-                        if (field.DefaultValue != null)
-                        {
-                            // RULE: If no value is provided for a defined input object field and that
-                            // field definition provides a default value, the default value should be used.
-                            newDictionary[field.Name] = field.DefaultValue;
-                        }
-                        else
-                        {
-                            // RULE: If no default value is provided and the input object field’s type is non‐null,
-                            // an error should be thrown.
-                            ThrowNullError(childFieldVariableName);
-                        }
+                        // RULE: If no default value is provided and the input object field’s type is non‐null,
+                        // an error should be thrown.
+                        ThrowNullError(childFieldVariableName);
                     }
 
                     // RULE: Otherwise, if the field is not required, then no
@@ -286,203 +301,18 @@ namespace GraphQL.Execution
             }
         }
 
-        /*
-        object ParseLiteral(IGraphType graphType, IValue value)
-        {
-            if (value == null || value is NullValue)
-                return null;
-
-            if (!(value is ObjectValue objectValue))
-            {
-                // RULE: The value for an input object should be an input object literal
-                // or an unordered map supplied by a variable, otherwise a query error
-                // must be thrown.
-
-                throw new ArgumentNullException(nameof(value), "Supplied value is not an object node");
-            }
-
-            var objectFieldsList = objectValue.ObjectFieldsList;
-            var newDictionary = new Dictionary<string, object>(objectFieldsList.Count);
-            foreach (var field in Fields)
-            {
-                var objectField = objectFieldsList.Find(o => o.Name == field.Name);
-                if (objectField != null)
-                {
-                    // RULE: If the value null was provided for an input object field, and
-                    // the field’s type is not a non‐null type, an entry in the coerced
-                    // unordered map is given the value null. In other words, there is a
-                    // semantic difference between the explicitly provided value null
-                    // versus having not provided a value.
-
-                    // Note: we always call ParseValue even for null values, and if it
-                    // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
-                    newDictionary[field.Name] = ((IInputType)field.ResolvedType).ParseLiteral(objectField.Value);
-                }
-                else if (field.ResolvedType is NonNullGraphType nonNullGraphType)
-                {
-                    // RULE: If no value is provided for a defined input object field and that
-                    // field definition provides a default value, the default value should be used.
-                    if (field.DefaultValue != null)
-                        newDictionary[field.Name] = field.DefaultValue;
-
-                    // RULE: If no default value is provided and the input object field’s type is non‐null,
-                    // an error should be thrown.
-                    newDictionary[field.Name] = nonNullGraphType.ParseLiteral(null); //throws error (unless overridden)
-                }
-
-                // RULE: Otherwise, if the field is not required, then no
-                // entry is added to the coerced unordered map.
-
-                // so do not do this:    else { newDictionary[field.Name] = null; }
-            }
-
-            // RULE: The value for an input object should be an input object literal
-            // or an unordered map supplied by a variable, otherwise a query error
-            // must be thrown. In either case, the input object literal or unordered
-            // map must not contain any entries with names not defined by a field
-            // of this input object type, ***otherwise an error must be thrown.***
-            foreach (var objectField in objectFieldsList)
-            {
-                if (!Fields.Any(x => x.Name == objectField.Name))
-                    throw new ArgumentException("An value within the list of object values cannot be matched to a field.", nameof(value));
-            }
-
-            return ParseDictionary(newDictionary);
-        }
-        */
-
-        /*
-        /// <summary>
-        /// Ensures that the specified variable value is valid for the variable's graph type.
-        /// </summary>
-        public static void AssertValidVariableValue(ISchema schema, IGraphType type, object input, string variableName, bool hasDefaultValue)
-        {
-            // see also GraphQLExtensions.IsValidLiteralValue
-            if (type is NonNullGraphType graphType)
-            {
-                var nonNullType = graphType.ResolvedType;
-
-                if (input == null && !hasDefaultValue)
-                {
-                    throw new InvalidVariableError(variableName, "Received a null input for a non-null variable.");
-                }
-
-                AssertValidVariableValue(schema, nonNullType, input, variableName, hasDefaultValue);
-                return;
-            }
-
-            if (input == null)
-            {
-                return;
-            }
-
-            if (type is ScalarGraphType scalar)
-            {
-                // verify value can be converted successfully
-
-                if (input is IValue value)
-                {
-                    bool conversionFailed;
-
-                    try
-                    {
-                        conversionFailed = scalar.ParseLiteral(value) == null;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'", ex);
-                    }
-
-                    if (conversionFailed)
-                        throw new InvalidVariableError(variableName, $"Unable to convert '{value.Value}' to '{type.Name}'");
-                }
-                else
-                {
-                    bool conversionFailed;
-
-                    try
-                    {
-                        conversionFailed = scalar.ParseValue(input) == null;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'", ex);
-                    }
-
-                    if (conversionFailed)
-                        throw new InvalidVariableError(variableName, $"Unable to convert '{input}' to '{type.Name}'");
-                }
-
-                return;
-            }
-
-            if (type is ListGraphType listType)
-            {
-                var listItemType = listType.ResolvedType;
-
-                if (input is IEnumerable list && !(input is string))
-                {
-                    var index = -1;
-                    foreach (var item in list)
-                        AssertValidVariableValue(schema, listItemType, item, $"{variableName}[{++index}]", hasDefaultValue);
-                }
-                else
-                {
-                    AssertValidVariableValue(schema, listItemType, input, variableName, hasDefaultValue);
-                }
-                return;
-            }
-
-            if (type is IObjectGraphType || type is IInputObjectGraphType)
-            {
-                var complexType = (IComplexGraphType)type;
-
-                if (!(input is Dictionary<string, object> dict))
-                {
-                    throw new InvalidVariableError(variableName,
-                        $"Unable to parse input as a '{type.Name}' type. Did you provide a List or Scalar value accidentally?");
-                }
-
-                // ensure every provided field is defined
-                IList<string> unknownFields = null;
-
-                if (type is IInputObjectGraphType)
-                {
-                    unknownFields = dict.Keys
-                        .Except(complexType.Fields.Select(f => f.Name))
-                        .ToList();
-                }
-
-                if (unknownFields?.Count > 0)
-                {
-                    throw new InvalidVariableError(variableName,
-                        $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{type.Name}'.");
-                }
-
-                foreach (var field in complexType.Fields)
-                {
-                    dict.TryGetValue(field.Name, out object fieldValue);
-                    AssertValidVariableValue(schema, field.ResolvedType, fieldValue, $"{variableName}.{field.Name}", hasDefaultValue);
-                }
-                return;
-            }
-
-            throw new InvalidVariableError(variableName ?? "input", "Invalid input");
-        }
-        */
-
         /// <summary>
         /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
         /// or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, object> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static Dictionary<string, ArgumentValue> GetArgumentValues(ISchema schema, QueryArguments definitionArguments, Arguments astArguments, Variables variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
             {
                 return null;
             }
 
-            var values = new Dictionary<string, object>(definitionArguments.Count);
+            var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
             foreach (var arg in definitionArguments.ArgumentsList)
             {
@@ -496,32 +326,34 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Coerces a variable value to a compatible .NET type for the variable's graph type.
+        /// Coerces a literal value to a compatible .NET type for the variable's graph type.
+        /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
+        public static ArgumentValue CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
         {
             if (type is NonNullGraphType nonNull)
             {
-                // validation rules and/or AssertValidVariableValue have verified that this is not null
+                // validation rules have verified that this is not null
                 return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
             if (input == null)
             {
-                return fieldDefault;
+                return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
             if (input is NullValue)
             {
-                return null;
+                return new ArgumentValue(null, ArgumentSource.Literal);
             }
 
             if (input is VariableReference variable)
             {
                 if (variables == null)
-                    return fieldDefault;
+                    return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
 
-                return variables.ValueFor(variable.Name, fieldDefault);
+                var found = variables.ValueFor(variable.Name, out var ret);
+                return found ? new ArgumentValue(ret, ArgumentSource.Variable) : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
             if (type is ListGraphType listType)
@@ -530,13 +362,13 @@ namespace GraphQL.Execution
 
                 if (input is ListValue list)
                 {
-                    return list.Values
-                        .Select(item => CoerceValue(schema, listItemType, item, variables))
-                        .ToList();
+                    return new ArgumentValue(list.Values
+                        .Select(item => CoerceValue(schema, listItemType, item, variables).Value)
+                        .ToList(), ArgumentSource.Literal);
                 }
                 else
                 {
-                    return new[] { CoerceValue(schema, listItemType, input, variables) };
+                    return new ArgumentValue(new[] { CoerceValue(schema, listItemType, input, variables).Value }, ArgumentSource.Literal);
                 }
             }
 
@@ -544,7 +376,7 @@ namespace GraphQL.Execution
             {
                 if (!(input is ObjectValue objectValue))
                 {
-                    return null;
+                    return new ArgumentValue(null, ArgumentSource.Literal);
                 }
 
                 var obj = new Dictionary<string, object>();
@@ -557,9 +389,6 @@ namespace GraphQL.Execution
                     {
                         // Rules covered:
 
-                        // If no default value is provided and the input object field’s type is non‐null, an error should be
-                        // thrown.
-
                         // If a literal value is provided for an input object field, an entry in the coerced unordered map is
                         // given the result of coercing that value according to the input coercion rules for the type of that field.
 
@@ -570,7 +399,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {
@@ -578,19 +407,22 @@ namespace GraphQL.Execution
                         // the default value should be used. 
                         obj[field.Name] = field.DefaultValue;
                     }
-                    // Covered by validation rules and/or AssertValidVariableValue:
                     // Otherwise, if the field is not required, then no entry is added to the coerced unordered map.
+
+                    // Covered by validation rules:
+                    // If no default value is provided and the input object field’s type is non‐null, an error should be
+                    // thrown.
                 }
 
-                return inputObjectGraphType.ParseDictionary(obj);
+                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
             }
 
             if (type is ScalarGraphType scalarType)
             {
-                return scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'");
+                return new ArgumentValue(scalarType.ParseLiteral(input) ?? throw new ArgumentException($"Unable to convert '{input}' to '{type.Name}'"), ArgumentSource.Literal);
             }
 
-            return null;
+            throw new ArgumentOutOfRangeException(nameof(input), $"Unknown type of input object '{type.GetType()}'");
         }
 
         private static Fields CollectFields(
@@ -688,7 +520,7 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    if (values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
+                    if (values.TryGetValue("if", out ArgumentValue ifObj) && bool.TryParse(ifObj.Value?.ToString() ?? string.Empty, out bool ifVal) && ifVal)
                         return false;
                 }
 
@@ -701,7 +533,7 @@ namespace GraphQL.Execution
                         directive.Arguments,
                         context.Variables);
 
-                    return values.TryGetValue("if", out object ifObj) && bool.TryParse(ifObj?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
+                    return values.TryGetValue("if", out ArgumentValue ifObj) && bool.TryParse(ifObj.Value?.ToString() ?? string.Empty, out bool ifVal) && ifVal;
                 }
             }
 

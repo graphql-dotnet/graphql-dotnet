@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Execution;
 
 namespace GraphQL.Language.AST
 {
@@ -22,17 +23,26 @@ namespace GraphQL.Language.AST
         /// </summary>
         public object ValueFor(string name, object defaultValue = null)
         {
+            return ValueFor(name, out var value) ? value : defaultValue;
+        }
+
+        public bool ValueFor(string name, out object value)
+        {
             // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)
             {
                 foreach (var v in _variables)
                 {
                     if (v.Name == name)
-                        return v.ValueSpecified ? v.Value : defaultValue;
+                    {
+                        value = v.Value;
+                        return v.ValueSpecified;
+                    }
                 }
             }
 
-            return defaultValue;
+            value = null;
+            return false;
         }
 
         /// <inheritdoc/>

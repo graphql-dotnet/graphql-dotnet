@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using GraphQL.Execution;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -15,6 +16,15 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
+
+        /*
+        public static T ToObject<T>(this IDictionary<string, ArgumentValue> source)
+            where T : class
+            => (T)ToObject(source, typeof(T));
+
+        public static object ToObject(this IDictionary<string, ArgumentValue> source, Type type, IGraphType mappedType = null)
+            => ToObject(source.ToObjectDictionary(), type, mappedType);
+        */
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -306,5 +316,44 @@ namespace GraphQL
 
             return false;
         }
+
+        /*
+        public static IDictionary<string, object> ToObjectDictionary(this IDictionary<string, ArgumentValue> source)
+        {
+            return new ObjectDictionary(source);
+        }
+
+        private class ObjectDictionary : IDictionary<string, object>
+        {
+            private readonly IDictionary<string, ArgumentValue> _dictionary;
+
+            public ObjectDictionary(IDictionary<string, ArgumentValue> dic)
+                => _dictionary = dic;
+
+            public object this[string key] { get => _dictionary[key].Value; set => _dictionary[key] = new ArgumentValue(value, ArgumentSource.Literal); }
+            public ICollection<string> Keys => _dictionary.Keys;
+            public ICollection<object> Values => _dictionary.Values.Select(x => x.Value).ToList();
+            public int Count => _dictionary.Count;
+            public bool IsReadOnly => _dictionary.IsReadOnly;
+            public void Add(string key, object value) => _dictionary.Add(key, new ArgumentValue(value, ArgumentSource.Literal));
+            public void Add(KeyValuePair<string, object> item) => _dictionary.Add(new KeyValuePair<string, ArgumentValue>(item.Key, new ArgumentValue(item, ArgumentSource.Literal)));
+            public void Clear() => _dictionary.Clear();
+            public bool Contains(KeyValuePair<string, object> item) => _dictionary.Any(x => x.Key == item.Key && x.Value.Value == item.Value);
+            public bool ContainsKey(string key) => _dictionary.ContainsKey(key);
+            public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) {
+                foreach(var entry in this)
+                    array[arrayIndex++] = entry;
+            }
+            public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _dictionary.Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value)).GetEnumerator();
+            public bool Remove(string key) => _dictionary.Remove(key);
+            public bool Remove(KeyValuePair<string, object> item) => TryGetValue(item.Key, out var value) && value == item.Value && _dictionary.Remove(item.Key);
+            public bool TryGetValue(string key, out object value) {
+                var ret = _dictionary.TryGetValue(key, out var outvalue);
+                value = outvalue.Value;
+                return ret;
+            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+        */
     }
 }
