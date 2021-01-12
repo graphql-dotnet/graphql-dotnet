@@ -235,6 +235,12 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+## Known Issues
+
+`IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.
+It cannot identify which arguments have been provided a `null` value compared to arguments which were not provided.
+This issue should supposedly be resolved in version 4.
+
 ## Common Errors
 
 ### Synchronous operations are disallowed.

@@ -18,9 +18,9 @@ namespace GraphQL.Language.AST
         public void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <summary>
-        /// Returns the first variable with a matching name, or <see langword="null"/> if none are found.
+        /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
         /// </summary>
-        public object ValueFor(string name)
+        public object ValueFor(string name, object defaultValue = null)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)
@@ -28,11 +28,11 @@ namespace GraphQL.Language.AST
                 foreach (var v in _variables)
                 {
                     if (v.Name == name)
-                        return v.Value;
+                        return v.ValueSpecified ? v.Value : defaultValue;
                 }
             }
 
-            return null;
+            return defaultValue;
         }
 
         /// <inheritdoc/>
