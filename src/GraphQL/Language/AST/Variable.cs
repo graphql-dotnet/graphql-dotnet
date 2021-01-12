@@ -10,9 +10,23 @@ namespace GraphQL.Language.AST
         /// </summary>
         public string Name { get; set; }
 
+        private object _value;
         /// <summary>
         /// Gets or sets the value of the variable.
         /// </summary>
-        public object Value { get; set; }
+        public object Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                ValueSpecified = true;
+            }
+        }
+
+        /// <summary>
+        /// Indicates if the variable value has been set.
+        /// </summary>
+        public bool ValueSpecified { get; private set; }
     }
 }

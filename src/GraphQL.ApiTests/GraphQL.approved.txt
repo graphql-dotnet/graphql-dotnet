@@ -663,7 +663,7 @@ namespace GraphQL.Execution
     public static class ExecutionHelper
     {
         public static void AssertValidVariableValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, object input, string variableName, bool hasDefaultValue) { }
-        public static object CoerceValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue input, GraphQL.Language.AST.Variables variables = null) { }
+        public static object CoerceValue(GraphQL.Types.ISchema schema, GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue input, GraphQL.Language.AST.Variables variables = null, object fieldDefault = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFields(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public static bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
         public static System.Collections.Generic.Dictionary<string, object> GetArgumentValues(GraphQL.Types.ISchema schema, GraphQL.Types.QueryArguments definitionArguments, GraphQL.Language.AST.Arguments astArguments, GraphQL.Language.AST.Variables variables) { }
@@ -1407,6 +1407,7 @@ namespace GraphQL.Language.AST
         public Variable() { }
         public string Name { get; set; }
         public object Value { get; set; }
+        public bool ValueSpecified { get; }
     }
     public class VariableDefinition : GraphQL.Language.AST.AbstractNode
     {
@@ -1440,7 +1441,7 @@ namespace GraphQL.Language.AST
         public void Add(GraphQL.Language.AST.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Variable> GetEnumerator() { }
         public override string ToString() { }
-        public object ValueFor(string name) { }
+        public object ValueFor(string name, object defaultValue = null) { }
     }
 }
 namespace GraphQL.Language
