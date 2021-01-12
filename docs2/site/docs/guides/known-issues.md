@@ -180,6 +180,12 @@ This is done within your database queries; it is not a function of the dataloade
 `CollectionBatchDataLoader` as you would for a one-to-many relationship; then when you are loading
 data from your database within the fetch delegate, use an inner join to retrieve the proper data.
 
+## Known Issues
+
+`IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.
+It cannot identify which arguments have been provided a `null` value compared to arguments which were not provided.
+This issue should supposedly be resolved in version 4.
+
 ## Common Errors
 
 ### Synchronous operations are disallowed.

@@ -97,9 +97,16 @@ namespace GraphQL.Execution
                         Name = v.Name
                     };
 
-                    object variableValue = null;
-                    inputs?.TryGetValue(v.Name, out variableValue);
-                    variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    if (inputs.TryGetValue(v.Name, out var variableValue))
+                    {
+                        variable.Value = GetVariableValue(document, schema, v, variableValue);
+                    }
+                    else
+                    {
+                        var value = GetVariableValue(document, schema, v, v.DefaultValue?.Value);
+                        if (value != null)
+                            variable.Value = value;
+                    }
 
                     variables.Add(variable);
                 }
@@ -110,6 +117,7 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Return the specified variable's value for the document from the attached <see cref="Inputs"/> object.
+        /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
         public static object GetVariableValue(Document document, ISchema schema, VariableDefinition variable, object input)
         {
@@ -125,9 +133,9 @@ namespace GraphQL.Execution
                 throw;
             }
 
-            if (input == null && variable.DefaultValue != null)
+            if (input == null)
             {
-                return variable.DefaultValue.Value;
+                return null;
             }
 
             return CoerceValue(schema, type, input.AstFromValue(schema, type));
@@ -269,12 +277,7 @@ namespace GraphQL.Execution
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
 
-                var coercedValue = CoerceValue(schema, type, value, variables) ?? arg.DefaultValue;
-
-                if (coercedValue != null)
-                {
-                    values[arg.Name] = coercedValue;
-                }
+                values[arg.Name] = CoerceValue(schema, type, value, variables, arg.DefaultValue);
             }
 
             return values;
@@ -283,21 +286,30 @@ namespace GraphQL.Execution
         /// <summary>
         /// Coerces a variable value to a compatible .NET type for the variable's graph type.
         /// </summary>
-        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null)
+        public static object CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
         {
             if (type is NonNullGraphType nonNull)
             {
-                return CoerceValue(schema, nonNull.ResolvedType, input, variables);
+                // validation rules and/or AssertValidVariableValue have verified that this is not null
+                return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
-            if (input == null || input is NullValue)
+            if (input == null)
+            {
+                return fieldDefault;
+            }
+
+            if (input is NullValue)
             {
                 return null;
             }
 
             if (input is VariableReference variable)
             {
-                return variables?.ValueFor(variable.Name);
+                if (variables == null)
+                    return fieldDefault;
+
+                return variables.ValueFor(variable.Name, fieldDefault);
             }
 
             if (type is ListGraphType listType)
@@ -328,15 +340,35 @@ namespace GraphQL.Execution
 
                 foreach (var field in complexType.Fields)
                 {
+                    // https://spec.graphql.org/June2018/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
-                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables) ?? field.DefaultValue;
+                        // Rules covered:
+
+                        // If no default value is provided and the input object field’s type is non‐null, an error should be
+                        // thrown.
+
+                        // If a literal value is provided for an input object field, an entry in the coerced unordered map is
+                        // given the result of coercing that value according to the input coercion rules for the type of that field.
+
+                        // If a variable is provided for an input object field, the runtime value of that variable must be used.
+                        // If the runtime value is null and the field type is non‐null, a field error must be thrown.
+                        // If no runtime value is provided, the variable definition’s default value should be used.
+                        // If the variable definition does not provide a default value, the input object field definition’s
+                        // default value should be used.
+
+                        // so: do not pass the field's default value to this method, since the field was specified
+                        obj[field.Name] = CoerceValue(schema, field.ResolvedType, objectField.Value, variables);
                     }
                     else if (field.DefaultValue != null)
                     {
+                        // If no value is provided for a defined input object field and that field definition provides a default value,
+                        // the default value should be used. 
                         obj[field.Name] = field.DefaultValue;
                     }
+                    // Covered by validation rules and/or AssertValidVariableValue:
+                    // Otherwise, if the field is not required, then no entry is added to the coerced unordered map.
                 }
 
                 return obj;
