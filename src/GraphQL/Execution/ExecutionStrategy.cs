@@ -129,12 +129,26 @@ namespace GraphQL.Execution
                 throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
             }
 
-            var index = 0;
+            int index = 0;
             var arrayItems = (data is ICollection collection)
                 ? new List<ExecutionNode>(collection.Count)
                 : new List<ExecutionNode>();
+            
+            if (data is IList list)
+            {
+                for (int i=0; i<list.Count; ++i)
+                    SetArrayItemNode(list[i]);
+            }
+            else
+            {
+                foreach (object d in data)
+                    SetArrayItemNode(d);
+            }
 
-            foreach (var d in data)
+            parent.Items = arrayItems;
+
+            // local function uses 'struct closure' without heap allocation
+            void SetArrayItemNode(object d)
             {
                 if (d != null)
                 {
@@ -173,8 +187,6 @@ namespace GraphQL.Execution
 
                 index++;
             }
-
-            parent.Items = arrayItems;
         }
 
         /// <summary>

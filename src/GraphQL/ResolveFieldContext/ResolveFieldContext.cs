@@ -79,6 +79,11 @@ namespace GraphQL
         /// <inheritdoc/>
         public IDictionary<string, object> Extensions { get; set; }
 
+        /// <inheritdoc/>
+        public TElement[] GetPooledArray<TElement>(int minimumLength) => _baseContext.GetPooledArray<TElement>(minimumLength);
+
+        private readonly IResolveFieldContext _baseContext;
+
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
         /// </summary>
@@ -89,6 +94,8 @@ namespace GraphQL
         /// </summary>
         public ResolveFieldContext(IResolveFieldContext context)
         {
+            _baseContext = context;
+
             Source = context.Source;
             FieldName = context.FieldName;
             FieldAst = context.FieldAst;
@@ -117,7 +124,7 @@ namespace GraphQL
     /// <inheritdoc cref="ResolveFieldContext"/>
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
-        /// <inheritdoc cref="ResolveFieldContext.ResolveFieldContext()"/>
+        /// <inheritdoc cref="ResolveFieldContext()"/>
         public ResolveFieldContext()
         {
         }

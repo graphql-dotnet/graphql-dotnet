@@ -46,7 +46,7 @@ namespace GraphQL.Introspection
                 resolve: async context =>
                 {
                     var arguments = context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
-                    var args = await arguments.WhereAsync(x => context.Schema.Filter.AllowArgument(context.Source, x)).ConfigureAwait(false);
+                    var args = await arguments.WhereAsync((x, context) => context.Schema.Filter.AllowArgument(context.Source, x), context).ConfigureAwait(false);
                     var comparer = context.Schema.Comparer.ArgumentComparer(context.Source);
                     if (comparer != null)
                         args = args.OrderBy(a => a, comparer);

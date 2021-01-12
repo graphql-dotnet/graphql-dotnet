@@ -282,6 +282,7 @@ namespace GraphQL
             {
                 result ??= new ExecutionResult();
                 result.Perf = metrics.Finish();
+                context?.ReturnArrays();
             }
 
             return result;

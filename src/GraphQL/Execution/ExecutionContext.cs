@@ -59,5 +59,23 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
+
+        private readonly List<Array> _trackedArrays = new List<Array>();
+
+        public void TrackArray(Array array)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+
+            lock (_trackedArrays)
+                _trackedArrays.Add(array);
+        }
+
+        internal void ReturnArrays()
+        {
+            // lock is not required because at this time work with ExecutionContext has already been completed
+            foreach (var array in _trackedArrays)
+                array.Return();
+        }
     }
 }

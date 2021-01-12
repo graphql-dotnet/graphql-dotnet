@@ -43,7 +43,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IInterfaceGraphType> ResolvedInterfaces
+        public ResolvedInterfaces ResolvedInterfaces
         {
             get => throw Invalid();
             set => throw Invalid();

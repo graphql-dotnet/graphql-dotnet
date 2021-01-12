@@ -14,24 +14,28 @@ namespace GraphQL.Introspection
         /// </summary>
         /// <param name="type">The graph type to consider.</param>
         Task<bool> AllowType(IGraphType type);
+
         /// <summary>
         /// Returns a boolean indicating whether the specified field should be returned within the introspection query.
         /// </summary>
         /// <param name="parent">The parent type to which the field belongs.</param>
         /// <param name="field">The field to consider.</param>
         Task<bool> AllowField(IGraphType parent, IFieldType field);
+
         /// <summary>
         /// Returns a boolean indicating whether the specified argument should be returned within the introspection query.
         /// </summary>
         /// <param name="field">The field to which the argument belongs.</param>
         /// <param name="argument">The argument to consider.</param>
         Task<bool> AllowArgument(IFieldType field, QueryArgument argument);
+
         /// <summary>
         /// Returns a boolean indicating whether the specified enumeration value should be returned within the introspection query.
         /// </summary>
         /// <param name="parent">The enumeration to which the enumeration value belongs.</param>
         /// <param name="enumValue">The enumeration value to consider.</param>
         Task<bool> AllowEnumValue(EnumerationGraphType parent, EnumValueDefinition enumValue);
+
         /// <summary>
         /// Returns a boolean indicating whether the specified directive should be returned within the introspection query.
         /// </summary>

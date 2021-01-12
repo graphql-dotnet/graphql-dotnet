@@ -506,46 +506,42 @@ Make sure that your ServiceProvider is configured correctly.");
 
             if (type is IObjectGraphType objectType)
             {
-                objectType.ResolvedInterfaces = objectType
-                    .ResolvedInterfaces
-                    .Select(i =>
+                var list = objectType.ResolvedInterfaces.List;
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    var interfaceType = (IInterfaceGraphType)ConvertTypeReference(objectType, list[i]);
+
+                    if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
                     {
-                        var interfaceType = (IInterfaceGraphType)ConvertTypeReference(objectType, i);
+                        throw new InvalidOperationException(
+                               $"Interface type \"{interfaceType.Name}\" does not provide a \"resolveType\" function " +
+                               $"and possible Type \"{objectType.Name}\" does not provide a \"isTypeOf\" function.  " +
+                                "There is no way to resolve this possible type during execution.");
+                    }
 
-                        if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
-                        {
-                            throw new InvalidOperationException(
-                                   $"Interface type \"{interfaceType.Name}\" does not provide a \"resolveType\" function " +
-                                   $"and possible Type \"{objectType.Name}\" does not provide a \"isTypeOf\" function.  " +
-                                    "There is no way to resolve this possible type during execution.");
-                        }
+                    interfaceType.AddPossibleType(objectType);
 
-                        interfaceType.AddPossibleType(objectType);
-
-                        return interfaceType;
-                    })
-                    .ToList();
+                    list[i] = interfaceType;
+                }
             }
 
             if (type is UnionGraphType union)
             {
-                union.PossibleTypes = union
-                    .PossibleTypes
-                    .Select(t =>
+                var list = union.PossibleTypes.List;
+                for (int i=0; i<list.Count; ++i)
+                {
+                    var unionType = ConvertTypeReference(union, list[i]) as IObjectGraphType;
+
+                    if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                     {
-                        var unionType = ConvertTypeReference(union, t) as IObjectGraphType;
+                        throw new InvalidOperationException(
+                           $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
+                           $"and possible Type \"{union.Name}\" does not provide a \"isTypeOf\" function. " +
+                            "There is no way to resolve this possible type during execution.");
+                    }
 
-                        if (union.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
-                        {
-                            throw new InvalidOperationException(
-                               $"Union type \"{union.Name}\" does not provide a \"resolveType\" function " +
-                               $"and possible Type \"{union.Name}\" does not provide a \"isTypeOf\" function. " +
-                                "There is no way to resolve this possible type during execution.");
-                        }
-
-                        return unionType;
-                    })
-                    .ToList();
+                    list[i] = unionType;
+                }
             }
         }
 

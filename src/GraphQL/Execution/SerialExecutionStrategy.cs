@@ -42,10 +42,7 @@ namespace GraphQL.Execution
                     else if (node is IParentExecutionNode parentNode)
                     {
                         // Add in reverse order so fields are executed in the correct order
-                        foreach (var child in parentNode.GetChildNodes().Reverse())
-                        {
-                            nodes.Push(child);
-                        }
+                        parentNode.ApplyToChildren((node, state) => state.Push(node), nodes, reverse: true);
                     }
                 }
 
@@ -69,10 +66,7 @@ namespace GraphQL.Execution
                     else if (node is IParentExecutionNode parentNode)
                     {
                         // Add in reverse order so fields are executed in the correct order
-                        foreach (var child in parentNode.GetChildNodes().Reverse())
-                        {
-                            nodes.Push(child);
-                        }
+                        parentNode.ApplyToChildren((node, state) => state.Push(node), nodes, reverse: true);
                     }
                 }
             }

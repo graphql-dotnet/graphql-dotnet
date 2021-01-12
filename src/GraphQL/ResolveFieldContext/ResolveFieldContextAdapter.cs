@@ -82,5 +82,8 @@ namespace GraphQL
         object IResolveFieldContext.Source => Source;
 
         public IServiceProvider RequestServices => _baseContext.RequestServices;
+
+        /// <inheritdoc/>
+        public TElement[] GetPooledArray<TElement>(int minimumLength) => _baseContext.GetPooledArray<TElement>(minimumLength);
     }
 }

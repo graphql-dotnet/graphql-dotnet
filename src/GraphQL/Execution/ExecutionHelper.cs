@@ -254,7 +254,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, object>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.ArgumentsList)
+            foreach (var arg in definitionArguments.List)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;

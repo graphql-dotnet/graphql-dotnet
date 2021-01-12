@@ -16,6 +16,15 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
+        /// <summary>
+        /// Gets an array of the specified minimum length from the pool.
+        /// This array does not need to be returned to the pool yourself.
+        /// </summary>
+        /// <typeparam name="TElement">Array element type.</typeparam>
+        /// <param name="minLength">The minimum length of the array.</param>
+        /// <returns>Array from pool.</returns>
+        TElement[] GetPooledArray<TElement>(int minLength);
+
         /// <summary>The name of the field being resolved.</summary>
         string FieldName { get; }
 

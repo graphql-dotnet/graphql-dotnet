@@ -46,7 +46,7 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: async context =>
                 {
-                    var types = await context.Schema.AllTypes.WhereAsync(x => context.Schema.Filter.AllowType(x)).ConfigureAwait(false);
+                    var types = await context.Schema.AllTypes.WhereAsync((x, context) => context.Schema.Filter.AllowType(x), context).ConfigureAwait(false);
                     if (context.Schema.Comparer.TypeComparer != null)
                         types = types.OrderBy(t => t, context.Schema.Comparer.TypeComparer);
                     return types;
@@ -87,7 +87,7 @@ namespace GraphQL.Introspection
                 "A list of all directives supported by this server.",
                 resolve: async context =>
                 {
-                    var directives = await context.Schema.Directives.WhereAsync(d => context.Schema.Filter.AllowDirective(d)).ConfigureAwait(false);
+                    var directives = await context.Schema.Directives.WhereAsync((d, context) => context.Schema.Filter.AllowDirective(d), context).ConfigureAwait(false);
                     if (context.Schema.Comparer.DirectiveComparer != null)
                         directives = directives.OrderBy(d => d, context.Schema.Comparer.DirectiveComparer);
                     return directives;
