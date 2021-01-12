@@ -7,7 +7,7 @@ namespace GraphQL.Types
     /// <summary>
     /// A class that represents a set of fields for <see cref="IComplexGraphType"/> i.e <see cref="ComplexGraphType{TSourceType}"/>.
     /// </summary>
-    public class FieldFields : IEnumerable<FieldType>
+    public class TypeFields : IEnumerable<FieldType>
     {
         internal List<FieldType> List { get; } = new List<FieldType>();
 

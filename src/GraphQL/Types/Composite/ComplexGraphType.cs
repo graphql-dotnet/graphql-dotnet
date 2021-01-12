@@ -17,7 +17,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of the fields configured for this graph type.
         /// </summary>
-        FieldFields Fields { get; }
+        TypeFields Fields { get; }
 
         /// <summary>
         /// Adds a field to this graph type.
@@ -51,7 +51,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public FieldFields Fields { get; } = new FieldFields();
+        public TypeFields Fields { get; } = new TypeFields();
 
         /// <inheritdoc/>
         public bool HasField(string name)

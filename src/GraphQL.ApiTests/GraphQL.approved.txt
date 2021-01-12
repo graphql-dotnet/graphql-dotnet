@@ -1632,7 +1632,7 @@ namespace GraphQL.Types
     public abstract class ComplexGraphType<TSourceType> : GraphQL.Types.GraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
         protected ComplexGraphType() { }
-        public GraphQL.Types.FieldFields Fields { get; }
+        public GraphQL.Types.TypeFields Fields { get; }
         public virtual GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : GraphQL.Types.IGraphType { }
@@ -1779,14 +1779,6 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IAsyncEventStreamResolver AsyncSubscriber { get; set; }
         public GraphQL.Resolvers.IEventStreamResolver Subscriber { get; set; }
     }
-    public class FieldFields : System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType>, System.Collections.IEnumerable
-    {
-        public FieldFields() { }
-        public int Count { get; }
-        public bool Contains(GraphQL.Types.FieldType field) { }
-        public bool Contains(GraphQL.Types.IFieldType field) { }
-        public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
-    }
     public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
@@ -1856,7 +1848,7 @@ namespace GraphQL.Types
     }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideMetadata
     {
-        GraphQL.Types.FieldFields Fields { get; }
+        GraphQL.Types.TypeFields Fields { get; }
         GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType);
         GraphQL.Types.FieldType GetField(string name);
         bool HasField(string name);
@@ -2145,6 +2137,14 @@ namespace GraphQL.Types
         public static string FullName(this GraphQL.Language.AST.IType type) { }
         public static GraphQL.Types.IGraphType GraphTypeFromType(this GraphQL.Language.AST.IType type, GraphQL.Types.ISchema schema) { }
         public static string Name(this GraphQL.Language.AST.IType type) { }
+    }
+    public class TypeFields : System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType>, System.Collections.IEnumerable
+    {
+        public TypeFields() { }
+        public int Count { get; }
+        public bool Contains(GraphQL.Types.FieldType field) { }
+        public bool Contains(GraphQL.Types.IFieldType field) { }
+        public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
     }
     public class UIntGraphType : GraphQL.Types.ScalarGraphType
     {
