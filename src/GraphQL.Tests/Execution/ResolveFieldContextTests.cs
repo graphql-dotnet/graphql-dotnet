@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Execution;
-using GraphQL.SystemTextJson;
 using Shouldly;
 using Xunit;
 
