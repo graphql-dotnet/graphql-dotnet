@@ -2,10 +2,10 @@ name: Test documentation
 
 on:
   pull_request:
-    branches: 
+    branches:
       - master
       - develop
-    paths: 
+    paths:
       - docs2/**
       - package.json
       - yarn.lock

@@ -85,12 +85,11 @@ namespace GraphQL.Types
                type => BuildNamedType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)),
                (name, type, ctx) =>
                {
-                   string trimmed = name.TrimGraphQLTypes();
                    lock (_lock)
                    {
-                       SetGraphType(trimmed, type);
+                       SetGraphType(name, type);
                    }
-                   ctx.AddType(trimmed, type, null);
+                   ctx.AddType(name, type, null);
                });
 
             // Add introspection types. Note that introspection types rely on the
@@ -232,7 +231,7 @@ namespace GraphQL.Types
 
                 lock (_lock)
                 {
-                    SetGraphType(typeName.TrimGraphQLTypes(), value);
+                    SetGraphType(typeName, value);
                 }
             }
         }

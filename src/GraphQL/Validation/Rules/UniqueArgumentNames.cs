@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Argument>((argument, context) =>
             {
                 var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
-                var argName = argument.Name;
+                string argName = argument.Name;
                 if (knownArgs.ContainsKey(argName))
                 {
                     context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));

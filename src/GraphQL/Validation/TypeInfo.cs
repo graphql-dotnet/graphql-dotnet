@@ -49,52 +49,34 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns the last graph type matched, or null if none.
         /// </summary>
-        public IGraphType GetLastType()
-        {
-            return _typeStack.Count > 0 ? _typeStack.Peek() : null;
-        }
+        public IGraphType GetLastType() => _typeStack.Count > 0 ? _typeStack.Peek() : null;
 
         /// <summary>
         /// Returns the last input graph type matched, or null if none.
         /// </summary>
-        public IGraphType GetInputType()
-        {
-            return _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
-        }
+        public IGraphType GetInputType() => _inputTypeStack.Count > 0 ? _inputTypeStack.Peek() : null;
 
         /// <summary>
         /// Returns the parent graph type of the current node, or null if none.
         /// </summary>
-        public IGraphType GetParentType()
-        {
-            return _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
-        }
+        public IGraphType GetParentType() => _parentTypeStack.Count > 0 ? _parentTypeStack.Peek() : null;
 
         /// <summary>
         /// Returns the last field type matched, or null if none.
         /// </summary>
-        public FieldType GetFieldDef()
-        {
-            return _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
-        }
+        public FieldType GetFieldDef() => _fieldDefStack.Count > 0 ? _fieldDefStack.Peek() : null;
 
         /// <summary>
         /// Returns the last directive specified, or null if none.
         /// </summary>
         /// <returns></returns>
-        public DirectiveGraphType GetDirective()
-        {
-            return _directive;
-        }
+        public DirectiveGraphType GetDirective() => _directive;
 
         /// <summary>
         /// Returns the last query argument matched, or null if none.
         /// </summary>
         /// <returns></returns>
-        public QueryArgument GetArgument()
-        {
-            return _argument;
-        }
+        public QueryArgument GetArgument() => _argument;
 
         /// <inheritdoc/>
         public void Enter(INode node, ValidationContext context)
@@ -209,47 +191,32 @@ namespace GraphQL.Validation
             if (node is SelectionSet)
             {
                 _parentTypeStack.Pop();
-                return;
             }
-
-            if (node is Field)
+            else if (node is Field)
             {
                 _fieldDefStack.Pop();
                 _typeStack.Pop();
-                return;
             }
-
-            if (node is Directive)
+            else if (node is Directive)
             {
                 _directive = null;
-                return;
             }
-
-            if (node is Operation
-                || node is FragmentDefinition
-                || node is InlineFragment)
+            else if (node is Operation || node is FragmentDefinition || node is InlineFragment)
             {
                 _typeStack.Pop();
-                return;
             }
-
-            if (node is VariableDefinition)
+            else if (node is VariableDefinition)
             {
                 _inputTypeStack.Pop();
-                return;
             }
-
-            if (node is Argument)
+            else if (node is Argument)
             {
                 _argument = null;
                 _inputTypeStack.Pop();
-                return;
             }
-
-            if (node is ListValue || node is ObjectField)
+            else if (node is ListValue || node is ObjectField)
             {
                 _inputTypeStack.Pop();
-                return;
             }
         }
 
@@ -257,14 +224,12 @@ namespace GraphQL.Validation
         {
             var name = field.Name;
 
-            if (name == schema.SchemaMetaFieldType.Name
-                && Equals(schema.Query, parentType))
+            if (name == schema.SchemaMetaFieldType.Name && Equals(schema.Query, parentType))
             {
                 return schema.SchemaMetaFieldType;
             }
 
-            if (name == schema.TypeMetaFieldType.Name
-                && Equals(schema.Query, parentType))
+            if (name == schema.TypeMetaFieldType.Name && Equals(schema.Query, parentType))
             {
                 return schema.TypeMetaFieldType;
             }

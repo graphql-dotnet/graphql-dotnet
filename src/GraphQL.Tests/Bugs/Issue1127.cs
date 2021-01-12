@@ -49,11 +49,11 @@ query {
                 resolve: ctx =>
                 {
                     ctx.Arguments["s1"].ShouldBe("def1");
-                    ctx.Arguments["s2"].ShouldBe("def2");
+                    ctx.Arguments["s2"].ShouldBeNull();
                     ctx.Arguments["s3"].ShouldBe("aaa");
 
                     ctx.Arguments["input1"].ShouldBe(1);
-                    ctx.Arguments["input2"].ShouldBe(2);
+                    ctx.Arguments["input2"].ShouldBeNull();
                     ctx.Arguments["input3"].ShouldNotBeNull();
 
                     (ctx.Arguments["input3"] as Dictionary<string, object>)["name"].ShouldBe("struct");
