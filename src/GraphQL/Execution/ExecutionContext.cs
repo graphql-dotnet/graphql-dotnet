@@ -62,7 +62,7 @@ namespace GraphQL.Execution
 
         private readonly List<Array> _trackedArrays = new List<Array>();
 
-        public void TrackArray(Array array)
+        internal void TrackArray(Array array)
         {
             if (array == null)
                 throw new ArgumentNullException(nameof(array));

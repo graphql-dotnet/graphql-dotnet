@@ -667,7 +667,6 @@ namespace GraphQL.Execution
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
-        public void TrackArray(System.Array array) { }
     }
     public static class ExecutionHelper
     {
