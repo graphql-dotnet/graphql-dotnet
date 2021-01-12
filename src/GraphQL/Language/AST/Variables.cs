@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.Execution;
 
 namespace GraphQL.Language.AST
 {
@@ -26,6 +25,9 @@ namespace GraphQL.Language.AST
             return ValueFor(name, out var value) ? value : defaultValue;
         }
 
+        /// <summary>
+        /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
+        /// </summary>
         public bool ValueFor(string name, out object value)
         {
             // DO NOT USE LINQ ON HOT PATH

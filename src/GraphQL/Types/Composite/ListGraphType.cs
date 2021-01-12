@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using GraphQL.Language.AST;
 
 namespace GraphQL.Types
 {
@@ -45,29 +42,6 @@ namespace GraphQL.Types
         /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
         public IGraphType ResolvedType { get; set; }
-
-        /*
-        /// <inheritdoc/>
-        public virtual object ParseLiteral(IValue value)
-        {
-            if (value == null || value is NullValue)
-                return null;
-
-            if (!(ResolvedType is IInputType resolvedInputType))
-                throw new InvalidOperationException("The underlying graph type is not an input graph type.");
-
-            if (!(value is ListValue listValue))
-                throw new ArgumentOutOfRangeException("The value supplied is not a list node.");
-
-            var valuesList = listValue.ValuesList;
-            var values = new List<object>(valuesList.Count);
-            for (int i = 0; i < values.Count; i++)
-            {
-                values[i] = resolvedInputType.ParseLiteral(valuesList[i]);
-            }
-            return values;
-        }
-        */
 
         /// <inheritdoc/>
         public override string ToString() => $"[{ResolvedType}]";

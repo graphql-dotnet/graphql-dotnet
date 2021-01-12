@@ -14,7 +14,7 @@ namespace GraphQL
         /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
         public static TType GetArgument<TType>(this IResolveFieldContext context, string name, TType defaultValue = default)
         {
-            bool exists = context.TryGetArgument(typeof(TType), name, out var result);
+            bool exists = context.TryGetArgument(typeof(TType), name, out object result);
             return exists
                 ? result == null && typeof(TType).IsValueType ? defaultValue : (TType)result
                 : defaultValue;

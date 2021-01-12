@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using GraphQL.Execution;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -16,15 +15,6 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new ConcurrentDictionary<Type, ConstructorInfo[]>();
-
-        /*
-        public static T ToObject<T>(this IDictionary<string, ArgumentValue> source)
-            where T : class
-            => (T)ToObject(source, typeof(T));
-
-        public static object ToObject(this IDictionary<string, ArgumentValue> source, Type type, IGraphType mappedType = null)
-            => ToObject(source.ToObjectDictionary(), type, mappedType);
-        */
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
