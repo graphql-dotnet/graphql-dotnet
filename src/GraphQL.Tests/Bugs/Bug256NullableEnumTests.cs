@@ -30,7 +30,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(null, ArgumentSource.Literal) } }
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
             };
 
             var result = ctx.GetArgument<EnumType?>("value");
@@ -42,7 +42,7 @@ namespace GraphQL.Tests.Bugs
         {
             var ctx = new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(null, ArgumentSource.Literal) } }
+                Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
             };
 
             var result = ctx.GetArgument<EnumType>("value");

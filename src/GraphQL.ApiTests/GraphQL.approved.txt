@@ -604,6 +604,8 @@ namespace GraphQL.Execution
         public ArgumentValue(object value, GraphQL.Execution.ArgumentSource source) { }
         public GraphQL.Execution.ArgumentSource Source { get; }
         public object Value { get; }
+        public static GraphQL.Execution.ArgumentValue NullLiteral { get; }
+        public static GraphQL.Execution.ArgumentValue NullVariable { get; }
     }
     public class ArrayExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {

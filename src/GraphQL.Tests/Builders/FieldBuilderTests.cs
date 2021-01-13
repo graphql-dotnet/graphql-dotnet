@@ -250,7 +250,7 @@ namespace GraphQL.Tests.Builders
             {
                 Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "skip", new ArgumentValue(null, ArgumentSource.Literal) }
+                    { "skip", ArgumentValue.NullLiteral }
                 },
                 FieldDefinition = field
             });

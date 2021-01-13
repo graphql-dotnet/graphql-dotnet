@@ -50,11 +50,11 @@ query {
                 resolve: ctx =>
                 {
                     ctx.Arguments["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
-                    ctx.Arguments["s2"].ShouldBe(new ArgumentValue(null, ArgumentSource.Literal));
+                    ctx.Arguments["s2"].ShouldBe(ArgumentValue.NullLiteral);
                     ctx.Arguments["s3"].ShouldBe(new ArgumentValue("aaa", ArgumentSource.Literal));
 
                     ctx.Arguments["input1"].ShouldBe(new ArgumentValue(1, ArgumentSource.FieldDefault));
-                    ctx.Arguments["input2"].ShouldBe(new ArgumentValue(null, ArgumentSource.Literal));
+                    ctx.Arguments["input2"].ShouldBe(ArgumentValue.NullLiteral);
                     ctx.Arguments["input3"].Value.ShouldNotBeNull();
                     ctx.Arguments["input3"].Source.ShouldBe(ArgumentSource.Literal);
 
