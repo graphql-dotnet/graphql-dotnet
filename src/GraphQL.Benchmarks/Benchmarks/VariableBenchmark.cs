@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using GraphQL.SystemTextJson;
 
 namespace GraphQL.Benchmarks
 {
@@ -15,14 +16,11 @@ namespace GraphQL.Benchmarks
         private ISchema _schema;
         private DocumentExecuter _executer;
 
-        private string _queryLiteral;
         private Language.AST.Document _queryLiteralDocument;
 
-        private string _queryVariable;
         private Language.AST.Document _queryVariableDocument;
         private Inputs _variableInputs;
 
-        private string _queryDefaultVariable;
         private Language.AST.Document _queryDefaultVariableDocument;
 
         [GlobalSetup]
@@ -39,100 +37,13 @@ namespace GraphQL.Benchmarks
             _schema = _provider.GetRequiredService<ISchema>();
             _schema.Initialize();
             _executer = new DocumentExecuter();
-            _queryLiteral = @"
-{
-  test(inputs: [
-    {
-      ints: [[1,2],[3,4,5],[6,7,8]],
-      widgets: [
-        {name:""bolts1"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts2"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    },
-    {
-      ints: [[11,12],[13,14,15],[16,17,18]],
-      widgets: [
-        {name:""bolts3"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts4"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    },
-    {
-      ints: [[21,12],[13,14,15],[16,17,18]],
-      widgets: [
-        {name:""bolts5"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts6"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    }
-  ])
-}
-";
-            _queryLiteralDocument = new Execution.GraphQLDocumentBuilder().Build(_queryLiteral);
+            _queryLiteralDocument = new Execution.GraphQLDocumentBuilder().Build(Queries.VariablesLiteral);
 
-            _queryDefaultVariable = @"
-query ($in: [MyInputObject] =
-  [
-    {
-      ints: [[1,2],[3,4,5],[6,7,8]],
-      widgets: [
-        {name:""bolts1"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts2"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    },
-    {
-      ints: [[11,12],[13,14,15],[16,17,18]],
-      widgets: [
-        {name:""bolts3"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts4"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    },
-    {
-      ints: [[21,12],[13,14,15],[16,17,18]],
-      widgets: [
-        {name:""bolts5"", description:""this is a test"", amount:2.99, quantity:42},
-        {name:""bolts6"", description:""this is a test"", amount:2.99, quantity:42}
-      ]
-    }
-  ])
-{
-  test(inputs: $in)
-}
-";
-            _queryDefaultVariableDocument = new Execution.GraphQLDocumentBuilder().Build(_queryDefaultVariable);
+            _queryDefaultVariableDocument = new Execution.GraphQLDocumentBuilder().Build(Queries.VariablesDefaultVariable);
 
-            _queryVariable = @"
-query ($in: [MyInputObject])
-{
-  test(inputs: $in)
-}
-";
-            _queryVariableDocument = new Execution.GraphQLDocumentBuilder().Build(_queryVariable);
-            _variableInputs = ToInputs(@"
-{ ""in"":
-  [
-    {
-      ""ints"": [[1,2],[3,4,5],[6,7,8]],
-      ""widgets"": [
-        {""name"":""bolts1"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42},
-        {""name"":""bolts2"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42}
-      ]
-    },
-    {
-      ""ints"": [[11,12],[13,14,15],[16,17,18]],
-      ""widgets"": [
-        {""name"":""bolts3"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42},
-        {""name"":""bolts4"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42}
-      ]
-    },
-    {
-      ""ints"": [[21,12],[13,14,15],[16,17,18]],
-      ""widgets"": [
-        {""name"":""bolts5"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42},
-        {""name"":""bolts6"", ""description"":""this is a test"", ""amount"":2.99, ""quantity"":42}
-      ]
-    }
-  ]
-}
-");
+            _queryVariableDocument = new Execution.GraphQLDocumentBuilder().Build(Queries.VariablesVariable);
+            _variableInputs = Variables.VariablesVariable.ToInputs();
+
             //confirm no errors during execution
             var val = EnableValidation;
             EnableValidation = true;
@@ -150,19 +61,19 @@ query ($in: [MyInputObject])
         [Benchmark(Baseline = true)]
         public void Literal()
         {
-            var result = ExecuteQuery(_schema, _queryLiteral, _queryLiteralDocument, null);
+            var result = ExecuteQuery(_schema, Queries.VariablesLiteral, _queryLiteralDocument, null);
         }
 
         [Benchmark]
         public void DefaultVariable()
         {
-            var result = ExecuteQuery(_schema, _queryDefaultVariable, _queryDefaultVariableDocument, null);
+            var result = ExecuteQuery(_schema, Queries.VariablesDefaultVariable, _queryDefaultVariableDocument, null);
         }
 
         [Benchmark]
         public void Variable()
         {
-            var result = ExecuteQuery(_schema, _queryVariable, _queryVariableDocument, _variableInputs);
+            var result = ExecuteQuery(_schema, Queries.VariablesVariable, _queryVariableDocument, _variableInputs);
         }
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query, Language.AST.Document document, Inputs inputs)
@@ -185,11 +96,6 @@ query ($in: [MyInputObject])
                 _.Schema = schema;
                 _.Query = query;
             }).GetAwaiter().GetResult();
-        }
-
-        private Inputs ToInputs(string inputs)
-        {
-            return SystemTextJson.StringExtensions.ToInputs(inputs);
         }
 
         void IBenchmark.Run() => Literal();
