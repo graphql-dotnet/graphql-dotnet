@@ -58,7 +58,7 @@ namespace GraphQL.Benchmarks
         [ParamsSource(nameof(TrueFalse))]
         public bool EnableValidation { get; set; }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public void Literal()
         {
             var result = ExecuteQuery(_schema, Queries.VariablesLiteral, _queryLiteralDocument, null);
