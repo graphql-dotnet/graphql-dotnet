@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
-using GraphQL.StarWars;
-using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
