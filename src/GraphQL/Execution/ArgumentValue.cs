@@ -3,7 +3,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Represents the value of an argument.
     /// </summary>
-    public struct ArgumentValue
+    public readonly struct ArgumentValue
     {
         /// <summary>
         /// Initializes a new instance with the specified values.
@@ -44,6 +44,11 @@ namespace GraphQL.Execution
         /// A variable referenced by the argument.
         /// </summary>
         Variable,
+
+        /// <summary>
+        /// A default value for a variable referenced by the argument.
+        /// </summary>
+        VariableDefault,
     }
 
 }

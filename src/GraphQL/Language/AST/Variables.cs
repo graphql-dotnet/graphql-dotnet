@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Execution;
 
 namespace GraphQL.Language.AST
 {
@@ -22,13 +23,13 @@ namespace GraphQL.Language.AST
         /// </summary>
         public object ValueFor(string name, object defaultValue = null)
         {
-            return ValueFor(name, out var value) ? value : defaultValue;
+            return ValueFor(name, out var value) ? value.Value : defaultValue;
         }
 
         /// <summary>
         /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
         /// </summary>
-        public bool ValueFor(string name, out object value)
+        public bool ValueFor(string name, out ArgumentValue value)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)
@@ -37,13 +38,13 @@ namespace GraphQL.Language.AST
                 {
                     if (v.Name == name)
                     {
-                        value = v.Value;
+                        value = new ArgumentValue(v.Value, v.IsDefault || !v.ValueSpecified ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
                         return v.ValueSpecified;
                     }
                 }
             }
 
-            value = null;
+            value = default;
             return false;
         }
 

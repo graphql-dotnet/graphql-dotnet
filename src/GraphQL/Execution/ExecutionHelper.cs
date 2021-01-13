@@ -110,6 +110,7 @@ namespace GraphQL.Execution
 
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         variable.Value = CoerceValue(schema, graphType, variableDef.DefaultValue, variables, null).Value;
+                        variable.IsDefault = true;
                     }
                     else if (graphType is NonNullGraphType)
                     {
@@ -353,7 +354,7 @@ namespace GraphQL.Execution
                     return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
 
                 var found = variables.ValueFor(variable.Name, out var ret);
-                return found ? new ArgumentValue(ret, ArgumentSource.Variable) : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
             if (type is ListGraphType listType)
