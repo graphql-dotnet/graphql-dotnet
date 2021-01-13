@@ -597,8 +597,9 @@ namespace GraphQL.Execution
         FieldDefault = 0,
         Literal = 1,
         Variable = 2,
+        VariableDefault = 3,
     }
-    public struct ArgumentValue
+    public readonly struct ArgumentValue
     {
         public ArgumentValue(object value, GraphQL.Execution.ArgumentSource source) { }
         public GraphQL.Execution.ArgumentSource Source { get; }
@@ -1416,6 +1417,7 @@ namespace GraphQL.Language.AST
     public class Variable
     {
         public Variable() { }
+        public bool IsDefault { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
         public bool ValueSpecified { get; }
@@ -1452,8 +1454,8 @@ namespace GraphQL.Language.AST
         public void Add(GraphQL.Language.AST.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Variable> GetEnumerator() { }
         public override string ToString() { }
+        public bool ValueFor(string name, out GraphQL.Execution.ArgumentValue value) { }
         public object ValueFor(string name, object defaultValue = null) { }
-        public bool ValueFor(string name, out object value) { }
     }
 }
 namespace GraphQL.Language
