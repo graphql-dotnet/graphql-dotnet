@@ -50,5 +50,4 @@ namespace GraphQL.Execution
         /// </summary>
         VariableDefault,
     }
-
 }
