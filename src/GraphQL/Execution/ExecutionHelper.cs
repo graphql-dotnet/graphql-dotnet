@@ -270,7 +270,7 @@ namespace GraphQL.Execution
                         // field definition provides a default value, the default value should be used.
                         newDictionary[field.Name] = field.DefaultValue;
                     }
-                    else if (field.ResolvedType is NonNullGraphType nonNullGraphType)
+                    else if (field.ResolvedType is NonNullGraphType)
                     {
                         // RULE: If no default value is provided and the input object field’s type is non‐null,
                         // an error should be thrown.
