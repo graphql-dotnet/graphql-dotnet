@@ -169,30 +169,15 @@ query ($in: [MyInputObject])
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query, Language.AST.Document document, Inputs inputs)
         {
-            try
+            return _executer.ExecuteAsync(_ =>
             {
-                if (query == null)
-                    throw new ArgumentNullException(nameof(query));
-                if (document == null)
-                    throw new ArgumentNullException(nameof(document));
-                if (schema == null)
-                    throw new ArgumentNullException(nameof(schema));
-                return _executer.ExecuteAsync(_ =>
-                {
-                    _.Schema = schema;
-                    _.Query = query;
-                    _.Document = document;
-                    _.Inputs = inputs;
-                    _.ValidationRules = EnableValidation ? null : Array.Empty<IValidationRule>();
-                    _.ThrowOnUnhandledException = true;
-                }).GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                Console.ReadLine();
-                throw;
-            }
+                _.Schema = schema;
+                _.Query = query;
+                _.Document = document;
+                _.Inputs = inputs;
+                _.ValidationRules = EnableValidation ? null : Array.Empty<IValidationRule>();
+                _.ThrowOnUnhandledException = true;
+            }).GetAwaiter().GetResult();
         }
 
         private ExecutionResult ExecuteQuery(ISchema schema, string query)
