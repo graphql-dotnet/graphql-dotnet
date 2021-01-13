@@ -147,7 +147,7 @@ query ($in: [MyInputObject])
         [ParamsSource(nameof(TrueFalse))]
         public bool EnableValidation { get; set; }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public void Literal()
         {
             var result = ExecuteQuery(_schema, _queryLiteral, _queryLiteralDocument, null);
