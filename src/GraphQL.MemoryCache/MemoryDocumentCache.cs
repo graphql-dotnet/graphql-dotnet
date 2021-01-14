@@ -11,7 +11,7 @@ namespace GraphQL.Caching
     public class MemoryDocumentCache : IDocumentCache, IDisposable
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly TimeSpan _slidingExpiration;
+        private readonly MemoryDocumentCacheOptions _options;
 
         /// <summary>
         /// Initializes a new instance with the specified options.
@@ -36,7 +36,7 @@ namespace GraphQL.Caching
         protected MemoryDocumentCache(IMemoryCache memoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _slidingExpiration = options?.Value.SlidingExpiration ?? default;
+            _options = options?.Value;
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace GraphQL.Caching
         /// </summary>
         protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query)
         {
-            return new MemoryCacheEntryOptions { SlidingExpiration = _slidingExpiration, Size = query.Length };
+            return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = query.Length };
         }
 
         /// <inheritdoc/>
