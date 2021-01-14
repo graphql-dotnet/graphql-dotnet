@@ -55,7 +55,7 @@ namespace GraphQL.Caching
         }
 
         /// <inheritdoc/>
-        public Document this[string query]
+        public virtual Document this[string query]
         {
             get => _memoryCache.TryGetValue<Document>(query, out var value) ? value : null;
             set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));
@@ -64,7 +64,7 @@ namespace GraphQL.Caching
         /// <summary>
         /// Disposes of the underlying <see cref="IMemoryCache"/> instance.
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             _memoryCache.Dispose();
         }
