@@ -12,6 +12,7 @@ namespace GraphQL.Caching
     {
         private readonly IMemoryCache _memoryCache;
         private readonly MemoryDocumentCacheOptions _options;
+        private readonly bool _memoryCacheIsOwned;
 
         /// <summary>
         /// Initializes a new instance with the default options: 100,000 maximum total query size and no expiration time.
@@ -28,6 +29,7 @@ namespace GraphQL.Caching
         public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
             : this(
                 new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
+                true,
                 options)
         {
         }
@@ -37,10 +39,14 @@ namespace GraphQL.Caching
         /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string)"/>, the sliding expiration
         /// time specified within <paramref name="options"/> can be ignored.
         /// </summary>
-        protected MemoryDocumentCache(IMemoryCache memoryCache, IOptions<MemoryDocumentCacheOptions> options)
+        /// <param name="memoryCache">The memory cache instance to use.</param>
+        /// <param name="disposeMemoryCache">Indicates if the memory cache is disposed when this instance is disposed.</param>
+        /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(string)"/>; optional.</param>
+        protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _options = options?.Value;
+            _memoryCacheIsOwned = disposeMemoryCache;
         }
 
         /// <summary>
@@ -60,12 +66,10 @@ namespace GraphQL.Caching
             set => _memoryCache.Set(query ?? throw new ArgumentNullException(nameof(query)), value, GetMemoryCacheEntryOptions(query));
         }
 
-        /// <summary>
-        /// Disposes of the underlying <see cref="IMemoryCache"/> instance.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void Dispose()
         {
-            _memoryCache.Dispose();
+            if (_memoryCacheIsOwned) _memoryCache.Dispose();
         }
     }
 }

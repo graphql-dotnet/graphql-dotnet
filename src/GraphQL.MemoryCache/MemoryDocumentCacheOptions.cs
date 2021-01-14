@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.Caching
@@ -6,8 +7,12 @@ namespace GraphQL.Caching
     /// <summary>
     /// Provides configuration options for <see cref="MemoryDocumentCache"/>.
     /// </summary>
-    public class MemoryDocumentCacheOptions : IOptions<MemoryDocumentCacheOptions>
+    public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDocumentCacheOptions>
     {
+        public MemoryDocumentCacheOptions()
+        {
+            SizeLimit = 100000;
+        }
         /// <summary>
         /// The maximum total length of all queries cached. Assume maximum memory used is about 10x this value. Defaults to 100,000.
         /// </summary>
