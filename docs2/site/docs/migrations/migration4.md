@@ -4,6 +4,7 @@
 
 * Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 * New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
+* Document caching supported via `IDocumentCache` and a default implementation within `DocumentCache`.
 
 ## Breaking Changes
 
