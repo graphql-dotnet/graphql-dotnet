@@ -297,7 +297,7 @@ namespace GraphQL.Utilities
                 ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => enumeration.Serialize(value).ToString(),
-                ScalarGraphType => value switch
+                ScalarGraphType _ => value switch
                 {
                     string s => $"\"{s}\"",
                     bool b => b ? "true" : "false",
