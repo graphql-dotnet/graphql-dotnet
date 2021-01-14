@@ -90,7 +90,7 @@ namespace GraphQL
 
                 var document = options.Document;
                 bool saveInCache = false;
-                bool analyseComplexity = true;
+                bool analyzeComplexity = true;
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
@@ -100,7 +100,7 @@ namespace GraphQL
                         // operation name is not passed to the document validator, so any successfully cached
                         // document should not need any validation rules run on it
                         validationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
-                        analyseComplexity = false;
+                        analyzeComplexity = false;
                     }
                     if (document == null)
                     {
@@ -134,7 +134,7 @@ namespace GraphQL
                         options.Inputs);
                 }
 
-                if (options.ComplexityConfiguration != null && validationResult.IsValid && analyseComplexity)
+                if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
                 {
                     using (metrics.Subject("document", "Analyzing complexity"))
                         _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
