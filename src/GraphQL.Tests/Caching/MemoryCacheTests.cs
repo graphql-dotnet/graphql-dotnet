@@ -12,7 +12,7 @@ namespace GraphQL.Tests.Caching
         {
             var doc = new Document();
             var query = "test";
-            var memoryCache = new MemoryDocumentCache(new MemoryDocumentCacheOptions());
+            var memoryCache = new MemoryDocumentCache();
             memoryCache[query].ShouldBeNull();
             memoryCache[query] = doc;
             memoryCache[query].ShouldBe(doc);
