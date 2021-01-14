@@ -14,16 +14,39 @@ namespace GraphQL.Caching
         private readonly TimeSpan _slidingExpiration;
 
         /// <summary>
+        /// Initializes a new instance with the specified options.
+        /// </summary>
+        /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
+        public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
+            : this(options.Value.MaxTotalQueryLength, options.Value.SlidingExpiration)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        /// <param name="maxTotalQueryLength">The total length of all queries cached in this instance. Assume maximum memory used is about 10x this value. Will not cache queries larger than 1/3 of this value. During cache compression, reduces cache size by 1/3 of this value.</param>
+        /// <param name="maxTotalQueryLength">The total length of all queries cached in this instance. Assume maximum memory used is about 10x this value.</param>
         /// <param name="slidingExpiration">The maximum lifetime of queries cached within this instance.</param>
         public MemoryDocumentCache(int maxTotalQueryLength, TimeSpan slidingExpiration)
             : this(
                 maxTotalQueryLength <= 0
-                    ? throw new ArgumentOutOfRangeException(nameof(maxTotalQueryLength))
-                    : new MemoryCache(new MemoryCacheOptions { SizeLimit = maxTotalQueryLength }),
+                  ? throw new ArgumentOutOfRangeException(nameof(maxTotalQueryLength))
+                  : new MemoryCacheOptions { SizeLimit = maxTotalQueryLength },
                 slidingExpiration)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="options">The memory cache configuration settings. Note that the <see cref="MemoryCacheOptions.SizeLimit"/> field is required.</param>
+        /// <param name="slidingExpiration">The maximum lifetime of queries cached within this instance.</param>
+        public MemoryDocumentCache(IOptions<MemoryCacheOptions> options, TimeSpan slidingExpiration)
+            : this(
+                new MemoryCache(options ?? throw new ArgumentNullException(nameof(options))),
+                slidingExpiration.Ticks <= 0
+                  ? throw new ArgumentOutOfRangeException(nameof(slidingExpiration))
+                  : slidingExpiration)
         {
         }
 
@@ -35,18 +58,6 @@ namespace GraphQL.Caching
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _slidingExpiration = slidingExpiration;
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="options">The memory cache configuration settings. Note that the <see cref="MemoryCacheOptions.SizeLimit"/> field is required.</param>
-        /// <param name="slidingExpiration">The maximum lifetime of queries cached within this instance.</param>
-        public MemoryDocumentCache(IOptions<MemoryCacheOptions> options, TimeSpan slidingExpiration)
-            : this(
-                new MemoryCache(options ?? throw new ArgumentNullException(nameof(options))),
-                slidingExpiration)
-        {
         }
 
         /// <summary>
