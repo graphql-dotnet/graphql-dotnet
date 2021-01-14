@@ -54,5 +54,4 @@ namespace GraphQL.Caching
             _memoryCache.Dispose();
         }
     }
-
 }
