@@ -26,6 +26,7 @@ namespace GraphQL
     {
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer, GraphQL.Caching.IDocumentCache documentCache) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQL.Language.AST.Operation GetOperation(string operationName, GraphQL.Language.AST.Document document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
@@ -82,6 +83,7 @@ namespace GraphQL
     public class ExecutionOptions : GraphQL.Execution.IProvideUserContext
     {
         public ExecutionOptions() { }
+        public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> CachedDocumentValidationRules { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
@@ -434,6 +436,18 @@ namespace GraphQL.Builders
         public bool IsUnidirectional { get; }
         public int? Last { get; }
         public int? PageSize { get; }
+    }
+}
+namespace GraphQL.Caching
+{
+    public class DocumentCache : GraphQL.Caching.IDocumentCache
+    {
+        public DocumentCache(int maxTotalQueryLength) { }
+        public GraphQL.Language.AST.Document this[string query] { get; set; }
+    }
+    public interface IDocumentCache
+    {
+        GraphQL.Language.AST.Document this[string query] { get; set; }
     }
 }
 namespace GraphQL.Conversion
