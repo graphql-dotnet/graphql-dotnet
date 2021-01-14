@@ -52,7 +52,6 @@ namespace GraphQL.Caching
                 if (CacheOversized)
                 {
                     var sortedValues = _dictionary.ToArray().OrderBy(x => x.Value.Accessed);
-                    var now = DateTime.Now;
                     foreach (var entry in sortedValues)
                     {
                         if (CacheOverCompressTo)
