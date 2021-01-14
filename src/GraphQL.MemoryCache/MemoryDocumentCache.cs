@@ -18,46 +18,25 @@ namespace GraphQL.Caching
         /// </summary>
         /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
         public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
-            : this(options.Value.MaxTotalQueryLength, options.Value.SlidingExpiration)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="maxTotalQueryLength">The total length of all queries cached in this instance. Assume maximum memory used is about 10x this value.</param>
-        /// <param name="slidingExpiration">The maximum lifetime of queries cached within this instance.</param>
-        public MemoryDocumentCache(int maxTotalQueryLength, TimeSpan slidingExpiration)
             : this(
-                maxTotalQueryLength <= 0
-                  ? throw new ArgumentOutOfRangeException(nameof(maxTotalQueryLength))
-                  : new MemoryCacheOptions { SizeLimit = maxTotalQueryLength },
-                slidingExpiration)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="options">The memory cache configuration settings. Note that the <see cref="MemoryCacheOptions.SizeLimit"/> field is required.</param>
-        /// <param name="slidingExpiration">The maximum lifetime of queries cached within this instance.</param>
-        public MemoryDocumentCache(IOptions<MemoryCacheOptions> options, TimeSpan slidingExpiration)
-            : this(
-                new MemoryCache(options ?? throw new ArgumentNullException(nameof(options))),
-                slidingExpiration.Ticks <= 0
-                  ? throw new ArgumentOutOfRangeException(nameof(slidingExpiration))
-                  : slidingExpiration)
+                options.Value.MaxTotalQueryLength <= 0
+                  ? throw new ArgumentOutOfRangeException(nameof(options) + "." + nameof(MemoryDocumentCacheOptions.MaxTotalQueryLength))
+                  : new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
+                options.Value.SlidingExpiration.Ticks <= 0
+                  ? throw new ArgumentOutOfRangeException(nameof(options) + "." + nameof(MemoryDocumentCacheOptions.SlidingExpiration))
+                  : options)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified memory cache and sliding expiration time period.
-        /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string)"/>, the sliding expiration time specified here can be ignored.
+        /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string)"/>, the sliding expiration
+        /// time specified within <paramref name="options"/> can be ignored.
         /// </summary>
-        protected MemoryDocumentCache(IMemoryCache memoryCache, TimeSpan slidingExpiration)
+        protected MemoryDocumentCache(IMemoryCache memoryCache, IOptions<MemoryDocumentCacheOptions> options)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _slidingExpiration = slidingExpiration;
+            _slidingExpiration = options?.Value.SlidingExpiration ?? default;
         }
 
         /// <summary>
