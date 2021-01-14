@@ -12,7 +12,6 @@ namespace GraphQL.Caching
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
         public MemoryDocumentCacheOptions() { }
-        public long? MaxTotalQueryLength { get; set; }
         public System.TimeSpan? SlidingExpiration { get; set; }
     }
 }

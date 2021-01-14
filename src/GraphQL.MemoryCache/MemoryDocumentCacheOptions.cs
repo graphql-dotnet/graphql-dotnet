@@ -9,14 +9,13 @@ namespace GraphQL.Caching
     /// </summary>
     public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDocumentCacheOptions>
     {
+        /// <summary>
+        /// Initializes a default instance with the size limit set to 100,000.
+        /// </summary>
         public MemoryDocumentCacheOptions()
         {
             SizeLimit = 100000;
         }
-        /// <summary>
-        /// The maximum total length of all queries cached. Assume maximum memory used is about 10x this value. Defaults to 100,000.
-        /// </summary>
-        public long? MaxTotalQueryLength { get; set; } = 100000;
 
         /// <summary>
         /// The maximum lifetime of queries cached within this instance. Upon cache hit, the expiration time

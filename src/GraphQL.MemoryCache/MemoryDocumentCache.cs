@@ -16,6 +16,7 @@ namespace GraphQL.Caching
 
         /// <summary>
         /// Initializes a new instance with the default options: 100,000 maximum total query size and no expiration time.
+        /// Anticipate memory use of approximately 1MB.
         /// </summary>
         public MemoryDocumentCache()
             : this(new MemoryDocumentCacheOptions())
@@ -23,12 +24,13 @@ namespace GraphQL.Caching
         }
 
         /// <summary>
-        /// Initializes a new instance with the specified options.
+        /// Initializes a new instance with the specified options. Set the <see cref="MemoryCacheOptions.SizeLimit"/>
+        /// value to the maximum total query size to be cached. Anticipate about 10x maximum memory use above that value.
         /// </summary>
         /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
         public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
             : this(
-                new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
+                new MemoryCache(options),
                 true,
                 options)
         {
