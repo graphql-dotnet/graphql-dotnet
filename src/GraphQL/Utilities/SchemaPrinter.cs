@@ -175,7 +175,7 @@ namespace GraphQL.Utilities
 
         public virtual string PrintObject(IObjectGraphType type)
         {
-            var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))

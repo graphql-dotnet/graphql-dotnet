@@ -75,7 +75,7 @@ namespace GraphQL.Validation.Rules
                     // This object defines this field.
                     suggestedObjectTypes.Add(possibleType.Name);
 
-                    possibleType.ResolvedInterfaces.Apply(possibleInterface =>
+                    possibleType.ResolvedInterfaces.List.Apply(possibleInterface =>
                     {
                         if (possibleInterface.HasField(fieldName))
                         {

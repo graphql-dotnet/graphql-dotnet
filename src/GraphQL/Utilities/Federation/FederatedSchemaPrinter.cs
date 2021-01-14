@@ -60,7 +60,7 @@ namespace GraphQL.Utilities.Federation
         {
             var isExtension = type.IsExtensionType();
 
-            var interfaces = type.ResolvedInterfaces.Select(x => x.Name).ToList();
+            var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))

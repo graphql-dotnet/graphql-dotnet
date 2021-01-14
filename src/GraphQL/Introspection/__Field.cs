@@ -14,14 +14,16 @@ namespace GraphQL.Introspection
         public __Field()
         {
             Name = nameof(__Field);
+
             Description =
                 "Object and Interface types are described by a list of Fields, each of " +
                 "which has a name, potentially a list of arguments, and a return type.";
 
             Field(f => f.Name).Description(null);
+
             Field<StringGraphType>("description", resolve: context =>
             {
-                var description = context.Source.Description;
+                string description = context.Source.Description;
 
                 // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
                 if (description == null)
@@ -30,7 +32,7 @@ namespace GraphQL.Introspection
                     var fieldOwner = context.Schema.AllTypes.OfType<IComplexGraphType>().Single(t => t.Fields.Contains(context.Source));
                     if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
                     {
-                        foreach (var iface in implementation.ResolvedInterfaces)
+                        foreach (var iface in implementation.ResolvedInterfaces.List)
                         {
                             var fieldFromInterface = iface.GetField(context.Source.Name);
                             if (fieldFromInterface?.Description != null)
@@ -52,8 +54,11 @@ namespace GraphQL.Introspection
                         args = args.OrderBy(a => a, comparer);
                     return args; 
                 });
+
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
+
             Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
+
             Field(f => f.DeprecationReason, nullable: true).Description(null);
         }
     }
