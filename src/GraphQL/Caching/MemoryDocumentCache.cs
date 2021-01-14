@@ -6,9 +6,9 @@ using GraphQL.Language.AST;
 namespace GraphQL.Caching
 {
     /// <summary>
-    /// The default implementation of a document cache, limited by a configured amount of memory.
+    /// A basic implementation of a document cache, limited by a configured amount of memory.
     /// </summary>
-    public class DocumentCache : IDocumentCache
+    public class MemoryDocumentCache : IDocumentCache
     {
         private readonly int _maxSize;
         private readonly int _maxSizeToCache;
@@ -20,7 +20,7 @@ namespace GraphQL.Caching
         /// Initializes a new instance with the specified parameters.
         /// </summary>
         /// <param name="maxTotalQueryLength">The total length of all queries cached in this instance. Assume maximum memory used is about 10x this value. Will not cache queries larger than 1/3 of this value. During cache compression, reduces cache size by 1/3 of this value.</param>
-        public DocumentCache(int maxTotalQueryLength)
+        public MemoryDocumentCache(int maxTotalQueryLength)
         {
             if (maxTotalQueryLength <= 0)
                 throw new ArgumentOutOfRangeException(nameof(maxTotalQueryLength));
@@ -32,6 +32,7 @@ namespace GraphQL.Caching
         private bool CacheOversized => System.Threading.Interlocked.CompareExchange(ref _currentSize, 0, 0) > _maxSize;
         private bool CacheOverCompressTo => System.Threading.Interlocked.CompareExchange(ref _currentSize, 0, 0) > _compactTo;
 
+        /// <inheritdoc/>
         public Document this[string query]
         {
             get

@@ -33,7 +33,7 @@ namespace GraphQL
         /// and without document caching.
         /// </summary>
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), DefaultDocumentCache.Instance)
         {
         }
 
@@ -43,7 +43,7 @@ namespace GraphQL
         /// and without document caching.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, null)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, DefaultDocumentCache.Instance)
         {
         }
 
@@ -57,7 +57,7 @@ namespace GraphQL
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
-            _documentCache = documentCache;
+            _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
         }
 
         /// <inheritdoc/>
@@ -94,7 +94,7 @@ namespace GraphQL
                 var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
-                    if (document == null && _documentCache != null && (document = _documentCache[options.Query]) != null)
+                    if (document == null && (document = _documentCache[options.Query]) != null)
                     {
                         // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
@@ -140,7 +140,7 @@ namespace GraphQL
                         _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
                 }
 
-                if (saveInCache && validationResult.IsValid && _documentCache != null)
+                if (saveInCache && validationResult.IsValid)
                 {
                     _documentCache[options.Query] = document;
                 }

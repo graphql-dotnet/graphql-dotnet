@@ -440,14 +440,18 @@ namespace GraphQL.Builders
 }
 namespace GraphQL.Caching
 {
-    public class DocumentCache : GraphQL.Caching.IDocumentCache
+    public sealed class DefaultDocumentCache : GraphQL.Caching.IDocumentCache
     {
-        public DocumentCache(int maxTotalQueryLength) { }
-        public GraphQL.Language.AST.Document this[string query] { get; set; }
+        public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
     }
     public interface IDocumentCache
     {
         GraphQL.Language.AST.Document this[string query] { get; set; }
+    }
+    public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache
+    {
+        public MemoryDocumentCache(int maxTotalQueryLength) { }
+        public GraphQL.Language.AST.Document this[string query] { get; set; }
     }
 }
 namespace GraphQL.Conversion
