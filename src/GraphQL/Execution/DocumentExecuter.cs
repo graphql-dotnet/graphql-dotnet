@@ -96,7 +96,7 @@ namespace GraphQL
                 {
                     if (document == null && _documentCache != null && (document = _documentCache[options.Query]) != null)
                     {
-                        // none of the default validation rules are dependent on the inputs, and the
+                        // none of the default validation rules yet are dependent on the inputs, and the
                         // operation name is not passed to the document validator, so any successfully cached
                         // document should not need any validation rules run on it
                         validationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
