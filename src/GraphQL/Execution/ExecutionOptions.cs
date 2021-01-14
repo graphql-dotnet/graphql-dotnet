@@ -39,6 +39,9 @@ namespace GraphQL
         public CancellationToken CancellationToken { get; set; }
 
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
+        public IEnumerable<IValidationRule> CachedDocumentValidationRules { get; set; }
+
+        /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
 
         /// <inheritdoc/>

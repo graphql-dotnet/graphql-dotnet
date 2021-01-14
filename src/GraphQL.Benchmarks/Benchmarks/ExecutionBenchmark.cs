@@ -1,8 +1,12 @@
 using System;
 using BenchmarkDotNet.Attributes;
+using GraphQL.Caching;
+using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks
@@ -14,6 +18,7 @@ namespace GraphQL.Benchmarks
         private IServiceProvider _provider;
         private ISchema _schema;
         private DocumentExecuter _executer;
+        private DocumentExecuter _cachedExecuter;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -34,6 +39,7 @@ namespace GraphQL.Benchmarks
             _schema = _provider.GetRequiredService<ISchema>();
             _schema.Initialize();
             _executer = new DocumentExecuter();
+            _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new DocumentCache(100000));
         }
 
         [Benchmark]
@@ -48,9 +54,12 @@ namespace GraphQL.Benchmarks
             var result = ExecuteQuery(_schema, Queries.Hero);
         }
 
+        [Params(true, false)]
+        public bool UseCaching { get; set; }
+
         private ExecutionResult ExecuteQuery(ISchema schema, string query)
         {
-            return _executer.ExecuteAsync(_ =>
+            return (UseCaching ? _cachedExecuter : _executer).ExecuteAsync(_ =>
             {
                 _.Schema = schema;
                 _.Query = query;

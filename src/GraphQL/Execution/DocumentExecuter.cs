@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -24,10 +25,12 @@ namespace GraphQL
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
         private readonly IComplexityAnalyzer _complexityAnalyzer;
+        private readonly IDocumentCache _documentCache;
 
         /// <summary>
         /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances,
+        /// and without document caching.
         /// </summary>
         public DocumentExecuter()
             : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer())
@@ -36,13 +39,25 @@ namespace GraphQL
 
         /// <summary>
         /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances.
+        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances,
+        /// and without document caching.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
+            : this(documentBuilder, documentValidator, complexityAnalyzer, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
+        /// and <see cref="IDocumentCache"/> instances.
+        /// </summary>
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
             _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
+            _documentCache = documentCache;
         }
 
         /// <inheritdoc/>
@@ -74,11 +89,23 @@ namespace GraphQL
                 }
 
                 var document = options.Document;
+                bool saveInCache = false;
+                bool analyseComplexity = true;
+                var validationRules = options.ValidationRules;
                 using (metrics.Subject("document", "Building document"))
                 {
+                    if (document == null && _documentCache != null && (document = _documentCache[options.Query]) != null)
+                    {
+                        // none of the default validation rules are dependent on the inputs, and the
+                        // operation name is not passed to the document validator, so any successfully cached
+                        // document should not need any validation rules run on it
+                        validationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
+                        analyseComplexity = false;
+                    }
                     if (document == null)
                     {
                         document = _documentBuilder.Build(options.Query);
+                        saveInCache = true;
                     }
                 }
 
@@ -102,15 +129,20 @@ namespace GraphQL
                         options.Query,
                         options.Schema,
                         document,
-                        options.ValidationRules,
+                        validationRules,
                         options.UserContext,
                         options.Inputs);
                 }
 
-                if (options.ComplexityConfiguration != null && validationResult.IsValid)
+                if (options.ComplexityConfiguration != null && validationResult.IsValid && analyseComplexity)
                 {
                     using (metrics.Subject("document", "Analyzing complexity"))
                         _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
+                }
+
+                if (saveInCache && validationResult.IsValid && _documentCache != null)
+                {
+                    _documentCache[options.Query] = document;
                 }
 
                 try
