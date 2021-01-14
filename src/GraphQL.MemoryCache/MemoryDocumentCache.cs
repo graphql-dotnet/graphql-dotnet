@@ -14,6 +14,14 @@ namespace GraphQL.Caching
         private readonly MemoryDocumentCacheOptions _options;
 
         /// <summary>
+        /// Initializes a new instance with the default options: 100,000 maximum total query size and no expiration time.
+        /// </summary>
+        public MemoryDocumentCache()
+            : this(new MemoryDocumentCacheOptions())
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance with the specified options.
         /// </summary>
         /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
@@ -22,9 +30,7 @@ namespace GraphQL.Caching
                 options.Value.MaxTotalQueryLength <= 0
                   ? throw new ArgumentOutOfRangeException(nameof(options) + "." + nameof(MemoryDocumentCacheOptions.MaxTotalQueryLength))
                   : new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
-                options.Value.SlidingExpiration.Ticks <= 0
-                  ? throw new ArgumentOutOfRangeException(nameof(options) + "." + nameof(MemoryDocumentCacheOptions.SlidingExpiration))
-                  : options)
+                options)
         {
         }
 

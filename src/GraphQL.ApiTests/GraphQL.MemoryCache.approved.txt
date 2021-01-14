@@ -2,10 +2,9 @@ namespace GraphQL.Caching
 {
     public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
     {
+        public MemoryDocumentCache() { }
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
-        protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, System.TimeSpan slidingExpiration) { }
-        public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<Microsoft.Extensions.Caching.Memory.MemoryCacheOptions> options, System.TimeSpan slidingExpiration) { }
-        public MemoryDocumentCache(int maxTotalQueryLength, System.TimeSpan slidingExpiration) { }
+        protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         public virtual GraphQL.Language.AST.Document this[string query] { get; set; }
         public virtual void Dispose() { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
@@ -13,7 +12,7 @@ namespace GraphQL.Caching
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
         public MemoryDocumentCacheOptions() { }
-        public int MaxTotalQueryLength { get; set; }
-        public System.TimeSpan SlidingExpiration { get; set; }
+        public long MaxTotalQueryLength { get; set; }
+        public System.TimeSpan? SlidingExpiration { get; set; }
     }
 }
