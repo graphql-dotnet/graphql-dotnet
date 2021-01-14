@@ -27,9 +27,7 @@ namespace GraphQL.Caching
         /// <param name="options">A value containing the <see cref="MemoryDocumentCacheOptions"/> to use.</param>
         public MemoryDocumentCache(IOptions<MemoryDocumentCacheOptions> options)
             : this(
-                options.Value.MaxTotalQueryLength <= 0
-                  ? throw new ArgumentOutOfRangeException(nameof(options) + "." + nameof(MemoryDocumentCacheOptions.MaxTotalQueryLength))
-                  : new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
+                new MemoryCache(new MemoryCacheOptions { SizeLimit = options.Value.MaxTotalQueryLength }),
                 options)
         {
         }
