@@ -9,6 +9,9 @@ namespace GraphQL.Types
     {
         /// <summary>
         /// Converts a supplied dictionary of keys and values to an object.
+        /// Overriding this method allows for customizing the deserialization process of input objects,
+        /// much like a field resolver does for output objects. For example, you can set some 'computed'
+        /// properties for your input object which were not passed in the GraphQL request.
         /// </summary>
         object ParseDictionary(IDictionary<string, object> value);
     }
