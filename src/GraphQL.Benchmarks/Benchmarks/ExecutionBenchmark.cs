@@ -39,7 +39,7 @@ namespace GraphQL.Benchmarks
             _schema = _provider.GetRequiredService<ISchema>();
             _schema.Initialize();
             _executer = new DocumentExecuter();
-            _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new MemoryDocumentCache(100000));
+            _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new MsMemoryDocumentCache(100000, TimeSpan.FromHours(2)));
         }
 
         [Benchmark]

@@ -1,0 +1,15 @@
+namespace GraphQL.Caching
+{
+    public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache
+    {
+        public MemoryDocumentCache(int maxTotalQueryLength) { }
+        public GraphQL.Language.AST.Document this[string query] { get; set; }
+    }
+    public class MsMemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
+    {
+        public MsMemoryDocumentCache(Microsoft.Extensions.Options.IOptions<Microsoft.Extensions.Caching.Memory.MemoryCacheOptions> options, System.TimeSpan slidingExpiration) { }
+        public MsMemoryDocumentCache(int maxTotalQueryLength, System.TimeSpan slidingExpiration) { }
+        public GraphQL.Language.AST.Document this[string query] { get; set; }
+        public void Dispose() { }
+    }
+}
