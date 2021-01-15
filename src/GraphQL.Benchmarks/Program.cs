@@ -8,7 +8,7 @@ namespace GraphQL.Benchmarks
     {
         // Call without args for BenchmarkDotNet
         // Call with some arbitrary args for any memory profiler
-        private static void Main(string[] args) => Run<ValidationBenchmark>(args);
+        private static void Main(string[] args) => Run<ExecutionBenchmark>(args);
 
         private static void Run<TBenchmark>(string[] args)
             where TBenchmark : IBenchmark, new()

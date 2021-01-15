@@ -38,6 +38,9 @@ namespace GraphQL
         /// <summary><see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel the request at any stage of its execution; defaults to <see cref="System.Threading.CancellationToken.None"/></summary>
         public CancellationToken CancellationToken { get; set; }
 
+        /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/> when a cached document is used. Since documents are only cached after they are validated, this defaults to an empty set so no validation is performed.</summary>
+        public IEnumerable<IValidationRule> CachedDocumentValidationRules { get; set; }
+
         /// <summary>Validation rules to be used by the <see cref="IDocumentValidator"/>; defaults to standard list of of validation rules - see <see cref="DocumentValidator.CoreRules"/></summary>
         public IEnumerable<IValidationRule> ValidationRules { get; set; }
 

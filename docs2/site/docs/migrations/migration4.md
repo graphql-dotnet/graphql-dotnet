@@ -4,6 +4,8 @@
 
 * Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 * New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
+* Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
+  Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 
 ## Breaking Changes
 
