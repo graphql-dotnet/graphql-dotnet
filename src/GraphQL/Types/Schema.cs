@@ -14,7 +14,6 @@ namespace GraphQL.Types
         private Lazy<GraphTypesLookup> _lookup;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
-        private readonly List<DirectiveGraphType> _directives;
         private readonly List<IAstFromValueConverter> _converters;
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace GraphQL.Types
             _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
             _additionalTypes = new List<Type>();
             _additionalInstances = new List<IGraphType>();
-            _directives = new List<DirectiveGraphType>
+            Directives = new SchemaDirectives
             {
                 DirectiveGraphType.Include,
                 DirectiveGraphType.Skip,
@@ -120,20 +119,7 @@ namespace GraphQL.Types
         public ISchemaComparer Comparer { get; set; } = new DefaultSchemaComparer();
 
         /// <inheritdoc/>
-        public IEnumerable<DirectiveGraphType> Directives
-        {
-            get => _directives;
-            set
-            {
-                CheckDisposed();
-                CheckInitialized();
-
-                _directives.Clear();
-
-                if (value != null)
-                    _directives.AddRange(value);
-            }
-        }
+        public SchemaDirectives Directives { get; }
 
         /// <inheritdoc/>
         public IEnumerable<IGraphType> AllTypes =>
@@ -205,7 +191,7 @@ namespace GraphQL.Types
             CheckDisposed();
             CheckInitialized();
 
-            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
+            Directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
@@ -230,7 +216,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public DirectiveGraphType FindDirective(string name)
         {
-            return _directives.FirstOrDefault(x => x.Name == name);
+            return Directives.FirstOrDefault(x => x.Name == name);
         }
 
         /// <inheritdoc/>
@@ -279,7 +265,7 @@ namespace GraphQL.Types
 
                     _additionalInstances.Clear();
                     _additionalTypes.Clear();
-                    _directives.Clear();
+                    Directives.Clear();
                     _converters.Clear();
 
                     if (_lookup.IsValueCreated)
@@ -338,7 +324,7 @@ namespace GraphQL.Types
 
             return GraphTypesLookup.Create(
                 types,
-                _directives,
+                Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 NameConverter,
                 seal: true);

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GraphQL.Types;
 
@@ -47,12 +48,26 @@ namespace GraphQL.Introspection
             FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
                 resolve: async context =>
                 {
-                    var arguments = context.Source.Arguments ?? Enumerable.Empty<QueryArgument>();
-                    var args = await arguments.WhereAsync((x, context) => context.Schema.Filter.AllowArgument(context.Source, x), context).ConfigureAwait(false);
-                    var comparer = context.Schema.Comparer.ArgumentComparer(context.Source);
-                    if (comparer != null)
-                        args = args.OrderBy(a => a, comparer);
-                    return args; 
+                    var source = context.Source;
+                    if (source.Arguments?.Count > 0)
+                    {
+                        var arguments = context.GetPooledArray<QueryArgument>(source.Arguments.Count);
+
+                        int index = 0;
+                        foreach (var argument in source.Arguments.List)
+                        {
+                            if (await context.Schema.Filter.AllowArgument(source, argument).ConfigureAwait(false))
+                                arguments[index++] = argument;
+                        }
+
+                        var comparer = context.Schema.Comparer.ArgumentComparer(source);
+                        if (comparer != null)
+                            Array.Sort(arguments, 0, index, comparer);
+
+                        return arguments.Constrained(index);
+                    }
+
+                    return Array.Empty<QueryArgument>();
                 });
 
             Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);

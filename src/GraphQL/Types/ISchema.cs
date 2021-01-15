@@ -59,7 +59,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
         /// </summary>
-        IEnumerable<DirectiveGraphType> Directives { get; set; }
+        SchemaDirectives Directives { get; }
 
         /// <summary>
         /// Returns a list of all the graph types utilized by this schema.
