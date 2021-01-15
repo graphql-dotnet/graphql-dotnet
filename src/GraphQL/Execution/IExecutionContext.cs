@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Compilation;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -21,6 +22,12 @@ namespace GraphQL.Execution
         /// The parsed GraphQL request
         /// </summary>
         Document Document { get; }
+
+        /// <summary>
+        /// A performance-optimized preprocessed representation of <see cref="IResolveFieldContext.Document"/> tied with
+        /// <see cref="IResolveFieldContext"/> used for an actual query execution.
+        /// </summary>
+        CompiledNode CompiledRootNode { get; }
 
         /// <summary>
         /// A list of errors generated during GraphQL request processing

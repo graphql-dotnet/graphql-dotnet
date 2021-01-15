@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Compilation;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
@@ -30,7 +31,7 @@ namespace GraphQL
         private IDictionary<string, Field> GetSubFields()
         {
             return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
-                ? ExecutionHelper.CollectFields(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
+                ? QueryCompilation.CollectFields(_executionContext.Schema, _executionContext.Variables, _executionContext.Document, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
                 : null;
         }
 

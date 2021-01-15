@@ -13,8 +13,7 @@ namespace GraphQL.Execution
     {
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
-            var rootNode = BuildExecutionRootNode(context, rootType);
+            var rootNode = BuildExecutionRootNode(context);
 
             var streams = await ExecuteSubscriptionNodesAsync(context, rootNode.SubFields).ConfigureAwait(false);
 
@@ -104,7 +103,7 @@ namespace GraphQL.Execution
                 return subscription
                     .Select(value =>
                     {
-                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
+                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.CompiledField, node.IndexInParentNode);
                         executionNode.Source = value;
                         return executionNode;
                     })
