@@ -54,7 +54,7 @@ namespace GraphQL.Caching
         /// <summary>
         /// Returns a <see cref="MemoryCacheEntryOptions"/> instance for the specified query.
         /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
-        /// in the constructor, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
+        /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
         /// </summary>
         protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query)
         {
