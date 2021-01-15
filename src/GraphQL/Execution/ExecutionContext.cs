@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Compilation;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -17,6 +18,9 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public ISchema Schema { get; set; }
+
+        /// <inheritdoc/>
+        public CompiledNode CompiledRootNode { get; set; }
 
         /// <inheritdoc/>
         public object RootValue { get; set; }

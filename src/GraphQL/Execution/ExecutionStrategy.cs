@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GraphQL.Compilation;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
@@ -23,8 +24,7 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
-            var rootNode = BuildExecutionRootNode(context, rootType);
+            var rootNode = BuildExecutionRootNode(context);
 
             await ExecuteNodeTreeAsync(context, rootNode)
                 .ConfigureAwait(false);
@@ -51,20 +51,16 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context)
         {
-            var root = new RootExecutionNode(rootType)
+            var root = new RootExecutionNode((IObjectGraphType)context.CompiledRootNode.GraphType)
             {
                 Result = context.RootValue
             };
 
-            var fields = CollectFields(
-                context,
-                rootType,
-                context.Operation.SelectionSet);
+            var fields = context.CompiledRootNode.Fields;
 
-
-            SetSubFieldNodes(context, root, fields);
+            SetSubFieldNodes(root, fields);
 
             return root;
         }
@@ -73,19 +69,8 @@ namespace GraphQL.Execution
         /// Creates execution nodes for child fields of an object execution node. Only run if
         /// the object execution node result is not null.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
+        public static void SetSubFieldNodes(ObjectExecutionNode parent, Dictionary<string, CompiledField> fields)
         {
-            var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
-            SetSubFieldNodes(context, parent, fields);
-        }
-
-        /// <summary>
-        /// Creates specified child execution nodes of an object execution node.
-        /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
-        {
-            var parentType = parent.GetObjectGraphType(context.Schema);
-
             var subFields = new Dictionary<string, ExecutionNode>(fields.Count);
 
             foreach (var kvp in fields)
@@ -93,18 +78,11 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var field = kvp.Value;
 
-                if (!ShouldIncludeNode(context, field.Directives))
+                if (field.Definition == null)
                     continue;
 
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
-
-                if (fieldDefinition == null)
-                    continue;
-
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
-
-                if (node == null)
-                    continue;
+                var resolvedType = field.Definition.ResolvedType;
+                var node = BuildExecutionNode(parent, resolvedType, field);
 
                 subFields[name] = node;
             }
@@ -113,10 +91,20 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Creates execution nodes for child fields of an object execution node. Only run if
+        /// the object execution node result is not null.
+        /// </summary>
+        public static void SetSubFieldNodes(ObjectExecutionNode parent)
+        {
+            var compiledNode = parent.CompiledField.Resolve(parent.Result, parent.IsResultSet);
+            SetSubFieldNodes(parent, compiledNode.Fields);
+        }
+
+        /// <summary>
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not null.
         /// </summary>
-        public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        public static void SetArrayItemNodes(ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
@@ -138,18 +126,18 @@ namespace GraphQL.Execution
             {
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
+                    var node = BuildExecutionNode(parent, itemType, parent.CompiledField, index);
                     node.Result = d;
 
                     if (!(d is IDataLoaderResult))
                     {
                         if (node is ObjectExecutionNode objectNode)
                         {
-                            SetSubFieldNodes(context, objectNode);
+                            SetSubFieldNodes(objectNode);
                         }
                         else if (node is ArrayExecutionNode arrayNode)
                         {
-                            SetArrayItemNodes(context, arrayNode);
+                            SetArrayItemNodes(arrayNode);
                         }
                         else if (node is ValueExecutionNode valueNode)
                         {
@@ -167,7 +155,7 @@ namespace GraphQL.Execution
                         throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
                     }
 
-                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
+                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.CompiledField, index);
                     arrayItems.Add(nullExecutionNode);
                 }
 
@@ -180,17 +168,17 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, CompiledField compiledField, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
             return graphType switch
             {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                ListGraphType _ => new ArrayExecutionNode(parent, graphType, compiledField, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, compiledField, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, compiledField, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, compiledField, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -295,11 +283,11 @@ namespace GraphQL.Execution
                 {
                     if (node is ObjectExecutionNode objectNode)
                     {
-                        SetSubFieldNodes(context, objectNode);
+                        SetSubFieldNodes(objectNode);
                     }
                     else if (node is ArrayExecutionNode arrayNode)
                     {
-                        SetArrayItemNodes(context, arrayNode);
+                        SetArrayItemNodes(arrayNode);
                     }
                     else if (node is ValueExecutionNode valueNode)
                     {
