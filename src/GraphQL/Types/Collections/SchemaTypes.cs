@@ -94,7 +94,7 @@ namespace GraphQL.Types
             _nameConverter = CamelCaseNameConverter.Instance;
 
             foreach (var introspectionType in _introspectionTypes.Values)
-                AddType(introspectionType);
+                AddType(introspectionType, _context);
 
             // set the name converter properly
             _nameConverter = nameConverter;
@@ -236,30 +236,6 @@ namespace GraphQL.Types
                 }
             }
         }
-
-        /// <summary>
-        /// Adds the specified GraphType to lookup. The instance of this type will be resolved by resolveType parameter specified in
-        /// <see cref="Create(IEnumerable{IGraphType}, IEnumerable{DirectiveGraphType}, Func{Type, IGraphType}, INameConverter, bool)"/>
-        /// method when creating this lookup.
-        /// </summary>
-        /// <typeparam name="TType">The graph type to add.</typeparam>
-        internal void AddType<TType>()
-            where TType : IGraphType
-        {
-            CheckSealed();
-
-            var type = typeof(TType).GetNamedType();
-            var instance = _context.ResolveType(type);
-            AddType(instance);
-
-            Debug.Assert(_context.InFlightRegisteredTypes.Count == 0);
-        }
-
-        /// <summary>
-        /// Adds the specified GraphType to lookup.
-        /// </summary>
-        /// <param name="type"> GraphType to add. </param>
-        internal void AddType(IGraphType type) => AddType(type, _context);
 
         private void AddType(IGraphType type, TypeCollectionContext context)
         {
