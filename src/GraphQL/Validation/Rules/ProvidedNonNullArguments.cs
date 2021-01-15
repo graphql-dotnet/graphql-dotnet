@@ -45,19 +45,17 @@ namespace GraphQL.Validation.Rules
             {
                 var directive = context.TypeInfo.GetDirective();
 
-                if (directive?.Arguments?.List == null)
+                if (directive?.Arguments?.Count > 0)
                 {
-                    return;
-                }
-
-                foreach (var arg in directive.Arguments.List)
-                {
-                    var argAst = node.Arguments?.ValueFor(arg.Name);
-                    var type = arg.ResolvedType;
-
-                    if (argAst == null && type is NonNullGraphType)
+                    foreach (var arg in directive.Arguments.List)
                     {
-                        context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        var argAst = node.Arguments?.ValueFor(arg.Name);
+                        var type = arg.ResolvedType;
+
+                        if (argAst == null && type is NonNullGraphType)
+                        {
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        }
                     }
                 }
             })

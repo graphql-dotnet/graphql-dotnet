@@ -157,20 +157,20 @@ namespace GraphQL.Types
 
             foreach (var directive in directives)
             {
-                if (directive.Arguments == null)
-                    continue;
-
-                foreach (var arg in directive.Arguments)
+                if (directive.Arguments?.Count > 0)
                 {
-                    if (arg.ResolvedType != null)
+                    foreach (var arg in directive.Arguments.List)
                     {
-                        lookup.AddTypeIfNotRegistered(arg.ResolvedType, ctx);
-                        arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
-                    }
-                    else
-                    {
-                        lookup.AddTypeIfNotRegistered(arg.Type, ctx);
-                        arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                        if (arg.ResolvedType != null)
+                        {
+                            lookup.AddTypeIfNotRegistered(arg.ResolvedType, ctx);
+                            arg.ResolvedType = lookup.ConvertTypeReference(directive, arg.ResolvedType);
+                        }
+                        else
+                        {
+                            lookup.AddTypeIfNotRegistered(arg.Type, ctx);
+                            arg.ResolvedType = lookup.BuildNamedType(arg.Type, ctx.ResolveType);
+                        }
                     }
                 }
             }
@@ -359,25 +359,25 @@ namespace GraphQL.Types
                 AddTypeIfNotRegistered(field.ResolvedType, context);
             }
 
-            if (field.Arguments == null)
-                return;
-
-            foreach (var arg in field.Arguments.List)
+            if (field.Arguments?.Count > 0)
             {
-                if (applyNameConverter)
+                foreach (var arg in field.Arguments.List)
                 {
-                    arg.Name = _nameConverter.NameForArgument(arg.Name, parentType, field);
-                    NameValidator.ValidateNameOnSchemaInitialize(arg.Name, "argument");
-                }
+                    if (applyNameConverter)
+                    {
+                        arg.Name = _nameConverter.NameForArgument(arg.Name, parentType, field);
+                        NameValidator.ValidateNameOnSchemaInitialize(arg.Name, "argument");
+                    }
 
-                if (arg.ResolvedType != null)
-                {
-                    AddTypeIfNotRegistered(arg.ResolvedType, context);
-                    continue;
-                }
+                    if (arg.ResolvedType != null)
+                    {
+                        AddTypeIfNotRegistered(arg.ResolvedType, context);
+                        continue;
+                    }
 
-                AddTypeIfNotRegistered(arg.Type, context);
-                arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                    AddTypeIfNotRegistered(arg.Type, context);
+                    arg.ResolvedType = BuildNamedType(arg.Type, context.ResolveType);
+                }
             }
         }
 
@@ -456,12 +456,12 @@ Make sure that your ServiceProvider is configured correctly.");
                 {
                     field.ResolvedType = ConvertTypeReference(type, field.ResolvedType);
 
-                    if (field.Arguments == null)
-                        continue;
-
-                    foreach (var arg in field.Arguments.List)
+                    if (field.Arguments?.Count > 0)
                     {
-                        arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
+                        foreach (var arg in field.Arguments.List)
+                        {
+                            arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
+                        }
                     }
                 }
             }
