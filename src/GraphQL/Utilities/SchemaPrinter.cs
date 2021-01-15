@@ -233,7 +233,7 @@ namespace GraphQL.Utilities
                 return string.Empty;
             }
 
-            return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue)));
+            return "({0})".ToFormat(string.Join(", ", field.Arguments.Select(PrintInputValue))); //TODO: iterator allocation
         }
 
         public string PrintInputValue(FieldType field)

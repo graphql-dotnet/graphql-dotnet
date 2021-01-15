@@ -223,7 +223,7 @@ namespace GraphQL.Language
         /// <summary>
         /// Converts a list of argument nodes and their children.
         /// </summary>
-        private static Arguments Arguments(IEnumerable<GraphQLArgument> source)
+        private static Arguments Arguments(List<GraphQLArgument> source)
         {
             Arguments target = null;
 

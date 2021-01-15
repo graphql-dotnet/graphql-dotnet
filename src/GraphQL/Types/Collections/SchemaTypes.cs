@@ -362,7 +362,7 @@ namespace GraphQL.Types
             if (field.Arguments == null)
                 return;
 
-            foreach (var arg in field.Arguments)
+            foreach (var arg in field.Arguments.List)
             {
                 if (applyNameConverter)
                 {
@@ -459,7 +459,7 @@ Make sure that your ServiceProvider is configured correctly.");
                     if (field.Arguments == null)
                         continue;
 
-                    foreach (var arg in field.Arguments)
+                    foreach (var arg in field.Arguments.List)
                     {
                         arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType);
                     }
