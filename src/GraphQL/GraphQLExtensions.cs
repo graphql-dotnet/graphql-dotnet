@@ -427,7 +427,14 @@ namespace GraphQL
             {
                 if (b != null)
                 {
-                    return a.PossibleTypes.Any(type => b.IsPossibleType(type));
+                    // DO NOT USE LINQ ON HOT PATH
+                    foreach (var type in a.PossibleTypes.List)
+                    {
+                        if (b.IsPossibleType(type))
+                            return true;
+                    }
+
+                    return false;
                 }
 
                 return a.IsPossibleType(typeB);

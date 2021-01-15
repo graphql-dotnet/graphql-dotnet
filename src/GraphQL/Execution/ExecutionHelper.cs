@@ -308,9 +308,13 @@ namespace GraphQL.Execution
 
                 if (input is ListValue list)
                 {
-                    return list.Values
-                        .Select(item => CoerceValue(schema, listItemType, item, variables))
-                        .ToList();
+                    var count = list.ValuesList.Count;
+                    if (count == 0)
+                        return Array.Empty<object>();
+
+                    var values = new object[count];
+                    for (int i = 0; i < count; ++i)
+                        values[i] = CoerceValue(schema, listItemType, list.ValuesList[i], variables);
                 }
                 else
                 {
