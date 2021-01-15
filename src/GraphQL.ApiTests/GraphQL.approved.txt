@@ -1811,23 +1811,6 @@ namespace GraphQL.Types
         public override int GetHashCode() { }
         public override string ToString() { }
     }
-    public class GraphTypesLookup
-    {
-        public GraphTypesLookup() { }
-        public GraphTypesLookup(GraphQL.Conversion.INameConverter nameConverter) { }
-        public GraphQL.Types.IGraphType this[string typeName] { get; set; }
-        public GraphQL.Types.IGraphType this[System.Type type] { get; }
-        public GraphQL.Conversion.INameConverter NameConverter { get; set; }
-        public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        public GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
-        public void AddType(GraphQL.Types.IGraphType type) { }
-        public void AddType<TType>()
-            where TType : GraphQL.Types.IGraphType { }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> All() { }
-        public void Clear() { }
-        public static GraphQL.Types.GraphTypesLookup Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter, bool seal = false) { }
-    }
     public class GuidGraphType : GraphQL.Types.ScalarGraphType
     {
         public GuidGraphType() { }
@@ -1899,10 +1882,10 @@ namespace GraphQL.Types
     public interface ISchema : GraphQL.Types.IProvideMetadata
     {
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
-        System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        GraphQL.Types.SchemaTypes AllTypes { get; }
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
-        System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
+        GraphQL.Types.SchemaDirectives Directives { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
@@ -2070,10 +2053,10 @@ namespace GraphQL.Types
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AllTypes { get; }
+        public GraphQL.Types.SchemaTypes AllTypes { get; }
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> Directives { get; set; }
+        public GraphQL.Types.SchemaDirectives Directives { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
@@ -2100,6 +2083,18 @@ namespace GraphQL.Types
         public void RegisterValueConverter(GraphQL.Types.IAstFromValueConverter converter) { }
         public static GraphQL.Types.ISchema For(string[] typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
         public static GraphQL.Types.ISchema For(string typeDefinitions, System.Action<GraphQL.Utilities.SchemaBuilder> configure = null) { }
+    }
+    public class SchemaDirectives : System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType>, System.Collections.IEnumerable
+    {
+        public SchemaDirectives() { }
+        public int Count { get; }
+        public bool Contains(GraphQL.Types.DirectiveGraphType type) { }
+        public System.Collections.Generic.IEnumerator<GraphQL.Types.DirectiveGraphType> GetEnumerator() { }
+    }
+    public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
+    {
+        public int Count { get; }
+        public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {

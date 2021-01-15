@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -30,14 +29,19 @@ namespace GraphQL.Introspection
                 if (description == null)
                 {
                     // We have to iterate over all schema types because FieldType has no reference to the GraphType to which it belongs.
-                    var fieldOwner = context.Schema.AllTypes.OfType<IComplexGraphType>().Single(t => t.Fields.Contains(context.Source));
-                    if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
+                    foreach (var item in context.Schema.AllTypes.Dictionary)
                     {
-                        foreach (var iface in implementation.ResolvedInterfaces.List)
+                        if (item.Value is IComplexGraphType fieldOwner && fieldOwner.Fields.Contains(context.Source))
                         {
-                            var fieldFromInterface = iface.GetField(context.Source.Name);
-                            if (fieldFromInterface?.Description != null)
-                                return fieldFromInterface.Description;
+                            if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
+                            {
+                                foreach (var iface in implementation.ResolvedInterfaces.List)
+                                {
+                                    var fieldFromInterface = iface.GetField(context.Source.Name);
+                                    if (fieldFromInterface?.Description != null)
+                                        return fieldFromInterface.Description;
+                                }
+                            }
                         }
                     }
                 }

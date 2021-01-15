@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
@@ -48,10 +47,20 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: async context =>
                 {
-                    var types = await context.Schema.AllTypes.WhereAsync((x, context) => context.Schema.Filter.AllowType(x), context).ConfigureAwait(false);
-                    if (context.Schema.Comparer.TypeComparer != null)
-                        types = types.OrderBy(t => t, context.Schema.Comparer.TypeComparer);
-                    return types;
+                    var types = context.GetPooledArray<IGraphType>(context.Schema.AllTypes.Count);
+
+                    int index = 0;
+                    foreach (var item in context.Schema.AllTypes.Dictionary)
+                    {
+                        if (await context.Schema.Filter.AllowType(item.Value).ConfigureAwait(false))
+                            types[index++] = item.Value;
+                    }
+
+                    var comparer = context.Schema.Comparer.TypeComparer;
+                    if (comparer != null)
+                        Array.Sort(types, 0, index, comparer);
+
+                    return types.Constrained(index);
                 });
 
 

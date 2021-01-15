@@ -64,7 +64,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of all the graph types utilized by this schema.
         /// </summary>
-        IEnumerable<IGraphType> AllTypes { get; }
+        SchemaTypes AllTypes { get; }
 
         /// <summary>
         /// Returns a <see cref="IGraphType"/> for a given name.

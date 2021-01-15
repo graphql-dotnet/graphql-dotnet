@@ -56,6 +56,8 @@ namespace GraphQL.Utilities
 
             var directives = Schema.Directives.Where(d => directiveFilter(d.Name)).OrderBy(d => d.Name, StringComparer.Ordinal).ToList();
             var types = Schema.AllTypes
+                .Dictionary
+                .Values
                 .Where(t => typeFilter(t.Name))
                 .OrderBy(x => x.Name, StringComparer.Ordinal)
                 .ToList();

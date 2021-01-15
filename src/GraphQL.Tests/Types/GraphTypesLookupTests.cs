@@ -11,14 +11,14 @@ namespace GraphQL.Tests.Types
 
         private readonly ManualResetEvent _inIteration = new ManualResetEvent(false);
         private readonly ManualResetEvent _lookupModified = new ManualResetEvent(false);
-        private readonly GraphTypesLookup _lookup = new GraphTypesLookup();
+        private readonly SchemaTypes _lookup = new Schema().AllTypes;
 
         [Fact]
         public void is_thread_safe()
         {
             Task.Run(AddAType);
             var modified = false;
-            foreach (var t in _lookup.All())
+            foreach (var t in _lookup.Dictionary)
             {
                 if (modified)
                     continue;
