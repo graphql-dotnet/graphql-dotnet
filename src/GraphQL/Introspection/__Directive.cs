@@ -28,7 +28,7 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
-                resolve: context => context.Source.Arguments ?? Enumerable.Empty<QueryArgument>()
+                resolve: context => context.Source.Arguments?.List ?? Enumerable.Empty<QueryArgument>()
             );
             Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l =>
