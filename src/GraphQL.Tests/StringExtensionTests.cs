@@ -33,7 +33,7 @@ namespace GraphQL.Tests
         [InlineData(typeof(void), "Void")]
         [InlineData(typeof(int), "Int32")]
         [InlineData(typeof(Dictionary<string, bool>), "Dictionary<String,Boolean>")]
-#if !NET48 //crashes test process after successfully compiling, prior to actually running the test
+#if !NET48 //hangs test process after successfully compiling, prior to actually running the test
         [InlineData(typeof(List<Dictionary<string, HashSet<DateTime>>>), "List<Dictionary<String,HashSet<DateTime>>>")]
 #endif
         [InlineData(typeof(Dictionary<,>), "Dictionary<TKey,TValue>")]       
