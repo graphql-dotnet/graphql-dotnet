@@ -33,7 +33,9 @@ namespace GraphQL.Tests
         [InlineData(typeof(void), "Void")]
         [InlineData(typeof(int), "Int32")]
         [InlineData(typeof(Dictionary<string, bool>), "Dictionary<String,Boolean>")]
+#if !NET48
         [InlineData(typeof(List<Dictionary<string, HashSet<DateTime>>>), "List<Dictionary<String,HashSet<DateTime>>>")]
+#endif
         [InlineData(typeof(Dictionary<,>), "Dictionary<TKey,TValue>")]       
         [InlineData(typeof(List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<int>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>), "List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<List<Int32>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")]
         public void GetFriendlyName_Should_Return_Expected_Results(Type source, string expected)
