@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -56,11 +54,11 @@ namespace GraphQL.Compilation
                 case IAbstractGraphType abstractType:
                 {
                     var gqlToNode = new Dictionary<IObjectGraphType, CompiledNode>();
-                    foreach (var possilbe in abstractType.PossibleTypes)
+                    foreach (var possible in abstractType.PossibleTypes)
                     {
-                        var fields = CollectFieldsRecursive(schema, document, variables, field.SelectionSet, possilbe);
-                        var rootNode = new CompiledNode(possilbe, fields);
-                        gqlToNode.Add(possilbe, rootNode);
+                        var fields = CollectFieldsRecursive(schema, document, variables, field.SelectionSet, possible);
+                        var rootNode = new CompiledNode(possible, fields);
+                        gqlToNode.Add(possible, rootNode);
                     }
                     var defaultType = new CompiledNode(abstractType, new Dictionary<string, CompiledField>());
 
