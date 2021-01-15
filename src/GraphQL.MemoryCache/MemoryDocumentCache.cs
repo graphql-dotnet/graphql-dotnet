@@ -37,7 +37,7 @@ namespace GraphQL.Caching
         }
 
         /// <summary>
-        /// Initializes a new instance with the specified memory cache and sliding expiration time period.
+        /// Initializes a new instance with the specified memory cache and options.
         /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(string)"/>, the sliding expiration
         /// time specified within <paramref name="options"/> can be ignored.
         /// </summary>
