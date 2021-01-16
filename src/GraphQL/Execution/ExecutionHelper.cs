@@ -315,6 +315,7 @@ namespace GraphQL.Execution
                     var values = new object[count];
                     for (int i = 0; i < count; ++i)
                         values[i] = CoerceValue(schema, listItemType, list.ValuesList[i], variables);
+                    return values;
                 }
                 else
                 {
@@ -358,7 +359,7 @@ namespace GraphQL.Execution
                     else if (field.DefaultValue != null)
                     {
                         // If no value is provided for a defined input object field and that field definition provides a default value,
-                        // the default value should be used. 
+                        // the default value should be used.
                         obj[field.Name] = field.DefaultValue;
                     }
                     // Covered by validation rules and/or AssertValidVariableValue:
