@@ -377,7 +377,7 @@ namespace GraphQL.Execution
             {
                 if (!(input is ObjectValue objectValue))
                 {
-                    return new ArgumentValue(null, ArgumentSource.Literal);
+                    return ArgumentValue.NullLiteral;
                 }
 
                 var obj = new Dictionary<string, object>();
