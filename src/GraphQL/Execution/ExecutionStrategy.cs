@@ -220,11 +220,24 @@ namespace GraphQL.Execution
 
             try
             {
-                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
-                var resolveContext = resolver is IResolveFieldContextProvider provider
-                    ? provider.CreateContext(node, context)
-                    : new ReadonlyResolveFieldContext<object>(node, context);
-                var result = resolver.Resolve(resolveContext);
+                object result;
+                var resolver = node.FieldDefinition.Resolver;
+                if (resolver == null)
+                {
+                    result = NameFieldResolver.Resolve(node.Source, node.Field.Name);
+                }
+                else if (resolver is IOptimizedFieldResolver optimized)
+                {
+                    result = optimized.Resolve(node, context);
+                }
+                else
+                {
+                    var resolveContext = resolver is IResolveFieldContextProvider provider
+                        ? provider.CreateContext(node, context)
+                        : new ReadonlyResolveFieldContext<object>(node, context);
+
+                    result = resolver.Resolve(resolveContext);
+                }
 
                 if (result is Task task)
                 {

@@ -27,7 +27,7 @@ namespace GraphQL.Resolvers
         /// <inheritdoc/>
         public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
 
-        private static object Resolve(object source, string name)
+        internal static object Resolve(object source, string name)
         {
             if (source == null || name == null)
                 return null;

@@ -21,7 +21,7 @@ namespace GraphQL.Introspection
 
             Field(f => f.Name).Description(null);
 
-            Field<StringGraphType>("description", resolve: context =>
+            FieldOptimized<StringGraphType>("description", resolve: context =>
             {
                 string description = context.Source.Description;
 
@@ -49,7 +49,7 @@ namespace GraphQL.Introspection
                 return description;
             });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
+            FieldAsyncOptimized<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
                 resolve: async context =>
                 {
                     var source = context.Source;
@@ -74,9 +74,9 @@ namespace GraphQL.Introspection
                     return Array.Empty<QueryArgument>();
                 });
 
-            Field<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
+            FieldOptimized<NonNullGraphType<__Type>>("type", resolve: ctx => ctx.Source.ResolvedType);
 
-            Field<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
+            FieldOptimized<NonNullGraphType<BooleanGraphType>>("isDeprecated", resolve: context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
 
             Field(f => f.DeprecationReason, nullable: true).Description(null);
         }

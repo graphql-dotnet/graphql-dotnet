@@ -276,6 +276,32 @@ namespace GraphQL
         public int? Last { get; }
         public int? PageSize { get; }
     }
+    public readonly struct ReadonlyResolveFieldContextStruct<TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>
+    {
+        public System.Collections.Generic.IDictionary<string, object> Arguments { get; }
+        public System.Threading.CancellationToken CancellationToken { get; }
+        public GraphQL.Language.AST.Document Document { get; }
+        public GraphQL.ExecutionErrors Errors { get; }
+        public System.Collections.Generic.IDictionary<string, object> Extensions { get; }
+        public GraphQL.Language.AST.Field FieldAst { get; }
+        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public string FieldName { get; }
+        public GraphQL.Language.AST.Fragments Fragments { get; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; }
+        public GraphQL.Language.AST.Operation Operation { get; }
+        public GraphQL.Types.IObjectGraphType ParentType { get; }
+        public System.Collections.Generic.IEnumerable<object> Path { get; }
+        public System.IServiceProvider RequestServices { get; }
+        public System.Collections.Generic.IEnumerable<object> ResponsePath { get; }
+        public GraphQL.Types.IGraphType ReturnType { get; }
+        public object RootValue { get; }
+        public GraphQL.Types.ISchema Schema { get; }
+        public TSource Source { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
+        public GraphQL.Language.AST.Variables Variables { get; }
+        public TElement[] GetPooledArray<TElement>(int minimumLength) { }
+    }
     public class ReadonlyResolveFieldContext<TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveEventStreamContext, GraphQL.IResolveEventStreamContext<TSource>, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
@@ -1618,6 +1644,8 @@ namespace GraphQL.Resolvers
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public object Resolve(GraphQL.IResolveFieldContext context) { }
     }
+    public delegate object OptimizedFunc<T>(GraphQL.ReadonlyResolveFieldContextStruct<T> arg);
+    public delegate System.Threading.Tasks.Task<object> OptimizedTaskFunc<T>(GraphQL.ReadonlyResolveFieldContextStruct<T> arg);
 }
 namespace GraphQL.Subscription
 {
@@ -1692,7 +1720,13 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType>> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
+        public GraphQL.Types.FieldType FieldAsyncOptimized(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, GraphQL.Resolvers.OptimizedTaskFunc<TSourceType> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldAsyncOptimized<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, GraphQL.Resolvers.OptimizedTaskFunc<TSourceType> resolve = null, string deprecationReason = null)
+            where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType FieldDelegate<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Delegate resolve = null, string deprecationReason = null)
+            where TGraphType : GraphQL.Types.IGraphType { }
+        public GraphQL.Types.FieldType FieldOptimized(System.Type type, string name, string description = null, GraphQL.Types.QueryArguments arguments = null, GraphQL.Resolvers.OptimizedFunc<TSourceType> resolve = null, string deprecationReason = null) { }
+        public GraphQL.Types.FieldType FieldOptimized<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, GraphQL.Resolvers.OptimizedFunc<TSourceType> resolve = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string description = null, GraphQL.Types.QueryArguments arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object> resolve = null, System.Func<GraphQL.IResolveEventStreamContext, System.IObservable<object>> subscribe = null, string deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }

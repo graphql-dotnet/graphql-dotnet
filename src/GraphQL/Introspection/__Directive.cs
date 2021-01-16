@@ -27,21 +27,21 @@ namespace GraphQL.Introspection
             Field(f => f.Description, nullable: true).Description(null);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
+            FieldOptimized<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
                 resolve: context => context.Source.Arguments?.List ?? Enumerable.Empty<QueryArgument>()
             );
-            Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
+            FieldOptimized<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l =>
                         l == DirectiveLocation.Query ||
                         l == DirectiveLocation.Mutation ||
                         l == DirectiveLocation.Subscription));
-            Field<NonNullGraphType<BooleanGraphType>>("onFragment", deprecationReason: "Use 'locations'.",
+            FieldOptimized<NonNullGraphType<BooleanGraphType>>("onFragment", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l =>
                         l == DirectiveLocation.FragmentSpread ||
                         l == DirectiveLocation.InlineFragment ||
                         l == DirectiveLocation.FragmentDefinition));
 
-            Field<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
+            FieldOptimized<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
                 resolve: context => context.Source.Locations.Any(l => l == DirectiveLocation.Field));
         }
     }

@@ -12,6 +12,10 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionNode
     {
+        internal IDictionary<string, object> Arguments { get; set; } //TODO: rename, storage for REsolveFieldContext
+
+        internal IDictionary<string, Field> SubFields1 { get; set; } //TODO: rename, storage for REsolveFieldContext
+
         /// <summary>
         /// Returns the parent node, or null if this is the root node.
         /// </summary>

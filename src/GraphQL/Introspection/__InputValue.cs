@@ -24,9 +24,9 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description");
 
-            Field<NonNullGraphType<__Type>>("type", resolve: context => context.Source.ResolvedType);
+            FieldOptimized<NonNullGraphType<__Type>>("type", resolve: context => context.Source.ResolvedType);
 
-            Field<StringGraphType>(
+            FieldOptimized<StringGraphType>(
                 "defaultValue",
                 "A GraphQL-formatted string representing the default value for this input value.",
                 resolve: context =>

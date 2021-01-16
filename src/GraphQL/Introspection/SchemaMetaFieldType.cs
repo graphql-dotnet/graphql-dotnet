@@ -38,11 +38,11 @@ namespace GraphQL.Introspection
                 "exposes all available types and directives on the server, as well as " +
                 "the entry points for query, mutation, and subscription operations.";
 
-            Field<StringGraphType>(
+            FieldOptimized<StringGraphType>(
                 "description",
                 resolve: context => context.Schema.Description);
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
+            FieldAsyncOptimized<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>(
                 "types",
                 "A list of all types supported by this server.",
                 resolve: async context =>
@@ -64,12 +64,12 @@ namespace GraphQL.Introspection
                 });
 
 
-            Field<NonNullGraphType<__Type>>(
+            FieldOptimized<NonNullGraphType<__Type>>(
                 "queryType",
                 "The type that query operations will be rooted at.",
                 resolve: context => context.Schema.Query);
 
-            FieldAsync<__Type>(
+            FieldAsyncOptimized<__Type>(
                 "mutationType",
                 "If this server supports mutation, the type that mutation operations will be rooted at.",
                 resolve: async context =>
@@ -79,7 +79,7 @@ namespace GraphQL.Introspection
                         : null;
                 });
 
-            FieldAsync<__Type>(
+            FieldAsyncOptimized<__Type>(
                 "subscriptionType",
                 "If this server supports subscription, the type that subscription operations will be rooted at.",
                 resolve: async context =>
@@ -89,7 +89,7 @@ namespace GraphQL.Introspection
                         : null;
                 });
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
+            FieldAsyncOptimized<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>(
                 "directives",
                 "A list of all directives supported by this server.",
                 resolve: async context =>

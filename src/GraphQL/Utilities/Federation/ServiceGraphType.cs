@@ -8,7 +8,7 @@ namespace GraphQL.Utilities.Federation
         {
             Name = "_Service";
 
-            Field<StringGraphType>("sdl", resolve: context =>
+            FieldOptimized<StringGraphType>("sdl", resolve: context =>
             {
                 var printer = new FederatedSchemaPrinter(context.Schema);
                 return printer.PrintFederatedSchema();

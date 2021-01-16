@@ -26,18 +26,18 @@ namespace GraphQL.Introspection
                 "types, Union and Interface, provide the Object types possible " +
                 "at runtime. List and NonNull types compose other types.";
 
-            Field<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
+            FieldOptimized<NonNullGraphType<__TypeKind>>("kind", null, null, context =>
             {
                 return context.Source is IGraphType type
                     ? KindForInstance(type)
                     : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
 
-            Field<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
+            FieldOptimized<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
 
             Field<StringGraphType>("description");
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
+            FieldAsyncOptimized<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
                 new QueryArguments(
                     new QueryArgument<BooleanGraphType>
                     {
@@ -69,7 +69,7 @@ namespace GraphQL.Introspection
                     return null;
                 });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
+            FieldAsyncOptimized<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
             {
                 if (context.Source is IImplementInterfaces type)
                 {
@@ -92,7 +92,7 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
+            FieldAsyncOptimized<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
@@ -115,7 +115,7 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
+            FieldAsyncOptimized<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
                 new QueryArguments(new QueryArgument<BooleanGraphType>
                 {
                     Name = "includeDeprecated",
@@ -146,7 +146,7 @@ namespace GraphQL.Introspection
                     return null;
                 });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
+            FieldAsyncOptimized<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
             {
                 if (context.Source is IInputObjectGraphType type)
                 {
@@ -169,7 +169,7 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            Field<__Type>("ofType", resolve: context =>
+            FieldOptimized<__Type>("ofType", resolve: context =>
             {
                 return context.Source switch
                 {
