@@ -4,6 +4,8 @@
 
 * Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 * New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
+* New method `IResolveFieldContext.GetPooledArray`
+* New method `IParentExecutionNode.ApplyToChildren`
 * Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 
@@ -59,3 +61,5 @@
 * `EnterLeaveListener` has been removed and the signatures of `INodeVisitor.Enter` and `INodeVisitor.Leave` have changed. `NodeVisitors` class has been added in its place.
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
+* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
