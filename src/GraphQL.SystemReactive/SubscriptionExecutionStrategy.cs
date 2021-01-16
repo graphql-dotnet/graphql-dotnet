@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
-using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using static GraphQL.Execution.ExecutionHelper;

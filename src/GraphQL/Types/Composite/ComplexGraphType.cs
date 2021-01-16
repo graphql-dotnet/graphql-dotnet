@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 

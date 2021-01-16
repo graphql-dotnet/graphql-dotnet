@@ -2,7 +2,6 @@ using System;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Tests.Types

@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Builders

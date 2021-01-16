@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription
