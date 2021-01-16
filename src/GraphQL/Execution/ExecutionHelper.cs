@@ -345,7 +345,7 @@ namespace GraphQL.Execution
 
             if (input is NullValue)
             {
-                return new ArgumentValue(null, ArgumentSource.Literal);
+                return ArgumentValue.NullLiteral;
             }
 
             if (input is VariableReference variable)
