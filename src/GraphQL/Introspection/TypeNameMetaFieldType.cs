@@ -17,7 +17,7 @@ namespace GraphQL.Introspection
             SetName("__typename", validate: false);
             Type = typeof(NonNullGraphType<StringGraphType>);
             Description = "The name of the current Object type at runtime.";
-            Resolver = new FuncFieldResolver<object>(context => context.ParentType.Name);
+            Resolver = new OptimizedFuncFieldResolver<object>(context => context.ParentType.Name);
         }
     }
 }

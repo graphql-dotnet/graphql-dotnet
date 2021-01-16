@@ -221,13 +221,10 @@ namespace GraphQL.Execution
             try
             {
                 object result;
-                var resolver = node.FieldDefinition.Resolver;
-                if (resolver == null)
+                var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
+                if (resolver is IOptimizedFieldResolver optimized)
                 {
-                    result = NameFieldResolver.Resolve(node.Source, node.Field.Name);
-                }
-                else if (resolver is IOptimizedFieldResolver optimized)
-                {
+                    // Special case for internal resolvers that do not require ResolveFieldContext allocation
                     result = optimized.Resolve(node, context);
                 }
                 else

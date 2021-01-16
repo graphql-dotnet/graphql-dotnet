@@ -17,7 +17,7 @@ namespace GraphQL.Introspection
             SetName("__schema", validate: false);
             Type = typeof(__Schema);
             Description = "Access the current type schema of this server.";
-            Resolver = new FuncFieldResolver<ISchema>(context => context.Schema);
+            Resolver = new OptimizedFuncFieldResolver<ISchema>(context => context.Schema);
         }
     }
 

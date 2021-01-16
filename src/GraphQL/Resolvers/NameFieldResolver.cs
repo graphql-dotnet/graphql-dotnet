@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using GraphQL.Execution;
 
 namespace GraphQL.Resolvers
 {
@@ -12,7 +13,7 @@ namespace GraphQL.Resolvers
     /// Call <see cref="Instance"/> to retrieve an instance of this class.
     /// </para>
     /// </summary>
-    public class NameFieldResolver : IFieldResolver
+    public class NameFieldResolver : IFieldResolver, IOptimizedFieldResolver
     {
         private static readonly ConcurrentDictionary<(Type targetType, string name), Func<object, object>> _delegates
             = new ConcurrentDictionary<(Type, string), Func<object, object>>();
@@ -27,7 +28,9 @@ namespace GraphQL.Resolvers
         /// <inheritdoc/>
         public object Resolve(IResolveFieldContext context) => Resolve(context?.Source, context?.FieldAst?.Name);
 
-        internal static object Resolve(object source, string name)
+        public object Resolve(ExecutionNode node, ExecutionContext context) => Resolve(node.Source, node.Field?.Name);
+
+        private static object Resolve(object source, string name)
         {
             if (source == null || name == null)
                 return null;

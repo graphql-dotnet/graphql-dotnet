@@ -1599,6 +1599,7 @@ namespace GraphQL.Resolvers
     {
         public ExpressionFieldResolver(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> property) { }
         public TProperty Resolve(GraphQL.IResolveFieldContext context) { }
+        public object Resolve(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
     }
     public static class FieldResolverExtensions
     {
@@ -1643,6 +1644,7 @@ namespace GraphQL.Resolvers
     {
         public static GraphQL.Resolvers.NameFieldResolver Instance { get; }
         public object Resolve(GraphQL.IResolveFieldContext context) { }
+        public object Resolve(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
     }
     public delegate object OptimizedFunc<T>(GraphQL.ReadonlyResolveFieldContextStruct<T> arg);
     public delegate System.Threading.Tasks.Task<object> OptimizedTaskFunc<T>(GraphQL.ReadonlyResolveFieldContextStruct<T> arg);
