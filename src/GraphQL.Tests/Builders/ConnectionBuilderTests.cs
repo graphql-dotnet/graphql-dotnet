@@ -191,7 +191,7 @@ namespace GraphQL.Tests.Builders
             };
             type.Connection<ObjectGraphType>()
                 .Name("testConnection")
-                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+                .Resolve(resArgs => Task.FromResult<object>(connection));
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
@@ -245,7 +245,7 @@ namespace GraphQL.Tests.Builders
             };
             type.Connection<ChildType, ParentChildrenEdgeType>()
                 .Name("testConnection")
-                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+                .Resolve(resArgs => Task.FromResult<object>(connection));
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");
@@ -322,7 +322,7 @@ namespace GraphQL.Tests.Builders
             };
             type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>()
                 .Name("testConnection")
-                .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+                .Resolve(resArgs => Task.FromResult<object>(connection));
 
             var field = type.Fields.Single();
             field.Name.ShouldBe("testConnection");

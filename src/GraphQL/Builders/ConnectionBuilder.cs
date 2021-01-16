@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -240,37 +240,7 @@ namespace GraphQL.Builders
         /// </summary>
         public void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
         {
-            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
-            {
-                var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
-                CheckForErrors(args);
-                return resolver(args);
-            });
-        }
-
-        /// <summary>
-        /// Sets the resolver method for the connection field.
-        /// </summary>
-        public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object>> resolver)
-        {
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
-            {
-                var args = new ResolveConnectionContext<TSourceType>(context, _isUnidirectional, _pageSize);
-                CheckForErrors(args);
-                return resolver(args);
-            });
-        }
-
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> args)
-        {
-            if (args.First.HasValue && args.Last.HasValue)
-            {
-                throw new ArgumentException("Cannot specify both `first` and `last`.");
-            }
-            if (args.IsUnidirectional && args.Last.HasValue)
-            {
-                throw new ArgumentException("Cannot use `last` with unidirectional connections.");
-            }
+            FieldType.Resolver = new ConnectionFuncFieldResolver<TSourceType>(resolver, _isUnidirectional, _pageSize);
         }
     }
 }

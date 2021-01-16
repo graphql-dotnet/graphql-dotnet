@@ -1,4 +1,4 @@
-namespace GraphQL.Subscription
+namespace GraphQL
 {
     public interface IResolveEventStreamContext : IResolveFieldContext
     {

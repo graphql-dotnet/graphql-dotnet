@@ -6,12 +6,14 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using Field = GraphQL.Language.AST.Field;
 
+// THIS FILE CONTAINS OLD CLASSES. THEY ARE USED ONLY FOR TESTS
+
 namespace GraphQL
 {
     /// <summary>
-    /// A mutable implementation of <see cref="IResolveFieldContext"/>
+    /// A mutable implementation of <see cref="IResolveFieldContext"/>.
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext
+    public class ResolveFieldContext : IResolveFieldContext //TODO: ??? This class is currently only used for tests
     {
         /// <inheritdoc/>
         public string FieldName { get; set; }
@@ -122,7 +124,7 @@ namespace GraphQL
     }
 
     /// <inheritdoc cref="ResolveFieldContext"/>
-    public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
+    public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource> //TODO: ??? This class is currently only used for tests
     {
         /// <inheritdoc cref="ResolveFieldContext()"/>
         public ResolveFieldContext()
@@ -145,5 +147,83 @@ namespace GraphQL
             get => (TSource)base.Source;
             set => base.Source = value;
         }
+    }
+
+    public class ResolveEventStreamContext<T> : ResolveFieldContext<T>, IResolveEventStreamContext<T> //TODO: ??? This class is currently only used for tests
+    {
+        public ResolveEventStreamContext() { }
+
+        public ResolveEventStreamContext(IResolveEventStreamContext context) : base(context) { }
+    }
+
+    public class ResolveEventStreamContext : ResolveEventStreamContext<object>, IResolveEventStreamContext //TODO: ??? This class is currently only used for tests
+    {
+    }
+}
+
+namespace GraphQL.Builders
+{
+    public class ResolveConnectionContext<T> : ResolveFieldContext<T>, IResolveConnectionContext<T> //TODO: ??? This class is currently only used for tests
+    {
+        private readonly int? _defaultPageSize;
+
+        /// <summary>
+        /// Initializes an instance which mirrors the specified <see cref="IResolveFieldContext"/>
+        /// with the specified properties and defaults
+        /// </summary>
+        /// <param name="context">The underlying <see cref="IResolveFieldContext"/> to mirror</param>
+        /// <param name="isUnidirectional">Indicates if the connection only allows forward paging requests</param>
+        /// <param name="defaultPageSize">Indicates the default page size if not specified by the request</param>
+        public ResolveConnectionContext(IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
+            : base(context)
+        {
+            IsUnidirectional = isUnidirectional;
+            _defaultPageSize = defaultPageSize;
+        }
+
+        public bool IsUnidirectional { get; private set; }
+
+        /// <inheritdoc/>
+        public int? First
+        {
+            get
+            {
+                var first = FirstInternal;
+                if (!first.HasValue && !Last.HasValue)
+                {
+                    return _defaultPageSize;
+                }
+
+                return first;
+            }
+        }
+
+        private int? FirstInternal
+        {
+            get
+            {
+                var first = this.GetArgument<int?>("first");
+                return first.HasValue ? (int?)Math.Abs(first.Value) : null;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int? Last
+        {
+            get
+            {
+                var last = this.GetArgument<int?>("last");
+                return last.HasValue ? (int?)Math.Abs(last.Value) : null;
+            }
+        }
+
+        /// <inheritdoc/>
+        public string After => this.GetArgument<string>("after");
+
+        /// <inheritdoc/>
+        public string Before => this.GetArgument<string>("before");
+
+        /// <inheritdoc/>
+        public int? PageSize => First ?? Last ?? _defaultPageSize;
     }
 }

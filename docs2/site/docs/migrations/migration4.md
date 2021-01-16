@@ -62,4 +62,5 @@
 * `TypeInfo.GetAncestors()` has been changed to `TypeInfo.GetAncestor(int index)`
 * Various methods within `StringUtils` have been removed; please use extension methods within `StringExtensions` instead.
 * Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
-* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs
+* Significantly changed the way of working with `IResolveFieldContext` and its descendants

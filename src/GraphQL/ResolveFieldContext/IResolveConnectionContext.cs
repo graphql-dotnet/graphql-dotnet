@@ -1,6 +1,6 @@
 using GraphQL.Resolvers;
 
-namespace GraphQL.Builders
+namespace GraphQL
 {
     /// <summary>
     /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>, along

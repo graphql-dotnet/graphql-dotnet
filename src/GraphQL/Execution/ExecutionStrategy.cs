@@ -220,9 +220,10 @@ namespace GraphQL.Execution
 
             try
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
-
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
+                var resolveContext = resolver is IResolveFieldContextProvider provider
+                    ? provider.CreateContext(node, context)
+                    : new ReadonlyResolveFieldContext<object>(node, context);
                 var result = resolver.Resolve(resolveContext);
 
                 if (result is Task task)
@@ -355,7 +356,7 @@ namespace GraphQL.Execution
             UnhandledExceptionContext exceptionContext = null;
             if (context.UnhandledExceptionDelegate != null)
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                var resolveContext = new ReadonlyResolveFieldContext<object>(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
                 context.UnhandledExceptionDelegate(exceptionContext);
                 ex = exceptionContext.Exception;

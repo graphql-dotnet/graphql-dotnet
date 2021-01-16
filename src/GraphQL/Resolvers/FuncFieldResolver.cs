@@ -1,4 +1,5 @@
 using System;
+using GraphQL.Execution;
 
 namespace GraphQL.Resolvers
 {
@@ -28,7 +29,7 @@ namespace GraphQL.Resolvers
     /// <br/><br/>
     /// This implementation provides a typed <see cref="IResolveFieldContext{TSource}"/> to the resolver function.
     /// </summary>
-    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
+    public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>, IResolveFieldContextProvider
     {
         private readonly Func<IResolveFieldContext<TSourceType>, TReturnType> _resolver;
 
@@ -38,8 +39,16 @@ namespace GraphQL.Resolvers
             _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
         }
 
+        public IResolveFieldContext CreateContext(ExecutionNode node, ExecutionContext context) => new ReadonlyResolveFieldContext<TSourceType>(node, context);
+
         /// <inheritdoc/>
-        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context.As<TSourceType>());
+        public TReturnType Resolve(IResolveFieldContext context)
+        {
+            return context is IResolveFieldContext<TSourceType> typedContext
+              ? _resolver(typedContext)
+              : _resolver(new ResolveFieldContext<TSourceType>(context)); //TODO: needed only for tests
+              //: throw new ArgumentException($"Context must be of '{typeof(IResolveFieldContext<TSourceType>).Name}' type. Use {typeof(IResolveFieldContextProvider).Name} to create context.", nameof(context));
+        }
 
         object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }

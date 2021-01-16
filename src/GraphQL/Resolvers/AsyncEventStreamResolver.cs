@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using GraphQL.Execution;
 using GraphQL.Reflection;
-using GraphQL.Subscription;
 using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
@@ -25,7 +25,7 @@ namespace GraphQL.Resolvers
         }
     }
 
-    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IAsyncEventStreamResolver<TReturnType>
+    public class AsyncEventStreamResolver<TSourceType, TReturnType> : IAsyncEventStreamResolver<TReturnType>, IResolveEventStreamContextProvider
     {
         private readonly Func<IResolveEventStreamContext<TSourceType>, Task<IObservable<TReturnType>>> _subscriber;
 
@@ -35,7 +35,15 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public Task<IObservable<TReturnType>> SubscribeAsync(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
+        public IResolveEventStreamContext CreateContext(ExecutionNode node, ExecutionContext context) => new ReadonlyResolveFieldContext<TSourceType>(node, context);
+
+        public Task<IObservable<TReturnType>> SubscribeAsync(IResolveEventStreamContext context)
+        {
+            return context is IResolveEventStreamContext<TSourceType> typedContext
+                ? _subscriber(typedContext)
+                : _subscriber(new ResolveEventStreamContext<TSourceType>(context)); //TODO: needed only for tests
+                //: throw new ArgumentException($"Context must be of '{typeof(IResolveEventStreamContext<TSourceType>).Name}' type. Use {typeof(IResolveEventStreamContextProvider).Name} to create context.", nameof(context));
+        }
 
         async Task<IObservable<object>> IAsyncEventStreamResolver.SubscribeAsync(IResolveEventStreamContext context)
         {

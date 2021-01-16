@@ -11,7 +11,7 @@ namespace GraphQL
     /// <summary>
     /// A readonly implementation of <see cref="IResolveFieldContext"/>.
     /// </summary>
-    public class ReadonlyResolveFieldContext : IResolveFieldContext<object>
+    public class ReadonlyResolveFieldContext<TSource> : IResolveFieldContext<TSource>, IResolveEventStreamContext<TSource>
     {
         private readonly ExecutionNode _executionNode;
         private readonly ExecutionContext _executionContext;
@@ -25,6 +25,9 @@ namespace GraphQL
         {
             _executionNode = node ?? throw new ArgumentNullException(nameof(node));
             _executionContext = context ?? throw new ArgumentNullException(nameof(context));
+
+            if (node.Source != null && !(node.Source is TSource))
+                throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 
         private IDictionary<string, Field> GetSubFields()
@@ -37,6 +40,9 @@ namespace GraphQL
         private IDictionary<string, object> GetArguments()
             => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
 
+        // ONLY FOR TESTS
+        internal void SetArguments(Dictionary<string, object> arguments) => _arguments = arguments;
+
         /// <inheritdoc/>
         public TElement[] GetPooledArray<TElement>(int minimumLength)
         {
@@ -46,7 +52,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public object Source => _executionNode.Source;
+        public TSource Source => (TSource)_executionNode.Source;
 
         /// <inheritdoc/>
         public string FieldName => _executionNode.Field.Name;

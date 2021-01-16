@@ -1,23 +1,24 @@
 using System;
+using GraphQL.Execution;
 
-namespace GraphQL.Builders
+namespace GraphQL
 {
     /// <summary>
     /// A mutable implementation of <see cref="IResolveConnectionContext{T}"/>
     /// </summary>
-    public class ResolveConnectionContext<T> : ResolveFieldContext<T>, IResolveConnectionContext<T>
+    public class ReadonlyResolveConnectionContext<T> : ReadonlyResolveFieldContext<T>, IResolveConnectionContext<T>
     {
         private readonly int? _defaultPageSize;
 
         /// <summary>
-        /// Initializes an instance which mirrors the specified <see cref="IResolveFieldContext"/>
-        /// with the specified properties and defaults
+        /// Initializes an instance with the specified <see cref="ExecutionNode"/>, <see cref="ExecutionContext"/> and other properties.
         /// </summary>
-        /// <param name="context">The underlying <see cref="IResolveFieldContext"/> to mirror</param>
+        /// <param name="node"></param>
+        /// <param name="context"></param>
         /// <param name="isUnidirectional">Indicates if the connection only allows forward paging requests</param>
         /// <param name="defaultPageSize">Indicates the default page size if not specified by the request</param>
-        public ResolveConnectionContext(IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize)
-            : base(context)
+        public ReadonlyResolveConnectionContext(ExecutionNode node, ExecutionContext context, bool isUnidirectional, int? defaultPageSize)
+            : base(node, context)
         {
             IsUnidirectional = isUnidirectional;
             _defaultPageSize = defaultPageSize;

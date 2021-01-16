@@ -1,6 +1,6 @@
 using System;
+using GraphQL.Execution;
 using GraphQL.Reflection;
-using GraphQL.Subscription;
 using GraphQL.Utilities;
 
 namespace GraphQL.Resolvers
@@ -9,8 +9,7 @@ namespace GraphQL.Resolvers
     {
         private readonly Func<IResolveEventStreamContext, IObservable<T>> _subscriber;
 
-        public EventStreamResolver(
-            Func<IResolveEventStreamContext, IObservable<T>> subscriber)
+        public EventStreamResolver(Func<IResolveEventStreamContext, IObservable<T>> subscriber)
         {
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
@@ -20,7 +19,7 @@ namespace GraphQL.Resolvers
         IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }
 
-    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>
+    public class EventStreamResolver<TSourceType, TReturnType> : IEventStreamResolver<TReturnType>, IResolveEventStreamContextProvider
     {
         private readonly Func<IResolveEventStreamContext<TSourceType>, IObservable<TReturnType>> _subscriber;
 
@@ -30,7 +29,15 @@ namespace GraphQL.Resolvers
             _subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
         }
 
-        public IObservable<TReturnType> Subscribe(IResolveEventStreamContext context) => _subscriber(context.As<TSourceType>());
+        public IResolveEventStreamContext CreateContext(ExecutionNode node, ExecutionContext context) => new ReadonlyResolveFieldContext<TSourceType>(node, context);
+
+        public IObservable<TReturnType> Subscribe(IResolveEventStreamContext context)
+        {
+            return context is IResolveEventStreamContext<TSourceType> typedContext
+                ? _subscriber(typedContext)
+                : _subscriber(new ResolveEventStreamContext<TSourceType>(context)); //TODO: needed only for tests
+                //: throw new ArgumentException($"Context must be of '{typeof(IResolveEventStreamContext<TSourceType>).Name}' type. Use {typeof(IResolveEventStreamContextProvider).Name} to create context.", nameof(context));
+        }
 
         IObservable<object> IEventStreamResolver.Subscribe(IResolveEventStreamContext context) => (IObservable<object>)Subscribe(context);
     }

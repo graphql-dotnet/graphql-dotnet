@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
+using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using static GraphQL.Execution.ExecutionHelper;
@@ -54,46 +55,28 @@ namespace GraphQL.Execution
                 node.Field.Arguments,
                 context.Variables);
 
-            object source = (node.Parent != null)
+            object source = node.Parent != null
                 ? node.Parent.Result
                 : context.RootValue;
 
             try
             {
-                var resolveContext = new ResolveEventStreamContext
-                {
-                    FieldName = node.Field.Name,
-                    FieldAst = node.Field,
-                    FieldDefinition = node.FieldDefinition,
-                    ReturnType = node.FieldDefinition.ResolvedType,
-                    ParentType = node.GetParentType(context.Schema),
-                    Arguments = arguments,
-                    Source = source,
-                    Schema = context.Schema,
-                    Document = context.Document,
-                    Fragments = context.Fragments,
-                    RootValue = context.RootValue,
-                    UserContext = context.UserContext,
-                    Operation = context.Operation,
-                    Variables = context.Variables,
-                    CancellationToken = context.CancellationToken,
-                    Metrics = context.Metrics,
-                    Errors = context.Errors,
-                    Path = node.Path,
-                    RequestServices = context.RequestServices,
-                };
-
                 var eventStreamField = node.FieldDefinition as EventStreamFieldType;
-
 
                 IObservable<object> subscription;
 
                 if (eventStreamField?.Subscriber != null)
                 {
+                    var resolveContext = eventStreamField.Subscriber is IResolveEventStreamContextProvider provider
+                        ? provider.CreateContext(node, context)
+                        : new ReadonlyResolveFieldContext<object>(node, context);
                     subscription = eventStreamField.Subscriber.Subscribe(resolveContext);
                 }
                 else if (eventStreamField?.AsyncSubscriber != null)
                 {
+                    var resolveContext = eventStreamField.AsyncSubscriber is IResolveEventStreamContextProvider provider
+                        ? provider.CreateContext(node, context)
+                        : new ReadonlyResolveFieldContext<object>(node, context);
                     subscription = await eventStreamField.AsyncSubscriber.SubscribeAsync(resolveContext).ConfigureAwait(false);
                 }
                 else

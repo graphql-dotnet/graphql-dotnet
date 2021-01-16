@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GraphQL.Subscription;
 
 namespace GraphQL.Resolvers
 {

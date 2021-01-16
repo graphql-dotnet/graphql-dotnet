@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -76,26 +75,6 @@ namespace GraphQL
         /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type
         /// </summary>
         private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
-
-        /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
-        public static IResolveFieldContext<TSourceType> As<TSourceType>(this IResolveFieldContext context)
-        {
-            if (context is IResolveFieldContext<TSourceType> typedContext)
-                return typedContext;
-
-            return new ResolveFieldContextAdapter<TSourceType>(context);
-        }
-
-        /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
-        public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
-        {
-            if (context is IResolveEventStreamContext<T> typedContext)
-                return typedContext;
-
-            return new ResolveEventStreamContext<T>(context);
-        }
 
         private static readonly char[] _separators = { '.' };
 
