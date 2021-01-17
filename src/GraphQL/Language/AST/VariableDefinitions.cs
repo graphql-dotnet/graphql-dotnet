@@ -10,19 +10,19 @@ namespace GraphQL.Language.AST
     /// </summary>
     public class VariableDefinitions : IEnumerable<VariableDefinition>
     {
-        internal List<VariableDefinition> VariablesList { get; private set; }
+        internal List<VariableDefinition> List { get; private set; }
 
         /// <summary>
         /// Adds a variable definition node to the list.
         /// </summary>
-        public void Add(VariableDefinition variable) => (VariablesList ??= new List<VariableDefinition>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+        public void Add(VariableDefinition variable) => (List ??= new List<VariableDefinition>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <inheritdoc/>
-        public IEnumerator<VariableDefinition> GetEnumerator() => (VariablesList ?? Enumerable.Empty<VariableDefinition>()).GetEnumerator();
+        public IEnumerator<VariableDefinition> GetEnumerator() => (List ?? Enumerable.Empty<VariableDefinition>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
-        public override string ToString() => VariablesList?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", VariablesList)}}}" : "VariableDefinitions(Empty)";
+        public override string ToString() => List?.Count > 0 ? $"VariableDefinitions{{{string.Join(", ", List)}}}" : "VariableDefinitions(Empty)";
     }
 }
