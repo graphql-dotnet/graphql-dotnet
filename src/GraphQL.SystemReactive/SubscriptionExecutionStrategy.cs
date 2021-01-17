@@ -49,7 +49,6 @@ namespace GraphQL.Execution
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var arguments = GetArgumentValues(
-                context.Schema,
                 node.FieldDefinition.Arguments,
                 node.Field.Arguments,
                 context.Variables);
