@@ -76,11 +76,16 @@ namespace GraphQL.Execution
         /// </summary>
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
-            var variables = new Variables();
+            if ((variableDefinitions?.VariablesList?.Count ?? 0) == 0)
+            {
+                return Variables.None;
+            }
+
+            var variables = new Variables(variableDefinitions.VariablesList.Count);
 
             if (variableDefinitions != null)
             {
-                foreach (var variableDef in variableDefinitions)
+                foreach (var variableDef in variableDefinitions.VariablesList)
                 {
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(schema);
@@ -243,25 +248,27 @@ namespace GraphQL.Execution
                 if (value is IEnumerable values && !(value is string))
                 {
                     // create a list containing the parsed elements in the input list
-                    var valueOutputs = new List<object>(values is ICollection collection ? collection.Count : 0);
-                    int index = 0;
                     if (values is IList list)
                     {
-                        for (index = 0; index < list.Count; index++)
+                        var valueOutputs = new object[list.Count];
+                        for (int index = 0; index < list.Count; index++)
                         {
                             // parse/validate values as required by graph type
-                            valueOutputs.Add(ParseValue(listGraphType.ResolvedType, new VariableName(variableName, index), list[index]));
+                            valueOutputs[index] = ParseValue(listGraphType.ResolvedType, new VariableName(variableName, index), list[index]);
                         }
+                        return valueOutputs;
                     }
                     else
                     {
+                        var valueOutputs = new List<object>(values is ICollection collection ? collection.Count : 0);
+                        int index = 0;
                         foreach (var val in values)
                         {
                             // parse/validate values as required by graph type
                             valueOutputs.Add(ParseValue(listGraphType.ResolvedType, new VariableName(variableName, index++), val));
                         }
+                        return valueOutputs;
                     }
-                    return valueOutputs;
                 }
                 else
                 {
@@ -270,7 +277,7 @@ namespace GraphQL.Execution
                     // result of input coercion for the list’s item type on the provided value (note this may apply
                     // recursively for nested lists).
                     var result = ParseValue(listGraphType.ResolvedType, variableName, value);
-                    return new List<object>(1) { result };
+                    return new object[] { result };
                 }
             }
 
@@ -289,7 +296,7 @@ namespace GraphQL.Execution
                 }
 
                 var newDictionary = new Dictionary<string, object>(dic.Count);
-                foreach (var field in graphType.Fields)
+                foreach (var field in graphType.Fields.List)
                 {
                     var childFieldVariableName = new VariableName(variableName, field.Name);
 
@@ -329,11 +336,27 @@ namespace GraphQL.Execution
                 // must be thrown. In either case, the input object literal or unordered
                 // map must not contain any entries with names not defined by a field
                 // of this input object type, ***otherwise an error must be thrown.***
+                //List<string> unknownFields = null;
+                //foreach (var key in dic.Keys)
+                //{
+                //    bool match = false;
+
+                //    foreach (var key2 in graphType.Fields.List)
+                //    {
+                //        if (key == key2.Name)
+                //        {
+                //            match = true;
+                //            break;
+                //        }
+                //    }
+
+                //    if (!match) (unknownFields ??= new List<string>(1)).Add(key);
+                //}
                 var unknownFields = dic.Keys
                     .Except(graphType.Fields.Select(f => f.Name))
                     .ToList();
 
-                if (unknownFields.Count > 0)
+                if (unknownFields?.Count > 0)
                 {
                     throw new InvalidVariableError(variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'.");

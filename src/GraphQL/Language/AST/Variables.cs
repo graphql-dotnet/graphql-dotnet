@@ -14,9 +14,18 @@ namespace GraphQL.Language.AST
         private List<Variable> _variables;
 
         /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public Variables()
+        {
+        }
+
+        internal Variables(int initialCount) => _variables = new List<Variable>(initialCount);
+
+        /// <summary>
         /// Adds a variable to the list.
         /// </summary>
-        public void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+        public virtual void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
 
         /// <summary>
         /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
@@ -55,6 +64,17 @@ namespace GraphQL.Language.AST
 
         /// <inheritdoc/>
         public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
+
+        /// <summary>
+        /// Returns a static instance that holds no variables.
+        /// </summary>
+        public static Variables None { get; } = new NoVariables();
+
+        private class NoVariables : Variables
+        {
+            public NoVariables() : base() { }
+            public override void Add(Variable variable) => throw new InvalidOperationException("Cannot add variables to this instance.");
+        }
     }
 
 }

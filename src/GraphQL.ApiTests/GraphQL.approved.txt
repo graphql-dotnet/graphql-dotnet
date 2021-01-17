@@ -1482,7 +1482,8 @@ namespace GraphQL.Language.AST
     public class Variables : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Variable>, System.Collections.IEnumerable
     {
         public Variables() { }
-        public void Add(GraphQL.Language.AST.Variable variable) { }
+        public static GraphQL.Language.AST.Variables None { get; }
+        public virtual void Add(GraphQL.Language.AST.Variable variable) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Variable> GetEnumerator() { }
         public override string ToString() { }
         public bool ValueFor(string name, out GraphQL.Execution.ArgumentValue value) { }
