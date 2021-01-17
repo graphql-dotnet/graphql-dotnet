@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GraphQL.Execution;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using Shouldly;
@@ -162,9 +163,9 @@ namespace GraphQL.Tests.Builders
             field.Arguments[0].DefaultValue.ShouldBe("12345");
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "arg1", "abc" }
+                    { "arg1", new ArgumentValue("abc", ArgumentSource.Literal) }
                 }
             });
         }
@@ -184,7 +185,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>(),
+                Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
             });
         }
@@ -204,7 +205,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>(),
+                Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
             });
         }
@@ -224,9 +225,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "skip", 1 }
+                    { "skip", new ArgumentValue(1, ArgumentSource.Literal) }
                 },
                 FieldDefinition = field
             });
@@ -247,9 +248,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "skip", null }
+                    { "skip", ArgumentValue.NullLiteral }
                 },
                 FieldDefinition = field
             });
@@ -270,7 +271,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>(),
+                Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
             });
         }
@@ -290,9 +291,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    {"episode", "JEDI" }
+                    {"episode", new ArgumentValue("JEDI", ArgumentSource.Literal) }
                 },
                 FieldDefinition = field
             });
@@ -313,7 +314,7 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>(),
+                Arguments = new Dictionary<string, ArgumentValue>(),
                 FieldDefinition = field
             });
         }
@@ -333,9 +334,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    {"episodes", new object[] {"JEDI", "EMPIRE" } }
+                    {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
                 },
                 FieldDefinition = field
             });
@@ -356,9 +357,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    {"episodes", new object[] {"JEDI", "EMPIRE" } }
+                    {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
                 },
                 FieldDefinition = field
             });
@@ -380,9 +381,9 @@ namespace GraphQL.Tests.Builders
             var field = objectType.Fields.First();
             field.Resolver.Resolve(new ResolveFieldContext
             {
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    { "arg1", "arg1value" }
+                    { "arg1", new ArgumentValue("arg1value", ArgumentSource.Literal) }
                 },
                 FieldDefinition = field
             });

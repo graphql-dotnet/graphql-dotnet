@@ -30,7 +30,7 @@ namespace GraphQL
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, ArgumentValue> Arguments { get; set; }
 
         /// <inheritdoc/>
         public object RootValue { get; set; }

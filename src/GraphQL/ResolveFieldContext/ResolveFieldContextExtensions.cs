@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQL.Execution;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
@@ -39,11 +40,11 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg is IDictionary<string, object> inputObject)
+            if (arg.Value is IDictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
                 {
-                    result = arg;
+                    result = arg.Value;
                     return true;
                 }
 
@@ -54,7 +55,7 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
+            result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
@@ -63,8 +64,8 @@ namespace GraphQL
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
-            object value = null;
-            return ((context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value != null);
+            ArgumentValue value = default;
+            return (context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value.Source != ArgumentSource.FieldDefault;
         }
 
         /// <summary>
