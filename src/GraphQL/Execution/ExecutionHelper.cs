@@ -332,6 +332,9 @@ namespace GraphQL.Execution
         /// </summary>
         public static ArgumentValue CoerceValue(ISchema schema, IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             if (type is NonNullGraphType nonNull)
             {
                 // validation rules have verified that this is not null
