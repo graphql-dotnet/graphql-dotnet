@@ -13,6 +13,8 @@ namespace GraphQL.Types
     /// <summary>
     /// A class that represents a list of all the graph types utilized by a schema.
     /// Also provides lookup for all schema types and has algorithms for discovering them.
+    /// <br/>
+    /// NOTE: After creating an instance of this class, its contents cannot be changed.
     /// </summary>
     public class SchemaTypes : IEnumerable<IGraphType>
     {
@@ -127,13 +129,11 @@ namespace GraphQL.Types
         /// <param name="directives">A list of directives to register.</param>
         /// <param name="resolveType">A delegate which returns an instance of a graph type from its .NET type.</param>
         /// <param name="nameConverter">A name converter to use for the specified graph types.</param>
-        /// <param name="seal">Prevents additional types from being added to the lookup table.</param>
-        internal static SchemaTypes Create(
+        public static SchemaTypes Create(
             IEnumerable<IGraphType> types,
             IEnumerable<DirectiveGraphType> directives,
             Func<Type, IGraphType> resolveType,
-            INameConverter nameConverter,
-            bool seal = false)
+            INameConverter nameConverter)
         {
             var lookup = new SchemaTypes(nameConverter ?? CamelCaseNameConverter.Instance);
 
@@ -178,7 +178,7 @@ namespace GraphQL.Types
             lookup.ApplyTypeReferences();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
-            lookup._sealed = seal;
+            lookup._sealed = true;
 
             return lookup;
         }

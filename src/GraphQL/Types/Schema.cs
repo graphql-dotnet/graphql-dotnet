@@ -322,8 +322,7 @@ namespace GraphQL.Types
                 types,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter,
-                seal: true);
+                NameConverter);
         }
     }
 }
