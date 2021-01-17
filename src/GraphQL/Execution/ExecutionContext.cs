@@ -72,13 +72,42 @@ namespace GraphQL.Execution
         private readonly List<Array> _trackedArrays = new List<Array>();
 
         /// <summary>
+        /// Clears all state in this context.
         /// Releases any rented arrays back to the backing memory pool.
         /// </summary>
         public void Dispose()
         {
-            // lock is not required because at this time work with ExecutionContext has already been completed
-            foreach (var array in _trackedArrays)
-                array.Return();
+            ClearContext();
+        }
+
+        /// <summary>
+        /// Clears all state in this context including any rented arrays.
+        /// </summary>
+        protected virtual void ClearContext()
+        {
+            Document = null;
+            Schema = null;
+            RootValue = null;
+            UserContext = null;
+            Operation = null;
+            Fragments = null;
+            Variables = null;
+            Errors = null;
+            CancellationToken = default;
+            Metrics = null;
+            Listeners = null;
+            ThrowOnUnhandledException = false;
+            UnhandledExceptionDelegate = null;
+            MaxParallelExecutionCount = null;
+            Extensions = null;
+            RequestServices = null;
+
+            lock (_trackedArrays)
+            {
+                foreach (var array in _trackedArrays)
+                    array.Return();
+                _trackedArrays.Clear();
+            }
         }
     }
 }
