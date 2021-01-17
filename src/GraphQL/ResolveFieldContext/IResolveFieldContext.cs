@@ -94,7 +94,7 @@ namespace GraphQL
         /// Returns a resource pool from which arrays can be rented during the current execution.
         /// Can be used to return lists of data from field resolvers.
         /// </summary>
-        IArrayPool ArrayPool { get; }
+        IExecutionArrayPool ArrayPool { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

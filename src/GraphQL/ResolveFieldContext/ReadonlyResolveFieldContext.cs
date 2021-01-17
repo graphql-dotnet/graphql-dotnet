@@ -106,6 +106,6 @@ namespace GraphQL
         public IServiceProvider RequestServices => _executionContext.RequestServices;
 
         /// <inheritdoc/>
-        public IArrayPool ArrayPool => _executionContext;
+        public IExecutionArrayPool ArrayPool => _executionContext;
     }
 }

@@ -174,7 +174,7 @@ namespace GraphQL
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
         System.Collections.Generic.IDictionary<string, object> Arguments { get; }
-        GraphQL.Execution.IArrayPool ArrayPool { get; }
+        GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
@@ -250,7 +250,7 @@ namespace GraphQL
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         public System.Collections.Generic.IDictionary<string, object> Arguments { get; }
-        public GraphQL.Execution.IArrayPool ArrayPool { get; }
+        public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
@@ -278,7 +278,7 @@ namespace GraphQL
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
         public System.Collections.Generic.IDictionary<string, object> Arguments { get; set; }
-        public GraphQL.Execution.IArrayPool ArrayPool { get; set; }
+        public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
@@ -661,7 +661,7 @@ namespace GraphQL.Execution
         public bool ExposeExceptionStackTrace { get; set; }
         public bool ExposeExtensions { get; set; }
     }
-    public class ExecutionContext : GraphQL.Execution.IArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
+    public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
     {
         public ExecutionContext() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
@@ -738,10 +738,6 @@ namespace GraphQL.Execution
         public GraphQLDocumentBuilder() { }
         public GraphQL.Language.AST.Document Build(string body) { }
     }
-    public interface IArrayPool
-    {
-        TElement[] Rent<TElement>(int minimumLength);
-    }
     public interface IDocumentBuilder
     {
         GraphQL.Language.AST.Document Build(string body);
@@ -759,6 +755,10 @@ namespace GraphQL.Execution
     public interface IErrorInfoProvider
     {
         GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError);
+    }
+    public interface IExecutionArrayPool
+    {
+        TElement[] Rent<TElement>(int minimumLength);
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {

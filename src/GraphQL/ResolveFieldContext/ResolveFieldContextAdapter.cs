@@ -85,6 +85,6 @@ namespace GraphQL
         public IServiceProvider RequestServices => _baseContext.RequestServices;
 
         /// <inheritdoc/>
-        public IArrayPool ArrayPool => _baseContext.ArrayPool;
+        public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }

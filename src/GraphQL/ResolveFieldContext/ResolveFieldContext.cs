@@ -81,7 +81,7 @@ namespace GraphQL
         public IDictionary<string, object> Extensions { get; set; }
 
         /// <inheritdoc/>
-        public IArrayPool ArrayPool { get; set; }
+        public IExecutionArrayPool ArrayPool { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.

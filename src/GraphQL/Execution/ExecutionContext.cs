@@ -10,7 +10,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Provides a mutable instance of <see cref="IExecutionContext"/>.
     /// </summary>
-    public class ExecutionContext : IExecutionContext, IArrayPool, IDisposable
+    public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
         /// <inheritdoc/>
         public Document Document { get; set; }
@@ -85,22 +85,23 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void ClearContext()
         {
-            Document = null;
-            Schema = null;
-            RootValue = null;
-            UserContext = null;
-            Operation = null;
-            Fragments = null;
-            Variables = null;
-            Errors = null;
-            CancellationToken = default;
-            Metrics = null;
-            Listeners = null;
-            ThrowOnUnhandledException = false;
-            UnhandledExceptionDelegate = null;
-            MaxParallelExecutionCount = null;
-            Extensions = null;
-            RequestServices = null;
+            //TODO:
+            //Document = null;
+            //Schema = null;
+            //RootValue = null;
+            //UserContext = null;
+            //Operation = null;
+            //Fragments = null;
+            //Variables = null;
+            //Errors = null;
+            //CancellationToken = default;
+            //Metrics = null;
+            //Listeners = null;
+            //ThrowOnUnhandledException = false;
+            //UnhandledExceptionDelegate = null;
+            //MaxParallelExecutionCount = null;
+            //Extensions = null;
+            //RequestServices = null;
 
             lock (_trackedArrays)
             {
