@@ -76,16 +76,16 @@ namespace GraphQL.Execution
         /// </summary>
         public static Variables GetVariableValues(Document document, ISchema schema, VariableDefinitions variableDefinitions, Inputs inputs)
         {
-            if ((variableDefinitions?.VariablesList?.Count ?? 0) == 0)
+            if ((variableDefinitions?.List?.Count ?? 0) == 0)
             {
                 return Variables.None;
             }
 
-            var variables = new Variables(variableDefinitions.VariablesList.Count);
+            var variables = new Variables(variableDefinitions.List.Count);
 
             if (variableDefinitions != null)
             {
-                foreach (var variableDef in variableDefinitions.VariablesList)
+                foreach (var variableDef in variableDefinitions.List)
                 {
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(schema);
