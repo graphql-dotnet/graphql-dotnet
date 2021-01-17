@@ -35,7 +35,7 @@ namespace GraphQL
         }
 
         private IDictionary<string, ArgumentValue> GetArguments()
-            => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
+            => ExecutionHelper.GetArgumentValues(_executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
 
         /// <inheritdoc/>
         public object Source => _executionNode.Source;
