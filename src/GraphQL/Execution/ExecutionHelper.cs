@@ -117,7 +117,7 @@ namespace GraphQL.Execution
                         ThrowNullError(variable.Name);
                     } 
 
-                    // if the variable was not specified and no default was specified, do not add the variable to the Variables object
+                    // if the variable was not specified and no default was specified, do not set variable.Value
 
                     // add the variable to the list of parsed variables defined for the operation
                     variables.Add(variable);
