@@ -67,3 +67,4 @@
   can be determined if the value returned is a default value or if it is a specified literal or variable.
 * `IResolveFieldContext.HasArgument` now returns `false` when `GetArgument` returns a field default value. Note that if a variable is specified,
   and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument is successfully resolving to a variable).
+* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.GetVariableValues` has changed.
