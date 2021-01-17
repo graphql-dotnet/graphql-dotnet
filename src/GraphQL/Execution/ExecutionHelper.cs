@@ -452,7 +452,7 @@ namespace GraphQL.Execution
 
                 var obj = new Dictionary<string, object>();
 
-                foreach (var field in inputObjectGraphType.Fields)
+                foreach (var field in inputObjectGraphType.Fields.List)
                 {
                     // https://spec.graphql.org/June2018/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
