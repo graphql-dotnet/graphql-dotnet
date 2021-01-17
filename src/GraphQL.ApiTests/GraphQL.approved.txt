@@ -661,7 +661,7 @@ namespace GraphQL.Execution
         public bool ExposeExceptionStackTrace { get; set; }
         public bool ExposeExtensions { get; set; }
     }
-    public class ExecutionContext : GraphQL.Execution.IArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
+    public class ExecutionContext : GraphQL.Execution.IArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
     {
         public ExecutionContext() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
@@ -680,6 +680,7 @@ namespace GraphQL.Execution
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
+        public void Dispose() { }
         public TElement[] Rent<TElement>(int minimumLength) { }
     }
     public static class ExecutionHelper

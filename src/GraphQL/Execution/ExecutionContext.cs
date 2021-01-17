@@ -10,7 +10,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Provides a mutable instance of <see cref="IExecutionContext"/>.
     /// </summary>
-    public class ExecutionContext : IExecutionContext, IArrayPool
+    public class ExecutionContext : IExecutionContext, IArrayPool, IDisposable
     {
         /// <inheritdoc/>
         public Document Document { get; set; }
@@ -71,7 +71,10 @@ namespace GraphQL.Execution
 
         private readonly List<Array> _trackedArrays = new List<Array>();
 
-        internal void ReturnArrays()
+        /// <summary>
+        /// Releases any rented arrays back to the backing memory pool.
+        /// </summary>
+        public void Dispose()
         {
             // lock is not required because at this time work with ExecutionContext has already been completed
             foreach (var array in _trackedArrays)

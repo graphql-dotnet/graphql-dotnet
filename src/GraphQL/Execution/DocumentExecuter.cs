@@ -313,7 +313,7 @@ namespace GraphQL
             {
                 result ??= new ExecutionResult();
                 result.Perf = metrics.Finish();
-                context?.ReturnArrays();
+                context?.Dispose();
             }
 
             return result;

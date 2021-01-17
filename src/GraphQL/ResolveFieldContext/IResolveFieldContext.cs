@@ -90,7 +90,10 @@ namespace GraphQL
         /// <summary>The service provider for the executing request.</summary>
         IServiceProvider RequestServices { get; }
 
-        /// <summary>Provides capabilities to work with array pools.</summary>
+        /// <summary>
+        /// Returns a resource pool from which arrays can be rented during the current execution.
+        /// Can be used to return lists of data from field resolvers.
+        /// </summary>
         IArrayPool ArrayPool { get; }
     }
 
