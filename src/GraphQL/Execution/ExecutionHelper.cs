@@ -337,7 +337,8 @@ namespace GraphQL.Execution
 
             if (type is NonNullGraphType nonNull)
             {
-                // validation rules have verified that this is not null
+                // validation rules have verified that this is not null; if the validation rule was not executed, it
+                // is assumed that the caller does not wish this check to be executed
                 return CoerceValue(schema, nonNull.ResolvedType, input, variables, fieldDefault);
             }
 
