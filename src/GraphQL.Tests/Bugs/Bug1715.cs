@@ -17,7 +17,6 @@ namespace GraphQL.Tests.Bugs
             var test = schema.FindType("ID");
             schema.Initialized.ShouldBeTrue();
 
-            Should.Throw<InvalidOperationException>(() => schema.Directives = new DirectiveGraphType[0]);
             Should.Throw<InvalidOperationException>(() => schema.RegisterType(new ObjectGraphType { Name = "Oops" }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new[] { new ObjectGraphType { Name = "Oops" } }));
             Should.Throw<InvalidOperationException>(() => schema.RegisterTypes(new[] { typeof(ObjectGraphType) }));

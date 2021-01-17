@@ -297,11 +297,7 @@ namespace GraphQL.Tests.Validation
             RegisterType<Human>();
             RegisterType<Alien>();
 
-            Directives = new[]
-            {
-                DirectiveGraphType.Include,
-                DirectiveGraphType.Skip,
-                DirectiveGraphType.Deprecated,
+            RegisterDirectives(
                 new DirectiveGraphType("onQuery", new []{ DirectiveLocation.Query }),
                 new DirectiveGraphType("onMutation", new []{ DirectiveLocation.Mutation }),
                 new DirectiveGraphType("onSubscription", new []{ DirectiveLocation.Subscription }),
@@ -320,7 +316,7 @@ namespace GraphQL.Tests.Validation
                 new DirectiveGraphType("onEnumValue", new []{ DirectiveLocation.EnumValue }),
                 new DirectiveGraphType("onInputObject", new []{ DirectiveLocation.InputObject }),
                 new DirectiveGraphType("onInputFieldDefinition", new []{ DirectiveLocation.InputFieldDefinition })
-            };
+            );
         }
     }
 }

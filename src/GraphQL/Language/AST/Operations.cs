@@ -40,6 +40,9 @@ namespace GraphQL.Language.AST
             return null;
         }
 
+        // This method avoids LINQ and 'List+Enumerator<Operation>' allocation
+        internal Operation FirstOrDefault() => _operations?[0];
+
         /// <inheritdoc/>
         public IEnumerator<Operation> GetEnumerator() => (_operations ?? Enumerable.Empty<Operation>()).GetEnumerator();
 

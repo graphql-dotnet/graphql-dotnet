@@ -68,15 +68,18 @@ namespace GraphQL.Instrumentation
             // allocation free optimization if no middlewares are defined
             if (!Empty)
             {
-                foreach (var complex in schema.AllTypes.OfType<IComplexGraphType>())
+                foreach (var item in schema.AllTypes.Dictionary)
                 {
-                    foreach (var field in complex.Fields)
+                    if (item.Value is IComplexGraphType complex)
                     {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+                        foreach (var field in complex.Fields)
+                        {
+                            var inner = field.Resolver ?? NameFieldResolver.Instance;
 
-                        var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
+                            var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
 
-                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                            field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                        }
                     }
                 }
             }

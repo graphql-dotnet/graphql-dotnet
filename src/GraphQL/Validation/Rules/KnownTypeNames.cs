@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
             var type = context.Schema.FindType(node.Name);
             if (type == null)
             {
-                var typeNames = context.Schema.AllTypes.Select(x => x.Name).ToArray();
+                var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
                 var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }

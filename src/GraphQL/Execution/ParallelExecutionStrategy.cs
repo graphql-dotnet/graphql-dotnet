@@ -48,10 +48,7 @@ namespace GraphQL.Execution
                             }
                             else if (pendingNode is IParentExecutionNode parentExecutionNode)
                             {
-                                foreach (var childNode in parentExecutionNode.GetChildNodes())
-                                {
-                                    pendingNodes.Enqueue(childNode);
-                                }
+                                parentExecutionNode.ApplyToChildren((node, state) => state.Enqueue(node), pendingNodes);
                             }
                         }
                         else
@@ -81,8 +78,7 @@ namespace GraphQL.Execution
                         }
                         else if (node is IParentExecutionNode p)
                         {
-                            foreach (var childNode in p.GetChildNodes())
-                                pendingNodes.Enqueue(childNode);
+                            p.ApplyToChildren((node, state) => state.Enqueue(node), pendingNodes);
                         }
                     }
 

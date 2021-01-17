@@ -83,5 +83,8 @@ namespace GraphQL
         object IResolveFieldContext.Source => Source;
 
         public IServiceProvider RequestServices => _baseContext.RequestServices;
+
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }
