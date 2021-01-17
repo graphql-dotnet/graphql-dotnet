@@ -344,6 +344,8 @@ namespace GraphQL
                 Operation = operation,
                 Variables = inputs == null ? null : GetVariableValues(document, schema, operation?.Variables, inputs),
                 Fragments = document.Fragments,
+                Errors = new ExecutionErrors(),
+                Extensions = new Dictionary<string, object>(),
                 CancellationToken = cancellationToken,
 
                 Metrics = metrics,

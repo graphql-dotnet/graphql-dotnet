@@ -28,13 +28,13 @@ namespace GraphQL.Execution
         public Operation Operation { get; set; }
 
         /// <inheritdoc/>
-        public Fragments Fragments { get; set; } = new Fragments();
+        public Fragments Fragments { get; set; }
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
 
         /// <inheritdoc/>
-        public ExecutionErrors Errors { get; set; } = new ExecutionErrors();
+        public ExecutionErrors Errors { get; set; }
 
         /// <inheritdoc/>
         public CancellationToken CancellationToken { get; set; }
@@ -55,7 +55,7 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Extensions { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
