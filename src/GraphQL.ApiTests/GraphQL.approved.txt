@@ -333,21 +333,6 @@ namespace GraphQL
         public static string ToPascalCase(this string s) { }
         public static string TrimGraphQLTypes(this string name) { }
     }
-    public static class TypeExtensions
-    {
-        public static T As<T>(this object item)
-            where T :  class { }
-        public static string Description(this System.Reflection.MemberInfo memberInfo) { }
-        public static System.Type GetEnumerableElementType(this System.Type type) { }
-        public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false) { }
-        public static string GraphQLName(this System.Type type) { }
-        public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
-        public static bool IsConcrete(this System.Type type) { }
-        public static bool IsGraphType(this System.Type type) { }
-        public static bool IsNullable(this System.Type type) { }
-        public static bool IsPrimitive(this System.Type type) { }
-        public static string ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
-    }
     public static class ValueConverter
     {
         public static object ConvertTo(object value, System.Type targetType) { }

@@ -406,7 +406,7 @@ Make sure that your ServiceProvider is configured correctly.");
             var foundType = this[namedType];
             if (foundType == null)
             {
-                if (namedType == typeof(PageInfoType))
+                if (namedType == typeof(PageInfoType)) //TODO: move relay stuff into separate project ?
                 {
                     AddType(new PageInfoType(), context);
                 }
