@@ -336,25 +336,22 @@ namespace GraphQL.Execution
                 // must be thrown. In either case, the input object literal or unordered
                 // map must not contain any entries with names not defined by a field
                 // of this input object type, ***otherwise an error must be thrown.***
-                //List<string> unknownFields = null;
-                //foreach (var key in dic.Keys)
-                //{
-                //    bool match = false;
+                List<string> unknownFields = null;
+                foreach (var key in dic.Keys)
+                {
+                    bool match = false;
 
-                //    foreach (var key2 in graphType.Fields.List)
-                //    {
-                //        if (key == key2.Name)
-                //        {
-                //            match = true;
-                //            break;
-                //        }
-                //    }
+                    foreach (var field in graphType.Fields.List)
+                    {
+                        if (key == field.Name)
+                        {
+                            match = true;
+                            break;
+                        }
+                    }
 
-                //    if (!match) (unknownFields ??= new List<string>(1)).Add(key);
-                //}
-                var unknownFields = dic.Keys
-                    .Except(graphType.Fields.Select(f => f.Name))
-                    .ToList();
+                    if (!match) (unknownFields ??= new List<string>(1)).Add(key);
+                }
 
                 if (unknownFields?.Count > 0)
                 {
