@@ -4,7 +4,6 @@ namespace GraphQL.Execution
     /// Provides a resource pool of temporary arrays during query execution.
     /// Can be used to return lists of data from field resolvers.
     /// </summary>
-    /// <inheritdoc cref="System.Buffers.ArrayPool{T}"/>
     public interface IArrayPool
     {
         /// <summary>
