@@ -20,7 +20,10 @@ namespace GraphQL.Language.AST
         {
         }
 
-        internal Variables(int initialCount) => _variables = new List<Variable>(initialCount);
+        internal Variables(int initialCount)
+        {
+            _variables = new List<Variable>(initialCount);
+        }
 
         /// <summary>
         /// Adds a variable to the list.
