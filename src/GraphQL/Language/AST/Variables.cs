@@ -70,7 +70,7 @@ namespace GraphQL.Language.AST
         /// </summary>
         public static Variables None { get; } = new NoVariables();
 
-        private class NoVariables : Variables
+        private sealed class NoVariables : Variables
         {
             public NoVariables() : base() { }
             public override void Add(Variable variable) => throw new InvalidOperationException("Cannot add variables to this instance.");
