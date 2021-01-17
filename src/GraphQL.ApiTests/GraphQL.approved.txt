@@ -309,6 +309,8 @@ namespace GraphQL
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
         public static object GetExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
+        public static void Preserve(this GraphQL.IResolveFieldContext context) { }
+        public static void Preserve<TSource>(this GraphQL.IResolveFieldContext<TSource> context) { }
         public static void SetExtension(this GraphQL.IResolveFieldContext context, string path, object value) { }
     }
     public class ResolveFieldContext<TSource> : GraphQL.ResolveFieldContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<TSource>

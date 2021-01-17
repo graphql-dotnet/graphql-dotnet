@@ -184,5 +184,17 @@ namespace GraphQL
                 }
             }
         }
+
+        /// <summary>
+        /// Preserve a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static void Preserve(this IResolveFieldContext context) => new ResolveFieldContext(context);
+
+        /// <summary>
+        /// Preserve a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static void Preserve<TSource>(this IResolveFieldContext<TSource> context) => new ResolveFieldContext<TSource>(context);
     }
 }
