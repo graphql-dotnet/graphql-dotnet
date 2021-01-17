@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -84,6 +85,6 @@ namespace GraphQL
         public IServiceProvider RequestServices => _baseContext.RequestServices;
 
         /// <inheritdoc/>
-        public TElement[] GetPooledArray<TElement>(int minimumLength) => _baseContext.GetPooledArray<TElement>(minimumLength);
+        public IArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }

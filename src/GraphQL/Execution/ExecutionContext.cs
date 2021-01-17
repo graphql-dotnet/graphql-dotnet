@@ -10,7 +10,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Provides a mutable instance of <see cref="IExecutionContext"/>.
     /// </summary>
-    public class ExecutionContext : IExecutionContext
+    public class ExecutionContext : IExecutionContext, IArrayPool
     {
         /// <inheritdoc/>
         public Document Document { get; set; }
@@ -60,16 +60,16 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
 
-        private readonly List<Array> _trackedArrays = new List<Array>();
-
-        internal void TrackArray(Array array)
+        /// <inheritdoc/>
+        public TElement[] Rent<TElement>(int minimumLength)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
-
+            var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
             lock (_trackedArrays)
                 _trackedArrays.Add(array);
+            return array;
         }
+
+        private readonly List<Array> _trackedArrays = new List<Array>();
 
         internal void ReturnArrays()
         {
