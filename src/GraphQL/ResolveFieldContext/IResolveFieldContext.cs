@@ -37,7 +37,7 @@ namespace GraphQL
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, object> Arguments { get; }
+        IDictionary<string, ArgumentValue> Arguments { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object RootValue { get; }

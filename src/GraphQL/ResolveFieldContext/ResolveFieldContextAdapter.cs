@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -49,7 +50,7 @@ namespace GraphQL
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IDictionary<string, object> Arguments => _baseContext.Arguments;
+        public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 
         public object RootValue => _baseContext.RootValue;
 
