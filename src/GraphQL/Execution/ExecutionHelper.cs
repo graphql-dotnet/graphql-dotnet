@@ -170,7 +170,7 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        public static object GetVariableValue(Document document, IGraphType graphType, VariableDefinition variable, object input)
+        private static object GetVariableValue(Document document, IGraphType graphType, VariableDefinition variable, object input)
         {
             try
             {
