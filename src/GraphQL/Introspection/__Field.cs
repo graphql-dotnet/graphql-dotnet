@@ -55,7 +55,7 @@ namespace GraphQL.Introspection
                     var source = context.Source;
                     if (source.Arguments?.Count > 0)
                     {
-                        var arguments = context.GetPooledArray<QueryArgument>(source.Arguments.Count);
+                        var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
 
                         int index = 0;
                         foreach (var argument in source.Arguments.List)

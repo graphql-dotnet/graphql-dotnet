@@ -10,7 +10,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Provides a mutable instance of <see cref="IExecutionContext"/>.
     /// </summary>
-    public class ExecutionContext : IExecutionContext
+    public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
         /// <inheritdoc/>
         public Document Document { get; set; }
@@ -28,13 +28,13 @@ namespace GraphQL.Execution
         public Operation Operation { get; set; }
 
         /// <inheritdoc/>
-        public Fragments Fragments { get; set; } = new Fragments();
+        public Fragments Fragments { get; set; }
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
 
         /// <inheritdoc/>
-        public ExecutionErrors Errors { get; set; } = new ExecutionErrors();
+        public ExecutionErrors Errors { get; set; }
 
         /// <inheritdoc/>
         public CancellationToken CancellationToken { get; set; }
@@ -55,27 +55,60 @@ namespace GraphQL.Execution
         public int? MaxParallelExecutionCount { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, object> Extensions { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Extensions { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }
 
-        private readonly List<Array> _trackedArrays = new List<Array>();
-
-        internal void TrackArray(Array array)
+        /// <inheritdoc/>
+        public TElement[] Rent<TElement>(int minimumLength)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
-
+            var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
             lock (_trackedArrays)
                 _trackedArrays.Add(array);
+            return array;
         }
 
-        internal void ReturnArrays()
+        private readonly List<Array> _trackedArrays = new List<Array>();
+
+        /// <summary>
+        /// Clears all state in this context.
+        /// Releases any rented arrays back to the backing memory pool.
+        /// </summary>
+        public void Dispose()
         {
-            // lock is not required because at this time work with ExecutionContext has already been completed
-            foreach (var array in _trackedArrays)
-                array.Return();
+            ClearContext();
+        }
+
+        /// <summary>
+        /// Clears all state in this context including any rented arrays.
+        /// </summary>
+        protected virtual void ClearContext()
+        {
+            //TODO:
+            //Document = null;
+            //Schema = null;
+            //RootValue = null;
+            //UserContext = null;
+            //Operation = null;
+            //Fragments = null;
+            //Variables = null;
+            //Errors = null;
+            //CancellationToken = default;
+            //Metrics = null;
+            //Listeners = null;
+            //ThrowOnUnhandledException = false;
+            //UnhandledExceptionDelegate = null;
+            //MaxParallelExecutionCount = null;
+            //Extensions = null;
+            //RequestServices = null;
+
+            lock (_trackedArrays)
+            {
+                foreach (var array in _trackedArrays)
+                    array.Return();
+                _trackedArrays.Clear();
+            }
         }
     }
 }

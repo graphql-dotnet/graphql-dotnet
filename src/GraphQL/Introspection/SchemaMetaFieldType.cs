@@ -47,7 +47,7 @@ namespace GraphQL.Introspection
                 "A list of all types supported by this server.",
                 resolve: async context =>
                 {
-                    var types = context.GetPooledArray<IGraphType>(context.Schema.AllTypes.Count);
+                    var types = context.ArrayPool.Rent<IGraphType>(context.Schema.AllTypes.Count);
 
                     int index = 0;
                     foreach (var item in context.Schema.AllTypes.Dictionary)
@@ -94,7 +94,7 @@ namespace GraphQL.Introspection
                 "A list of all directives supported by this server.",
                 resolve: async context =>
                 {
-                    var directives = context.GetPooledArray<DirectiveGraphType>(context.Schema.Directives.Count);
+                    var directives = context.ArrayPool.Rent<DirectiveGraphType>(context.Schema.Directives.Count);
 
                     int index = 0;
                     foreach (var directive in context.Schema.Directives.List)

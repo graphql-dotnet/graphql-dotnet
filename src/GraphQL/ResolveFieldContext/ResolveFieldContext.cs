@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -31,7 +32,7 @@ namespace GraphQL
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Arguments { get; set; }
+        public IDictionary<string, ArgumentValue> Arguments { get; set; }
 
         /// <inheritdoc/>
         public object RootValue { get; set; }
@@ -82,9 +83,7 @@ namespace GraphQL
         public IDictionary<string, object> Extensions { get; set; }
 
         /// <inheritdoc/>
-        public TElement[] GetPooledArray<TElement>(int minimumLength) => _baseContext.GetPooledArray<TElement>(minimumLength);
-
-        private readonly IResolveFieldContext _baseContext;
+        public IExecutionArrayPool ArrayPool { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
@@ -96,8 +95,6 @@ namespace GraphQL
         /// </summary>
         public ResolveFieldContext(IResolveFieldContext context)
         {
-            _baseContext = context;
-
             Source = context.Source;
             FieldName = context.FieldName;
             FieldAst = context.FieldAst;
@@ -120,6 +117,7 @@ namespace GraphQL
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
             Extensions = context.Extensions;
+            ArrayPool = context.ArrayPool;
         }
     }
 

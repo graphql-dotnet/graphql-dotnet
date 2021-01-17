@@ -16,17 +16,6 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>
-        /// Gets an array of the specified minimum length from the pool. This array does not need
-        /// to be returned to the pool yourself because it will be returned to the pool once the
-        /// execution completes. It is important that you should not use this array anyway after
-        /// execution, otherwise its contents will most likely be overwritten at any point in time.
-        /// </summary>
-        /// <typeparam name="TElement">Array element type.</typeparam>
-        /// <param name="minLength">The minimum length of the array.</param>
-        /// <returns>Array from pool.</returns>
-        TElement[] GetPooledArray<TElement>(int minLength);
-
         /// <summary>The name of the field being resolved.</summary>
         string FieldName { get; }
 
@@ -48,7 +37,7 @@ namespace GraphQL
         /// and <see cref="GraphQL.ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, object> Arguments { get; }
+        IDictionary<string, ArgumentValue> Arguments { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
         object RootValue { get; }
@@ -100,6 +89,12 @@ namespace GraphQL
 
         /// <summary>The service provider for the executing request.</summary>
         IServiceProvider RequestServices { get; }
+
+        /// <summary>
+        /// Returns a resource pool from which arrays can be rented during the current execution.
+        /// Can be used to return lists of data from field resolvers.
+        /// </summary>
+        IExecutionArrayPool ArrayPool { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

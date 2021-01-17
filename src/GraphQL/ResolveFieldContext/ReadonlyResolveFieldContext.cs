@@ -35,19 +35,8 @@ namespace GraphQL
                 : null;
         }
 
-        private IDictionary<string, object> GetArguments()
+        private IDictionary<string, ArgumentValue> GetArguments()
             => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
-
-        // ONLY FOR TESTS
-        internal void SetArguments(Dictionary<string, object> arguments) => _executionNode.Arguments = arguments;
-
-        /// <inheritdoc/>
-        public TElement[] GetPooledArray<TElement>(int minimumLength)
-        {
-            var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
-            _executionContext.TrackArray(array);
-            return array;
-        }
 
         /// <inheritdoc/>
         public TSource Source => (TSource)_executionNode.Source;
@@ -68,7 +57,7 @@ namespace GraphQL
         public IObjectGraphType ParentType => _executionNode.GetParentType(_executionContext.Schema);
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Arguments => _executionNode.Arguments ??= GetArguments();
+        public IDictionary<string, ArgumentValue> Arguments => _executionNode.Arguments ??= GetArguments();
 
         /// <inheritdoc/>
         public object RootValue => _executionContext.RootValue;
@@ -116,5 +105,8 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices => _executionContext.RequestServices;
+
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool => _executionContext;
     }
 }

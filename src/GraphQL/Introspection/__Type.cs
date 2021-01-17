@@ -35,6 +35,7 @@ namespace GraphQL.Introspection
 
             FieldOptimized<StringGraphType>("name", resolve: context => ((IGraphType)context.Source).Name);
 
+
             Field<StringGraphType>("description");
 
             FieldAsyncOptimized<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
@@ -49,7 +50,7 @@ namespace GraphQL.Introspection
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
                         var type = (IComplexGraphType)context.Source;
-                        var fields = context.GetPooledArray<FieldType>(type.Fields.Count);
+                        var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
 
@@ -73,7 +74,7 @@ namespace GraphQL.Introspection
             {
                 if (context.Source is IImplementInterfaces type)
                 {
-                    var interfaces = context.GetPooledArray<IInterfaceGraphType>(type.ResolvedInterfaces.Count);
+                    var interfaces = context.ArrayPool.Rent<IInterfaceGraphType>(type.ResolvedInterfaces.Count);
 
                     int index = 0;
                     foreach (var resolved in type.ResolvedInterfaces.List)
@@ -96,7 +97,7 @@ namespace GraphQL.Introspection
             {
                 if (context.Source is IAbstractGraphType type)
                 {
-                    var possibleTypes = context.GetPooledArray<IObjectGraphType>(type.PossibleTypes.Count);
+                    var possibleTypes = context.ArrayPool.Rent<IObjectGraphType>(type.PossibleTypes.Count);
 
                     int index = 0;
                     foreach (var possible in type.PossibleTypes.List)
@@ -125,7 +126,7 @@ namespace GraphQL.Introspection
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
-                        var enumValueDefinitions = context.GetPooledArray<EnumValueDefinition>(type.Values.Count);
+                        var enumValueDefinitions = context.ArrayPool.Rent<EnumValueDefinition>(type.Values.Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
 
@@ -150,7 +151,7 @@ namespace GraphQL.Introspection
             {
                 if (context.Source is IInputObjectGraphType type)
                 {
-                    var inputFields = context.GetPooledArray<FieldType>(type.Fields.Count);
+                    var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
                     int index = 0;
                     foreach (var field in type.Fields.List)
