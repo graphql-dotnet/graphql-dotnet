@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Instrumentation;
@@ -10,7 +11,7 @@ namespace GraphQL.Execution
     /// <summary>
     /// Provides a mutable instance of <see cref="IExecutionContext"/>.
     /// </summary>
-    public class ExecutionContext : IExecutionContext
+    public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
         /// <inheritdoc/>
         public Document Document { get; set; }
@@ -62,20 +63,27 @@ namespace GraphQL.Execution
 
         private readonly List<Array> _trackedArrays = new List<Array>();
 
-        internal void TrackArray(Array array)
-        {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+        TElement[] IExecutionArrayPool.Rent<TElement>(int minimumLength) => RentSharedArray<TElement>(minimumLength);
 
+        /// <inheritdoc cref="IExecutionArrayPool.Rent{TElement}(int)"/>
+        public TElement[] RentSharedArray<TElement>(int minimumLength)
+        {
+            var array = ArrayPool<TElement>.Shared.Rent(minimumLength);
             lock (_trackedArrays)
                 _trackedArrays.Add(array);
+            return array;
         }
 
-        internal void ReturnArrays()
+        /// <summary>
+        /// Releases any rented arrays back to the backing memory pool.
+        /// </summary>
+        public void Dispose()
         {
             // lock is not required because at this time work with ExecutionContext has already been completed
             foreach (var array in _trackedArrays)
                 array.Return();
+
+            _trackedArrays.Clear();
         }
     }
 }

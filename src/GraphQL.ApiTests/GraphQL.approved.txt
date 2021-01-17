@@ -174,6 +174,7 @@ namespace GraphQL
     public interface IResolveFieldContext : GraphQL.Execution.IProvideUserContext
     {
         System.Collections.Generic.IDictionary<string, object> Arguments { get; }
+        GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         System.Threading.CancellationToken CancellationToken { get; }
         GraphQL.Language.AST.Document Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
@@ -194,7 +195,6 @@ namespace GraphQL
         object Source { get; }
         System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
-        TElement[] GetPooledArray<TElement>(int minLength);
     }
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
@@ -250,6 +250,7 @@ namespace GraphQL
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         public System.Collections.Generic.IDictionary<string, object> Arguments { get; }
+        public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; }
         public System.Threading.CancellationToken CancellationToken { get; }
         public GraphQL.Language.AST.Document Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
@@ -271,13 +272,13 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
-        public TElement[] GetPooledArray<TElement>(int minimumLength) { }
     }
     public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
         public System.Collections.Generic.IDictionary<string, object> Arguments { get; set; }
+        public GraphQL.Execution.IExecutionArrayPool ArrayPool { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
@@ -299,7 +300,6 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
-        public TElement[] GetPooledArray<TElement>(int minimumLength) { }
     }
     public static class ResolveFieldContextExtensions
     {
@@ -661,7 +661,7 @@ namespace GraphQL.Execution
         public bool ExposeExceptionStackTrace { get; set; }
         public bool ExposeExtensions { get; set; }
     }
-    public class ExecutionContext : GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext
+    public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
     {
         public ExecutionContext() { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
@@ -680,6 +680,8 @@ namespace GraphQL.Execution
         public System.Action<GraphQL.Execution.UnhandledExceptionContext> UnhandledExceptionDelegate { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
+        public void Dispose() { }
+        public TElement[] RentSharedArray<TElement>(int minimumLength) { }
     }
     public static class ExecutionHelper
     {
@@ -752,6 +754,10 @@ namespace GraphQL.Execution
     public interface IErrorInfoProvider
     {
         GraphQL.Execution.ErrorInfo GetInfo(GraphQL.ExecutionError executionError);
+    }
+    public interface IExecutionArrayPool
+    {
+        TElement[] Rent<TElement>(int minimumLength);
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {

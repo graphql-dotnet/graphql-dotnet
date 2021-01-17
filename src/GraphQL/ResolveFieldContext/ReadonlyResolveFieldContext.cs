@@ -38,12 +38,7 @@ namespace GraphQL
             => ExecutionHelper.GetArgumentValues(_executionContext.Schema, _executionNode.FieldDefinition.Arguments, _executionNode.Field.Arguments, _executionContext.Variables);
 
         /// <inheritdoc/>
-        public TElement[] GetPooledArray<TElement>(int minimumLength)
-        {
-            var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
-            _executionContext.TrackArray(array);
-            return array;
-        }
+        public IExecutionArrayPool ArrayPool => _executionContext;
 
         /// <inheritdoc/>
         public object Source => _executionNode.Source;
