@@ -80,6 +80,9 @@ namespace GraphQL
         /// <inheritdoc/>
         public IDictionary<string, object> Extensions { get; set; }
 
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool { get; set; }
+
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
         /// </summary>
@@ -112,13 +115,14 @@ namespace GraphQL
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
             Extensions = context.Extensions;
+            ArrayPool = context.ArrayPool;
         }
     }
 
     /// <inheritdoc cref="ResolveFieldContext"/>
     public class ResolveFieldContext<TSource> : ResolveFieldContext, IResolveFieldContext<TSource>
     {
-        /// <inheritdoc cref="ResolveFieldContext.ResolveFieldContext()"/>
+        /// <inheritdoc cref="ResolveFieldContext()"/>
         public ResolveFieldContext()
         {
         }

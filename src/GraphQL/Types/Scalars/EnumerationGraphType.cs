@@ -136,7 +136,7 @@ namespace GraphQL.Types
     /// </summary>
     public class EnumValues : IEnumerable<EnumValueDefinition>
     {
-        private readonly List<EnumValueDefinition> _values = new List<EnumValueDefinition>();
+        internal List<EnumValueDefinition> List { get; } = new List<EnumValueDefinition>();
 
         /// <summary>
         /// Returns an enumeration definition for the specified name.
@@ -144,10 +144,15 @@ namespace GraphQL.Types
         public EnumValueDefinition this[string name] => FindByName(name);
 
         /// <summary>
+        /// Gets the count of enumeration definitions.
+        /// </summary>
+        public int Count => List.Count;
+
+        /// <summary>
         /// Adds an enumeration definition to the set.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(EnumValueDefinition value) => _values.Add(value ?? throw new ArgumentNullException(nameof(value)));
+        public void Add(EnumValueDefinition value) => List.Add(value ?? throw new ArgumentNullException(nameof(value)));
 
         /// <summary>
         /// Returns an enumeration definition for the specified name.
@@ -155,7 +160,7 @@ namespace GraphQL.Types
         public EnumValueDefinition FindByName(string name, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var def in _values)
+            foreach (var def in List)
             {
                 if (def.Name.Equals(name, comparison))
                     return def;
@@ -175,7 +180,7 @@ namespace GraphQL.Types
             }
 
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var def in _values)
+            foreach (var def in List)
             {
                 if (def.UnderlyingValue.Equals(value))
                     return def;
@@ -185,7 +190,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        public IEnumerator<EnumValueDefinition> GetEnumerator() => _values.GetEnumerator();
+        public IEnumerator<EnumValueDefinition> GetEnumerator() => List.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

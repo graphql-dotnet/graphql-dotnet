@@ -356,7 +356,7 @@ namespace GraphQL.Execution
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.ArgumentsList)
+            foreach (var arg in definitionArguments.List)
             {
                 var value = astArguments?.ValueFor(arg.Name);
                 var type = arg.ResolvedType;
@@ -408,9 +408,14 @@ namespace GraphQL.Execution
 
                 if (input is ListValue list)
                 {
-                    return new ArgumentValue(list.Values
-                        .Select(item => CoerceValue(listItemType, item, variables).Value)
-                        .ToList(), ArgumentSource.Literal);
+                    var count = list.ValuesList.Count;
+                    if (count == 0)
+                        return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
+
+                    var values = new object[count];
+                    for (int i = 0; i < count; ++i)
+                        values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
+                    return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
                 {
@@ -450,7 +455,7 @@ namespace GraphQL.Execution
                     else if (field.DefaultValue != null)
                     {
                         // If no value is provided for a defined input object field and that field definition provides a default value,
-                        // the default value should be used. 
+                        // the default value should be used.
                         obj[field.Name] = field.DefaultValue;
                     }
                     // Otherwise, if the field is not required, then no entry is added to the coerced unordered map.

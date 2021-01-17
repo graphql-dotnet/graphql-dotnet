@@ -29,7 +29,7 @@ namespace GraphQL.Validation.Rules
 
                 if (fieldDef?.Arguments?.Count > 0)
                 {
-                    foreach (var arg in fieldDef.Arguments.ArgumentsList)
+                    foreach (var arg in fieldDef.Arguments.List)
                     {
                         if (arg.DefaultValue == null &&
                             arg.ResolvedType is NonNullGraphType &&
@@ -45,19 +45,17 @@ namespace GraphQL.Validation.Rules
             {
                 var directive = context.TypeInfo.GetDirective();
 
-                if (directive?.Arguments?.ArgumentsList == null)
+                if (directive?.Arguments?.Count > 0)
                 {
-                    return;
-                }
-
-                foreach (var arg in directive.Arguments.ArgumentsList)
-                {
-                    var argAst = node.Arguments?.ValueFor(arg.Name);
-                    var type = arg.ResolvedType;
-
-                    if (argAst == null && type is NonNullGraphType)
+                    foreach (var arg in directive.Arguments.List)
                     {
-                        context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        var argAst = node.Arguments?.ValueFor(arg.Name);
+                        var type = arg.ResolvedType;
+
+                        if (argAst == null && type is NonNullGraphType)
+                        {
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
+                        }
                     }
                 }
             })

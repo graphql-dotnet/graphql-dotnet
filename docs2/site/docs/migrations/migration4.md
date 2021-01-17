@@ -4,6 +4,8 @@
 
 * Extension methods to configure authorization requirements for GraphQL elements: types, fields, schema.
 * New property `GraphQL.Introspection.ISchemaComparer ISchema.Comparer { get; set; }`
+* New property `IResolveFieldContext.ArrayPool`
+* New method `IParentExecutionNode.ApplyToChildren`
 * Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
 
@@ -67,4 +69,6 @@
   can be determined if the value returned is a default value or if it is a specified literal or variable.
 * `IResolveFieldContext.HasArgument` now returns `false` when `GetArgument` returns a field default value. Note that if a variable is specified,
   and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument is successfully resolving to a variable).
+* Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
+* `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
 * `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.

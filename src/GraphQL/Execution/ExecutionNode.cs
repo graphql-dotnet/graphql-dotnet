@@ -217,6 +217,15 @@ namespace GraphQL.Execution
         /// Returns a list of child execution nodes.
         /// </summary>
         IEnumerable<ExecutionNode> GetChildNodes();
+
+        /// <summary>
+        /// Applies the specified delegate to child execution nodes.
+        /// </summary>
+        /// <typeparam name="TState">Type of the provided state.</typeparam>
+        /// <param name="action">Delegate to execute on every child node of this node.</param>
+        /// <param name="state">An arbitrary state passed by the caller.</param>
+        /// <param name="reverse">Specifies the direct or reverse direction of child nodes traversal.</param>
+        void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false);
     }
 
     /// <summary>
@@ -227,7 +236,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a dictionary of child execution nodes, with keys set to the names of the child fields that the child nodes represent.
         /// </summary>
-        public IDictionary<string, ExecutionNode> SubFields { get; set; }
+        public Dictionary<string, ExecutionNode> SubFields { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
@@ -281,6 +290,24 @@ namespace GraphQL.Execution
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes()
         {
             return SubFields?.Values ?? Enumerable.Empty<ExecutionNode>();
+        }
+
+        /// <inheritdoc/>
+        public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)
+        {
+            if (SubFields != null)
+            {
+                if (reverse)
+                {
+                    foreach (var item in SubFields.Reverse()) //TODO: write custom enumerator for reverse
+                        action(item.Value, state);
+                }
+                else
+                {
+                    foreach (var item in SubFields)
+                        action(item.Value, state);
+                }
+            }
         }
     }
 
@@ -352,6 +379,24 @@ namespace GraphQL.Execution
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes()
         {
             return Items ?? Enumerable.Empty<ExecutionNode>();
+        }
+
+        /// <inheritdoc/>
+        public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)
+        {
+            if (Items != null)
+            {
+                if (reverse)
+                {
+                    for (int i = Items.Count - 1; i >= 0; --i)
+                        action(Items[i], state);
+                }
+                else
+                {
+                    foreach (var item in Items)
+                        action(item, state);
+                }
+            }
         }
     }
 

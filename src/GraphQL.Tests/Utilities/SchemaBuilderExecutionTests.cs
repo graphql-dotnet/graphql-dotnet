@@ -157,7 +157,7 @@ namespace GraphQL.Tests.Utilities
                 builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
             );
 
-            schema.AllTypes.Count().ShouldBe(expectedCount);
+            schema.AllTypes.Count.ShouldBe(expectedCount);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace GraphQL.Tests.Utilities
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");
-            schema.AllTypes.Count().ShouldBe(16);
+            schema.AllTypes.Count.ShouldBe(16);
 
             var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
             cat.Description.ShouldBe(" A cat");
