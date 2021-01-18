@@ -90,7 +90,7 @@ namespace GraphQL.Execution
             // once a field resolver finishes executing. However, a ReadonlyResolveFieldContext instance is not re-used
             // when an exception within a field resolver is thrown, and the FAQ says that calls to UnhandledExceptionDelegate
             // will be provided with a context that is not re-used. If we clear or re-use execution contexts, we should
-            // at least provide UnhandledExecptionDelegate with a copy (e.g. create one with ReadonlyResolveFieldContext
+            // at least provide UnhandledExceptionDelegate with a copy (e.g. create one with ReadonlyResolveFieldContext
             // and then Copy it) so that it is unaffected by clearing the execution context. Also note that subscription
             // execution will be affected by clearing the execution context.
 
