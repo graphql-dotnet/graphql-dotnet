@@ -358,6 +358,7 @@ namespace GraphQL.Execution
             UnhandledExceptionContext exceptionContext = null;
             if (context.UnhandledExceptionDelegate != null)
             {
+                // be sure not to re-use this instance of `IResolveFieldContext`
                 var resolveContext = new ReadonlyResolveFieldContext(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
                 context.UnhandledExceptionDelegate(exceptionContext);
