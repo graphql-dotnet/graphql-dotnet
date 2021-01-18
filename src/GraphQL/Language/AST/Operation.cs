@@ -70,7 +70,7 @@ namespace GraphQL.Language.AST
         /// <inheritdoc/>
         public override void Visit<TState>(Action<INode, TState> action, TState state)
         {
-            var variables = Variables?.VariablesList;
+            var variables = Variables?.List;
             if (variables != null)
             {
                 foreach (var variable in variables)
