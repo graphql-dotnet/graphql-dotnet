@@ -98,7 +98,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     case ASTNodeKind.SchemaDefinition:
                     {
-                        _schemaDef = def.As<GraphQLSchemaDefinition>();
+                        _schemaDef = def as GraphQLSchemaDefinition;
                         schema.SetAstType(_schemaDef);
 
                         VisitNode(schema, v => v.VisitSchema(schema));
@@ -107,49 +107,49 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     case ASTNodeKind.ObjectTypeDefinition:
                     {
-                        var type = ToObjectGraphType(def.As<GraphQLObjectTypeDefinition>());
+                        var type = ToObjectGraphType(def as GraphQLObjectTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.TypeExtensionDefinition:
                     {
-                        var type = ToObjectGraphType(def.As<GraphQLTypeExtensionDefinition>().Definition, true);
+                        var type = ToObjectGraphType((def as GraphQLTypeExtensionDefinition).Definition, true);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.InterfaceTypeDefinition:
                     {
-                        var type = ToInterfaceType(def.As<GraphQLInterfaceTypeDefinition>());
+                        var type = ToInterfaceType(def as GraphQLInterfaceTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.EnumTypeDefinition:
                     {
-                        var type = ToEnumerationType(def.As<GraphQLEnumTypeDefinition>());
+                        var type = ToEnumerationType(def as GraphQLEnumTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.UnionTypeDefinition:
                     {
-                        var type = ToUnionType(def.As<GraphQLUnionTypeDefinition>());
+                        var type = ToUnionType(def as GraphQLUnionTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.InputObjectTypeDefinition:
                     {
-                        var type = ToInputObjectType(def.As<GraphQLInputObjectTypeDefinition>());
+                        var type = ToInputObjectType(def as GraphQLInputObjectTypeDefinition);
                         _types[type.Name] = type;
                         break;
                     }
 
                     case ASTNodeKind.DirectiveDefinition:
                     {
-                        var directive = ToDirective(def.As<GraphQLDirectiveDefinition>());
+                        var directive = ToDirective(def as GraphQLDirectiveDefinition);
                         directives.Add(directive);
                         break;
                     }
