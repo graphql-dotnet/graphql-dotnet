@@ -85,6 +85,15 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void ClearContext()
         {
+            // clearing or re-using the context will break any instances of ReadonlyResolveFieldContext from being
+            // able to access many of their properties. This is not typically a problem since the context is re-used
+            // once a field resolver finishes executing. However, a ReadonlyResolveFieldContext instance is not re-used
+            // when an exception within a field resolver is thrown, and the FAQ says that calls to UnhandledExceptionDelegate
+            // will be provided with a context that is not re-used. If we clear or re-use execution contexts, we should
+            // at least provide UnhandledExecptionDelegate with a copy (e.g. create one with ReadonlyResolveFieldContext
+            // and then Copy it) so that it is unaffected by clearing the execution context. Also note that subscription
+            // execution will be affected by clearing the execution context.
+
             //TODO:
             //Document = null;
             //Schema = null;
@@ -103,6 +112,8 @@ namespace GraphQL.Execution
             //Extensions = null;
             //RequestServices = null;
 
+            // arrays rented after the execution context has been 'disposed' will still rent just fine, but will
+            // not be returned to the pool (since Dispose has already been run) and will be garbage collected.
             lock (_trackedArrays)
             {
                 foreach (var array in _trackedArrays)
