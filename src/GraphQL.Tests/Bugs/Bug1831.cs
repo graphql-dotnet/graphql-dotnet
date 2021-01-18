@@ -54,8 +54,7 @@ namespace GraphQL.Tests.Bugs
         {
             Field<StringGraphType>(
                 "test1",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(Bug1831InputGraphType)) { Name = "arg" }),
+                arguments: Arg.Next("arg").Type<Bug1831InputGraphType>(),
                 resolve: context =>
                 {
                     var arg = context.GetArgument<Bug1831Class>("arg");

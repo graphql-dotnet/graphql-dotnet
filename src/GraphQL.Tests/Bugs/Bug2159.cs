@@ -116,28 +116,23 @@ namespace GraphQL.Tests.Bugs
         {
             Field<StringGraphType>(
                 "testValue",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(StringGraphType)) { Name = "arg", DefaultValue = "defaultValue" }),
+                arguments: Arg.Next("arg").String().Default("defaultValue"),
                 resolve: ctx => ctx.GetArgument<string>("arg"));
             Field<StringGraphType>(
                 "testObject",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(Bug2159ObjectGraphType)) { Name = "arg", DefaultValue = new Bug2159Object { Value = "defaultValue" } }),
+                arguments: Arg.Next("arg").Type<Bug2159ObjectGraphType>().Default(new Bug2159Object { Value = "defaultValue" }),
                 resolve: ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value);
             Field<BooleanGraphType>(
                 "hasArgumentNoDefault",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg" }),
+                arguments: Arg.Next("arg").Boolean(),
                 resolve: ctx => ctx.HasArgument("arg"));
             Field<BooleanGraphType>(
                 "hasArgumentWithDefault",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }),
+                arguments: Arg.Next("arg").Boolean().Default(true),
                 resolve: ctx => ctx.HasArgument("arg"));
             Field<StringGraphType>(
                 "testReqObjField",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(Bug2159ReqObjGraphType)) { Name = "arg" }),
+                arguments: Arg.Next("arg").Type<Bug2159ReqObjGraphType>(),
                 resolve: ctx => "OK");
         }
     }

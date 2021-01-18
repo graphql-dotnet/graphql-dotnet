@@ -142,11 +142,7 @@ namespace GraphQL.Types
             })
         {
             Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
-            {
-                Name = "if",
-                Description = "Included when true."
-            });
+            Arguments = Arg.Next("if").Boolean().NonNull().Description("Included when true.");
         }
     }
 
@@ -167,11 +163,7 @@ namespace GraphQL.Types
             })
         {
             Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
-            {
-                Name = "if",
-                Description = "Skipped when true."
-            });
+            Arguments = Arg.Next("if").Boolean().NonNull().Description("Skipped when true.");
         }
     }
 

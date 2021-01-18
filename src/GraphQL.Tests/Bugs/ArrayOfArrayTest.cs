@@ -60,7 +60,7 @@ mutation {
         {
             Field<ArrayOfArrayType>(
                 "create",
-                arguments: new QueryArguments(new QueryArgument<ArrayOfArrayInput> { Name = "input" }),
+                arguments: Arg.Next("input").Type<ArrayOfArrayInput>(),
                 resolve: ctx =>
                 {
                     var arg = ctx.GetArgument<ArrayOfArrayModel>("input");

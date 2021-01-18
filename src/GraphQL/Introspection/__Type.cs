@@ -38,12 +38,7 @@ namespace GraphQL.Introspection
             Field<StringGraphType>("description");
 
             FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
-                new QueryArguments(
-                    new QueryArgument<BooleanGraphType>
-                    {
-                        Name = "includeDeprecated",
-                        DefaultValue = false
-                    }),
+                Arg.Next("includeDeprecated").Boolean().Default(false),
                 async context =>
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
@@ -116,11 +111,7 @@ namespace GraphQL.Introspection
             });
 
             FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues", null,
-                new QueryArguments(new QueryArgument<BooleanGraphType>
-                {
-                    Name = "includeDeprecated",
-                    DefaultValue = false
-                }),
+                Arg.Next("includeDeprecated").Boolean().Default(false),
                 async context =>
                 {
                     if (context.Source is EnumerationGraphType type)

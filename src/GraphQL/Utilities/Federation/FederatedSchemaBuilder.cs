@@ -66,7 +66,7 @@ namespace GraphQL.Utilities.Federation
             query.FieldAsync(
                 "_entities",
                 new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+                arguments: Arg.Next("representations").ResolvedType(representationsType),
                 resolve: async context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);

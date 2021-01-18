@@ -58,9 +58,7 @@ namespace GraphQL.Tests.Subscription
             AddField(new EventStreamFieldType
             {
                 Name = "messageAddedByUserAsync",
-                Arguments = new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
-                ),
+                Arguments = Arg.Next("id").String().NonNull(),
                 Type = typeof(MessageType),
                 Resolver = new FuncFieldResolver<Message>(ResolveMessage),
                 AsyncSubscriber = new AsyncEventStreamResolver<Message>(SubscribeByIdAsync)

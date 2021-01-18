@@ -199,12 +199,7 @@ namespace GraphQL.Tests.Execution
 
             Field<DateTimeHolderType>(
                 "immediatelyChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
+                arguments: Arg.Next("newDateTime").DateTime(),
                 resolve: context =>
                 {
                     var root = context.Source as Root;
@@ -247,12 +242,7 @@ namespace GraphQL.Tests.Execution
 
             Field<DateTimeHolderType>(
                 "promiseAndFailToChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
+                arguments: Arg.Next("newDateTime").DateTime(),
                 resolve: context =>
                 {
                     var root = context.Source as Root;

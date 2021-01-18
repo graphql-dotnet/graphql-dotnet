@@ -1634,6 +1634,31 @@ namespace GraphQL.Types
         public static GraphQL.Types.IObjectGraphType GetTypeOf(this GraphQL.Types.IAbstractGraphType abstractType, object value) { }
         public static bool IsPossibleType(this GraphQL.Types.IAbstractGraphType abstractType, GraphQL.Types.IGraphType type) { }
     }
+    public static class Arg
+    {
+        public static GraphQL.Types.ArgumentBuilder Next(string name) { }
+    }
+    public class ArgumentBuilder
+    {
+        public GraphQL.Types.ArgumentBuilder Default(object value) { }
+        public GraphQL.Types.ArgumentBuilder Description(string description) { }
+        public GraphQL.Types.ArgumentBuilder Metadata(string key, object value) { }
+        public GraphQL.Types.ArgumentBuilder Next(string name) { }
+        public GraphQL.Types.ArgumentBuilder NonNull() { }
+        public GraphQL.Types.ArgumentBuilder ResolvedType(GraphQL.Types.IGraphType type) { }
+        public GraphQL.Types.ArgumentBuilder Type(System.Type type) { }
+        public GraphQL.Types.ArgumentBuilder Type<TType>()
+            where TType : GraphQL.Types.IGraphType { }
+        public static GraphQL.Types.QueryArgument op_Implicit(GraphQL.Types.ArgumentBuilder builder) { }
+        public static GraphQL.Types.QueryArguments op_Implicit(GraphQL.Types.ArgumentBuilder builder) { }
+    }
+    public static class ArgumentBuilderExtensions
+    {
+        public static GraphQL.Types.ArgumentBuilder Boolean(this GraphQL.Types.ArgumentBuilder builder) { }
+        public static GraphQL.Types.ArgumentBuilder DateTime(this GraphQL.Types.ArgumentBuilder builder) { }
+        public static GraphQL.Types.ArgumentBuilder Int(this GraphQL.Types.ArgumentBuilder builder) { }
+        public static GraphQL.Types.ArgumentBuilder String(this GraphQL.Types.ArgumentBuilder builder) { }
+    }
     public class AutoRegisteringInputObjectGraphType<TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }

@@ -22,7 +22,7 @@ namespace GraphQL.Tests.Bugs
             var query = new ObjectGraphType();
             query.Field<IntGraphType>(
                 name: "query",
-                arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "argumentValue" }),
+                arguments: Arg.Next("argumentValue").Int(),
                 resolve: context => context.GetArgument<int>("argumentValue")
             );
             Query = query;
