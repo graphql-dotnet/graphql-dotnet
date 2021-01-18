@@ -238,7 +238,7 @@ namespace GraphQL.Execution
                 {
                     CompleteNode(context, node);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
-                    System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext);
+                    System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)

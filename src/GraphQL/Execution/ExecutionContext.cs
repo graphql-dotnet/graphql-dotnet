@@ -112,10 +112,10 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
-        /// Provides a method for an execution strategy to reuse an instance of <see cref="ReadonlyResolveFieldContext"/>.
+        /// Allows for an execution strategy to reuse an instance of <see cref="ReadonlyResolveFieldContext"/>.
         /// Although in theory this field should not be accessed by multiple threads at the same time,
         /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>.
         /// </summary>
-        internal ReadonlyResolveFieldContext ReusableReadonlyResolveFieldContext = null;
+        internal ReadonlyResolveFieldContext ReusableReadonlyResolveFieldContext;
     }
 }
