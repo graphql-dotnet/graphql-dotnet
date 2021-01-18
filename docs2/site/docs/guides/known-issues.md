@@ -235,6 +235,15 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
+### Why does my saved `IResolveFieldContext` instance "change" after the field resolver executes?
+
+The `IResolveFieldContext` instance passed to field resolvers is re-used at the completion of the resolver. Be sure not to
+use this instance once the resolver finishes executing. To preserve a copy of the context, call `.Copy()` on the context
+to create a copy that is not re-used. Note that it is safe to use the field context within asynchronous field resolvers and
+data loaders. Once the asynchronous field resolver or data loader returns its final result, the context may be re-used.
+Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
+so it is safe to preserve these instances without calling `.Copy()`.
+
 ## Known Issues
 
 `IResolveFieldContext.HasArgument` will return `true` for all arguments where `GetArgument` does not return `null`.

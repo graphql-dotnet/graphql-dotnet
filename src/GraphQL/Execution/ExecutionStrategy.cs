@@ -220,7 +220,8 @@ namespace GraphQL.Execution
 
             try
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                ReadonlyResolveFieldContext resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);
@@ -236,6 +237,8 @@ namespace GraphQL.Execution
                 if (!(result is IDataLoaderResult))
                 {
                     CompleteNode(context, node);
+                    // for non-dataloader nodes that completed without throwing an error, we can re-use the context
+                    System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                 }
             }
             catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
@@ -355,6 +358,7 @@ namespace GraphQL.Execution
             UnhandledExceptionContext exceptionContext = null;
             if (context.UnhandledExceptionDelegate != null)
             {
+                // be sure not to re-use this instance of `IResolveFieldContext`
                 var resolveContext = new ReadonlyResolveFieldContext(node, context);
                 exceptionContext = new UnhandledExceptionContext(context, resolveContext, ex);
                 context.UnhandledExceptionDelegate(exceptionContext);
