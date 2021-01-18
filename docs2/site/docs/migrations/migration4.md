@@ -71,6 +71,8 @@
   and the variable resolves to its default value, then `HasArgument` returns `true` (since the field argument is successfully resolving to a variable).
 * Various `IEnumerable<T>` properties on schema and graph types have been changed to custom collections: `SchemaDirectives`, `SchemaTypes`, `TypeFields`, `PossibleTypes`, `ResolvedInterfaces`
 * `GraphTypesLookup` has been renamed to `SchemaTypes` with a significant decrease in public APIs 
+* `ExecutionHelper.GetVariableValue` has been removed, and the signature for `ExecutionHelper.CoerceValue` has changed.
+* Removed `TypeExtensions.As`
 * The `IResolveFieldContext` instance passed to field resolvers is re-used at the completion of the resolver. Be sure not to
   use this instance once the resolver finishes executing. To preserve a copy of the context, call `.Copy()` on the context
   to create a copy that is not re-used. Note that it is safe to use the field context within asynchronous field resolvers and

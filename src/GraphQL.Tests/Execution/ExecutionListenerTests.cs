@@ -37,7 +37,7 @@ namespace GraphQL.Tests.Execution
                 Name = "Query";
                 Field<StringGraphType>("foo", resolve: context =>
                 {
-                    var uc = context.UserContext.As<TestContext>();
+                    var uc = context.UserContext as TestContext;
                     return uc.ResolveAsync();
                 });
             }
