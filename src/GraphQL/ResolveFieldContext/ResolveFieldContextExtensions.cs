@@ -195,6 +195,6 @@ namespace GraphQL
         /// Make a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
         /// accessed at a later time.
         /// </summary>
-        public static void Copy<TSource>(this IResolveFieldContext<TSource> context) => new ResolveFieldContext<TSource>(context);
+        public static IResolveFieldContext<TSource> Copy<TSource>(this IResolveFieldContext<TSource> context) => new ResolveFieldContext<TSource>(context);
     }
 }
