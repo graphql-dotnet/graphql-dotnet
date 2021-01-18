@@ -101,7 +101,7 @@ namespace GraphQL.Execution
                 if (fieldDefinition == null)
                     continue;
 
-                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType, field, fieldDefinition);
+                var node = BuildExecutionNode(context, parent, fieldDefinition.ResolvedType, field, fieldDefinition);
 
                 if (node == null)
                     continue;
@@ -152,7 +152,7 @@ namespace GraphQL.Execution
             {
                 if (d != null)
                 {
-                    var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
+                    var node = BuildExecutionNode(context, parent, itemType, parent.Field, parent.FieldDefinition, index);
                     node.Result = d;
 
                     if (!(d is IDataLoaderResult))
@@ -181,7 +181,7 @@ namespace GraphQL.Execution
                         throw new InvalidOperationException($"Cannot return a null member within a non-null list for list index {index}.");
                     }
 
-                    var nullExecutionNode = new NullExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
+                    var nullExecutionNode = new NullExecutionNode(context, parent, itemType, parent.Field, parent.FieldDefinition, index);
                     arrayItems.Add(nullExecutionNode);
                 }
 
@@ -192,17 +192,17 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        public static ExecutionNode BuildExecutionNode(ExecutionContext context, ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
 
             return graphType switch
             {
-                ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                ListGraphType _ => new ArrayExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                IObjectGraphType _ => new ObjectExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                IAbstractGraphType _ => new ObjectExecutionNode(context, parent, graphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(context, parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
@@ -220,7 +220,7 @@ namespace GraphQL.Execution
 
             try
             {
-                var resolveContext = new ReadonlyResolveFieldContext(node, context);
+                var resolveContext = node;//new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = node.FieldDefinition.Resolver ?? NameFieldResolver.Instance;
                 var result = resolver.Resolve(resolveContext);

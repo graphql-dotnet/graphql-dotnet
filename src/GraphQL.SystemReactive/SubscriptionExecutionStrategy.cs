@@ -104,7 +104,7 @@ namespace GraphQL.Execution
                 return subscription
                     .Select(value =>
                     {
-                        var executionNode = BuildExecutionNode(node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
+                        var executionNode = BuildExecutionNode(context, node.Parent, node.GraphType, node.Field, node.FieldDefinition, node.IndexInParentNode);
                         executionNode.Source = value;
                         return executionNode;
                     })

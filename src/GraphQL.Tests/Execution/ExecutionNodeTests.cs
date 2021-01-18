@@ -42,6 +42,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
+                null,
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
                 new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
@@ -58,6 +59,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
+                null,
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
                 new AST.Field(default, new AST.NameNode("name")),
@@ -74,6 +76,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
+                null,
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
                 new AST.Field(new AST.NameNode("alias"), new AST.NameNode("name")),
@@ -90,6 +93,7 @@ namespace GraphQL.Tests.Execution
             var objectGraphType = new AliasedFieldTestObject();
 
             var node = new ValueExecutionNode(
+                null,
                 new RootExecutionNode(objectGraphType),
                 new StringGraphType(),
                 new AST.Field(default, new AST.NameNode("name")),
