@@ -60,6 +60,7 @@ namespace GraphQL.Resolvers
                     var ret = resolver(adapter);
                     if (!(ret is Task task && !task.IsCompleted) && !(ret is IDataLoaderResult))
                     {
+                        adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     }
                     return ret;
