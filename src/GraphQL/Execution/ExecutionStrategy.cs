@@ -127,16 +127,19 @@ namespace GraphQL.Execution
 
                     if (!(d is IDataLoaderResult))
                     {
-                        SetSubFieldNodes(objectNode);
-                    }
-                    else if (node is ArrayExecutionNode arrayNode)
-                    {
-                        SetArrayItemNodes(arrayNode);
-                    }
-                    else if (node is ValueExecutionNode valueNode)
-                    {
-                        node.Result = valueNode.GraphType.Serialize(d)
-                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                        if (node is ObjectExecutionNode objectNode)
+                        {
+                            SetSubFieldNodes(objectNode);
+                        }
+                        else if (node is ArrayExecutionNode arrayNode)
+                        {
+                            SetArrayItemNodes(arrayNode);
+                        }
+                        else if (node is ValueExecutionNode valueNode)
+                        {
+                            node.Result = valueNode.GraphType.Serialize(d)
+                                ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                        }
                     }
 
                     arrayItems.Add(node);
