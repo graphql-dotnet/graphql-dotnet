@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 
 namespace GraphQL.Resolvers
 {
@@ -30,16 +32,43 @@ namespace GraphQL.Resolvers
     /// </summary>
     public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver<TReturnType>
     {
-        private readonly Func<IResolveFieldContext<TSourceType>, TReturnType> _resolver;
+        private readonly Func<IResolveFieldContext, TReturnType> _resolver;
+        private static ResolveFieldContextAdapter<TSourceType> _sharedAdapter;
 
         /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+            if (resolver == null) throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+            if (typeof(TSourceType) == typeof(object))
+            {
+                // ReadonlyResolveFieldContext implements IResolveFieldContext<object>
+                _resolver = (context) => resolver(context.As<TSourceType>());
+            }
+            else
+            {
+                _resolver = (context) =>
+                {
+                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
+                    if (adapter == null)
+                    {
+                        adapter = new ResolveFieldContextAdapter<TSourceType>(context);
+                    }
+                    else
+                    {
+                        adapter.Set(context);
+                    }
+                    var ret = resolver(adapter);
+                    if (!(ret is Task task && !task.IsCompleted) && !(ret is IDataLoaderResult))
+                    {
+                        System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                    }
+                    return ret;
+                };
+            }
         }
 
         /// <inheritdoc/>
-        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context.As<TSourceType>());
+        public TReturnType Resolve(IResolveFieldContext context) => _resolver(context);
 
         object IFieldResolver.Resolve(IResolveFieldContext context) => Resolve(context);
     }

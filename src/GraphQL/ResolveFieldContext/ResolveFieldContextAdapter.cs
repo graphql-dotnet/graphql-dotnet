@@ -10,7 +10,7 @@ namespace GraphQL
 {
     internal sealed class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
-        private readonly IResolveFieldContext _baseContext;
+        private IResolveFieldContext _baseContext;
         private static readonly bool _acceptNulls = !typeof(T).IsValueType || (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>));
 
         /// <summary>
@@ -18,6 +18,17 @@ namespace GraphQL
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public ResolveFieldContextAdapter(IResolveFieldContext baseContext)
+        {
+            Set(baseContext);
+        }
+
+        internal void Reset()
+        {
+            _baseContext = null;
+            Source = default;
+        }
+
+        internal void Set(IResolveFieldContext baseContext)
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
 
@@ -38,7 +49,7 @@ namespace GraphQL
             }
         }
 
-        public T Source { get; }
+        public T Source { get; private set; }
 
         public string FieldName => _baseContext.FieldName;
 
