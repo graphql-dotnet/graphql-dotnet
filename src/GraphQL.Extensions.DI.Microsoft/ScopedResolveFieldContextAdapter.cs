@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
@@ -9,23 +10,39 @@ namespace GraphQL.Extensions.DI.Microsoft
 {
     internal class ScopedResolveFieldContextAdapter<TSource> : ScopedResolveFieldContextAdapter, IResolveFieldContext<TSource>
     {
-        private readonly IResolveFieldContext<TSource> _baseContext;
+        private static readonly bool _acceptNulls = !typeof(TSource).IsValueType || (typeof(TSource).IsGenericType && typeof(TSource).GetGenericTypeDefinition() == typeof(Nullable<>));
 
-        public ScopedResolveFieldContextAdapter(IResolveFieldContext<TSource> context, IServiceProvider serviceProvider) : base(context, serviceProvider)
+        public ScopedResolveFieldContextAdapter(IResolveFieldContext baseContext, IServiceProvider serviceProvider) : base(baseContext, serviceProvider)
         {
-            _baseContext = context;
+            if (baseContext.Source == null && !_acceptNulls)
+            {
+                throw new ArgumentException("baseContext.Source is null and cannot be cast to non-nullable value type " + typeof(TSource).Name, nameof(baseContext));
+            }
+            else
+            {
+                try
+                {
+                    Source = (TSource)baseContext.Source;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException("baseContext.Source is not of type " + typeof(TSource).Name, nameof(baseContext));
+                }
+            }
         }
 
-        TSource IResolveFieldContext<TSource>.Source => _baseContext.Source;
+        public new TSource Source { get; }
+
+        TSource IResolveFieldContext<TSource>.Source => Source;
     }
 
-    internal class ScopedResolveFieldContextAdapter : IResolveFieldContext
+    internal class ScopedResolveFieldContextAdapter : IResolveFieldContext, IResolveFieldContext<object>
     {
-        private readonly IResolveFieldContext _baseContext;
+        protected readonly IResolveFieldContext _baseContext;
 
-        public ScopedResolveFieldContextAdapter(IResolveFieldContext context, IServiceProvider serviceProvider)
+        public ScopedResolveFieldContextAdapter(IResolveFieldContext baseContext, IServiceProvider serviceProvider)
         {
-            _baseContext = context;
+            _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
             RequestServices = serviceProvider;
         }
 
@@ -41,7 +58,7 @@ namespace GraphQL.Extensions.DI.Microsoft
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IDictionary<string, object> Arguments => _baseContext.Arguments;
+        public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 
         public object RootValue => _baseContext.RootValue;
 
@@ -74,5 +91,7 @@ namespace GraphQL.Extensions.DI.Microsoft
         public IDictionary<string, object> Extensions => _baseContext.Extensions;
 
         object IResolveFieldContext.Source => _baseContext.Source;
+
+        public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }

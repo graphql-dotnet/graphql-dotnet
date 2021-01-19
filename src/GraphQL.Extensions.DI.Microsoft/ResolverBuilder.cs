@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL.Builders;
 using GraphQL.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Extensions.DI.Microsoft
 {
