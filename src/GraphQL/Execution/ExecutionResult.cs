@@ -6,6 +6,9 @@ using GraphQL.Language.AST;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Represents the result of an execution.
+    /// </summary>
     public class ExecutionResult
     {
         /// <summary>
@@ -39,19 +42,20 @@ namespace GraphQL
         public PerfRecord[] Perf { get; set; }
 
         /// <summary>
-        /// Indicates that unhandled <see cref="Exception"/> stack traces should be serialized into GraphQL response json along with exception messages; otherwise only <see cref="Exception.Message"/> should be serialized
-        /// </summary>
-        public bool ExposeExceptions { get; set; }
-
-        /// <summary>
         /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is serialized as part of the GraphQL json response.
         /// </summary>
         public Dictionary<string, object> Extensions { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance with all properties set to their defaults.
+        /// </summary>
         public ExecutionResult()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance as a clone of an existing <see cref="ExecutionResult"/>.
+        /// </summary>
         public ExecutionResult(ExecutionResult result)
         {
             if (result == null)
@@ -63,7 +67,6 @@ namespace GraphQL
             Operation = result.Operation;
             Document = result.Document;
             Perf = result.Perf;
-            ExposeExceptions = result.ExposeExceptions;
             Extensions = result.Extensions;
         }
     }

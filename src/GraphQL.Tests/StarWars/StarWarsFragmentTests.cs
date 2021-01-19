@@ -1,4 +1,5 @@
 using GraphQL.Validation;
+using GraphQL.Validation.Errors;
 using Xunit;
 
 namespace GraphQL.Tests.StarWars
@@ -91,7 +92,10 @@ namespace GraphQL.Tests.StarWars
                }
             ";
             var errors = new ExecutionErrors();
-            var error = new ValidationError(query, "5.4.2.1", @"Unknown fragment ""unknown_fragment"".");
+            var error = new ValidationError(query, KnownFragmentNamesError.NUMBER, @"Unknown fragment ""unknown_fragment"".")
+            {
+                Code = "KNOWN_FRAGMENT_NAMES"
+            };
             error.AddLocation(4, 25);
             errors.Add(error);
 

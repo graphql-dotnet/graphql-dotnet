@@ -6,96 +6,61 @@ using System.Threading.Tasks;
 
 namespace GraphQL.DataLoader
 {
-    public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<ILookup<TKey, T>>, IDataLoader<TKey, IEnumerable<T>>
+    /// <summary>
+    /// A data loader that returns a list of values for each given unique key
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key</typeparam>
+    /// <typeparam name="T">The type of the return value</typeparam>
+    public class CollectionBatchDataLoader<TKey, T> : DataLoaderBase<TKey, IEnumerable<T>>
     {
         private readonly Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> _loader;
-        private readonly Dictionary<TKey, IEnumerable<T>> _cache;
-        private readonly HashSet<TKey> _pendingKeys;
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> loader, IEqualityComparer<TKey> keyComparer = null)
+        /// <summary>
+        /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and cancellation token, which returns an ILookup of keys and values</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<ILookup<TKey, T>>> fetchDelegate,
+               IEqualityComparer<TKey> keyComparer = null,
+               int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
-            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
-
-            keyComparer ??= EqualityComparer<TKey>.Default;
-            _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
-            _pendingKeys = new HashSet<TKey>(keyComparer);
+            _loader = fetchDelegate ?? throw new ArgumentNullException(nameof(fetchDelegate));
         }
 
-        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> loader, Func<T, TKey> keySelector,
-            IEqualityComparer<TKey> keyComparer = null)
+        /// <summary>
+        /// Initializes a new instance of CollectionBatchDataLoader with the specified fetch delegate and key selector
+        /// </summary>
+        /// <param name="fetchDelegate">An asynchronous delegate that is passed a list of keys and a cancellation token, which returns a list objects</param>
+        /// <param name="keySelector">A selector for the key from the returned object</param>
+        /// <param name="keyComparer">An optional equality comparer for the keys</param>
+        /// <param name="maxBatchSize">The maximum number of keys passed to the fetch delegate at a time</param>
+        public CollectionBatchDataLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IEnumerable<T>>> fetchDelegate,
+            Func<T, TKey> keySelector,
+            IEqualityComparer<TKey> keyComparer = null,
+            int maxBatchSize = int.MaxValue) : base(keyComparer, maxBatchSize)
         {
-            if (loader == null)
-                throw new ArgumentNullException(nameof(loader));
-
+            if (fetchDelegate == null)
+                throw new ArgumentNullException(nameof(fetchDelegate));
             if (keySelector == null)
                 throw new ArgumentNullException(nameof(keySelector));
 
-            keyComparer ??= EqualityComparer<TKey>.Default;
-
-            async Task<ILookup<TKey, T>> LoadAndMapToLookup(IEnumerable<TKey> keys, CancellationToken cancellationToken)
+            _loader = async (keys, cancellationToken) =>
             {
-                var values = await loader(keys, cancellationToken).ConfigureAwait(false);
-                return values.ToLookup(keySelector, keyComparer);
-            }
-
-            _loader = LoadAndMapToLookup;
-            _cache = new Dictionary<TKey, IEnumerable<T>>(keyComparer);
-            _pendingKeys = new HashSet<TKey>(keyComparer);
+                var ret = await fetchDelegate(keys, cancellationToken);
+                return ret.ToLookup(keySelector, keyComparer);
+            };
         }
 
-        public async Task<IEnumerable<T>> LoadAsync(TKey key)
+        /// <inheritdoc/>
+        protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, IEnumerable<T>>> list, CancellationToken cancellationToken)
         {
-            lock (_cache)
+            var keys = list.Select(x => x.Key);
+            var lookup = await _loader(keys, cancellationToken);
+            foreach (var item in list)
             {
-                // Get value from the cache if it's there
-                if (_cache.TryGetValue(key, out var value))
-                {
-                    return value;
-                }
-
-                // Otherwise add to pending keys
-                if (!_pendingKeys.Contains(key))
-                {
-                    _pendingKeys.Add(key);
-                }
+                item.SetResult(lookup[item.Key]);
             }
-
-            var result = await DataLoaded.ConfigureAwait(false);
-
-            return result[key];
-        }
-
-        protected override bool IsFetchNeeded()
-        {
-            lock (_cache)
-            {
-                return _pendingKeys.Count > 0;
-            }
-        }
-
-        protected override async Task<ILookup<TKey, T>> FetchAsync(CancellationToken cancellationToken)
-        {
-            IList<TKey> keys;
-
-            lock (_cache)
-            {
-                // Get pending keys and clear pending list
-                keys = _pendingKeys.ToArray();
-                _pendingKeys.Clear();
-            }
-
-            var lookup = await _loader(keys, cancellationToken).ConfigureAwait(false);
-
-            // Populate cache
-            lock (_cache)
-            {
-                foreach (TKey key in keys)
-                {
-                    _cache[key] = lookup[key].ToArray();
-                }
-            }
-
-            return lookup;
         }
     }
 }

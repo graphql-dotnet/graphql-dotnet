@@ -29,12 +29,12 @@ namespace GraphQL.Tests.Execution
             });
 
             var retail = new ObjectGraphType { Name = "Retail" };
-            retail.Field("catalog", catalog, resolve: ctx => new {});
+            retail.Field("catalog", catalog, resolve: ctx => new { });
 
             var root = new ObjectGraphType { Name = "Root" };
-            root.Field("retail", retail, resolve: ctx => new {});
+            root.Field("retail", retail, resolve: ctx => new { });
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
             schema.RegisterTypes(retail);
             schema.RegisterTypes(catalog);
 
@@ -55,7 +55,7 @@ namespace GraphQL.Tests.Execution
             person.Field(
                 "friends",
                 new ListGraphType(new NonNullGraphType(person)),
-                resolve: ctx => new[] {new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" }});
+                resolve: ctx => new[] { new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" } });
 
             var root = new ObjectGraphType { Name = "Root" };
             root.Field("hero", person, resolve: ctx => ctx.RootValue);
@@ -67,7 +67,7 @@ namespace GraphQL.Tests.Execution
                 schema,
                 @"{ hero { name friends { name } } }",
                 @"{ ""hero"": { ""name"": ""Quinn"", ""friends"": [ { ""name"": ""Jaime"" }, { ""name"": ""Joe"" }] } }",
-                root: new SomeObject { Name = "Quinn"});
+                root: new SomeObject { Name = "Quinn" });
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace GraphQL.Tests.Execution
                     ... on Robot { name }
                 } }",
                 @"{ ""hero"": { ""name"" : ""Quinn"" }}",
-                root: new SomeObject { Name = "Quinn"});
+                root: new SomeObject { Name = "Quinn" });
         }
 
         [Fact]
@@ -109,41 +109,9 @@ namespace GraphQL.Tests.Execution
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: [NestedObjType]
@@ -158,41 +126,9 @@ type root {
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: NestedObjType!
@@ -207,41 +143,9 @@ type root {
   query: root
 }
 
-scalar BigInt
-
-scalar Byte
-
-scalar Date
-
-scalar DateTime
-
-scalar DateTimeOffset
-
-scalar Decimal
-
-scalar Guid
-
-scalar Long
-
-scalar Milliseconds
-
 type NestedObjType {
   intField: Int
 }
-
-scalar SByte
-
-scalar Seconds
-
-scalar Short
-
-scalar UInt
-
-scalar ULong
-
-scalar UShort
-
-scalar Uri
 
 type root {
   listOfObjField: NestedObjType

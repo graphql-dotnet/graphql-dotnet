@@ -1,4 +1,5 @@
-﻿using GraphQL.Validation.Rules;
+using GraphQL.Validation.Errors;
+using GraphQL.Validation.Rules;
 using Xunit;
 
 namespace GraphQL.Tests.Validation
@@ -65,7 +66,7 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(x =>
                 {
-                    x.Message = Rule.DuplicateInputField("f1");
+                    x.Message = UniqueInputFieldNamesError.DuplicateInputField("f1");
                     x.Loc(3, 38);
                     x.Loc(3, 51);
                 });
@@ -84,13 +85,13 @@ namespace GraphQL.Tests.Validation
                 ";
                 _.Error(x =>
                 {
-                    x.Message = Rule.DuplicateInputField("f1");
+                    x.Message = UniqueInputFieldNamesError.DuplicateInputField("f1");
                     x.Loc(3, 38);
                     x.Loc(3, 51);
                 });
                 _.Error(x =>
                 {
-                    x.Message = Rule.DuplicateInputField("f1");
+                    x.Message = UniqueInputFieldNamesError.DuplicateInputField("f1");
                     x.Loc(3, 38);
                     x.Loc(3, 64);
                 });

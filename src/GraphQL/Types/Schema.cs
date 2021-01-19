@@ -11,10 +11,9 @@ namespace GraphQL.Types
     public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         private IServiceProvider _services;
-        private Lazy<GraphTypesLookup> _lookup;
+        private Lazy<SchemaTypes> _allTypes;
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
-        private readonly List<DirectiveGraphType> _directives;
         private readonly List<IAstFromValueConverter> _converters;
 
         /// <summary>
@@ -34,10 +33,10 @@ namespace GraphQL.Types
         {
             _services = services;
 
-            _lookup = new Lazy<GraphTypesLookup>(CreateTypesLookup);
+            _allTypes = new Lazy<SchemaTypes>(CreateSchemaTypes);
             _additionalTypes = new List<Type>();
             _additionalInstances = new List<IGraphType>();
-            _directives = new List<DirectiveGraphType>
+            Directives = new SchemaDirectives
             {
                 DirectiveGraphType.Include,
                 DirectiveGraphType.Skip,
@@ -59,10 +58,20 @@ namespace GraphQL.Types
             return builder.Build(typeDefinitions);
         }
 
+        /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
-        public bool Initialized => _lookup?.IsValueCreated == true;
+        /// <inheritdoc/>
+        public bool Initialized => _allTypes?.IsValueCreated == true;
 
+        // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
+        private void CheckInitialized()
+        {
+            if (Initialized)
+                throw new InvalidOperationException("Schema is already initialized and sealed for modifications. You should call RegisterXXX methods only when Schema.Initialized = false.");
+        }
+
+        /// <inheritdoc/>
         public void Initialize()
         {
             CheckDisposed();
@@ -70,12 +79,16 @@ namespace GraphQL.Types
             FindType("____");
         }
 
+        /// <inheritdoc/>
         public string Description { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Query { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Mutation { get; set; }
 
+        /// <inheritdoc/>
         public IObjectGraphType Subscription { get; set; }
 
         /// <summary>
@@ -99,54 +112,54 @@ namespace GraphQL.Types
         /// </returns>
         object IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
 
+        /// <inheritdoc/>
         public ISchemaFilter Filter { get; set; } = new DefaultSchemaFilter();
 
-        public IEnumerable<DirectiveGraphType> Directives
-        {
-            get => _directives;
-            set
-            {
-                CheckDisposed();
+        /// <inheritdoc/>
+        public ISchemaComparer Comparer { get; set; } = new DefaultSchemaComparer();
 
-                _directives.Clear();
+        /// <inheritdoc/>
+        public SchemaDirectives Directives { get; }
 
-                if (value != null)
-                    _directives.AddRange(value);
-            }
-        }
+        /// <inheritdoc/>
+        public SchemaTypes AllTypes => _allTypes?.Value;
 
-        public IEnumerable<IGraphType> AllTypes =>
-            _lookup?
-                .Value
-                .All()
-                .ToList() ?? (IEnumerable<IGraphType>)Array.Empty<IGraphType>();
-
+        /// <inheritdoc/>
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
-        public FieldType SchemaMetaFieldType => _lookup?.Value.SchemaMetaFieldType;
+        /// <inheritdoc/>
+        public FieldType SchemaMetaFieldType => _allTypes?.Value.SchemaMetaFieldType;
 
-        public FieldType TypeMetaFieldType => _lookup?.Value.TypeMetaFieldType;
+        /// <inheritdoc/>
+        public FieldType TypeMetaFieldType => _allTypes?.Value.TypeMetaFieldType;
 
-        public FieldType TypeNameMetaFieldType => _lookup?.Value.TypeNameMetaFieldType;
+        /// <inheritdoc/>
+        public FieldType TypeNameMetaFieldType => _allTypes?.Value.TypeNameMetaFieldType;
 
+        /// <inheritdoc/>
         public void RegisterType(IGraphType type)
         {
             CheckDisposed();
+            CheckInitialized();
 
             _additionalInstances.Add(type ?? throw new ArgumentNullException(nameof(type)));
         }
 
+        /// <inheritdoc/>
         public void RegisterTypes(params IGraphType[] types)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var type in types)
                 RegisterType(type);
         }
 
+        /// <inheritdoc/>
         public void RegisterTypes(params Type[] types)
         {
             CheckDisposed();
+            CheckInitialized();
 
             if (types == null)
             {
@@ -159,41 +172,50 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
         public void RegisterType<T>() where T : IGraphType
         {
             CheckDisposed();
+            CheckInitialized();
 
             RegisterType(typeof(T));
         }
 
+        /// <inheritdoc/>
         public void RegisterDirective(DirectiveGraphType directive)
         {
             CheckDisposed();
+            CheckInitialized();
 
-            _directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
+            Directives.Add(directive ?? throw new ArgumentNullException(nameof(directive)));
         }
 
         public void RegisterDirectives(IEnumerable<DirectiveGraphType> directives)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var directive in directives)
                 RegisterDirective(directive);
         }
 
+        /// <inheritdoc/>
         public void RegisterDirectives(params DirectiveGraphType[] directives)
         {
             CheckDisposed();
+            CheckInitialized();
 
             foreach (var directive in directives)
                 RegisterDirective(directive);
         }
 
+        /// <inheritdoc/>
         public DirectiveGraphType FindDirective(string name)
         {
-            return _directives.FirstOrDefault(x => x.Name == name);
+            return Directives.FirstOrDefault(x => x.Name == name);
         }
 
+        /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
             CheckDisposed();
@@ -201,11 +223,13 @@ namespace GraphQL.Types
             _converters.Add(converter ?? throw new ArgumentNullException(nameof(converter)));
         }
 
+        /// <inheritdoc/>
         public IAstFromValueConverter FindValueConverter(object value, IGraphType type)
         {
             return _converters.FirstOrDefault(x => x.Matches(value, type));
         }
 
+        /// <inheritdoc/>
         public IGraphType FindType(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -213,9 +237,10 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
             }
 
-            return _lookup?.Value[name];
+            return _allTypes?.Value[name];
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
@@ -226,7 +251,7 @@ namespace GraphQL.Types
         {
             if (disposing)
             {
-                if (_lookup != null)
+                if (_allTypes != null)
                 {
                     _services = null;
                     Query = null;
@@ -236,22 +261,22 @@ namespace GraphQL.Types
 
                     _additionalInstances.Clear();
                     _additionalTypes.Clear();
-                    _directives.Clear();
+                    Directives.Clear();
                     _converters.Clear();
 
-                    if (_lookup.IsValueCreated)
+                    if (_allTypes.IsValueCreated)
                     {
-                        _lookup.Value.Clear(true);
+                        _allTypes.Value.Dictionary.Clear();
                     }
 
-                    _lookup = null;
+                    _allTypes = null;
                 }
             }
         }
 
         private void CheckDisposed()
         {
-            if (_lookup == null)
+            if (_allTypes == null)
                 throw new ObjectDisposedException(nameof(Schema));
         }
 
@@ -287,18 +312,17 @@ namespace GraphQL.Types
                 yield return Subscription;
         }
 
-        private GraphTypesLookup CreateTypesLookup()
+        private SchemaTypes CreateSchemaTypes()
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
                 .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
-            return GraphTypesLookup.Create(
+            return SchemaTypes.Create(
                 types,
-                _directives,
+                Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
-                NameConverter,
-                seal: true);
+                NameConverter);
         }
     }
 }

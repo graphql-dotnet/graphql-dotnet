@@ -67,28 +67,13 @@ namespace GraphQL
             set => _onMissing = value;
         }
 
-        public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
-
         /// <summary>
         /// Gets the count.
         /// </summary>
         public int Count => _values.Count;
 
-        public TValue First
-        {
-            get
-            {
-                foreach (var pair in _values)
-                {
-                    return pair.Value;
-                }
-
-                return default;
-            }
-        }
-
         /// <summary>
-        /// Gets or sets the <see cref="TValue"/> with the specified key.
+        /// Gets or sets the <typeparamref name="TValue"/> with the specified key.
         /// </summary>
         /// <param name="key">The key.</param>
         public TValue this[TKey key]
@@ -142,10 +127,7 @@ namespace GraphQL
         /// If it does not already exist, it's created using the OnMissing action.
         /// </summary>
         /// <param name="key">The key.</param>
-        public void FillDefault(TKey key)
-        {
-            Fill(key, _onMissing(key));
-        }
+        public void FillDefault(TKey key) => Fill(key, _onMissing(key));
 
         /// <summary>
         /// Guarantees that the Cache has a value for a given key.
@@ -219,9 +201,9 @@ namespace GraphQL
         /// <param name="predicate">The search predicate.</param>
         public bool Exists(Predicate<TValue> predicate)
         {
-            var returnValue = false;
+            bool returnValue = false;
 
-            Each(delegate (TValue value) { returnValue |= predicate(value); });
+            Each(value => returnValue |= predicate(value));
 
             return returnValue;
         }
@@ -270,10 +252,7 @@ namespace GraphQL
         /// <summary>
         /// Clears this instance of all key/value pairs.
         /// </summary>
-        public void Clear()
-        {
-            _values.Clear();
-        }
+        public void Clear() => _values.Clear();
 
         /// <summary>
         /// If the dictionary contains the indicated key, performs the action with its value.
@@ -291,9 +270,6 @@ namespace GraphQL
         /// <summary>
         /// Equivalent to Clear()
         /// </summary>
-        public void ClearAll()
-        {
-            _values.Clear();
-        }
+        public void ClearAll() => _values.Clear();
     }
 }

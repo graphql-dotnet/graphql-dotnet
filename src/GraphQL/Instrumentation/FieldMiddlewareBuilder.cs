@@ -15,6 +15,7 @@ namespace GraphQL.Instrumentation
         private Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _singleMiddleware;
         private IList<Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate>> _middlewares;
 
+        /// <inheritdoc/>
         public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
         {
             middleware = middleware ?? throw new ArgumentNullException(nameof(middleware));
@@ -61,20 +62,24 @@ namespace GraphQL.Instrumentation
 
         private bool Empty => _singleMiddleware == null;
 
+        /// <inheritdoc/>
         public void ApplyTo(ISchema schema)
         {
             // allocation free optimization if no middlewares are defined
             if (!Empty)
             {
-                foreach (var complex in schema.AllTypes.OfType<IComplexGraphType>())
+                foreach (var item in schema.AllTypes.Dictionary)
                 {
-                    foreach (var field in complex.Fields)
+                    if (item.Value is IComplexGraphType complex)
                     {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+                        foreach (var field in complex.Fields)
+                        {
+                            var inner = field.Resolver ?? NameFieldResolver.Instance;
 
-                        var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
+                            var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
 
-                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                            field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                        }
                     }
                 }
             }

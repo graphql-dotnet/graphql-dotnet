@@ -12,16 +12,19 @@ namespace GraphQL.DataLoader
     {
         private readonly IDataLoaderContextAccessor _accessor;
 
+        /// <summary>
+        /// Constructs a <see cref="DataLoaderDocumentListener"/> with the specified <see cref="IDataLoaderContextAccessor"/>
+        /// </summary>
         public DataLoaderDocumentListener(IDataLoaderContextAccessor accessor)
         {
             _accessor = accessor;
         }
 
+        /// <inheritdoc/>
         public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
-        {
-            return Task.CompletedTask;
-        }
+            => Task.CompletedTask;
 
+        /// <inheritdoc/>
         public Task BeforeExecutionAsync(IExecutionContext context)
         {
             if (_accessor.Context == null)
@@ -30,11 +33,11 @@ namespace GraphQL.DataLoader
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task BeforeExecutionAwaitedAsync(IExecutionContext context)
-        {
-            return Task.CompletedTask;
-        }
+            => Task.CompletedTask;
 
+        /// <inheritdoc/>
         public Task AfterExecutionAsync(IExecutionContext context)
         {
             _accessor.Context = null;
@@ -42,11 +45,8 @@ namespace GraphQL.DataLoader
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task BeforeExecutionStepAwaitedAsync(IExecutionContext context)
-        {
-            var dataLoaderContext = _accessor.Context;
-
-            return dataLoaderContext.DispatchAllAsync(context.CancellationToken);
-        }
+            => Task.CompletedTask;
     }
 }

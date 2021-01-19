@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using GraphQL.Types;
 using Shouldly;
@@ -44,9 +45,18 @@ namespace GraphQL.Tests.Types
                 expectedErrorCount: 3);
 
             var errors = result.Errors.ToArray();
-            errors[0].Message.ShouldBe("Cannot return null for non-null type. Field: a, Type: Int!.");
-            errors[1].Message.ShouldBe("Cannot return null for non-null type. Field: b, Type: Boolean!.");
-            errors[2].Message.ShouldBe("Cannot return null for non-null type. Field: c, Type: String!.");
+            errors[0].Message.ShouldBe("Error trying to resolve field 'a'.");
+            errors[0].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: a, Type: Int!.");
+            errors[1].Message.ShouldBe("Error trying to resolve field 'b'.");
+            errors[1].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: b, Type: Boolean!.");
+            errors[2].Message.ShouldBe("Error trying to resolve field 'c'.");
+            errors[2].InnerException.Message.ShouldBe("Cannot return null for non-null type. Field: c, Type: String!.");
+        }
+
+        [Fact]
+        public void NonNull_Wrapped_With_NonNull_Should_Throw()
+        {
+            Should.Throw<ArgumentException>(() => new NonNullGraphType(new NonNullGraphType(new StringGraphType()))).ParamName.ShouldBe("type");
         }
     }
 
@@ -69,7 +79,8 @@ namespace GraphQL.Tests.Types
     public class NullableSchema : Schema
     {
         public NullableSchema()
-        {   var query = new ObjectGraphType();
+        {
+            var query = new ObjectGraphType();
 
             query.Field<NullableSchemaType>("nullable",
                 resolve: c => new NullableSchemaType { Data = c.Source as ExampleContext });
@@ -96,7 +107,6 @@ namespace GraphQL.Tests.Types
     {
         public NonNullableSchemaType()
         {
-
             Field<NonNullGraphType<IntGraphType>>("a", resolve: _ => _.Source.Data.A);
             Field<NonNullGraphType<BooleanGraphType>>("b", resolve: _ => _.Source.Data.B);
             Field<NonNullGraphType<StringGraphType>>("c", resolve: _ => _.Source.Data.C);

@@ -1,11 +1,16 @@
 using GraphQL.Types;
+using Shouldly;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
 {
     public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
     {
+#if NETCOREAPP3_1
         [Fact]
+#else
+        [Fact(Skip = "24.149999999999999 with .NET Core < 3.1")]
+#endif
         public void double_to_decimal_does_not_lose_precision()
         {
             var query = @"
@@ -34,10 +39,11 @@ namespace GraphQL.Tests.Bugs
         {
             Field<DecimalGraphType>(
                 "set",
-                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request"}),
+                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request" }),
                 resolve: context =>
                 {
                     var val = context.GetArgument<decimal>("request");
+                    val.ShouldBe(24.15m);
                     return val;
                 });
         }

@@ -6,16 +6,25 @@ using GraphQLParser.Exceptions;
 
 namespace GraphQL.Execution
 {
+    /// <summary>
+    /// <inheritdoc cref="IDocumentBuilder"/>
+    /// <br/><br/>
+    /// Default instance of <see cref="IDocumentBuilder"/>.
+    /// </summary>
     public class GraphQLDocumentBuilder : IDocumentBuilder
     {
         private readonly Parser _parser;
 
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
         public GraphQLDocumentBuilder()
         {
             var lexer = new Lexer();
             _parser = new Parser(lexer);
         }
 
+        /// <inheritdoc/>
         public Document Build(string body)
         {
             var source = new Source(body);
@@ -26,12 +35,10 @@ namespace GraphQL.Execution
             }
             catch (GraphQLSyntaxErrorException ex)
             {
-                var e = new ExecutionError("Error parsing query: " + ex.Description, ex);
-                e.AddLocation(ex.Line, ex.Column);
-                throw e;
+                throw new SyntaxError(ex);
             }
 
-            var document = CoreToVanillaConverter.Convert(body, result);
+            var document = CoreToVanillaConverter.Convert(result);
             document.OriginalQuery = body;
             return document;
         }

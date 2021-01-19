@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using GraphQL.Execution;
 using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="IResolveFieldContext"/> instances.
+    /// </summary>
     public static class ResolveFieldContextExtensions
     {
         /// <summary>Returns the value of the specified field argument, or defaultValue if none found</summary>
@@ -37,11 +40,11 @@ namespace GraphQL
                 return false;
             }
 
-            if (arg is IDictionary<string, object> inputObject)
+            if (arg.Value is IDictionary<string, object> inputObject)
             {
                 if (argumentType == typeof(object))
                 {
-                    result = arg;
+                    result = arg.Value;
                     return true;
                 }
 
@@ -52,7 +55,7 @@ namespace GraphQL
                 return true;
             }
 
-            result = arg.GetPropertyValue(argumentType);
+            result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
@@ -61,7 +64,8 @@ namespace GraphQL
         {
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType, context.FieldDefinition) ?? name);
-            return context.Arguments?.ContainsKey(argumentName) ?? false;
+            ArgumentValue value = default;
+            return (context.Arguments?.TryGetValue(argumentName, out value) ?? false) && value.Source != ArgumentSource.FieldDefault;
         }
 
         /// <summary>
@@ -85,40 +89,13 @@ namespace GraphQL
         }
 
         /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveEventStreamContext.Source"/> property cannot be cast to the specified type</exception>
+        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
         public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
         {
             if (context is IResolveEventStreamContext<T> typedContext)
                 return typedContext;
 
             return new ResolveEventStreamContext<T>(context);
-        }
-
-        public static Task<object> TryAsyncResolve(this IResolveFieldContext context, Func<IResolveFieldContext, Task<object>> resolve, Func<ExecutionErrors, Task<object>> error = null)
-            => TryAsyncResolve<object>(context, resolve, error);
-
-        public static async Task<TResult> TryAsyncResolve<TResult>(this IResolveFieldContext context, Func<IResolveFieldContext, Task<TResult>> resolve, Func<ExecutionErrors, Task<TResult>> error = null)
-        {
-            try
-            {
-                return await resolve(context).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                if (error == null)
-                {
-                    var er = new ExecutionError(ex.Message, ex);
-                    er.AddLocation(context.FieldAst, context.Document);
-                    er.Path = context.Path;
-                    context.Errors.Add(er);
-                    return default;
-                }
-                else
-                {
-                    var result = error(context.Errors);
-                    return result == null ? default : await result.ConfigureAwait(false);
-                }
-            }
         }
 
         private static readonly char[] _separators = { '.' };
@@ -207,5 +184,17 @@ namespace GraphQL
                 }
             }
         }
+
+        /// <summary>
+        /// Make a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static IResolveFieldContext Copy(this IResolveFieldContext context) => new ResolveFieldContext(context);
+
+        /// <summary>
+        /// Make a copy of the specified <see cref="IResolveFieldContext"/> instance so it can be
+        /// accessed at a later time.
+        /// </summary>
+        public static IResolveFieldContext<TSource> Copy<TSource>(this IResolveFieldContext<TSource> context) => new ResolveFieldContext<TSource>(context);
     }
 }

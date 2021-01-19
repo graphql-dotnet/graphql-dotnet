@@ -10,14 +10,14 @@ namespace GraphQL.Tests.Execution
     {
         public RepeatedSubfieldsTests()
         {
-            FirstInnerField = new Field(null, new NameNode("first"));
+            FirstInnerField = new Field(default, new NameNode("first"));
             FirstFieldSelection = new SelectionSet();
             FirstFieldSelection.Add(FirstInnerField);
-            SecondInnerField = new Field(null, new NameNode("second"));
+            SecondInnerField = new Field(default, new NameNode("second"));
             SecondFieldSelection = new SelectionSet();
             SecondFieldSelection.Add(SecondInnerField);
-            FirstTestField = new Field(null, new NameNode("test"));
-            SecondTestField = new Field(null, new NameNode("test"));
+            FirstTestField = new Field(default, new NameNode("test"));
+            SecondTestField = new Field(default, new NameNode("test"));
             AliasedTestField = new Field(new NameNode("alias"), new NameNode("test"));
 
             FirstTestField.SelectionSet = FirstFieldSelection;
@@ -43,8 +43,8 @@ namespace GraphQL.Tests.Execution
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -57,9 +57,9 @@ namespace GraphQL.Tests.Execution
             var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
             fields["alias"].SelectionSet.Selections.ShouldHaveSingleItem();
-            fields["alias"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["alias"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace GraphQL.Tests.Execution
             fragment.Type = new GraphQL.Language.AST.NamedType(
                 new NameNode("Person"));
 
-            var fragments = new Fragments {fragment};
+            var fragments = new Fragments { fragment };
 
             var schema = new Schema();
             schema.RegisterType(new PersonType());
@@ -94,8 +94,8 @@ namespace GraphQL.Tests.Execution
                 outerSelection);
 
             fields.ShouldHaveSingleItem();
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(FirstInnerField));
-            fields["test"].SelectionSet.Selections.ShouldContain(x => x.IsEqualTo(SecondInnerField));
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
+            fields["test"].SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
         }
     }
 }

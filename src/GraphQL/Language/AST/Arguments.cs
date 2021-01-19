@@ -4,56 +4,57 @@ using System.Collections.Generic;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Represents a list of argument nodes.
+    /// </summary>
     public class Arguments : AbstractNode, IEnumerable<Argument>
     {
         private List<Argument> _arguments;
         // for internal use only, do not modify this instance
         internal static readonly Arguments Empty = new Arguments();
 
+        /// <inheritdoc/>
         public override IEnumerable<INode> Children => _arguments;
 
-        public void Add(Argument arg)
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
         {
-            if (arg == null)
-                throw new ArgumentNullException(nameof(arg));
-
-            if (_arguments == null)
-                _arguments = new List<Argument>();
-
-            _arguments.Add(arg);
+            if (_arguments != null)
+            {
+                foreach (var arg in _arguments)
+                    action(arg, state);
+            }
         }
 
+        /// <summary>
+        /// Adds an argument node to the list.
+        /// </summary>
+        public void Add(Argument arg) => (_arguments ??= new List<Argument>()).Add(arg ?? throw new ArgumentNullException(nameof(arg)));
+
+        /// <summary>
+        /// Returns the value of an argument node, searching the list of argument nodes by the name of the argument.
+        /// </summary>
         public IValue ValueFor(string name)
         {
-            if (_arguments == null)
-                return null;
-
             // DO NOT USE LINQ ON HOT PATH
-            foreach (var x in _arguments)
-                if (x.Name == name)
-                    return x.Value;
+            if (_arguments != null)
+            {
+                foreach (var x in _arguments)
+                {
+                    if (x.Name == name)
+                        return x.Value;
+                }
+            }
 
             return null;
         }
 
-        protected bool Equals(Arguments args) => false;
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Arguments)obj);
-        }
-
-        public IEnumerator<Argument> GetEnumerator()
-        {
-            if (_arguments == null)
-                return System.Linq.Enumerable.Empty<Argument>().GetEnumerator();
-
-            return _arguments.GetEnumerator();
-        }
+        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+        public IEnumerator<Argument> GetEnumerator() => (_arguments ?? System.Linq.Enumerable.Empty<Argument>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public override string ToString() => _arguments?.Count > 0 ? $"Arguments{{{string.Join(", ", _arguments)}}}" : "Arguments(Empty)";
     }
 }

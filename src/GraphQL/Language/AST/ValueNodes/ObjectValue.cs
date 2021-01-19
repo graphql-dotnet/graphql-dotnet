@@ -4,16 +4,31 @@ using System.Linq;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Represents a complex value within a document that has child fields (an object).
+    /// </summary>
     public class ObjectValue : AbstractNode, IValue
     {
+        /// <summary>
+        /// Initializes a new instance that contains the specified field nodes.
+        /// </summary>
         public ObjectValue(IEnumerable<ObjectField> fields)
         {
-            if (fields == null)
-                ObjectFields = Array.Empty<ObjectField>();
-            else
-                ObjectFields = fields;
+            ObjectFieldsList = (fields ?? throw new ArgumentNullException(nameof(fields))).ToList();
         }
 
+        /// <summary>
+        /// Initializes a new instance that contains the specified field nodes.
+        /// </summary>
+        public ObjectValue(List<ObjectField> fields)
+        {
+            ObjectFieldsList = fields ?? throw new ArgumentNullException(nameof(fields));
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Dictionary{TKey, TValue}">Dictionary&lt;string, object&gt;</see>
+        /// containing the values of the field nodes that this object value node contains.
+        /// </summary>
         public object Value
         {
             get
@@ -24,29 +39,57 @@ namespace GraphQL.Language.AST
             }
         }
 
-        public IEnumerable<ObjectField> ObjectFields { get; }
+        /// <summary>
+        /// Returns the field value nodes that are contained within this object value node.
+        /// </summary>
+        public IEnumerable<ObjectField> ObjectFields => ObjectFieldsList;
 
-        public IEnumerable<string> FieldNames => ObjectFields.Select(x => x.Name).ToList();
+        internal List<ObjectField> ObjectFieldsList { get; private set; }
 
-        public override IEnumerable<INode> Children => ObjectFields;
+        /// <summary>
+        /// Returns a list of the names of the fields specified for this object value node.
+        /// </summary>
+        public IEnumerable<string> FieldNames
+        {
+            get
+            {
+                var list = new List<string>(ObjectFieldsList.Count);
+                foreach (var item in ObjectFieldsList)
+                    list.Add(item.Name);
+                return list;
+            }
+        }
 
+        /// <inheritdoc/>
+        public override IEnumerable<INode> Children => ObjectFieldsList;
+
+        /// <inheritdoc/>
+        public override void Visit<TState>(Action<INode, TState> action, TState state)
+        {
+            foreach (var field in ObjectFieldsList)
+                action(field, state);
+        }
+
+        /// <summary>
+        /// Returns the first matching field node contained within this object value node that matches the specified name, or <see langword="null"/> otherwise.
+        /// </summary>
         public ObjectField Field(string name)
         {
-            return ObjectFields.FirstOrDefault(x => x.Name == name);
+            // DO NOT USE LINQ ON HOT PATH
+            foreach (var field in ObjectFieldsList)
+            {
+                if (field.Name == name)
+                    return field;
+            }
+
+            return null;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
-            return "ObjectValue{{objectFields={0}}}".ToFormat(string.Join(", ", ObjectFields.Select(x => x.ToString())));
-        }
-
-        public override bool IsEqualTo(INode obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-
-            return true;
+            string fields = string.Join(", ", ObjectFields.Select(x => x.ToString()));
+            return $"ObjectValue{{objectFields={fields}}}";
         }
     }
 }

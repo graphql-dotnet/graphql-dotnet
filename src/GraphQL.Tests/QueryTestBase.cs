@@ -14,18 +14,25 @@ using Shouldly;
 
 namespace GraphQL.Tests
 {
-    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder>
-        where TSchema : ISchema
+    public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuilder, SimpleContainer>
+        where TSchema : Schema
     {
     }
 
-    public class QueryTestBase<TSchema, TDocumentBuilder>
-        where TSchema : ISchema
+    public class QueryTestBase<TSchema, TIocContainer> : QueryTestBase<TSchema, GraphQLDocumentBuilder, TIocContainer>
+       where TSchema : Schema
+       where TIocContainer : ISimpleContainer, new()
+    {
+    }
+
+    public class QueryTestBase<TSchema, TDocumentBuilder, TIocContainer>
+        where TSchema : Schema
         where TDocumentBuilder : IDocumentBuilder, new()
+        where TIocContainer : ISimpleContainer, new()
     {
         public QueryTestBase()
         {
-            Services = new SimpleContainer();
+            Services = new TIocContainer();
             Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer());
             Writer = new DocumentWriter(indent: true);
         }
@@ -124,9 +131,11 @@ namespace GraphQL.Tests
             INameConverter nameConverter = null,
             IDocumentWriter writer = null)
         {
+            var schema = Schema;
+            schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             var runResult = Executer.ExecuteAsync(options =>
             {
-                options.Schema = Schema;
+                options.Schema = schema;
                 options.Query = query;
                 options.Root = root;
                 options.Inputs = inputs;
@@ -134,7 +143,6 @@ namespace GraphQL.Tests
                 options.CancellationToken = cancellationToken;
                 options.ValidationRules = rules;
                 options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (ctx => { });
-                options.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
             }).GetAwaiter().GetResult();
 
             writer ??= Writer;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 using Xunit;
 
@@ -101,7 +102,7 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
 
-                undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] {"barkVolume"}, line: 3, column: 21);
+                undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
             });
         }
 
@@ -152,7 +153,7 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
 
-                undefinedField(_, "meowVolume", "Dog", suggestedFields: new [] {"barkVolume"}, line: 4, column: 23);
+                undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 4, column: 23);
             });
         }
 
@@ -167,7 +168,7 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
 
-                undefinedField(_, "mooVolume", "Dog", suggestedFields: new [] {"barkVolume"}, line: 3, column: 21);
+                undefinedField(_, "mooVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
             });
         }
 
@@ -182,7 +183,7 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
 
-                undefinedField(_, "kawVolume", "Dog", suggestedFields: new [] {"barkVolume"}, line: 3, column: 21);
+                undefinedField(_, "kawVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
             });
         }
 
@@ -212,7 +213,7 @@ namespace GraphQL.Tests.Validation
                   }
                 ";
 
-                undefinedField(_, "nickname", "Pet", suggestedTypes: new[] {"Dog", "Cat"}, line: 3, column: 21);
+                undefinedField(_, "nickname", "Pet", suggestedTypes: new[] { "Dog", "Cat" }, line: 3, column: 21);
             });
         }
 
@@ -253,7 +254,7 @@ namespace GraphQL.Tests.Validation
                 ";
 
                 undefinedField(_, "name", "CatOrDog",
-                    suggestedTypes: new[] {"Canine", "Being", "Pet", "Cat", "Dog"},
+                    suggestedTypes: new[] { "Canine", "Being", "Pet", "Cat", "Dog" },
                     line: 3, column: 21);
             });
         }
@@ -285,7 +286,7 @@ namespace GraphQL.Tests.Validation
             suggestedTypes ??= Enumerable.Empty<string>();
             suggestedFields ??= Enumerable.Empty<string>();
 
-            _.Error(Rule.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
+            _.Error(FieldsOnCorrectTypeError.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
         }
     }
 }

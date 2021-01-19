@@ -35,16 +35,17 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {NonNullable = null};
+            var data = new Data { NonNullable = null };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullable, Type: String!.")
+                new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullable, Type: String!."))
                 {
                     Path = new[] {"nullableDataGraph", "nonNullable"}
                 }
             };
 
-            AssertResult(QUERY,EXPECTED, data, errors);
+            AssertResult(QUERY, EXPECTED, data, errors);
         }
 
         [Fact]
@@ -52,10 +53,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nullableNest { nonNullable } } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": { ""nullableNest"": null } }";
-            var data = new Data {NullableNest = new Data {NonNullable = null}};
+            var data = new Data { NullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullable, Type: String!.")
+                new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullable, Type: String!."))
                 {
                     Path = new[] {"nullableDataGraph", "nullableNest", "nonNullable"}
                 }
@@ -69,10 +71,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableNest { nonNullable } } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {NonNullableNest = new Data {NonNullable = null}};
+            var data = new Data { NonNullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullable, Type: String!.")
+                new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullable, Type: String!."))
                 {
                     Path = new[] {"nullableDataGraph", "nonNullableNest", "nonNullable"}
                 }
@@ -86,10 +89,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { nonNullableNest { nonNullable } } }";
             const string EXPECTED = null;
-            var data = new Data {NonNullableNest = new Data {NonNullable = null}};
+            var data = new Data { NonNullableNest = new Data { NonNullable = null } };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullable, Type: String!.")
+                new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullable, Type: String!."))
                 {
                     Path = new[] {"nonNullableDataGraph", "nonNullableNest", "nonNullable"}
                 }
@@ -103,12 +107,13 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
             const string EXPECTED = @"{ ""nonNullableDataGraph"": { ""listOfNonNullable"": null } }";
-            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
+            var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: listOfNonNullable, Type: [String!].")
+                new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
+                    "Cannot return a null member within a non-null list for list index 1."))
                 {
-                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 1}
+                    Path = new object[] {"nonNullableDataGraph", "listOfNonNullable"}
                 }
             };
 
@@ -120,10 +125,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableList } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
+                new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullableList, Type: [String]!."))
                 {
                     Path = new[] {"nullableDataGraph", "nonNullableList"}
                 }
@@ -137,10 +143,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nonNullableDataGraph { nonNullableList } }";
             const string EXPECTED = null;
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
-                new ExecutionError("Cannot return null for non-null type. Field: nonNullableList, Type: [String]!.")
+                new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullableList, Type: [String]!."))
                 {
                     Path = new[] {"nonNullableDataGraph", "nonNullableList"}
                 }
@@ -154,13 +161,13 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = new List<string> {"text", null, null}};
+            var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
             var errors = new[]
             {
-                new ExecutionError(
-                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
+                new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
+                    "Cannot return a null member within a non-null list for list index 1."))
                 {
-                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 1}
+                    Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
                 }
             };
 
@@ -172,11 +179,11 @@ namespace GraphQL.Tests.Bugs
         {
             const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
             const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-            var data = new Data {ListOfStrings = null};
+            var data = new Data { ListOfStrings = null };
             var errors = new[]
             {
-                new ExecutionError(
-                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!.")
+                new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
+                    "Cannot return null for non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!."))
                 {
                     Path = new[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
                 }
@@ -193,8 +200,8 @@ namespace GraphQL.Tests.Bugs
             var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
             var errors = new[]
             {
-                new ExecutionError(
-                    "Error trying to resolve nonNullableListOfNonNullableThrow.")
+                new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullableThrow'.", new Exception(
+                    "test"))
                 {
                     Path = new object[] { "nonNullableListOfNonNullableDataGraph", 0, "nonNullableListOfNonNullableThrow"}
                 }
@@ -229,6 +236,16 @@ namespace GraphQL.Tests.Bugs
 
                     actualError.Message.ShouldBe(expectedError.Message);
                     actualError.Path.ShouldBe(expectedError.Path);
+                    if (expectedError.InnerException == null)
+                    {
+                        actualError.InnerException.ShouldBeNull();
+                    }
+                    else
+                    {
+                        actualError.InnerException.ShouldNotBeNull();
+                        actualError.InnerException.ShouldBeOfType(expectedError.InnerException.GetType());
+                        actualError.InnerException.Message.ShouldBe(expectedError.InnerException.Message);
+                    }
                 }
             }
         }

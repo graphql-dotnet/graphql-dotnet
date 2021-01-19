@@ -47,8 +47,8 @@ public class StarWarsSchema : Schema
   public StarWarsSchema(IServiceProvider provider)
     : base(provider)
   {
-    Query = resolver.Resolve<StarWarsQuery>();
-    Mutation = resolver.Resolve<StarWarsMutation>();
+    Query = provider.Resolve<StarWarsQuery>();
+    Mutation = provider.Resolve<StarWarsMutation>();
   }
 }
 ```

@@ -1,84 +1,64 @@
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Provided required arguments
+    /// Provided required arguments:
     ///
     /// A field or directive is only valid if all required (non-null) field arguments
     /// have been provided.
     /// </summary>
     public class ProvidedNonNullArguments : IValidationRule
     {
-        public string MissingFieldArgMessage(string fieldName, string argName, string type)
-        {
-            return $"Argument \"{argName}\" of type \"{type}\" is required for field \"{fieldName}\" but not provided.";
-        }
-
-        public string MissingDirectiveArgMessage(string directiveName, string argName, string type)
-        {
-            return $"Argument \"{argName}\" of type \"{type}\" is required for directive \"{directiveName}\" but not provided.";
-        }
-
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly ProvidedNonNullArguments Instance = new ProvidedNonNullArguments();
 
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context)
-        {
-            return new EnterLeaveListener(_ =>
+        /// <inheritdoc/>
+        /// <exception cref="ProvidedNonNullArgumentsError"/>
+        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+
+        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<Field>(leave: (node, context) =>
             {
-                _.Match<Field>(leave: node =>
+                var fieldDef = context.TypeInfo.GetFieldDef();
+
+                if (fieldDef?.Arguments?.Count > 0)
                 {
-                    var fieldDef = context.TypeInfo.GetFieldDef();
-
-                    if (fieldDef == null || fieldDef.Arguments == null)
-                    {
-                        return;
-                    }
-
-                    foreach (var arg in fieldDef.Arguments)
+                    foreach (var arg in fieldDef.Arguments.List)
                     {
                         if (arg.DefaultValue == null &&
                             arg.ResolvedType is NonNullGraphType &&
                             node.Arguments?.ValueFor(arg.Name) == null)
                         {
-                            context.ReportError(
-                                new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.3.2",
-                                    MissingFieldArgMessage(node.Name, arg.Name, context.Print(arg.ResolvedType)),
-                                    node));
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                         }
                     }
-                });
+                }
+            }),
 
-                _.Match<Directive>(leave: node =>
+            new MatchingNodeVisitor<Directive>(leave: (node, context) =>
+            {
+                var directive = context.TypeInfo.GetDirective();
+
+                if (directive?.Arguments?.Count > 0)
                 {
-                    var directive = context.TypeInfo.GetDirective();
-
-                    if (directive?.Arguments?.ArgumentsList == null)
-                    {
-                        return;
-                    }
-
-                    foreach (var arg in directive.Arguments.ArgumentsList)
+                    foreach (var arg in directive.Arguments.List)
                     {
                         var argAst = node.Arguments?.ValueFor(arg.Name);
                         var type = arg.ResolvedType;
 
                         if (argAst == null && type is NonNullGraphType)
                         {
-                            context.ReportError(
-                                new ValidationError(
-                                    context.OriginalQuery,
-                                    "5.3.3.2",
-                                    MissingDirectiveArgMessage(node.Name, arg.Name, context.Print(type)),
-                                    node));
+                            context.ReportError(new ProvidedNonNullArgumentsError(context, node, arg));
                         }
                     }
-                });
-            }).ToTask();
-        }
+                }
+            })
+        ).ToTask();
     }
 }

@@ -15,7 +15,8 @@ namespace GraphQL.Tests.Bugs
         private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null)
         {
             var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
-            if (line != 0) error.AddLocation(line, column);
+            if (line != 0)
+                error.AddLocation(line, column);
             error.Path = path;
             if (code != null)
                 error.Code = code;
@@ -60,10 +61,10 @@ namespace GraphQL.Tests.Bugs
         }
 
         [Fact]
-        public void query_is_empty1() => AssertQueryWithError("", null, "Cannot execute query if no operation is specified.", 0, 0, (object[])null, code: "NO_OPERATION");
+        public void query_is_empty1() => AssertQueryWithError("", null, "Document does not contain any operations.", 0, 0, (object[])null, code: "NO_OPERATION");
 
         [Fact]
-        public void query_is_whitespace2() => AssertQueryWithError("\t \t \r\n", null, "Cannot execute query if no operation is specified.", 0, 0, (object[])null, code: "NO_OPERATION");
+        public void query_is_whitespace2() => AssertQueryWithError("\t \t \r\n", null, "Document does not contain any operations.", 0, 0, (object[])null, code: "NO_OPERATION");
 
         [Fact]
         public void DocumentExecuter_cannot_have_null_constructor_parameters()

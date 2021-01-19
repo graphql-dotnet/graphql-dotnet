@@ -45,7 +45,7 @@ namespace GraphQL.Utilities
             }
         }
 
-        private Dictionary<string, object> ToArguments(IEnumerable<GraphQLArgument> arguments)
+        private Dictionary<string, object> ToArguments(List<GraphQLArgument> arguments)
         {
             return arguments.ToDictionary(x => x.Name.Value, x => x.Value.ToValue());
         }

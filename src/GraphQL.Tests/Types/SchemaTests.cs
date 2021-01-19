@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new AnInterfaceOnlySchemaWithExtraRegisteredType();
             schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -116,7 +116,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new SchemaWithDuplicates();
             schema.FindType("abcd");
-            
+
             ContainsTypeNames(schema, "SomeQuery", "SomeInterface", "SomeObject");
         }
 
@@ -148,7 +148,7 @@ namespace GraphQL.Tests.Types
             typeNames.Apply(typeName =>
             {
                 var type = schema.FindType(typeName);
-                type.ShouldNotBeNull("Did not find {0} in type lookup.".ToFormat(typeName));
+                type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
             });
         }
 
@@ -157,7 +157,7 @@ namespace GraphQL.Tests.Types
             typeNames.Apply(typeName =>
             {
                 var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
-                type.ShouldBe(null, "Found {0} in type lookup.".ToFormat(typeName));
+                type.ShouldBe(null, $"Found {typeName} in type lookup.");
             });
         }
     }
@@ -313,11 +313,11 @@ namespace GraphQL.Tests.Types
     {
         public DSchemaType()
         {
-            Field<StringGraphType>("id", resolve: ctx => new {id = "id"});
+            Field<StringGraphType>("id", resolve: ctx => new { id = "id" });
             Field<StringGraphType>(
                 "filter",
-                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> {Name = "input2", ResolvedType = new DInputType2()}),
-                resolve: ctx => new {id = "id"});
+                arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> { Name = "input2", ResolvedType = new DInputType2() }),
+                resolve: ctx => new { id = "id" });
             Field<ListGraphType<DListType>>("alist");
         }
     }

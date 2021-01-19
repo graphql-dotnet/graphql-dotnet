@@ -2,58 +2,82 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.Execution;
 
 namespace GraphQL.Language.AST
 {
+    /// <summary>
+    /// Contains a list of variables (name &amp; value tuples) that have been gathered from the document and attached <see cref="Inputs"/>.
+    /// </summary>
     public class Variables : IEnumerable<Variable>
     {
-        private readonly List<Variable> _variables = new List<Variable>();
+        private List<Variable> _variables;
 
-        public void Add(Variable variable)
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public Variables()
         {
-            _variables.Add(variable ?? throw new ArgumentNullException(nameof(variable)));
         }
 
-        public object ValueFor(string name)
+        internal Variables(int initialCount)
         {
-            var variable = _variables.FirstOrDefault(v => v.Name == name);
-            return variable?.Value;
+            _variables = new List<Variable>(initialCount);
         }
 
-        public IEnumerator<Variable> GetEnumerator()
+        /// <summary>
+        /// Adds a variable to the list.
+        /// </summary>
+        public virtual void Add(Variable variable) => (_variables ??= new List<Variable>()).Add(variable ?? throw new ArgumentNullException(nameof(variable)));
+
+        /// <summary>
+        /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
+        /// </summary>
+        public object ValueFor(string name, object defaultValue = null)
         {
-            return _variables.GetEnumerator();
+            return ValueFor(name, out var value) ? value.Value : defaultValue;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        /// <summary>
+        /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
+        /// </summary>
+        public bool ValueFor(string name, out ArgumentValue value)
         {
-            return GetEnumerator();
-        }
-    }
+            // DO NOT USE LINQ ON HOT PATH
+            if (_variables != null)
+            {
+                foreach (var v in _variables)
+                {
+                    if (v.Name == name)
+                    {
+                        value = new ArgumentValue(v.Value, v.IsDefault || !v.ValueSpecified ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+                        return v.ValueSpecified;
+                    }
+                }
+            }
 
-    public class VariableDefinitions : IEnumerable<VariableDefinition>
-    {
-        private List<VariableDefinition> _variables;
-
-        public void Add(VariableDefinition variable)
-        {
-            if (variable == null)
-                throw new ArgumentNullException(nameof(variable));
-
-            if (_variables == null)
-                _variables = new List<VariableDefinition>();
-
-            _variables.Add(variable);
+            value = default;
+            return false;
         }
 
-        public IEnumerator<VariableDefinition> GetEnumerator()
-        {
-            if (_variables == null)
-                return Enumerable.Empty<VariableDefinition>().GetEnumerator();
-
-            return _variables.GetEnumerator();
-        }
+        /// <inheritdoc/>
+        public IEnumerator<Variable> GetEnumerator() => (_variables ?? Enumerable.Empty<Variable>()).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc/>
+        public override string ToString() => _variables?.Count > 0 ? $"Variables{{{string.Join(", ", _variables)}}}" : "Variables(Empty)";
+
+        /// <summary>
+        /// Returns a static instance that holds no variables.
+        /// </summary>
+        public static Variables None { get; } = new NoVariables();
+
+        private sealed class NoVariables : Variables
+        {
+            public NoVariables() : base() { }
+            public override void Add(Variable variable) => throw new InvalidOperationException("Cannot add variables to this instance.");
+        }
     }
+
 }

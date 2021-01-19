@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
 namespace GraphQL
 {
-    internal class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
+    internal sealed class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
     {
         private readonly IResolveFieldContext _baseContext;
+        private static readonly bool _acceptNulls = !typeof(T).IsValueType || (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>));
 
         /// <summary>
         /// Creates an instance that maps to the specified base <see cref="IResolveFieldContext"/>
@@ -19,17 +21,20 @@ namespace GraphQL
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
 
-            try
-            {
-                Source = (T)baseContext.Source;
-            }
-            catch (InvalidCastException)
-            {
-                throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
-            }
-            catch (NullReferenceException)
+            if (baseContext.Source == null && !_acceptNulls)
             {
                 throw new ArgumentException("baseContext.Source is null and cannot be cast to non-nullable value type " + typeof(T).Name, nameof(baseContext));
+            }
+            else
+            {
+                try
+                {
+                    Source = (T)baseContext.Source;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
+                }
             }
         }
 
@@ -45,7 +50,7 @@ namespace GraphQL
 
         public IObjectGraphType ParentType => _baseContext.ParentType;
 
-        public IDictionary<string, object> Arguments => _baseContext.Arguments;
+        public IDictionary<string, ArgumentValue> Arguments => _baseContext.Arguments;
 
         public object RootValue => _baseContext.RootValue;
 
@@ -78,5 +83,8 @@ namespace GraphQL
         object IResolveFieldContext.Source => Source;
 
         public IServiceProvider RequestServices => _baseContext.RequestServices;
+
+        /// <inheritdoc/>
+        public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
     }
 }

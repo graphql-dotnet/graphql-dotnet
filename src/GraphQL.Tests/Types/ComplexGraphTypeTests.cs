@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using GraphQL.Conversion;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -16,7 +17,8 @@ namespace GraphQL.Tests.Types
 
     public class ComplexGraphTypeTests
     {
-        internal class ComplexType<T> : ComplexGraphType<T> {
+        internal class ComplexType<T> : ComplexGraphType<T>
+        {
             public ComplexType()
             {
                 Name = typeof(T).GetFriendlyName().Replace("<", "Of").Replace(">", "");
@@ -302,15 +304,29 @@ namespace GraphQL.Tests.Types
             exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
         }
 
+        private Exception test_field_name(string fieldName)
+        {
+            // test failure
+            return Should.Throw<ArgumentOutOfRangeException>(() =>
+            {
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>(fieldName);
+                var schema = new Schema
+                {
+                    Query = type
+                };
+                schema.Initialize();
+            });
+        }
+
         [Theory]
         [InlineData("__id")]
         [InlineData("___id")]
         public void throws_when_field_name_prefix_with_reserved_underscores(string fieldName)
         {
-            var type = new ComplexType<TestObject>();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+            var exception = test_field_name(fieldName);
 
-            exception.Message.ShouldStartWith($"A field name: {fieldName} must not begin with \"__\", which is reserved by GraphQL introspection.");
+            exception.Message.ShouldStartWith($"A field name: '{fieldName}' must not begin with \"__\", which is reserved by GraphQL introspection.");
         }
 
         [Theory]
@@ -319,10 +335,71 @@ namespace GraphQL.Tests.Types
         [InlineData("id$")]
         public void throws_when_field_name_doesnot_follow_spec(string fieldName)
         {
-            var type = new ComplexType<TestObject>();
-            var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<StringGraphType>(fieldName));
+            var exception = test_field_name(fieldName);
 
-            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but {fieldName} does not.");
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but '{fieldName}' does not.");
+        }
+
+        [Theory]
+        [InlineData("__id")]
+        [InlineData("___id")]
+        [InlineData("i#d")]
+        [InlineData("i$d")]
+        [InlineData("id$")]
+        public void does_not_throw_with_filtering_nameconverter(string fieldName)
+        {
+            NameValidator.Validation = (n, t) => { }; // disable "before" checks
+
+            try
+            {
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>(fieldName);
+                var schema = new Schema
+                {
+                    Query = type,
+                    NameConverter = new TestNameConverter(fieldName, "pass")
+                };
+                schema.Initialize();
+            }
+            finally
+            {
+                NameValidator.Validation = NameValidator.ValidateDefault; // restore defaults
+            }
+        }
+
+        [Fact]
+        public void throws_with_bad_namevalidator()
+        {
+            var exception = Should.Throw<ArgumentOutOfRangeException>(() =>
+            {
+                var type = new ObjectGraphType();
+                type.Field<StringGraphType>("hello");
+                var schema = new Schema
+                {
+                    Query = type,
+                    NameConverter = new TestNameConverter("hello", "hello$")
+                };
+                schema.Initialize();
+            });
+
+            exception.Message.ShouldStartWith($"A field name must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but 'hello$' does not.");
+        }
+
+        private class TestNameConverter : INameConverter
+        {
+            private readonly string _from;
+            private readonly string _to;
+            public TestNameConverter(string from, string to)
+            {
+                _from = from;
+                _to = to;
+            }
+
+            public string NameForArgument(string argumentName, IComplexGraphType parentGraphType, FieldType field)
+                => argumentName == _from ? _to : argumentName;
+
+            public string NameForField(string fieldName, IComplexGraphType parentGraphType)
+                => fieldName == _from ? _to : fieldName;
         }
 
         [Theory]
@@ -374,5 +451,5 @@ namespace GraphQL.Tests.Types
         }
     }
 
-    #pragma warning restore 618
+#pragma warning restore 618
 }

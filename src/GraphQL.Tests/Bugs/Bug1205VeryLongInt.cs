@@ -1,6 +1,8 @@
 using System;
 using System.Numerics;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQL.Validation.Errors;
 using Xunit;
 
 namespace GraphQL.Tests.Bugs
@@ -13,14 +15,15 @@ namespace GraphQL.Tests.Bugs
         public void Very_Long_Number_Should_Return_Error_For_Int()
         {
             var query = "{ int }";
-            var error = new ExecutionError("Error trying to resolve int.", new OverflowException());
+            var error = new ExecutionError("Error trying to resolve field 'int'.", new OverflowException());
             error.AddLocation(1, 3);
             error.Path = new object[] { "int" };
-            var expected = new ExecutionResult {
+            var expected = new ExecutionResult
+            {
                 Errors = new ExecutionErrors { error },
                 Data = new { @int = (object)null }
             };
-            
+
             AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
         }
 
@@ -32,9 +35,9 @@ namespace GraphQL.Tests.Bugs
             {
                 Errors = new ExecutionErrors
                 {
-                    new ExecutionError("Argument \"in\" has invalid value 636474637870330463.\nExpected type \"Int\", found 636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463.\nExpected type \"Int\", found 636474637870330463.")
                     {
-                        Code = "5.3.3.1"
+                        Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }
                 }
             };
@@ -67,7 +70,7 @@ namespace GraphQL.Tests.Bugs
         public void Very_Very_Long_Number_Should_Return_Error_For_Long()
         {
             var query = "{ long_return_bigint }";
-            var error = new ExecutionError("Error trying to resolve long_return_bigint.", new OverflowException());
+            var error = new ExecutionError("Error trying to resolve field 'long_return_bigint'.", new OverflowException());
             error.AddLocation(1, 3);
             error.Path = new object[] { "long_return_bigint" };
             var expected = new ExecutionResult
@@ -87,9 +90,9 @@ namespace GraphQL.Tests.Bugs
             {
                 Errors = new ExecutionErrors
                 {
-                    new ExecutionError("Argument \"in\" has invalid value 636474637870330463636474637870330463636474637870330463.\nExpected type \"Long\", found 636474637870330463636474637870330463636474637870330463.")
+                    new ValidationError(null, ArgumentsOfCorrectTypeError.NUMBER, "Argument \"in\" has invalid value 636474637870330463636474637870330463636474637870330463.\nExpected type \"Long\", found 636474637870330463636474637870330463636474637870330463.")
                     {
-                        Code = "5.3.3.1"
+                        Code = "ARGUMENTS_OF_CORRECT_TYPE"
                     }
                 }
             };

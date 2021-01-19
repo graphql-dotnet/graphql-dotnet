@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using GraphQL.Conversion;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Shouldly;
@@ -117,7 +116,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -153,7 +151,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();
@@ -201,7 +198,6 @@ namespace GraphQL.Tests.Execution.Performance
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-                _.NameConverter = CamelCaseNameConverter.Instance;
             });
 
             smallListTimer.Stop();
