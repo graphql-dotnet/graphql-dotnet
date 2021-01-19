@@ -28,7 +28,7 @@ namespace GraphQL
             Source = default;
         }
 
-        internal void Set(IResolveFieldContext baseContext)
+        internal ResolveFieldContextAdapter<T> Set(IResolveFieldContext baseContext)
         {
             _baseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
 
@@ -47,6 +47,8 @@ namespace GraphQL
                     throw new ArgumentException("baseContext.Source is not of type " + typeof(T).Name, nameof(baseContext));
                 }
             }
+
+            return this;
         }
 
         public T Source { get; private set; }

@@ -39,14 +39,33 @@ namespace GraphQL.Resolvers
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
         {
             if (resolver == null) throw new ArgumentNullException(nameof(resolver), "A resolver function must be specified");
+            _resolver = GetResolverFor(resolver);
+        }
+
+        private Func<IResolveFieldContext, TReturnType> GetResolverFor(Func<IResolveFieldContext<TSourceType>, TReturnType> resolver)
+        {
             if (typeof(TSourceType) == typeof(object))
             {
                 // ReadonlyResolveFieldContext implements IResolveFieldContext<object>
-                _resolver = (context) => resolver(context.As<TSourceType>());
+                return (context) => resolver(context.As<TSourceType>());
             }
-            else
+
+            if (typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType)))     
             {
-                _resolver = (context) =>
+                // Data loaders cannot use pooled contexts
+                return (context) => resolver(context.As<TSourceType>());
+            }
+
+            if (typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>) && typeof(IDataLoaderResult).IsAssignableFrom(typeof(TReturnType).GetGenericArguments()[0]))
+            {
+                // Data loaders cannot use pooled contexts
+                return (context) => resolver(context.As<TSourceType>());
+            }
+
+            if (typeof(TReturnType) == typeof(object) || typeof(TReturnType).IsGenericType && typeof(TReturnType).GetGenericTypeDefinition() == typeof(Task<>) && typeof(TReturnType).GetGenericArguments()[0] == typeof(object))
+            {
+                // must determine type at runtime
+                return (context) =>
                 {
                     var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
                     if (adapter == null)
@@ -58,11 +77,48 @@ namespace GraphQL.Resolvers
                         adapter.Set(context);
                     }
                     var ret = resolver(adapter);
-                    if (!(ret is Task task && !task.IsCompleted) && !(ret is IDataLoaderResult))
+                    // only re-use contexts that completed synchronously and do not return an IDataLoaderResult
+                    if (ret is Task task)
+                    {
+                        if (task.IsCompleted && task.Status == TaskStatus.RanToCompletion && !(task.GetResult() is IDataLoaderResult))
+                        {
+                            adapter.Reset();
+                            System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                        }
+                    }
+                    else if (!(ret is IDataLoaderResult))
                     {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     }
+                    return ret;
+                };
+            }
+
+            // use pooled context
+            if (typeof(Task).IsAssignableFrom(typeof(TReturnType)))
+            {
+                return (context) =>
+                {
+                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
+                    adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
+                    var ret = resolver(adapter);
+                    if ((ret as Task).IsCompleted) {
+                        adapter.Reset();
+                        System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
+                    }
+                    return ret;
+                };
+            }
+            else
+            {
+                return (context) =>
+                {
+                    var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
+                    adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
+                    var ret = resolver(adapter);
+                    adapter.Reset();
+                    System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     return ret;
                 };
             }
