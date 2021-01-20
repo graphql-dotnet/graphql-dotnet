@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 
 namespace GraphQL.Execution
 {
@@ -92,7 +93,7 @@ namespace GraphQL.Execution
 
                     if (graphType == null)
                     {
-                        var error = new InvalidVariableError(variableDef.Name, $"Variable has unknown type '{variableDef.Type.Name()}'");
+                        var error = new InvalidVariableError((string)variableDef.Name, $"Variable has unknown type '{variableDef.Type.Name()}'");
                         error.AddLocation(variableDef, document);
                         throw error;
                     }
@@ -104,7 +105,7 @@ namespace GraphQL.Execution
                     };
 
                     // attempt to retrieve the variable value from the inputs
-                    if (inputs.TryGetValue(variableDef.Name, out var variableValue))
+                    if (inputs.TryGetValue((string)variableDef.Name, out var variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         variable.Value = GetVariableValue(document, graphType, variableDef, variableValue);
@@ -119,7 +120,7 @@ namespace GraphQL.Execution
                     }
                     else if (graphType is NonNullGraphType)
                     {
-                        ThrowNullError(variable.Name);
+                        ThrowNullError((string)variable.Name);
                     } 
 
                     // if the variable was not specified and no default was specified, do not set variable.Value
@@ -142,9 +143,9 @@ namespace GraphQL.Execution
             {
                 Name = variableName;
                 Index = index;
-                ChildName = null;
+                ChildName = default;
             }
-            public VariableName(VariableName variableName, string childName)
+            public VariableName(VariableName variableName, ROM childName)
             {
                 if (variableName.ChildName == null)
                 {
@@ -158,12 +159,21 @@ namespace GraphQL.Execution
                 }
                 ChildName = childName;
             }
-            public string Name { get; set; }
+            public ROM Name { get; set; }
             public int? Index { get; set; }
-            public string ChildName { get; set; }
-            public override string ToString() => (!Index.HasValue ? Name : Name + "[" + Index.Value + "]") + (ChildName != null ? '.' + ChildName : null);
+            public ROM ChildName { get; set; }
+            public override string ToString() => (!Index.HasValue ? (string)Name : (string)Name + "[" + Index.Value + "]") + (ChildName.Length > 0 ? '.' + (string)ChildName : null);
             public static implicit operator VariableName(string name) => new VariableName { Name = name };
-            public static implicit operator string(VariableName variableName) => variableName.ToString();
+            public static implicit operator VariableName(ROM name) => new VariableName { Name = name };
+            public static implicit operator ROM(VariableName variableName)
+            {
+                if (!variableName.Index.HasValue && variableName.ChildName.Length == 0)
+                    return variableName.Name;
+
+                return variableName.ToString().AsMemory();
+            }
+
+            public static explicit operator string(VariableName variableName) => variableName.ToString();
         }
 
         /// <summary>
@@ -197,7 +207,7 @@ namespace GraphQL.Execution
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
                     if (value == null)
-                        ThrowNullError(variableName);
+                        ThrowNullError((string)variableName);
 
                     return ParseValue(nonNullGraphType.ResolvedType, variableName, value);
                 }
@@ -229,11 +239,11 @@ namespace GraphQL.Execution
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidVariableError(variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
+                    throw new InvalidVariableError((string)variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
                 }
 
                 if (ret == null)
-                    throw new InvalidVariableError(variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
+                    throw new InvalidVariableError((string)variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'");
 
                 return ret;
             }
@@ -292,7 +302,7 @@ namespace GraphQL.Execution
                     // or an unordered map supplied by a variable, otherwise a query error
                     // must be thrown.
 
-                    throw new InvalidVariableError(variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?");
+                    throw new InvalidVariableError((string)variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?");
                 }
 
                 var newDictionary = new Dictionary<string, object>(dic.Count);
@@ -322,7 +332,7 @@ namespace GraphQL.Execution
                     {
                         // RULE: If no default value is provided and the input object field’s type is non‐null,
                         // an error should be thrown.
-                        ThrowNullError(childFieldVariableName);
+                        ThrowNullError((string)childFieldVariableName);
                     }
 
                     // RULE: Otherwise, if the field is not required, then no
@@ -355,7 +365,7 @@ namespace GraphQL.Execution
 
                 if (unknownFields?.Count > 0)
                 {
-                    throw new InvalidVariableError(variableName,
+                    throw new InvalidVariableError((string)variableName,
                         $"Unrecognized input fields {string.Join(", ", unknownFields.Select(k => $"'{k}'"))} for type '{graphType.Name}'.");
                 }
 
@@ -501,7 +511,7 @@ namespace GraphQL.Execution
             IGraphType specificType,
             SelectionSet selectionSet,
             Fields fields,
-            List<string> visitedFragmentNames)
+            List<ROM> visitedFragmentNames)
         {
             if (selectionSet != null)
             {
@@ -562,12 +572,12 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
         /// </summary>
-        public static Dictionary<string, Field> CollectFields(
+        public static Dictionary<ROM, Field> CollectFields(
             ExecutionContext context,
             IGraphType specificType,
             SelectionSet selectionSet)
         {
-            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
+            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<ROM>());
         }
 
         /// <summary>
@@ -615,9 +625,9 @@ namespace GraphQL.Execution
         /// <br/><br/>
         /// See http://spec.graphql.org/June2018/#DoesFragmentTypeApply()
         /// </summary>
-        public static bool DoesFragmentConditionMatch(ExecutionContext context, string fragmentName, IGraphType type)
+        public static bool DoesFragmentConditionMatch(ExecutionContext context, ROM fragmentName, IGraphType type)
         {
-            if (string.IsNullOrWhiteSpace(fragmentName))
+            if (fragmentName.IsEmpty)
             {
                 return true;
             }

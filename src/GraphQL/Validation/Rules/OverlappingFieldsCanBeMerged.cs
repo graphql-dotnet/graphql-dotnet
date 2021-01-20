@@ -5,6 +5,7 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -116,7 +117,7 @@ namespace GraphQL.Validation.Rules
             List<Conflict> conflicts,
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
-            Dictionary<string, List<FieldDefPair>> fieldMap)
+            Dictionary<ROM, List<FieldDefPair>> fieldMap)
         {
             // A field map is a keyed collection, where each key represents a response
             // name and the value at that key is a list of all fields which provide that
@@ -124,7 +125,7 @@ namespace GraphQL.Validation.Rules
             // must be compared to find a potential conflict.
             foreach (var entry in fieldMap)
             {
-                string responseName = entry.Key;
+                var responseName = entry.Key;
                 var fields = entry.Value;
 
                 // This compares every field in the list to every other field in this list
@@ -161,7 +162,7 @@ namespace GraphQL.Validation.Rules
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
             bool parentFieldsAreMutuallyExclusive,
-            string responseName,
+            ROM responseName,
             FieldDefPair fieldDefPair1,
             FieldDefPair fieldDefPair2)
         {
@@ -203,7 +204,7 @@ namespace GraphQL.Validation.Rules
                     {
                         Reason = new ConflictReason
                         {
-                            Name = responseName,
+                            Name = (string)responseName,
                             Message = new Message
                             {
                                 Msg = $"{name1} and {name2} are different fields"
@@ -221,7 +222,7 @@ namespace GraphQL.Validation.Rules
                     {
                         Reason = new ConflictReason
                         {
-                            Name = responseName,
+                            Name = (string)responseName,
                             Message = new Message
                             {
                                 Msg = "they have differing arguments"
@@ -239,7 +240,7 @@ namespace GraphQL.Validation.Rules
                 {
                     Reason = new ConflictReason
                     {
-                        Name = responseName,
+                        Name = (string)responseName,
                         Message = new Message
                         {
                             Msg = $"they return conflicting types {type1} and {type2}"
@@ -381,8 +382,8 @@ namespace GraphQL.Validation.Rules
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
             bool areMutuallyExclusive,
-            string fragmentName1,
-            string fragmentName2)
+            ROM fragmentName1,
+            ROM fragmentName2)
         {
             // No need to compare a fragment to itself.
             if (fragmentName1 == fragmentName2)
@@ -471,8 +472,8 @@ namespace GraphQL.Validation.Rules
             ObjMap<bool> comparedFragments,
             PairSet comparedFragmentPairs,
             bool areMutuallyExclusive,
-            Dictionary<string, List<FieldDefPair>> fieldMap,
-            string fragmentName)
+            Dictionary<ROM, List<FieldDefPair>> fieldMap,
+            ROM fragmentName)
         {
 
             // Memoize so a fragment is not compared for conflicts more than once.
@@ -538,8 +539,8 @@ namespace GraphQL.Validation.Rules
             Dictionary<SelectionSet, CachedField> cachedFieldsAndFragmentNames,
             PairSet comparedFragmentPairs,
             bool parentFieldsAreMutuallyExclusive,
-            Dictionary<string, List<FieldDefPair>> fieldMap1,
-            Dictionary<string, List<FieldDefPair>> fieldMap2)
+            Dictionary<ROM, List<FieldDefPair>> fieldMap1,
+            Dictionary<ROM, List<FieldDefPair>> fieldMap2)
         {
             // A field map is a keyed collection, where each key represents a response
             // name and the value at that key is a list of all fields which provide that
@@ -642,8 +643,8 @@ namespace GraphQL.Validation.Rules
 
             if (cached == null)
             {
-                var nodeAndDef = new Dictionary<string, List<FieldDefPair>>();
-                var fragmentNames = new Dictionary<string, bool>();
+                var nodeAndDef = new Dictionary<ROM, List<FieldDefPair>>();
+                var fragmentNames = new Dictionary<ROM, bool>();
 
                 CollectFieldsAndFragmentNames(
                     context,
@@ -684,8 +685,8 @@ namespace GraphQL.Validation.Rules
             ValidationContext context,
             IGraphType parentType,
             SelectionSet selectionSet,
-            Dictionary<string, List<FieldDefPair>> nodeAndDefs,
-            Dictionary<string, bool> fragments)
+            Dictionary<ROM, List<FieldDefPair>> nodeAndDefs,
+            Dictionary<ROM, bool> fragments)
         {
             for (int i = 0; i < selectionSet.Selections.Count; i++)
             {
@@ -700,7 +701,7 @@ namespace GraphQL.Validation.Rules
                         fieldDef = (parentType as IComplexGraphType).GetField(fieldName);
                     }
 
-                    var responseName = !string.IsNullOrWhiteSpace(field.Alias) ? field.Alias : fieldName;
+                    var responseName = !field.Alias.IsEmpty ? field.Alias : fieldName;
 
                     if (!nodeAndDefs.ContainsKey(responseName))
                     {
@@ -759,7 +760,7 @@ namespace GraphQL.Validation.Rules
         // generate a single Conflict.
         private static Conflict SubfieldConflicts(
             List<Conflict> conflicts,
-            string responseName,
+            ROM responseName,
             ISelection node1,
             ISelection node2)
         {
@@ -769,7 +770,7 @@ namespace GraphQL.Validation.Rules
                 {
                     Reason = new ConflictReason
                     {
-                        Name = responseName,
+                        Name = (string)responseName,
                         Message = new Message
                         {
                             Msgs = conflicts.Select(c => c.Reason).ToList()
@@ -846,8 +847,8 @@ namespace GraphQL.Validation.Rules
 
         private sealed class CachedField
         {
-            public Dictionary<string, List<FieldDefPair>> NodeAndDef { get; set; }
-            public List<string> Names { get; set; }
+            public Dictionary<ROM, List<FieldDefPair>> NodeAndDef { get; set; }
+            public List<ROM> Names { get; set; }
         }
 
         private sealed class PairSet
@@ -859,7 +860,7 @@ namespace GraphQL.Validation.Rules
                 _data = new ObjMap<ObjMap<bool>>();
             }
 
-            public bool Has(string a, string b, bool areMutuallyExclusive)
+            public bool Has(ROM a, ROM b, bool areMutuallyExclusive)
             {
                 _data.TryGetValue(a, out var first);
 
@@ -878,13 +879,13 @@ namespace GraphQL.Validation.Rules
                 return true;
             }
 
-            public void Add(string a, string b, bool areMutuallyExclusive)
+            public void Add(ROM a, ROM b, bool areMutuallyExclusive)
             {
                 PairSetAdd(a, b, areMutuallyExclusive);
                 PairSetAdd(b, a, areMutuallyExclusive);
             }
 
-            private void PairSetAdd(string a, string b, bool areMutuallyExclusive)
+            private void PairSetAdd(ROM a, ROM b, bool areMutuallyExclusive)
             {
                 _data.TryGetValue(a, out var map);
 
@@ -897,14 +898,14 @@ namespace GraphQL.Validation.Rules
             }
         }
 
-        private sealed class ObjMap<T> : Dictionary<string, T>
+        private sealed class ObjMap<T> : Dictionary<ROM, T>
         {
         }
     }
 
     internal static class ISelectionExtensions
     {
-        public static string GetName(this ISelection selection)
+        public static ROM GetName(this ISelection selection)
         {
             if (selection is Field field)
             {
@@ -916,7 +917,7 @@ namespace GraphQL.Validation.Rules
                 return fragmentSpread.Name;
             }
 
-            return null;
+            return default;
         }
 
         public static Arguments GetArguments(this ISelection selection)

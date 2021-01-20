@@ -1,3 +1,5 @@
+using GraphQLParser;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the variable being referenced.
         /// </summary>
-        public string Name { get; }
+        public ROM Name { get; }
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the name of the variable being referenced.

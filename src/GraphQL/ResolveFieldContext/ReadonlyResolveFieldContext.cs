@@ -4,6 +4,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
@@ -16,7 +17,7 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue> _arguments;
-        private IDictionary<string, Field> _subFields;
+        private IDictionary<ROM, Field> _subFields;
 
         /// <summary>
         /// Initializes an instance with the specified <see cref="ExecutionNode"/> and <see cref="ExecutionContext"/>.
@@ -36,7 +37,7 @@ namespace GraphQL
             return this;
         }
 
-        private IDictionary<string, Field> GetSubFields()
+        private IDictionary<ROM, Field> GetSubFields()
         {
             return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
                 ? ExecutionHelper.CollectFields(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
@@ -50,7 +51,7 @@ namespace GraphQL
         public object Source => _executionNode.Source;
 
         /// <inheritdoc/>
-        public string FieldName => _executionNode.Field.Name;
+        public string FieldName => (string)_executionNode.Field.Name;
 
         /// <inheritdoc/>
         public Field FieldAst => _executionNode.Field;
@@ -101,7 +102,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields => _subFields ??= GetSubFields();
+        public IDictionary<ROM, Field> SubFields => _subFields ??= GetSubFields();
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext => _executionContext.UserContext;

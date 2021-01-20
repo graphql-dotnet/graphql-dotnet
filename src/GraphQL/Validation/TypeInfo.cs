@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 
 namespace GraphQL.Validation
 {
@@ -253,7 +254,7 @@ namespace GraphQL.Validation
         /// Tracks already visited fragments to maintain O(N) and to ensure that cycles
         /// are not redundantly reported.
         /// </summary>
-        internal HashSet<string> NoFragmentCycles_VisitedFrags;
+        internal HashSet<ROM> NoFragmentCycles_VisitedFrags;
         /// <summary>
         /// Array of AST nodes used to produce meaningful errors
         /// </summary>
@@ -261,26 +262,26 @@ namespace GraphQL.Validation
         /// <summary>
         /// Position in the spread path
         /// </summary>
-        internal Dictionary<string, int> NoFragmentCycles_SpreadPathIndexByName;
+        internal Dictionary<ROM, int> NoFragmentCycles_SpreadPathIndexByName;
 
-        internal HashSet<string> NoUndefinedVariables_VariableNameDefined;
+        internal HashSet<ROM> NoUndefinedVariables_VariableNameDefined;
 
         internal List<Operation> NoUnusedFragments_OperationDefs;
         internal List<FragmentDefinition> NoUnusedFragments_FragmentDefs;
 
         internal List<VariableDefinition> NoUnusedVariables_VariableDefs;
 
-        internal Dictionary<string, Argument> UniqueArgumentNames_KnownArgs;
+        internal Dictionary<ROM, Argument> UniqueArgumentNames_KnownArgs;
 
-        internal Dictionary<string, FragmentDefinition> UniqueFragmentNames_KnownFragments;
+        internal Dictionary<ROM, FragmentDefinition> UniqueFragmentNames_KnownFragments;
 
-        internal Stack<Dictionary<string, IValue>> UniqueInputFieldNames_KnownNameStack;
-        internal Dictionary<string, IValue> UniqueInputFieldNames_KnownNames;
+        internal Stack<Dictionary<ROM, IValue>> UniqueInputFieldNames_KnownNameStack;
+        internal Dictionary<ROM, IValue> UniqueInputFieldNames_KnownNames;
 
-        internal HashSet<string> UniqueOperationNames_Frequency;
+        internal HashSet<ROM> UniqueOperationNames_Frequency;
 
-        internal Dictionary<string, VariableDefinition> UniqueVariableNames_KnownVariables;
+        internal Dictionary<ROM, VariableDefinition> UniqueVariableNames_KnownVariables;
 
-        internal Dictionary<string, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
+        internal Dictionary<ROM, VariableDefinition> VariablesInAllowedPosition_VarDefMap;
     }
 }

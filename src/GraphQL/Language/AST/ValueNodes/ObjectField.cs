@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -20,7 +21,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance for the specified field name and value.
         /// </summary>
-        public ObjectField(string name, IValue value)
+        public ObjectField(ROM name, IValue value)
         {
             Name = name;
             Value = value;
@@ -29,7 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name { get; }
+        public ROM Name { get; }
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of the field, if initialized with the <see cref="ObjectField.ObjectField(NameNode, IValue)"/> constructor.

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -25,7 +26,7 @@ namespace GraphQL.Validation.Rules
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
             {
-                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<string>();
+                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<ROM>();
                 varNameDef.Add(varDef.Name);
             }),
 

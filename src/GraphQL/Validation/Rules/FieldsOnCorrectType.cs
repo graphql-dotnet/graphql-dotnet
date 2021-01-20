@@ -6,6 +6,7 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -39,12 +40,12 @@ namespace GraphQL.Validation.Rules
                     var fieldName = node.Name;
 
                     // First determine if there are any suggested types to condition on.
-                    var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
+                    var suggestedTypeNames = GetSuggestedTypeNames(type, (string)fieldName).ToList();
 
                     // If there are no suggested types, then perhaps this was a typo?
                     var suggestedFieldNames = suggestedTypeNames.Count > 0
                         ? Array.Empty<string>()
-                        : GetSuggestedFieldNames(type, fieldName);
+                        : GetSuggestedFieldNames(type, (string)fieldName);
 
                     // Report an error, including helpful suggestions.
                     context.ReportError(new FieldsOnCorrectTypeError(context, node, type, suggestedTypeNames, suggestedFieldNames));

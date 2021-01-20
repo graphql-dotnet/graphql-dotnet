@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -10,7 +11,7 @@ namespace GraphQL.Language.AST
     public class Directives : AbstractNode, ICollection<Directive>
     {
         private List<Directive> _directives;
-        private readonly Dictionary<string, Directive> _unique = new Dictionary<string, Directive>(StringComparer.Ordinal);
+        private readonly Dictionary<ROM, Directive> _unique = new Dictionary<ROM, Directive>();
 
         /// <inheritdoc/>
         public override IEnumerable<INode> Children => _directives;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -27,8 +28,8 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Directive>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
             new MatchingNodeVisitor<Argument>((argument, context) =>
             {
-                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<string, Argument>();
-                string argName = argument.Name;
+                var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new Dictionary<ROM, Argument>();
+                var argName = argument.Name;
                 if (knownArgs.ContainsKey(argName))
                 {
                     context.ReportError(new UniqueArgumentNamesError(context, knownArgs[argName], argument));

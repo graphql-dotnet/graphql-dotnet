@@ -5,6 +5,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 
 namespace GraphQL
 {
@@ -74,7 +75,7 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
+        public IDictionary<ROM, Language.AST.Field> SubFields => _baseContext.SubFields;
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 

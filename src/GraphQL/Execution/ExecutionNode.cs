@@ -61,7 +61,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the AST field alias, if specified, or AST field name otherwise.
         /// </summary>
-        public string Name => Field?.Alias ?? Field?.Name;
+        public string Name => Field == null ? null : Field.Alias.IsEmpty ? (string)Field.Name : (string)Field.Alias;
 
         /// <summary>
         /// Returns true if the result has been set. Also returns true when the result is temporarily set to an <see cref="IDataLoaderResult"/>

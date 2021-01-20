@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -28,7 +29,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the field.
         /// </summary>
-        public string Name => NameNode.Name;
+        public ROM Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of this field.
@@ -38,7 +39,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the alias for this field, if any.
         /// </summary>
-        public string Alias { get; set; }
+        public ROM Alias { get; set; }
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the alias of this field, if any.

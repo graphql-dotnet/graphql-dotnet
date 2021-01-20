@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GraphQL.Language.AST;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Complexity
 {
@@ -22,7 +23,7 @@ namespace GraphQL.Validation.Complexity
             public ComplexityResult Result { get; } = new ComplexityResult();
             public int LoopCounter { get; set; }
             public int MaxRecursionCount { get; set; }
-            public Dictionary<string, FragmentComplexity> FragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
+            public Dictionary<ROM, FragmentComplexity> FragmentMap { get; } = new Dictionary<ROM, FragmentComplexity>();
 
             public void AssertRecursion()
             {

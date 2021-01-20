@@ -7,6 +7,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
@@ -79,7 +80,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        IDictionary<string, Field> SubFields { get; }
+        IDictionary<ROM, Field> SubFields { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the

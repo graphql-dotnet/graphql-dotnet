@@ -1,3 +1,5 @@
+using GraphQLParser;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -8,7 +10,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified comment value.
         /// </summary>
-        public CommentNode(string value)
+        public CommentNode(ROM value)
         {
             Value = value;
         }
@@ -16,6 +18,6 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the comment stored in this node.
         /// </summary>
-        public string Value { get; }
+        public ROM Value { get; }
     }
 }

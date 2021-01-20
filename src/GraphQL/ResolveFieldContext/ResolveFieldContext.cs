@@ -5,6 +5,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser;
 using Field = GraphQL.Language.AST.Field;
 
 namespace GraphQL
@@ -72,7 +73,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields { get; set; }
+        public IDictionary<ROM, Field> SubFields { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }

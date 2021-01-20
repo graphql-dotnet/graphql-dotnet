@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -42,7 +43,7 @@ namespace GraphQL.Validation.Rules
             if (!directives.HasDuplicates)
                 return;
 
-            var knownDirectives = new Dictionary<string, Directive>(directives.Count);
+            var knownDirectives = new Dictionary<ROM, Directive>(directives.Count);
 
             foreach (var directive in directives)
             {

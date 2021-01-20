@@ -4,6 +4,7 @@ using System.Linq;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -215,6 +216,11 @@ namespace GraphQL.Types
             return Directives.FirstOrDefault(x => x.Name == name);
         }
 
+        public DirectiveGraphType FindDirective(ROM name)
+        {
+            return Directives.FirstOrDefault(x => x.Name == name);
+        }
+
         /// <inheritdoc/>
         public void RegisterValueConverter(IAstFromValueConverter converter)
         {
@@ -238,6 +244,14 @@ namespace GraphQL.Types
             }
 
             return _allTypes?.Value[name];
+        }
+
+        public IGraphType FindType(ROM rom)
+        {
+            if (rom.IsEmpty)
+                throw new ArgumentOutOfRangeException(nameof(rom), "A type name is required to lookup.");
+
+            return _allTypes?.Value[rom];
         }
 
         /// <inheritdoc/>
@@ -267,6 +281,7 @@ namespace GraphQL.Types
                     if (_allTypes.IsValueCreated)
                     {
                         _allTypes.Value.Dictionary.Clear();
+                        _allTypes.Value.Dictionary2.Clear();
                     }
 
                     _allTypes = null;

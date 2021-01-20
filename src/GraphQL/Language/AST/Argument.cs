@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -26,7 +27,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of this argument.
         /// </summary>
-        public string Name => NameNode.Name;
+        public ROM Name => NameNode.Name;
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the name of this argument.

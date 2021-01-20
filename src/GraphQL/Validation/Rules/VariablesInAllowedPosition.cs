@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -24,7 +25,7 @@ namespace GraphQL.Validation.Rules
         private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<VariableDefinition>(
                 (varDefAst, context) => {
-                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<string, VariableDefinition>();
+                    var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new Dictionary<ROM, VariableDefinition>();
                     varDefMap[varDefAst.Name] = varDefAst;
                 }
             ),

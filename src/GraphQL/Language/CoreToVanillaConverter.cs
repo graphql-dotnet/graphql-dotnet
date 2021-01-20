@@ -433,7 +433,7 @@ namespace GraphQL.Language
         private static NameNode Name(GraphQLName name)
         {
             if (name == null) return default;
-            return new NameNode(name.ValueString, Convert(name.Location));
+            return new NameNode(name.Value, Convert(name.Location));
         }
 
         /// <summary>

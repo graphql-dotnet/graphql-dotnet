@@ -4,6 +4,7 @@ using GraphQL.Execution;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Validation
 {
@@ -105,7 +106,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Searches the document for a fragment definition by name and returns it.
         /// </summary>
-        public FragmentDefinition GetFragment(string name)
+        public FragmentDefinition GetFragment(ROM name)
         {
             return Document.Fragments.FindDefinition(name);
         }
@@ -156,7 +157,7 @@ namespace GraphQL.Validation
             var fragments = new List<FragmentDefinition>();
             var nodesToVisit = new Stack<SelectionSet>();
             nodesToVisit.Push(operation.SelectionSet);
-            var collectedNames = new Dictionary<string, bool>();
+            var collectedNames = new Dictionary<ROM, bool>();
 
             while (nodesToVisit.Count > 0)
             {
@@ -164,7 +165,7 @@ namespace GraphQL.Validation
 
                 foreach (var spread in GetFragmentSpreads(node))
                 {
-                    string fragName = spread.Name;
+                    var fragName = spread.Name;
                     if (!collectedNames.ContainsKey(fragName))
                     {
                         collectedNames[fragName] = true;

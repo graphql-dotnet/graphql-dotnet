@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -71,11 +72,14 @@ namespace GraphQL.Types
         /// </summary>
         IGraphType FindType(string name);
 
+        IGraphType FindType(ROM rom);
+
         /// <summary>
         /// Returns a <see cref="DirectiveGraphType"/> for a given name.
         /// </summary>
         DirectiveGraphType FindDirective(string name);
 
+        DirectiveGraphType FindDirective(ROM name);
         /// <summary>
         /// A list of additional graph types manually added to the schema by RegisterType call.
         /// </summary>

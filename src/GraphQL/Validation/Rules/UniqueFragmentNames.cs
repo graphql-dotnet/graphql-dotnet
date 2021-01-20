@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,7 +24,7 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((fragmentDefinition, context) =>
             {
-                var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<string, FragmentDefinition>();
+                var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new Dictionary<ROM, FragmentDefinition>();
 
                 var fragmentName = fragmentDefinition.Name;
                 if (knownFragments.ContainsKey(fragmentName)) // .NET 2.2+ has TryAdd

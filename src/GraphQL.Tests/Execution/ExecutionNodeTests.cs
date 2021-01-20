@@ -107,7 +107,7 @@ namespace GraphQL.Tests.Execution
         {
             Field<StringGraphType>(
                 "value",
-                resolve: context => context.FieldAst.Alias ?? context.FieldAst.Name);
+                resolve: context => (string)(context.FieldAst.Alias.IsEmpty ? context.FieldAst.Name : context.FieldAst.Alias));
         }
     }
 }

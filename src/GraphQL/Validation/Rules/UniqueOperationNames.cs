@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -23,12 +24,12 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((op, context) =>
         {
-            if (string.IsNullOrWhiteSpace(op.Name))
+            if (op.Name.IsEmpty)
             {
                 return;
             }
 
-            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<string>();
+            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new HashSet<ROM>();
 
             if (!frequency.Add(op.Name))
             {

@@ -7,6 +7,7 @@ using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -103,6 +104,7 @@ namespace GraphQL.Types
         }
 
         internal Dictionary<string, IGraphType> Dictionary { get; } = new Dictionary<string, IGraphType>();
+        internal Dictionary<ROM, IGraphType> Dictionary2 { get; } = new Dictionary<ROM, IGraphType>();
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();
@@ -181,6 +183,22 @@ namespace GraphQL.Types
             lookup._sealed = true;
 
             return lookup;
+        }
+
+        internal IGraphType this[ROM typeName]
+        {
+            get
+            {
+                if (typeName.IsEmpty)
+                    throw new ArgumentOutOfRangeException(nameof(typeName), "A type name is required to lookup.");
+
+                IGraphType type;
+                lock (_lock)
+                {
+                    Dictionary2.TryGetValue(typeName, out type);
+                }
+                return type;
+            }
         }
 
         /// <summary>
@@ -557,6 +575,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else if (existingGraphType.GetType() == type.GetType())
                 {
                     Dictionary[typeName] = type; // this case worked before overwriting the old value
+                    Dictionary2[typeName.AsMemory()] = type;
                 }
                 else
                 {
@@ -567,6 +586,7 @@ the name '{typeName}' is already registered to '{existingGraphType.GetType().Ful
             else
             {
                 Dictionary.Add(typeName, type);
+                Dictionary2.Add(typeName.AsMemory(), type);
             }
         }
 

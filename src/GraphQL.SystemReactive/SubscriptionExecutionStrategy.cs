@@ -61,7 +61,7 @@ namespace GraphQL.Execution
             {
                 var resolveContext = new ResolveEventStreamContext
                 {
-                    FieldName = node.Field.Name,
+                    FieldName = (string)node.Field.Name,
                     FieldAst = node.Field,
                     FieldDefinition = node.FieldDefinition,
                     ReturnType = node.FieldDefinition.ResolvedType,

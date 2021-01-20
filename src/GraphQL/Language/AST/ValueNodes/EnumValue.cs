@@ -1,3 +1,5 @@
+using GraphQLParser;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -27,7 +29,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the string representation of the enumeration value.
         /// </summary>
-        public string Name { get; }
+        public ROM Name { get; }
 
         /// <summary>
         /// Returns a <see cref="NameNode"/> containing the string representation of the enumeration value.

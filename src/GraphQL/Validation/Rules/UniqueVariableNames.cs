@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -25,7 +26,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<Operation>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
             new MatchingNodeVisitor<VariableDefinition>((variableDefinition, context) =>
             {
-                var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<string, VariableDefinition>();
+                var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new Dictionary<ROM, VariableDefinition>();
 
                 var variableName = variableDefinition.Name;
 

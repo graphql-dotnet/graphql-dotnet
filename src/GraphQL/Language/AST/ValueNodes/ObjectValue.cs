@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -34,7 +35,7 @@ namespace GraphQL.Language.AST
             get
             {
                 var obj = new Dictionary<string, object>();
-                FieldNames.Apply(name => obj.Add(name, Field(name).Value.Value));
+                FieldNames.Apply(name => obj.Add((string)name, Field(name).Value.Value));
                 return obj;
             }
         }
@@ -49,11 +50,11 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns a list of the names of the fields specified for this object value node.
         /// </summary>
-        public IEnumerable<string> FieldNames
+        public IEnumerable<ROM> FieldNames
         {
             get
             {
-                var list = new List<string>(ObjectFieldsList.Count);
+                var list = new List<ROM>(ObjectFieldsList.Count);
                 foreach (var item in ObjectFieldsList)
                     list.Add(item.Name);
                 return list;
@@ -73,7 +74,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first matching field node contained within this object value node that matches the specified name, or <see langword="null"/> otherwise.
         /// </summary>
-        public ObjectField Field(string name)
+        public ObjectField Field(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             foreach (var field in ObjectFieldsList)

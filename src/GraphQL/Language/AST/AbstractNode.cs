@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the comment associated with the node.
         /// </summary>
-        public string Comment => CommentNode?.Value;
+        public ROM Comment => CommentNode?.Value ?? default;
 
         /// <summary>
         /// Returns the comment node associated with the node.

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -24,9 +25,9 @@ namespace GraphQL.Validation.Rules
 
         private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
         {
-            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<string>();
+            var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new HashSet<ROM>();
             var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new Stack<FragmentSpread>();
-            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<string, int>();
+            var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new Dictionary<ROM, int>();
             if (!visitedFrags.Contains(node.Name))
             {
                 detectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);
@@ -36,8 +37,8 @@ namespace GraphQL.Validation.Rules
         private static void detectCycleRecursive(
             FragmentDefinition fragment,
             Stack<FragmentSpread> spreadPath,
-            HashSet<string> visitedFrags,
-            Dictionary<string, int> spreadPathIndexByName,
+            HashSet<ROM> visitedFrags,
+            Dictionary<ROM, int> spreadPathIndexByName,
             ValidationContext context)
         {
             var fragmentName = fragment.Name;
@@ -79,7 +80,7 @@ namespace GraphQL.Validation.Rules
                     var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
                     var nodes = cyclePath.OfType<INode>().Concat(new[] { spreadNode }).ToArray();
 
-                    context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.Name).ToArray(), nodes));
+                    context.ReportError(new NoFragmentCyclesError(context, (string)spreadName, cyclePath.Select(x => (string)x.Name).ToArray(), nodes));
                 }
             }
 

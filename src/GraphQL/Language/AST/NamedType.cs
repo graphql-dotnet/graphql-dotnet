@@ -1,3 +1,5 @@
+using GraphQLParser;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -16,7 +18,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the name of the named type node.
         /// </summary>
-        public string Name => NameNode.Name;
+        public ROM Name => NameNode.Name;
 
         /// <summary>
         /// Returns the <see cref="NameNode"/> containing the name of the type.

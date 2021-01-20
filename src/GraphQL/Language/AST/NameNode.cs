@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -11,7 +12,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
-        public NameNode(string name, SourceLocation location)
+        public NameNode(ROM name, SourceLocation location)
         {
             Name = name;
             SourceLocation = location;
@@ -20,7 +21,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
-        public NameNode(string name)
+        public NameNode(ROM name)
         {
             Name = name;
             SourceLocation = default;
@@ -29,7 +30,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the contained name.
         /// </summary>
-        public string Name { get; }
+        public ROM Name { get; }
 
         /// <inheritdoc/>
         public SourceLocation SourceLocation { get; }

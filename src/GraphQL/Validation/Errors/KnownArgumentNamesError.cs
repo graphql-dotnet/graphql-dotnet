@@ -18,10 +18,10 @@ namespace GraphQL.Validation.Errors
         public KnownArgumentNamesError(ValidationContext context, Argument node, FieldType fieldDef, IGraphType parentType)
             : base(context.OriginalQuery, NUMBER,
                 UnknownArgMessage(
-                    node.Name,
+                    (string)node.Name,
                     fieldDef.Name,
                     context.Print(parentType),
-                    StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))),
+                    StringUtils.SuggestionList((string)node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))),
                 node)
         {
         }
@@ -32,9 +32,9 @@ namespace GraphQL.Validation.Errors
         public KnownArgumentNamesError(ValidationContext context, Argument node, DirectiveGraphType directive)
             : base(context.OriginalQuery, NUMBER,
                 UnknownDirectiveArgMessage(
-                    node.Name,
+                    (string)node.Name,
                     directive.Name,
-                    StringUtils.SuggestionList(node.Name, directive.Arguments?.Select(q => q.Name))),
+                    StringUtils.SuggestionList((string)node.Name, directive.Arguments?.Select(q => q.Name))),
                 node)
         {
         }

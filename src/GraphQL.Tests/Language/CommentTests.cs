@@ -20,7 +20,7 @@ query _ {
 }";
 
             var document = CoreToVanillaConverter.Convert(query.Parse());
-            document.Operations.First().Comment.ShouldBeNull();
+            document.Operations.First().Comment.IsEmpty.ShouldBeTrue();
         }
 
         [Fact]
@@ -49,10 +49,10 @@ query _ {
 
             var document = CoreToVanillaConverter.Convert(query.Parse());
             document.Operations.First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
+                .SelectionSet.Selections.OfType<Field>().First().Comment.IsEmpty.ShouldBeTrue();
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
-                .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
+                .SelectionSet.Selections.OfType<Field>().First().Comment.IsEmpty.ShouldBeTrue();
         }
 
         [Fact]

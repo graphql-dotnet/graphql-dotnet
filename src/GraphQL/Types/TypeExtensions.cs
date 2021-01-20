@@ -1,5 +1,6 @@
 using System;
 using GraphQL.Language.AST;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -56,7 +57,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the name of an AST type after unwrapping any <see cref="NonNullType"/> or <see cref="ListType"/> layers.
         /// </summary>
-        public static string Name(this IType type) => type switch
+        public static ROM Name(this IType type) => type switch
         {
             NonNullType nonnull => Name(nonnull.Type),
             ListType list => Name(list.Type),
@@ -71,7 +72,7 @@ namespace GraphQL.Types
         {
             NonNullType nonnull => $"{FullName(nonnull.Type)}!",
             ListType list => $"[{FullName(list.Type)}]",
-            _ => ((NamedType)type).Name
+            _ => (string)((NamedType)type).Name
         };
     }
 }

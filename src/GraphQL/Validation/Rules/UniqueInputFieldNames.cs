@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -26,7 +27,7 @@ namespace GraphQL.Validation.Rules
                 new MatchingNodeVisitor<ObjectValue>(
                     enter: (objVal, context) =>
                     {
-                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<string, IValue>>();
+                        var knownNameStack = context.TypeInfo.UniqueInputFieldNames_KnownNameStack ??= new Stack<Dictionary<ROM, IValue>>();
 
                         knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames);
                         context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
@@ -36,7 +37,7 @@ namespace GraphQL.Validation.Rules
                 new MatchingNodeVisitor<ObjectField>(
                     leave: (objField, context) =>
                     {
-                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<string, IValue>();
+                        var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new Dictionary<ROM, IValue>();
 
                         if (knownNames.ContainsKey(objField.Name))
                         {

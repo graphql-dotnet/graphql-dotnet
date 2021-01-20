@@ -6,6 +6,7 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser;
 using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
@@ -82,7 +83,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
+        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<ROM, Field> fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
@@ -106,7 +107,7 @@ namespace GraphQL.Execution
                 if (node == null)
                     continue;
 
-                subFields[name] = node;
+                subFields[fieldDefinition.Name == name ? fieldDefinition.Name : (string)name] = node;
             }
 
             parent.SubFields = subFields;

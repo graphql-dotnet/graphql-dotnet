@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
 
 namespace GraphQL.Validation.Rules
 {
@@ -37,7 +38,7 @@ namespace GraphQL.Validation.Rules
 
             new MatchingNodeVisitor<FragmentSpread>((node, context) =>
             {
-                string fragName = node.Name;
+                var fragName = node.Name;
                 var fragType = getFragmentType(context, fragName);
                 var parentType = context.TypeInfo.GetParentType().GetNamedType();
 
@@ -48,7 +49,7 @@ namespace GraphQL.Validation.Rules
             })
         ).ToTask();
 
-        private static IGraphType getFragmentType(ValidationContext context, string name)
+        private static IGraphType getFragmentType(ValidationContext context, ROM name)
         {
             var frag = context.GetFragment(name);
             return frag?.Type?.GraphTypeFromType(context.Schema);

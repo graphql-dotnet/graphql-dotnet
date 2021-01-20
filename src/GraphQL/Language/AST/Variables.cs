@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Execution;
+using GraphQLParser;
 
 namespace GraphQL.Language.AST
 {
@@ -33,7 +34,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Returns the first variable with a matching name, or <paramref name="defaultValue"/> if none are found.
         /// </summary>
-        public object ValueFor(string name, object defaultValue = null)
+        public object ValueFor(ROM name, object defaultValue = null)
         {
             return ValueFor(name, out var value) ? value.Value : defaultValue;
         }
@@ -41,7 +42,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
         /// </summary>
-        public bool ValueFor(string name, out ArgumentValue value)
+        public bool ValueFor(ROM name, out ArgumentValue value)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)

@@ -1,3 +1,5 @@
+using GraphQLParser;
+
 namespace GraphQL.Language.AST
 {
     /// <summary>
@@ -8,7 +10,7 @@ namespace GraphQL.Language.AST
         /// <summary>
         /// Gets or sets the name of the variable.
         /// </summary>
-        public string Name { get; set; }
+        public ROM Name { get; set; }
 
         private object _value;
         /// <summary>
