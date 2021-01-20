@@ -115,7 +115,6 @@ namespace GraphQL
 
                 var operation = GetOperation(options.OperationName, document);
                 metrics.SetOperationName(operation == null ? null : (string)operation.Name);
-                GraphQLParser.ROM z;
 
                 if (operation == null)
                 {
