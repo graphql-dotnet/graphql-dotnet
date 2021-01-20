@@ -25,6 +25,16 @@ namespace GraphQL
         /// </summary>
         static ValueConverter()
         {
+#if NETSTANDARD2_1
+            Register<GraphQLParser.ROM, double>(value => double.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<GraphQLParser.ROM, float>(value => float.Parse(value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<GraphQLParser.ROM, bool>(value => bool.Parse(value));
+#else //TODO: optimize
+            Register<GraphQLParser.ROM, double>(value => double.Parse((string)value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<GraphQLParser.ROM, float>(value => float.Parse((string)value, NumberStyles.Float, NumberFormatInfo.InvariantInfo));
+            Register<GraphQLParser.ROM, bool>(value => bool.Parse((string)value));
+#endif
+
             Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
             Register<string, byte>(value => byte.Parse(value, NumberFormatInfo.InvariantInfo));
             Register<string, short>(value => short.Parse(value, NumberFormatInfo.InvariantInfo));

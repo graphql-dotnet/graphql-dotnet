@@ -9,13 +9,6 @@ namespace GraphQL.Tests.Language
 {
     public class CommentTests
     {
-        private readonly Parser _parser;
-
-        public CommentTests()
-        {
-            _parser = new Parser(new Lexer());
-        }
-
         [Fact]
         public void operation_comment_should_be_null()
         {
@@ -26,7 +19,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse());
             document.Operations.First().Comment.ShouldBeNull();
         }
 
@@ -40,7 +33,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First().Comment.ShouldBe("comment");
         }
 
@@ -54,7 +47,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse());
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBeNull();
             document.Operations.First()
@@ -74,7 +67,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First().Comment.ShouldBe("comment1");
             document.Operations.First()
@@ -97,7 +90,7 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Fragments.First().Comment.ShouldBe("comment");
         }
 
@@ -116,7 +109,7 @@ fragment human on person {
         name
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .SelectionSet.Selections.OfType<FragmentSpread>().First().Comment.ShouldBe("comment");
@@ -135,7 +128,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .SelectionSet.Selections.OfType<InlineFragment>().First().Comment.ShouldBe("comment");
@@ -153,7 +146,7 @@ query _ {
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First()
                 .SelectionSet.Selections.OfType<Field>().First()
                 .Arguments.First().Comment.ShouldBe("comment");
@@ -171,7 +164,7 @@ query _(
     }
 }";
 
-            var document = CoreToVanillaConverter.Convert(_parser.Parse(new Source(query)));
+            var document = CoreToVanillaConverter.Convert(query.Parse(ignoreComments: false));
             document.Operations.First()
                 .Variables.First().Comment.ShouldBe("comment");
         }

@@ -254,31 +254,46 @@ namespace GraphQL.Language
                 case ASTNodeKind.StringValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new StringValue(str.Value) { SourceLocation = Convert(str.Location) };
+                    return new StringValue(str.ValueString) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.IntValue:
                 {
                     var str = (GraphQLScalarValue)source;
-
+#if NETSTANDARD2_1
                     if (int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
+#else
+                    if (int.TryParse(str.ValueString, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var intResult))
+#endif
                     {
                         return new IntValue(intResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
+#if NETSTANDARD2_1
                     if (long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
+#else
+                    if (long.TryParse(str.ValueString, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var longResult))
+#endif
                     {
                         return new LongValue(longResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
+#if NETSTANDARD2_1
                     if (decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
+#else
+                    if (decimal.TryParse(str.ValueString, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var decimalResult))
+#endif
                     {
                         return new DecimalValue(decimalResult) { SourceLocation = Convert(str.Location) };
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
+#if NETSTANDARD2_1
                     if (BigInteger.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
+#else
+                    if (BigInteger.TryParse(str.ValueString, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
+#endif
                     {
                         return new BigIntValue(bigIntegerResult) { SourceLocation = Convert(str.Location) };
                     }
@@ -293,17 +308,25 @@ namespace GraphQL.Language
                     // the idea is to see if there is a loss of accuracy of value
                     // for example, 12.1 or 12.11 is double but 12.10 is decimal
                     if (double.TryParse(
+#if NETSTANDARD2_1
                         str.Value,
+#else
+                        str.ValueString,
+#endif
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
                         out var dbl) == false)
                     {
-                        dbl = str.Value[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
+                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
                     }
 
                     //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
                     if (decimal.TryParse(
+#if NETSTANDARD2_1
                         str.Value,
+#else
+                         str.ValueString,
+#endif
                         NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                         CultureInfo.InvariantCulture,
                         out decimal dec))
@@ -321,12 +344,16 @@ namespace GraphQL.Language
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = (GraphQLScalarValue)source;
+#if NETSTANDARD2_1
                     return new BooleanValue(bool.Parse(str.Value)) { SourceLocation = Convert(str.Location) };
+#else
+                    return new BooleanValue(bool.Parse(str.ValueString)) { SourceLocation = Convert(str.Location) }; //TODO: rewrite
+#endif
                 }
                 case ASTNodeKind.EnumValue:
                 {
                     var str = (GraphQLScalarValue)source;
-                    return new EnumValue(str.Value) { SourceLocation = Convert(str.Location) };
+                    return new EnumValue(str.ValueString) { SourceLocation = Convert(str.Location) };
                 }
                 case ASTNodeKind.Variable:
                 {
@@ -406,7 +433,7 @@ namespace GraphQL.Language
         private static NameNode Name(GraphQLName name)
         {
             if (name == null) return default;
-            return new NameNode(name.Value, Convert(name.Location));
+            return new NameNode(name.ValueString, Convert(name.Location));
         }
 
         /// <summary>
@@ -416,7 +443,7 @@ namespace GraphQL.Language
         {
             return comment == null
                 ? null
-                : new CommentNode(comment.Text) { SourceLocation = Convert(comment.Location) };
+                : new CommentNode(comment.TextString) { SourceLocation = Convert(comment.Location) };
         }
 
         /// <summary>

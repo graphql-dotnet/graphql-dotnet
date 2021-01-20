@@ -179,7 +179,11 @@ namespace GraphQL.Tests.Utilities
         {
             var schema = Schema.For(
                 ReadSchema("PetComplex.graphql"),
-                builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+                builder =>
+                {
+                    builder.Types.ForAll(config => config.ResolveType = _ => null);
+                    builder.IgnoreComments = false;
+                }
             );
 
             schema.Description.ShouldBe("Animals - cats and dogs");

@@ -749,6 +749,7 @@ namespace GraphQL.Execution
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
         public GraphQLDocumentBuilder() { }
+        public bool IgnoreComments { get; set; }
         public GraphQL.Language.AST.Document Build(string body) { }
     }
     public interface IDocumentBuilder
@@ -2419,6 +2420,7 @@ namespace GraphQL.Utilities
         protected readonly System.Collections.Generic.IDictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
         public System.Collections.Generic.IDictionary<string, System.Type> Directives { get; }
+        public bool IgnoreComments { get; set; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
         public virtual GraphQL.Types.ISchema Build(string[] typeDefinitions) { }

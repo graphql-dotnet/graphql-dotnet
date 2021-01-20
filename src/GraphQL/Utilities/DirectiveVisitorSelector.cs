@@ -35,10 +35,10 @@ namespace GraphQL.Utilities
 
         private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
         {
-            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.Value)))
+            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.ValueString)))
             {
-                var visitor = _typeResolver(_directiveVisitors[dir.Name.Value]);
-                visitor.Name = dir.Name.Value;
+                var visitor = _typeResolver(_directiveVisitors[dir.Name.ValueString]);
+                visitor.Name = dir.Name.ValueString;
                 if (dir.Arguments != null)
                     visitor.Arguments = ToArguments(dir.Arguments);
                 yield return visitor;
@@ -47,7 +47,7 @@ namespace GraphQL.Utilities
 
         private Dictionary<string, object> ToArguments(List<GraphQLArgument> arguments)
         {
-            return arguments.ToDictionary(x => x.Name.Value, x => x.Value.ToValue());
+            return arguments.ToDictionary(x => x.Name.ValueString, x => x.Value.ToValue());
         }
     }
 }
