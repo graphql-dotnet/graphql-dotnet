@@ -13,6 +13,9 @@ namespace GraphQL
 {
     /// <summary>
     /// Contains parameters pertaining to the currently executing <see cref="IFieldResolver"/>.
+    /// This object is only valid during the execution of the field; it is re-used once the field
+    /// has resolved. Use <see cref="ResolveFieldContextExtensions.Copy(IResolveFieldContext)"/>
+    /// if you need to preserve a copy of the context for later use or copy required properties from the context.
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
