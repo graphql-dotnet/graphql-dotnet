@@ -648,7 +648,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return str.Value.Length == 4; /*true.Length=4*/
+                    return (str.Value.Length == 4).Boxed(); /*true.Length=4*/
                 }
                 case ASTNodeKind.EnumValue:
                 {
