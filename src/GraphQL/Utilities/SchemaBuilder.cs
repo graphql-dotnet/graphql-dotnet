@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
