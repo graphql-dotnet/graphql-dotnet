@@ -615,13 +615,40 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return ValueConverter.ConvertTo<double>(str.Value);
+
+                    // the idea is to see if there is a loss of accuracy of value
+                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
+                    if (Double.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out double dbl) == false)
+                    {
+                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
+                    }
+
+                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                    if (Decimal.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out decimal dec))
+                    {
+                        // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
+                        var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
+                        decimal temp = new decimal(dbl);
+                        var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
+                        if (!decBits.Equals(dblAsDecBits))
+                            return dec;
+                    }
+
+                    return dbl;
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return ValueConverter.ConvertTo<bool>(str.Value);
+                    return str.Value.Length == 4; /*true.Length=4*/
                 }
                 case ASTNodeKind.EnumValue:
                 {
