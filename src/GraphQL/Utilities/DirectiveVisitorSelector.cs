@@ -8,11 +8,11 @@ namespace GraphQL.Utilities
 {
     public class DirectiveVisitorSelector : IVisitorSelector
     {
-        private readonly IDictionary<string, Type> _directiveVisitors;
+        private readonly Dictionary<string, Type> _directiveVisitors;
         private readonly Func<Type, SchemaDirectiveVisitor> _typeResolver;
 
         public DirectiveVisitorSelector(
-            IDictionary<string, Type> directiveVisitors,
+            Dictionary<string, Type> directiveVisitors,
             Func<Type, SchemaDirectiveVisitor> typeResolver)
         {
             _directiveVisitors = directiveVisitors;
@@ -33,21 +33,20 @@ namespace GraphQL.Utilities
             }
         }
 
-        private IEnumerable<ISchemaNodeVisitor> BuildVisitors(IEnumerable<GraphQLDirective> directives)
+        private IEnumerable<ISchemaNodeVisitor> BuildVisitors(List<GraphQLDirective> directives)
         {
-            foreach (var dir in directives.Where(x => _directiveVisitors.ContainsKey(x.Name.ValueString)))
+            foreach (var dir in directives)
             {
-                var visitor = _typeResolver(_directiveVisitors[dir.Name.ValueString]);
-                visitor.Name = dir.Name.ValueString;
-                if (dir.Arguments != null)
-                    visitor.Arguments = ToArguments(dir.Arguments);
-                yield return visitor;
+                var name = (string)dir.Name.Value;
+                if (_directiveVisitors.TryGetValue(name, out var type))
+                {
+                    var visitor = _typeResolver(type);
+                    visitor.Name = name;
+                    if (dir.Arguments != null)
+                        visitor.Arguments = dir.Arguments.ToDictionary(x => (string)x.Name.Value, x => x.Value.ToValue());
+                    yield return visitor;
+                }
             }
-        }
-
-        private Dictionary<string, object> ToArguments(List<GraphQLArgument> arguments)
-        {
-            return arguments.ToDictionary(x => x.Name.ValueString, x => x.Value.ToValue());
         }
     }
 }

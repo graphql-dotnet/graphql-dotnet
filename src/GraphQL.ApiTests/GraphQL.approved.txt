@@ -2330,7 +2330,7 @@ namespace GraphQL.Utilities
     }
     public class DirectiveVisitorSelector : GraphQL.Utilities.IVisitorSelector
     {
-        public DirectiveVisitorSelector(System.Collections.Generic.IDictionary<string, System.Type> directiveVisitors, System.Func<System.Type, GraphQL.Utilities.SchemaDirectiveVisitor> typeResolver) { }
+        public DirectiveVisitorSelector(System.Collections.Generic.Dictionary<string, System.Type> directiveVisitors, System.Func<System.Type, GraphQL.Utilities.SchemaDirectiveVisitor> typeResolver) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Utilities.ISchemaNodeVisitor> Select(object node) { }
     }
     public class ExpressionValueResolver<TObject, TProperty> : GraphQL.Utilities.IValueResolver, GraphQL.Utilities.IValueResolver<TProperty>
@@ -2419,7 +2419,7 @@ namespace GraphQL.Utilities
     {
         protected readonly System.Collections.Generic.IDictionary<string, GraphQL.Types.IGraphType> _types;
         public SchemaBuilder() { }
-        public System.Collections.Generic.IDictionary<string, System.Type> Directives { get; }
+        public System.Collections.Generic.Dictionary<string, System.Type> Directives { get; }
         public bool IgnoreComments { get; set; }
         public System.IServiceProvider ServiceProvider { get; set; }
         public GraphQL.Utilities.TypeSettings Types { get; }
