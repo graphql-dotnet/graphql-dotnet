@@ -25,7 +25,7 @@ namespace GraphQL.Execution
             GraphQLDocument result;
             try
             {
-                result = Parser.Parse(body, ignoreComments: IgnoreComments);
+                result = Parser.Parse(body, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
             }
             catch (GraphQLSyntaxErrorException ex)
             {
