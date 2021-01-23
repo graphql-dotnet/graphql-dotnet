@@ -10,7 +10,7 @@ namespace GraphQL.Instrumentation
     public static class FieldMiddlewareBuilderExtensions
     {
         /// <summary>
-        /// Adds middleware to the list of delegates that will be applied to the schema when invoking <see cref="IFieldMiddlewareBuilder.ApplyTo(ISchema)"/>.
+        /// Adds middleware to the list of delegates that will be applied to the schema when invoking <see cref="SchemaTypes.ApplyMiddleware(IFieldMiddlewareBuilder, ISchema)"/>.
         /// </summary>
         /// <param name="builder">Interface for connecting middlewares to a schema.</param>
         /// <param name="middleware">Middleware instance.</param>
@@ -19,7 +19,7 @@ namespace GraphQL.Instrumentation
             => builder.Use(next => context => middleware.Resolve(context, next));
 
         /// <summary>
-        /// Adds the specified delegate to the list of delegates that will be applied to the schema when invoking <see cref="IFieldMiddlewareBuilder.ApplyTo(ISchema)"/>.
+        /// Adds the specified delegate to the list of delegates that will be applied to the schema when invoking <see cref="SchemaTypes.ApplyMiddleware(IFieldMiddlewareBuilder, ISchema)"/>.
         /// <br/><br/>
         /// This is a compatibility shim when compiling delegates without schema specified.
         /// </summary>
@@ -30,7 +30,7 @@ namespace GraphQL.Instrumentation
             => builder.Use((_, next) => middleware(next));
 
         /// <summary>
-        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="IFieldMiddlewareBuilder.ApplyTo(ISchema)"/>.
+        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="SchemaTypes.ApplyMiddleware(IFieldMiddlewareBuilder, ISchema)"/>.
         /// <br/><br/>
         /// Middleware will be created using the DI container obtained from the <see cref="Schema"/>.
         /// </summary>
@@ -40,7 +40,7 @@ namespace GraphQL.Instrumentation
         public static IFieldMiddlewareBuilder Use<T>(this IFieldMiddlewareBuilder builder) where T : IFieldMiddleware => Use(builder, typeof(T));
 
         /// <summary>
-        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="IFieldMiddlewareBuilder.ApplyTo(ISchema)"/>.
+        /// Adds middleware specified by its type to the list of delegates that will be applied to the schema when invoking <see cref="SchemaTypes.ApplyMiddleware(IFieldMiddlewareBuilder, ISchema)"/>.
         /// <br/><br/>
         /// Middleware will be created using the DI container obtained from the <see cref="Schema"/>.
         /// </summary>
