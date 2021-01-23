@@ -101,8 +101,6 @@ namespace GraphQL.Types
                 CreateSchemaTypes();
 
                 Initialized = true;
-
-                FindType("____");
             }
         }
 
