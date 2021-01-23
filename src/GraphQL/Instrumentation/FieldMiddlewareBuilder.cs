@@ -24,11 +24,13 @@ namespace GraphQL.Instrumentation
             else
             {
                 var firstMiddleware = _middleware;
-                _middleware = (d) => firstMiddleware(middleware(d));
+                _middleware = (next) => firstMiddleware(middleware(next));
             }
 
             return this;
         }
+
+        private readonly FieldMiddlewareDelegate _defaultDelegate = context => Task.FromResult(NameFieldResolver.Instance.Resolve(context));
 
         /// <inheritdoc/>
         public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
@@ -36,12 +38,7 @@ namespace GraphQL.Instrumentation
             if (_middleware == null)
                 return null;
 
-            return (start) =>
-            {
-                start ??= (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
-
-                return _middleware(start);
-            };
+            return (start) => _middleware(start ?? _defaultDelegate);
         }
     }
 }
