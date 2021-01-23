@@ -581,6 +581,39 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_input_type_with_default()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
+                "str",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<SomeInputType>> { Name = "argOne", DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true } },
+                    new QueryArgument<ListGraphType<SomeInputType>> { Name = "argTwo", DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } } })
+                );
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_custom_scalar()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -712,8 +745,11 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
+  # Red!
   RED
+  # Green!
   GREEN
+  # Blue!
   BLUE
 }"
                 },
@@ -750,8 +786,11 @@ scalar Uri"
                 {
                     "RGB",
 @"enum RGB {
+  # Red!
   RED
+  # Green!
   GREEN
+  # Blue!
   BLUE
 }"
                 },
@@ -811,23 +850,41 @@ type __Directive {
 # A Directive can be adjacent to many parts of the GraphQL language, a
 # __DirectiveLocation describes one such possible adjacencies.
 enum __DirectiveLocation {
+  # Location adjacent to a query operation.
   QUERY
+  # Location adjacent to a mutation operation.
   MUTATION
+  # Location adjacent to a subscription operation.
   SUBSCRIPTION
+  # Location adjacent to a field.
   FIELD
+  # Location adjacent to a fragment definition.
   FRAGMENT_DEFINITION
+  # Location adjacent to a fragment spread.
   FRAGMENT_SPREAD
+  # Location adjacent to an inline fragment.
   INLINE_FRAGMENT
+  # Location adjacent to a schema definition.
   SCHEMA
+  # Location adjacent to a scalar definition.
   SCALAR
+  # Location adjacent to an object type definition.
   OBJECT
+  # Location adjacent to a field definition.
   FIELD_DEFINITION
+  # Location adjacent to an argument definition.
   ARGUMENT_DEFINITION
+  # Location adjacent to an interface definition.
   INTERFACE
+  # Location adjacent to a union definition.
   UNION
+  # Location adjacent to an enum definition
   ENUM
+  # Location adjacent to an enum value definition
   ENUM_VALUE
+  # Location adjacent to an input object type definition.
   INPUT_OBJECT
+  # Location adjacent to an input object field definition.
   INPUT_FIELD_DEFINITION
 }
 
@@ -902,13 +959,21 @@ type __Type {
 
 # An enum describing what kind of type a given __Type is.
 enum __TypeKind {
+  # Indicates this type is a scalar.
   SCALAR
+  # Indicates this type is an object. `fields` and `possibleTypes` are valid fields.
   OBJECT
+  # Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.
   INTERFACE
+  # Indicates this type is a union. `possibleTypes` is a valid field.
   UNION
+  # Indicates this type is an enum. `enumValues` is a valid field.
   ENUM
+  # Indicates this type is an input object. `inputFields` is a valid field.
   INPUT_OBJECT
+  # Indicates this type is a list. `ofType` is a valid field.
   LIST
+  # Indicates this type is a non-null. `ofType` is a valid field.
   NON_NULL
 }
 ";
@@ -1015,6 +1080,26 @@ enum __TypeKind {
             }
         }
 
+        public class SomeInputType : InputObjectGraphType<SomeInput>
+        {
+            public SomeInputType()
+            {
+                Name = "SomeInput";
+                Field(x => x.Age);
+                Field(x => x.Name);
+                Field(x => x.IsDeveloper);
+            }
+        }
+
+        public class SomeInput
+        {
+            public string Name { get; set; }
+
+            public int Age { get; set; }
+
+            public bool IsDeveloper { get; set; }
+        }
+
         public class OddType : ScalarGraphType
         {
             public OddType()
@@ -1032,9 +1117,9 @@ enum __TypeKind {
             public RgbEnum()
             {
                 Name = "RGB";
-                AddValue("RED", "", 0);
-                AddValue("GREEN", "", 1);
-                AddValue("BLUE", "", 2);
+                AddValue("RED", "Red!", 0);
+                AddValue("GREEN", "Green!", 1);
+                AddValue("BLUE", "Blue!", 2);
             }
         }
     }

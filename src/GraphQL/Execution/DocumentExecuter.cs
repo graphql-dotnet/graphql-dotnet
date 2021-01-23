@@ -82,8 +82,14 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        options.FieldMiddleware.ApplyTo(options.Schema);
-                        options.Schema.Initialize();
+                        lock (options.Schema)
+                        {
+                            if (!options.Schema.Initialized)
+                            {
+                                options.FieldMiddleware.ApplyTo(options.Schema);
+                                options.Schema.Initialize();
+                            }
+                        }
                     }
                 }
 

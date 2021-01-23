@@ -23,6 +23,9 @@ namespace GraphQL.Types
         /// Initializes the schema. Called by <see cref="IDocumentExecuter"/> before validating or executing the request.
         /// <br/><br/>
         /// Note that middleware cannot be applied once the schema has been initialized. See <see cref="ExecutionOptions.FieldMiddleware"/>.
+        /// <br/><br/>
+        /// This method should be safe to be called from multiple threads simultaneously. However, field middleware
+        /// must be applied in a thread-safe manner so that it is not applied to the schema multiple times.
         /// </summary>
         void Initialize();
 

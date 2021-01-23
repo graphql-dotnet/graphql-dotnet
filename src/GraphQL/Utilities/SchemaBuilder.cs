@@ -535,7 +535,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
     internal static class SchemaExtensions
     {
-        public static TNode As<TNode>(ASTNode node) where TNode : ASTNode
+        public static TNode As<TNode>(this ASTNode node) where TNode : ASTNode
         {
             return node as TNode ?? throw new InvalidOperationException($"Node should be of type '{typeof(TNode).Name}' but it is of type '{node?.GetType().Name}'.");
         }
