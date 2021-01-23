@@ -11,8 +11,10 @@ namespace GraphQL.Types
     /// <inheritdoc cref="ISchema"/>
     public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
+        private bool _disposed;
         private IServiceProvider _services;
-        private Lazy<SchemaTypes> _allTypes;
+        private SchemaTypes _allTypes;
+        private readonly object _allTypesInitializationLock = new object();
         private readonly List<Type> _additionalTypes;
         private readonly List<IGraphType> _additionalInstances;
         private readonly List<IAstFromValueConverter> _converters;
@@ -34,7 +36,6 @@ namespace GraphQL.Types
         {
             _services = services;
 
-            _allTypes = new Lazy<SchemaTypes>(CreateSchemaTypes);
             _additionalTypes = new List<Type>();
             _additionalInstances = new List<IGraphType>();
             Directives = new SchemaDirectives
@@ -75,7 +76,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public bool Initialized => _allTypes?.IsValueCreated == true;
+        public bool Initialized { get; private set; } = false;
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
         private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
@@ -89,7 +90,20 @@ namespace GraphQL.Types
         {
             CheckDisposed();
 
-            FindType("____");
+            if (Initialized)
+                return;
+
+            lock (_allTypesInitializationLock)
+            {
+                if (Initialized)
+                    return;
+
+                CreateSchemaTypes();
+
+                Initialized = true;
+
+                FindType("____");
+            }
         }
 
         /// <inheritdoc/>
@@ -135,19 +149,29 @@ namespace GraphQL.Types
         public SchemaDirectives Directives { get; }
 
         /// <inheritdoc/>
-        public SchemaTypes AllTypes => _allTypes?.Value;
+        public SchemaTypes AllTypes {
+            get
+            {
+                if (_allTypes != null)
+                    return _allTypes;
+
+                Initialize();
+
+                return _allTypes;
+            }
+        }
 
         /// <inheritdoc/>
         public IEnumerable<Type> AdditionalTypes => _additionalTypes;
 
         /// <inheritdoc/>
-        public FieldType SchemaMetaFieldType => _allTypes?.Value.SchemaMetaFieldType;
+        public FieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeMetaFieldType => _allTypes?.Value.TypeMetaFieldType;
+        public FieldType TypeMetaFieldType => AllTypes.TypeMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeNameMetaFieldType => _allTypes?.Value.TypeNameMetaFieldType;
+        public FieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
 
         /// <inheritdoc/>
         public void RegisterType(IGraphType type)
@@ -250,7 +274,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(name), "A type name is required to lookup.");
             }
 
-            return _allTypes?.Value[name];
+            return AllTypes[name];
         }
 
         /// <inheritdoc/>
@@ -264,7 +288,7 @@ namespace GraphQL.Types
         {
             if (disposing)
             {
-                if (_allTypes != null)
+                if (_disposed)
                 {
                     _services = null;
                     Query = null;
@@ -277,19 +301,17 @@ namespace GraphQL.Types
                     Directives.Clear();
                     _converters.Clear();
 
-                    if (_allTypes.IsValueCreated)
-                    {
-                        _allTypes.Value.Dictionary.Clear();
-                    }
-
+                    _allTypes?.Dictionary.Clear();
                     _allTypes = null;
+
+                    _disposed = true;
                 }
             }
         }
 
         private void CheckDisposed()
         {
-            if (_allTypes == null)
+            if (_disposed)
                 throw new ObjectDisposedException(nameof(Schema));
         }
 
@@ -325,21 +347,21 @@ namespace GraphQL.Types
                 yield return Subscription;
         }
 
-        private SchemaTypes CreateSchemaTypes()
+        private void CreateSchemaTypes()
         {
             var types = _additionalInstances
                 .Union(GetRootTypes())
                 .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
-            var schemaTypes = SchemaTypes.Create(
+            _allTypes = SchemaTypes.Create(
                 types,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 NameConverter);
 
-            schemaTypes.ApplyMiddleware(FieldMiddleware, this);
-
-            return schemaTypes;
+            //at this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete
+            //however, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock
+            _allTypes.ApplyMiddleware(FieldMiddleware, this);
         }
     }
 }
