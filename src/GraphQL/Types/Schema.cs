@@ -359,7 +359,7 @@ namespace GraphQL.Types
 
             //at this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete
             //however, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock
-            _allTypes.ApplyMiddleware(FieldMiddleware, this);
+            _allTypes.ApplyMiddleware(FieldMiddleware);
         }
     }
 }

@@ -51,6 +51,32 @@ namespace GraphQL.Tests.Instrumentation
         }
 
         [Fact]
+        public void multiple_middleware_runs_in_correct_order()
+        {
+            // verify that the middleware runs in the same order as it did in 3.x
+
+            _builder.Use(next =>
+            {
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "One " + res.ToString();
+                };
+            });
+            _builder.Use(next =>
+            {
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "Two " + res.ToString();
+                };
+            });
+
+            var result = _builder.BuildResolve().Invoke(_context).Result;
+            result.ShouldBe("One Two Quinn");
+        }
+
+        [Fact]
         public void middleware_can_combine()
         {
             _builder.Use(next =>
@@ -91,9 +117,9 @@ namespace GraphQL.Tests.Instrumentation
         [Fact]
         public void can_use_class()
         {
-            _builder.Use<SimpleMiddleware>();
+            _builder.Use(new SimpleMiddleware());
 
-            var result = _builder.BuildResolve(start: null, schema: _context.Schema).Invoke(_context).Result;
+            var result = _builder.BuildResolve().Invoke(_context).Result;
             result.ShouldBe("Quinn");
 
             var record = _context.Metrics.Finish().Skip(1).Single();
@@ -170,13 +196,13 @@ namespace GraphQL.Tests.Instrumentation
         public static FieldMiddlewareDelegate BuildResolve(this FieldMiddlewareBuilder builder)
         {
             var transform = builder.Build();
-            return transform != null ? transform(null, null) : null;
+            return transform != null ? transform(null) : null;
         }
 
-        public static FieldMiddlewareDelegate BuildResolve(this FieldMiddlewareBuilder builder, FieldMiddlewareDelegate start, ISchema schema)
+        public static FieldMiddlewareDelegate BuildResolve(this FieldMiddlewareBuilder builder, FieldMiddlewareDelegate start)
         {
             var transform = builder.Build();
-            return transform(schema, start);
+            return transform(start);
         }
     }
 }

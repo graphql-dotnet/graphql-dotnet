@@ -25,7 +25,7 @@ query {
 }";
 
             var start = DateTime.UtcNow;
-            Schema.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+            Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
             var result = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;

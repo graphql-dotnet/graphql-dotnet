@@ -191,14 +191,14 @@ namespace GraphQL.Types
         /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
         /// Therefore, as a rule, this method should be called only once during schema initialization.
         /// </summary>
-        public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder, ISchema schema)
+        public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder)
         {
             var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
 
             // allocation free optimization if no middlewares are defined
             if (transform != null)
             {
-                ApplyMiddleware(transform, schema);
+                ApplyMiddleware(transform);
             }
         }
 
@@ -208,13 +208,10 @@ namespace GraphQL.Types
         /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
         /// Therefore, as a rule, this method should be called only once during schema initialization.
         /// </summary>
-        public void ApplyMiddleware(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform, ISchema schema)
+        public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
         {
             if (transform == null)
                 throw new ArgumentNullException(nameof(transform));
-
-            if (schema == null)
-                throw new ArgumentNullException(nameof(schema));
 
             foreach (var item in Dictionary)
             {
@@ -224,7 +221,7 @@ namespace GraphQL.Types
                     {
                         var inner = field.Resolver ?? NameFieldResolver.Instance;
 
-                        var fieldMiddlewareDelegate = transform(schema, context => inner.ResolveAsync(context));
+                        var fieldMiddlewareDelegate = transform(context => inner.ResolveAsync(context));
 
                         field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                     }

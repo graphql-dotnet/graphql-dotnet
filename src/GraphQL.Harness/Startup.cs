@@ -56,8 +56,8 @@ namespace GraphQL.Harness
                 if (settings.Value.EnableMetrics)
                 {
                     schema.FieldMiddleware
-                        .Use<CountFieldMiddleware>()
-                        .Use<InstrumentFieldsMiddleware>();
+                        .Use(services.GetRequiredService<CountFieldMiddleware>())
+                        .Use(services.GetRequiredService<InstrumentFieldsMiddleware>());
                 }
                 return schema;
             });

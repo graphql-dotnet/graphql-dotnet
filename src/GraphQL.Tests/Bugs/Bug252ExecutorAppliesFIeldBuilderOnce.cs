@@ -15,13 +15,13 @@ namespace GraphQL.Tests.Bugs
         public int AppliedCount;
         private readonly FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
 
-        public Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
+        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
         {
             AppliedCount++;
             return overriddenBuilder.Build();
         }
 
-        public IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
             => overriddenBuilder.Use(middleware);
     }
 

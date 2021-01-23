@@ -913,16 +913,12 @@ namespace GraphQL.Instrumentation
     public class FieldMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
     {
         public FieldMiddlewareBuilder() { }
-        public System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build() { }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build() { }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
     public static class FieldMiddlewareBuilderExtensions
     {
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
-            where T : GraphQL.Instrumentation.IFieldMiddleware { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
     public interface IFieldMiddleware
@@ -931,8 +927,8 @@ namespace GraphQL.Instrumentation
     }
     public interface IFieldMiddlewareBuilder
     {
-        System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build();
-        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
+        System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build();
+        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
     }
     public class InstrumentFieldsMiddleware : GraphQL.Instrumentation.IFieldMiddleware
     {
@@ -2135,8 +2131,8 @@ namespace GraphQL.Types
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         public int Count { get; }
-        public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder, GraphQL.Types.ISchema schema) { }
-        public void ApplyMiddleware(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform, GraphQL.Types.ISchema schema) { }
+        public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
+        public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter) { }
     }
