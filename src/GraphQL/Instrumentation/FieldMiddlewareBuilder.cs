@@ -41,7 +41,7 @@ namespace GraphQL.Instrumentation
             return this;
         }
 
-        internal FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start, ISchema schema)
+        private FieldMiddlewareDelegate Build(FieldMiddlewareDelegate start, ISchema schema)
         {
             var middlewareDelegate = start ?? (context => Task.FromResult(NameFieldResolver.Instance.Resolve(context)));
 
@@ -60,29 +60,15 @@ namespace GraphQL.Instrumentation
             return middlewareDelegate;
         }
 
-        private bool Empty => _singleMiddleware == null;
-
         /// <inheritdoc/>
-        public void ApplyTo(ISchema schema)
+        public Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
         {
-            // allocation free optimization if no middlewares are defined
-            if (!Empty)
-            {
-                foreach (var item in schema.AllTypes.Dictionary)
-                {
-                    if (item.Value is IComplexGraphType complex)
-                    {
-                        foreach (var field in complex.Fields)
-                        {
-                            var inner = field.Resolver ?? NameFieldResolver.Instance;
+            if (Empty)
+                return null;
 
-                            var fieldMiddlewareDelegate = Build(context => inner.ResolveAsync(context), schema);
-
-                            field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
-                        }
-                    }
-                }
-            }
+            return (schema, start) => Build(start, schema);
         }
+
+        private bool Empty => _singleMiddleware == null;
     }
 }

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GraphQL.Conversion;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Resolvers;
 using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 
@@ -181,6 +183,53 @@ namespace GraphQL.Types
             lookup._sealed = true;
 
             return lookup;
+        }
+
+        /// <summary>
+        /// Applies all delegates specified by the middleware builder to the schema.
+        /// <br/><br/>
+        /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
+        /// Therefore, as a rule, this method should be called only once during schema initialization.
+        /// </summary>
+        public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder, ISchema schema)
+        {
+            var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
+
+            // allocation free optimization if no middlewares are defined
+            if (transform != null)
+            {
+                ApplyMiddleware(transform, schema);
+            }
+        }
+
+        /// <summary>
+        /// Applies the speicifed middleware transform delegate to the schema.
+        /// <br/><br/>
+        /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
+        /// Therefore, as a rule, this method should be called only once during schema initialization.
+        /// </summary>
+        public void ApplyMiddleware(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform, ISchema schema)
+        {
+            if (transform == null)
+                throw new ArgumentNullException(nameof(transform));
+
+            if (schema == null)
+                throw new ArgumentNullException(nameof(schema));
+
+            foreach (var item in Dictionary)
+            {
+                if (item.Value is IComplexGraphType complex)
+                {
+                    foreach (var field in complex.Fields)
+                    {
+                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+
+                        var fieldMiddlewareDelegate = transform(schema, context => inner.ResolveAsync(context));
+
+                        field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -913,7 +913,7 @@ namespace GraphQL.Instrumentation
     public class FieldMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
     {
         public FieldMiddlewareBuilder() { }
-        public void ApplyTo(GraphQL.Types.ISchema schema) { }
+        public System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build() { }
         public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
     public static class FieldMiddlewareBuilderExtensions
@@ -931,7 +931,7 @@ namespace GraphQL.Instrumentation
     }
     public interface IFieldMiddlewareBuilder
     {
-        void ApplyTo(GraphQL.Types.ISchema schema);
+        System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build();
         GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
     }
     public class InstrumentFieldsMiddleware : GraphQL.Instrumentation.IFieldMiddleware
@@ -2135,6 +2135,8 @@ namespace GraphQL.Types
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         public int Count { get; }
+        public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder, GraphQL.Types.ISchema schema) { }
+        public void ApplyMiddleware(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform, GraphQL.Types.ISchema schema) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter) { }
     }

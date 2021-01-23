@@ -18,12 +18,9 @@ namespace GraphQL.Instrumentation
         IFieldMiddlewareBuilder Use(Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
 
         /// <summary>
-        /// Applies all delegates specified by the <see cref="Use(Func{ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate})"/> method to the schema.
-        /// <br/><br/>
-        /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
-        /// Therefore, as a rule, this method should be called only once during schema initialization. See <see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)"/>.
+        /// Returns a transform for field resolvers, or <see langword="null"/> if no middleware is defined.
+        /// The transform is a cumulation of all middleware configured within this builder.
         /// </summary>
-        /// <param name="schema">The schema to which you want to apply middlewares.</param>
-        void ApplyTo(ISchema schema);
+        Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build();
     }
 }

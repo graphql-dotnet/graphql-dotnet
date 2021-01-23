@@ -78,10 +78,10 @@ namespace GraphQL.Types
         public bool Initialized => _allTypes?.IsValueCreated == true;
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
-        private void CheckInitialized()
+        private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
         {
             if (Initialized)
-                throw new InvalidOperationException("Schema is already initialized and sealed for modifications. You should call RegisterXXX methods only when Schema.Initialized = false.");
+                throw new InvalidOperationException($"Schema is already initialized and sealed for modifications. You should call '{name}' only when Schema.Initialized = false.");
         }
 
         /// <inheritdoc/>
@@ -327,17 +327,19 @@ namespace GraphQL.Types
 
         private SchemaTypes CreateSchemaTypes()
         {
-            FieldMiddleware.ApplyTo(this);
-
             var types = _additionalInstances
                 .Union(GetRootTypes())
                 .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));
 
-            return SchemaTypes.Create(
+            var schemaTypes = SchemaTypes.Create(
                 types,
                 Directives,
                 type => (IGraphType)_services.GetRequiredService(type),
                 NameConverter);
+
+            schemaTypes.ApplyMiddleware(FieldMiddleware, this);
+
+            return schemaTypes;
         }
     }
 }
