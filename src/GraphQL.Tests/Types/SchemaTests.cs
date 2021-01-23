@@ -160,6 +160,22 @@ namespace GraphQL.Tests.Types
                 type.ShouldBe(null, $"Found {typeName} in type lookup.");
             });
         }
+
+        [Fact]
+        public void middleware_can_reference_SchemaTypes()
+        {
+            var schema = new Schema() { Query = new SomeQuery() };
+            schema.FieldMiddleware.Use((schema, next) =>
+            {
+                schema.AllTypes.Count.ShouldNotBe(0);
+                return async context =>
+                {
+                    var res = await next(context);
+                    return "One " + res.ToString();
+                };
+            });
+            schema.Initialize();
+        }
     }
 
     public class MyDto
