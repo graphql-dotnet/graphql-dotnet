@@ -4,7 +4,7 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="SerialExecutionStrategy.ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
     public class SerialExecutionStrategy : ExecutionStrategy
     {
         /// <summary>

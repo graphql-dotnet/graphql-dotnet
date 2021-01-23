@@ -6,6 +6,7 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Microsoft.Extensions.ObjectPool;
 using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
@@ -15,6 +16,19 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
+        private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider().Create(new ValueExecutionNodePooledObjectPolicy());
+
+        private sealed class ValueExecutionNodePooledObjectPolicy : PooledObjectPolicy<ValueExecutionNode>
+        {
+            public override ValueExecutionNode Create() => new ValueExecutionNode();
+
+            public override bool Return(ValueExecutionNode node)
+            {
+                node.Reset();
+                return true;
+            }
+        }
+
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
         /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>.
@@ -51,7 +65,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        public RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
             {
@@ -73,7 +87,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for child fields of an object execution node. Only run if
         /// the object execution node result is not null.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
+        public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
             var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
             SetSubFieldNodes(context, parent, fields);
@@ -82,7 +96,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
+        public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
@@ -116,7 +130,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not null.
         /// </summary>
-        public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        public void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
@@ -133,7 +147,7 @@ namespace GraphQL.Execution
             var arrayItems = (data is ICollection collection)
                 ? new List<ExecutionNode>(collection.Count)
                 : new List<ExecutionNode>();
-            
+
             if (data is IList list)
             {
                 for (int i=0; i<list.Count; ++i)
@@ -192,7 +206,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        public static ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
+        public virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType;
@@ -202,7 +216,7 @@ namespace GraphQL.Execution
                 ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => _nodesPool.Get().Initialize(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }
