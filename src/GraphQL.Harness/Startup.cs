@@ -49,7 +49,18 @@ namespace GraphQL.Harness
             services.AddSingleton<EpisodeEnum>();
 
             // add schema
-            services.AddSingleton<ISchema, StarWarsSchema>();
+            services.AddSingleton<ISchema, StarWarsSchema>(services =>
+            {
+                var settings = services.GetRequiredService<IOptions<GraphQLSettings>>();
+                var schema = new StarWarsSchema(services);
+                if (settings.Value.EnableMetrics)
+                {
+                    schema.FieldMiddleware
+                        .Use<CountFieldMiddleware>()
+                        .Use<InstrumentFieldsMiddleware>();
+                }
+                return schema;
+            });
 
             // add infrastructure stuff
             services.AddHttpContextAccessor();

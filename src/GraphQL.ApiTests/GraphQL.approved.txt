@@ -88,7 +88,6 @@ namespace GraphQL
         public GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public bool EnableMetrics { get; set; }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
@@ -1925,6 +1924,7 @@ namespace GraphQL.Types
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
+        GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
@@ -2097,6 +2097,7 @@ namespace GraphQL.Types
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }

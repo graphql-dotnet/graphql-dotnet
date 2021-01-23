@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Conversion;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
 
@@ -60,6 +61,18 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
+
+        private IFieldMiddlewareBuilder _fieldMiddlewareBuilder = new FieldMiddlewareBuilder();
+        /// <inheritdoc/>
+        public IFieldMiddlewareBuilder FieldMiddleware
+        {
+            get => _fieldMiddlewareBuilder;
+            set
+            {
+                CheckInitialized();
+                _fieldMiddlewareBuilder = value ?? throw new ArgumentNullException();
+            }
+        }
 
         /// <inheritdoc/>
         public bool Initialized => _allTypes?.IsValueCreated == true;
@@ -314,6 +327,8 @@ namespace GraphQL.Types
 
         private SchemaTypes CreateSchemaTypes()
         {
+            FieldMiddleware.ApplyTo(this);
+
             var types = _additionalInstances
                 .Union(GetRootTypes())
                 .Union(_additionalTypes.Select(type => (IGraphType)_services.GetRequiredService(type.GetNamedType())));

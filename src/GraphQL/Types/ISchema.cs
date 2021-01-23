@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GraphQL.Conversion;
+using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 
 namespace GraphQL.Types
@@ -24,8 +25,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// Note that middleware cannot be applied once the schema has been initialized. See <see cref="ExecutionOptions.FieldMiddleware"/>.
         /// <br/><br/>
-        /// This method should be safe to be called from multiple threads simultaneously. However, field middleware
-        /// must be applied in a thread-safe manner so that it is not applied to the schema multiple times.
+        /// This method should be safe to be called from multiple threads simultaneously.
         /// </summary>
         void Initialize();
 
@@ -33,6 +33,13 @@ namespace GraphQL.Types
         /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
         /// </summary>
         INameConverter NameConverter { get; }
+
+        /// <summary>
+        /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
+        /// then adding additional middleware through the builder does nothing. The schema is initialized (if not yet)
+        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
+        /// </summary>
+        IFieldMiddlewareBuilder FieldMiddleware { get; }
 
         /// <summary>
         /// Description of the schema.
