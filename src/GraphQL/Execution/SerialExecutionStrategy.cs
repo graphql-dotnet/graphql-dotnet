@@ -8,6 +8,11 @@ namespace GraphQL.Execution
     public class SerialExecutionStrategy : ExecutionStrategy
     {
         /// <summary>
+        /// Gets a static instance of <see cref="SerialExecutionStrategy"/> strategy.
+        /// </summary>
+        public static SerialExecutionStrategy Instance { get; } = new SerialExecutionStrategy();
+
+        /// <summary>
         /// Executes document nodes serially. Nodes that return a <see cref="IDataLoaderResult"/> will
         /// execute once all other pending nodes have been completed.
         /// </summary>

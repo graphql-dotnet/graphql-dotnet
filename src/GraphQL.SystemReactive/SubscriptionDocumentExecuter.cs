@@ -20,7 +20,7 @@ namespace GraphQL
         {
             return context.Operation.OperationType switch
             {
-                OperationType.Subscription => new SubscriptionExecutionStrategy(),
+                OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
                 _ => base.SelectExecutionStrategy(context)
             };
         }

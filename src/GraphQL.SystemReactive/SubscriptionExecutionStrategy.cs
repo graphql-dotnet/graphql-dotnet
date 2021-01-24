@@ -11,6 +11,11 @@ namespace GraphQL.Execution
 {
     public class SubscriptionExecutionStrategy : ParallelExecutionStrategy
     {
+        /// <summary>
+        /// Gets a static instance of <see cref="SubscriptionExecutionStrategy"/> strategy.
+        /// </summary>
+        public static new SubscriptionExecutionStrategy Instance { get; } = new SubscriptionExecutionStrategy();
+
         public override async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
