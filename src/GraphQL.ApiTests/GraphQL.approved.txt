@@ -273,7 +273,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
-    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }

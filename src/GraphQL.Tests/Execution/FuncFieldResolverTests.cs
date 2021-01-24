@@ -25,6 +25,20 @@ namespace GraphQL.Tests.Execution
         }
 
         [Fact]
+        public void Pass_Through_Object_Source()
+        {
+            IResolveFieldContext<object> rfc1 = null;
+            var ffr1 = new FuncFieldResolver<object, string>(context =>
+            {
+                rfc1 = context;
+                return "ok";
+            });
+            ffr1.Resolve(_context);
+            rfc1.ShouldNotBeNull();
+            rfc1.ShouldBeSameAs(_context);
+        }
+
+        [Fact]
         public void Shares_Complete_Typed()
         {
             IResolveFieldContext<int?> rfc1 = null;
@@ -42,7 +56,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldBe(rfc2);
         }
 
@@ -64,7 +80,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldBe(rfc2);
         }
 
@@ -90,7 +108,9 @@ namespace GraphQL.Tests.Execution
             catch { }
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -116,7 +136,9 @@ namespace GraphQL.Tests.Execution
             catch { }
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -138,7 +160,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldBe(rfc2);
         }
 
@@ -160,7 +184,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldBe(rfc2);
         }
 
@@ -182,7 +208,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -208,7 +236,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -230,7 +260,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -256,7 +288,9 @@ namespace GraphQL.Tests.Execution
             catch { }
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -278,7 +312,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -304,7 +340,9 @@ namespace GraphQL.Tests.Execution
             catch { }
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -326,7 +364,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -348,7 +388,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -370,7 +412,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -392,7 +436,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -414,7 +460,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
 
@@ -436,7 +484,9 @@ namespace GraphQL.Tests.Execution
             ffr1.Resolve(_context);
             ffr2.Resolve(_context);
             rfc1.ShouldNotBeNull();
+            rfc1.ShouldNotBeSameAs(_context);
             rfc2.ShouldNotBeNull();
+            rfc2.ShouldNotBeSameAs(_context);
             rfc1.ShouldNotBe(rfc2);
         }
     }
