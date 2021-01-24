@@ -16,7 +16,7 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue> _arguments;
-        private IDictionary<string, Field> _subFields;
+        private Fields _subFields;
 
         /// <summary>
         /// Initializes an instance with the specified <see cref="ExecutionNode"/> and <see cref="ExecutionContext"/>.
@@ -101,7 +101,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields => _subFields ??= GetSubFields();
+        public Fields SubFields => _subFields ??= GetSubFields();
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext => _executionContext.UserContext;

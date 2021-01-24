@@ -15,8 +15,6 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
-        private readonly ObjectPool<Fields> _fieldsPool = new DefaultObjectPoolProvider().Create(new FieldsPooledObjectPolicy());
-
         private sealed class FieldsPooledObjectPolicy : PooledObjectPolicy<Fields>
         {
             public override Fields Create() => new Fields();
@@ -27,6 +25,8 @@ namespace GraphQL.Execution
                 return true;
             }
         }
+
+        private readonly ObjectPool<Fields> _fieldsPool = new DefaultObjectPoolProvider().Create(new FieldsPooledObjectPolicy());
 
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
@@ -104,7 +104,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
+        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Fields fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 

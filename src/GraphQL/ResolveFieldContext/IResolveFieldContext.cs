@@ -79,7 +79,7 @@ namespace GraphQL
         IEnumerable<object> ResponsePath { get; }
 
         /// <summary>Returns a list of child fields requested for the current field.</summary>
-        IDictionary<string, Field> SubFields { get; }
+        Fields SubFields { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the

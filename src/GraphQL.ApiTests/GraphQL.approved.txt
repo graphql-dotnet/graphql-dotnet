@@ -193,7 +193,7 @@ namespace GraphQL
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         object Source { get; }
-        System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        GraphQL.Language.AST.Fields SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
     }
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
@@ -269,7 +269,7 @@ namespace GraphQL
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
         public object Source { get; }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        public GraphQL.Language.AST.Fields SubFields { get; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
@@ -297,7 +297,7 @@ namespace GraphQL
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public object Source { get; set; }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
+        public GraphQL.Language.AST.Fields SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
     }
@@ -741,9 +741,9 @@ namespace GraphQL.Execution
         public void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         protected void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         public void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
-        public void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent, System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> fields) { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         public static GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQL.Language.AST.Field field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
+        public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent, GraphQL.Language.AST.Fields fields) { }
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
