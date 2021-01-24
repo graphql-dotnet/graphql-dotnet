@@ -836,6 +836,7 @@ namespace GraphQL.Execution
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public ParallelExecutionStrategy() { }
+        public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
@@ -846,6 +847,7 @@ namespace GraphQL.Execution
     public class SerialExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public SerialExecutionStrategy() { }
+        public static GraphQL.Execution.SerialExecutionStrategy Instance { get; }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
     [System.Serializable]
