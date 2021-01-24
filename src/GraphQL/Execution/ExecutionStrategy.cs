@@ -16,7 +16,7 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
-        private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider().Create(new ValueExecutionNodePooledObjectPolicy());
+        private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider { MaximumRetained = 128 }.Create(new ValueExecutionNodePooledObjectPolicy());
 
         private sealed class ValueExecutionNodePooledObjectPolicy : PooledObjectPolicy<ValueExecutionNode>
         {
@@ -37,14 +37,20 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
+
             var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode)
                 .ConfigureAwait(false);
 
+
+
+
             // After the entire node tree has been executed, get the values
             var data = rootNode.ToValue();
+
+            Clear(rootNode, _nodesPool);
 
             return new ExecutionResult
             {
@@ -54,6 +60,17 @@ namespace GraphQL.Execution
                 Operation = context.Operation,
                 Extensions = context.Extensions
             };
+        }
+
+        private static void Clear(IParentExecutionNode parent, ObjectPool<ValueExecutionNode> pool)
+        {
+            parent.ApplyToChildren((node, state) =>
+            {
+                if (node is IParentExecutionNode p)
+                    Clear(p, state);
+                else if (node is ValueExecutionNode v)
+                    state.Return(v);
+            }, pool);
         }
 
         /// <summary>
