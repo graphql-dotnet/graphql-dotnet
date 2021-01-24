@@ -14,7 +14,10 @@ namespace GraphQL.Instrumentation
         private readonly List<PerfRecord> _records;
         private PerfRecord _main;
 
-        public static readonly Metrics Disabled = new Metrics(false);
+        /// <summary>
+        /// Gets an instance of the metrics for which metrics collection is disabled.
+        /// </summary>
+        public static Metrics Disabled { get; } = new Metrics(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Metrics"/> class.
