@@ -945,6 +945,8 @@ namespace GraphQL.Instrumentation
     public class Metrics
     {
         public Metrics(bool enabled = true) { }
+        public bool Enabled { get; }
+        public static GraphQL.Instrumentation.Metrics None { get; }
         public GraphQL.Instrumentation.PerfRecord[] Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(string name) { }
         public GraphQL.Instrumentation.Metrics Start(string operationName) { }

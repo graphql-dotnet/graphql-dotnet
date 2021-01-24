@@ -8,6 +8,7 @@
 * New method `IParentExecutionNode.ApplyToChildren`
 * Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
+* `ExecutionOptions.EnableMetrics` is disabled by default
 
 ## Breaking Changes
 
