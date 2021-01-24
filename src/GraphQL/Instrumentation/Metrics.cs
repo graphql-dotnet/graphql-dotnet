@@ -16,7 +16,7 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Gets an instance of the metrics for which metrics collection is disabled.
         /// </summary>
-        public static Metrics Disabled { get; } = new Metrics(false);
+        public static Metrics None { get; } = new Metrics(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Metrics"/> class.
