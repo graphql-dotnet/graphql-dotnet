@@ -5,7 +5,7 @@ using System.Linq;
 namespace GraphQL.Instrumentation
 {
     /// <summary>
-    /// Records metrics during execution of a GraphQL document
+    /// Records metrics during execution of a GraphQL document.
     /// </summary>
     public class Metrics
     {
@@ -13,6 +13,8 @@ namespace GraphQL.Instrumentation
         private ValueStopwatch _stopwatch;
         private readonly List<PerfRecord> _records;
         private PerfRecord _main;
+
+        public static readonly Metrics Disabled = new Metrics(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Metrics"/> class.
@@ -24,6 +26,11 @@ namespace GraphQL.Instrumentation
             if (enabled)
                 _records = new List<PerfRecord>();
         }
+
+        /// <summary>
+        /// Shows whether metrics collection is enabled.
+        /// </summary>
+        public bool Enabled => _enabled;
 
         /// <summary>
         /// Logs the start of the execution.

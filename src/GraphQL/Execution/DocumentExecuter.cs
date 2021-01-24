@@ -71,7 +71,7 @@ namespace GraphQL
             if (options.FieldMiddleware == null)
                 throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
-            var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
+            var metrics = (options.EnableMetrics ? new Metrics() : Metrics.Disabled).Start(options.OperationName);
 
             ExecutionResult result = null;
             ExecutionContext context = null;
