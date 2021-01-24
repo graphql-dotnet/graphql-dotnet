@@ -103,7 +103,8 @@ namespace GraphQL.Resolvers
                     var adapter = System.Threading.Interlocked.Exchange(ref _sharedAdapter, null);
                     adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
                     var ret = resolver(adapter);
-                    if ((ret as Task).IsCompleted) {
+                    var t = ret as Task;
+                    if (t.IsCompleted && t.Status == TaskStatus.RanToCompletion) {
                         adapter.Reset();
                         System.Threading.Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);
                     }
