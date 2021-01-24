@@ -15,6 +15,9 @@
   These properties can be set in the constructor of the `Schema` instance, or within your DI registration delegate, or at any time before
   any query is executed. Once a query has been executed, changes to these fields is not allowed, and adding middleware via the field middleware
   builder has no effect.
+* The signature of `IFieldMiddlewareBuilder.Use` has been changed to remove the schema from delegate. Since the schema is now known, there is no
+  need for it to be passed to the middleware builder.
+* The middleware `Use<T>` extension method has been removed. Please use the `Use` method with a middleware instance instead.
 * `GraphQL.Utilities.ServiceProviderExtensions` has been made internal. This affects usages of its extension method `GetRequiredService`. Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` NuGet package and use extension method from `Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions` class.
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into your project if you require these classes.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
