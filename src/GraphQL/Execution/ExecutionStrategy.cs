@@ -7,7 +7,6 @@ using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Microsoft.Extensions.ObjectPool;
-using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
 {
@@ -16,15 +15,28 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
-        private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider { MaximumRetained = 128 }.Create(new ValueExecutionNodePooledObjectPolicy());
+        //private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider { MaximumRetained = 128 }.Create(new ValueExecutionNodePooledObjectPolicy());
 
-        private sealed class ValueExecutionNodePooledObjectPolicy : PooledObjectPolicy<ValueExecutionNode>
+        //private sealed class ValueExecutionNodePooledObjectPolicy : PooledObjectPolicy<ValueExecutionNode>
+        //{
+        //    public override ValueExecutionNode Create() => new ValueExecutionNode();
+
+        //    public override bool Return(ValueExecutionNode node)
+        //    {
+        //        node.Reset();
+        //        return true;
+        //    }
+        //}
+
+        private readonly ObjectPool<Fields> _fieldsPool = new DefaultObjectPoolProvider().Create(new FieldsPooledObjectPolicy());
+
+        private sealed class FieldsPooledObjectPolicy : PooledObjectPolicy<Fields>
         {
-            public override ValueExecutionNode Create() => new ValueExecutionNode();
+            public override Fields Create() => new Fields();
 
-            public override bool Return(ValueExecutionNode node)
+            public override bool Return(Fields fields)
             {
-                node.Reset();
+                fields.Clear();
                 return true;
             }
         }
@@ -38,7 +50,7 @@ namespace GraphQL.Execution
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
 
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode)
@@ -50,7 +62,7 @@ namespace GraphQL.Execution
             // After the entire node tree has been executed, get the values
             var data = rootNode.ToValue();
 
-            Clear(rootNode, _nodesPool);
+            //Clear(rootNode, _nodesPool);
 
             return new ExecutionResult
             {
@@ -89,13 +101,15 @@ namespace GraphQL.Execution
                 Result = context.RootValue
             };
 
-            var fields = CollectFields(
-                context,
-                rootType,
-                context.Operation.SelectionSet);
-
-
-            SetSubFieldNodes(context, root, fields);
+            var fields = _fieldsPool.Get();
+            try
+            {
+                SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
+            }
+            finally
+            {
+                _fieldsPool.Return(fields);
+            }
 
             return root;
         }
@@ -106,8 +120,15 @@ namespace GraphQL.Execution
         /// </summary>
         public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
-            SetSubFieldNodes(context, parent, fields);
+            var fields = _fieldsPool.Get();
+            try
+            {
+                SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
+            }
+            finally
+            {
+                _fieldsPool.Return(fields);
+            }
         }
 
         /// <summary>
@@ -124,10 +145,10 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var field = kvp.Value;
 
-                if (!ShouldIncludeNode(context, field.Directives))
-                    continue;
+                //if (!ShouldIncludeNode(context, field.Directives))
+                //    continue;
 
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
+                var fieldDefinition = ExecutionHelper.GetFieldDefinition(context.Schema, parentType, field);
 
                 if (fieldDefinition == null)
                     continue;
@@ -233,7 +254,7 @@ namespace GraphQL.Execution
                 ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => _nodesPool.Get().Initialize(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),// _nodesPool.Get().Initialize(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }

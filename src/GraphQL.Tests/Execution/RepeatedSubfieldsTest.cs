@@ -40,7 +40,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = new Fields().CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields.ContainsKey("test").ShouldBeTrue();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
@@ -54,7 +54,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(FirstTestField);
             outerSelection.Add(AliasedTestField);
 
-            var fields = ExecutionHelper.CollectFields(new ExecutionContext(), null, outerSelection);
+            var fields = new Fields().CollectFrom(new ExecutionContext(), null, outerSelection);
 
             fields["test"].SelectionSet.Selections.ShouldHaveSingleItem();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
@@ -88,10 +88,7 @@ namespace GraphQL.Tests.Execution
             outerSelection.Add(fragSpread);
             outerSelection.Add(SecondTestField);
 
-            var fields = ExecutionHelper.CollectFields(
-                context,
-                new PersonType(),
-                outerSelection);
+            var fields = new Fields().CollectFrom(context, new PersonType(), outerSelection);
 
             fields.ShouldHaveSingleItem();
             fields["test"].SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);

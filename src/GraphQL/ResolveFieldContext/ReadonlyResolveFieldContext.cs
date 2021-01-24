@@ -36,10 +36,10 @@ namespace GraphQL
             return this;
         }
 
-        private IDictionary<string, Field> GetSubFields()
+        private Fields GetSubFields()
         {
             return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
-                ? ExecutionHelper.CollectFields(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
+                ? new Fields().CollectFrom(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
                 : null;
         }
 
