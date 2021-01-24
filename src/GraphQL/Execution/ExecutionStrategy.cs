@@ -15,14 +15,6 @@ namespace GraphQL.Execution
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
         /// <summary>
-        /// Allows for an execution strategy to reuse an instance of <see cref="Fields"/>.
-        /// This field may be accessed by multiple threads at the same time, so
-        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
-        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
-        /// </summary>
-        private Fields _reusableFields;
-
-        /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
         /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>.
         /// Once complete, the values are collected into an object that is ready to be serialized and returned
@@ -58,19 +50,19 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds the root execution node.
         /// </summary>
-        public RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
+        public static RootExecutionNode BuildExecutionRootNode(ExecutionContext context, IObjectGraphType rootType)
         {
             var root = new RootExecutionNode(rootType)
             {
                 Result = context.RootValue
             };
 
-            var fields = System.Threading.Interlocked.Exchange(ref _reusableFields, null) ?? new Fields();
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
             SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
 
             fields.Clear();
-            System.Threading.Interlocked.CompareExchange(ref _reusableFields, fields, null);
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
 
             return root;
         }
@@ -79,14 +71,14 @@ namespace GraphQL.Execution
         /// Creates execution nodes for child fields of an object execution node. Only run if
         /// the object execution node result is not null.
         /// </summary>
-        public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
+        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = System.Threading.Interlocked.Exchange(ref _reusableFields, null) ?? new Fields();
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
             SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
 
             fields.Clear();
-            System.Threading.Interlocked.CompareExchange(ref _reusableFields, fields, null);
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
@@ -123,7 +115,7 @@ namespace GraphQL.Execution
         /// Creates execution nodes for array elements of an array execution node. Only run if
         /// the array execution node result is not null.
         /// </summary>
-        public void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
+        public static void SetArrayItemNodes(ExecutionContext context, ArrayExecutionNode parent)
         {
             var listType = (ListGraphType)parent.GraphType;
             var itemType = listType.ResolvedType;
