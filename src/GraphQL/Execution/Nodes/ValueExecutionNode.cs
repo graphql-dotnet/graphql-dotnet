@@ -8,8 +8,6 @@ namespace GraphQL.Execution
     /// </summary>
     public class ValueExecutionNode : ExecutionNode
     {
-        internal ValueExecutionNode() { }
-
         /// <summary>
         /// Initializes an instance of <see cref="ValueExecutionNode"/> with the specified values.
         /// </summary>

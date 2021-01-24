@@ -15,19 +15,6 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
-        //private readonly ObjectPool<ValueExecutionNode> _nodesPool = new DefaultObjectPoolProvider { MaximumRetained = 128 }.Create(new ValueExecutionNodePooledObjectPolicy());
-
-        //private sealed class ValueExecutionNodePooledObjectPolicy : PooledObjectPolicy<ValueExecutionNode>
-        //{
-        //    public override ValueExecutionNode Create() => new ValueExecutionNode();
-
-        //    public override bool Return(ValueExecutionNode node)
-        //    {
-        //        node.Reset();
-        //        return true;
-        //    }
-        //}
-
         private readonly ObjectPool<Fields> _fieldsPool = new DefaultObjectPoolProvider().Create(new FieldsPooledObjectPolicy());
 
         private sealed class FieldsPooledObjectPolicy : PooledObjectPolicy<Fields>
@@ -49,20 +36,14 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-
             var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode)
                 .ConfigureAwait(false);
 
-
-
-
             // After the entire node tree has been executed, get the values
             var data = rootNode.ToValue();
-
-            //Clear(rootNode, _nodesPool);
 
             return new ExecutionResult
             {
@@ -72,17 +53,6 @@ namespace GraphQL.Execution
                 Operation = context.Operation,
                 Extensions = context.Extensions
             };
-        }
-
-        private static void Clear(IParentExecutionNode parent, ObjectPool<ValueExecutionNode> pool)
-        {
-            parent.ApplyToChildren((node, state) =>
-            {
-                if (node is IParentExecutionNode p)
-                    Clear(p, state);
-                else if (node is ValueExecutionNode v)
-                    state.Return(v);
-            }, pool);
         }
 
         /// <summary>
@@ -144,9 +114,6 @@ namespace GraphQL.Execution
             {
                 var name = kvp.Key;
                 var field = kvp.Value;
-
-                //if (!ShouldIncludeNode(context, field.Directives))
-                //    continue;
 
                 var fieldDefinition = ExecutionHelper.GetFieldDefinition(context.Schema, parentType, field);
 
@@ -254,7 +221,7 @@ namespace GraphQL.Execution
                 ListGraphType _ => new ArrayExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IObjectGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
                 IAbstractGraphType _ => new ObjectExecutionNode(parent, graphType, field, fieldDefinition, indexInParentNode),
-                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),// _nodesPool.Get().Initialize(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
+                ScalarGraphType scalarGraphType => new ValueExecutionNode(parent, scalarGraphType, field, fieldDefinition, indexInParentNode),
                 _ => throw new InvalidOperationException($"Unexpected type: {graphType}")
             };
         }

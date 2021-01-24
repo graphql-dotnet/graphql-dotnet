@@ -14,28 +14,28 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the parent node, or null if this is the root node.
         /// </summary>
-        public ExecutionNode Parent { get; private set; }
+        public ExecutionNode Parent { get; }
 
         /// <summary>
         /// Returns the graph type of this node, unwrapped if it is a <see cref="NonNullGraphType"/>.
         /// Array nodes will be a <see cref="ListGraphType"/> instance.
         /// </summary>
-        public IGraphType GraphType { get; private set; }
+        public IGraphType GraphType { get; }
 
         /// <summary>
         /// Returns the AST field of this node.
         /// </summary>
-        public Field Field { get; private set; }
+        public Field Field { get; }
 
         /// <summary>
         /// Returns the graph's field type of this node.
         /// </summary>
-        public FieldType FieldDefinition { get; private set; }
+        public FieldType FieldDefinition { get; }
 
         /// <summary>
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, null.
         /// </summary>
-        public int? IndexInParentNode { get; protected set; }
+        public int? IndexInParentNode { get; }
 
         /// <summary>
         /// Returns the underlying graph type of this node, retaining the <see cref="NonNullGraphType"/> wrapping if applicable.
@@ -93,8 +93,6 @@ namespace GraphQL.Execution
             set => _source = value;
         }
 
-        protected ExecutionNode() { }
-
         /// <summary>
         /// Initializes an instance of <see cref="ExecutionNode"/> with the specified values
         /// </summary>
@@ -105,30 +103,11 @@ namespace GraphQL.Execution
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, null</param>
         protected ExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
         {
-            Initialize(parent, graphType, field, fieldDefinition, indexInParentNode);
-        }
-
-        protected internal virtual ExecutionNode Initialize(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
-        {
             Parent = parent;
             GraphType = graphType;
             Field = field;
             FieldDefinition = fieldDefinition;
             IndexInParentNode = indexInParentNode;
-
-            return this;
-        }
-
-        protected internal virtual void Reset()
-        {
-            Parent = null;
-            GraphType = null;
-            Field = null;
-            FieldDefinition = null;
-            IndexInParentNode = null;
-            IsResultSet = false;
-            _result = null;
-            _source = null;
         }
 
         /// <summary>
