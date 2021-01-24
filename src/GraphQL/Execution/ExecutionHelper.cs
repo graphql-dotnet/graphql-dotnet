@@ -243,7 +243,7 @@ namespace GraphQL.Execution
                 if (value == null)
                     return null;
 
-                // note: a list can have a single child element which will automatically be intrepreted as a list of 1 elements. (see below rule)
+                // note: a list can have a single child element which will automatically be interpreted as a list of 1 elements. (see below rule)
                 // so, to prevent a string as being interpreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
                 if (value is IEnumerable values && !(value is string))
                 {
