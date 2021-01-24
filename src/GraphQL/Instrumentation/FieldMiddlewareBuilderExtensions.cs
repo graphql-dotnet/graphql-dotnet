@@ -1,6 +1,5 @@
 using System;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Instrumentation
 {
