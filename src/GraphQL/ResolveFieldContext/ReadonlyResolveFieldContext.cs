@@ -29,8 +29,8 @@ namespace GraphQL
 
         internal ReadonlyResolveFieldContext Reset(ExecutionNode node, ExecutionContext context)
         {
-            _executionNode = node ?? throw new ArgumentNullException(nameof(node));
-            _executionContext = context ?? throw new ArgumentNullException(nameof(context));
+            _executionNode = node;
+            _executionContext = context;
             _arguments = null;
             _subFields = null;
             return this;

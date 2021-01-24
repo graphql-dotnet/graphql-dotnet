@@ -6,7 +6,6 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Microsoft.Extensions.ObjectPool;
 
 namespace GraphQL.Execution
 {
@@ -15,18 +14,13 @@ namespace GraphQL.Execution
     /// </summary>
     public abstract class ExecutionStrategy : IExecutionStrategy
     {
-        private sealed class FieldsPooledObjectPolicy : PooledObjectPolicy<Fields>
-        {
-            public override Fields Create() => new Fields();
-
-            public override bool Return(Fields fields)
-            {
-                fields.Clear();
-                return true;
-            }
-        }
-
-        private readonly ObjectPool<Fields> _fieldsPool = new DefaultObjectPoolProvider().Create(new FieldsPooledObjectPolicy());
+        /// <summary>
+        /// Allows for an execution strategy to reuse an instance of <see cref="Fields"/>.
+        /// This field may be accessed by multiple threads at the same time, so
+        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// </summary>
+        private Fields _reusableFields;
 
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
@@ -71,15 +65,12 @@ namespace GraphQL.Execution
                 Result = context.RootValue
             };
 
-            var fields = _fieldsPool.Get();
-            try
-            {
-                SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
-            }
-            finally
-            {
-                _fieldsPool.Return(fields);
-            }
+            var fields = System.Threading.Interlocked.Exchange(ref _reusableFields, null) ?? new Fields();
+
+            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
+
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref _reusableFields, fields, null);
 
             return root;
         }
@@ -90,15 +81,12 @@ namespace GraphQL.Execution
         /// </summary>
         public void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = _fieldsPool.Get();
-            try
-            {
-                SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
-            }
-            finally
-            {
-                _fieldsPool.Return(fields);
-            }
+            var fields = System.Threading.Interlocked.Exchange(ref _reusableFields, null) ?? new Fields();
+
+            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
+
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref _reusableFields, fields, null);
         }
 
         /// <summary>
@@ -257,6 +245,7 @@ namespace GraphQL.Execution
                 {
                     CompleteNode(context, node);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
+                    resolveContext.Reset(null, null);
                     System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                 }
             }
