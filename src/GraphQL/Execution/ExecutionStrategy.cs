@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using GraphQL.Language.AST;
@@ -138,18 +137,21 @@ namespace GraphQL.Execution
                     var node = BuildExecutionNode(parent, itemType, parent.Field, parent.FieldDefinition, index);
                     node.Result = d;
 
-                    if (node is ObjectExecutionNode objectNode)
+                    if (!(d is IDataLoaderResult))
                     {
-                        SetSubFieldNodes(context, objectNode);
-                    }
-                    else if (node is ArrayExecutionNode arrayNode)
-                    {
-                        SetArrayItemNodes(context, arrayNode);
-                    }
-                    else if (node is ValueExecutionNode valueNode)
-                    {
-                        node.Result = valueNode.GraphType.Serialize(d)
-                            ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                        if (node is ObjectExecutionNode objectNode)
+                        {
+                            SetSubFieldNodes(context, objectNode);
+                        }
+                        else if (node is ArrayExecutionNode arrayNode)
+                        {
+                            SetArrayItemNodes(context, arrayNode);
+                        }
+                        else if (node is ValueExecutionNode valueNode)
+                        {
+                            node.Result = valueNode.GraphType.Serialize(d)
+                                ?? throw new InvalidOperationException($"Unable to serialize '{d}' to '{valueNode.GraphType.Name}' for list index {index}.");
+                        }
                     }
 
                     arrayItems.Add(node);
@@ -360,7 +362,7 @@ namespace GraphQL.Execution
         {
             var result = node.Result;
 
-            IGraphType fieldType = node.FieldDefinition.ResolvedType;
+            IGraphType fieldType = node.ResolvedType;
             var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is NonNullGraphType nonNullType)
@@ -408,6 +410,7 @@ namespace GraphQL.Execution
         /// runs the <see cref="IDocumentExecutionListener.BeforeExecutionStepAwaitedAsync(IExecutionContext)">BeforeExecutionStepAwaitedAsync</see>
         /// method on each of the registered document execution listeners.
         /// </summary>
+        [Obsolete]
         protected virtual async Task OnBeforeExecutionStepAwaitedAsync(ExecutionContext context)
         {
             if (context.Listeners != null)

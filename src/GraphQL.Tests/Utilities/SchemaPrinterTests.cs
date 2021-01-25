@@ -153,7 +153,7 @@ directive @skip(
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var expected = new Dictionary<string, string>
             {
@@ -183,7 +183,7 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
@@ -218,7 +218,7 @@ type Foo {
             var root = new ObjectGraphType { Name = "Query" };
             root.Field<FooType>("foo");
 
-            var schema = new Schema {Query = root};
+            var schema = new Schema { Query = root };
 
             var options = new SchemaPrinterOptions
             {
@@ -581,6 +581,39 @@ union SingleUnion = Foo
         }
 
         [Fact]
+        public void prints_input_type_with_default()
+        {
+            var root = new ObjectGraphType { Name = "Query" };
+            root.Field<NonNullGraphType<StringGraphType>>(
+                "str",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<SomeInputType>> { Name = "argOne", DefaultValue = new SomeInput { Name = "Tom", Age = 42, IsDeveloper = true } },
+                    new QueryArgument<ListGraphType<SomeInputType>> { Name = "argTwo", DefaultValue = new[] { new SomeInput { Name = "Tom1", Age = 12 }, new SomeInput { Name = "Tom2", Age = 22, IsDeveloper = true } } })
+                );
+
+            var schema = new Schema { Query = root };
+
+            var expected = new Dictionary<string, string>
+            {
+                {
+                    "SomeInput",
+@"input SomeInput {
+  age: Int!
+  name: String!
+  isDeveloper: Boolean!
+}"
+                },
+                                {
+                    "Query",
+@"type Query {
+  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
+}"
+                },
+            };
+            AssertEqual(print(schema), expected);
+        }
+
+        [Fact]
         public void prints_custom_scalar()
         {
             var root = new ObjectGraphType { Name = "Query" };
@@ -725,7 +758,7 @@ scalar Uri"
         public void prints_enum_default_args()
         {
             var root = new ObjectGraphType { Name = "Query" };
-            
+
             var f = new FieldType
             {
                 Name = "bestColor",
@@ -1013,6 +1046,26 @@ enum __TypeKind {
                 Name = "InputType";
                 Field<IntGraphType>("int");
             }
+        }
+
+        public class SomeInputType : InputObjectGraphType<SomeInput>
+        {
+            public SomeInputType()
+            {
+                Name = "SomeInput";
+                Field(x => x.Age);
+                Field(x => x.Name);
+                Field(x => x.IsDeveloper);
+            }
+        }
+
+        public class SomeInput
+        {
+            public string Name { get; set; }
+
+            public int Age { get; set; }
+
+            public bool IsDeveloper { get; set; }
         }
 
         public class OddType : ScalarGraphType

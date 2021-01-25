@@ -58,7 +58,7 @@ jobs:
         run: dotnet restore
       - name: Build solution [Release]
         working-directory: src
-        run: dotnet build --no-restore -c Release -p:NoWarn=CS1591 -p:Version=$ref
+        run: dotnet build --no-restore -c Release -p:Version=$ref
       - name: Pack solution [Release]
         working-directory: src
         run: dotnet pack --no-restore -c Release -p:Version=$ref -o out

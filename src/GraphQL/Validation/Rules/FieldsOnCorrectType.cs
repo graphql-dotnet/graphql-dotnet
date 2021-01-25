@@ -10,15 +10,20 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// Fields on correct type
+    /// Fields on correct type:
     ///
     /// A GraphQL document is only valid if all fields selected are defined by the
-    /// parent type, or are an allowed meta field such as __typename
+    /// parent type, or are an allowed meta field such as __typename.
     /// </summary>
     public class FieldsOnCorrectType : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly FieldsOnCorrectType Instance = new FieldsOnCorrectType();
 
+        /// <inheritdoc/>
+        /// <exception cref="FieldsOnCorrectTypeError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             return new EnterLeaveListener(_ =>
@@ -36,7 +41,7 @@ namespace GraphQL.Validation.Rules
                             var fieldName = node.Name;
 
                             // First determine if there are any suggested types to condition on.
-                            var suggestedTypeNames = GetSuggestedTypeNames(context.Schema, type, fieldName).ToList();
+                            var suggestedTypeNames = GetSuggestedTypeNames(type, fieldName).ToList();
 
                             // If there are no suggested types, then perhaps this was a typo?
                             var suggestedFieldNames = suggestedTypeNames.Count > 0
@@ -57,10 +62,7 @@ namespace GraphQL.Validation.Rules
         /// suggest them, sorted by how often the type is referenced,  starting
         /// with Interfaces.
         /// </summary>
-        private IEnumerable<string> GetSuggestedTypeNames(
-          ISchema schema,
-          IGraphType type,
-          string fieldName)
+        private IEnumerable<string> GetSuggestedTypeNames(IGraphType type, string fieldName)
         {
             if (type is IAbstractGraphType absType)
             {

@@ -7,14 +7,19 @@ using GraphQL.Validation.Errors;
 namespace GraphQL.Validation.Rules
 {
     /// <summary>
-    /// No fragment cycles
+    /// No fragment cycles:
     ///
     /// A GraphQL document is only valid if it does not contain fragment cycles.
     /// </summary>
     public class NoFragmentCycles : IValidationRule
     {
+        /// <summary>
+        /// Returns a static instance of this validation rule.
+        /// </summary>
         public static readonly NoFragmentCycles Instance = new NoFragmentCycles();
 
+        /// <inheritdoc/>
+        /// <exception cref="NoFragmentCyclesError"/>
         public Task<INodeVisitor> ValidateAsync(ValidationContext context)
         {
             // Tracks already visited fragments to maintain O(N) and to ensure that cycles
@@ -85,7 +90,7 @@ namespace GraphQL.Validation.Rules
                 else
                 {
                     var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
-                    var nodes = cyclePath.OfType<INode>().Concat(new[] {spreadNode}).ToArray();
+                    var nodes = cyclePath.OfType<INode>().Concat(new[] { spreadNode }).ToArray();
 
                     context.ReportError(new NoFragmentCyclesError(context, spreadName, cyclePath.Select(x => x.Name).ToArray(), nodes));
                 }

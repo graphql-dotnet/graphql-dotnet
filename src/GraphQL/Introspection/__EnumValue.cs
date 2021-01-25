@@ -2,8 +2,14 @@ using GraphQL.Types;
 
 namespace GraphQL.Introspection
 {
+    /// <summary>
+    /// The <c>__EnumValue</c> introspection type represents one of possible values of an enum.
+    /// </summary>
     public class __EnumValue : ObjectGraphType<EnumValueDefinition>
     {
+        /// <summary>
+        /// Initializes a new instance of the <c>__EnumValue</c> introspection type.
+        /// </summary>
         public __EnumValue()
         {
             Name = nameof(__EnumValue);

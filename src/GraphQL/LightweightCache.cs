@@ -67,6 +67,7 @@ namespace GraphQL
             set => _onMissing = value;
         }
 
+        [Obsolete]
         public Func<TValue, TKey> GetKey { get; set; } = delegate { throw new NotImplementedException(); };
 
         /// <summary>
@@ -74,6 +75,7 @@ namespace GraphQL
         /// </summary>
         public int Count => _values.Count;
 
+        [Obsolete]
         public TValue First
         {
             get
@@ -216,9 +218,9 @@ namespace GraphQL
         /// <param name="predicate">The search predicate.</param>
         public bool Exists(Predicate<TValue> predicate)
         {
-            var returnValue = false;
+            bool returnValue = false;
 
-            Each(delegate (TValue value) { returnValue |= predicate(value); });
+            Each(value => returnValue |= predicate(value));
 
             return returnValue;
         }

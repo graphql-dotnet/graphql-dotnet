@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using GraphQL.Introspection;
@@ -8,7 +9,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Utilities
 {
-    public class SchemaPrinter
+    public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
         protected SchemaPrinterOptions Options { get; }
 
@@ -89,7 +90,7 @@ namespace GraphQL.Utilities
 
         public bool IsSpecDirective(string directiveName)
         {
-            var names = new []
+            var names = new[]
             {
                 "skip",
                 "include",
@@ -100,7 +101,8 @@ namespace GraphQL.Utilities
 
         public string PrintSchemaDefinition(ISchema schema)
         {
-            if (IsSchemaOfCommonNames(Schema)) return null;
+            if (IsSchemaOfCommonNames(Schema))
+                return null;
 
             var operationTypes = new List<string>();
 
@@ -164,7 +166,7 @@ namespace GraphQL.Utilities
                 IObjectGraphType objectGraphType => PrintObject(objectGraphType),
                 IInterfaceGraphType interfaceGraphType => PrintInterface(interfaceGraphType),
                 UnionGraphType unionGraphType => PrintUnion(unionGraphType),
-                DirectiveGraphType directiveGraphType => PrintDirective(directiveGraphType),
+                DirectiveGraphType directiveGraphType => PrintDirective(directiveGraphType),  //TODO: DirectiveGraphType does not inherit IGraphType
                 IInputObjectGraphType input => PrintInputObject(input),
                 _ => throw new InvalidOperationException($"Unknown GraphType '{type.GetType().Name}' with name '{type.Name}'")
             };
@@ -274,8 +276,9 @@ namespace GraphQL.Utilities
 
         private string FormatDirectiveArguments(QueryArguments arguments)
         {
-            if (arguments == null || arguments.Count == 0) return null;
-            return string.Join(Environment.NewLine, arguments.Select(arg=> $"  {PrintInputValue(arg)}"));
+            if (arguments == null || arguments.Count == 0)
+                return null;
+            return string.Join(Environment.NewLine, arguments.Select(arg => $"  {PrintInputValue(arg)}"));
         }
 
         private string FormatDirectiveLocationList(IEnumerable<DirectiveLocation> locations)
@@ -290,31 +293,68 @@ namespace GraphQL.Utilities
         {
             return graphType switch
             {
-                NonNullGraphType nullable => FormatDefaultValue(value, nullable.ResolvedType),
+                NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType),
                 ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType)))),
+                IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => enumeration.Serialize(value).ToString(),
-                _ => value switch
+                ScalarGraphType _ => value switch
                 {
                     string s => $"\"{s}\"",
                     bool b => b ? "true" : "false",
-                    _ => value.ToString()
-                }
+                    _ => value.ToString() // TODO: how to print custom scalars ("") ?
+                },
+                _ => throw new NotSupportedException($"Unsopported graph type '{graphType}'")
             };
+        }
+
+        private string FormatInputObjectValue(object value, IInputObjectGraphType input)
+        {
+            var sb = new StringBuilder();
+            sb.Append("{ ");
+
+            foreach (var field in input.Fields)
+            {
+                string propertyName = field.GetMetadata<string>(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? field.Name;
+                PropertyInfo propertyInfo;
+
+                try
+                {
+                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                }
+
+                object propertyValue = propertyInfo.GetValue(value);
+                if (propertyValue != null)
+                {
+                    sb.Append(field.Name)
+                       .Append(": ")
+                       .Append(FormatDefaultValue(propertyValue, field.ResolvedType))
+                       .Append(", ");
+                }
+            }
+
+            sb.Length -= 2;
+            sb.Append(" }");
+            return sb.ToString();
         }
 
         public static string ResolveName(IGraphType type)
         {
             return type switch
             {
-                NonNullGraphType nullable => "{0}!".ToFormat(ResolveName(nullable.ResolvedType)),
-                ListGraphType list => "[{0}]".ToFormat(ResolveName(list.ResolvedType)),
+                NonNullGraphType nonNull => $"{ResolveName(nonNull.ResolvedType)}!",
+                ListGraphType list => $"[{ResolveName(list.ResolvedType)}]",
                 _ => type?.Name
             };
         }
 
         public string PrintDescription(string description, string indentation = "", bool firstInBlock = true)
         {
-            if (string.IsNullOrWhiteSpace(description)) return "";
+            if (string.IsNullOrWhiteSpace(description))
+                return "";
 
             indentation ??= "";
 

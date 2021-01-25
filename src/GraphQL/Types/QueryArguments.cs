@@ -5,8 +5,15 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Types
 {
+    // TODO: better to rename QueryArguments and QueryArgument to something like GraphQLArguments and GraphQLArgument.
+    /// <summary>
+    /// Represents a list of arguments to a field or directive.
+    /// </summary>
     public class QueryArguments : IEnumerable<QueryArgument>
     {
+        /// <summary>
+        /// Initializes a new instance containing the specified arguments.
+        /// </summary>
         public QueryArguments(params QueryArgument[] args)
         {
             foreach (var arg in args)
@@ -15,6 +22,9 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance containing the specified arguments.
+        /// </summary>
         public QueryArguments(IEnumerable<QueryArgument> list)
         {
             foreach (var arg in list)
@@ -23,12 +33,15 @@ namespace GraphQL.Types
             }
         }
 
+        /// <summary>
+        /// Gets or sets the argument at the specified index.
+        /// </summary>
         public QueryArgument this[int index]
         {
             get => ArgumentsList != null ? ArgumentsList[index] : throw new IndexOutOfRangeException();
             set
             {
-                if (value != null && string.IsNullOrEmpty(value.Name))
+                if (value != null)
                 {
                     NameValidator.ValidateName(value.Name, "argument");
                 }
@@ -42,15 +55,20 @@ namespace GraphQL.Types
 
         internal List<QueryArgument> ArgumentsList { get; private set; }
 
+        /// <summary>
+        /// Returns the number of arguments in the list.
+        /// </summary>
         public int Count => ArgumentsList?.Count ?? 0;
 
+        /// <summary>
+        /// Adds an argument to the list.
+        /// </summary>
         public void Add(QueryArgument argument)
         {
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
-            if (string.IsNullOrEmpty(argument.Name))
-                NameValidator.ValidateName(argument.Name, "argument");
+            NameValidator.ValidateName(argument.Name, "argument");
 
             if (ArgumentsList == null)
                 ArgumentsList = new List<QueryArgument>();
@@ -58,6 +76,9 @@ namespace GraphQL.Types
             ArgumentsList.Add(argument);
         }
 
+        /// <summary>
+        /// Finds an argument by its name from the list.
+        /// </summary>
         public QueryArgument Find(string name)
         {
             if (ArgumentsList == null)
@@ -71,6 +92,7 @@ namespace GraphQL.Types
             return null;
         }
 
+        /// <inheritdoc/>
         public IEnumerator<QueryArgument> GetEnumerator()
         {
             if (ArgumentsList == null)

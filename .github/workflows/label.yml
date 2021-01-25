@@ -16,3 +16,4 @@ jobs:
       with:
         sync-labels: ""
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+      continue-on-error: true
