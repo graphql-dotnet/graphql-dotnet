@@ -25,12 +25,12 @@ query {
 }";
 
             var start = DateTime.UtcNow;
+            Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
             var result = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
                 _.Query = query;
                 _.EnableMetrics = true;
-                _.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
             }).Result;
             result.EnrichWithApolloTracing(start);
             var trace = (ApolloTrace)result.Extensions["tracing"];

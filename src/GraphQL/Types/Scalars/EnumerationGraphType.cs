@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using GraphQL.Language.AST;
@@ -63,7 +64,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public override object Serialize(object value)
         {
-            var valueString = value.ToString();
+            var valueString = value.ToString(); //TODO: find only by value?
             var foundByName = Values.FindByName(valueString);
             if (foundByName != null)
             {
@@ -176,7 +177,7 @@ namespace GraphQL.Types
         {
             if (value is Enum)
             {
-                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+                value = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())); //TODO: allocation, move work with enums into new generic class
             }
 
             // DO NOT USE LINQ ON HOT PATH
@@ -198,6 +199,7 @@ namespace GraphQL.Types
     /// <summary>
     /// A class that represents an enumeration definition.
     /// </summary>
+    [DebuggerDisplay("{Name}: {Value}")]
     public class EnumValueDefinition : MetadataProvider
     {
         /// <summary>

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using GraphQL.Execution;
-using GraphQL.Instrumentation;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -47,13 +46,6 @@ namespace GraphQL
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext { get; set; } = new Dictionary<string, object>();
 
-        /// <summary>
-        /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
-        /// then applying different middleware through options does nothing. The schema is initialized (if not yet)
-        /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
-        /// </summary>
-        public IFieldMiddlewareBuilder FieldMiddleware { get; set; } = new FieldMiddlewareBuilder();
-
         /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
         public ComplexityConfiguration ComplexityConfiguration { get; set; }
 
@@ -61,7 +53,7 @@ namespace GraphQL
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
         /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
-        public bool EnableMetrics { get; set; } = true;
+        public bool EnableMetrics { get; set; }
 
         /// <summary>When false, captures unhandled exceptions and returns them within <see cref="ExecutionResult.Errors">ExecutionResult.Errors</see></summary>
         public bool ThrowOnUnhandledException { get; set; }

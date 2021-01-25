@@ -8,10 +8,18 @@
 * New method `IParentExecutionNode.ApplyToChildren`
 * Document caching supported via `IDocumentCache` and a default implementation within `DefaultDocumentCache`.
   Within the `GraphQL.Caching` nuget package, a memory-backed implementation is available which is backed by `Microsoft.Extensions.Caching.Memory.IMemoryCache`.
+* `ExecutionOptions.EnableMetrics` is disabled by default
 
 ## Breaking Changes
 
-* `NameConverter` and `SchemaFilter` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
+* GraphQL.NET now uses GraphQL-Parser v7 with new memory model
+* `NameConverter`, `SchemaFilter` and `FieldMiddleware` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
+  These properties can be set in the constructor of the `Schema` instance, or within your DI composition root, or at any time before
+  any query is executed. Once a query has been executed, changes to these fields is not allowed, and adding middleware via the field middleware
+  builder has no effect.
+* The signature of `IFieldMiddlewareBuilder.Use` has been changed to remove the schema from delegate. Since the schema is now known, there is no
+  need for it to be passed to the middleware builder.
+* The middleware `Use<T>` extension method has been removed. Please use the `Use` method with a middleware instance instead.
 * `GraphQL.Utilities.ServiceProviderExtensions` has been made internal. This affects usages of its extension method `GetRequiredService`. Instead, reference the `Microsoft.Extensions.DependencyInjection.Abstractions` NuGet package and use extension method from `Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions` class.
 * `GraphQL.Instrumentation.StatsReport` and its associated classes have been removed. Please copy the source code into your project if you require these classes.
 * When used, Apollo tracing will now convert the starting timestamp to UTC so that `StartTime` and `EndTime` are properly serialized as UTC values.
@@ -79,3 +87,4 @@
   data loaders. Once the asynchronous field resolver or data loader returns its final result, the context may be re-used.
   Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
   so it is safe to preserve these instances without calling `.Copy()`.
+* `ExecutionHelper.CollectFields` method was moved into `Fields` class and renamed to `CollectFrom`

@@ -72,7 +72,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields { get; set; }
+        public Fields SubFields { get; set; }
 
         /// <inheritdoc/>
         public IServiceProvider RequestServices { get; set; }

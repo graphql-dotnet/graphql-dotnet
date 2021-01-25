@@ -21,10 +21,7 @@ namespace GraphQL.Instrumentation
             };
 
             using (context.Metrics.Subject("field", context.FieldName, metadata))
-            {
-                var result = await next(context).ConfigureAwait(false);
-                return result;
-            }
+                return await next(context).ConfigureAwait(false);
         }
     }
 }

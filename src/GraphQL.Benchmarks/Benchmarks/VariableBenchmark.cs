@@ -98,7 +98,7 @@ namespace GraphQL.Benchmarks
             }).GetAwaiter().GetResult();
         }
 
-        void IBenchmark.Run() => Literal();
+        void IBenchmark.RunProfiler() => Literal();
 
         public class MySchema : Schema
         {

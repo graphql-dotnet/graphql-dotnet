@@ -31,12 +31,7 @@ namespace GraphQL.Utilities.Federation
         {
         }
 
-        public string PrintFederatedDirectives(IGraphType type)
-        {
-            if (type.IsInputObjectType())
-                return "";
-            return PrintFederatedDirectivesFromAst(type);
-        }
+        public string PrintFederatedDirectives(IGraphType type) => type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
@@ -47,7 +42,7 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective(x.Name.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name.Value))
                     .Select(PrintAstDirective)
             );
 

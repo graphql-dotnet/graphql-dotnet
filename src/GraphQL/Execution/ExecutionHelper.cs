@@ -120,7 +120,7 @@ namespace GraphQL.Execution
                     else if (graphType is NonNullGraphType)
                     {
                         ThrowNullError(variable.Name);
-                    } 
+                    }
 
                     // if the variable was not specified and no default was specified, do not set variable.Value
 
@@ -243,7 +243,7 @@ namespace GraphQL.Execution
                 if (value == null)
                     return null;
 
-                // note: a list can have a single child element which will automatically be intrepreted as a list of 1 elements. (see below rule)
+                // note: a list can have a single child element which will automatically be interpreted as a list of 1 elements. (see below rule)
                 // so, to prevent a string as being interpreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
                 if (value is IEnumerable values && !(value is string))
                 {
@@ -494,80 +494,6 @@ namespace GraphQL.Execution
             }
 
             throw new ArgumentOutOfRangeException(nameof(input), $"Unknown type of input object '{type.GetType()}'");
-        }
-
-        private static Fields CollectFields(
-            ExecutionContext context,
-            IGraphType specificType,
-            SelectionSet selectionSet,
-            Fields fields,
-            List<string> visitedFragmentNames)
-        {
-            if (selectionSet != null)
-            {
-                foreach (var selection in selectionSet.SelectionsList)
-                {
-                    if (selection is Field field)
-                    {
-                        if (!ShouldIncludeNode(context, field.Directives))
-                        {
-                            continue;
-                        }
-
-                        fields.Add(field);
-                    }
-                    else if (selection is FragmentSpread spread)
-                    {
-                        if (visitedFragmentNames.Contains(spread.Name)
-                            || !ShouldIncludeNode(context, spread.Directives))
-                        {
-                            continue;
-                        }
-
-                        visitedFragmentNames.Add(spread.Name);
-
-                        var fragment = context.Fragments.FindDefinition(spread.Name);
-                        if (fragment == null
-                            || !ShouldIncludeNode(context, fragment.Directives)
-                            || !DoesFragmentConditionMatch(context, fragment.Type.Name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, fragment.SelectionSet, fields, visitedFragmentNames);
-                    }
-                    else if (selection is InlineFragment inline)
-                    {
-                        var name = inline.Type != null ? inline.Type.Name : specificType.Name;
-
-                        if (!ShouldIncludeNode(context, inline.Directives)
-                          || !DoesFragmentConditionMatch(context, name, specificType))
-                        {
-                            continue;
-                        }
-
-                        CollectFields(context, specificType, inline.SelectionSet, fields, visitedFragmentNames);
-                    }
-                }
-            }
-
-            return fields;
-        }
-
-        /// <summary>
-        /// Before execution, the selection set is converted to a grouped field set by calling CollectFields().
-        /// Each entry in the grouped field set is a list of fields that share a response key (the alias if defined,
-        /// otherwise the field name). This ensures all fields with the same response key included via referenced
-        /// fragments are executed at the same time.
-        /// <br/><br/>
-        /// See http://spec.graphql.org/June2018/#sec-Field-Collection and http://spec.graphql.org/June2018/#CollectFields()
-        /// </summary>
-        public static Dictionary<string, Field> CollectFields(
-            ExecutionContext context,
-            IGraphType specificType,
-            SelectionSet selectionSet)
-        {
-            return CollectFields(context, specificType, selectionSet, Fields.Empty(), new List<string>());
         }
 
         /// <summary>

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQLParser;
@@ -19,9 +19,15 @@ namespace GraphQL.Utilities
 
         public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProvider();
 
+        /// <summary>
+        /// Specifies whether to ignore comments when parsing GraphQL document.
+        /// By default, all comments are ignored
+        /// </summary>
+        public bool IgnoreComments { get; set; } = true;
+
         public TypeSettings Types { get; } = new TypeSettings();
 
-        public IDictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
+        public Dictionary<string, Type> Directives { get; } = new Dictionary<string, Type>
         {
             { "deprecated", typeof(DeprecatedDirectiveVisitor) }
         };
@@ -56,7 +62,7 @@ namespace GraphQL.Utilities
 
         public virtual ISchema Build(string typeDefinitions)
         {
-            var document = Parse(typeDefinitions);
+            var document = Parser.Parse(typeDefinitions, new ParserOptions { Ignore = IgnoreComments ? IgnoreOptions.IgnoreComments : IgnoreOptions.None });
             Validate(document);
             return BuildSchemaFrom(document);
         }
@@ -70,13 +76,6 @@ namespace GraphQL.Utilities
 Schema contains a redefinition of these types: {string.Join(", ", duplicates.Select(item => item.Key))}", nameof(document));
 
             // checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
-        }
-
-        private static GraphQLDocument Parse(string document)
-        {
-            var lexer = new Lexer();
-            var parser = new Parser(lexer);
-            return parser.Parse(new Source(document));
         }
 
         private ISchema BuildSchemaFrom(GraphQLDocument document)
@@ -158,11 +157,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.Comment?.Text;
+                schema.Description = _schemaDef.Comment?.Text.ToString();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes)
                 {
-                    var typeName = operationTypeDef.Type.Name.Value;
+                    var typeName = (string)operationTypeDef.Type.Name.Value;
                     var type = GetType(typeName) as IObjectGraphType;
 
                     switch (operationTypeDef.Operation)
@@ -219,21 +218,22 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
-            var typeConfig = Types.For(astType.Name.Value);
+            var name = (string)astType.Name.Value;
+            var typeConfig = Types.For(name);
 
             ObjectGraphType type;
-            if (!_types.ContainsKey(astType.Name.Value))
+            if (!_types.ContainsKey(name))
             {
-                type = new ObjectGraphType { Name = astType.Name.Value };
+                type = new ObjectGraphType { Name = name };
             }
             else
             {
-                type = _types[astType.Name.Value] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{astType.Name.Value} should be ObjectGraphType");
+                type = _types[name] as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType");
             }
 
             if (!isExtensionType)
             {
-                type.Description = typeConfig.Description ?? astType.Comment?.Text;
+                type.Description = typeConfig.Description ?? astType.Comment?.Text.ToString();
                 type.IsTypeOf = typeConfig.IsTypeOfFunc;
             }
 
@@ -258,7 +258,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (astType.Interfaces != null)
             {
                 astType.Interfaces
-                    .Select(i => new GraphQLTypeReference(i.Name.Value))
+                    .Select(i => new GraphQLTypeReference((string)i.Name.Value))
                     .Apply(type.AddResolvedInterface);
             }
 
@@ -279,12 +279,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.FieldFor(fieldDef.Name.Value, ServiceProvider);
+            var name = (string)fieldDef.Name.Value;
+            var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
 
             var field = new FieldType
             {
-                Name = fieldDef.Name.Value,
-                Description = fieldConfig.Description ?? fieldDef.Comment?.Text,
+                Name = name,
+                Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver
             };
@@ -304,12 +305,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.SubscriptionFieldFor(fieldDef.Name.Value, ServiceProvider);
+            var name = (string)fieldDef.Name.Value;
+            var fieldConfig = typeConfig.SubscriptionFieldFor(name, ServiceProvider);
 
             var field = new EventStreamFieldType
             {
-                Name = fieldDef.Name.Value,
-                Description = fieldConfig.Description ?? fieldDef.Comment?.Text,
+                Name = name,
+                Description = fieldConfig.Description ?? fieldDef.Comment?.Text.ToString(),
                 ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
                 Subscriber = fieldConfig.Subscriber,
@@ -331,12 +333,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
             var typeConfig = Types.For(parentTypeName);
-            var fieldConfig = typeConfig.FieldFor(inputDef.Name.Value, ServiceProvider);
+            var name = (string)inputDef.Name.Value;
+            var fieldConfig = typeConfig.FieldFor(name, ServiceProvider);
 
             var field = new FieldType
             {
-                Name = inputDef.Name.Value,
-                Description = fieldConfig.Description ?? inputDef.Comment?.Text,
+                Name = name,
+                Description = fieldConfig.Description ?? inputDef.Comment?.Text.ToString(),
                 ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = inputDef.DefaultValue.ToValue()
             }.SetAstType(inputDef);
@@ -348,12 +351,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
-            var typeConfig = Types.For(interfaceDef.Name.Value);
+            var name = (string)interfaceDef.Name.Value;
+            var typeConfig = Types.For(name);
 
             var type = new InterfaceGraphType
             {
-                Name = interfaceDef.Name.Value,
-                Description = typeConfig.Description ?? interfaceDef.Comment?.Text,
+                Name = name,
+                Description = typeConfig.Description ?? interfaceDef.Comment?.Text.ToString(),
                 ResolveType = typeConfig.ResolveType
             }.SetAstType(interfaceDef);
 
@@ -372,12 +376,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
-            var typeConfig = Types.For(unionDef.Name.Value);
+            var name = (string)unionDef.Name.Value;
+            var typeConfig = Types.For(name);
 
             var type = new UnionGraphType
             {
-                Name = unionDef.Name.Value,
-                Description = typeConfig.Description ?? unionDef.Comment?.Text,
+                Name = name,
+                Description = typeConfig.Description ?? unionDef.Comment?.Text.ToString(),
                 ResolveType = typeConfig.ResolveType
             }.SetAstType(unionDef);
 
@@ -385,19 +390,24 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             CopyMetadata(type, typeConfig);
 
-            var possibleTypes = unionDef.Types.Select(x => GetType(x.Name.Value) ?? new GraphQLTypeReference(x.Name.Value));
+            var possibleTypes = unionDef.Types.Select(x =>
+            {
+                var name = (string)x.Name.Value;
+                return GetType(name) ?? new GraphQLTypeReference(name);
+            });
             possibleTypes.Apply(x => type.AddPossibleType(x as IObjectGraphType));
             return type;
         }
 
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
-            var typeConfig = Types.For(inputDef.Name.Value);
+            var name = (string)inputDef.Name.Value;
+            var typeConfig = Types.For(name);
 
             var type = new InputObjectGraphType
             {
-                Name = inputDef.Name.Value,
-                Description = typeConfig.Description ?? inputDef.Comment?.Text
+                Name = name,
+                Description = typeConfig.Description ?? inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
 
             VisitNode(type, v => v.VisitInputObject(type));
@@ -415,12 +425,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
-            var typeConfig = Types.For(enumDef.Name.Value);
+            var name = (string)enumDef.Name.Value;
+            var typeConfig = Types.For(name);
 
             var type = new EnumerationGraphType
             {
-                Name = enumDef.Name.Value,
-                Description = typeConfig.Description ?? enumDef.Comment?.Text
+                Name = name,
+                Description = typeConfig.Description ?? enumDef.Comment?.Text.ToString()
             }.SetAstType(enumDef);
 
             VisitNode(type, v => v.VisitEnum(type));
@@ -432,10 +443,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         protected virtual DirectiveGraphType ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
-            var locations = directiveDef.Locations.Select(l => ToDirectiveLocation(l.Value));
-            return new DirectiveGraphType(directiveDef.Name.Value, locations)
+            var locations = directiveDef.Locations.Select(l => ToDirectiveLocation((string)l.Value)); //TODO: can be rewritten without cast
+            return new DirectiveGraphType((string)directiveDef.Name.Value, locations)
             {
-                Description = directiveDef.Comment?.Text,
+                Description = directiveDef.Comment?.Text.ToString(),
                 Arguments = ToQueryArguments(directiveDef.Arguments)
             };
         }
@@ -457,8 +468,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             var val = new EnumValueDefinition
             {
                 Value = valDef.Name.Value,
-                Name = valDef.Name.Value,
-                Description = valDef.Comment?.Text
+                Name = (string)valDef.Name.Value,
+                Description = valDef.Comment?.Text.ToString()
             }.SetAstType(valDef);
 
             VisitNode(val, v => v.VisitEnumValue(val));
@@ -472,10 +483,10 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var argument = new QueryArgument(type)
             {
-                Name = inputDef.Name.Value,
+                Name = (string)inputDef.Name.Value,
                 DefaultValue = inputDef.DefaultValue.ToValue(),
                 ResolvedType = ToGraphType(inputDef.Type),
-                Description = inputDef.Comment?.Text
+                Description = inputDef.Comment?.Text.ToString()
             }.SetAstType(inputDef);
 
             VisitNode(argument, v => v.VisitArgumentDefinition(argument));
@@ -502,8 +513,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 case ASTNodeKind.NamedType:
                 {
                     var namedType = (GraphQLNamedType)astType;
-                    var type = GetType(namedType.Name.Value);
-                    return type ?? new GraphQLTypeReference(namedType.Name.Value);
+                    var name = (string)namedType.Name.Value;
+                    var type = GetType(name);
+                    return type ?? new GraphQLTypeReference(name);
                 }
 
                 default:
@@ -542,12 +554,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
         public static GraphQLDirective Directive(this IEnumerable<GraphQLDirective> directives, string name)
         {
-            return directives?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+            return directives?.FirstOrDefault(x => x.Name.Value == name);
         }
 
         public static GraphQLArgument Argument(this IEnumerable<GraphQLArgument> arguments, string name)
         {
-            return arguments?.FirstOrDefault(x => string.Equals(x.Name.Value, name, StringComparison.OrdinalIgnoreCase));
+            return arguments?.FirstOrDefault(x => x.Name.Value == name);
         }
 
         public static object ToValue(this GraphQLValue source)
@@ -567,32 +579,32 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return str.Value;
+                    return (string)str.Value;
                 }
                 case ASTNodeKind.IntValue:
                 {
                     var str = source as GraphQLScalarValue;
 
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    if (int.TryParse(str.Value, out var intResult))
+                    if (Int.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out int intResult))
                     {
                         return intResult;
                     }
 
                     // If the value doesn't fit in an integer, revert to using long...
-                    if (long.TryParse(str.Value, out var longResult))
+                    if (Long.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long longResult))
                     {
                         return longResult;
                     }
 
                     // If the value doesn't fit in an long, revert to using decimal...
-                    if (decimal.TryParse(str.Value, out var decimalResult))
+                    if (Decimal.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal decimalResult))
                     {
                         return decimalResult;
                     }
 
                     // If the value doesn't fit in an decimal, revert to using BigInteger...
-                    if (BigInteger.TryParse(str.Value, out var bigIntegerResult))
+                    if (BigInt.TryParse(str.Value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var bigIntegerResult))
                     {
                         return bigIntegerResult;
                     }
@@ -603,19 +615,46 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return ValueConverter.ConvertTo<double>(str.Value);
+
+                    // the idea is to see if there is a loss of accuracy of value
+                    // for example, 12.1 or 12.11 is double but 12.10 is decimal
+                    if (Double.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out double dbl) == false)
+                    {
+                        dbl = str.Value.Span[0] == '-' ? double.NegativeInfinity : double.PositiveInfinity;
+                    }
+
+                    //it is possible for a FloatValue to overflow a decimal; however, with a double, it just returns Infinity or -Infinity
+                    if (Decimal.TryParse(
+                        str.Value,
+                        NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                        CultureInfo.InvariantCulture,
+                        out decimal dec))
+                    {
+                        // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
+                        var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
+                        decimal temp = new decimal(dbl);
+                        var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
+                        if (!decBits.Equals(dblAsDecBits))
+                            return dec;
+                    }
+
+                    return dbl;
                 }
                 case ASTNodeKind.BooleanValue:
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return ValueConverter.ConvertTo<bool>(str.Value);
+                    return (str.Value.Length == 4).Boxed(); /*true.Length=4*/
                 }
                 case ASTNodeKind.EnumValue:
                 {
                     var str = source as GraphQLScalarValue;
                     Debug.Assert(str != null, nameof(str) + " != null");
-                    return str.Value;
+                    return (string)str.Value;
                 }
                 case ASTNodeKind.ObjectValue:
                 {
@@ -624,7 +663,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
                     Debug.Assert(obj != null, nameof(obj) + " != null");
                     if (obj.Fields != null)
-                        obj.Fields.Apply(f => values[f.Name.Value] = ToValue(f.Value));
+                        obj.Fields.Apply(f => values[(string)f.Name.Value] = ToValue(f.Value));
                     return values;
                 }
                 case ASTNodeKind.ListValue:
