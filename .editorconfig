@@ -132,8 +132,8 @@ csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 
 # C# code style - Index and range preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#index-and-range-preferences
-csharp_style_prefer_index_operator = true:warning
-csharp_style_prefer_range_operator = true:warning
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
 
 # C# code style - Miscellaneous preferences
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#miscellaneous-preferences
