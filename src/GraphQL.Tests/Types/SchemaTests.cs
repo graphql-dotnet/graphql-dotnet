@@ -184,6 +184,7 @@ namespace GraphQL.Tests.Types
         {
             var schema = new Schema();
             schema.Dispose();
+            schema.Dispose();
             Should.Throw<ObjectDisposedException>(() => schema.Initialize());
             Should.Throw<ObjectDisposedException>(() => schema.RegisterType(new ObjectGraphType { Name = "test" }));
             Should.Throw<ObjectDisposedException>(() => schema.RegisterTypes(new IGraphType[] { }));
