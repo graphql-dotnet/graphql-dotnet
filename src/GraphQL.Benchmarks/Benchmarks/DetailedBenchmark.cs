@@ -242,6 +242,7 @@ namespace GraphQL.Benchmarks
                 return mem;
             }
         }
+
         private class BenchmarkConfig : ManualConfig
         {
             public BenchmarkConfig()
