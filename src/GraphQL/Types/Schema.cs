@@ -76,7 +76,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public bool Initialized { get; private set; } = false;
+        public bool Initialized { get; private set; }
 
         // TODO: It would be worthwhile to think at all about how to redo the design so that such a situation does not arise.
         private void CheckInitialized([System.Runtime.CompilerServices.CallerMemberName] string name = "")
@@ -147,13 +147,12 @@ namespace GraphQL.Types
         public SchemaDirectives Directives { get; }
 
         /// <inheritdoc/>
-        public SchemaTypes AllTypes {
+        public SchemaTypes AllTypes
+        {
             get
             {
-                if (_allTypes != null)
-                    return _allTypes;
-
-                Initialize();
+                if (_allTypes == null)
+                    Initialize();
 
                 return _allTypes;
             }
@@ -286,7 +285,7 @@ namespace GraphQL.Types
         {
             if (disposing)
             {
-                if (_disposed)
+                if (!_disposed)
                 {
                     _services = null;
                     Query = null;
@@ -357,8 +356,8 @@ namespace GraphQL.Types
                 type => (IGraphType)_services.GetRequiredService(type),
                 NameConverter);
 
-            //at this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete
-            //however, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock
+            // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
+            // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
             _allTypes.ApplyMiddleware(FieldMiddleware);
         }
     }

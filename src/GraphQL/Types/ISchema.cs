@@ -35,7 +35,7 @@ namespace GraphQL.Types
         INameConverter NameConverter { get; }
 
         /// <summary>
-        /// Note that field middlewares apply only to an uninitialized schema. If the schema is initialized
+        /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized
         /// then adding additional middleware through the builder does nothing. The schema is initialized (if not yet)
         /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
         /// </summary>

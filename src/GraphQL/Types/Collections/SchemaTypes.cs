@@ -189,7 +189,7 @@ namespace GraphQL.Types
         /// Applies all delegates specified by the middleware builder to the schema.
         /// <br/><br/>
         /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
-        /// Therefore, as a rule, this method should be called only once during schema initialization.
+        /// Therefore, as a rule, this method should be called only once - during schema initialization.
         /// </summary>
         public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder)
         {
@@ -203,10 +203,10 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Applies the speicifed middleware transform delegate to the schema.
+        /// Applies the specified middleware transform delegate to the schema.
         /// <br/><br/>
         /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
-        /// Therefore, as a rule, this method should be called only once during schema initialization.
+        /// Therefore, as a rule, this method should be called only once - during schema initialization.
         /// </summary>
         public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
         {

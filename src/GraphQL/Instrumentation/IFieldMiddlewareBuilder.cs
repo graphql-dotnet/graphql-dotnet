@@ -19,7 +19,7 @@ namespace GraphQL.Instrumentation
 
         /// <summary>
         /// Returns a transform for field resolvers, or <see langword="null"/> if no middleware is defined.
-        /// The transform is a cumulation of all middleware configured within this builder.
+        /// The transform is a cumulation of all middlewares configured within this builder.
         /// </summary>
         Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build();
     }

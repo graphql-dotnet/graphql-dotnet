@@ -164,8 +164,8 @@ namespace GraphQL.Tests.Types
         [Fact]
         public void middleware_can_reference_SchemaTypes()
         {
-            var schema = new Schema() { Query = new SomeQuery() };
-            schema.FieldMiddleware.Use((next) =>
+            var schema = new Schema { Query = new SomeQuery() };
+            schema.FieldMiddleware.Use(next =>
             {
                 schema.AllTypes.Count.ShouldNotBe(0);
                 return async context =>
