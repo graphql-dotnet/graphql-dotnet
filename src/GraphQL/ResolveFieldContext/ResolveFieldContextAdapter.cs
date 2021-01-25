@@ -74,7 +74,7 @@ namespace GraphQL
 
         public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-        public IDictionary<string, Language.AST.Field> SubFields => _baseContext.SubFields;
+        public Fields SubFields => _baseContext.SubFields;
 
         public IDictionary<string, object> UserContext => _baseContext.UserContext;
 

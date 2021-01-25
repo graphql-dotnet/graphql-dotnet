@@ -193,7 +193,7 @@ namespace GraphQL
         object RootValue { get; }
         GraphQL.Types.ISchema Schema { get; }
         object Source { get; }
-        System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        GraphQL.Language.AST.Fields SubFields { get; }
         GraphQL.Language.AST.Variables Variables { get; }
     }
     public interface IResolveFieldContext<out TSource> : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
@@ -269,11 +269,11 @@ namespace GraphQL
         public object RootValue { get; }
         public GraphQL.Types.ISchema Schema { get; }
         public object Source { get; }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; }
+        public GraphQL.Language.AST.Fields SubFields { get; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; }
         public GraphQL.Language.AST.Variables Variables { get; }
     }
-    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
+    public class ResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object>
     {
         public ResolveFieldContext() { }
         public ResolveFieldContext(GraphQL.IResolveFieldContext context) { }
@@ -297,7 +297,7 @@ namespace GraphQL
         public object RootValue { get; set; }
         public GraphQL.Types.ISchema Schema { get; set; }
         public object Source { get; set; }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Language.AST.Field> SubFields { get; set; }
+        public GraphQL.Language.AST.Fields SubFields { get; set; }
         public System.Collections.Generic.IDictionary<string, object> UserContext { get; set; }
         public GraphQL.Language.AST.Variables Variables { get; set; }
     }
@@ -702,7 +702,6 @@ namespace GraphQL.Execution
     public static class ExecutionHelper
     {
         public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQL.Language.AST.IValue input, GraphQL.Language.AST.Variables variables = null, object fieldDefault = null) { }
-        public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> CollectFields(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
         public static bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, string fragmentName, GraphQL.Types.IGraphType type) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue> GetArgumentValues(GraphQL.Types.QueryArguments definitionArguments, GraphQL.Language.AST.Arguments astArguments, GraphQL.Language.AST.Variables variables) { }
         public static GraphQL.Types.FieldType GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IObjectGraphType parentType, GraphQL.Language.AST.Field field) { }
@@ -716,7 +715,7 @@ namespace GraphQL.Execution
         public GraphQL.Language.AST.Field Field { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
         public GraphQL.Types.IGraphType GraphType { get; }
-        public int? IndexInParentNode { get; set; }
+        public int? IndexInParentNode { get; }
         public bool IsResultSet { get; }
         public string Name { get; }
         public GraphQL.Execution.ExecutionNode Parent { get; }
@@ -744,7 +743,7 @@ namespace GraphQL.Execution
         public static GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         public static void SetArrayItemNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
-        public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent, System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> fields) { }
+        public static void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent, GraphQL.Language.AST.Fields fields) { }
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
@@ -837,6 +836,7 @@ namespace GraphQL.Execution
     public class ParallelExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public ParallelExecutionStrategy() { }
+        public static GraphQL.Execution.ParallelExecutionStrategy Instance { get; }
         protected System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
@@ -847,6 +847,7 @@ namespace GraphQL.Execution
     public class SerialExecutionStrategy : GraphQL.Execution.ExecutionStrategy
     {
         public SerialExecutionStrategy() { }
+        public static GraphQL.Execution.SerialExecutionStrategy Instance { get; }
         protected override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode rootNode) { }
     }
     [System.Serializable]
@@ -944,6 +945,8 @@ namespace GraphQL.Instrumentation
     public class Metrics
     {
         public Metrics(bool enabled = true) { }
+        public bool Enabled { get; }
+        public static GraphQL.Instrumentation.Metrics None { get; }
         public GraphQL.Instrumentation.PerfRecord[] Finish() { }
         public GraphQL.Instrumentation.Metrics SetOperationName(string name) { }
         public GraphQL.Instrumentation.Metrics Start(string operationName) { }
@@ -1206,12 +1209,11 @@ namespace GraphQL.Language.AST
         public override string ToString() { }
         public override void Visit<TState>(System.Action<GraphQL.Language.AST.INode, TState> action, TState state) { }
     }
-    public class Fields : System.Collections.Generic.IEnumerable<GraphQL.Language.AST.Field>, System.Collections.IEnumerable
+    public class Fields : System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field>
     {
+        public Fields() { }
         public void Add(GraphQL.Language.AST.Field field) { }
-        public System.Collections.Generic.IEnumerator<GraphQL.Language.AST.Field> GetEnumerator() { }
-        public static GraphQL.Language.AST.Fields Empty() { }
-        public static System.Collections.Generic.Dictionary<string, GraphQL.Language.AST.Field> op_Implicit(GraphQL.Language.AST.Fields fields) { }
+        public GraphQL.Language.AST.Fields CollectFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQL.Language.AST.SelectionSet selectionSet) { }
     }
     public class FloatValue : GraphQL.Language.AST.ValueNode<double>
     {

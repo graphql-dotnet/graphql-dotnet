@@ -71,7 +71,7 @@ namespace GraphQL
             if (options.FieldMiddleware == null)
                 throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
-            var metrics = new Metrics(options.EnableMetrics).Start(options.OperationName);
+            var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
             ExecutionResult result = null;
             ExecutionContext context = null;
@@ -82,8 +82,14 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        options.FieldMiddleware.ApplyTo(options.Schema);
-                        options.Schema.Initialize();
+                        lock (options.Schema)
+                        {
+                            if (!options.Schema.Initialized)
+                            {
+                                options.FieldMiddleware.ApplyTo(options.Schema);
+                                options.Schema.Initialize();
+                            }
+                        }
                     }
                 }
 
@@ -367,9 +373,9 @@ namespace GraphQL
         /// </summary>
         protected virtual Operation GetOperation(string operationName, Document document)
         {
-            return !string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.WithName(operationName)
-                : document.Operations.FirstOrDefault();
+            return string.IsNullOrWhiteSpace(operationName)
+                ? document.Operations.FirstOrDefault()
+                : document.Operations.WithName(operationName);
         }
 
         /// <summary>
@@ -386,8 +392,8 @@ namespace GraphQL
             // TODO: Should we use cached instances of the default execution strategies?
             return context.Operation.OperationType switch
             {
-                OperationType.Query => new ParallelExecutionStrategy(),
-                OperationType.Mutation => new SerialExecutionStrategy(),
+                OperationType.Query => ParallelExecutionStrategy.Instance,
+                OperationType.Mutation => SerialExecutionStrategy.Instance,
                 OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
                 _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
             };
