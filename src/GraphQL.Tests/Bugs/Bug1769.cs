@@ -49,15 +49,6 @@ namespace GraphQL.Tests.Bugs
                     Schema = null,
                 });
             });
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await de.ExecuteAsync(new ExecutionOptions()
-                {
-                    Query = "{test}",
-                    Schema = Schema,
-                    FieldMiddleware = null,
-                });
-            });
         }
 
         [Fact]

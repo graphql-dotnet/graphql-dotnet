@@ -65,12 +65,6 @@ namespace Example
                 options.UserContext = _settings.BuildUserContext?.Invoke(context);
                 options.EnableMetrics = _settings.EnableMetrics;
                 options.RequestServices = context.RequestServices;
-                if (_settings.EnableMetrics)
-                {
-                    options.FieldMiddleware
-                        .Use<CountFieldMiddleware>()
-                        .Use<InstrumentFieldsMiddleware>();
-                }
             });
 
             if (_settings.EnableMetrics)
