@@ -99,6 +99,30 @@ Also, the middleware itself should be registered in DI:
 services.AddSingleton<InstrumentFieldsMiddleware>();
 ```
 
+Alternatively, you can use an enumerable in your constructor to add all DI-registered middleware:
+
+```csharp
+public MySchema : Schema
+{
+  public MySchema(
+    IServiceProvider services,
+    MyQuery query,
+    IEnumerable<IFieldMiddleware> middlewares)
+    : base(services)
+  {
+    Query = query;
+    foreach (var middleware in middlewares)
+      FieldMiddleware.Use(middleware);
+  }
+}
+
+// within Startup.cs
+services.AddSingleton<ISchema, MySchema>();
+services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
+services.AddSingleton<IFieldMiddleware, MyMiddleware>();
+...
+```
+
 ## Known issues
 
 Perhaps the most important thing with Field Middlewares that you should be aware of is that the

@@ -2093,7 +2093,7 @@ namespace GraphQL.Types
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }

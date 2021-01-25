@@ -63,17 +63,8 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public INameConverter NameConverter { get; set; } = CamelCaseNameConverter.Instance;
 
-        private IFieldMiddlewareBuilder _fieldMiddlewareBuilder = new FieldMiddlewareBuilder();
         /// <inheritdoc/>
-        public IFieldMiddlewareBuilder FieldMiddleware
-        {
-            get => _fieldMiddlewareBuilder;
-            set
-            {
-                CheckInitialized();
-                _fieldMiddlewareBuilder = value ?? throw new ArgumentNullException();
-            }
-        }
+        public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
 
         /// <inheritdoc/>
         public bool Initialized { get; private set; }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Example;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -55,9 +56,12 @@ namespace GraphQL.Harness
                 var schema = new StarWarsSchema(services);
                 if (settings.Value.EnableMetrics)
                 {
-                    schema.FieldMiddleware
-                        .Use(services.GetRequiredService<CountFieldMiddleware>())
-                        .Use(services.GetRequiredService<InstrumentFieldsMiddleware>());
+                    var middlewares = services.GetRequiredService<IEnumerable<IFieldMiddleware>>();
+                    foreach (var middleware in middlewares)
+                        schema.FieldMiddleware.Use(middleware);
+                    //schema.FieldMiddleware
+                    //    .Use(services.GetRequiredService<CountFieldMiddleware>())
+                    //    .Use(services.GetRequiredService<InstrumentFieldsMiddleware>());
                 }
                 return schema;
             });
@@ -71,8 +75,8 @@ namespace GraphQL.Harness
             services.Configure<GraphQLSettings>(settings => settings.BuildUserContext = ctx => new GraphQLUserContext { User = ctx.User });
 
             // add Field Middlewares
-            services.AddSingleton<CountFieldMiddleware>();
-            services.AddSingleton<InstrumentFieldsMiddleware>();
+            services.AddSingleton<IFieldMiddleware, CountFieldMiddleware>();
+            services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

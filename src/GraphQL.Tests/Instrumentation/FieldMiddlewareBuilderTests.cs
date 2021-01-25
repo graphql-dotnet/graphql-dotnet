@@ -198,11 +198,5 @@ namespace GraphQL.Tests.Instrumentation
             var transform = builder.Build();
             return transform != null ? transform(null) : null;
         }
-
-        public static FieldMiddlewareDelegate BuildResolve(this FieldMiddlewareBuilder builder, FieldMiddlewareDelegate start)
-        {
-            var transform = builder.Build();
-            return transform(start);
-        }
     }
 }
