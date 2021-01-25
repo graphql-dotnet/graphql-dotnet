@@ -28,6 +28,7 @@ namespace GraphQL.Benchmarks
         private BenchmarkInfo _bIntrospection;
         private BenchmarkInfo _bHero;
         private BenchmarkInfo _bVariable;
+        private BenchmarkInfo _bLiteral;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -71,6 +72,7 @@ namespace GraphQL.Benchmarks
             };
 
             _bVariable = new BenchmarkInfo(Queries.VariablesVariable, Benchmarks.Variables.VariablesVariable.ToInputs(), variableSchemaBuilder);
+            _bLiteral = new BenchmarkInfo(Queries.VariablesLiteral, null, variableSchemaBuilder);
         }
 
         [Benchmark]
@@ -89,6 +91,12 @@ namespace GraphQL.Benchmarks
         public void Variables()
         {
             Run(_bVariable);
+        }
+
+        [Benchmark]
+        public void Literal()
+        {
+            Run(_bLiteral);
         }
 
         private void Run(BenchmarkInfo benchmarkInfo)
