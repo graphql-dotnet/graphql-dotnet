@@ -57,7 +57,7 @@ namespace GraphQL.Benchmarks
         [Benchmark]
         public Dictionary<string, object> SystemTextJson() => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(Json, _jsonOptions);
 
-        void IBenchmark.Run()
+        void IBenchmark.RunProfiler()
         {
             Code = "Introspection";
             _ = SystemTextJson();

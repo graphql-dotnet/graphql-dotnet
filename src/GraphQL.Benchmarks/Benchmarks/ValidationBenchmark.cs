@@ -65,6 +65,6 @@ namespace GraphQL.Benchmarks
 
         private IValidationResult Validate(Document document) => _validator.ValidateAsync(null, _schema, document).GetAwaiter().GetResult();
 
-        void IBenchmark.Run() => Introspection();
+        void IBenchmark.RunProfiler() => Introspection();
     }
 }

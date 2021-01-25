@@ -4,6 +4,6 @@ namespace GraphQL.Benchmarks
     {
         void GlobalSetup();
 
-        void Run();
+        void RunProfiler();
     }
 }
