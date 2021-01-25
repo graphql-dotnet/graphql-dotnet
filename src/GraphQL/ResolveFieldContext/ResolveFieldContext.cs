@@ -12,7 +12,7 @@ namespace GraphQL
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext
+    public class ResolveFieldContext : IResolveFieldContext<object>
     {
         /// <inheritdoc/>
         public string FieldName { get; set; }
