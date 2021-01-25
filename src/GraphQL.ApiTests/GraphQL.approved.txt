@@ -88,7 +88,6 @@ namespace GraphQL
         public GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; set; }
         public GraphQL.Language.AST.Document Document { get; set; }
         public bool EnableMetrics { get; set; }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; set; }
         public GraphQL.Inputs Inputs { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
         public int? MaxParallelExecutionCount { get; set; }
@@ -915,16 +914,12 @@ namespace GraphQL.Instrumentation
     public class FieldMiddlewareBuilder : GraphQL.Instrumentation.IFieldMiddlewareBuilder
     {
         public FieldMiddlewareBuilder() { }
-        public void ApplyTo(GraphQL.Types.ISchema schema) { }
-        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build() { }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
     }
     public static class FieldMiddlewareBuilderExtensions
     {
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, System.Type middleware) { }
-        public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use<T>(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder)
-            where T : GraphQL.Instrumentation.IFieldMiddleware { }
     }
     public delegate System.Threading.Tasks.Task<object> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
     public interface IFieldMiddleware
@@ -933,8 +928,8 @@ namespace GraphQL.Instrumentation
     }
     public interface IFieldMiddlewareBuilder
     {
-        void ApplyTo(GraphQL.Types.ISchema schema);
-        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Types.ISchema, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
+        System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> Build();
+        GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware);
     }
     public class InstrumentFieldsMiddleware : GraphQL.Instrumentation.IFieldMiddleware
     {
@@ -1927,6 +1922,7 @@ namespace GraphQL.Types
         GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         string Description { get; set; }
         GraphQL.Types.SchemaDirectives Directives { get; }
+        GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         GraphQL.Introspection.ISchemaFilter Filter { get; }
         bool Initialized { get; }
         GraphQL.Types.IObjectGraphType Mutation { get; set; }
@@ -2099,6 +2095,7 @@ namespace GraphQL.Types
         public GraphQL.Introspection.ISchemaComparer Comparer { get; set; }
         public string Description { get; set; }
         public GraphQL.Types.SchemaDirectives Directives { get; }
+        public GraphQL.Instrumentation.IFieldMiddlewareBuilder FieldMiddleware { get; }
         public GraphQL.Introspection.ISchemaFilter Filter { get; set; }
         public bool Initialized { get; }
         public GraphQL.Types.IObjectGraphType Mutation { get; set; }
@@ -2136,6 +2133,8 @@ namespace GraphQL.Types
     public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         public int Count { get; }
+        public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
+        public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         public static GraphQL.Types.SchemaTypes Create(System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> types, System.Collections.Generic.IEnumerable<GraphQL.Types.DirectiveGraphType> directives, System.Func<System.Type, GraphQL.Types.IGraphType> resolveType, GraphQL.Conversion.INameConverter nameConverter) { }
     }

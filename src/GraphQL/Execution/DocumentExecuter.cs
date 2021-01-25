@@ -68,8 +68,6 @@ namespace GraphQL
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
             if (options.Query == null)
                 throw new InvalidOperationException("Cannot execute request if no query is specified");
-            if (options.FieldMiddleware == null)
-                throw new InvalidOperationException("Cannot execute request if no middleware builder specified");
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
@@ -82,14 +80,7 @@ namespace GraphQL
                 {
                     using (metrics.Subject("schema", "Initializing schema"))
                     {
-                        lock (options.Schema)
-                        {
-                            if (!options.Schema.Initialized)
-                            {
-                                options.FieldMiddleware.ApplyTo(options.Schema);
-                                options.Schema.Initialize();
-                            }
-                        }
+                        options.Schema.Initialize();
                     }
                 }
 
