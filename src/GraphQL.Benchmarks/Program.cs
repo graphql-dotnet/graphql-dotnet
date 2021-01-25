@@ -102,7 +102,10 @@ Available benchmarks:
                 Thread.Sleep(10);
 
                 if (++index % count == 0)
+                {
+                    Console.WriteLine($"{count} iterations completed, press enter");
                     Console.ReadLine();
+                }
             }
         }
     }

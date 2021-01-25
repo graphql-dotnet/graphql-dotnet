@@ -6,7 +6,6 @@ using GraphQL.DataLoader;
 using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using static GraphQL.Execution.ExecutionHelper;
 
 namespace GraphQL.Execution
 {
@@ -23,7 +22,7 @@ namespace GraphQL.Execution
         /// </summary>
         public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionContext context)
         {
-            var rootType = GetOperationRootType(context.Document, context.Schema, context.Operation);
+            var rootType = ExecutionHelper.GetOperationRootType(context.Document, context.Schema, context.Operation);
             var rootNode = BuildExecutionRootNode(context, rootType);
 
             await ExecuteNodeTreeAsync(context, rootNode)
@@ -58,13 +57,12 @@ namespace GraphQL.Execution
                 Result = context.RootValue
             };
 
-            var fields = CollectFields(
-                context,
-                rootType,
-                context.Operation.SelectionSet);
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
 
+            SetSubFieldNodes(context, root, fields.CollectFrom(context, rootType, context.Operation.SelectionSet));
 
-            SetSubFieldNodes(context, root, fields);
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
 
             return root;
         }
@@ -75,14 +73,18 @@ namespace GraphQL.Execution
         /// </summary>
         public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var fields = CollectFields(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet);
-            SetSubFieldNodes(context, parent, fields);
+            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null) ?? new Fields();
+
+            SetSubFieldNodes(context, parent, fields.CollectFrom(context, parent.GetObjectGraphType(context.Schema), parent.Field?.SelectionSet));
+
+            fields.Clear();
+            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
         /// Creates specified child execution nodes of an object execution node.
         /// </summary>
-        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Dictionary<string, Field> fields)
+        public static void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent, Fields fields)
         {
             var parentType = parent.GetObjectGraphType(context.Schema);
 
@@ -93,10 +95,7 @@ namespace GraphQL.Execution
                 var name = kvp.Key;
                 var field = kvp.Value;
 
-                if (!ShouldIncludeNode(context, field.Directives))
-                    continue;
-
-                var fieldDefinition = GetFieldDefinition(context.Schema, parentType, field);
+                var fieldDefinition = ExecutionHelper.GetFieldDefinition(context.Schema, parentType, field);
 
                 if (fieldDefinition == null)
                     continue;
@@ -238,6 +237,7 @@ namespace GraphQL.Execution
                 {
                     CompleteNode(context, node);
                     // for non-dataloader nodes that completed without throwing an error, we can re-use the context
+                    resolveContext.Reset(null, null);
                     System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                 }
             }
