@@ -93,27 +93,27 @@ namespace GraphQL.Benchmarks
 
         private void Run(BenchmarkInfo benchmarkInfo)
         {
-            switch (CurrentStage)
+            switch (Stage)
             {
-                case Stage.Build:
+                case StageEnum.Build:
                     benchmarkInfo.BuildSchema();
                     break;
-                case Stage.Parse:
+                case StageEnum.Parse:
                     benchmarkInfo.Parse();
                     break;
-                case Stage.Convert:
+                case StageEnum.Convert:
                     benchmarkInfo.Convert();
                     break;
-                case Stage.Validate:
+                case StageEnum.Validate:
                     benchmarkInfo.Validate();
                     break;
-                case Stage.ParseVariables:
+                case StageEnum.ParseVariables:
                     benchmarkInfo.ParseVariables();
                     break;
-                case Stage.Execute:
+                case StageEnum.Execute:
                     benchmarkInfo.Execute();
                     break;
-                case Stage.Serialize:
+                case StageEnum.Serialize:
                     benchmarkInfo.Serialize();
                     break;
                 default:
@@ -121,12 +121,12 @@ namespace GraphQL.Benchmarks
             }
         }
 
-        [Params(Stage.Build, Stage.Parse, Stage.Convert, Stage.Validate, Stage.ParseVariables, Stage.Execute, Stage.Serialize)]
-        public Stage CurrentStage { get; set; }
+        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
+        public StageEnum Stage { get; set; }
 
         void IBenchmark.RunProfiler() => throw new NotSupportedException();
 
-        public enum Stage
+        public enum StageEnum
         {
             Build,
             Parse,
