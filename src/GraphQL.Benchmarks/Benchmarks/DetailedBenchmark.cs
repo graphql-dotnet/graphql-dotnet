@@ -89,7 +89,7 @@ namespace GraphQL.Benchmarks
                 return schema;
             };
 
-            _bVariable = new BenchmarkInfo(Queries.VariablesVariable, Benchmarks.Variables.VariablesVariable.ToInputs(), variableSchemaBuilder);
+            _bVariable = new BenchmarkInfo(Queries.VariablesVariable, Benchmarks.Variables.VariablesVariable, variableSchemaBuilder);
             _bLiteral = new BenchmarkInfo(Queries.VariablesLiteral, null, variableSchemaBuilder);
         }
 
@@ -133,6 +133,9 @@ namespace GraphQL.Benchmarks
                 case StageEnum.Validate:
                     benchmarkInfo.Validate();
                     break;
+                case StageEnum.DeserializeVars:
+                    benchmarkInfo.DeserializeInputs();
+                    break;
                 case StageEnum.ParseVariables:
                     benchmarkInfo.ParseVariables();
                     break;
@@ -147,7 +150,7 @@ namespace GraphQL.Benchmarks
             }
         }
 
-        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
+        [Params(StageEnum.Build, StageEnum.Parse, StageEnum.Convert, StageEnum.Validate, StageEnum.DeserializeVars, StageEnum.ParseVariables, StageEnum.Execute, StageEnum.Serialize)]
         public StageEnum Stage { get; set; }
 
         void IBenchmark.RunProfiler() => throw new NotSupportedException();
@@ -158,6 +161,7 @@ namespace GraphQL.Benchmarks
             Parse,
             Convert,
             Validate,
+            DeserializeVars,
             ParseVariables,
             Execute,
             Serialize,
@@ -168,6 +172,7 @@ namespace GraphQL.Benchmarks
             public ISchema Schema;
             public Func<ISchema> SchemaBuilder;
             public string Query;
+            public string InputsString;
             public GraphQLDocument GraphQLDocument;
             public Document Document;
             public Operation Operation;
@@ -175,7 +180,7 @@ namespace GraphQL.Benchmarks
             public Language.AST.Variables Variables;
             public ExecutionResult ExecutionResult;
 
-            public BenchmarkInfo(string query, Inputs inputs, Func<ISchema> schemaBuilder)
+            public BenchmarkInfo(string query, string inputs, Func<ISchema> schemaBuilder)
             {
                 // this exercises all the code in case of any errors, in addition to prep for each stage of testing
                 SchemaBuilder = schemaBuilder;
@@ -184,7 +189,8 @@ namespace GraphQL.Benchmarks
                 GraphQLDocument = Parse();
                 Document = Convert();
                 Operation = Document.Operations.FirstOrDefault();
-                Inputs = inputs;
+                InputsString = inputs;
+                Inputs = DeserializeInputs();
                 Variables = ParseVariables();
                 ExecutionResult = Execute();
                 _ = Serialize();
@@ -203,6 +209,11 @@ namespace GraphQL.Benchmarks
             public Document Convert()
             {
                 return CoreToVanillaConverter.Convert(GraphQLDocument);
+            }
+
+            public Inputs DeserializeInputs()
+            {
+                return InputsString?.ToInputs();
             }
 
             public Language.AST.Variables ParseVariables()
