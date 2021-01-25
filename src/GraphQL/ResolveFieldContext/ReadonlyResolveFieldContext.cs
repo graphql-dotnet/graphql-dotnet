@@ -16,7 +16,7 @@ namespace GraphQL
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
         private IDictionary<string, ArgumentValue> _arguments;
-        private IDictionary<string, Field> _subFields;
+        private Fields _subFields;
 
         /// <summary>
         /// Initializes an instance with the specified <see cref="ExecutionNode"/> and <see cref="ExecutionContext"/>.
@@ -29,17 +29,17 @@ namespace GraphQL
 
         internal ReadonlyResolveFieldContext Reset(ExecutionNode node, ExecutionContext context)
         {
-            _executionNode = node ?? throw new ArgumentNullException(nameof(node));
-            _executionContext = context ?? throw new ArgumentNullException(nameof(context));
+            _executionNode = node;
+            _executionContext = context;
             _arguments = null;
             _subFields = null;
             return this;
         }
 
-        private IDictionary<string, Field> GetSubFields()
+        private Fields GetSubFields()
         {
             return _executionNode.Field?.SelectionSet?.Selections?.Count > 0
-                ? ExecutionHelper.CollectFields(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
+                ? new Fields().CollectFrom(_executionContext, _executionNode.FieldDefinition.ResolvedType, _executionNode.Field.SelectionSet)
                 : null;
         }
 
@@ -101,7 +101,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public IDictionary<string, Field> SubFields => _subFields ??= GetSubFields();
+        public Fields SubFields => _subFields ??= GetSubFields();
 
         /// <inheritdoc/>
         public IDictionary<string, object> UserContext => _executionContext.UserContext;
