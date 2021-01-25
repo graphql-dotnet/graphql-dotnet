@@ -31,12 +31,7 @@ namespace GraphQL.Utilities.Federation
         {
         }
 
-        public string PrintFederatedDirectives(IGraphType type)
-        {
-            if (type.IsInputObjectType())
-                return "";
-            return PrintFederatedDirectivesFromAst(type);
-        }
+        public string PrintFederatedDirectives(IGraphType type) => type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
