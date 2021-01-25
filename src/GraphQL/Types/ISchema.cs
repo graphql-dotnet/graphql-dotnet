@@ -38,6 +38,7 @@ namespace GraphQL.Types
         /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized
         /// then adding additional middleware through the builder does nothing. The schema is initialized (if not yet)
         /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
+        /// However, you can also apply middlewares at any time in runtime using SchemaTypes.ApplyMiddleware method.
         /// </summary>
         IFieldMiddlewareBuilder FieldMiddleware { get; }
 
