@@ -12,7 +12,7 @@
 ## Breaking Changes
 
 * `NameConverter`, `SchemaFilter` and `FieldMiddleware` have been removed from `ExecutionOptions` and are now properties on the `Schema`.
-  These properties can be set in the constructor of the `Schema` instance, or within your DI registration delegate, or at any time before
+  These properties can be set in the constructor of the `Schema` instance, or within your DI composition root, or at any time before
   any query is executed. Once a query has been executed, changes to these fields is not allowed, and adding middleware via the field middleware
   builder has no effect.
 * The signature of `IFieldMiddlewareBuilder.Use` has been changed to remove the schema from delegate. Since the schema is now known, there is no
