@@ -66,6 +66,6 @@ namespace GraphQL.Benchmarks
             }).GetAwaiter().GetResult();
         }
 
-        void IBenchmark.Run() => Introspection();
+        void IBenchmark.RunProfiler() => Introspection();
     }
 }
