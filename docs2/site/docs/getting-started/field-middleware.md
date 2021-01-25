@@ -99,7 +99,7 @@ Also, the middleware itself should be registered in DI:
 services.AddSingleton<InstrumentFieldsMiddleware>();
 ```
 
-Alternatively, you can use an enumerable in your constructor to add all DI-registered middleware:
+Alternatively, you can use an enumerable in your constructor to add all DI-registered middlewares:
 
 ```csharp
 public MySchema : Schema
