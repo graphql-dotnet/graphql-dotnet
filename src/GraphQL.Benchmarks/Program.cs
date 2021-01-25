@@ -11,8 +11,6 @@ namespace GraphQL.Benchmarks
     {
         private static readonly Type _defaultBenchmark = typeof(ExecutionBenchmark);
 
-        // Call without args for BenchmarkDotNet
-        // Call with some arbitrary args for any profiler
         private static void Main(string[] args)
         {
             args = args.Select(x => x.ToLower()).ToArray();
